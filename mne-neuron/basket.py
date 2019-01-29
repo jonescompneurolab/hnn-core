@@ -1,16 +1,44 @@
-# L2_basket.py - establish class def for layer 2 basket cells
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: removed dependence on it.izip)
-# last rev: (SL: toward python3)
+"""Model for inhibitory cell class."""
 
 from neuron import h as nrn
-from cell import BasketSingle
+from .cell import Cell
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
 
-# Layer 2 basket cell class
+
+class BasketSingle (Cell):
+    """Inhibitory cell class."""
+
+    def __init__(self, gid, pos, cell_name='Basket'):
+        self.props = self.__set_props(cell_name, pos)
+        Cell.__init__(self, gid, self.props)
+        # store cell name for later
+        self.name = cell_name
+        # set 3D shape - unused for now but a prototype
+        self.__shape_change()
+
+    def __set_props(self, cell_name, pos):
+        return {
+            'pos': pos,
+            'L': 39.,
+            'diam': 20.,
+            'cm': 0.85,
+            'Ra': 200.,
+            'name': cell_name,
+        }
+
+    # Define 3D shape and position of cell. By default neuron uses xy plane for
+    # height and xz plane for depth. This is opposite for model as a whole, but
+    # convention is followed in this function ease use of gui.
+    def __shape_change(self):
+        self.shape_soma()
+        """
+        s = self.soma
+        for i in range(int(s.n3d())):
+            h.pt3dchange(i, self.pos[0]*100 + s.x3d(i), -self.pos[2] + s.y3d(i),
+                                     self.pos[1] * 100 + s.z3d(i), s.diam3d(i), sec=s)
+        """
 
 
 class L2Basket(BasketSingle):
@@ -232,21 +260,6 @@ class L2Basket(BasketSingle):
 
         else:
             print("Warning, type def not specified in L2Basket")
-
-
-# L5_basket.py - establish class def for layer 5 basket cells
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: removed izip dep)
-# last rev: (SL: toward python3)
-
-from neuron import h as nrn
-from cell import BasketSingle
-
-# Units for e: mV
-# Units for gbar: S/cm^2 unless otherwise noted
-
-# Layer 5 basket cell class
 
 
 class L5Basket(BasketSingle):
