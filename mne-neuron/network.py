@@ -231,16 +231,6 @@ class NetworkOnNode ():
             if gid in gids:
                 return gidtype
 
-    """
-        def checkInputOn (self, type):
-            if type.startswith('ev'):
-                if self.p['useEvokedInputs']:
-                    return True
-                else:
-                    return False
-            return True
-        """
-
     # reset src (source/external) event times
     # evinputinc is an offset for evoked inputs (added to mean start time - e.g. per trial increment)
     def reset_src_event_times(self, seed=None, debug=False, inc_evinput=0.0):
@@ -268,7 +258,6 @@ class NetworkOnNode ():
     # these are spike SOURCES but cells are also targets
     # external inputs are not targets
     def __create_all_src(self):
-        #print('in __create_all_src')
         # loop through gids on this node
         for gid in self.__gid_list:
             # check existence of gid with Neuron
