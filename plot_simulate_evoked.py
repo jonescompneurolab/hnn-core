@@ -12,7 +12,7 @@ import time
 import shutil
 import numpy as np
 from neuron import h
-h.load_file("stdrun.hoc")
+
 # Cells are defined in other files
 import network
 import fileio as fio
@@ -23,12 +23,12 @@ import specfn as specfn
 import pickle
 from dipolefn import Dipole
 from conf import readconf
-from L5_pyramidal import L5Pyr
-from L2_pyramidal import L2Pyr
-from L2_basket import L2Basket
-from L5_basket import L5Basket
 from lfp import LFPElectrode
-from morphology import shapeplot, getshapecoords
+
+from .pyramidal import L5Pyr, L2Pyr
+from .basket import L2Basket, L5Basket
+
+h.load_file("stdrun.hoc")
 
 dconf = readconf()
 
