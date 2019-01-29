@@ -14,10 +14,9 @@ h("dp_total_L5 = 0.")  # put here since these variables used in cells
 # Units for e: mV
 # Units for gbar: S/cm^2
 
-# Create a cell class
 
-
-class Cell ():
+class Cell():
+    """Create a cell class."""
 
     def __init__(self, gid, soma_props):
         self.gid = gid
@@ -52,7 +51,8 @@ class Cell ():
         self.vsoma = h.Vector()
         self.vsoma.record(self.soma(0.5)._ref_v)
 
-    def get_sections(self): return [self.soma]
+    def get_sections(self):
+        return [self.soma]
 
     def get3dinfo(self):
         ls = self.get_sections()
