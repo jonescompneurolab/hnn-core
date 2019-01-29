@@ -422,24 +422,6 @@ class L2Pyr(Pyr):
         self.apicaltuft_nmda = self.syn_create(
             self.dends['apical_tuft'](0.5), p_syn['nmda'])
 
-        # self.synapses = {
-        #     'soma_gabaa': self.syn_gabaa_create(self.soma(0.5)),
-        #     'soma_gabab': self.syn_gabab_create(self.soma(0.5)),
-        # }
-
-        # Dendritic synapses
-        # self.apicaloblique_ampa = self.syn_ampa_create(self.dends['apical_oblique'](0.5), p_syn['ampa'])
-        # self.apicaloblique_nmda = self.syn_create(self.dends['apical_oblique'](0.5), p_syn['nmda'])
-
-        # self.basal2_ampa = self.syn_ampa_create(self.dends['basal_2'](0.5))
-        # self.basal2_nmda = self.syn_nmda_create(self.dends['basal_2'](0.5))
-
-        # self.basal3_ampa = self.syn_ampa_create(self.dends['basal_3'](0.5))
-        # self.basal3_nmda = self.syn_nmda_create(self.dends['basal_3'](0.5))
-
-        # self.apicaltuft_ampa = self.syn_ampa_create(self.dends['apical_tuft'](0.5))
-        # self.apicaltuft_nmda = self.syn_nmda_create(self.dends['apical_tuft'](0.5))
-
     # collect receptor-type-based connections here
     def parconnect(self, gid, gid_dict, pos_dict, p):
         # init dict of dicts
@@ -513,18 +495,6 @@ class L2Pyr(Pyr):
                 gid_src, nc_dict['gabaa'], self.synapses['soma_gabaa']))
             self.ncfrom_L2Basket.append(self.parconnect_from_src(
                 gid_src, nc_dict['gabab'], self.synapses['soma_gabab']))
-
-        # connections FROM L5 basket cells TO this L2Pyr cell
-        # for gid_src in gid_dict['L5_basket']:
-        #     nc_dict = {
-        #         'pos_src': pos_list[gid_src],
-        #         'A_weight': 2.5e-2,
-        #         'A_delay': 1.,
-        #         'lamtha': 70.
-        #     }
-
-        #     self.ncfrom_L5Basket.append(self.parconnect_from_src(gid_src, nc_dict, self.synapes['soma_gabaa']))
-        #     self.ncfrom_L5Basket.append(self.parconnect_from_src(gid_src, nc_dict, self.synapes['soma_gabab']))
 
     # may be reorganizable
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
