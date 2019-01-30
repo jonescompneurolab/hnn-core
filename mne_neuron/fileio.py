@@ -4,8 +4,13 @@
 # rev 2016-05-01 (SL: return_data_dir() instead of hardcoded everywhere, etc.)
 # last rev: (SL: toward python3)
 
-import datetime, fnmatch, os, shutil, sys
-import subprocess, multiprocessing
+import datetime
+import fnmatch
+import os
+import shutil
+import sys
+import subprocess
+import multiprocessing
 import numpy as np
 import paramrw
 

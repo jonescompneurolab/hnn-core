@@ -82,8 +82,8 @@ class ParFeedAll ():
     def __create_extpois(self):
         # print("__create_extpois")
         if self.p_ext[self.celltype][0] <= 0.0 and \
-           self.p_ext[self.celltype][1] <= 0.0:
-               return False  # 0 ampa and 0 nmda weight
+                self.p_ext[self.celltype][1] <= 0.0:
+            return False  # 0 ampa and 0 nmda weight
         # check the t interval
         t0 = self.p_ext['t_interval'][0]
         T = self.p_ext['t_interval'][1]
