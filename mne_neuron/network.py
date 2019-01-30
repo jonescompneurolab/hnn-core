@@ -8,10 +8,11 @@ import itertools as it
 import numpy as np
 
 from neuron import h
-from feed import ParFeedAll
+
+from .feed import ParFeedAll
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
-import .paramrw as paramrw
+from .paramrw import create_pext
 
 
 class NetworkOnNode ():
@@ -27,13 +28,13 @@ class NetworkOnNode ():
         self.N_t = np.arange(0., h.tstop, self.p['dt']).size + 1
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
-                'L5Pyr_soma': h.Vector(self.N_t, 0),
-                'L2Pyr_soma': h.Vector(self.N_t, 0),
+            'L5Pyr_soma': h.Vector(self.N_t, 0),
+            'L2Pyr_soma': h.Vector(self.N_t, 0),
         }
         # int variables for grid of pyramidal cells (for now in both L2 and L5)
         self.gridpyr = {
-                'x': self.p['N_pyr_x'],
-                'y': self.p['N_pyr_y'],
+            'x': self.p['N_pyr_x'],
+            'y': self.p['N_pyr_y'],
         }
         # Parallel stuff
         self.pc = h.ParallelContext()
@@ -51,14 +52,16 @@ class NetworkOnNode ():
         # this should not change interlaminar weight/delay calculations
         self.zdiff = 1307.4
         # params of external inputs in p_ext
-        # Global number of external inputs ... automatic counting makes more sense
+        # Global number of external inputs ... automatic counting
+        # makes more sense
         # p_unique represent ext inputs that are going to go to each cell
-        self.p_ext, self.p_unique = paramrw.create_pext(self.p, h.tstop)
+        self.p_ext, self.p_unique = create_pext(self.p, h.tstop)
         self.N_extinput = len(self.p_ext)
         # Source list of names
         # in particular order (cells, extinput, alpha names of unique inputs)
         self.src_list_new = self.__create_src_list()
-        # cell position lists, also will give counts: must be known by ALL nodes
+        # cell position lists, also will give counts: must be known
+        # by ALL nodes
         # extinput positions are all located at origin.
         # sort of a hack bc of redundancy
         self.pos_dict = dict.fromkeys(self.src_list_new)
@@ -208,8 +211,8 @@ class NetworkOnNode ():
             self.pc.set_gid2node(gid, self.rank)
             self.__gid_list.append(gid)
             # now to do the cell-specific external input gids on the same proc
-            # these are guaranteed to exist because all of these inputs were created
-            # for each cell
+            # these are guaranteed to exist because all of
+            # these inputs were created for each cell
             for key in self.p_unique.keys():
                 gid_input = gid + self.gid_dict[key][0]
                 self.pc.set_gid2node(gid_input, self.rank)
@@ -232,7 +235,8 @@ class NetworkOnNode ():
                 return gidtype
 
     # reset src (source/external) event times
-    # evinputinc is an offset for evoked inputs (added to mean start time - e.g. per trial increment)
+    # evinputinc is an offset for evoked inputs
+    # (added to mean start time - e.g. per trial increment)
     def reset_src_event_times(self, seed=None, debug=False, inc_evinput=0.0):
         if debug:
             print('in reset_src_input_times')
@@ -273,7 +277,8 @@ class NetworkOnNode ():
                 if type == 'L2_pyramidal':
                     self.cells.append(L2Pyr(gid, pos, self.p))
                     self.pc.cell(
-                            gid, self.cells[-1].connect_to_target(None, self.p['threshold']))
+                        gid, self.cells[-1].connect_to_target(
+                            None, self.p['threshold']))
                     # run the IClamp function here
                     # create_all_IClamp() is defined in L2Pyr (etc)
                     self.cells[-1].create_all_IClamp(self.p)
@@ -282,7 +287,8 @@ class NetworkOnNode ():
                 elif type == 'L5_pyramidal':
                     self.cells.append(L5Pyr(gid, pos, self.p))
                     self.pc.cell(
-                            gid, self.cells[-1].connect_to_target(None, self.p['threshold']))
+                        gid, self.cells[-1].connect_to_target(
+                            None, self.p['threshold']))
                     # run the IClamp function here
                     self.cells[-1].create_all_IClamp(self.p)
                     if self.p['save_vsoma']:
@@ -290,7 +296,8 @@ class NetworkOnNode ():
                 elif type == 'L2_basket':
                     self.cells.append(L2Basket(gid, pos))
                     self.pc.cell(
-                            gid, self.cells[-1].connect_to_target(None, self.p['threshold']))
+                        gid, self.cells[-1].connect_to_target(
+                            None, self.p['threshold']))
                     # also run the IClamp for L2_basket
                     self.cells[-1].create_all_IClamp(self.p)
                     if self.p['save_vsoma']:
@@ -298,7 +305,8 @@ class NetworkOnNode ():
                 elif type == 'L5_basket':
                     self.cells.append(L5Basket(gid, pos))
                     self.pc.cell(
-                            gid, self.cells[-1].connect_to_target(None, self.p['threshold']))
+                        gid, self.cells[-1].connect_to_target(
+                            None, self.p['threshold']))
                     # run the IClamp function here
                     self.cells[-1].create_all_IClamp(self.p)
                     if self.p['save_vsoma']:
@@ -311,17 +319,19 @@ class NetworkOnNode ():
                     # now use the param index in the params and create
                     # the cell and artificial NetCon
                     self.extinput_list.append(ParFeedAll(
-                            type, None, self.p_ext[p_ind], gid))
+                        type, None, self.p_ext[p_ind], gid))
                     self.pc.cell(
-                            gid, self.extinput_list[-1].connect_to_target(self.p['threshold']))
+                        gid, self.extinput_list[-1].connect_to_target(
+                            self.p['threshold']))
                 elif type in self.p_unique.keys():
                     gid_post = gid - self.gid_dict[type][0]
                     cell_type = self.gid_to_type(gid_post)
                     # create dictionary entry, append to list
                     self.ext_list[type].append(ParFeedAll(
-                            type, cell_type, self.p_unique[type], gid))
+                        type, cell_type, self.p_unique[type], gid))
                     self.pc.cell(
-                            gid, self.ext_list[type][-1].connect_to_target(self.p['threshold']))
+                        gid, self.ext_list[type][-1].connect_to_target(
+                            self.p['threshold']))
                 else:
                     print("None of these types in Net()")
                     exit()
@@ -349,7 +359,8 @@ class NetworkOnNode ():
                 cell.parconnect(gid, self.gid_dict, self.pos_dict, self.p)
                 cell.parreceive(gid, self.gid_dict, self.pos_dict, self.p_ext)
                 # now do the unique inputs specific to these cells
-                # parreceive_ext receives connections from UNIQUE external inputs
+                # parreceive_ext receives connections from UNIQUE
+                # external inputs
                 for type in self.p_unique.keys():
                     p_type = self.p_unique[type]
                     # print('parnet_connect p_type:',p_type)

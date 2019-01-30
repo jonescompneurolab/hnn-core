@@ -13,7 +13,6 @@ class ParFeedAll ():
     # usually, p_ext is a dict of cell types
 
     def __init__(self, ty, celltype, p_ext, gid):
-        #print("ParFeedAll __init__")
         # VecStim setup
         self.eventvec = h.Vector()
         self.vs = h.VecStim()
@@ -162,7 +161,8 @@ class ParFeedAll ():
         self.eventvec.from_python(val_gauss)
         return self.eventvec.size() > 0
 
-    def __create_extinput(self):  # creates the ongoing external inputs (rhythmic)
+    def __create_extinput(self):
+        """Creates the ongoing external inputs (rhythmic)."""
         # print("__create_extinput")
         # store f_input as self variable for later use if it exists in p
         # t0 is always defined
@@ -174,7 +174,6 @@ class ParFeedAll ():
         elif self.p_ext['t0_stdev'] > 0.0:  # randomize start time based on t0_stdev
             # start time uses different prng
             t0 = self.prng2.normal(t0, self.p_ext['t0_stdev'])
-            #print(self.ty,'t0 is', t0, 'seed:',self.seed,'seed2:',self.seed2)
         f_input = self.p_ext['f_input']
         stdev = self.p_ext['stdev']
         events_per_cycle = self.p_ext['events_per_cycle']
@@ -227,7 +226,8 @@ class ParFeedAll ():
             t_input = t_input[t_input > 0]
             t_input.sort()
         else:
-            print("Indicated distribution not recognized. Not making any alpha feeds.")
+            print("Indicated distribution not recognized. "
+                  "Not making any alpha feeds.")
             t_input = []
         # Convert array into nrn vector
         self.eventvec.from_python(t_input)

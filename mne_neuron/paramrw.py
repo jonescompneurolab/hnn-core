@@ -8,7 +8,6 @@ import re
 import fileio as fio
 import numpy as np
 import itertools as it
-# from cartesian import cartesian
 from params_default import get_params_default
 
 # get dict of ':' separated params from fn; ignore lines starting with #
