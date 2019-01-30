@@ -212,7 +212,8 @@ class Cell():
         return syn
 
     # For all synapses, section location 'secloc' is being explicitly supplied
-    # for clarity, even though they are (right now) always 0.5. Might change in future
+    # for clarity, even though they are (right now) always 0.5.
+    # Might change in future
     # creates a RECEIVING inhibitory synapse at secloc
     def syn_gabaa_create(self, secloc):
         syn_gabaa = h.Exp2Syn(secloc)
@@ -255,8 +256,9 @@ class Cell():
         nc.threshold = threshold
         return nc
 
-    # parallel receptor-centric connect FROM presyn TO this cell, based on GID
     def parconnect_from_src(self, gid_presyn, nc_dict, postsyn):
+        """Parallel receptor-centric connect FROM presyn TO this cell,
+           based on GID."""
         # nc_dict keys are: {pos_src, A_weight, A_delay, lamtha}
         nc = self.pc.gid_connect(gid_presyn, postsyn)
         # calculate distance between cell positions with pardistance()
