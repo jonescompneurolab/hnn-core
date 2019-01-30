@@ -188,6 +188,7 @@ def readconf(fn="hnn.cfg", nohomeout=False):
     else:  # cwd for output
         dbase = os.getcwd()  # use os.getcwd instead for better compatability with NSG
 
+    dbase = os.path.join(os.path.dirname(__file__), '..')
     d['datdir'] = os.path.join(dbase, 'data')  # data output directory
     d['paramoutdir'] = os.path.join(dbase, 'param')
     # this depends on hnn install location
