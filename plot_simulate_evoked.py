@@ -9,23 +9,24 @@
 import os
 import sys
 import time
+import pickle
 import shutil
 import numpy as np
+
 from neuron import h
 
 # Cells are defined in other files
-import network
-import fileio as fio
-import paramrw as paramrw
-from paramrw import usingOngoingInputs
-import pickle
-from dipolefn import Dipole
-from lfp import LFPElectrode
+import mne_neuron.fileio as fio
+import mne_neuron.paramrw as paramrw
+from mne_neuron.paramrw import usingOngoingInputs
+from mne_neuron.dipolefn import Dipole
+from mne_neuron.lfp import LFPElectrode
 
-from .pyramidal import L5Pyr, L2Pyr
-from .basket import L2Basket, L5Basket
+from mne_neuron.pyramidal import L5Pyr, L2Pyr
+from mne_neuron.basket import L2Basket, L5Basket
 
-from .conf import readconf
+from mne_neuron import network
+from mne_neuron.conf import readconf
 
 h.load_file("stdrun.hoc")
 
