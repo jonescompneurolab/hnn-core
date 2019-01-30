@@ -720,8 +720,9 @@ def create_pext (p, tstop):
 # Finds the changed variables
 # sort of inefficient, probably should be part of something else
 # not worried about all that right now, as it appears to work
-# brittle in that the match string needs to be correct to find all the changed params
-# is redundant with(?) get_key_types() dynamic keys information
+# brittle in that the match string needs to be correct to find
+# all the changed params is redundant with(?)
+# get_key_types() dynamic keys information
 def changed_vars(fparam):
     # Strip empty lines and comments
     lines = fio.clean_lines(fparam)
@@ -747,6 +748,7 @@ def changed_vars(fparam):
     # return the list of "changed" or "default" vars
     return var_list
 
+
 # Takes two dictionaries (d1 and d2) and compares the keys in d1 to those in d2
 # if any match, updates the (key, value) pair of d1 to match that of d2
 # not real happy with variable names, but will have to do for now
@@ -758,23 +760,28 @@ def compare_dictionaries(d1, d2):
 
     return d1
 
-# get diff on 2 dictionaries
-def diffdict (d1, d2, verbose=True):
-  print('d1,d2 num keys - ', len(d1.keys()), len(d2.keys()))
-  for k in d1.keys():
-    if not k in d2:
-      if verbose: print(k, ' in d1, not in d2')
-  for k in d2.keys():  
-    if not k in d1:
-      if verbose: print(k, ' in d2, not in d1')
-  for k in d1.keys():
-    if k in d2:
-      if d1[k] != d2[k]:
-        print('d1[',k,']=',d1[k],' d2[',k,']=',d2[k])
+
+def diffdict(d1, d2, verbose=True):
+    """Get diff on 2 dictionaries."""
+    print('d1,d2 num keys - ', len(d1.keys()), len(d2.keys()))
+    for k in d1.keys():
+        if not k in d2:
+            if verbose:
+                print(k, ' in d1, not in d2')
+    for k in d2.keys():
+        if not k in d1:
+            if verbose:
+                print(k, ' in d2, not in d1')
+    for k in d1.keys():
+        if k in d2:
+            if d1[k] != d2[k]:
+                print('d1[', k, ']=',
+                      d1[k], ' d2[', k, ']=',
+                      d2[k])
+
 
 # debug test function
 if __name__ == '__main__':
-  fparam = 'param/debug.param'
-  p = ExpParams(fparam,debug=True)
-  # print(find_param(fparam, 'WhoDat')) # ?
-
+    fparam = 'param/debug.param'
+    p = ExpParams(fparam, debug=True)
+    # print(find_param(fparam, 'WhoDat')) # ?
