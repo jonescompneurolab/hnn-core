@@ -12,116 +12,151 @@ import itertools as it
 from params_default import get_params_default
 
 # get dict of ':' separated params from fn; ignore lines starting with #
-def quickreadprm (fn):
-  d = {}
-  with open(fn,'r') as fp:
-    ln = fp.readlines()
-    for l in ln:
-      s = l.strip()
-      if s.startswith('#'): continue
-      sp = s.split(':')
-      if len(sp) > 1:
-        d[sp[0].strip()]=str(sp[1]).strip()
-  return d
+
+
+def quickreadprm(fn):
+    d = {}
+    with open(fn, 'r') as fp:
+        ln = fp.readlines()
+        for l in ln:
+            s = l.strip()
+            if s.startswith('#'):
+                continue
+            sp = s.split(':')
+            if len(sp) > 1:
+                d[sp[0].strip()] = str(sp[1]).strip()
+    return d
 
 # get dict of ':' separated params from fn; ignore lines starting with #
-def quickgetprm (fn,k,ty):
-  d = quickreadprm(fn)
-  return ty(d[k])
+
+
+def quickgetprm(fn, k, ty):
+    d = quickreadprm(fn)
+    return ty(d[k])
 
 # check if using ongoing inputs
-def usingOngoingInputs (d, lty = ['_prox', '_dist']):
-  if type(d)==str: d = quickreadprm(d)
-  tstop = float(d['tstop'])
-  dpref = {'_prox':'input_prox_A_','_dist':'input_dist_A_'}
-  try:
-    for postfix in lty:
-      if float(d['t0_input'+postfix])<= tstop and \
-         float(d['tstop_input'+postfix])>=float(d['t0_input'+postfix]) and \
-         float(d['f_input'+postfix])>0.:
-        for k in ['weight_L2Pyr_ampa','weight_L2Pyr_nmda',\
-                  'weight_L5Pyr_ampa','weight_L5Pyr_nmda',\
-                  'weight_inh_ampa','weight_inh_nmda']:
-          if float(d[dpref[postfix]+k])>0.:
-            #print('usingOngoingInputs:',d[dpref[postfix]+k])
-            return True
-  except: 
+
+
+def usingOngoingInputs(d, lty=['_prox', '_dist']):
+    if type(d) == str:
+        d = quickreadprm(d)
+    tstop = float(d['tstop'])
+    dpref = {'_prox': 'input_prox_A_', '_dist': 'input_dist_A_'}
+    try:
+        for postfix in lty:
+            if float(d['t0_input'+postfix]) <= tstop and \
+               float(d['tstop_input'+postfix]) >= float(d['t0_input'+postfix]) and \
+               float(d['f_input'+postfix]) > 0.:
+                for k in ['weight_L2Pyr_ampa', 'weight_L2Pyr_nmda',
+                          'weight_L5Pyr_ampa', 'weight_L5Pyr_nmda',
+                          'weight_inh_ampa', 'weight_inh_nmda']:
+                    if float(d[dpref[postfix]+k]) > 0.:
+                        # print('usingOngoingInputs:',d[dpref[postfix]+k])
+                        return True
+    except:
+        return False
     return False
-  return False
 
 # return number of evoked inputs (proximal, distal)
-# using dictionary d (or if d is a string, first load the dictionary from filename d)
-def countEvokedInputs (d):
-  if type(d) == str: d = quickreadprm(d)
-  nprox = ndist = 0
-  for k,v in d.items():
-    if k.startswith('t_'):
-      if k.count('evprox') > 0:
-        nprox += 1
-      elif k.count('evdist') > 0:
-        ndist += 1
-  return nprox, ndist
+# using dictionary d (or if d is a string, first load the dictionary from
+# filename d)
 
-# check if using any evoked inputs 
-def usingEvokedInputs (d, lsuffty = ['_evprox_', '_evdist_']):
-  if type(d) == str: d = quickreadprm(d)
-  nprox,ndist = countEvokedInputs(d)
-  tstop = float(d['tstop']) 
-  lsuff = []
-  if '_evprox_' in lsuffty:
-    for i in range(1,nprox+1,1): lsuff.append('_evprox_'+str(i))
-  if '_evdist_' in lsuffty:
-    for i in range(1,ndist+1,1): lsuff.append('_evdist_'+str(i))
-  for suff in lsuff:
-    k = 't' + suff
-    if k not in d: continue
-    if float(d[k]) > tstop: continue
-    k = 'gbar' + suff
-    for k1 in d.keys():
-      if k1.startswith(k):
-        if float(d[k1]) > 0.0: return True
-  return False
 
-# check if using any poisson inputs 
-def usingPoissonInputs (d):
-  if type(d)==str: d = quickreadprm(d)
-  tstop = float(d['tstop'])
-  if 't0_pois' in d and 'T_pois' in d:
-    t0_pois = float(d['t0_pois'])
-    if t0_pois > tstop: return False
-    T_pois = float(d['T_pois'])
-    if t0_pois > T_pois and T_pois != -1.0:
-      return False
-  for cty in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket']:
-    for sy in ['ampa','nmda']:
-      k = cty+'_Pois_A_weight_'+sy
-      if k in d:
-        if float(d[k]) != 0.0: return True
-  return False
+def countEvokedInputs(d):
+    if type(d) == str:
+        d = quickreadprm(d)
+    nprox = ndist = 0
+    for k, v in d.items():
+        if k.startswith('t_'):
+            if k.count('evprox') > 0:
+                nprox += 1
+            elif k.count('evdist') > 0:
+                ndist += 1
+    return nprox, ndist
 
-# check if using any tonic (IClamp) inputs 
-def usingTonicInputs (d):
-  if type(d)==str: d = quickreadprm(d)
-  tstop = float(d['tstop'])
-  for cty in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket']:
-    k = 'Itonic_A_' + cty + '_soma'
-    if k in d:
-      amp = float(d[k])
-      if amp != 0.0:
-        print(k,'amp != 0.0',amp)
-        k = 'Itonic_t0_' + cty
-        t0,t1 = 0.0,-1.0
-        if k in d: t0 = float(d[k])
-        k = 'Itonic_T_' + cty
-        if k in d: t1 = float(d[k])
-        if t0 > tstop: continue
-        #print('t0:',t0,'t1:',t1)
-        if t0 < t1 or t1 == -1.0: return True
-  return False
+# check if using any evoked inputs
+
+
+def usingEvokedInputs(d, lsuffty=['_evprox_', '_evdist_']):
+    if type(d) == str:
+        d = quickreadprm(d)
+    nprox, ndist = countEvokedInputs(d)
+    tstop = float(d['tstop'])
+    lsuff = []
+    if '_evprox_' in lsuffty:
+        for i in range(1, nprox+1, 1):
+            lsuff.append('_evprox_'+str(i))
+    if '_evdist_' in lsuffty:
+        for i in range(1, ndist+1, 1):
+            lsuff.append('_evdist_'+str(i))
+    for suff in lsuff:
+        k = 't' + suff
+        if k not in d:
+            continue
+        if float(d[k]) > tstop:
+            continue
+        k = 'gbar' + suff
+        for k1 in d.keys():
+            if k1.startswith(k):
+                if float(d[k1]) > 0.0:
+                    return True
+    return False
+
+# check if using any poisson inputs
+
+
+def usingPoissonInputs(d):
+    if type(d) == str:
+        d = quickreadprm(d)
+    tstop = float(d['tstop'])
+    if 't0_pois' in d and 'T_pois' in d:
+        t0_pois = float(d['t0_pois'])
+        if t0_pois > tstop:
+            return False
+        T_pois = float(d['T_pois'])
+        if t0_pois > T_pois and T_pois != -1.0:
+            return False
+    for cty in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket']:
+        for sy in ['ampa', 'nmda']:
+            k = cty+'_Pois_A_weight_'+sy
+            if k in d:
+                if float(d[k]) != 0.0:
+                    return True
+    return False
+
+# check if using any tonic (IClamp) inputs
+
+
+def usingTonicInputs(d):
+    if type(d) == str:
+        d = quickreadprm(d)
+    tstop = float(d['tstop'])
+    for cty in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket']:
+        k = 'Itonic_A_' + cty + '_soma'
+        if k in d:
+            amp = float(d[k])
+            if amp != 0.0:
+                print(k, 'amp != 0.0', amp)
+                k = 'Itonic_t0_' + cty
+                t0, t1 = 0.0, -1.0
+                if k in d:
+                    t0 = float(d[k])
+                k = 'Itonic_T_' + cty
+                if k in d:
+                    t1 = float(d[k])
+                if t0 > tstop:
+                    continue
+                # print('t0:',t0,'t1:',t1)
+                if t0 < t1 or t1 == -1.0:
+                    return True
+    return False
 
 # class controlling multiple simulation files (.param)
+
+
 class ExpParams():
-    def __init__ (self, f_psim, debug=False):
+
+    def __init__(self, f_psim, debug=False):
 
         self.debug = debug
 
@@ -148,7 +183,8 @@ class ExpParams():
         self.list_params = self.__create_paramlist()
         self.N_sims = len(self.list_params[0][1])
 
-    # return pdict based on that one value, PLUS append the p_ext here ... yes, hack-y
+    # return pdict based on that one value, PLUS append the p_ext here ...
+    # yes, hack-y
     def return_pdict(self, expmt_group, i):
         # p_template was always updated to include the ones from exp and others
         p_sim = dict.fromkeys(self.p_template)
@@ -169,7 +205,7 @@ class ExpParams():
             p_sim[param] = val
 
         # Add coupled params
-        for coupled_param, val_param  in self.coupled_params.items():
+        for coupled_param, val_param in self.coupled_params.items():
             p_sim[coupled_param] = p_sim[val_param]
 
         return p_sim
@@ -194,7 +230,8 @@ class ExpParams():
             # expmt_groups must be listed before other vals
             elif param == 'expmt_groups':
                 # this list will be the preservation of the original order
-                self.expmt_groups = [expmt_group for expmt_group in val[1:-1].split(', ')]
+                self.expmt_groups = [
+                    expmt_group for expmt_group in val[1:-1].split(', ')]
 
                 # this dict here for easy access
                 # p_group saves each of the changed params per group
@@ -226,12 +263,14 @@ class ExpParams():
                     if val[1] is 'L':
                         # in this case, val_range must be as long as the correct expmt_group length
                         # everything beyond that will be truncated by the zip operation below
-                        # param passed will strip away the curly braces and just pass the linspace
+                        # param passed will strip away the curly braces and
+                        # just pass the linspace
                         val_range = self.__expand_linspace(val[1:-1])
                     else:
                         val_range = self.__expand_array(val)
 
-                    # add the expmt_group param to the list if it's not already present
+                    # add the expmt_group param to the list if it's not already
+                    # present
                     if param not in self.expmt_group_params:
                         self.expmt_group_params.append(param)
 
@@ -279,22 +318,26 @@ class ExpParams():
 
     # general function to expand the arange
     def __expand_arange(self, str_val):
-        # strip away the leading character along with the brackets and split the csv values
+        # strip away the leading character along with the brackets and split
+        # the csv values
         val_list = str_val[2:-1].split(', ')
 
         # use the values in val_list as params for np.linspace
-        val_range = np.arange(float(val_list[0]), float(val_list[1]), float(val_list[2]))
+        val_range = np.arange(float(val_list[0]), float(
+            val_list[1]), float(val_list[2]))
 
         # return the final linspace expanded
         return val_range
 
     # general function to expand the linspace
     def __expand_linspace(self, str_val):
-        # strip away the leading character along with the brackets and split the csv values
+        # strip away the leading character along with the brackets and split
+        # the csv values
         val_list = str_val[2:-1].split(', ')
 
         # use the values in val_list as params for np.linspace
-        val_range = np.linspace(float(val_list[0]), float(val_list[1]), int(val_list[2]))
+        val_range = np.linspace(float(val_list[0]), float(
+            val_list[1]), int(val_list[2]))
 
         # return the final linspace expanded
         return val_range
@@ -335,7 +378,7 @@ class ExpParams():
         }
 
     # create the dict based on the default param dict
-    def __create_dict_from_default (self, p_all_input):
+    def __create_dict_from_default(self, p_all_input):
         nprox, ndist = countEvokedInputs(p_all_input)
         # print('found nprox,ndist ev inputs:', nprox, ndist)
 
@@ -348,17 +391,20 @@ class ExpParams():
             # automatically expects that keys are either in p_all_input OR will resort
             # to default value
             if key in p_all_input:
-                # pop val off so the remaining items in p_all_input are extraneous
+                # pop val off so the remaining items in p_all_input are
+                # extraneous
                 p_all[key] = p_all_input.pop(key)
 
         # now display extraneous keys, if there were any
         if len(p_all_input):
-            if self.debug: print("Invalid keys from param file not found in default params: %s" % str(p_all_input.keys()))
+            if self.debug:
+                print("Invalid keys from param file not found in default params: %s" % str(
+                    p_all_input.keys()))
 
         return p_all
 
     # creates all combination of non-exp params
-    def __create_paramlist (self):
+    def __create_paramlist(self):
         # p_all is the dict specifying all of the changing params
         plist = []
 
@@ -408,7 +454,8 @@ class ExpParams():
             try:
                 len(self.p_all[key])
 
-                # Before storing key, check to make sure it has not already been stored
+                # Before storing key, check to make sure it has not already
+                # been stored
                 if key not in key_dict['dynamic_keys']:
                     key_dict['dynamic_keys'].append(key)
 
@@ -424,13 +471,16 @@ class ExpParams():
 
         return key_dict
 
-# reads params from a generated txt file and returns gid dict and p dict 
-def read (fparam):
+# reads params from a generated txt file and returns gid dict and p dict
+
+
+def read(fparam):
     lines = fio.clean_lines(fparam)
     p = {}
     gid_dict = {}
     for line in lines:
-        if line.startswith('#'): continue
+        if line.startswith('#'):
+            continue
         keystring, val = line.split(": ")
         key = keystring.strip()
         if val[0] is '[':
@@ -449,38 +499,42 @@ def read (fparam):
     return gid_dict, p
 
 # write the params to a filename
+
+
 def write(fparam, p, gid_list):
-  """ now sorting
-  """
-  # sort the items in the dict by key
-  # p_sorted = [item for item in p.items()]
-  p_keys = [key for key, val in p.items()]
-  p_sorted = [(key, p[key]) for key in p_keys]
-  # for some reason this is now crashing in python/mpi
-  # specifically, lambda sorting in place?
-  # p_sorted = [item for item in p.items()]
-  # p_sorted.sort(key=lambda x: x[0])
-  # open the file for writing
-  with open(fparam, 'w') as f:
-    pstring = '%26s: '
-    # write the gid info first
-    for key in gid_list.keys():
-      f.write(pstring % key)
-      if len(gid_list[key]):
-        f.write('[%4i, %4i] ' % (gid_list[key][0], gid_list[key][-1]))
-      else:
-        f.write('[]')
-      f.write('\n')
-    # do the params in p_sorted
-    for param in p_sorted:
-      key, val = param
-      f.write(pstring % key)
-      if key.startswith('N_'):
-        f.write('%i\n' % val)
-      else:
-        f.write(str(val)+'\n')
+    """ now sorting
+    """
+    # sort the items in the dict by key
+    # p_sorted = [item for item in p.items()]
+    p_keys = [key for key, val in p.items()]
+    p_sorted = [(key, p[key]) for key in p_keys]
+    # for some reason this is now crashing in python/mpi
+    # specifically, lambda sorting in place?
+    # p_sorted = [item for item in p.items()]
+    # p_sorted.sort(key=lambda x: x[0])
+    # open the file for writing
+    with open(fparam, 'w') as f:
+        pstring = '%26s: '
+        # write the gid info first
+        for key in gid_list.keys():
+            f.write(pstring % key)
+            if len(gid_list[key]):
+                f.write('[%4i, %4i] ' % (gid_list[key][0], gid_list[key][-1]))
+            else:
+                f.write('[]')
+            f.write('\n')
+        # do the params in p_sorted
+        for param in p_sorted:
+            key, val = param
+            f.write(pstring % key)
+            if key.startswith('N_'):
+                f.write('%i\n' % val)
+            else:
+                f.write(str(val)+'\n')
 
 # Searches f_param for any match of p
+
+
 def find_param(fparam, param_key):
     _, p = read(fparam)
 
@@ -491,9 +545,12 @@ def find_param(fparam, param_key):
         return "There is no key by the name %s" % param_key
 
 # reads the simgroup name from fparam
+
+
 def read_sim_prefix(fparam):
     lines = fio.clean_lines(fparam)
-    param_list = [line for line in lines if line.split(': ')[0].startswith('sim_prefix')]
+    param_list = [line for line in lines if line.split(
+        ': ')[0].startswith('sim_prefix')]
 
     # Assume we found something ...
     if param_list:
@@ -503,6 +560,8 @@ def read_sim_prefix(fparam):
         return 0
 
 # Finds the experiments list from the simulation param file (.param)
+
+
 def read_expmt_groups(fparam):
     lines = fio.clean_lines(fparam)
     lines = [line for line in lines if line.split(': ')[0] == 'expmt_groups']
@@ -514,6 +573,8 @@ def read_expmt_groups(fparam):
         return 0
 
 # qnd function to add feeds if they are sensible
+
+
 def feed_validate(p_ext, d, tstop):
     """ whips into shape ones that are not
         could be properly made into a meaningful class.
@@ -529,7 +590,8 @@ def feed_validate(p_ext, d, tstop):
             d['tstop'] = tstop
 
         # if stdev is zero, increase synaptic weights 5 fold to make
-        # single input equivalent to 5 simultaneous input to prevent spiking    <<---- SN: WHAT IS THIS RULE!?!?!?
+        # single input equivalent to 5 simultaneous input to prevent spiking
+        # <<---- SN: WHAT IS THIS RULE!?!?!?
         if not d['stdev'] and d['distribution'] != 'uniform':
             for key in d.keys():
                 if key.endswith('Pyr'):
@@ -537,8 +599,9 @@ def feed_validate(p_ext, d, tstop):
                 elif key.endswith('Basket'):
                     d[key] = (d[key][0] * 5., d[key][1])
 
-        # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
-        if d['L5Pyr_ampa'][1] == -1:                                  
+        # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in
+        # which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
+        if d['L5Pyr_ampa'][1] == -1:
             for key in d.keys():
                 if key.startswith('L5'):
                     if d['L2Pyr'][1] != 0.1:
@@ -551,41 +614,53 @@ def feed_validate(p_ext, d, tstop):
     return p_ext
 
 #
-def checkevokedsynkeys (p, nprox, ndist):
-  # make sure ampa,nmda gbar values are in the param dict for evoked inputs(for backwards compatibility)
-  lctprox = ['L2Pyr','L5Pyr','L2Basket','L5Basket'] # evoked distal target cell types
-  lctdist = ['L2Pyr','L5Pyr','L2Basket'] # evoked proximal target cell types
-  lsy = ['ampa','nmda'] # synapse types used in evoked inputs
-  for nev,pref,lct in zip([nprox,ndist],['evprox_','evdist_'],[lctprox,lctdist]):
-    for i in range(nev):
-      skey = pref + str(i+1)
-      for sy in lsy:
-        for ct in lct:
-          k = 'gbar_'+skey+'_'+ct+'_'+sy
-          # if the synapse-specific gbar not present, use the existing weight for both ampa,nmda
-          if k not in p: 
-            p[k] = p['gbar_'+skey+'_'+ct]
+
+
+def checkevokedsynkeys(p, nprox, ndist):
+    # make sure ampa,nmda gbar values are in the param dict for evoked
+    # inputs(for backwards compatibility)
+    # evoked distal target cell types
+    lctprox = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']
+    # evoked proximal target cell types
+    lctdist = ['L2Pyr', 'L5Pyr', 'L2Basket']
+    lsy = ['ampa', 'nmda']  # synapse types used in evoked inputs
+    for nev, pref, lct in zip([nprox, ndist], ['evprox_', 'evdist_'], [lctprox, lctdist]):
+        for i in range(nev):
+            skey = pref + str(i+1)
+            for sy in lsy:
+                for ct in lct:
+                    k = 'gbar_'+skey+'_'+ct+'_'+sy
+                    # if the synapse-specific gbar not present, use the
+                    # existing weight for both ampa,nmda
+                    if k not in p:
+                        p[k] = p['gbar_'+skey+'_'+ct]
 
 #
-def checkpoissynkeys (p):
-  # make sure ampa,nmda gbar values are in the param dict for Poisson inputs (for backwards compatibility)
-  lct = ['L2Pyr','L5Pyr','L2Basket','L5Basket'] # target cell types
-  lsy = ['ampa','nmda'] # synapse types used in Poisson inputs
-  for ct in lct:
-    for sy in lsy:
-      k = ct + '_Pois_A_weight_' + sy
-      # if the synapse-specific weight not present, set it to 0 in p
-      if k not in p: 
-        p[k] = 0.0 
+
+
+def checkpoissynkeys(p):
+    # make sure ampa,nmda gbar values are in the param dict for Poisson inputs
+    # (for backwards compatibility)
+    lct = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']  # target cell types
+    lsy = ['ampa', 'nmda']  # synapse types used in Poisson inputs
+    for ct in lct:
+        for sy in lsy:
+            k = ct + '_Pois_A_weight_' + sy
+            # if the synapse-specific weight not present, set it to 0 in p
+            if k not in p:
+                p[k] = 0.0
 
 # creates the external feed params based on individual simulation params p
-def create_pext (p, tstop):
-    # indexable py list of param dicts for parallel
-    # turn off individual feeds by commenting out relevant line here.
-    # always valid, no matter the length
+
+
+def create_pext(p, tstop):
+        # indexable py list of param dicts for parallel
+        # turn off individual feeds by commenting out relevant line here.
+        # always valid, no matter the length
     p_ext = []
 
-    # p_unique is a dict of input param types that end up going to each cell uniquely
+    # p_unique is a dict of input param types that end up going to each cell
+    # uniquely
     p_unique = {}
 
     # default params for proximal rhythmic inputs
@@ -645,51 +720,51 @@ def create_pext (p, tstop):
     # NEW: make sure all evoked synaptic weights present (for backwards compatibility)
     # could cause differences between output of param files since some nmda weights should
     # be 0 while others > 0
-    checkevokedsynkeys(p,nprox,ndist) 
+    checkevokedsynkeys(p, nprox, ndist)
 
     # Create proximal evoked response parameters
     # f_input needs to be defined as 0
     for i in range(nprox):
-      skey = 'evprox_' + str(i+1)
-      p_unique['evprox' + str(i+1)] = {
-          't0': p['t_' + skey],
-          'L2_pyramidal':(p['gbar_'+skey+'_L2Pyr_ampa'],p['gbar_'+skey+'_L2Pyr_nmda'],0.1,p['sigma_t_'+skey]),
-          'L2_basket':(p['gbar_'+skey+'_L2Basket_ampa'],p['gbar_'+skey+'_L2Basket_nmda'],0.1,p['sigma_t_'+skey]),
-          'L5_pyramidal':(p['gbar_'+skey+'_L5Pyr_ampa'],p['gbar_'+skey+'_L5Pyr_nmda'],1.,p['sigma_t_'+skey]),
-          'L5_basket':(p['gbar_'+skey+'_L5Basket_ampa'],p['gbar_'+skey+'_L5Basket_nmda'],1.,p['sigma_t_'+skey]),
-          'prng_seedcore': int(p['prng_seedcore_' + skey]),
-          'lamtha_space': 3.,
-          'loc': 'proximal',
-          'sync_evinput': p['sync_evinput'],
-          'threshold': p['threshold'],
-          'numspikes': p['numspikes_' + skey]
-      }
+        skey = 'evprox_' + str(i+1)
+        p_unique['evprox' + str(i+1)] = {
+            't0': p['t_' + skey],
+            'L2_pyramidal': (p['gbar_'+skey+'_L2Pyr_ampa'], p['gbar_'+skey+'_L2Pyr_nmda'], 0.1, p['sigma_t_'+skey]),
+            'L2_basket': (p['gbar_'+skey+'_L2Basket_ampa'], p['gbar_'+skey+'_L2Basket_nmda'], 0.1, p['sigma_t_'+skey]),
+            'L5_pyramidal': (p['gbar_'+skey+'_L5Pyr_ampa'], p['gbar_'+skey+'_L5Pyr_nmda'], 1., p['sigma_t_'+skey]),
+            'L5_basket': (p['gbar_'+skey+'_L5Basket_ampa'], p['gbar_'+skey+'_L5Basket_nmda'], 1., p['sigma_t_'+skey]),
+            'prng_seedcore': int(p['prng_seedcore_' + skey]),
+            'lamtha_space': 3.,
+            'loc': 'proximal',
+            'sync_evinput': p['sync_evinput'],
+            'threshold': p['threshold'],
+            'numspikes': p['numspikes_' + skey]
+        }
 
     # Create distal evoked response parameters
     # f_input needs to be defined as 0
     for i in range(ndist):
-      skey = 'evdist_' + str(i+1)
-      p_unique['evdist' + str(i+1)] = {
-          't0': p['t_' + skey],
-          'L2_pyramidal':(p['gbar_'+skey+'_L2Pyr_ampa'],p['gbar_'+skey+'_L2Pyr_nmda'],0.1,p['sigma_t_'+skey]),
-          'L5_pyramidal':(p['gbar_'+skey+'_L5Pyr_ampa'],p['gbar_'+skey+'_L5Pyr_nmda'],0.1,p['sigma_t_'+skey]),
-          'L2_basket':(p['gbar_'+skey+'_L2Basket_ampa'],p['gbar_'+skey+'_L2Basket_nmda'],0.1,p['sigma_t_' + skey]),
-          'prng_seedcore': int(p['prng_seedcore_' + skey]),
-          'lamtha_space': 3.,
-          'loc': 'distal',
-          'sync_evinput': p['sync_evinput'],
-          'threshold': p['threshold'],
-          'numspikes': p['numspikes_' + skey]
-      }
+        skey = 'evdist_' + str(i+1)
+        p_unique['evdist' + str(i+1)] = {
+            't0': p['t_' + skey],
+            'L2_pyramidal': (p['gbar_'+skey+'_L2Pyr_ampa'], p['gbar_'+skey+'_L2Pyr_nmda'], 0.1, p['sigma_t_'+skey]),
+            'L5_pyramidal': (p['gbar_'+skey+'_L5Pyr_ampa'], p['gbar_'+skey+'_L5Pyr_nmda'], 0.1, p['sigma_t_'+skey]),
+            'L2_basket': (p['gbar_'+skey+'_L2Basket_ampa'], p['gbar_'+skey+'_L2Basket_nmda'], 0.1, p['sigma_t_' + skey]),
+            'prng_seedcore': int(p['prng_seedcore_' + skey]),
+            'lamtha_space': 3.,
+            'loc': 'distal',
+            'sync_evinput': p['sync_evinput'],
+            'threshold': p['threshold'],
+            'numspikes': p['numspikes_' + skey]
+        }
 
     # this needs to create many feeds
     # (amplitude, delay, mu, sigma). ordered this way to preserve compatibility
-    p_unique['extgauss'] = { # NEW: note double weight specification since only use ampa for gauss inputs
+    p_unique['extgauss'] = {  # NEW: note double weight specification since only use ampa for gauss inputs
         'stim': 'gaussian',
-        'L2_basket':(p['L2Basket_Gauss_A_weight'],p['L2Basket_Gauss_A_weight'],1.,p['L2Basket_Gauss_mu'],p['L2Basket_Gauss_sigma']),
-        'L2_pyramidal':(p['L2Pyr_Gauss_A_weight'],p['L2Pyr_Gauss_A_weight'],0.1,p['L2Pyr_Gauss_mu'],p['L2Pyr_Gauss_sigma']),
-        'L5_basket':(p['L5Basket_Gauss_A_weight'],p['L5Basket_Gauss_A_weight'],1.,p['L5Basket_Gauss_mu'],p['L5Basket_Gauss_sigma']),
-        'L5_pyramidal':(p['L5Pyr_Gauss_A_weight'],p['L5Pyr_Gauss_A_weight'],1.,p['L5Pyr_Gauss_mu'],p['L5Pyr_Gauss_sigma']),
+        'L2_basket': (p['L2Basket_Gauss_A_weight'], p['L2Basket_Gauss_A_weight'], 1., p['L2Basket_Gauss_mu'], p['L2Basket_Gauss_sigma']),
+        'L2_pyramidal': (p['L2Pyr_Gauss_A_weight'], p['L2Pyr_Gauss_A_weight'], 0.1, p['L2Pyr_Gauss_mu'], p['L2Pyr_Gauss_sigma']),
+        'L5_basket': (p['L5Basket_Gauss_A_weight'], p['L5Basket_Gauss_A_weight'], 1., p['L5Basket_Gauss_mu'], p['L5Basket_Gauss_sigma']),
+        'L5_pyramidal': (p['L5Pyr_Gauss_A_weight'], p['L5Pyr_Gauss_A_weight'], 1., p['L5Pyr_Gauss_mu'], p['L5Pyr_Gauss_sigma']),
         'lamtha': 100.,
         'prng_seedcore': int(p['prng_seedcore_extgauss']),
         'loc': 'proximal',
@@ -699,15 +774,16 @@ def create_pext (p, tstop):
     checkpoissynkeys(p)
 
     # define T_pois as 0 or -1 to reset automatically to tstop
-    if p['T_pois'] in (0, -1): p['T_pois'] = tstop
+    if p['T_pois'] in (0, -1):
+        p['T_pois'] = tstop
 
     # Poisson distributed inputs to proximal
-    p_unique['extpois'] = {# NEW: setting up AMPA and NMDA for Poisson inputs; why delays differ?
+    p_unique['extpois'] = {  # NEW: setting up AMPA and NMDA for Poisson inputs; why delays differ?
         'stim': 'poisson',
-        'L2_basket': (p['L2Basket_Pois_A_weight_ampa'],p['L2Basket_Pois_A_weight_nmda'],1.,p['L2Basket_Pois_lamtha']),
-        'L2_pyramidal': (p['L2Pyr_Pois_A_weight_ampa'],p['L2Pyr_Pois_A_weight_nmda'], 0.1,p['L2Pyr_Pois_lamtha']),
-        'L5_basket': (p['L5Basket_Pois_A_weight_ampa'],p['L5Basket_Pois_A_weight_nmda'],1.,p['L5Basket_Pois_lamtha']),
-        'L5_pyramidal': (p['L5Pyr_Pois_A_weight_ampa'],p['L5Pyr_Pois_A_weight_nmda'],1.,p['L5Pyr_Pois_lamtha']),
+        'L2_basket': (p['L2Basket_Pois_A_weight_ampa'], p['L2Basket_Pois_A_weight_nmda'], 1., p['L2Basket_Pois_lamtha']),
+        'L2_pyramidal': (p['L2Pyr_Pois_A_weight_ampa'], p['L2Pyr_Pois_A_weight_nmda'], 0.1, p['L2Pyr_Pois_lamtha']),
+        'L5_basket': (p['L5Basket_Pois_A_weight_ampa'], p['L5Basket_Pois_A_weight_nmda'], 1., p['L5Basket_Pois_lamtha']),
+        'L5_pyramidal': (p['L5Pyr_Pois_A_weight_ampa'], p['L5Pyr_Pois_A_weight_nmda'], 1., p['L5Pyr_Pois_lamtha']),
         'lamtha_space': 100.,
         'prng_seedcore': int(p['prng_seedcore_extpois']),
         't_interval': (p['t0_pois'], p['T_pois']),
@@ -723,6 +799,8 @@ def create_pext (p, tstop):
 # brittle in that the match string needs to be correct to find
 # all the changed params is redundant with(?)
 # get_key_types() dynamic keys information
+
+
 def changed_vars(fparam):
     # Strip empty lines and comments
     lines = fio.clean_lines(fparam)
@@ -732,7 +810,8 @@ def changed_vars(fparam):
     # each item of keyvals is a pair [key, val]
     keyvals = [line.split(": ") for line in lines]
 
-    # match the list for changed items starting with "AKL[(" on the 1st char of the val
+    # match the list for changed items starting with "AKL[(" on the 1st char
+    # of the val
     var_list = [line for line in keyvals if re.match('[AKL[\(]', line[1][0])]
 
     # additional default info to add always
@@ -755,7 +834,7 @@ def changed_vars(fparam):
 def compare_dictionaries(d1, d2):
     # iterate over intersection of key sets (i.e. any common keys)
     for key in d1.keys() and d2.keys():
-        # update d1 to have same (key, value) pair as d2
+                # update d1 to have same (key, value) pair as d2
         d1[key] = d2[key]
 
     return d1
