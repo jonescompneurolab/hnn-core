@@ -11,7 +11,7 @@ from neuron import h
 from feed import ParFeedAll
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
-import paramrw as paramrw
+import .paramrw as paramrw
 
 
 class NetworkOnNode ():
