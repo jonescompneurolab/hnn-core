@@ -103,10 +103,10 @@ class NetworkOnNode ():
     def __create_src_list(self):
         # base source list of tuples, name and number, in this order
         self.cellname_list = [
-                'L2_basket',
-                'L2_pyramidal',
-                'L5_basket',
-                'L5_pyramidal',
+            'L2_basket',
+            'L2_pyramidal',
+            'L5_basket',
+            'L5_pyramidal',
         ]
         # add the legacy extinput here
         self.extname_list = []
@@ -127,9 +127,9 @@ class NetworkOnNode ():
         yrange = np.arange(self.gridpyr['y'])
         # create list of tuples/coords, (x, y, z)
         self.pos_dict['L2_pyramidal'] = [
-                pos for pos in it.product(xrange, yrange, [0])]
+            pos for pos in it.product(xrange, yrange, [0])]
         self.pos_dict['L5_pyramidal'] = [
-                pos for pos in it.product(xrange, yrange, [self.zdiff])]
+            pos for pos in it.product(xrange, yrange, [self.zdiff])]
 
     # create basket cell coords based on pyr grid
     def __create_coords_basket(self):
@@ -141,13 +141,13 @@ class NetworkOnNode ():
         yodd = np.arange(1, self.gridpyr['y'], 2)
         # create general list of x,y coords and sort it
         coords = [pos for pos in it.product(
-                xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+            xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
         coords_sorted = sorted(coords, key=lambda pos: pos[1])
         # append the z value for position for L2 and L5
         # print(len(coords_sorted))
         self.pos_dict['L2_basket'] = [pos_xy + (0,) for pos_xy in coords_sorted]
         self.pos_dict['L5_basket'] = [
-                pos_xy + (self.zdiff,) for pos_xy in coords_sorted]
+            pos_xy + (self.zdiff,) for pos_xy in coords_sorted]
 
     # creates origin AND creates external input coords
     def __create_coords_extinput(self):
@@ -161,7 +161,8 @@ class NetworkOnNode ():
         origin_y = yrange[int((len(yrange) - 1) // 2)]
         origin_z = np.floor(self.zdiff / 2)
         self.origin = (origin_x, origin_y, origin_z)
-        self.pos_dict['extinput'] = [self.origin for i in range(self.N_extinput)]
+        self.pos_dict['extinput'] = [self.origin for i in
+                                     range(self.N_extinput)]
         # at this time, each of the unique inputs is per cell
         for key in self.p_unique.keys():
             # create the pos_dict for all the sources
@@ -228,8 +229,8 @@ class NetworkOnNode ():
         # extremely important to get the gids in the right order
         self.__gid_list.sort()
 
-    # reverse lookup of gid to type
     def gid_to_type(self, gid):
+        """reverse lookup of gid to type."""
         for gidtype, gids in self.gid_dict.items():
             if gid in gids:
                 return gidtype
@@ -350,9 +351,10 @@ class NetworkOnNode ():
         # cells has NO extinputs anyway. also no extgausses
         for gid, cell in zip(self.__gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
-            if self.pc.gid_exists(gid) and self.gid_to_type(gid) is not 'extinput':
-                # print("rank:", self.rank, "gid:", gid, cell, self.gid_to_type(gid))
-                # for each gid, find all the other cells connected to it, based on gid
+            if self.pc.gid_exists(gid) and self.gid_to_type(gid) \
+                    is not 'extinput':
+                # for each gid, find all the other cells connected to it,
+                # based on gid
                 # this MUST be defined in EACH class of cell in self.cells
                 # parconnect receives connections from other cells
                 # parreceive receives connections from external inputs
@@ -364,7 +366,8 @@ class NetworkOnNode ():
                 for type in self.p_unique.keys():
                     p_type = self.p_unique[type]
                     # print('parnet_connect p_type:',p_type)
-                    cell.parreceive_ext(type, gid, self.gid_dict, self.pos_dict, p_type)
+                    cell.parreceive_ext(
+                        type, gid, self.gid_dict, self.pos_dict, p_type)
 
     # setup spike recording for this node
     def __record_spikes(self):
