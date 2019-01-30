@@ -19,7 +19,7 @@ from neuron import h
 import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
 from mne_neuron.dipolefn import Dipole
-from mne_neuron.lfp import LFPElectrode
+# from mne_neuron.lfp import LFPElectrode
 
 from mne_neuron.pyramidal import L5Pyr, L2Pyr
 from mne_neuron.basket import L2Basket, L5Basket
@@ -485,5 +485,3 @@ if __name__ == "__main__":
             runsim()
         pc.runworker()
         pc.done()
-    if dconf['doquit']:
-        h.quit()
