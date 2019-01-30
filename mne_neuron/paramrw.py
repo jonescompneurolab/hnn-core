@@ -44,13 +44,13 @@ def usingOngoingInputs(d, lty=['_prox', '_dist']):
     dpref = {'_prox': 'input_prox_A_', '_dist': 'input_dist_A_'}
     try:
         for postfix in lty:
-            if float(d['t0_input'+postfix]) <= tstop and \
-               float(d['tstop_input'+postfix]) >= float(d['t0_input'+postfix]) and \
-               float(d['f_input'+postfix]) > 0.:
+            if float(d['t0_input' + postfix]) <= tstop and \
+               float(d['tstop_input' + postfix]) >= float(d['t0_input' + postfix]) and \
+               float(d['f_input' + postfix]) > 0.:
                 for k in ['weight_L2Pyr_ampa', 'weight_L2Pyr_nmda',
                           'weight_L5Pyr_ampa', 'weight_L5Pyr_nmda',
                           'weight_inh_ampa', 'weight_inh_nmda']:
-                    if float(d[dpref[postfix]+k]) > 0.:
+                    if float(d[dpref[postfix] + k]) > 0.:
                         # print('usingOngoingInputs:',d[dpref[postfix]+k])
                         return True
     except:
@@ -84,11 +84,11 @@ def usingEvokedInputs(d, lsuffty=['_evprox_', '_evdist_']):
     tstop = float(d['tstop'])
     lsuff = []
     if '_evprox_' in lsuffty:
-        for i in range(1, nprox+1, 1):
-            lsuff.append('_evprox_'+str(i))
+        for i in range(1, nprox + 1, 1):
+            lsuff.append('_evprox_' + str(i))
     if '_evdist_' in lsuffty:
-        for i in range(1, ndist+1, 1):
-            lsuff.append('_evdist_'+str(i))
+        for i in range(1, ndist + 1, 1):
+            lsuff.append('_evdist_' + str(i))
     for suff in lsuff:
         k = 't' + suff
         if k not in d:
@@ -118,7 +118,7 @@ def usingPoissonInputs(d):
             return False
     for cty in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket']:
         for sy in ['ampa', 'nmda']:
-            k = cty+'_Pois_A_weight_'+sy
+            k = cty + '_Pois_A_weight_'+sy
             if k in d:
                 if float(d[k]) != 0.0:
                     return True
