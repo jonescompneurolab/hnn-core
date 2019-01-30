@@ -7,7 +7,9 @@ from collections import OrderedDict
 # last major: (SL: Added default params for L2Basket and L5Basket cells)
 
 # returns default params - see note
-def get_params_default (nprox = 2, ndist = 1):
+
+
+def get_params_default(nprox=2, ndist=1):
     """ Note that nearly all start times are set BEYOND tstop for this file
         Most values here are set to whatever default value inactivates them, such as 0 for conductance
         prng seed values are also set to 0 (non-random)
@@ -114,7 +116,8 @@ def get_params_default (nprox = 2, ndist = 1):
         'input_prox_A_delay_L2': 0.1,
         'input_prox_A_delay_L5': 1.0,
 
-        # current values, not sure where these distal values come from, need to check
+        # current values, not sure where these distal values come from, need to
+        # check
         'input_dist_A_weight_L2Pyr_ampa': 0.,
         'input_dist_A_weight_L2Pyr_nmda': 0.,
         'input_dist_A_weight_L5Pyr_ampa': 0.,
@@ -125,21 +128,24 @@ def get_params_default (nprox = 2, ndist = 1):
         'input_dist_A_delay_L5': 5.,
 
         # times and stdevs for evoked responses
-        'dt_evprox0_evdist': -1, # not used in GUI
-        'dt_evprox0_evprox1': -1, # not used in GUI
-        'sync_evinput': 1, # whether evoked inputs arrive at same time to all cells
-        'inc_evinput': 0.0, # increment (ms) for avg evoked input start (for trial n, avg start time is n * evinputinc
+        'dt_evprox0_evdist': -1,  # not used in GUI
+        'dt_evprox0_evprox1': -1,  # not used in GUI
+        'sync_evinput': 1,  # whether evoked inputs arrive at same time to all cells
+        # increment (ms) for avg evoked input start (for trial n, avg start
+        # time is n * evinputinc
+        'inc_evinput': 0.0,
 
         # analysis
         'save_spec_data': 0,
         'f_max_spec': 40.,
-        'dipole_scalefctr': 30e3, # scale factor for dipole - default at 30e3
-        #based on scaling needed to match model ongoing rhythms from jones 2009 - for ERPs can use 300
+        'dipole_scalefctr': 30e3,  # scale factor for dipole - default at 30e3
+        # based on scaling needed to match model ongoing rhythms from jones 2009 - for ERPs can use 300
         # for ongoing rhythms + ERPs ... use ... ?
-        'dipole_smooth_win': 15.0, # window for smoothing (box filter) - 15 ms from jones 2009; shorten
+        # window for smoothing (box filter) - 15 ms from jones 2009; shorten
+        'dipole_smooth_win': 15.0,
         # in case want to look at higher frequency activity
         'save_figs': 0,
-        'save_vsoma': 0, # whether to record/save somatic voltage
+        'save_vsoma': 0,  # whether to record/save somatic voltage
 
         # IClamp params for L2Pyr
         'Itonic_A_L2Pyr_soma': 0.,
@@ -179,7 +185,7 @@ def get_params_default (nprox = 2, ndist = 1):
         'T_pois': -1,
         'dt': 0.025,
         'celsius': 37.0,
-        'threshold': 0.0 # firing threshold
+        'threshold': 0.0  # firing threshold
     }
 
     # grab cell-specific params and update p accordingly
@@ -189,8 +195,8 @@ def get_params_default (nprox = 2, ndist = 1):
     p.update(p_L5Pyr)
 
     # get evoked params and update p accordingly
-    p_ev_prox = get_ev_params_default(nprox,True)
-    p_ev_dist = get_ev_params_default(ndist,False)
+    p_ev_prox = get_ev_params_default(nprox, True)
+    p_ev_dist = get_ev_params_default(ndist, False)
     p.update(p_ev_prox)
     p.update(p_ev_dist)
 
@@ -198,27 +204,36 @@ def get_params_default (nprox = 2, ndist = 1):
 
 # return dict with default params (empty) for evoked inputs; n is number of evoked inputs
 # isprox == True iff proximal (otherwise distal)
-def get_ev_params_default (n,isprox):
-  dout = {}#OrderedDict()
-  if isprox: pref = 'evprox'
-  else: pref = 'evdist'
-  # print('isprox:',isprox,'n:',n)
-  lty = ['L2Pyr', 'L5Pyr', 'L2Basket']
-  if isprox: lty.append('L5Basket')
-  lsy = ['ampa', 'nmda'] # allow changing both ampa and nmda weights
-  for i in range(n):
-    tystr = pref + '_' + str(i+1) # this string includes input number 
-    for ty in lty:
-      for sy in lsy:
-        dout['gbar_' + tystr + '_' + ty + '_' + sy] = 0. # feed strength
-    dout['t_' + tystr] = 0. # times and stdevs for evoked responses
-    dout['sigma_t_' + tystr] = 0.
-    dout['prng_seedcore_' + tystr] = 0 # random number generator seed for this input
-    dout['numspikes_' + tystr] = 1 # number of presynaptic spikes (postsynaptic inputs)
-  return dout
 
-# returns default params for L2 pyramidal cell
+
+def get_ev_params_default(n, isprox):
+    dout = {}  # OrderedDict()
+    if isprox:
+        pref = 'evprox'
+    else:
+        pref = 'evdist'
+    # print('isprox:',isprox,'n:',n)
+    lty = ['L2Pyr', 'L5Pyr', 'L2Basket']
+    if isprox:
+        lty.append('L5Basket')
+    lsy = ['ampa', 'nmda']  # allow changing both ampa and nmda weights
+    for i in range(n):
+        tystr = pref + '_' + str(i+1)  # this string includes input number
+        for ty in lty:
+            for sy in lsy:
+                dout['gbar_' + tystr + '_' + ty +
+                     '_' + sy] = 0.  # feed strength
+        dout['t_' + tystr] = 0.  # times and stdevs for evoked responses
+        dout['sigma_t_' + tystr] = 0.
+        # random number generator seed for this input
+        dout['prng_seedcore_' + tystr] = 0
+        # number of presynaptic spikes (postsynaptic inputs)
+        dout['numspikes_' + tystr] = 1
+    return dout
+
+
 def get_L2Pyr_params_default():
+    """Returns default params for L2 pyramidal cell."""
     return {
         # Soma
         'L2Pyr_soma_L': 22.1,
@@ -283,8 +298,9 @@ def get_L2Pyr_params_default():
         'L2Pyr_dend_gbar_km': 250.,
     }
 
-# returns default params for L5 pyramidal cell
+
 def get_L5Pyr_params_default():
+    """Returns default params for L5 pyramidal cell."""
     return {
         # Soma
         'L5Pyr_soma_L': 39.,

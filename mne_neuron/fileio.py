@@ -12,10 +12,12 @@ import sys
 import subprocess
 import multiprocessing
 import numpy as np
-import paramrw
+
+from .paramrw import read_expmt_groups, read_sim_prefix
 
 # creates data dirs and a dictionary of useful types
-# self.dfig is a dictionary of experiments, which is each a dictionary of data type
+# self.dfig is a dictionary of experiments, which is each a
+# dictionary of data type
 # keys and the specific directories that contain them.
 
 
@@ -60,8 +62,8 @@ class SimulationPaths ():
         self.dsim = dsim
         # match the param from this sim
         self.fparam = file_match(dsim, '.param')[0]
-        self.expmt_groups = paramrw.read_expmt_groups(self.fparam)
-        self.sim_prefix = paramrw.read_sim_prefix(self.fparam)
+        self.expmt_groups = read_expmt_groups(self.fparam)
+        self.sim_prefix = read_sim_prefix(self.fparam)
         # this should somehow be supplied by the ExpParams() class, but doing
         # it here
         self.trial_prefix_str = self.sim_prefix + "-%03d-T%02d"
