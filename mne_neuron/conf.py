@@ -2,8 +2,9 @@ from configparser import ConfigParser
 import io
 import os
 import sys
-from fileio import safemkdir
 from collections import OrderedDict
+
+from .fileio import safemkdir
 
 try:
     from StringIO import StringIO
