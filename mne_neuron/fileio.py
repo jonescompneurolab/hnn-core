@@ -10,7 +10,6 @@ import os
 import shutil
 import sys
 import subprocess
-import multiprocessing
 import numpy as np
 
 from .paramrw import read_expmt_groups, read_sim_prefix
@@ -101,7 +100,8 @@ class SimulationPaths ():
         return flist
 
     # returns a filename for an example type of data
-    def return_filename_example(self, datatype, expmt_group, sim_no=None, tr=None, ext='png'):
+    def return_filename_example(self, datatype, expmt_group,
+                                sim_no=None, tr=None, ext='png'):
         fname_short = "%s-%s" % (self.sim_prefix, expmt_group)
         if sim_no is not None:
             fname_short += "-%03i" % (sim_no)
