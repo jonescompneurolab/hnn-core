@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 # params_default.py - master list of changeable params. most set to default val of inactive
 #
 # v 1.9.01
@@ -11,7 +9,8 @@ from collections import OrderedDict
 
 def get_params_default(nprox=2, ndist=1):
     """ Note that nearly all start times are set BEYOND tstop for this file
-        Most values here are set to whatever default value inactivates them, such as 0 for conductance
+        Most values here are set to whatever default value
+        inactivates them, such as 0 for conductance
         prng seed values are also set to 0 (non-random)
         flat file of default values
         will most often be overwritten

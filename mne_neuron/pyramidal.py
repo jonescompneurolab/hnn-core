@@ -3,10 +3,12 @@
 import numpy as np
 
 from neuron import h
+
 from .cell import Cell
 
-import paramrw
-import params_default as p_default
+from .paramrw import compare_dictionaries
+from .params_default import (get_L2Pyr_params_default,
+                             get_L5Pyr_params_default)
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
@@ -113,8 +115,8 @@ class L2Pyr(Pyr):
 
     def __init__(self, gid=-1, pos=-1, p={}):
         # Get default L2Pyr params and update them with any corresponding params in p
-        p_all_default = p_default.get_L2Pyr_params_default()
-        self.p_all = paramrw.compare_dictionaries(p_all_default, p)
+        p_all_default = get_L2Pyr_params_default()
+        self.p_all = compare_dictionaries(p_all_default, p)
 
         # Get somatic, dendritic, and synapse properties
         p_soma = self.__get_soma_props(pos)
@@ -796,8 +798,8 @@ class L5Pyr(Pyr):
 
     def __init__(self, gid = -1, pos = -1, p={}):
         # Get default L5Pyr params and update them with corresponding params in p
-        p_all_default = p_default.get_L5Pyr_params_default()
-        self.p_all = paramrw.compare_dictionaries(p_all_default, p)
+        p_all_default = get_L5Pyr_params_default()
+        self.p_all = compare_dictionaries(p_all_default, p)
 
         # Get somatic, dendirtic, and synapse properties
         p_soma = self.__get_soma_props(pos)

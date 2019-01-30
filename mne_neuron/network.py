@@ -168,8 +168,8 @@ class NetworkOnNode ():
             # create the pos_dict for all the sources
             self.pos_dict[key] = [self.origin for i in range(self.N_cells)]
 
-    # cell counting routine
     def __count_cells(self):
+        """Cell counting routine."""
         # cellname list is used *only* for this purpose for now
         for src in self.cellname_list:
             # if it's a cell, then add the number to total number of cells
@@ -184,8 +184,8 @@ class NetworkOnNode ():
         for src in self.extname_list:
             self.N[src] = len(self.pos_dict[src])
 
-    # creates gid dicts and pos_lists
     def __create_gid_dict(self):
+        """creates gid dicts and pos_lists."""
         # initialize gid index gid_ind to start at 0
         gid_ind = [0]
         # append a new gid_ind based on previous and next cell count
@@ -194,7 +194,8 @@ class NetworkOnNode ():
             # N = self.src_list_new[i][1]
             # grab the src name in ordered list src_list_new
             src = self.src_list_new[i]
-            # query the N dict for that number and append here to gid_ind, based on previous entry
+            # query the N dict for that number and append here
+            # to gid_ind, based on previous entry
             gid_ind.append(gid_ind[i] + self.N[src])
             # accumulate total source count
             self.N_src += self.N[src]
@@ -386,8 +387,7 @@ class NetworkOnNode ():
 
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
-        """ this method must be run post-integration
-        """
+        """This method must be run post-integration."""
         # this is quite ugly
         for cell in self.cells:
             # check for celltype
