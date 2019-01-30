@@ -262,18 +262,20 @@ net.movecellstopos()  # position cells in 2D grid
 
 
 def expandbbox(boxA, boxB):
-    return [(min(boxA[i][0], boxB[i][0]), max(boxA[i][1], boxB[i][1])) for i in range(3)]
+    return [(min(boxA[i][0], boxB[i][0]), max(boxA[i][1], boxB[i][1]))
+            for i in range(3)]
 
 
 def arrangelayers():
     # offsets for L2, L5 cells so that L5 below L2 in display
     dyoff = {L2Pyr: 1000, 'L2_pyramidal': 1000,
-             L5Pyr: -1000-149.39990234375, 'L5_pyramidal': -1000-149.39990234375,
+             L5Pyr: -1000 - 149.39990234375,
+             'L5_pyramidal': -1000 - 149.39990234375,
              L2Basket: 1000, 'L2_basket': 1000,
-             L5Basket: -1000-149.39990234375, 'L5_basket': -1000-149.39990234375}
+             L5Basket: -1000 - 149.39990234375,
+             'L5_basket': -1000 - 149.39990234375}
     for cell in net.cells:
         cell.translate3d(0, dyoff[cell.celltype], 0)
-    dcheck = {x: False for x in dyoff.keys()}
     dbbox = {x: [[1e9, -1e9], [1e9, -1e9], [1e9, -1e9]] for x in dyoff.keys()}
     for cell in net.cells:
         dbbox[cell.celltype] = expandbbox(dbbox[cell.celltype], cell.getbbox())
@@ -282,11 +284,11 @@ arrangelayers()  # arrange cells in layers - for visualization purposes
 
 pc.barrier()
 
+
 # save spikes from the individual trials in a single file
-
-
 def catspks():
-    lf = [os.path.join(datdir, 'spk_'+str(i)+'.txt') for i in range(ntrial)]
+    lf = [os.path.join(datdir, 'spk_' + str(i) + '.txt')
+          for i in range(ntrial)]
     if debug:
         print('catspk lf:', lf)
     lspk = [[], []]
