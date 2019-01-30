@@ -236,23 +236,7 @@ def arrangelayers ():
   dcheck = {x:False for x in dyoff.keys()}
   dbbox = {x:[[1e9,-1e9],[1e9,-1e9],[1e9,-1e9]] for x in dyoff.keys()}
   for cell in net.cells:
-
     dbbox[cell.celltype] = expandbbox(dbbox[cell.celltype], cell.getbbox())
-    #if dcheck[cell.celltype]: continue
-    """
-    bbox = cell.getbbox()
-    lx,ly,lz = getshapecoords(h,cell.get_sections())  
-    if cell.celltype == L2Pyr or cell.celltype == 'L2_pyramidal':
-      print('L2Pyr bbox:',bbox)#,lx,ly,lz)
-    elif cell.celltype == L5Pyr or cell.celltype == 'L5_pyramidal':
-      print('L5Pyr bbox:',bbox)#,lx,ly,lz)
-    elif cell.celltype == L2Basket or cell.celltype == 'L2_basket':
-      print('L2Basket bbox:',bbox)#,lx,ly,lz)
-    elif cell.celltype == L5Basket or cell.celltype == 'L5_basket':
-      print('L5Basket bbox:',bbox)#,lx,ly,lz)
-    dcheck[cell.celltype]=True
-    """
-  # for ty in ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']: print(ty, dbbox[ty])
 
 arrangelayers() # arrange cells in layers - for visualization purposes
 
