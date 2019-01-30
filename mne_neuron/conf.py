@@ -55,7 +55,8 @@ class param:
 
     def __str__(self):
         sout = ''
-        for s in [self.var, self.minval, self.maxval, self.origval, self.bounded, self.bestval]:
+        for s in [self.var, self.minval, self.maxval,
+                  self.origval, self.bounded, self.bestval]:
             sout += str(s)
             sout += ' '
         return sout
@@ -97,7 +98,8 @@ def writeconf(fn, sec, opt, val):
         conf.write(cfile)
 
 
-def str2bool(v): return v.lower() in ("true", "t", "1")
+def str2bool(v):
+    return v.lower() in ("true", "t", "1")
 
 # read config file
 
