@@ -18,7 +18,6 @@ from neuron import h
 # Cells are defined in other files
 import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
-from mne_neuron.paramrw import usingOngoingInputs
 from mne_neuron.dipolefn import Dipole
 from mne_neuron.lfp import LFPElectrode
 
@@ -51,8 +50,8 @@ for i in range(len(sys.argv)):
         foundprm = True
         if pcID == 0 and debug:
             print('using ', f_psim, ' param file.')
-    elif sys.argv[i] == 'ntrial' and i+1 < len(sys.argv):
-        ntrial = int(sys.argv[i+1])
+    elif sys.argv[i] == 'ntrial' and i + 1 < len(sys.argv):
+        ntrial = int(sys.argv[i + 1])
         if ntrial < 1:
             ntrial = 1
         if pcID == 0 and debug:
@@ -66,10 +65,10 @@ if not foundprm:
 simstr = f_psim.split(os.path.sep)[-1].split('.param')[0]
 datdir = os.path.join(dproj, simstr)
 
-# spike write function
-
 
 def spikes_write(net, filename_spikes):
+    """Spike write function."""
+
     f = open(filename_spikes, 'w')
     f.close()  # first make sure writes to an empty file
     for rank in range(int(pc.nhost())):
@@ -85,15 +84,16 @@ def spikes_write(net, filename_spikes):
     # let all nodes iterate through loop in which only one rank writes
     pc.barrier()
 
-# copies param file into root dsim directory
-
 
 def copy_paramfile(dsim, f_psim, str_date):
+    """Copies param file into root dsim directory."""
+
     fout = os.path.join(dsim, f_psim.split(os.path.sep)[-1])
     shutil.copyfile(f_psim, fout)
     # open the new param file and append the date to it
     with open(fout, 'a') as f_param:
         f_param.write('\nRun_Date: %s' % str_date)
+
 
 # callback function for printing out time during simulation run
 printdt = 10
@@ -103,10 +103,10 @@ def prsimtime():
     sys.stdout.write('\rSimulation time: {0} ms...'.format(round(h.t, 2)))
     sys.stdout.flush()
 
-# save somatic voltage of all cells to pkl object
-
 
 def save_vsoma():
+    """Save somatic voltage of all cells to pkl object."""
+
     for host in range(int(pc.nhost())):
         if host == pcID:
             dsoma = net.get_vsoma()
@@ -123,8 +123,6 @@ def save_vsoma():
         dsomaout['vtime'] = t_vec.to_python()
         # print('dsomaout.keys():',dsomaout.keys(),'file:',doutf['file_vsoma'])
         pickle.dump(dsomaout, open(doutf['file_vsoma'], 'wb'))
-
-#
 
 
 def savedat(p, rank, t_vec, dp_rec_L2, dp_rec_L5, net):
@@ -149,7 +147,7 @@ def savedat(p, rank, t_vec, dp_rec_L2, dp_rec_L5, net):
         dconf['dipole_scalefctr'] = dpl.scale(
             paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
         dpl.smooth(paramrw.find_param(
-            doutf['file_param'], 'dipole_smooth_win')/h.dt)
+            doutf['file_param'], 'dipole_smooth_win') / h.dt)
         dpl.write(doutf['file_dpl_norm'])
         # write the somatic current to the file
         # for now does not write the total but just L2 somatic and L5 somatic
@@ -169,9 +167,7 @@ def savedat(p, rank, t_vec, dp_rec_L2, dp_rec_L5, net):
         save_vsoma()
     for i, elec in enumerate(lelec):
         elec.lfpout(fn=doutf['file_lfp'].split('.txt')
-                    [0]+'_'+str(i)+'.txt', tvec=t_vec)
-
-#
+                    [0] + '_' + str(i) + '.txt', tvec=t_vec)
 
 
 def setupsimdir(f_psim, p_exp, rank):
@@ -204,7 +200,7 @@ def getfname(ddir, key, trial=0, ntrial=1):
                  'lfp': ('lfp', '.txt')
                  }
     if ntrial == 1 or key == 'param':  # param file currently identical for all trials
-        return os.path.join(datdir, datatypes[key][0]+datatypes[key][1])
+        return os.path.join(datdir, datatypes[key][0] + datatypes[key][1])
     else:
         return os.path.join(datdir, datatypes[key][0] + '_' + str(trial) + datatypes[key][1])
 
@@ -224,6 +220,7 @@ def setoutfiles(ddir, trial=0, ntrial=1):
     doutf['file_lfp'] = getfname(ddir, 'lfp', trial, ntrial)
     # if pcID==0: print(doutf)
     return doutf
+
 
 # creates p_exp.sim_prefix and other param structures
 p_exp = paramrw.ExpParams(f_psim, debug=debug)
@@ -280,8 +277,8 @@ def arrangelayers():
     for cell in net.cells:
         dbbox[cell.celltype] = expandbbox(dbbox[cell.celltype], cell.getbbox())
 
-arrangelayers()  # arrange cells in layers - for visualization purposes
 
+arrangelayers()  # arrange cells in layers - for visualization purposes
 pc.barrier()
 
 
@@ -315,10 +312,10 @@ def catspks():
 def catdpl():
     ldpl = []
     for pre in ['dpl', 'rawdpl']:
-        lf = [os.path.join(datdir, pre+'_'+str(i)+'.txt')
+        lf = [os.path.join(datdir, pre + '_' + str(i) + '.txt')
               for i in range(ntrial)]
         dpl = np.mean(np.array([np.loadtxt(f) for f in lf]), axis=0)
-        with open(os.path.join(datdir, pre+'.txt'), 'w') as fp:
+        with open(os.path.join(datdir, pre + '.txt'), 'w') as fp:
             for i in range(dpl.shape[0]):
                 fp.write("%03.3f\t" % dpl[i, 0])
                 fp.write("%5.8f\t" % dpl[i, 1])
@@ -331,7 +328,7 @@ def catdpl():
 
 
 def catspec():
-    lf = [os.path.join(datdir, 'rawspec_'+str(i)+'.npz')
+    lf = [os.path.join(datdir, 'rawspec_' + str(i) + '.npz')
           for i in range(ntrial)]
     dspecin = {}
     dout = {}
@@ -421,6 +418,7 @@ def setupLFPelectrodes():
         lelec.append(LFPElectrode([370.0, 1050.0, 450.0], pc=pc))
         lelec.append(LFPElectrode([370.0, 208.0, 450.0], pc=pc))
     return lelec
+
 
 lelec = setupLFPelectrodes()
 
