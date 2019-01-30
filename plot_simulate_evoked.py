@@ -18,15 +18,14 @@ import network
 import fileio as fio
 import paramrw as paramrw
 from paramrw import usingOngoingInputs
-import plotfn as plotfn
-import specfn as specfn
 import pickle
 from dipolefn import Dipole
-from conf import readconf
 from lfp import LFPElectrode
 
 from .pyramidal import L5Pyr, L2Pyr
 from .basket import L2Basket, L5Basket
+
+from .conf import readconf
 
 h.load_file("stdrun.hoc")
 
@@ -146,29 +145,6 @@ def savedat (p, rank, t_vec, dp_rec_L2, dp_rec_L5, net):
   if p['save_vsoma']: save_vsoma()
   for i,elec in enumerate(lelec):
     elec.lfpout(fn=doutf['file_lfp'].split('.txt')[0]+'_'+str(i)+'.txt',tvec = t_vec)
-
-#
-def runanalysis (prm, fparam, fdpl, fspec):
-  if pcID==0: print("Running spectral analysis...",)
-  spec_opts = {'type': 'dpl_laminar',
-               'f_max': prm['f_max_spec'],
-               'save_data': 0,
-               'runtype': 'parallel',
-             }
-  t_start_analysis = time.time()
-  specfn.analysis_simp(spec_opts, fparam, fdpl, fspec) # run the spectral analysis
-  if pcID==0 and debug: print("time: %4.4f s" % (time.time() - t_start_analysis))
-
-#
-def savefigs (ddir, prm, p_exp):
-  print("Saving figures...",)
-  plot_start = time.time()
-  # run plots and epscompress function
-  # spec results is passed as an argument here
-  # because it's not necessarily saved
-  xlim_plot = (0., prm['tstop'])
-  plotfn.pallsimp(datdir, p_exp, doutf, xlim_plot)
-  if debug: print("time: %4.4f s" % (time.time() - plot_start))
 
 #
 def setupsimdir (f_psim,p_exp,rank):
@@ -430,9 +406,7 @@ def runsim ():
 
   if pcID == 0:
     if debug: print("Simulation run time: %4.4f s" % (time.time()-t0))
-    if debug: print("Simulation directory is: %s" % ddir.dsim)    
-    if paramrw.find_param(doutf['file_param'],'save_spec_data') or usingOngoingInputs(doutf['file_param']): 
-      runanalysis(p, doutf['file_param'], doutf['file_dpl_norm'], doutf['file_spec']) # run spectral analysis
+    if debug: print("Simulation directory is: %s" % ddir.dsim)
     if paramrw.find_param(doutf['file_param'],'save_figs'): savefigs(ddir,p,p_exp) # save output figures
 
   pc.barrier() # make sure all done in case multiple trials
