@@ -344,77 +344,9 @@ def subdir_move(dir_out, name_dir, file_pattern):
     for filename in glob.iglob(os.path.join(dir_out, file_pattern)):
         shutil.move(filename, dir_name)
 
-# currently used only minimally in epscompress
-# need to figure out how to change argument list in cmd as below
-
-
-def cmds_runmulti(cmdlist):
-    n_threads = multiprocessing.cpu_count()
-    list_runs = [cmdlist[i:i+n_threads]
-                 for i in range(0, len(cmdlist), n_threads)]
-    # open devnull for writing extraneous output
-    with open(os.devnull, 'w') as devnull:
-        for sublist in list_runs:
-            procs = [subprocess.Popen(
-                cmd, stdout=devnull, stderr=devnull) for cmd in sublist]
-            for proc in procs:
-                proc.wait()
-
-# small kernel for png optimization based on fig directory
-
-
-def pngoptimize(dfig):
-    local = 0
-    pnglist = file_match(dfig, '.png', local)
-    cmds_opti = [('optipng', pngfile) for pngfile in pnglist]
-    cmds_runmulti(cmds_opti)
 
 # list spike raster eps files and then rasterize them to HQ png files, lossless compress,
 # reencapsulate as eps, and remove backups when successful
-
-
-def epscompress(dfig_spk, fext_figspk, local=0):
-    cmds_gs = []
-    cmds_opti = []
-    cmds_encaps = []
-    n_threads = multiprocessing.cpu_count()
-    # lists of eps files and corresponding png files
-    # fext_figspk, dfig_spk = fileinfo['figspk']
-    epslist = file_match(dfig_spk, fext_figspk, local)
-    pnglist = [f.replace('.eps', '.png') for f in epslist]
-    epsbackuplist = [f.replace('.eps', '.bak.eps') for f in epslist]
-    # create command lists for gs, optipng, and convert
-    for pngfile, epsfile in zip(pnglist, epslist):
-        cmds_gs.append(
-            ('gs -r300 -dEPSCrop -dTextAlphaBits=4 -sDEVICE=png16m -sOutputFile=%s -dBATCH -dNOPAUSE %s' % (pngfile, epsfile)))
-        cmds_opti.append(('optipng', pngfile))
-        cmds_encaps.append(('convert %s eps3:%s' % (pngfile, epsfile)))
-    # create procs list of manageable lists and run
-    runs_gs = [cmds_gs[i:i+n_threads]
-               for i in range(0, len(cmds_gs), n_threads)]
-    # run each sublist differently
-    for sublist in runs_gs:
-        procs_gs = [subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) for cmd in sublist]
-        for proc in procs_gs:
-            proc.wait()
-    # create optipng procs list and run
-    cmds_runmulti(cmds_opti)
-    # backup original eps files temporarily
-    for epsfile, epsbakfile in zip(epslist, epsbackuplist):
-        shutil.move(epsfile, epsbakfile)
-    # recreate original eps files, now encapsulated, optimized rasters
-    # cmds_runmulti(cmds_encaps)
-    runs_encaps = [cmds_encaps[i:i+n_threads]
-                   for i in range(0, len(cmds_encaps), n_threads)]
-    for sublist in runs_encaps:
-        procs_encaps = [subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.PIPE) for cmd in sublist]
-        for proc in procs_encaps:
-            proc.wait()
-    # remove all of the backup files
-    for epsbakfile in epsbackuplist:
-        os.remove(epsbakfile)
 
 # make dir, catch exceptions
 
