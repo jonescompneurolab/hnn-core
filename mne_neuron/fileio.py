@@ -12,8 +12,6 @@ import sys
 import subprocess
 import numpy as np
 
-from .paramrw import read_expmt_groups, read_sim_prefix
-
 # creates data dirs and a dictionary of useful types
 # self.dfig is a dictionary of experiments, which is each a
 # dictionary of data type
@@ -57,6 +55,9 @@ class SimulationPaths ():
 
     # reads sim information based on sim directory and param files
     def read_sim(self, dproj, dsim):
+        # nested import to avoid circular dependency
+        from .paramrw import read_expmt_groups, read_sim_prefix
+
         self.dproj = dproj
         self.dsim = dsim
         # match the param from this sim

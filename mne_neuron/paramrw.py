@@ -5,11 +5,11 @@
 # last major: (SL: cleanup of self.p_all)
 
 import re
-import fileio as fio
 import numpy as np
 import itertools as it
 
 from .params_default import get_params_default
+from .fileio import clean_lines
 
 # get dict of ':' separated params from fn; ignore lines starting with #
 
@@ -212,7 +212,7 @@ class ExpParams():
 
     # reads .param file and returns p_all_input dict
     def __read_sim(self, f_psim):
-        lines = fio.clean_lines(f_psim)
+        lines = clean_lines(f_psim)
 
         # ignore comments
         lines = [line for line in lines if line[0] is not '#']
@@ -475,7 +475,7 @@ class ExpParams():
 
 
 def read(fparam):
-    lines = fio.clean_lines(fparam)
+    lines = clean_lines(fparam)
     p = {}
     gid_dict = {}
     for line in lines:
@@ -548,7 +548,7 @@ def find_param(fparam, param_key):
 
 
 def read_sim_prefix(fparam):
-    lines = fio.clean_lines(fparam)
+    lines = clean_lines(fparam)
     param_list = [line for line in lines if line.split(
         ': ')[0].startswith('sim_prefix')]
 
@@ -563,7 +563,7 @@ def read_sim_prefix(fparam):
 
 
 def read_expmt_groups(fparam):
-    lines = fio.clean_lines(fparam)
+    lines = clean_lines(fparam)
     lines = [line for line in lines if line.split(': ')[0] == 'expmt_groups']
 
     try:
@@ -803,7 +803,7 @@ def create_pext(p, tstop):
 
 def changed_vars(fparam):
     # Strip empty lines and comments
-    lines = fio.clean_lines(fparam)
+    lines = clean_lines(fparam)
     lines = [line for line in lines if line[0] != '#']
 
     # grab the keys and vals in a list of lists
