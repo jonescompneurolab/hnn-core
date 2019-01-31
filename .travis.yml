@@ -2,7 +2,6 @@ language: python
 
 env:
   - PYTHON_VERSION=3.6
-  - install_prefix=~
 
 before_install:
   - wget -q http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -11,9 +10,10 @@ before_install:
   - export PATH=/home/travis/miniconda/bin:$PATH
   - conda update --yes --quiet conda
 install:
+    - install_prefix=~
     - conda create -n testenv --yes pip python=${PYTHON_VERSION}
     - source activate testenv
-    - conda install --yes --quiet numpy scipy scikit-learn matplotlib
+    - conda install --yes --quiet numpy scipy matplotlib
     - conda install --yes --quiet nose coverage
     - pip install -q flake8 mne check-manifest h5py
     - pip install coverage coveralls
