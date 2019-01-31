@@ -1,0 +1,33 @@
+language: python
+
+env:
+  - PYTHON_VERSION=3.6
+  - install_prefix=~
+
+before_install:
+  - wget -q http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p /home/travis/miniconda
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes --quiet conda
+install:
+    - conda create -n testenv --yes pip python=${PYTHON_VERSION}
+    - source activate testenv
+    - conda install --yes --quiet numpy scipy scikit-learn matplotlib
+    - conda install --yes --quiet nose coverage
+    - pip install -q flake8 mne check-manifest h5py
+    - pip install coverage coveralls
+    - |
+      git clone https://github.com/neuronsimulator/iv
+      cd iv
+      ./build.sh
+      ./configure --prefix=${install_prefix}
+    - |
+      git clone https://github.com/neuronsimulator/nrn
+      cd ../nrn
+      ./build.sh
+      ./configure --with-nrnpython=python3 --with-paranrn --with-iv=${install_prefix} --prefix=${install_prefix}
+      make -j4
+      make install -j4
+      cd src/nrnpython
+      python3 setup.py install
