@@ -3,12 +3,20 @@ language: python
 env:
   - PYTHON_VERSION=3.6
 
+cache:
+  directories:
+  - /home/travis/build/jasmainak/mpich/
+
 before_install:
   - wget -q http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b -p /home/travis/miniconda
   - export PATH=/home/travis/miniconda/bin:$PATH
   - conda update --yes --quiet conda
+  - chmod +x get_mpi.sh
+  - ./get_mpi.sh
+  - export PATH=/home/travis/build/jasmainak/mpich/bin:$PATH
+  - test -n $CC && unset CC
 install:
     - install_prefix=~
     - conda create -n testenv --yes pip python=${PYTHON_VERSION}
