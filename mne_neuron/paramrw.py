@@ -4,7 +4,6 @@
 # rev 2016-05-01 (SL: removed dependence on cartesian, updated for python3)
 # last major: (SL: cleanup of self.p_all)
 
-import re
 import numpy as np
 import itertools as it
 
@@ -26,13 +25,6 @@ def quickreadprm(fn):
             if len(sp) > 1:
                 d[sp[0].strip()] = str(sp[1]).strip()
     return d
-
-# get dict of ':' separated params from fn; ignore lines starting with #
-
-
-def quickgetprm(fn, k, ty):
-    d = quickreadprm(fn)
-    return ty(d[k])
 
 # check if using ongoing inputs
 
@@ -73,83 +65,6 @@ def countEvokedInputs(d):
             elif k.count('evdist') > 0:
                 ndist += 1
     return nprox, ndist
-
-# check if using any evoked inputs
-
-
-def usingEvokedInputs(d, lsuffty=['_evprox_', '_evdist_']):
-    if type(d) == str:
-        d = quickreadprm(d)
-    nprox, ndist = countEvokedInputs(d)
-    tstop = float(d['tstop'])
-    lsuff = []
-    if '_evprox_' in lsuffty:
-        for i in range(1, nprox + 1, 1):
-            lsuff.append('_evprox_' + str(i))
-    if '_evdist_' in lsuffty:
-        for i in range(1, ndist + 1, 1):
-            lsuff.append('_evdist_' + str(i))
-    for suff in lsuff:
-        k = 't' + suff
-        if k not in d:
-            continue
-        if float(d[k]) > tstop:
-            continue
-        k = 'gbar' + suff
-        for k1 in d.keys():
-            if k1.startswith(k):
-                if float(d[k1]) > 0.0:
-                    return True
-    return False
-
-# check if using any poisson inputs
-
-
-def usingPoissonInputs(d):
-    if type(d) == str:
-        d = quickreadprm(d)
-    tstop = float(d['tstop'])
-    if 't0_pois' in d and 'T_pois' in d:
-        t0_pois = float(d['t0_pois'])
-        if t0_pois > tstop:
-            return False
-        T_pois = float(d['T_pois'])
-        if t0_pois > T_pois and T_pois != -1.0:
-            return False
-    for cty in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket']:
-        for sy in ['ampa', 'nmda']:
-            k = cty + '_Pois_A_weight_'+sy
-            if k in d:
-                if float(d[k]) != 0.0:
-                    return True
-    return False
-
-# check if using any tonic (IClamp) inputs
-
-
-def usingTonicInputs(d):
-    if type(d) == str:
-        d = quickreadprm(d)
-    tstop = float(d['tstop'])
-    for cty in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket']:
-        k = 'Itonic_A_' + cty + '_soma'
-        if k in d:
-            amp = float(d[k])
-            if amp != 0.0:
-                print(k, 'amp != 0.0', amp)
-                k = 'Itonic_t0_' + cty
-                t0, t1 = 0.0, -1.0
-                if k in d:
-                    t0 = float(d[k])
-                k = 'Itonic_T_' + cty
-                if k in d:
-                    t1 = float(d[k])
-                if t0 > tstop:
-                    continue
-                # print('t0:',t0,'t1:',t1)
-                if t0 < t1 or t1 == -1.0:
-                    return True
-    return False
 
 # class controlling multiple simulation files (.param)
 
@@ -793,41 +708,6 @@ def create_pext(p, tstop):
 
     return p_ext, p_unique
 
-# Finds the changed variables
-# sort of inefficient, probably should be part of something else
-# not worried about all that right now, as it appears to work
-# brittle in that the match string needs to be correct to find
-# all the changed params is redundant with(?)
-# get_key_types() dynamic keys information
-
-
-def changed_vars(fparam):
-    # Strip empty lines and comments
-    lines = clean_lines(fparam)
-    lines = [line for line in lines if line[0] != '#']
-
-    # grab the keys and vals in a list of lists
-    # each item of keyvals is a pair [key, val]
-    keyvals = [line.split(": ") for line in lines]
-
-    # match the list for changed items starting with "AKL[(" on the 1st char
-    # of the val
-    var_list = [line for line in keyvals if re.match('[AKL[\(]', line[1][0])]
-
-    # additional default info to add always
-    list_meta = [
-        'N_trials',
-        'N_sims',
-        'Run_Date'
-    ]
-
-    # list concatenate these lists
-    var_list += [line for line in keyvals if line[0] in list_meta]
-
-    # return the list of "changed" or "default" vars
-    return var_list
-
-
 # Takes two dictionaries (d1 and d2) and compares the keys in d1 to those in d2
 # if any match, updates the (key, value) pair of d1 to match that of d2
 # not real happy with variable names, but will have to do for now
@@ -838,25 +718,6 @@ def compare_dictionaries(d1, d2):
         d1[key] = d2[key]
 
     return d1
-
-
-def diffdict(d1, d2, verbose=True):
-    """Get diff on 2 dictionaries."""
-    print('d1,d2 num keys - ', len(d1.keys()), len(d2.keys()))
-    for k in d1.keys():
-        if not k in d2:
-            if verbose:
-                print(k, ' in d1, not in d2')
-    for k in d2.keys():
-        if not k in d1:
-            if verbose:
-                print(k, ' in d2, not in d1')
-    for k in d1.keys():
-        if k in d2:
-            if d1[k] != d2[k]:
-                print('d1[', k, ']=',
-                      d1[k], ' d2[', k, ']=',
-                      d2[k])
 
 
 # debug test function
