@@ -45,6 +45,7 @@ install:
       cd $TRAVIS_BUILD_DIR
       python setup.py develop
       export PATH=$PATH:$install_prefix/x86_64/bin
-      nrnivmodl mod/km.mod mod/hh2.mod
+      export NRNHOME=$install_prefix
+      nrnivmodl mod/km.mod
 script:
     - python plot_simulate_evoked.py
