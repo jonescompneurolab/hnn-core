@@ -43,8 +43,9 @@ install:
       python3 setup.py install
     - |
       cd $TRAVIS_BUILD_DIR
-      python setup.py develop
-      export PATH=$PATH:$install_prefix/x86_64/bin
+      export CPU=$(uname -m)
+      export PATH=$PATH:${install_prefix}/x86_64/bin
       make
+      python setup.py develop
 script:
     - python plot_simulate_evoked.py
