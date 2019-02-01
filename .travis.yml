@@ -41,6 +41,9 @@ install:
       make install -j4
       cd src/nrnpython/
       python3 setup.py install
+    - |
+      cd $TRAVIS_BUILD_DIR
+      python setup.py develop
+
 script:
-    - echo $pwd
     - python plot_simulate_evoked.py
