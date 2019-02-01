@@ -44,6 +44,6 @@ install:
     - |
       cd $TRAVIS_BUILD_DIR
       python setup.py develop
-
+      export PATH=$PATH:$TRAVIS_BUILD_DIR/mne-neuron/x86_64
 script:
     - python plot_simulate_evoked.py
