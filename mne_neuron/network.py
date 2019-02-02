@@ -15,7 +15,14 @@ from .basket import L2Basket, L5Basket
 from .paramrw import create_pext
 
 
-class NetworkOnNode ():
+class NetworkOnNode(object):
+    """The NetworkOnNode class.
+
+    Parameters
+    ----------
+    p : dict
+        The parameters
+    """
 
     def __init__(self, p):
         # set the params internally for this net
@@ -155,7 +162,8 @@ class NetworkOnNode ():
         """
         xrange = np.arange(self.gridpyr['x'])
         yrange = np.arange(self.gridpyr['y'])
-        # origin's z component isn't really used in calculating distance functions from origin
+        # origin's z component isn't really used in
+        # calculating distance functions from origin
         # these will be forced as ints!
         origin_x = xrange[int((len(xrange) - 1) // 2)]
         origin_y = yrange[int((len(yrange) - 1) // 2)]

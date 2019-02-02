@@ -8,9 +8,23 @@ import numpy as np
 from neuron import h
 
 
-class ParFeedAll ():
-    # p_ext has a different structure for the extinput
-    # usually, p_ext is a dict of cell types
+class ParFeedAll(object):
+    """"The ParFeedAll class.
+
+    Parameters
+    ----------
+    ty : str
+        The feed type.
+    celltype : str | None
+        The cell type.
+    p_ext : dict | list (XXX: check)
+        Parameters of external input.
+        p_ext has a different structure for the extinput
+        usually, p_ext is a dict of cell types
+    gid : int
+        The gid.
+
+    """
 
     def __init__(self, ty, celltype, p_ext, gid):
         # VecStim setup
