@@ -55,14 +55,14 @@ class BasketSingle(Cell):
         ]
 
         # some parameters
-        t_delay = p['Itonic_t0_%s' % self.celltype]
+        t_delay = p['Itonic_t0_%s' % self.name]
 
         # T = -1 means use nrn.tstop
-        if p['Itonic_T_%s' % self.celltype] == -1:
+        if p['Itonic_T_%s' % self.name] == -1:
             t_dur = nrn.tstop - t_delay
 
         else:
-            t_dur = p['Itonic_T_%s' % self.celltype] - t_delay
+            t_dur = p['Itonic_T_%s' % self.name] - t_delay
 
         # t_dur must be nonnegative, I imagine
         if t_dur < 0.:
@@ -73,7 +73,7 @@ class BasketSingle(Cell):
             'loc': 0.5,
             'delay': t_delay,
             'dur': t_dur,
-            'amp': p['Itonic_A_%s' % self.celltype]
+            'amp': p['Itonic_A_%s' % self.name]
         }
 
         # iterate through list of sect_list_IClamp to create a persistent IClamp object
