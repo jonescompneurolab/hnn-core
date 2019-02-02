@@ -150,43 +150,6 @@ class L2Pyr(Pyr):
         # run record_current_soma(), defined in Cell()
         self.record_current_soma()
 
-    # insert IClamps in all situations
-    # temporarily an external function taking the p dict
-    def create_all_IClamp(self, p):
-        # list of sections for this celltype
-        sect_list_IClamp = [
-            'soma',
-        ]
-
-        # some parameters
-        t_delay = p['Itonic_t0_L2Pyr_soma']
-
-        # T = -1 means use h.tstop
-        if p['Itonic_T_L2Pyr_soma'] == -1:
-            # t_delay = 50.
-            t_dur = h.tstop - t_delay
-
-        else:
-            t_dur = p['Itonic_T_L2Pyr_soma'] - t_delay
-
-        # t_dur must be nonnegative, I imagine
-        if t_dur < 0.:
-            t_dur = 0.
-
-        # properties of the IClamp
-        props_IClamp = {
-            'loc': 0.5,
-            'delay': t_delay,
-            'dur': t_dur,
-            'amp': p['Itonic_A_L2Pyr_soma']
-        }
-
-        # iterate through list of sect_list_IClamp to create a persistent IClamp object
-        # the insert_IClamp procedure is in Cell() and checks on names
-        # so names must be actual section names, or else it will fail silently
-        self.list_IClamp = [self.insert_IClamp(
-            sect_name, props_IClamp) for sect_name in sect_list_IClamp]
-
     # Returns hardcoded somatic properties
     def __get_soma_props(self, pos):
         return {
@@ -832,39 +795,6 @@ class L5Pyr(Pyr):
 
         # run record current soma, defined in Cell()
         self.record_current_soma()
-
-    # insert IClamps in all situations
-    # temporarily an external function taking the p dict
-    def create_all_IClamp(self, p):
-        # list of sections for this celltype
-        sect_list_IClamp = ['soma',]
-
-        # some parameters
-        t_delay = p['Itonic_t0_L5Pyr_soma']
-
-        # T = -1 means use h.tstop
-        if p['Itonic_T_L5Pyr_soma'] == -1:
-            # t_delay = 50.
-            t_dur = h.tstop - t_delay
-        else:
-            t_dur = p['Itonic_T_L5Pyr_soma'] - t_delay
-
-        # t_dur must be nonnegative, I imagine
-        if t_dur < 0.:
-            t_dur = 0.
-
-        # properties of the IClamp
-        props_IClamp = {
-            'loc': 0.5,
-            'delay': t_delay,
-            'dur': t_dur,
-            'amp': p['Itonic_A_L5Pyr_soma']
-        }
-
-        # iterate through list of sect_list_IClamp to create a persistent IClamp object
-        # the insert_IClamp procedure is in Cell() and checks on names
-        # so names must be actual section names, or else it will fail silently
-        self.list_IClamp = [self.insert_IClamp(sect_name, props_IClamp) for sect_name in sect_list_IClamp]
 
     # Sets somatic properties. Returns dictionary.
     def __get_soma_props(self, pos):

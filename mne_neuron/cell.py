@@ -287,3 +287,43 @@ class Cell():
         # self.soma.diam set above
         h.pt3dadd(0, 0, 0, self.diam, sec=self.soma)
         h.pt3dadd(0, self.L, 0, self.diam, sec=self.soma)
+
+    # insert IClamps in all situations
+    def create_all_IClamp(self, p):
+        """ temporarily an external function taking the p dict
+        """
+        # list of sections for this celltype
+        sect_list_IClamp = [
+            'soma',
+        ]
+
+        name_key = self.name
+        if 'Pyr' in self.name:
+            name_key = '%s_soma' % self.name
+        # some parameters
+        t_delay = p['Itonic_t0_%s' % name_key]
+
+        # T = -1 means use h.tstop
+        if p['Itonic_T_%s' % name_key] == -1:
+            t_dur = h.tstop - t_delay
+
+        else:
+            t_dur = p['Itonic_T_%s' % name_key] - t_delay
+
+        # t_dur must be nonnegative, I imagine
+        if t_dur < 0.:
+            t_dur = 0.
+
+        # properties of the IClamp
+        props_IClamp = {
+            'loc': 0.5,
+            'delay': t_delay,
+            'dur': t_dur,
+            'amp': p['Itonic_A_%s' % name_key]
+        }
+
+        # iterate through list of sect_list_IClamp to create a persistent IClamp object
+        # the insert_IClamp procedure is in Cell() and checks on names
+        # so names must be actual section names, or else it will fail silently
+        self.list_IClamp = [self.insert_IClamp(
+            sect_name, props_IClamp) for sect_name in sect_list_IClamp]

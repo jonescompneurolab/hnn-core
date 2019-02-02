@@ -45,43 +45,6 @@ class BasketSingle(Cell):
         self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
         self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
 
-    # insert IClamps in all situations
-    def create_all_IClamp(self, p):
-        """ temporarily an external function taking the p dict
-        """
-        # list of sections for this celltype
-        sect_list_IClamp = [
-            'soma',
-        ]
-
-        # some parameters
-        t_delay = p['Itonic_t0_%s' % self.name]
-
-        # T = -1 means use nrn.tstop
-        if p['Itonic_T_%s' % self.name] == -1:
-            t_dur = nrn.tstop - t_delay
-
-        else:
-            t_dur = p['Itonic_T_%s' % self.name] - t_delay
-
-        # t_dur must be nonnegative, I imagine
-        if t_dur < 0.:
-            t_dur = 0.
-
-        # properties of the IClamp
-        props_IClamp = {
-            'loc': 0.5,
-            'delay': t_delay,
-            'dur': t_dur,
-            'amp': p['Itonic_A_%s' % self.name]
-        }
-
-        # iterate through list of sect_list_IClamp to create a persistent IClamp object
-        # the insert_IClamp procedure is in Cell() and checks on names
-        # so names must be actual section names, or else it will fail silently
-        self.list_IClamp = [self.insert_IClamp(
-            sect_name, props_IClamp) for sect_name in sect_list_IClamp]
-
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
                  lamtha=3., synapse='ampa'):
         for gid_src, pos in zip(gid_dict[type_src],
