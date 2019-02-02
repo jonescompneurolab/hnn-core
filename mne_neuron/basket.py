@@ -41,6 +41,13 @@ class BasketSingle (Cell):
                                      self.pos[1] * 100 + s.z3d(i), s.diam3d(i), sec=s)
         """
 
+    # creation of synapses
+    def __synapse_create(self):
+        # creates synapses onto this cell
+        self.soma_ampa = self.syn_ampa_create(self.soma(0.5))
+        self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
+        self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
+
 
 class L2Basket(BasketSingle):
     def __init__(self, gid=-1, pos=-1):
@@ -51,13 +58,6 @@ class L2Basket(BasketSingle):
 
         self.__synapse_create()
         self.__biophysics()
-
-    # creation of synapses
-    def __synapse_create(self):
-        # creates synapses onto this cell
-        self.soma_ampa = self.syn_ampa_create(self.soma(0.5))
-        self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
-        self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
 
     def __biophysics(self):
         self.soma.insert('hh2')
@@ -271,13 +271,6 @@ class L5Basket(BasketSingle):
 
         self.__synapse_create()
         self.__biophysics()
-
-    # creates synapses
-    def __synapse_create(self):
-        # creates synapses onto this cell
-        self.soma_ampa = self.syn_ampa_create(self.soma(0.5))
-        self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
-        self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
 
     # insert IClamps in all situations
     def create_all_IClamp(self, p):
