@@ -48,6 +48,43 @@ class BasketSingle (Cell):
         self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
         self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
 
+    # insert IClamps in all situations
+    def create_all_IClamp(self, p):
+        """ temporarily an external function taking the p dict
+        """
+        # list of sections for this celltype
+        sect_list_IClamp = [
+            'soma',
+        ]
+
+        # some parameters
+        t_delay = p['Itonic_t0_%s' % self.celltype]
+
+        # T = -1 means use nrn.tstop
+        if p['Itonic_T_%s' % self.celltype] == -1:
+            t_dur = nrn.tstop - t_delay
+
+        else:
+            t_dur = p['Itonic_T_%s' % self.celltype] - t_delay
+
+        # t_dur must be nonnegative, I imagine
+        if t_dur < 0.:
+            t_dur = 0.
+
+        # properties of the IClamp
+        props_IClamp = {
+            'loc': 0.5,
+            'delay': t_delay,
+            'dur': t_dur,
+            'amp': p['Itonic_A_%s' % self.celltype]
+        }
+
+        # iterate through list of sect_list_IClamp to create a persistent IClamp object
+        # the insert_IClamp procedure is in Cell() and checks on names
+        # so names must be actual section names, or else it will fail silently
+        self.list_IClamp = [self.insert_IClamp(
+            sect_name, props_IClamp) for sect_name in sect_list_IClamp]
+
 
 class L2Basket(BasketSingle):
     def __init__(self, gid=-1, pos=-1):
@@ -61,42 +98,6 @@ class L2Basket(BasketSingle):
 
     def __biophysics(self):
         self.soma.insert('hh2')
-
-    # insert IClamps in all situations
-    def create_all_IClamp(self, p):
-        # list of sections for this celltype
-        sect_list_IClamp = [
-            'soma',
-        ]
-
-        # some parameters
-        t_delay = p['Itonic_t0_L2Basket']
-
-        # T = -1 means use nrn.tstop
-        if p['Itonic_T_L2Basket'] == -1:
-            t_dur = nrn.tstop - t_delay
-
-        else:
-            t_dur = p['Itonic_T_L2Basket'] - t_delay
-
-        # t_dur must be nonnegative, I imagine
-        if t_dur < 0.:
-            t_dur = 0.
-
-        # properties of the IClamp
-        props_IClamp = {
-            'loc': 0.5,
-            'delay': t_delay,
-            'dur': t_dur,
-            'amp': p['Itonic_A_L2Basket']
-        }
-
-        # iterate through list of sect_list_IClamp to create a persistent IClamp object
-        # the insert_IClamp procedure is in Cell() and checks on names
-        # so names must be actual section names, or else it will fail silently
-        # self.list_IClamp as a variable is guaranteed in Cell()
-        self.list_IClamp = [self.insert_IClamp(
-            sect_name, props_IClamp) for sect_name in sect_list_IClamp]
 
     # par connect between all presynaptic cells
     # no connections from L5Pyr or L5Basket to L2Baskets
@@ -271,43 +272,6 @@ class L5Basket(BasketSingle):
 
         self.__synapse_create()
         self.__biophysics()
-
-    # insert IClamps in all situations
-    def create_all_IClamp(self, p):
-        """ temporarily an external function taking the p dict
-        """
-        # list of sections for this celltype
-        sect_list_IClamp = [
-            'soma',
-        ]
-
-        # some parameters
-        t_delay = p['Itonic_t0_L5Basket']
-
-        # T = -1 means use nrn.tstop
-        if p['Itonic_T_L5Basket'] == -1:
-            t_dur = nrn.tstop - t_delay
-
-        else:
-            t_dur = p['Itonic_T_L5Basket'] - t_delay
-
-        # t_dur must be nonnegative, I imagine
-        if t_dur < 0.:
-            t_dur = 0.
-
-        # properties of the IClamp
-        props_IClamp = {
-            'loc': 0.5,
-            'delay': t_delay,
-            'dur': t_dur,
-            'amp': p['Itonic_A_L5Basket']
-        }
-
-        # iterate through list of sect_list_IClamp to create a persistent IClamp object
-        # the insert_IClamp procedure is in Cell() and checks on names
-        # so names must be actual section names, or else it will fail silently
-        self.list_IClamp = [self.insert_IClamp(
-            sect_name, props_IClamp) for sect_name in sect_list_IClamp]
 
     # defines biophysics
     def __biophysics(self):
