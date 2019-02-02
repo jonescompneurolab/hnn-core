@@ -82,6 +82,25 @@ class BasketSingle(Cell):
         self.list_IClamp = [self.insert_IClamp(
             sect_name, props_IClamp) for sect_name in sect_list_IClamp]
 
+    def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
+                 lamtha=3., synapse='ampa'):
+        for gid_src, pos in zip(gid_dict[type_src],
+                                pos_dict[type_src]):
+            if gid_src == gid:
+                continue
+            nc_dict = {
+                'pos_src': pos,
+                'A_weight': p['gbar_%s_%s' % (name_src, self.name)],
+                'A_delay': 1.,
+                'lamtha': lamtha,
+                'threshold': p['threshold'],
+                'type_src': type_src
+            }
+
+            getattr(self, 'ncfrom_%s' % name_src).append(
+                self.parconnect_from_src(
+                    gid_src, nc_dict, getattr(self, 'soma_%s' % synapse)))
+
 
 class L2Basket(BasketSingle):
     def __init__(self, gid=-1, pos=-1):
@@ -96,35 +115,9 @@ class L2Basket(BasketSingle):
     # par connect between all presynaptic cells
     # no connections from L5Pyr or L5Basket to L2Baskets
     def parconnect(self, gid, gid_dict, pos_dict, p):
-        # FROM L2 pyramidals TO this cell
-        for gid_src, pos in zip(gid_dict['L2_pyramidal'], pos_dict['L2_pyramidal']):
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L2Pyr_L2Basket'],
-                'A_delay': 1.,
-                'lamtha': 3.,
-                'threshold': p['threshold'],
-                'type_src': 'L2_pyramidal'
-            }
-
-            self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                gid_src, nc_dict, self.soma_ampa))
-
-        # FROM other L2Basket cells
-        for gid_src, pos in zip(gid_dict['L2_basket'], pos_dict['L2_basket']):
-            # no autapses
-            # if gid_src != gid:
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L2Basket_L2Basket'],
-                'A_delay': 1.,
-                'lamtha': 20.,
-                'threshold': p['threshold'],
-                'type_src': 'L2_basket'
-            }
-
-            self.ncfrom_L2Basket.append(self.parconnect_from_src(
-                gid_src, nc_dict, self.soma_gabaa))
+        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr')
+        self._connect(gid, gid_dict, pos_dict, p, 'L2_basket', 'L2Basket',
+                      lamtha=20., synapse='gabaa')
 
     # this function might make more sense as a method of net?
     # par: receive from external inputs
@@ -270,48 +263,10 @@ class L5Basket(BasketSingle):
     # connections FROM other cells TO this cell
     # there are no connections from the L2Basket cells. congrats!
     def parconnect(self, gid, gid_dict, pos_dict, p):
-        # FROM other L5Basket cells TO this cell
-        for gid_src, pos in zip(gid_dict['L5_basket'], pos_dict['L5_basket']):
-            if gid_src != gid:
-                nc_dict = {
-                    'pos_src': pos,
-                    'A_weight': p['gbar_L5Basket_L5Basket'],
-                    'A_delay': 1.,
-                    'lamtha': 20.,
-                    'threshold': p['threshold'],
-                    'type_src': 'L5_basket'
-                }
-
-                self.ncfrom_L5Basket.append(self.parconnect_from_src(
-                    gid_src, nc_dict, self.soma_gabaa))
-
-        # FROM other L5Pyr cells TO this cell
-        for gid_src, pos in zip(gid_dict['L5_pyramidal'], pos_dict['L5_pyramidal']):
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L5Pyr_L5Basket'],
-                'A_delay': 1.,
-                'lamtha': 3.,
-                'threshold': p['threshold'],
-                'type_src': 'L5_pyramidal'
-            }
-
-            self.ncfrom_L5Pyr.append(self.parconnect_from_src(
-                gid_src, nc_dict, self.soma_ampa))
-
-        # FROM other L2Pyr cells TO this cell
-        for gid_src, pos in zip(gid_dict['L2_pyramidal'], pos_dict['L2_pyramidal']):
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L2Pyr_L5Basket'],
-                'A_delay': 1.,
-                'lamtha': 3.,
-                'threshold': p['threshold'],
-                'type_src': 'L2_pyramidal'
-            }
-
-            self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                gid_src, nc_dict, self.soma_ampa))
+        self._connect(gid, gid_dict, pos_dict, p, 'L5_basket', 'L5Basket',
+                      lamtha=20., synapse='gabaa')
+        self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr')
+        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr')
 
     # parallel receive function parreceive()
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
