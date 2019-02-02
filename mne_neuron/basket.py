@@ -34,12 +34,6 @@ class BasketSingle (Cell):
     # convention is followed in this function ease use of gui.
     def __shape_change(self):
         self.shape_soma()
-        """
-        s = self.soma
-        for i in range(int(s.n3d())):
-            h.pt3dchange(i, self.pos[0]*100 + s.x3d(i), -self.pos[2] + s.y3d(i),
-                                     self.pos[1] * 100 + s.z3d(i), s.diam3d(i), sec=s)
-        """
 
     # creation of synapses
     def __synapse_create(self):
