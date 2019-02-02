@@ -19,6 +19,9 @@ class BasketSingle(Cell):
         # set 3D shape - unused for now but a prototype
         self.__shape_change()
 
+    def _biophysics(self):
+        self.soma.insert('hh2')
+
     def __set_props(self, cell_name, pos):
         return {
             'pos': pos,
@@ -88,10 +91,7 @@ class L2Basket(BasketSingle):
         self.celltype = 'L2_basket'
 
         self._synapse_create()
-        self.__biophysics()
-
-    def __biophysics(self):
-        self.soma.insert('hh2')
+        self._biophysics()
 
     # par connect between all presynaptic cells
     # no connections from L5Pyr or L5Basket to L2Baskets
@@ -265,11 +265,7 @@ class L5Basket(BasketSingle):
         self.celltype = 'L5_basket'
 
         self._synapse_create()
-        self.__biophysics()
-
-    # defines biophysics
-    def __biophysics(self):
-        self.soma.insert('hh2')
+        self._biophysics()
 
     # connections FROM other cells TO this cell
     # there are no connections from the L2Basket cells. congrats!
