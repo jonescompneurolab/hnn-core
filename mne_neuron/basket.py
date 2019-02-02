@@ -8,7 +8,7 @@ from .cell import Cell
 # Units for gbar: S/cm^2 unless otherwise noted
 
 
-class BasketSingle (Cell):
+class BasketSingle(Cell):
     """Inhibitory cell class."""
 
     def __init__(self, gid, pos, cell_name='Basket'):
@@ -36,7 +36,7 @@ class BasketSingle (Cell):
         self.shape_soma()
 
     # creation of synapses
-    def __synapse_create(self):
+    def _synapse_create(self):
         # creates synapses onto this cell
         self.soma_ampa = self.syn_ampa_create(self.soma(0.5))
         self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
@@ -87,7 +87,7 @@ class L2Basket(BasketSingle):
         BasketSingle.__init__(self, gid, pos, 'L2Basket')
         self.celltype = 'L2_basket'
 
-        self.__synapse_create()
+        self._synapse_create()
         self.__biophysics()
 
     def __biophysics(self):
@@ -264,7 +264,7 @@ class L5Basket(BasketSingle):
         BasketSingle.__init__(self, gid, pos, 'L5Basket')
         self.celltype = 'L5_basket'
 
-        self.__synapse_create()
+        self._synapse_create()
         self.__biophysics()
 
     # defines biophysics
