@@ -1,0 +1,51 @@
+language: python
+
+env:
+  - PYTHON_VERSION=3.6
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - libopenmpi-dev
+
+
+before_install:
+  - wget -q http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p /home/travis/miniconda
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes --quiet conda
+
+install:
+    - install_prefix=~
+    - conda create -n testenv --yes pip python=${PYTHON_VERSION}
+    - source activate testenv
+    - conda install --yes scipy numpy matplotlib pyqt pyqtgraph pyopengl
+    - pip install mpi4py
+    - pip install coverage coveralls
+    - |
+      git clone https://github.com/neuronsimulator/iv
+      cd iv
+      ./build.sh
+      ./configure --prefix=${install_prefix}
+      make -j4
+      make install -j4
+    - |
+      git clone https://github.com/neuronsimulator/nrn
+      cd nrn
+      ./build.sh
+      ./configure --with-nrnpython=python3 --with-paranrn --with-iv=${install_prefix} --prefix=${install_prefix}
+      make -j4
+      make install -j4
+      cd src/nrnpython/
+      python3 setup.py install
+    - |
+      cd $TRAVIS_BUILD_DIR
+      export CPU=$(uname -m)
+      export PATH=$PATH:${install_prefix}/x86_64/bin
+      make
+      python setup.py develop
+script:
+    - python plot_simulate_evoked.py

@@ -152,8 +152,8 @@ class SimulationPaths ():
 
     # returns the directory for the sim
     def __simdir(self):
-        return os.path.join(
-            os.path.expanduser('~'), 'hnn', 'data', self.sim_prefix)
+        return os.path.join(os.path.dirname(__file__), '..', 'data',
+                            self.sim_prefix)
 
     # creates all the experimental directories based on dproj
     def __create_dexpmt(self, expmt_groups):
