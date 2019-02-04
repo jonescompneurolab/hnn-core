@@ -23,7 +23,7 @@ install:
     - conda create -n testenv --yes pip python=${PYTHON_VERSION}
     - source activate testenv
     - conda install --yes scipy numpy matplotlib pyqt pyqtgraph pyopengl
-    - pip install mpi4py
+    - pip install mpi4py mne
     - pip install coverage coveralls
     - |
       git clone https://github.com/neuronsimulator/iv
@@ -49,3 +49,4 @@ install:
       python setup.py develop
 script:
     - python plot_simulate_evoked.py
+    - pytest mne_neuron/tests/test_mne_neuron.py
