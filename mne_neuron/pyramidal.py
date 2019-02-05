@@ -575,7 +575,8 @@ class L2Pyr(Pyr):
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_ampa, self.apicaloblique_ampa))
 
-                    # NEW: note that default/original is 0 nmda weight for these proximal dends
+                    # NEW: note that default/original is 0 nmda weight
+                    # for these proximal dends
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_nmda, self.basal2_nmda))
                     self.ncfrom_ev.append(self.parconnect_from_src(
@@ -954,7 +955,8 @@ class L5Pyr(Pyr):
         }
 
         # connections FROM L5Pyr TO here
-        for gid_src, pos in zip(gid_dict['L5_pyramidal'], pos_dict['L5_pyramidal']):
+        for gid_src, pos in zip(gid_dict['L5_pyramidal'],
+                                pos_dict['L5_pyramidal']):
             # no autapses
             if gid_src != gid:
                 nc_dict['ampa'] = {
@@ -987,9 +989,15 @@ class L5Pyr(Pyr):
                 }
 
                 # nmda connections
-                self.ncfrom_L5Pyr.append(self.parconnect_from_src(gid_src, nc_dict['nmda'], self.apicaloblique_nmda))
-                self.ncfrom_L5Pyr.append(self.parconnect_from_src(gid_src, nc_dict['nmda'], self.basal2_nmda))
-                self.ncfrom_L5Pyr.append(self.parconnect_from_src(gid_src, nc_dict['nmda'], self.basal3_nmda))
+                self.ncfrom_L5Pyr.append(
+                    self.parconnect_from_src(gid_src, nc_dict['nmda'],
+                                             self.apicaloblique_nmda))
+                self.ncfrom_L5Pyr.append(
+                    self.parconnect_from_src(gid_src, nc_dict['nmda'],
+                                             self.basal2_nmda))
+                self.ncfrom_L5Pyr.append(
+                    self.parconnect_from_src(
+                        gid_src, nc_dict['nmda'], self.basal3_nmda))
 
         # connections FROM L5Basket TO here
         for gid_src, pos in zip(gid_dict['L5_basket'], pos_dict['L5_basket']):
@@ -999,7 +1007,7 @@ class L5Pyr(Pyr):
                 'A_delay': 1.,
                 'lamtha': 70.,
                 'threshold': p['threshold'],
-                'type_src' : 'L5_basket'
+                'type_src': 'L5_basket'
             }
 
             nc_dict['gabab'] = {
@@ -1008,15 +1016,20 @@ class L5Pyr(Pyr):
                 'A_delay': 1.,
                 'lamtha': 70.,
                 'threshold': p['threshold'],
-                'type_src' : 'L5_basket'
+                'type_src': 'L5_basket'
             }
 
             # soma synapses are defined in Pyr()
-            self.ncfrom_L5Basket.append(self.parconnect_from_src(gid_src, nc_dict['gabaa'], self.synapses['soma_gabaa']))
-            self.ncfrom_L5Basket.append(self.parconnect_from_src(gid_src, nc_dict['gabab'], self.synapses['soma_gabab']))
+            self.ncfrom_L5Basket.append(
+                self.parconnect_from_src(gid_src, nc_dict['gabaa'],
+                                         self.synapses['soma_gabaa']))
+            self.ncfrom_L5Basket.append(
+                self.parconnect_from_src(gid_src, nc_dict['gabab'],
+                                         self.synapses['soma_gabab']))
 
         # connections FROM L2Pyr TO here
-        for gid_src, pos in zip(gid_dict['L2_pyramidal'], pos_dict['L2_pyramidal']):
+        for gid_src, pos in zip(gid_dict['L2_pyramidal'],
+                                pos_dict['L2_pyramidal']):
             # this delay is longer than most
             nc_dict = {
                 'pos_src': pos,
@@ -1024,13 +1037,21 @@ class L5Pyr(Pyr):
                 'A_delay': 1.,
                 'lamtha': 3.,
                 'threshold': p['threshold'],
-                'type_src' : 'L2_pyramidal'
+                'type_src': 'L2_pyramidal'
             }
 
-            self.ncfrom_L2Pyr.append(self.parconnect_from_src(gid_src, nc_dict, self.basal2_ampa))
-            self.ncfrom_L2Pyr.append(self.parconnect_from_src(gid_src, nc_dict, self.basal3_ampa))
-            self.ncfrom_L2Pyr.append(self.parconnect_from_src(gid_src, nc_dict, self.apicaltuft_ampa))
-            self.ncfrom_L2Pyr.append(self.parconnect_from_src(gid_src, nc_dict, self.apicaloblique_ampa))
+            self.ncfrom_L2Pyr.append(
+                self.parconnect_from_src(
+                    gid_src, nc_dict, self.basal2_ampa))
+            self.ncfrom_L2Pyr.append(
+                self.parconnect_from_src(
+                    gid_src, nc_dict, self.basal3_ampa))
+            self.ncfrom_L2Pyr.append(
+                self.parconnect_from_src(
+                    gid_src, nc_dict, self.apicaltuft_ampa))
+            self.ncfrom_L2Pyr.append(
+                self.parconnect_from_src(
+                    gid_src, nc_dict, self.apicaloblique_ampa))
 
         # connections FROM L2Basket TO here
         for gid_src, pos in zip(gid_dict['L2_basket'], pos_dict['L2_basket']):
@@ -1040,10 +1061,12 @@ class L5Pyr(Pyr):
                 'A_delay': 1.,
                 'lamtha': 50.,
                 'threshold': p['threshold'],
-                'type_src' : 'L2_basket'
+                'type_src': 'L2_basket'
             }
 
-            self.ncfrom_L2Basket.append(self.parconnect_from_src(gid_src, nc_dict, self.apicaltuft_gabaa))
+            self.ncfrom_L2Basket.append(
+                self.parconnect_from_src(
+                    gid_src, nc_dict, self.apicaltuft_gabaa))
 
     # receive from external inputs
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
