@@ -170,6 +170,30 @@ class Pyr(Cell):
             })
         return props
 
+    def _get_syn_props(self):
+        return {
+            'ampa': {
+                'e': self.p_all['%s_ampa_e' % self.name],
+                'tau1': self.p_all['%s_ampa_tau1' % self.name],
+                'tau2': self.p_all['%s_ampa_tau2' % self.name],
+            },
+            'nmda': {
+                'e': self.p_all['%s_nmda_e' % self.name],
+                'tau1': self.p_all['%s_nmda_tau1' % self.name],
+                'tau2': self.p_all['%s_nmda_tau2' % self.name],
+            },
+            'gabaa': {
+                'e': self.p_all['%s_gabaa_e' % self.name],
+                'tau1': self.p_all['%s_gabaa_tau1' % self.name],
+                'tau2': self.p_all['%s_gabaa_tau2' % self.name],
+            },
+            'gabab': {
+                'e': self.p_all['%s_gabab_e' % self.name],
+                'tau1': self.p_all['%s_gabab_tau1' % self.name],
+                'tau2': self.p_all['%s_gabab_tau2' % self.name],
+            }
+        }
+
     def _synapse_create(self, p_syn):
         """Creates synapses onto this cell."""
         # Somatic synapses
@@ -228,7 +252,7 @@ class L2Pyr(Pyr):
         Pyr.__init__(self, gid, p_soma)
 
         p_dend = self._get_dend_props()
-        p_syn = self.__get_syn_props()
+        p_syn = self._get_syn_props()
         # p_dend_props, dend_names = self.__get_dend_props()
 
         self.celltype = 'L2_pyramidal'
@@ -272,30 +296,6 @@ class L2Pyr(Pyr):
         #              'basal_1', 'basal_2', 'basal_3']
 
         # return dend_props, dend_order
-
-    def __get_syn_props(self):
-        return {
-            'ampa': {
-                'e': self.p_all['L2Pyr_ampa_e'],
-                'tau1': self.p_all['L2Pyr_ampa_tau1'],
-                'tau2': self.p_all['L2Pyr_ampa_tau2'],
-            },
-            'nmda': {
-                'e': self.p_all['L2Pyr_nmda_e'],
-                'tau1': self.p_all['L2Pyr_nmda_tau1'],
-                'tau2': self.p_all['L2Pyr_nmda_tau2'],
-            },
-            'gabaa': {
-                'e': self.p_all['L2Pyr_gabaa_e'],
-                'tau1': self.p_all['L2Pyr_gabaa_tau1'],
-                'tau2': self.p_all['L2Pyr_gabaa_tau2'],
-            },
-            'gabab': {
-                'e': self.p_all['L2Pyr_gabab_e'],
-                'tau1': self.p_all['L2Pyr_gabab_tau1'],
-                'tau2': self.p_all['L2Pyr_gabab_tau2'],
-            }
-        }
 
     def geom(self, p_dend):
         soma = self.soma
@@ -724,8 +724,9 @@ class L5Pyr(Pyr):
         dend[7].diam = 8.5
         self.set_dend_props(p_dend) # resets length,diam,etc. based on param specification
 
-    def __init__(self, gid = -1, pos = -1, p={}):
-        # Get default L5Pyr params and update them with corresponding params in p
+    def __init__(self, gid=-1, pos=-1, p={}):
+        """.Get default L5Pyr params and update them with
+            corresponding params in p."""
         p_all_default = get_L5Pyr_params_default()
         self.p_all = compare_dictionaries(p_all_default, p)
 
@@ -734,7 +735,7 @@ class L5Pyr(Pyr):
 
         Pyr.__init__(self, gid, p_soma)
         p_dend = self._get_dend_props()
-        p_syn = self.__get_syn_props()
+        p_syn = self._get_syn_props()
 
         self.celltype = 'L5_pyramidal'
 
@@ -771,30 +772,6 @@ class L5Pyr(Pyr):
             'cm': self.p_all['L5Pyr_soma_cm'],
             'Ra': self.p_all['L5Pyr_soma_Ra'],
             'name': 'L5Pyr',
-        }
-
-    def __get_syn_props(self):
-        return {
-            'ampa': {
-                'e': self.p_all['L5Pyr_ampa_e'],
-                'tau1': self.p_all['L5Pyr_ampa_tau1'],
-                'tau2': self.p_all['L5Pyr_ampa_tau2'],
-            },
-            'nmda': {
-                'e': self.p_all['L5Pyr_nmda_e'],
-                'tau1': self.p_all['L5Pyr_nmda_tau1'],
-                'tau2': self.p_all['L5Pyr_nmda_tau2'],
-            },
-            'gabaa': {
-                'e': self.p_all['L5Pyr_gabaa_e'],
-                'tau1': self.p_all['L5Pyr_gabaa_tau1'],
-                'tau2': self.p_all['L5Pyr_gabaa_tau2'],
-            },
-            'gabab': {
-                'e': self.p_all['L5Pyr_gabab_e'],
-                'tau1': self.p_all['L5Pyr_gabab_tau1'],
-                'tau2': self.p_all['L5Pyr_gabab_tau2'],
-            }
         }
 
     # connects sections of this cell together
