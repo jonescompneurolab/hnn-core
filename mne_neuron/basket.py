@@ -1,7 +1,5 @@
 """Model for inhibitory cell class."""
 
-from neuron import h as nrn
-
 from .cell import Cell
 
 # Units for e: mV

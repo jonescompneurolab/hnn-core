@@ -113,10 +113,74 @@ class Pyr(Cell):
                 ls.append(key)
         return ls
 
-# Layer 2 pyramidal cell class
+    def _get_dend_props(self):
+        """Returns hardcoded dendritic properties."""
+        props = {
+            'apical_trunk': {
+                'L': self.p_all['%s_apicaltrunk_L' % self.name],
+                'diam': self.p_all['%s_apicaltrunk_diam' % self.name],
+                'cm': self.p_all['%s_dend_cm' % self.name],
+                'Ra': self.p_all['%s_dend_Ra' % self.name],
+            },
+            'apical_1': {
+                'L': self.p_all['%s_apical1_L' % self.name],
+                'diam': self.p_all['%s_apical1_diam' % self.name],
+                'cm': self.p_all['%s_dend_cm' % self.name],
+                'Ra': self.p_all['%s_dend_Ra' % self.name],
+            },
+            'apical_tuft': {
+                'L': self.p_all['%s_apicaltuft_L' % self.name],
+                'diam': self.p_all['%s_apicaltuft_diam' % self.name],
+                'cm': self.p_all['%s_dend_cm' % self.name],
+                'Ra': self.p_all['%s_dend_Ra' % self.name],
+            },
+            'apical_oblique': {
+                'L': self.p_all['%s_apicaloblique_L' % self.name],
+                'diam': self.p_all['%s_apicaloblique_diam' % self.name],
+                'cm': self.p_all['%s_dend_cm' % self.name],
+                'Ra': self.p_all['%s_dend_Ra' % self.name],
+            },
+            'basal_1': {
+                'L': self.p_all['%s_basal1_L' % self.name],
+                'diam': self.p_all['%s_basal1_diam' % self.name],
+                'cm': self.p_all['%s_dend_cm' % self.name],
+                'Ra': self.p_all['%s_dend_Ra' % self.name],
+            },
+            'basal_2': {
+                'L': self.p_all['%s_basal2_L' % self.name],
+                'diam': self.p_all['%s_basal2_diam' % self.name],
+                'cm': self.p_all['%s_dend_cm' % self.name],
+                'Ra': self.p_all['%s_dend_Ra' % self.name],
+            },
+            'basal_3': {
+                'L': self.p_all['%s_basal3_L' % self.name],
+                'diam': self.p_all['%s_basal3_diam' % self.name],
+                'cm': self.p_all['%s_dend_cm' % self.name],
+                'Ra': self.p_all['%s_dend_Ra' % self.name],
+            },
+        }
+        if self.name == 'L5Pyr':
+            props.update({
+                'apical_2': {
+                    'L': self.p_all['L5Pyr_apical2_L'],
+                    'diam': self.p_all['L5Pyr_apical2_diam'],
+                    'cm': self.p_all['L5Pyr_dend_cm'],
+                    'Ra': self.p_all['L5Pyr_dend_Ra'],
+                },
+            })
+        return props
 
 
 class L2Pyr(Pyr):
+    """Layer 2 pyramidal cell class.
+
+    Parameters
+    ----------
+    gid : int
+        The cell id.
+    p : dict
+        The parameters dictionary.
+    """
 
     def __init__(self, gid=-1, pos=-1, p={}):
         # Get default L2Pyr params and update them with any
@@ -126,12 +190,14 @@ class L2Pyr(Pyr):
 
         # Get somatic, dendritic, and synapse properties
         p_soma = self.__get_soma_props(pos)
-        p_dend = self.__get_dend_props()
-        p_syn = self.__get_syn_props()
-        # p_dend_props, dend_names = self.__get_dend_props()
 
         # usage: Pyr.__init__(self, soma_props)
         Pyr.__init__(self, gid, p_soma)
+
+        p_dend = self._get_dend_props()
+        p_syn = self.__get_syn_props()
+        # p_dend_props, dend_names = self.__get_dend_props()
+
         self.celltype = 'L2_pyramidal'
 
         # geometry
@@ -166,53 +232,6 @@ class L2Pyr(Pyr):
             'cm': self.p_all['L2Pyr_soma_cm'],
             'Ra': self.p_all['L2Pyr_soma_Ra'],
             'name': 'L2Pyr',
-        }
-
-    # Returns hardcoded dendritic properties
-    def __get_dend_props(self):
-        return {
-            'apical_trunk': {
-                'L': self.p_all['L2Pyr_apicaltrunk_L'],
-                'diam': self.p_all['L2Pyr_apicaltrunk_diam'],
-                'cm': self.p_all['L2Pyr_dend_cm'],
-                'Ra': self.p_all['L2Pyr_dend_Ra'],
-            },
-            'apical_1': {
-                'L': self.p_all['L2Pyr_apical1_L'],
-                'diam': self.p_all['L2Pyr_apical1_diam'],
-                'cm': self.p_all['L2Pyr_dend_cm'],
-                'Ra': self.p_all['L2Pyr_dend_Ra'],
-            },
-            'apical_tuft': {
-                'L': self.p_all['L2Pyr_apicaltuft_L'],
-                'diam': self.p_all['L2Pyr_apicaltuft_diam'],
-                'cm': self.p_all['L2Pyr_dend_cm'],
-                'Ra': self.p_all['L2Pyr_dend_Ra'],
-            },
-            'apical_oblique': {
-                'L': self.p_all['L2Pyr_apicaloblique_L'],
-                'diam': self.p_all['L2Pyr_apicaloblique_diam'],
-                'cm': self.p_all['L2Pyr_dend_cm'],
-                'Ra': self.p_all['L2Pyr_dend_Ra'],
-            },
-            'basal_1': {
-                'L': self.p_all['L2Pyr_basal1_L'],
-                'diam': self.p_all['L2Pyr_basal1_diam'],
-                'cm': self.p_all['L2Pyr_dend_cm'],
-                'Ra': self.p_all['L2Pyr_dend_Ra'],
-            },
-            'basal_2': {
-                'L': self.p_all['L2Pyr_basal2_L'],
-                'diam': self.p_all['L2Pyr_basal2_diam'],
-                'cm': self.p_all['L2Pyr_dend_cm'],
-                'Ra': self.p_all['L2Pyr_dend_Ra'],
-            },
-            'basal_3': {
-                'L': self.p_all['L2Pyr_basal3_L'],
-                'diam': self.p_all['L2Pyr_basal3_diam'],
-                'cm': self.p_all['L2Pyr_dend_cm'],
-                'Ra': self.p_all['L2Pyr_dend_Ra'],
-            },
         }
 
         # This order matters!
@@ -705,10 +724,11 @@ class L5Pyr(Pyr):
 
         # Get somatic, dendirtic, and synapse properties
         p_soma = self.__get_soma_props(pos)
-        p_dend = self.__get_dend_props()
-        p_syn = self.__get_syn_props()
 
         Pyr.__init__(self, gid, p_soma)
+        p_dend = self._get_dend_props()
+        p_syn = self.__get_syn_props()
+
         self.celltype = 'L5_pyramidal'
 
         # Geometry
@@ -744,62 +764,6 @@ class L5Pyr(Pyr):
             'cm': self.p_all['L5Pyr_soma_cm'],
             'Ra': self.p_all['L5Pyr_soma_Ra'],
             'name': 'L5Pyr',
-        }
-
-    # Returns dictionary of dendritic properties and list of dendrite names
-    def __get_dend_props(self):
-        # def __set_dend_props(self):
-        # Hard coded dend properties
-        # dend_props =  {
-        return {
-            'apical_trunk': {
-                'L': self.p_all['L5Pyr_apicaltrunk_L'],
-                'diam': self.p_all['L5Pyr_apicaltrunk_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
-            'apical_1': {
-                'L': self.p_all['L5Pyr_apical1_L'],
-                'diam': self.p_all['L5Pyr_apical1_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
-            'apical_2': {
-                'L': self.p_all['L5Pyr_apical2_L'],
-                'diam': self.p_all['L5Pyr_apical2_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
-            'apical_tuft': {
-                'L': self.p_all['L5Pyr_apicaltuft_L'],
-                'diam': self.p_all['L5Pyr_apicaltuft_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
-            'apical_oblique': {
-                'L': self.p_all['L5Pyr_apicaloblique_L'],
-                'diam': self.p_all['L5Pyr_apicaloblique_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
-            'basal_1': {
-                'L': self.p_all['L5Pyr_basal1_L'],
-                'diam': self.p_all['L5Pyr_basal1_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
-            'basal_2': {
-                'L': self.p_all['L5Pyr_basal2_L'],
-                'diam': self.p_all['L5Pyr_basal2_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
-            'basal_3': {
-                'L': self.p_all['L5Pyr_basal3_L'],
-                'diam': self.p_all['L5Pyr_basal3_diam'],
-                'cm': self.p_all['L5Pyr_dend_cm'],
-                'Ra': self.p_all['L5Pyr_dend_Ra'],
-            },
         }
 
     def __get_syn_props(self):
