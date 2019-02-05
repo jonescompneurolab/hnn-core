@@ -129,7 +129,6 @@ class ParFeedAll(object):
 
     # mu and sigma vals come from p
     def __create_evoked(self, inc=0.0):
-        #print("__create_evoked", self.p_ext)
         if self.celltype in self.p_ext.keys():
             # assign the params
             mu = self.p_ext['t0'] + inc
@@ -157,7 +156,7 @@ class ParFeedAll(object):
         # assign the params
         if self.p_ext[self.celltype][0] <= 0.0 and \
            self.p_ext[self.celltype][1] <= 0.0:
-               return False  # 0 ampa and 0 nmda weight
+                return False  # 0 ampa and 0 nmda weight
         # print('gauss params:',self.p_ext[self.celltype])
         mu = self.p_ext[self.celltype][3]
         sigma = self.p_ext[self.celltype][4]
@@ -184,8 +183,8 @@ class ParFeedAll(object):
         # If t0 is -1, randomize start time of inputs
         if t0 == -1:
             t0 = self.prng.uniform(25., 125.)
-            #print(self.ty,'t0 was -1; now', t0,'seed:',self.seed)
-        elif self.p_ext['t0_stdev'] > 0.0:  # randomize start time based on t0_stdev
+        # randomize start time based on t0_stdev
+        elif self.p_ext['t0_stdev'] > 0.0:
             # start time uses different prng
             t0 = self.prng2.normal(t0, self.p_ext['t0_stdev'])
         f_input = self.p_ext['f_input']

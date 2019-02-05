@@ -106,7 +106,8 @@ class NetworkOnNode(object):
         self.spikegids = h.Vector()
         self.__record_spikes()
 
-    # creates the immutable source list along with corresponding numbers of cells
+    # creates the immutable source list along with corresponding numbers
+    # of cells
     def __create_src_list(self):
         # base source list of tuples, name and number, in this order
         self.cellname_list = [
@@ -152,7 +153,8 @@ class NetworkOnNode(object):
         coords_sorted = sorted(coords, key=lambda pos: pos[1])
         # append the z value for position for L2 and L5
         # print(len(coords_sorted))
-        self.pos_dict['L2_basket'] = [pos_xy + (0,) for pos_xy in coords_sorted]
+        self.pos_dict['L2_basket'] = [pos_xy + (0,) for
+                                      pos_xy in coords_sorted]
         self.pos_dict['L5_basket'] = [
             pos_xy + (self.zdiff,) for pos_xy in coords_sorted]
 

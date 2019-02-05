@@ -62,27 +62,6 @@ class param:
             sout += ' '
         return sout
 
-    def assignstr(self, val):  # generates string for execution
-        if type(self.var) == list:
-            astr = ''
-            for var in self.var:
-                astr += var + ' = ' + str(val) + ';'
-            return astr
-        else:
-            return self.var + ' = ' + str(val)
-
-    def inbounds(self, val):   # check if value is within bounds
-        if not bounded:
-            return True
-        return val >= self.minval and val <= self.maxval
-    # only return assignstr if val is within bounds
-
-    def checkassign(self, val):
-        if self.inbounds(val):
-            return self.assignstr(val)
-        else:
-            return None
-
 # write config file starting with defaults and new entries
 # specified in section (sec) , option (opt), and value (val)
 # saves to output filepath fn
@@ -224,9 +203,11 @@ def setfcfg():
     # print("hnn config file is " , fcfg)
     return fcfg
 
+
 fcfg = setfcfg()  # config file name
 nohomeout = False
-for i in range(len(sys.argv)):  # override homeout option through commandline flag
+# override homeout option through commandline flag
+for i in range(len(sys.argv)):
     if sys.argv[i] == '-nohomeout' or sys.argv[i] == 'nohomeout':
         nohomeout = True
 dconf = readconf(fcfg, nohomeout)

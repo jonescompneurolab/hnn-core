@@ -26,29 +26,6 @@ def quickreadprm(fn):
                 d[sp[0].strip()] = str(sp[1]).strip()
     return d
 
-# check if using ongoing inputs
-
-
-def usingOngoingInputs(d, lty=['_prox', '_dist']):
-    if type(d) == str:
-        d = quickreadprm(d)
-    tstop = float(d['tstop'])
-    dpref = {'_prox': 'input_prox_A_', '_dist': 'input_dist_A_'}
-    try:
-        for postfix in lty:
-            if float(d['t0_input' + postfix]) <= tstop and \
-               float(d['tstop_input' + postfix]) >= float(d['t0_input' + postfix]) and \
-               float(d['f_input' + postfix]) > 0.:
-                for k in ['weight_L2Pyr_ampa', 'weight_L2Pyr_nmda',
-                          'weight_L5Pyr_ampa', 'weight_L5Pyr_nmda',
-                          'weight_inh_ampa', 'weight_inh_nmda']:
-                    if float(d[dpref[postfix] + k]) > 0.:
-                        # print('usingOngoingInputs:',d[dpref[postfix]+k])
-                        return True
-    except:
-        return False
-    return False
-
 # return number of evoked inputs (proximal, distal)
 # using dictionary d (or if d is a string, first load the dictionary from
 # filename d)
@@ -69,7 +46,7 @@ def countEvokedInputs(d):
 # class controlling multiple simulation files (.param)
 
 
-class ExpParams():
+class ExpParams(object):
 
     def __init__(self, f_psim, debug=False):
 
@@ -176,8 +153,10 @@ class ExpParams():
                 if val[0] is '{':
                     # check for a linspace as a param!
                     if val[1] is 'L':
-                        # in this case, val_range must be as long as the correct expmt_group length
-                        # everything beyond that will be truncated by the zip operation below
+                        # in this case, val_range must be as long as the
+                        # correct expmt_group length
+                        # everything beyond that will be truncated by the zip
+                        # operation below
                         # param passed will strip away the curly braces and
                         # just pass the linspace
                         val_range = self.__expand_linspace(val[1:-1])
@@ -280,8 +259,8 @@ class ExpParams():
         self.sim_prefix = self.p_all.pop('sim_prefix')
 
         # create an experimental string prefix template
-        self.exp_prefix_str = self.sim_prefix+"-%03d"
-        self.trial_prefix_str = self.exp_prefix_str+"-T%02d"
+        self.exp_prefix_str = self.sim_prefix + "-%03d"
+        self.trial_prefix_str = self.exp_prefix_str + "-T%02d"
 
         # self.N_trials = int(self.p_all.pop('N_trials'))
         # self.prng_state = self.p_all.pop('prng_state')[1:-1]
@@ -347,44 +326,6 @@ class ExpParams():
         vals_new = vals_new.transpose()
 
         return [item for item in zip(self.keys_sorted, vals_new)]
-
-    # Find keys that change anytime during simulation
-    # (i.e. have more than one associated value)
-    def get_key_types(self):
-        key_dict = {
-            'expmt_keys': [],
-            'dynamic_keys': [],
-            'static_keys': [],
-        }
-
-        # Save exmpt keys
-        key_dict['expmt_keys'] = self.expmt_group_params
-
-        # Save expmt keys as dynamic keys
-        key_dict['dynamic_keys'] = self.expmt_group_params
-
-        # Find keys that change run to run within experiments
-        for key in self.p_all.keys():
-            # if key has length associated with it, must change run to run
-            try:
-                len(self.p_all[key])
-
-                # Before storing key, check to make sure it has not already
-                # been stored
-                if key not in key_dict['dynamic_keys']:
-                    key_dict['dynamic_keys'].append(key)
-
-            except TypeError:
-                key_dict['static_keys'].append(key)
-
-        # Check if coupled params are dynamic
-        for dep_param, ind_param in self.coupled_params.items():
-            if ind_param in key_dict['dynamic_keys']:
-                key_dict['dynamic_keys'].append(dep_param)
-            else:
-                key_dict['static_keys'].append(dep_param)
-
-        return key_dict
 
 # reads params from a generated txt file and returns gid dict and p dict
 
@@ -724,4 +665,3 @@ def compare_dictionaries(d1, d2):
 if __name__ == '__main__':
     fparam = 'param/debug.param'
     p = ExpParams(fparam, debug=True)
-    # print(find_param(fparam, 'WhoDat')) # ?

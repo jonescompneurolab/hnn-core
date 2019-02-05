@@ -15,7 +15,7 @@ import sys
 # keys and the specific directories that contain them.
 
 
-class SimulationPaths ():
+class SimulationPaths(object):
 
     def __init__(self):
         # hard coded data types
@@ -133,16 +133,6 @@ class SimulationPaths ():
         if not safemkdir(dout):
             print("ERR: could not create output dir", dout)
 
-    # extern function to create directories
-    def create_dirs(self):
-        # create expmt directories
-        for expmt_group, dexpmt in self.dexpmt_dict.items():
-            dir_create(dexpmt)
-            for key in self.__datatypes.keys():
-                ddatatype = os.path.join(dexpmt, key)
-                self.dfig[expmt_group][key] = ddatatype
-                dir_create(ddatatype)
-
     # Returns date directory
     # this is NOT safe for midnight
     def __datedir(self):
@@ -162,35 +152,6 @@ class SimulationPaths ():
             d[expmt_group] = os.path.join(self.dsim, expmt_group)
         return d
 
-    # dictionary creation
-    # this is specific to a expmt_group
-    def create_dict(self, expmt_group):
-        fileinfo = dict.fromkeys(self.__datatypes)
-        for key in self.__datatypes.keys():
-            # join directory name
-            dtype = os.path.join(self.dexpmt_dict(expmt_group), key)
-            fileinfo[key] = (self.__datatypes[key], dtype)
-        return fileinfo
-
-    def return_specific_filename(self, expmt_group, datatype, n_sim, n_trial):
-        f_list = self.file_match(expmt_group, datatype)
-        trial_prefix = self.trial_prefix_str % (n_sim, n_trial)
-        # assume there is only one match (this should be true)
-        f_datatype = [f for f in f_list if trial_prefix in f][0]
-        return f_datatype
-
-    # requires dict lookup
-    def create_filename(self, expmt_group, key):
-        d = self.__simdir()
-        # some kind of if key in self.fileinfo.keys() catch
-        file_name_raw = self.__datatypes[key]
-        return os.path.join(d, file_name_raw)
-        # grab the whole experimental directory
-        dexpmt = self.dexpmt_dict[expmt_group]
-        # create the full path name for the file
-        file_path_full = os.path.join(dexpmt, key, file_name_raw)
-        return file_path_full
-
     # Get the data files matching file_ext in this directory
     # functionally the same as the previous function but with a local scope
     def file_match(self, expmt_group, key):
@@ -207,16 +168,6 @@ class SimulationPaths ():
         file_list.sort()
         return file_list
 
-    def exp_files_of_type(self, datatype):
-        # create dict of experiments
-        d = dict.fromkeys(self.expmt_groups)
-        # create file lists that match the dict keys for only files for this experiment
-        # this all would be nicer with a freaking folder
-        for key in d:
-            d[key] = [file for file in self.filelists[
-                datatype] if key in file.split("/")[-1]]
-        return d
-
 # Cleans input files
 
 
@@ -225,13 +176,6 @@ def clean_lines(file):
         lines = (line.rstrip() for line in f_in)
         lines = [line for line in lines if line]
     return lines
-
-# this make a little more sense in fileio
-
-
-def prettyprint(iterable_items):
-    for item in iterable_items:
-        print(item)
 
 # create file name for temporary spike file
 # that every processor is aware of
@@ -272,18 +216,14 @@ def dir_check(d):
 
 # only create if check comes back 0
 
-
-def dir_create(d):
-    if not dir_check(d):
-        os.makedirs(d)
-
-# list spike raster eps files and then rasterize them to HQ png files, lossless compress,
+# list spike raster eps files and then rasterize them to HQ png files,
+# lossless compress,
 # reencapsulate as eps, and remove backups when successful
-
-# make dir, catch exceptions
 
 
 def safemkdir(dn):
+    """Make dir, catch exceptions."""
+
     try:
         os.mkdir(dn)
         return True
