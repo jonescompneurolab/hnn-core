@@ -170,6 +170,39 @@ class Pyr(Cell):
             })
         return props
 
+    def _synapse_create(self, p_syn):
+        """Creates synapses onto this cell."""
+        # Somatic synapses
+        self.synapses = {
+            'soma_gabaa': self.syn_create(self.soma(0.5), p_syn['gabaa']),
+            'soma_gabab': self.syn_create(self.soma(0.5), p_syn['gabab']),
+        }
+
+        # Dendritic synapses
+        self.apicaloblique_ampa = self.syn_create(
+            self.dends['apical_oblique'](0.5), p_syn['ampa'])
+        self.apicaloblique_nmda = self.syn_create(
+            self.dends['apical_oblique'](0.5), p_syn['nmda'])
+
+        self.basal2_ampa = self.syn_create(
+            self.dends['basal_2'](0.5), p_syn['ampa'])
+        self.basal2_nmda = self.syn_create(
+            self.dends['basal_2'](0.5), p_syn['nmda'])
+
+        self.basal3_ampa = self.syn_create(
+            self.dends['basal_3'](0.5), p_syn['ampa'])
+        self.basal3_nmda = self.syn_create(
+            self.dends['basal_3'](0.5), p_syn['nmda'])
+
+        self.apicaltuft_ampa = self.syn_create(
+            self.dends['apical_tuft'](0.5), p_syn['ampa'])
+        self.apicaltuft_nmda = self.syn_create(
+            self.dends['apical_tuft'](0.5), p_syn['nmda'])
+
+        if self.name == 'L5Pyr':
+            self.apicaltuft_gabaa = self.syn_create(
+                self.dends['apical_tuft'](0.5), p_syn['gabaa'])
+
 
 class L2Pyr(Pyr):
     """Layer 2 pyramidal cell class.
@@ -217,7 +250,7 @@ class L2Pyr(Pyr):
         self.dipole_insert(self.yscale)
 
         # create synapses
-        self.__synapse_create(p_syn)
+        self._synapse_create(p_syn)
         # self.__synapse_create()
 
         # run record_current_soma(), defined in Cell()
@@ -384,35 +417,6 @@ class L2Pyr(Pyr):
             self.dends[key].insert('km')
             self.dends[key].gbar_km = self.p_all['L2Pyr_dend_gbar_km']
 
-    def __synapse_create(self, p_syn):
-        """Creates synapses onto this cell."""
-        # Somatic synapses
-        self.synapses = {
-            'soma_gabaa': self.syn_create(self.soma(0.5), p_syn['gabaa']),
-            'soma_gabab': self.syn_create(self.soma(0.5), p_syn['gabab']),
-        }
-
-        # Dendritic synapses
-        self.apicaloblique_ampa = self.syn_create(
-            self.dends['apical_oblique'](0.5), p_syn['ampa'])
-        self.apicaloblique_nmda = self.syn_create(
-            self.dends['apical_oblique'](0.5), p_syn['nmda'])
-
-        self.basal2_ampa = self.syn_create(
-            self.dends['basal_2'](0.5), p_syn['ampa'])
-        self.basal2_nmda = self.syn_create(
-            self.dends['basal_2'](0.5), p_syn['nmda'])
-
-        self.basal3_ampa = self.syn_create(
-            self.dends['basal_3'](0.5), p_syn['ampa'])
-        self.basal3_nmda = self.syn_create(
-            self.dends['basal_3'](0.5), p_syn['nmda'])
-
-        self.apicaltuft_ampa = self.syn_create(
-            self.dends['apical_tuft'](0.5), p_syn['ampa'])
-        self.apicaltuft_nmda = self.syn_create(
-            self.dends['apical_tuft'](0.5), p_syn['nmda'])
-
     # collect receptor-type-based connections here
     def parconnect(self, gid, gid_dict, pos_dict, p):
         # init dict of dicts
@@ -423,8 +427,10 @@ class L2Pyr(Pyr):
         }
 
         # Connections FROM all other L2 Pyramidal cells to this one
-        for gid_src, pos in zip(gid_dict['L2_pyramidal'], pos_dict['L2_pyramidal']):
-            # don't be redundant, this is only possible for LIKE cells, but it might not hurt to check
+        for gid_src, pos in zip(gid_dict['L2_pyramidal'],
+                                pos_dict['L2_pyramidal']):
+            # don't be redundant, this is only possible for LIKE cells,
+            # but it might not hurt to check
             if gid_src != gid:
                 nc_dict['ampa'] = {
                     'pos_src': pos,
@@ -748,7 +754,7 @@ class L5Pyr(Pyr):
         self.dipole_insert(self.yscale)
 
         # create synapses
-        self.__synapse_create(p_syn)
+        self._synapse_create(p_syn)
 
         # insert iclamp
         self.list_IClamp = []
@@ -912,38 +918,6 @@ class L5Pyr(Pyr):
                 seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
 
             h.pop_section()
-
-    def __synapse_create(self, p_syn):
-        # creates synapses onto this cell
-        # Somatic synapses
-        self.synapses = {
-            'soma_gabaa': self.syn_create(self.soma(0.5), p_syn['gabaa']),
-            'soma_gabab': self.syn_create(self.soma(0.5), p_syn['gabab']),
-        }
-
-        # Dendritic synapses
-        self.apicaltuft_gabaa = self.syn_create(
-            self.dends['apical_tuft'](0.5), p_syn['gabaa'])
-
-        self.apicaltuft_ampa = self.syn_create(
-            self.dends['apical_tuft'](0.5), p_syn['ampa'])
-        self.apicaltuft_nmda = self.syn_create(
-            self.dends['apical_tuft'](0.5), p_syn['nmda'])
-
-        self.apicaloblique_ampa = self.syn_create(
-            self.dends['apical_oblique'](0.5), p_syn['ampa'])
-        self.apicaloblique_nmda = self.syn_create(
-            self.dends['apical_oblique'](0.5), p_syn['nmda'])
-
-        self.basal2_ampa = self.syn_create(
-            self.dends['basal_2'](0.5), p_syn['ampa'])
-        self.basal2_nmda = self.syn_create(
-            self.dends['basal_2'](0.5), p_syn['nmda'])
-
-        self.basal3_ampa = self.syn_create(
-            self.dends['basal_3'](0.5), p_syn['ampa'])
-        self.basal3_nmda = self.syn_create(
-            self.dends['basal_3'](0.5), p_syn['nmda'])
 
     # parallel connection function FROM all cell types TO here
     def parconnect(self, gid, gid_dict, pos_dict, p):
