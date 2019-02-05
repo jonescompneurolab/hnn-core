@@ -168,6 +168,7 @@ def savedat(p, rank, t_vec, dp_rec_L2, dp_rec_L5, net):
     for i, elec in enumerate(lelec):
         elec.lfpout(fn=doutf['file_lfp'].split('.txt')
                     [0] + '_' + str(i) + '.txt', tvec=t_vec)
+    return dpl
 
 
 def setupsimdir(f_psim, p_exp, rank):
@@ -282,103 +283,6 @@ arrangelayers()  # arrange cells in layers - for visualization purposes
 pc.barrier()
 
 
-# save spikes from the individual trials in a single file
-def catspks():
-    lf = [os.path.join(datdir, 'spk_' + str(i) + '.txt')
-          for i in range(ntrial)]
-    if debug:
-        print('catspk lf:', lf)
-    lspk = [[], []]
-    for f in lf:
-        xarr = np.loadtxt(f)
-        for i in range(2):
-            lspk[i].extend(xarr[:, i])
-        if debug:
-            print('xarr.shape:', xarr.shape)
-    lspk = np.array(lspk).T
-    # lspk.sort(axis=1) # not multidim sort - can fix if want spikes across
-    # trials in temporal order
-    fout = os.path.join(datdir, 'spk.txt')
-    with open(fout, 'w') as fspkout:
-        for i in range(lspk.shape[0]):
-            fspkout.write('%3.2f\t%d\n' % (lspk[i, 0], lspk[i, 1]))
-    if debug:
-        print('lspk.shape:', lspk.shape)
-    return lspk
-
-# save average dipole from individual trials in a single file
-
-
-def catdpl():
-    ldpl = []
-    for pre in ['dpl', 'rawdpl']:
-        lf = [os.path.join(datdir, pre + '_' + str(i) + '.txt')
-              for i in range(ntrial)]
-        dpl = np.mean(np.array([np.loadtxt(f) for f in lf]), axis=0)
-        with open(os.path.join(datdir, pre + '.txt'), 'w') as fp:
-            for i in range(dpl.shape[0]):
-                fp.write("%03.3f\t" % dpl[i, 0])
-                fp.write("%5.8f\t" % dpl[i, 1])
-                fp.write("%5.8f\t" % dpl[i, 2])
-                fp.write("%5.8f\n" % dpl[i, 3])
-        ldpl.append(dpl)
-    return ldpl
-
-# save average spectrogram from individual trials in a single file
-
-
-def catspec():
-    lf = [os.path.join(datdir, 'rawspec_' + str(i) + '.npz')
-          for i in range(ntrial)]
-    dspecin = {}
-    dout = {}
-    try:
-        for f in lf:
-            dspecin[f] = np.load(f)
-    except:
-        return None
-    for k in ['t_L5', 'f_L5', 't_L2', 'f_L2', 'time', 'freq']:
-        dout[k] = dspecin[lf[0]][k]
-    for k in ['TFR', 'TFR_L5', 'TFR_L2']:
-        dout[k] = np.mean(np.array([dspecin[f][k] for f in lf]), axis=0)
-    with open(os.path.join(datdir, 'rawspec.npz'), 'wb') as fdpl:
-        np.savez_compressed(fdpl, t_L5=dout['t_L5'], f_L5=dout['f_L5'], t_L2=dout['t_L2'], f_L2=dout['f_L2'], time=dout[
-                            'time'], freq=dout['freq'], TFR=dout['TFR'], TFR_L5=dout['TFR_L5'], TFR_L2=dout['TFR_L2'])
-    return dout
-
-# gather trial outputs via either raw concatenation or averaging
-
-
-def cattrialoutput():
-    global doutf
-    lspk = catspks()  # concatenate spikes from different trials to a single file
-    ldpl = catdpl()
-    dspec = catspec()
-    del lspk, ldpl, dspec  # do not need these variables; returned for testing
-
-# run individual trials via runsim, then calc/save average dipole/specgram
-# evinputinc is an increment (in milliseconds) that gets added to the evoked inputs on each
-# successive trial. the default value is 0.0.
-
-
-def runtrials(ntrial, inc_evinput=0.0):
-    global doutf
-    if pcID == 0:
-        print('Running', ntrial, 'trials.')
-    for i in range(ntrial):
-        if pcID == 0:
-            print('Running trial', i+1, '...')
-        doutf = setoutfiles(ddir, i, ntrial)
-        # initrands(ntrial+(i+1)**ntrial) # reinit for each trial
-        net.state_init()  # initialize voltages
-        runsim()  # run the simulation
-        # adjusts the rng seeds and then the feed/event input times
-        net.reset_src_event_times(inc_evinput=inc_evinput * (i + 1))
-    doutf = setoutfiles(ddir, 0, 1)  # reset output files based on sim name
-    if pcID == 0:
-        cattrialoutput()  # get/save the averages
-
-
 def initrands(s=0):  # fix to use s
     # if there are N_trials, then randomize the seed
     # establishes random seed for the seed seeder (yeah.)
@@ -460,7 +364,7 @@ def runsim():
 
     # write time and calculated dipole to data file only if on the first proc
     # only execute this statement on one proc
-    savedat(p, pcID, t_vec, dp_rec_L2, dp_rec_L5, net)
+    dpl = savedat(p, pcID, t_vec, dp_rec_L2, dp_rec_L5, net)
 
     for elec in lelec:
         print('end; t_vec.size()', t_vec.size(),
@@ -479,9 +383,6 @@ def runsim():
 
 if __name__ == "__main__":
     if dconf['dorun']:
-        if ntrial > 1:
-            runtrials(ntrial, p['inc_evinput'])
-        else:
-            runsim()
+        runsim()
         pc.runworker()
         pc.done()
