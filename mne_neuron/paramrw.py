@@ -47,6 +47,8 @@ def countEvokedInputs(d):
 
 
 class ExpParams(object):
+    """Class for getting the experiment parameters.
+    """
 
     def __init__(self, f_psim, debug=False):
 
@@ -75,9 +77,17 @@ class ExpParams(object):
         self.list_params = self.__create_paramlist()
         self.N_sims = len(self.list_params[0][1])
 
-    # return pdict based on that one value, PLUS append the p_ext here ...
-    # yes, hack-y
     def return_pdict(self, expmt_group, i):
+        """Return pdict based on that one value, PLUS append the p_ext here ...
+           yes, hack-y
+
+        Parameters
+        ----------
+        expmt_group : str
+            The experiment group (e.g., 'default')
+        i : int
+            An integer
+        """
         # p_template was always updated to include the ones from exp and others
         p_sim = dict.fromkeys(self.p_template)
 
@@ -386,7 +396,7 @@ def write(fparam, p, gid_list):
             if key.startswith('N_'):
                 f.write('%i\n' % val)
             else:
-                f.write(str(val)+'\n')
+                f.write(str(val) + '\n')
 
 # Searches f_param for any match of p
 
@@ -432,8 +442,8 @@ def read_expmt_groups(fparam):
 
 
 def feed_validate(p_ext, d, tstop):
-    """ whips into shape ones that are not
-        could be properly made into a meaningful class.
+    """Whips into shape ones that are not
+       could be properly made into a meaningful class.
     """
     # only append if t0 is less than simulation tstop
     if tstop > d['t0']:
@@ -510,9 +520,16 @@ def checkpoissynkeys(p):
 
 
 def create_pext(p, tstop):
-        # indexable py list of param dicts for parallel
-        # turn off individual feeds by commenting out relevant line here.
-        # always valid, no matter the length
+    """Indexable Python list of param dicts for parallel.
+
+    Turn off individual feeds by commenting out relevant line here.
+    always valid, no matter the length.
+
+    Parameters
+    ----------
+    p : dict
+        The parameters returned by ExpParams(f_psim).return_pdict()
+    """
     p_ext = []
 
     # p_unique is a dict of input param types that end up going to each cell
@@ -525,14 +542,22 @@ def create_pext(p, tstop):
         't0': p['t0_input_prox'],
         'tstop': p['tstop_input_prox'],
         'stdev': p['f_stdev_prox'],
-        'L2Pyr_ampa': (p['input_prox_A_weight_L2Pyr_ampa'], p['input_prox_A_delay_L2']),
-        'L2Pyr_nmda': (p['input_prox_A_weight_L2Pyr_nmda'], p['input_prox_A_delay_L2']),
-        'L5Pyr_ampa': (p['input_prox_A_weight_L5Pyr_ampa'], p['input_prox_A_delay_L5']),
-        'L5Pyr_nmda': (p['input_prox_A_weight_L5Pyr_nmda'], p['input_prox_A_delay_L5']),
-        'L2Basket_ampa': (p['input_prox_A_weight_L2Basket_ampa'], p['input_prox_A_delay_L2']),
-        'L2Basket_nmda': (p['input_prox_A_weight_L2Basket_nmda'], p['input_prox_A_delay_L2']),
-        'L5Basket_ampa': (p['input_prox_A_weight_L5Basket_ampa'], p['input_prox_A_delay_L5']),
-        'L5Basket_nmda': (p['input_prox_A_weight_L5Basket_nmda'], p['input_prox_A_delay_L5']),
+        'L2Pyr_ampa': (p['input_prox_A_weight_L2Pyr_ampa'],
+                       p['input_prox_A_delay_L2']),
+        'L2Pyr_nmda': (p['input_prox_A_weight_L2Pyr_nmda'],
+                       p['input_prox_A_delay_L2']),
+        'L5Pyr_ampa': (p['input_prox_A_weight_L5Pyr_ampa'],
+                       p['input_prox_A_delay_L5']),
+        'L5Pyr_nmda': (p['input_prox_A_weight_L5Pyr_nmda'],
+                       p['input_prox_A_delay_L5']),
+        'L2Basket_ampa': (p['input_prox_A_weight_L2Basket_ampa'],
+                          p['input_prox_A_delay_L2']),
+        'L2Basket_nmda': (p['input_prox_A_weight_L2Basket_nmda'],
+                          p['input_prox_A_delay_L2']),
+        'L5Basket_ampa': (p['input_prox_A_weight_L5Basket_ampa'],
+                          p['input_prox_A_delay_L5']),
+        'L5Basket_nmda': (p['input_prox_A_weight_L5Basket_nmda'],
+                          p['input_prox_A_delay_L5']),
         'events_per_cycle': p['events_per_cycle_prox'],
         'prng_seedcore': int(p['prng_seedcore_input_prox']),
         'distribution': p['distribution_prox'],
@@ -552,12 +577,18 @@ def create_pext(p, tstop):
         't0': p['t0_input_dist'],
         'tstop': p['tstop_input_dist'],
         'stdev': p['f_stdev_dist'],
-        'L2Pyr_ampa': (p['input_dist_A_weight_L2Pyr_ampa'], p['input_dist_A_delay_L2']),
-        'L2Pyr_nmda': (p['input_dist_A_weight_L2Pyr_nmda'], p['input_dist_A_delay_L2']),
-        'L5Pyr_ampa': (p['input_dist_A_weight_L5Pyr_ampa'], p['input_dist_A_delay_L5']),
-        'L5Pyr_nmda': (p['input_dist_A_weight_L5Pyr_nmda'], p['input_dist_A_delay_L5']),
-        'L2Basket_ampa': (p['input_dist_A_weight_L2Basket_ampa'], p['input_dist_A_delay_L2']),
-        'L2Basket_nmda': (p['input_dist_A_weight_L2Basket_nmda'], p['input_dist_A_delay_L2']),
+        'L2Pyr_ampa': (p['input_dist_A_weight_L2Pyr_ampa'],
+                       p['input_dist_A_delay_L2']),
+        'L2Pyr_nmda': (p['input_dist_A_weight_L2Pyr_nmda'],
+                       p['input_dist_A_delay_L2']),
+        'L5Pyr_ampa': (p['input_dist_A_weight_L5Pyr_ampa'],
+                       p['input_dist_A_delay_L5']),
+        'L5Pyr_nmda': (p['input_dist_A_weight_L5Pyr_nmda'],
+                       p['input_dist_A_delay_L5']),
+        'L2Basket_ampa': (p['input_dist_A_weight_L2Basket_ampa'],
+                          p['input_dist_A_delay_L2']),
+        'L2Basket_nmda': (p['input_dist_A_weight_L2Basket_nmda'],
+                          p['input_dist_A_delay_L2']),
         'events_per_cycle': p['events_per_cycle_dist'],
         'prng_seedcore': int(p['prng_seedcore_input_dist']),
         'distribution': p['distribution_dist'],
@@ -573,21 +604,30 @@ def create_pext(p, tstop):
     nprox, ndist = countEvokedInputs(p)
     # print('nprox,ndist evoked inputs:', nprox, ndist)
 
-    # NEW: make sure all evoked synaptic weights present (for backwards compatibility)
-    # could cause differences between output of param files since some nmda weights should
-    # be 0 while others > 0
+    # NEW: make sure all evoked synaptic weights present
+    # (for backwards compatibility)
+    # could cause differences between output of param files
+    # since some nmda weights should be 0 while others > 0
     checkevokedsynkeys(p, nprox, ndist)
 
     # Create proximal evoked response parameters
     # f_input needs to be defined as 0
     for i in range(nprox):
-        skey = 'evprox_' + str(i+1)
-        p_unique['evprox' + str(i+1)] = {
+        skey = 'evprox_' + str(i + 1)
+        p_unique['evprox' + str(i + 1)] = {
             't0': p['t_' + skey],
-            'L2_pyramidal': (p['gbar_'+skey+'_L2Pyr_ampa'], p['gbar_'+skey+'_L2Pyr_nmda'], 0.1, p['sigma_t_'+skey]),
-            'L2_basket': (p['gbar_'+skey+'_L2Basket_ampa'], p['gbar_'+skey+'_L2Basket_nmda'], 0.1, p['sigma_t_'+skey]),
-            'L5_pyramidal': (p['gbar_'+skey+'_L5Pyr_ampa'], p['gbar_'+skey+'_L5Pyr_nmda'], 1., p['sigma_t_'+skey]),
-            'L5_basket': (p['gbar_'+skey+'_L5Basket_ampa'], p['gbar_'+skey+'_L5Basket_nmda'], 1., p['sigma_t_'+skey]),
+            'L2_pyramidal': (p['gbar_' + skey + '_L2Pyr_ampa'],
+                             p['gbar_' + skey + '_L2Pyr_nmda'],
+                             0.1, p['sigma_t_' + skey]),
+            'L2_basket': (p['gbar_' + skey + '_L2Basket_ampa'],
+                          p['gbar_' + skey + '_L2Basket_nmda'],
+                          0.1, p['sigma_t_' + skey]),
+            'L5_pyramidal': (p['gbar_' + skey + '_L5Pyr_ampa'],
+                             p['gbar_' + skey + '_L5Pyr_nmda'],
+                             1., p['sigma_t_' + skey]),
+            'L5_basket': (p['gbar_' + skey + '_L5Basket_ampa'],
+                          p['gbar_' + skey + '_L5Basket_nmda'],
+                          1., p['sigma_t_' + skey]),
             'prng_seedcore': int(p['prng_seedcore_' + skey]),
             'lamtha_space': 3.,
             'loc': 'proximal',
@@ -648,6 +688,7 @@ def create_pext(p, tstop):
     }
 
     return p_ext, p_unique
+
 
 # Takes two dictionaries (d1 and d2) and compares the keys in d1 to those in d2
 # if any match, updates the (key, value) pair of d1 to match that of d2

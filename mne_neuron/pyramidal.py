@@ -24,8 +24,9 @@ class Pyr(Cell):
         # for legacy use with L5Pyr
         self.list_dend = []
 
-    # Create dictionary of section names with entries to scale section lengths to length along z-axis
     def get_sectnames(self):
+        """Create dictionary of section names with entries
+           to scale section lengths to length along z-axis."""
         seclist = h.SectionList()
         seclist.wholetree(sec=self.soma)
         d = dict((sect.name(), 1.) for sect in seclist)
@@ -48,8 +49,10 @@ class Pyr(Cell):
             self.dends[key] = h.Section(
                 name=self.name + '_' + key)  # create dend
         # apical: 0--4; basal: 5--7
-        self.list_dend = [self.dends[key] for key in ['apical_trunk', 'apical_oblique', 'apical_1',
-                                                      'apical_2', 'apical_tuft', 'basal_1', 'basal_2', 'basal_3'] if key in self.dends]
+        self.list_dend = [self.dends[key] for key in
+                          ['apical_trunk', 'apical_oblique', 'apical_1',
+                           'apical_2', 'apical_tuft', 'basal_1', 'basal_2',
+                           'basal_3'] if key in self.dends]
 
     def set_dend_props(self, p_dend_props):
         # iterate over keys in p_dend_props. Create dend for each key.
@@ -89,8 +92,10 @@ class Pyr(Cell):
 
         # apical: 0--4
         # basal: 5--7
-        self.list_dend = [self.dends[key] for key in ['apical_trunk', 'apical_oblique', 'apical_1',
-                                                      'apical_2', 'apical_tuft', 'basal_1', 'basal_2', 'basal_3'] if key in self.dends]
+        self.list_dend = [self.dends[key] for key in
+                          ['apical_trunk', 'apical_oblique', 'apical_1',
+                           'apical_2', 'apical_tuft', 'basal_1', 'basal_2',
+                           'basal_3'] if key in self.dends]
 
     def get_sections(self):
         ls = [self.soma]
@@ -114,7 +119,8 @@ class Pyr(Cell):
 class L2Pyr(Pyr):
 
     def __init__(self, gid=-1, pos=-1, p={}):
-        # Get default L2Pyr params and update them with any corresponding params in p
+        # Get default L2Pyr params and update them with any
+        # corresponding params in p
         p_all_default = get_L2Pyr_params_default()
         self.p_all = compare_dictionaries(p_all_default, p)
 
@@ -132,7 +138,8 @@ class L2Pyr(Pyr):
         # creates dict of dends: self.dends
         self.create_dends(p_dend)
         self.topol()  # sets the connectivity between sections
-        # sets geom properties; adjusted after translation from hoc (2009 model)
+        # sets geom properties;
+        # adjusted after translation from hoc (2009 model)
         self.geom(p_dend)
 
         # biophysics
@@ -359,7 +366,7 @@ class L2Pyr(Pyr):
             self.dends[key].gbar_km = self.p_all['L2Pyr_dend_gbar_km']
 
     def __synapse_create(self, p_syn):
-        # creates synapses onto this cell
+        """Creates synapses onto this cell."""
         # Somatic synapses
         self.synapses = {
             'soma_gabaa': self.syn_create(self.soma(0.5), p_syn['gabaa']),
@@ -633,37 +640,58 @@ class L2Pyr(Pyr):
 
 class L5Pyr(Pyr):
 
-    def basic_shape (self):
+    def basic_shape(self):
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
-        pt3dclear=h.pt3dclear; pt3dadd=h.pt3dadd; dend = self.list_dend
-        pt3dclear(sec=self.soma); pt3dadd(0, 0, 0, 1, sec=self.soma); pt3dadd(0, 23, 0, 1, sec=self.soma)
-        pt3dclear(sec=dend[0]); pt3dadd(0, 23, 0, 1,sec=dend[0]); pt3dadd(0, 83, 0, 1,sec=dend[0])
-        pt3dclear(sec=dend[1]); pt3dadd(0, 83, 0, 1,sec=dend[1]); pt3dadd(-150, 83, 0, 1,sec=dend[1])
-        pt3dclear(sec=dend[2]); pt3dadd(0, 83, 0, 1,sec=dend[2]); pt3dadd(0, 483, 0, 1,sec=dend[2])
-        pt3dclear(sec=dend[3]); pt3dadd(0, 483, 0, 1,sec=dend[3]); pt3dadd(0, 883, 0, 1,sec=dend[3])
-        pt3dclear(sec=dend[4]); pt3dadd(0, 883, 0, 1,sec=dend[4]); pt3dadd(0, 1133, 0, 1,sec=dend[4])
-        pt3dclear(sec=dend[5]); pt3dadd(0, 0, 0, 1,sec=dend[5]); pt3dadd(0, -50, 0, 1,sec=dend[5])
-        pt3dclear(sec=dend[6]); pt3dadd(0, -50, 0, 1,sec=dend[6]); pt3dadd(-106, -156, 0, 1,sec=dend[6])
-        pt3dclear(sec=dend[7]); pt3dadd(0, -50, 0, 1,sec=dend[7]); pt3dadd(106, -156, 0, 1,sec=dend[7])
+        pt3dclear = h.pt3dclear
+        pt3dadd = h.pt3dadd
+        dend = self.list_dend
+        pt3dclear(sec=self.soma)
+        pt3dadd(0, 0, 0, 1, sec=self.soma)
+        pt3dadd(0, 23, 0, 1, sec=self.soma)
+        pt3dclear(sec=dend[0])
+        pt3dadd(0, 23, 0, 1, sec=dend[0])
+        pt3dadd(0, 83, 0, 1, sec=dend[0])
+        pt3dclear(sec=dend[1])
+        pt3dadd(0, 83, 0, 1, sec=dend[1])
+        pt3dadd(-150, 83, 0, 1, sec=dend[1])
+        pt3dclear(sec=dend[2])
+        pt3dadd(0, 83, 0, 1, sec=dend[2])
+        pt3dadd(0, 483, 0, 1, sec=dend[2])
+        pt3dclear(sec=dend[3])
+        pt3dadd(0, 483, 0, 1, sec=dend[3])
+        pt3dadd(0, 883, 0, 1, sec=dend[3])
+        pt3dclear(sec=dend[4])
+        pt3dadd(0, 883, 0, 1, sec=dend[4])
+        pt3dadd(0, 1133, 0, 1, sec=dend[4])
+        pt3dclear(sec=dend[5])
+        pt3dadd(0, 0, 0, 1, sec=dend[5])
+        pt3dadd(0, -50, 0, 1, sec=dend[5])
+        pt3dclear(sec=dend[6])
+        pt3dadd(0, -50, 0, 1, sec=dend[6])
+        pt3dadd(-106, -156, 0, 1, sec=dend[6])
+        pt3dclear(sec=dend[7])
+        pt3dadd(0, -50, 0, 1, sec=dend[7])
+        pt3dadd(106, -156, 0, 1, sec=dend[7])
 
-    def geom (self, p_dend):
-        soma = self.soma; dend = self.list_dend;
+    def geom(self, p_dend):
+        soma = self.soma
+        dend = self.list_dend
         # soma.L = 13 # BUSH 1999 spike amp smaller
-        soma.L=39 # Bush 1993
+        soma.L = 39  # Bush 1993
         dend[0].L = 102
         dend[1].L = 255
-        dend[2].L = 680 # default 400
-        dend[3].L = 680 # default 400
+        dend[2].L = 680  # default 400
+        dend[3].L = 680  # default 400
         dend[4].L = 425
         dend[5].L = 85
-        dend[6].L = 255 #  default 150
-        dend[7].L = 255 #  default 150
+        dend[6].L = 255  # default 150
+        dend[7].L = 255  # default 150
         # soma.diam = 18.95 # Bush 1999
-        soma.diam = 28.9 # Bush 1993
+        soma.diam = 28.9  # Bush 1993
         dend[0].diam = 10.2
         dend[1].diam = 5.1
-        dend[2].diam = 7.48 # default 4.4
-        dend[3].diam = 4.93 # default 2.9
+        dend[2].diam = 7.48  # default 4.4
+        dend[3].diam = 4.93  # default 2.9
         dend[4].diam = 3.4
         dend[5].diam = 6.8
         dend[6].diam = 8.5
@@ -685,9 +713,9 @@ class L5Pyr(Pyr):
 
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
-        self.create_dends(p_dend) # just creates the sections
-        self.topol() # sets the connectivity between sections
-        self.geom(p_dend) # sets geom properties; adjusted after translation from hoc (2009 model)
+        self.create_dends(p_dend)  # just creates the sections
+        self.topol()  # sets the connectivity between sections
+        self.geom(p_dend)  # sets geom properties; adjusted after translation from hoc (2009 model)
 
         # biophysics
         self.__biophys_soma()
@@ -709,7 +737,7 @@ class L5Pyr(Pyr):
 
     # Sets somatic properties. Returns dictionary.
     def __get_soma_props(self, pos):
-         return {
+        return {
             'pos': pos,
             'L': self.p_all['L5Pyr_soma_L'],
             'diam': self.p_all['L5Pyr_soma_diam'],
@@ -725,7 +753,7 @@ class L5Pyr(Pyr):
         # dend_props =  {
         return {
             'apical_trunk': {
-                'L': self.p_all['L5Pyr_apicaltrunk_L'] ,
+                'L': self.p_all['L5Pyr_apicaltrunk_L'],
                 'diam': self.p_all['L5Pyr_apicaltrunk_diam'],
                 'cm': self.p_all['L5Pyr_dend_cm'],
                 'Ra': self.p_all['L5Pyr_dend_Ra'],
@@ -824,7 +852,7 @@ class L5Pyr(Pyr):
         self.dends['basal_2'].connect(self.dends['basal_1'], 1, 0)
         self.dends['basal_3'].connect(self.dends['basal_1'], 1, 0)
 
-        self.basic_shape() # translated from original hoc (2009 model)
+        self.basic_shape()  # translated from original hoc (2009 model)
 
     # adds biophysics to soma
     def __biophys_soma(self):
@@ -929,20 +957,28 @@ class L5Pyr(Pyr):
         }
 
         # Dendritic synapses
-        self.apicaltuft_gabaa = self.syn_create(self.dends['apical_tuft'](0.5), p_syn['gabaa'])
-        #self.apicaltuft_gabaa = self.syn_create(self.dends['apical_tuft'](0.5), p_syn['gabab'])#RL version
+        self.apicaltuft_gabaa = self.syn_create(
+            self.dends['apical_tuft'](0.5), p_syn['gabaa'])
 
-        self.apicaltuft_ampa = self.syn_create(self.dends['apical_tuft'](0.5), p_syn['ampa'])
-        self.apicaltuft_nmda = self.syn_create(self.dends['apical_tuft'](0.5), p_syn['nmda'])
+        self.apicaltuft_ampa = self.syn_create(
+            self.dends['apical_tuft'](0.5), p_syn['ampa'])
+        self.apicaltuft_nmda = self.syn_create(
+            self.dends['apical_tuft'](0.5), p_syn['nmda'])
 
-        self.apicaloblique_ampa = self.syn_create(self.dends['apical_oblique'](0.5), p_syn['ampa'])
-        self.apicaloblique_nmda = self.syn_create(self.dends['apical_oblique'](0.5), p_syn['nmda'])
+        self.apicaloblique_ampa = self.syn_create(
+            self.dends['apical_oblique'](0.5), p_syn['ampa'])
+        self.apicaloblique_nmda = self.syn_create(
+            self.dends['apical_oblique'](0.5), p_syn['nmda'])
 
-        self.basal2_ampa = self.syn_create(self.dends['basal_2'](0.5), p_syn['ampa'])
-        self.basal2_nmda = self.syn_create(self.dends['basal_2'](0.5), p_syn['nmda'])
+        self.basal2_ampa = self.syn_create(
+            self.dends['basal_2'](0.5), p_syn['ampa'])
+        self.basal2_nmda = self.syn_create(
+            self.dends['basal_2'](0.5), p_syn['nmda'])
 
-        self.basal3_ampa = self.syn_create(self.dends['basal_3'](0.5), p_syn['ampa'])
-        self.basal3_nmda = self.syn_create(self.dends['basal_3'](0.5), p_syn['nmda'])
+        self.basal3_ampa = self.syn_create(
+            self.dends['basal_3'](0.5), p_syn['ampa'])
+        self.basal3_nmda = self.syn_create(
+            self.dends['basal_3'](0.5), p_syn['nmda'])
 
     # parallel connection function FROM all cell types TO here
     def parconnect(self, gid, gid_dict, pos_dict, p):
@@ -963,13 +999,19 @@ class L5Pyr(Pyr):
                     'A_delay': 1.,
                     'lamtha': 3.,
                     'threshold': p['threshold'],
-                    'type_src' : 'L5_pyramidal'
+                    'type_src': 'L5_pyramidal'
                 }
 
                 # ampa connections
-                self.ncfrom_L5Pyr.append(self.parconnect_from_src(gid_src, nc_dict['ampa'], self.apicaloblique_ampa))
-                self.ncfrom_L5Pyr.append(self.parconnect_from_src(gid_src, nc_dict['ampa'], self.basal2_ampa))
-                self.ncfrom_L5Pyr.append(self.parconnect_from_src(gid_src, nc_dict['ampa'], self.basal3_ampa))
+                self.ncfrom_L5Pyr.append(
+                    self.parconnect_from_src(
+                        gid_src, nc_dict['ampa'], self.apicaloblique_ampa))
+                self.ncfrom_L5Pyr.append(
+                    self.parconnect_from_src(
+                        gid_src, nc_dict['ampa'], self.basal2_ampa))
+                self.ncfrom_L5Pyr.append(
+                    self.parconnect_from_src(
+                        gid_src, nc_dict['ampa'], self.basal3_ampa))
 
                 nc_dict['nmda'] = {
                     'pos_src': pos,
@@ -977,7 +1019,7 @@ class L5Pyr(Pyr):
                     'A_delay': 1.,
                     'lamtha': 3.,
                     'threshold': p['threshold'],
-                    'type_src' : 'L5_pyramidal'
+                    'type_src': 'L5_pyramidal'
                 }
 
                 # nmda connections
@@ -1041,7 +1083,8 @@ class L5Pyr(Pyr):
 
     # receive from external inputs
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
-        for gid_src, p_src, pos in zip(gid_dict['extinput'], p_ext, pos_dict['extinput']):
+        for gid_src, p_src, pos in zip(gid_dict['extinput'],
+                                       p_ext, pos_dict['extinput']):
             # Check if AMPA params defined in p_src
             if 'L5Pyr_ampa' in p_src.keys():
                 nc_dict_ampa = {
@@ -1050,19 +1093,27 @@ class L5Pyr(Pyr):
                     'A_delay': p_src['L5Pyr_ampa'][1],
                     'lamtha': p_src['lamtha'],
                     'threshold': p_src['threshold'],
-                    'type_src' : 'ext'
+                    'type_src': 'ext'
                 }
 
                 # Proximal feed AMPA synapses
                 if p_src['loc'] is 'proximal':
                     # basal2_ampa, basal3_ampa, apicaloblique_ampa
-                    self.ncfrom_extinput.append(self.parconnect_from_src(gid_src, nc_dict_ampa, self.basal2_ampa))
-                    self.ncfrom_extinput.append(self.parconnect_from_src(gid_src, nc_dict_ampa, self.basal3_ampa))
-                    self.ncfrom_extinput.append(self.parconnect_from_src(gid_src, nc_dict_ampa, self.apicaloblique_ampa))
+                    self.ncfrom_extinput.append(
+                        self.parconnect_from_src(gid_src, nc_dict_ampa,
+                                                 self.basal2_ampa))
+                    self.ncfrom_extinput.append(
+                        self.parconnect_from_src(gid_src, nc_dict_ampa,
+                                                 self.basal3_ampa))
+                    self.ncfrom_extinput.append(
+                        self.parconnect_from_src(gid_src, nc_dict_ampa,
+                                                 self.apicaloblique_ampa))
                 # Distal feed AMPA synsapes
                 elif p_src['loc'] is 'distal':
                     # apical tuft
-                    self.ncfrom_extinput.append(self.parconnect_from_src(gid_src, nc_dict_ampa, self.apicaltuft_ampa))
+                    self.ncfrom_extinput.append(
+                        self.parconnect_from_src(gid_src, nc_dict_ampa,
+                                                 self.apicaltuft_ampa))
 
             # Check if NMDA params defined in p_src
             if 'L5Pyr_nmda' in p_src.keys():
@@ -1072,7 +1123,7 @@ class L5Pyr(Pyr):
                     'A_delay': p_src['L5Pyr_nmda'][1],
                     'lamtha': p_src['lamtha'],
                     'threshold': p_src['threshold'],
-                    'type_src' : 'ext'
+                    'type_src': 'ext'
                 }
 
                 # Proximal feed NMDA synapses
