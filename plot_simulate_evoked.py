@@ -18,7 +18,7 @@ from neuron import h
 # Cells are defined in other files
 import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
-from mne_neuron.dipolefn import Dipole
+from mne_neuron.dipole import Dipole
 # from mne_neuron.lfp import LFPElectrode
 
 from mne_neuron.pyramidal import L5Pyr, L2Pyr

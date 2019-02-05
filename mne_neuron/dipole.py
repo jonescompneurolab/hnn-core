@@ -1,4 +1,4 @@
-# dipolefn.py - dipole-based analysis functions
+# dipole.py - dipole-based analysis functions
 #
 # v 1.10.0-py35
 # rev 2016-05-01 (SL: itertools and return data dir)
@@ -6,7 +6,7 @@
 import numpy as np
 
 from .paramrw import find_param
-from .filt import boxfilt, hammfilt, emptyfilt
+from .filt import hammfilt
 
 # class Dipole() is for a single set of f_dpl and f_param
 
