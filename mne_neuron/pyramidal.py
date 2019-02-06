@@ -235,7 +235,8 @@ class Pyr(Cell):
                 continue
             nc_dict = {
                 'pos_src': pos,
-                'A_weight': p['gbar_%s_%s' % (name_src, self.name)],
+                'A_weight': p['gbar_%s_%s_%s' %
+                              (name_src, self.name, synapse)],
                 'A_delay': 1.,
                 'lamtha': lamtha,
                 'threshold': p['threshold'],
