@@ -231,7 +231,8 @@ class L5Basket(BasketSingle):
 
     # parallel receive function parreceive()
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
-        for gid_src, p_src, pos in zip(gid_dict['extinput'], p_ext, pos_dict['extinput']):
+        for gid_src, p_src, pos in zip(gid_dict['extinput'], p_ext,
+                                       pos_dict['extinput']):
             # Check if AMPA params are define in p_src
             if 'L5Basket_ampa' in p_src.keys():
                 nc_dict_ampa = {
