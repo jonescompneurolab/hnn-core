@@ -44,7 +44,7 @@ class BasketSingle(Cell):
         self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
 
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
-                 lamtha=3., synapse='ampa'):
+                 lamtha=3., receptor='ampa'):
         for gid_src, pos in zip(gid_dict[type_src],
                                 pos_dict[type_src]):
             if gid_src == gid:
@@ -60,7 +60,7 @@ class BasketSingle(Cell):
 
             getattr(self, 'ncfrom_%s' % name_src).append(
                 self.parconnect_from_src(
-                    gid_src, nc_dict, getattr(self, 'soma_%s' % synapse)))
+                    gid_src, nc_dict, getattr(self, 'soma_%s' % receptor)))
 
 
 class L2Basket(BasketSingle):
@@ -78,7 +78,7 @@ class L2Basket(BasketSingle):
     def parconnect(self, gid, gid_dict, pos_dict, p):
         self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr')
         self._connect(gid, gid_dict, pos_dict, p, 'L2_basket', 'L2Basket',
-                      lamtha=20., synapse='gabaa')
+                      lamtha=20., receptor='gabaa')
 
     # this function might make more sense as a method of net?
     # par: receive from external inputs
@@ -225,7 +225,7 @@ class L5Basket(BasketSingle):
     # there are no connections from the L2Basket cells. congrats!
     def parconnect(self, gid, gid_dict, pos_dict, p):
         self._connect(gid, gid_dict, pos_dict, p, 'L5_basket', 'L5Basket',
-                      lamtha=20., synapse='gabaa')
+                      lamtha=20., receptor='gabaa')
         self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr')
         self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr')
 
