@@ -227,6 +227,28 @@ class Pyr(Cell):
             self.apicaltuft_gabaa = self.syn_create(
                 self.dends['apical_tuft'](0.5), p_syn['gabaa'])
 
+    def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
+                 lamtha=3., receptor='ampa', postsyns=None):
+        for gid_src, pos in zip(gid_dict[type_src],
+                                pos_dict[type_src]):
+            if gid_src == gid:
+                continue
+            A_weight = p.get('gbar_%s_%s_%s' % (name_src, self.name, receptor),
+                             p.get('gbar_%s_%s' % (name_src, self.name), None))
+            nc_dict = {
+                'pos_src': pos,
+                'A_weight': A_weight,
+                'A_delay': 1.,
+                'lamtha': lamtha,
+                'threshold': p['threshold'],
+                'type_src': type_src
+            }
+
+            for postsyn in postsyns:
+                getattr(self, 'ncfrom_%s' % name_src).append(
+                    self.parconnect_from_src(
+                        gid_src, nc_dict, postsyn))
+
 
 class L2Pyr(Pyr):
     """Layer 2 pyramidal cell class.
@@ -411,81 +433,26 @@ class L2Pyr(Pyr):
             self.dends[key].insert('km')
             self.dends[key].gbar_km = self.p_all['L2Pyr_dend_gbar_km']
 
-    # collect receptor-type-based connections here
     def parconnect(self, gid, gid_dict, pos_dict, p):
-        # init dict of dicts
-        # nc_dict for ampa and nmda may be the same for this cell type
-        nc_dict = {
-            'ampa': None,
-            'nmda': None,
-        }
+        """Collect receptor-type-based connections here."""
 
-        # Connections FROM all other L2 Pyramidal cells to this one
-        for gid_src, pos in zip(gid_dict['L2_pyramidal'],
-                                pos_dict['L2_pyramidal']):
-            # don't be redundant, this is only possible for LIKE cells,
-            # but it might not hurt to check
-            if gid_src != gid:
-                nc_dict['ampa'] = {
-                    'pos_src': pos,
-                    'A_weight': p['gbar_L2Pyr_L2Pyr_ampa'],
-                    'A_delay': 1.,
-                    'lamtha': 3.,
-                    'threshold': p['threshold'],
-                    'type_src': 'L2_pyramidal'
-                }
+        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
+                    self.basal3_ampa]
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='ampa',
+                      postsyns=postsyns)
+        postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
+                    self.basal3_nmda]
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='nmda',
+                      postsyns=postsyns)
 
-                # parconnect_from_src(gid_presyn, nc_dict, postsyn)
-                # ampa connections
-                self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                    gid_src, nc_dict['ampa'], self.apicaloblique_ampa))
-                self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                    gid_src, nc_dict['ampa'], self.basal2_ampa))
-                self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                    gid_src, nc_dict['ampa'], self.basal3_ampa))
-
-                nc_dict['nmda'] = {
-                    'pos_src': pos,
-                    'A_weight': p['gbar_L2Pyr_L2Pyr_nmda'],
-                    'A_delay': 1.,
-                    'lamtha': 3.,
-                    'threshold': p['threshold'],
-                    'type_src': 'L2_pyramidal'
-                }
-
-                # parconnect_from_src(gid_presyn, nc_dict, postsyn)
-                # nmda connections
-                self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                    gid_src, nc_dict['nmda'], self.apicaloblique_nmda))
-                self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                    gid_src, nc_dict['nmda'], self.basal2_nmda))
-                self.ncfrom_L2Pyr.append(self.parconnect_from_src(
-                    gid_src, nc_dict['nmda'], self.basal3_nmda))
-
-        # connections FROM L2 basket cells TO this L2Pyr cell
-        for gid_src, pos in zip(gid_dict['L2_basket'], pos_dict['L2_basket']):
-            nc_dict['gabaa'] = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L2Basket_L2Pyr_gabaa'],
-                'A_delay': 1.,
-                'lamtha': 50.,
-                'threshold': p['threshold'],
-                'type_src': 'L2_basket'
-            }
-
-            nc_dict['gabab'] = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L2Basket_L2Pyr_gabab'],
-                'A_delay': 1.,
-                'lamtha': 50.,
-                'threshold': p['threshold'],
-                'type_src': 'L2_basket'
-            }
-
-            self.ncfrom_L2Basket.append(self.parconnect_from_src(
-                gid_src, nc_dict['gabaa'], self.synapses['soma_gabaa']))
-            self.ncfrom_L2Basket.append(self.parconnect_from_src(
-                gid_src, nc_dict['gabab'], self.synapses['soma_gabab']))
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L2_basket', 'L2Basket', lamtha=50., receptor='gabaa',
+                      postsyns=[self.synapses['soma_gabaa']])
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L2_basket', 'L2Basket', lamtha=50., receptor='gabab',
+                      postsyns=[self.synapses['soma_gabab']])
 
     # may be reorganizable
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
@@ -894,126 +861,39 @@ class L5Pyr(Pyr):
 
     # parallel connection function FROM all cell types TO here
     def parconnect(self, gid, gid_dict, pos_dict, p):
-        # init dict of dicts
-        # nc_dict for ampa and nmda may be the same for this cell type
-        nc_dict = {
-            'ampa': None,
-            'nmda': None,
-        }
 
-        # connections FROM L5Pyr TO here
-        for gid_src, pos in zip(gid_dict['L5_pyramidal'],
-                                pos_dict['L5_pyramidal']):
-            # no autapses
-            if gid_src != gid:
-                nc_dict['ampa'] = {
-                    'pos_src': pos,
-                    'A_weight': p['gbar_L5Pyr_L5Pyr_ampa'],
-                    'A_delay': 1.,
-                    'lamtha': 3.,
-                    'threshold': p['threshold'],
-                    'type_src': 'L5_pyramidal'
-                }
+        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
+                    self.basal3_ampa]
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='ampa',
+                      postsyns=postsyns)
+        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
+                    self.basal3_nmda]
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='nmda',
+                      postsyns=postsyns)
 
-                # ampa connections
-                self.ncfrom_L5Pyr.append(
-                    self.parconnect_from_src(
-                        gid_src, nc_dict['ampa'], self.apicaloblique_ampa))
-                self.ncfrom_L5Pyr.append(
-                    self.parconnect_from_src(
-                        gid_src, nc_dict['ampa'], self.basal2_ampa))
-                self.ncfrom_L5Pyr.append(
-                    self.parconnect_from_src(
-                        gid_src, nc_dict['ampa'], self.basal3_ampa))
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L5_basket', 'L5Basket', lamtha=70., receptor='gabaa',
+                      postsyns=[self.synapses['soma_gabaa']])
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L5_basket', 'L5Basket', lamtha=70., receptor='gabab',
+                      postsyns=[self.synapses['soma_gabab']])
 
-                nc_dict['nmda'] = {
-                    'pos_src': pos,
-                    'A_weight': p['gbar_L5Pyr_L5Pyr_nmda'],
-                    'A_delay': 1.,
-                    'lamtha': 3.,
-                    'threshold': p['threshold'],
-                    'type_src': 'L5_pyramidal'
-                }
+        postsyns = [self.basal2_ampa, self.basal3_ampa, self.apicaltuft_ampa,
+                    self.apicaloblique_ampa]
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='ampa',
+                      postsyns=postsyns)
+        postsyns = [self.basal2_nmda, self.basal3_nmda, self.apicaltuft_nmda,
+                    self.apicaloblique_nmda]
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='nmda',
+                      postsyns=postsyns)
 
-                # nmda connections
-                self.ncfrom_L5Pyr.append(
-                    self.parconnect_from_src(gid_src, nc_dict['nmda'],
-                                             self.apicaloblique_nmda))
-                self.ncfrom_L5Pyr.append(
-                    self.parconnect_from_src(gid_src, nc_dict['nmda'],
-                                             self.basal2_nmda))
-                self.ncfrom_L5Pyr.append(
-                    self.parconnect_from_src(
-                        gid_src, nc_dict['nmda'], self.basal3_nmda))
-
-        # connections FROM L5Basket TO here
-        for gid_src, pos in zip(gid_dict['L5_basket'], pos_dict['L5_basket']):
-            nc_dict['gabaa'] = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L5Basket_L5Pyr_gabaa'],
-                'A_delay': 1.,
-                'lamtha': 70.,
-                'threshold': p['threshold'],
-                'type_src': 'L5_basket'
-            }
-
-            nc_dict['gabab'] = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L5Basket_L5Pyr_gabab'],
-                'A_delay': 1.,
-                'lamtha': 70.,
-                'threshold': p['threshold'],
-                'type_src': 'L5_basket'
-            }
-
-            # soma synapses are defined in Pyr()
-            self.ncfrom_L5Basket.append(
-                self.parconnect_from_src(gid_src, nc_dict['gabaa'],
-                                         self.synapses['soma_gabaa']))
-            self.ncfrom_L5Basket.append(
-                self.parconnect_from_src(gid_src, nc_dict['gabab'],
-                                         self.synapses['soma_gabab']))
-
-        # connections FROM L2Pyr TO here
-        for gid_src, pos in zip(gid_dict['L2_pyramidal'],
-                                pos_dict['L2_pyramidal']):
-            # this delay is longer than most
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L2Pyr_L5Pyr'],
-                'A_delay': 1.,
-                'lamtha': 3.,
-                'threshold': p['threshold'],
-                'type_src': 'L2_pyramidal'
-            }
-
-            self.ncfrom_L2Pyr.append(
-                self.parconnect_from_src(
-                    gid_src, nc_dict, self.basal2_ampa))
-            self.ncfrom_L2Pyr.append(
-                self.parconnect_from_src(
-                    gid_src, nc_dict, self.basal3_ampa))
-            self.ncfrom_L2Pyr.append(
-                self.parconnect_from_src(
-                    gid_src, nc_dict, self.apicaltuft_ampa))
-            self.ncfrom_L2Pyr.append(
-                self.parconnect_from_src(
-                    gid_src, nc_dict, self.apicaloblique_ampa))
-
-        # connections FROM L2Basket TO here
-        for gid_src, pos in zip(gid_dict['L2_basket'], pos_dict['L2_basket']):
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': p['gbar_L2Basket_L5Pyr'],
-                'A_delay': 1.,
-                'lamtha': 50.,
-                'threshold': p['threshold'],
-                'type_src': 'L2_basket'
-            }
-
-            self.ncfrom_L2Basket.append(
-                self.parconnect_from_src(
-                    gid_src, nc_dict, self.apicaltuft_gabaa))
+        self._connect(gid, gid_dict, pos_dict, p,
+                      'L2_basket', 'L2Basket', lamtha=3., receptor='nmda',
+                      postsyns=[self.apicaltuft_gabaa])
 
     # receive from external inputs
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
