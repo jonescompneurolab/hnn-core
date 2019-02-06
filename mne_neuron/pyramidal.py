@@ -228,7 +228,7 @@ class Pyr(Cell):
                 self.dends['apical_tuft'](0.5), p_syn['gabaa'])
 
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
-                 lamtha=3., synapse='ampa', dendrites=['basal2']):
+                 lamtha=3., synapse='ampa', postsyns=None):
         for gid_src, pos in zip(gid_dict[type_src],
                                 pos_dict[type_src]):
             if gid_src == gid:
@@ -243,12 +243,10 @@ class Pyr(Cell):
                 'type_src': type_src
             }
 
-            for dendrite in dendrites:
+            for postsyn in postsyns:
                 getattr(self, 'ncfrom_%s' % name_src).append(
                     self.parconnect_from_src(
-                        gid_src, nc_dict,
-                        getattr(self, '%s_%s' % (dendrite, synapse))
-                    ))
+                        gid_src, nc_dict, postsyn))
 
 
 class L2Pyr(Pyr):
@@ -434,23 +432,26 @@ class L2Pyr(Pyr):
             self.dends[key].insert('km')
             self.dends[key].gbar_km = self.p_all['L2Pyr_dend_gbar_km']
 
-    # collect receptor-type-based connections here
     def parconnect(self, gid, gid_dict, pos_dict, p):
+        """Collect receptor-type-based connections here."""
 
-        dendrites = ['apicaloblique', 'basal2', 'basal3']
+        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
+                    self.basal3_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., synapse='ampa',
-                      dendrites=dendrites)
+                      postsyns=postsyns)
+        postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
+                    self.basal3_nmda]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., synapse='nmda',
-                      dendrites=dendrites)
+                      postsyns=postsyns)
 
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50., synapse='gabaa',
-                      dendrites=[self.synapses['soma_gabaa']])
+                      postsyns=[self.synapses['soma_gabaa']])
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50., synapse='gabab',
-                      dendrites=[self.synapses['soma_gabab']])
+                      postsyns=[self.synapses['soma_gabab']])
 
     # may be reorganizable
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
@@ -860,28 +861,34 @@ class L5Pyr(Pyr):
     # parallel connection function FROM all cell types TO here
     def parconnect(self, gid, gid_dict, pos_dict, p):
 
-        dendrites = ['apicaloblique', 'basal2', 'basal3']
+        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
+                    self.basal3_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., synapse='ampa',
-                      dendrites=dendrites)
+                      postsyns=postsyns)
+        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
+                    self.basal3_nmda]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., synapse='nmda',
-                      dendrites=dendrites)
+                      postsyns=postsyns)
 
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_basket', 'L5Basket', lamtha=70., synapse='gabaa',
-                      dendrites=['soma_gabaa'])
+                      postsyns=['soma_gabaa'])
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_basket', 'L5Basket', lamtha=70., synapse='gabab',
-                      dendrites=['soma_gabab'])
+                      postsyns=['soma_gabab'])
 
-        dendrites = ['basal2', 'basal3', 'apicaltuft', 'apicaloblique']
+        postsyns = [self.basal2_ampa, self.basal3_ampa, self.apicaltuft_ampa,
+                    self.apicaloblique_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_Pyramidal', 'L2Pyr', lamtha=3., synapse='ampa',
-                      dendrites=dendrites)
+                      postsyns=postsyns)
+        postsyns = [self.basal2_nmda, self.basal3_nmda, self.apicaltuft_nmda,
+                    self.apicaloblique_nmda]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_Pyramidal', 'L2Pyr', lamtha=3., synapse='nmda',
-                      dendrites=dendrites)
+                      postsyns=postsyns)
 
     # receive from external inputs
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
