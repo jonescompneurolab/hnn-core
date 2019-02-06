@@ -16,7 +16,16 @@ h("dp_total_L5 = 0.")  # put here since these variables used in cells
 
 
 class Cell(object):
-    """Create a cell class."""
+    """Create a cell object.
+
+    Parameters
+    ----------
+    gid : int
+        The cell ID
+    soma_props : dict
+        The properties of the soma. Must contain
+        keys 'L', 'diam', and 'pos'
+    """
 
     def __init__(self, gid, soma_props):
         self.gid = gid
@@ -80,12 +89,8 @@ class Cell(object):
         return ((minx, maxx), (miny, maxy), (minz, maxz))
 
     def translate3d(self, dx, dy, dz):
-        #s = self.soma
-        # for i in range(s.n3d()):
-        #  h.pt3dchange(i,s.x3d(i)+dx,s.y3d(i)+dy,s.z3d(i)+dz,s.diam3d(i),sec=s)
         for s in self.get_sections():
             for i in range(s.n3d()):
-                # print(s,i,s.x3d(i)+dx,s.y3d(i)+dy,s.z3d(i)+dz,s.diam3d(i))
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
                              s.z3d(i) + dz, s.diam3d(i), sec=s)
 
@@ -104,7 +109,8 @@ class Cell(object):
 
     # two things need to happen here for h:
     # 1. dipole needs to be inserted into each section
-    # 2. a list needs to be created with a Dipole (Point Process) in each section at position 1
+    # 2. a list needs to be created with a Dipole (Point Process) in each
+    #    section at position 1
     # In Cell() and not Pyr() for future possibilities
     def dipole_insert(self, yscale):
             # insert dipole into each section of this cell
@@ -134,7 +140,8 @@ class Cell(object):
             loc = np.array([seg.x for seg in sect])
             # these are the positions, including 0 but not L
             pos = np.array([seg.x for seg in sect.allseg()])
-            # diff in yvals, scaled against the pos np.array. y_long as in longitudinal
+            # diff in yvals, scaled against the pos np.array. y_long as
+            # in longitudinal
             y_scale = (yscale[sect.name()] * sect.L) * pos
             # y_long = (h.y3d(1, sec=sect) - h.y3d(0, sec=sect)) * pos
             # diff values calculate length between successive section points
@@ -205,6 +212,21 @@ class Cell(object):
     # General fn that creates any Exp2Syn synapse type
     # requires dictionary of synapse properties
     def syn_create(self, secloc, p):
+        """Create an h.Exp2Syn synapse.
+
+        Parameters
+        ----------
+        p : dict
+            Should contain keys
+                - 'e' (reverse potential)
+                - 'tau1' (rise time)
+                - 'tau2' (decay time)
+
+        Returns
+        -------
+        syn : instance of h.Exp2Syn
+            A two state kinetic scheme synapse.
+        """
         syn = h.Exp2Syn(secloc)
         syn.e = p['e']
         syn.tau1 = p['tau1']
@@ -258,8 +280,23 @@ class Cell(object):
 
     def parconnect_from_src(self, gid_presyn, nc_dict, postsyn):
         """Parallel receptor-centric connect FROM presyn TO this cell,
-           based on GID."""
-        # nc_dict keys are: {pos_src, A_weight, A_delay, lamtha}
+           based on GID.
+
+        Parameters
+        ----------
+        gid_presyn : int
+            The cell ID of the presynaptic neuron
+        nc_dict : dict
+            Dictionary with keys: pos_src, A_weight, A_delay, lamtha
+            Defines the connection parameters
+        postsyn : str
+            The postsynaptic cell object.
+
+        Returns
+        -------
+        nc : instance of h.NetCon
+            A network connection object.
+        """
         nc = self.pc.gid_connect(gid_presyn, postsyn)
         # calculate distance between cell positions with pardistance()
         d = self.__pardistance(nc_dict['pos_src'])
@@ -276,7 +313,6 @@ class Cell(object):
     def __pardistance(self, pos_pre):
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
-        #dz = self.pos[2] - pos_pre[2]
         return np.sqrt(dx**2 + dy**2)
 
     # Define 3D shape of soma -- is needed for gui representation of cell
