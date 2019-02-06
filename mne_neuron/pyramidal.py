@@ -437,17 +437,17 @@ class L2Pyr(Pyr):
     def parconnect(self, gid, gid_dict, pos_dict, p):
 
         dendrites = ['apicaloblique', 'basal2', 'basal3']
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., synapse='ampa',
                       dendrites=dendrites)
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., synapse='nmda',
                       dendrites=dendrites)
 
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50., synapse='gabaa',
                       dendrites=[self.synapses['soma_gabaa']])
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50., synapse='gabab',
                       dendrites=[self.synapses['soma_gabab']])
 
@@ -860,25 +860,25 @@ class L5Pyr(Pyr):
     def parconnect(self, gid, gid_dict, pos_dict, p):
 
         dendrites = ['apicaloblique', 'basal2', 'basal3']
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., synapse='ampa',
                       dendrites=dendrites)
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., synapse='nmda',
                       dendrites=dendrites)
 
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L5_basket', 'L5Basket', lamtha=70., synapse='gabaa',
                       dendrites=['soma_gabaa'])
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L5_basket', 'L5Basket', lamtha=70., synapse='gabab',
                       dendrites=['soma_gabab'])
 
         dendrites = ['basal2', 'basal3', 'apicaltuft', 'apicaloblique']
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L2_Pyramidal', 'L2Pyr', lamtha=3., synapse='ampa',
                       dendrites=dendrites)
-        self._connect(self, gid, gid_dict, pos_dict, p,
+        self._connect(gid, gid_dict, pos_dict, p,
                       'L2_Pyramidal', 'L2Pyr', lamtha=3., synapse='nmda',
                       dendrites=dendrites)
 
