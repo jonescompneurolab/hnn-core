@@ -202,12 +202,3 @@ def setfcfg():
             fcfg = sys.argv[i]
     # print("hnn config file is " , fcfg)
     return fcfg
-
-
-fcfg = setfcfg()  # config file name
-nohomeout = False
-# override homeout option through commandline flag
-for i in range(len(sys.argv)):
-    if sys.argv[i] == '-nohomeout' or sys.argv[i] == 'nohomeout':
-        nohomeout = True
-dconf = readconf(fcfg, nohomeout)

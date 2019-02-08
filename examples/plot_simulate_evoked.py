@@ -9,28 +9,27 @@ This example demonstrates how to simulate a dipole using Neurons.
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
-import os
+import os.path as op
+
 import sys
 import time
-import shutil
+
 import numpy as np
 
 from neuron import h
 
-# Cells are defined in other files
+import mne_neuron
 import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
 from mne_neuron.dipole import Dipole
-
-from mne_neuron.pyramidal import L5Pyr, L2Pyr
-from mne_neuron.basket import L2Basket, L5Basket
-
 from mne_neuron import network
 from mne_neuron.conf import readconf
 
+mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
+h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
-dconf = readconf()
+dconf = readconf(op.join(mne_neuron_root, 'hnn.cfg'))
 
 # data directory - ./data
 dproj = dconf['datdir']  # fio.return_data_dir(dconf['datdir'])
@@ -40,10 +39,10 @@ pc_id = int(pc.id())
 f_psim = ''
 ntrial = 1
 
-f_psim = os.path.join('param', 'default.param')
+f_psim = op.join(mne_neuron_root, 'param', 'default.param')
 
-simstr = f_psim.split(os.path.sep)[-1].split('.param')[0]
-datdir = os.path.join(dproj, simstr)
+simstr = f_psim.split(op.sep)[-1].split('.param')[0]
+datdir = op.join(dproj, simstr)
 
 
 # callback function for printing out time during simulation run
@@ -66,8 +65,8 @@ if pc_id == 0:
 
 # create rotating data files
 doutf = {}
-doutf['file_dpl'] = os.path.join(datdir, 'rawdpl.txt')
-doutf['file_param'] = os.path.join(datdir, 'param.txt')
+doutf['file_dpl'] = op.join(datdir, 'rawdpl.txt')
+doutf['file_param'] = op.join(datdir, 'param.txt')
 
 # core iterator through experimental groups
 expmt_group = p_exp.expmt_groups[0]
@@ -181,7 +180,7 @@ if pc_id == 0:
     dpl.plot()
 
     if debug:
-        print("Simulation run time: %4.4f s" % (time.time()-t0))
+        print("Simulation run time: %4.4f s" % (time.time() - t0))
         print("Simulation directory is: %s" % ddir.dsim)
 
 pc.barrier()  # make sure all done in case multiple trials
