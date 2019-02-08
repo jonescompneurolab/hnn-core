@@ -2,6 +2,26 @@
 
 
 
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole using Neurons. ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_simulate_evoked
 .. raw:: html
 
     <div style='clear:both'></div>
