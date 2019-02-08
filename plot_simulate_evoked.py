@@ -1,15 +1,17 @@
-#!/usr/bin/env python
-# run.py - primary run function for s1 project
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: removed izip, fixed an nhost bug)
-# last major: (SL: toward python3)
-# other branch for hnn
+"""
+===============
+Simulate dipole
+===============
+
+This example demonstrates how to simulate a dipole using Neurons.
+"""
+
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
 
 import os
 import sys
 import time
-import pickle
 import shutil
 import numpy as np
 
@@ -19,7 +21,6 @@ from neuron import h
 import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
 from mne_neuron.dipole import Dipole
-# from mne_neuron.lfp import LFPElectrode
 
 from mne_neuron.pyramidal import L5Pyr, L2Pyr
 from mne_neuron.basket import L2Basket, L5Basket
@@ -35,64 +36,14 @@ dconf = readconf()
 dproj = dconf['datdir']  # fio.return_data_dir(dconf['datdir'])
 debug = dconf['debug']
 pc = h.ParallelContext()
-pcID = int(pc.id())
+pc_id = int(pc.id())
 f_psim = ''
 ntrial = 1
-testLFP = dconf['testlfp']
-testlaminarLFP = dconf['testlaminarlfp']
-lelec = []  # list of LFP electrodes
 
-# reads the specified param file
-foundprm = False
-for i in range(len(sys.argv)):
-    if sys.argv[i].endswith('.param'):
-        f_psim = sys.argv[i]
-        foundprm = True
-        if pcID == 0 and debug:
-            print('using ', f_psim, ' param file.')
-    elif sys.argv[i] == 'ntrial' and i + 1 < len(sys.argv):
-        ntrial = int(sys.argv[i + 1])
-        if ntrial < 1:
-            ntrial = 1
-        if pcID == 0 and debug:
-            print('ntrial:', ntrial)
-
-if not foundprm:
-    f_psim = os.path.join('param', 'default.param')
-    if pcID == 0 and debug:
-        print(f_psim)
+f_psim = os.path.join('param', 'default.param')
 
 simstr = f_psim.split(os.path.sep)[-1].split('.param')[0]
 datdir = os.path.join(dproj, simstr)
-
-
-def spikes_write(net, filename_spikes):
-    """Spike write function."""
-
-    f = open(filename_spikes, 'w')
-    f.close()  # first make sure writes to an empty file
-    for rank in range(int(pc.nhost())):
-        # guarantees node order and no competition
-        pc.barrier()
-        if rank == int(pc.id()):
-            # net.spiketimes and net.spikegids are type h.Vector()
-            L = int(net.spikegids.size())
-            with open(filename_spikes, 'a') as file_spikes:
-                for i in range(L):
-                    file_spikes.write('%3.2f\t%d\n' % (
-                        net.spiketimes.x[i], net.spikegids.x[i]))
-    # let all nodes iterate through loop in which only one rank writes
-    pc.barrier()
-
-
-def copy_paramfile(dsim, f_psim, str_date):
-    """Copies param file into root dsim directory."""
-
-    fout = os.path.join(dsim, f_psim.split(os.path.sep)[-1])
-    shutil.copyfile(f_psim, fout)
-    # open the new param file and append the date to it
-    with open(fout, 'a') as f_param:
-        f_param.write('\nRun_Date: %s' % str_date)
 
 
 # callback function for printing out time during simulation run
@@ -104,130 +55,20 @@ def prsimtime():
     sys.stdout.flush()
 
 
-def save_vsoma():
-    """Save somatic voltage of all cells to pkl object."""
-
-    for host in range(int(pc.nhost())):
-        if host == pcID:
-            dsoma = net.get_vsoma()
-            # create a message ID and store this value
-            messageid = pc.pack(dsoma)
-            pc.post(host, messageid)  # post the message
-    if pcID == 0:
-        dsomaout = {}
-        for host in range(int(pc.nhost())):
-            pc.take(host)
-            dsoma_node = pc.upkpyobj()
-            for k, v in dsoma_node.items():
-                dsomaout[k] = v
-        dsomaout['vtime'] = t_vec.to_python()
-        # print('dsomaout.keys():',dsomaout.keys(),'file:',doutf['file_vsoma'])
-        pickle.dump(dsomaout, open(doutf['file_vsoma'], 'wb'))
-
-
-def savedat(p, rank, t_vec, dp_rec_L2, dp_rec_L5, net):
-    global doutf
-    # write time and calculated dipole to data file only if on the first proc
-    # only execute this statement on one proc
-    if rank == 0:
-        # write params to the file
-        paramrw.write(doutf['file_param'], p, net.gid_dict)
-        # write the raw dipole
-        with open(doutf['file_dpl'], 'w') as f:
-            for k in range(int(t_vec.size())):
-                f.write("%03.3f\t" % t_vec.x[k])
-                f.write("%5.4f\t" % (dp_rec_L2.x[k] + dp_rec_L5.x[k]))
-                f.write("%5.4f\t" % dp_rec_L2.x[k])
-                f.write("%5.4f\n" % dp_rec_L5.x[k])
-        # renormalize the dipole and save
-        # fix to allow init from data rather than file
-        dpl = Dipole(doutf['file_dpl'])
-        dpl.baseline_renormalize(doutf['file_param'])
-        dpl.convert_fAm_to_nAm()
-        dconf['dipole_scalefctr'] = dpl.scale(
-            paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
-        dpl.smooth(paramrw.find_param(
-            doutf['file_param'], 'dipole_smooth_win') / h.dt)
-        dpl.write(doutf['file_dpl_norm'])
-        # write the somatic current to the file
-        # for now does not write the total but just L2 somatic and L5 somatic
-        with open(doutf['file_current'], 'w') as fc:
-            for t, i_L2, i_L5 in zip(t_vec.x, net.current['L2Pyr_soma'].x, net.current['L5Pyr_soma'].x):
-                fc.write("%03.3f\t" % t)
-                # fc.write("%5.4f\t" % (i_L2 + i_L5))
-                fc.write("%5.4f\t" % i_L2)
-                fc.write("%5.4f\n" % i_L5)
-    # write output spikes
-    file_spikes_tmp = fio.file_spike_tmp(dproj)
-    spikes_write(net, file_spikes_tmp)
-    # move the spike file to the spike dir
-    if rank == 0:
-        shutil.move(file_spikes_tmp, doutf['file_spikes'])
-    if p['save_vsoma']:
-        save_vsoma()
-    for i, elec in enumerate(lelec):
-        elec.lfpout(fn=doutf['file_lfp'].split('.txt')
-                    [0] + '_' + str(i) + '.txt', tvec=t_vec)
-    return dpl
-
-
-def setupsimdir(f_psim, p_exp, rank):
-    ddir = fio.SimulationPaths()
-    ddir.create_new_sim(dproj, p_exp.expmt_groups, p_exp.sim_prefix)
-    if rank == 0:
-        ddir.create_datadir()
-        copy_paramfile(ddir.dsim, f_psim, ddir.str_date)
-    return ddir
-
-
-def getfname(ddir, key, trial=0, ntrial=1):
-    datatypes = {'rawspk': ('spk', '.txt'),
-                 'rawdpl': ('rawdpl', '.txt'),
-                 # same output name - do not need both raw and normalized
-                 # dipole - unless debugging
-                 'normdpl': ('dpl', '.txt'),
-                 'rawcurrent': ('i', '.txt'),
-                 'rawspec': ('rawspec', '.npz'),
-                 'rawspeccurrent': ('speci', '.npz'),
-                 'avgdpl': ('dplavg', '.txt'),
-                 'avgspec': ('specavg', '.npz'),
-                 'figavgdpl': ('dplavg', '.png'),
-                 'figavgspec': ('specavg', '.png'),
-                 'figdpl': ('dpl', '.png'),
-                 'figspec': ('spec', '.png'),
-                 'figspk': ('spk', '.png'),
-                 'param': ('param', '.txt'),
-                 'vsoma': ('vsoma', '.pkl'),
-                 'lfp': ('lfp', '.txt')
-                 }
-    if ntrial == 1 or key == 'param':  # param file currently identical for all trials
-        return os.path.join(datdir, datatypes[key][0] + datatypes[key][1])
-    else:
-        return os.path.join(datdir, datatypes[key][0] + '_' + str(trial) + datatypes[key][1])
-
-
-# create file names
-def setoutfiles(ddir, trial=0, ntrial=1):
-    # if pcID==0: print('setoutfiles:',trial,ntrial)
-    doutf = {}
-    doutf['file_dpl'] = getfname(ddir, 'rawdpl', trial, ntrial)
-    doutf['file_current'] = getfname(ddir, 'rawcurrent', trial, ntrial)
-    doutf['file_param'] = getfname(ddir, 'param', trial, ntrial)
-    doutf['file_spikes'] = getfname(ddir, 'rawspk', trial, ntrial)
-    doutf['file_spec'] = getfname(ddir, 'rawspec', trial, ntrial)
-    doutf['filename_debug'] = 'debug.dat'
-    doutf['file_dpl_norm'] = getfname(ddir, 'normdpl', trial, ntrial)
-    doutf['file_vsoma'] = getfname(ddir, 'vsoma', trial, ntrial)
-    doutf['file_lfp'] = getfname(ddir, 'lfp', trial, ntrial)
-    # if pcID==0: print(doutf)
-    return doutf
-
-
 # creates p_exp.sim_prefix and other param structures
 p_exp = paramrw.ExpParams(f_psim, debug=debug)
-ddir = setupsimdir(f_psim, p_exp, pcID)  # one directory for all experiments
+
+# one directory for all experiments
+ddir = fio.SimulationPaths()
+ddir.create_new_sim(dproj, p_exp.expmt_groups, p_exp.sim_prefix)
+if pc_id == 0:
+    ddir.create_datadir()
+
 # create rotating data files
-doutf = setoutfiles(ddir)
+doutf = {}
+doutf['file_dpl'] = os.path.join(datdir, 'rawdpl.txt')
+doutf['file_param'] = os.path.join(datdir, 'param.txt')
+
 # core iterator through experimental groups
 expmt_group = p_exp.expmt_groups[0]
 
@@ -245,8 +86,6 @@ h("dp_total_L5 = 0.")
 h.tstop = p['tstop']
 h.dt = p['dt']  # simulation duration and time-step
 h.celsius = p['celsius']  # 37.0 # p['celsius'] # set temperature
-# spike file needs to be known by all nodes
-file_spikes_tmp = fio.file_spike_tmp(dproj)
 net = network.NetworkOnNode(p)  # create node-specific network
 
 t_vec = h.Vector()
@@ -257,29 +96,6 @@ dp_rec_L5 = h.Vector()
 dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 
 net.movecellstopos()  # position cells in 2D grid
-
-
-def expandbbox(boxA, boxB):
-    return [(min(boxA[i][0], boxB[i][0]), max(boxA[i][1], boxB[i][1]))
-            for i in range(3)]
-
-
-def arrangelayers():
-    # offsets for L2, L5 cells so that L5 below L2 in display
-    dyoff = {L2Pyr: 1000, 'L2_pyramidal': 1000,
-             L5Pyr: -1000 - 149.39990234375,
-             'L5_pyramidal': -1000 - 149.39990234375,
-             L2Basket: 1000, 'L2_basket': 1000,
-             L5Basket: -1000 - 149.39990234375,
-             'L5_basket': -1000 - 149.39990234375}
-    for cell in net.cells:
-        cell.translate3d(0, dyoff[cell.celltype], 0)
-    dbbox = {x: [[1e9, -1e9], [1e9, -1e9], [1e9, -1e9]] for x in dyoff.keys()}
-    for cell in net.cells:
-        dbbox[cell.celltype] = expandbbox(dbbox[cell.celltype], cell.getbbox())
-
-
-arrangelayers()  # arrange cells in layers - for visualization purposes
 pc.barrier()
 
 
@@ -288,10 +104,10 @@ def initrands(s=0):  # fix to use s
     # establishes random seed for the seed seeder (yeah.)
     # this creates a prng_tmp on each, but only the value from 0 will be used
     prng_tmp = np.random.RandomState()
-    if pcID == 0:
+    if pc_id == 0:
         r = h.Vector(1, s)  # initialize vector to 1 element, with a 0
         if ntrial == 1:
-            prng_base = np.random.RandomState(pcID + s)
+            prng_base = np.random.RandomState(pc_id + s)
         else:
             # Create a random seed value
             r.x[0] = prng_tmp.randint(1e9)
@@ -313,76 +129,62 @@ def initrands(s=0):  # fix to use s
 initrands(0)  # init once
 
 
-def setupLFPelectrodes():
-    lelec = []
-    if testlaminarLFP:
-        for y in np.linspace(1466.0, -72.0, 16):
-            lelec.append(LFPElectrode([370.0, y, 450.0], pc=pc))
-    elif testLFP:
-        lelec.append(LFPElectrode([370.0, 1050.0, 450.0], pc=pc))
-        lelec.append(LFPElectrode([370.0, 208.0, 450.0], pc=pc))
-    return lelec
-
-
-lelec = setupLFPelectrodes()
-
 # All units for time: ms
 
+t0 = time.time()  # clock start time
 
-def runsim():
-    t0 = time.time()  # clock start time
+# sets the default max solver step in ms (purposefully large)
+pc.set_maxstep(10)
 
-    # sets the default max solver step in ms (purposefully large)
-    pc.set_maxstep(10)
+h.finitialize()  # initialize cells to -65 mV, after all the NetCon delays have been specified
+if pc_id == 0:
+    for tt in range(0, int(h.tstop), printdt):
+        h.cvode.event(tt, prsimtime)  # print time callbacks
 
-    for elec in lelec:
-        elec.setup()
-        elec.LFPinit()
+h.fcurrent()
+h.frecord_init()  # set state variables if they have been changed since h.finitialize
+pc.psolve(h.tstop)  # actual simulation - run the solver
+pc.barrier()
 
-    h.finitialize()  # initialize cells to -65 mV, after all the NetCon delays have been specified
-    if pcID == 0:
-        for tt in range(0, int(h.tstop), printdt):
-            h.cvode.event(tt, prsimtime)  # print time callbacks
+# these calls aggregate data across procs/nodes
+pc.allreduce(dp_rec_L2, 1)
+# combine dp_rec on every node, 1=add contributions together
+pc.allreduce(dp_rec_L5, 1)
+net.aggregate_currents()  # aggregate the currents independently on each proc
+# combine net.current{} variables on each proc
+pc.allreduce(net.current['L5Pyr_soma'], 1)
+pc.allreduce(net.current['L2Pyr_soma'], 1)
 
-    h.fcurrent()
-    h.frecord_init()  # set state variables if they have been changed since h.finitialize
-    pc.psolve(h.tstop)  # actual simulation - run the solver
-    pc.barrier()
+pc.barrier()
 
-    # these calls aggregate data across procs/nodes
-    pc.allreduce(dp_rec_L2, 1)
-    # combine dp_rec on every node, 1=add contributions together
-    pc.allreduce(dp_rec_L5, 1)
-    for elec in lelec:
-        elec.lfp_final()
-    net.aggregate_currents()  # aggregate the currents independently on each proc
-    # combine net.current{} variables on each proc
-    pc.allreduce(net.current['L5Pyr_soma'], 1)
-    pc.allreduce(net.current['L2Pyr_soma'], 1)
+# write time and calculated dipole to data file only if on the first proc
+# only execute this statement on one proc
+if pc_id == 0:
+    # write params to the file
+    paramrw.write(doutf['file_param'], p, net.gid_dict)
+    # write the raw dipole
+    with open(doutf['file_dpl'], 'w') as f:
+        for k in range(int(t_vec.size())):
+            f.write("%03.3f\t" % t_vec.x[k])
+            f.write("%5.4f\t" % (dp_rec_L2.x[k] + dp_rec_L5.x[k]))
+            f.write("%5.4f\t" % dp_rec_L2.x[k])
+            f.write("%5.4f\n" % dp_rec_L5.x[k])
+    # renormalize the dipole and save
+    # fix to allow init from data rather than file
+    dpl = Dipole(doutf['file_dpl'])
+    dpl.baseline_renormalize(doutf['file_param'])
+    dpl.convert_fAm_to_nAm()
+    dconf['dipole_scalefctr'] = dpl.scale(
+        paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
+    dpl.smooth(paramrw.find_param(
+        doutf['file_param'], 'dipole_smooth_win') / h.dt)
+    dpl.plot()
 
-    pc.barrier()
+    if debug:
+        print("Simulation run time: %4.4f s" % (time.time()-t0))
+        print("Simulation directory is: %s" % ddir.dsim)
 
-    # write time and calculated dipole to data file only if on the first proc
-    # only execute this statement on one proc
-    dpl = savedat(p, pcID, t_vec, dp_rec_L2, dp_rec_L5, net)
+pc.barrier()  # make sure all done in case multiple trials
 
-    for elec in lelec:
-        print('end; t_vec.size()', t_vec.size(),
-              'elec.lfp_t.size()', elec.lfp_t.size())
-
-    if pcID == 0:
-        if debug:
-            print("Simulation run time: %4.4f s" % (time.time()-t0))
-        if debug:
-            print("Simulation directory is: %s" % ddir.dsim)
-        if paramrw.find_param(doutf['file_param'], 'save_figs'):
-            savefigs(ddir, p, p_exp)  # save output figures
-
-    pc.barrier()  # make sure all done in case multiple trials
-
-
-if __name__ == "__main__":
-    if dconf['dorun']:
-        runsim()
-        pc.runworker()
-        pc.done()
+pc.runworker()
+pc.done()

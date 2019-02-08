@@ -74,77 +74,24 @@ class Dipole():
         for key in self.dpl.keys():
             self.dpl[key] = hammfilt(self.dpl[key], winsz)
 
-    # average stationary dipole over a time window
-    def mean_stationary(self, opts_input={}):
-        # opts is default AND input to below, can be modified by opts_input
-        opts = {
-            't0': 50.,
-            'tstop': self.t[-1],
-            'layer': 'agg',
-        }
-        # attempt to override the keys in opts
-        for key in opts_input.keys():
-            # check for each of the keys in opts
-            if key in opts.keys():
-                # special rule for tstop
-                if key == 'tstop':
-                    # if value in tstop is -1, then use end to T
-                    if opts_input[key] == -1:
-                        opts[key] = self.t[-1]
-                else:
-                    opts[key] = opts_input[key]
-        # check for layer in keys
-        if opts['layer'] in self.dpl.keys():
-            # get the dipole that matches the xlim
-            x_dpl = self.dpl[opts['layer']][(
-                self.t > opts['t0']) & (self.t < opts['tstop'])]
-            # directly return the average
-            return np.mean(x_dpl, axis=0)
-        else:
-            print("Layer not found. Try one of %s" % self.dpl.keys())
+    def plot(self, layer='agg'):
+        """Simple layer-specific plot function.
 
-    # finds the max value within a specified xlim
-    # def max(self, layer, xlim):
-    def lim(self, layer, xlim):
-        # better implemented as a dict
-        if layer is None:
-            dpl_tmp = self.dpl['agg']
-        elif layer in self.dpl.keys():
-            dpl_tmp = self.dpl[layer]
-        # set xmin and xmax
-        if xlim is None:
-            xmin = self.t[0]
-            xmax = self.t[-1]
-        else:
-            xmin, xmax = xlim
-            if xmin < 0.:
-                xmin = 0.
-            if xmax < 0.:
-                xmax = self.f[-1]
-        dpl_tmp = dpl_tmp[(self.t > xmin) & (self.t < xmax)]
-        return (np.min(dpl_tmp), np.max(dpl_tmp))
+        Parameters
+        ----------
+        layer : str
+            The layer to plot
 
-    # simple layer-specific plot function
-    def plot(self, ax, xlim, layer='agg'):
-        # plot the whole thing and just change the xlim and the ylim
-        # if layer is None:
-        #     ax.plot(self.t, self.dpl['agg'])
-        #     ymax = self.max(None, xlim)
-        #     ylim = (-ymax, ymax)
-        #     ax.set_ylim(ylim)
+        Returns
+        -------
+        fig : instance of plt.fig
+            The matplotlib figure handle.
+        """
+        import matplotlib.pyplot as plt
         if layer in self.dpl.keys():
-            ax.plot(self.t, self.dpl[layer])
-            ylim = self.lim(layer, xlim)
-            # force ymax to be something sane
-            # commenting this out for now, but
-            # we can change if absolutely necessary.
-            # ax.set_ylim(top=ymax*1.2)
-            # set the lims here, as a default
-            ax.set_ylim(ylim)
-            ax.set_xlim(xlim)
-        else:
-            print("raise some error")
-        return ax.get_xlim()
+            fig = plt.plot(self.t, self.dpl[layer])
+        plt.show()
+        return fig
 
     # ext function to renormalize
     # this function changes in place but does NOT write the new values to the file
