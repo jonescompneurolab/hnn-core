@@ -9,10 +9,8 @@ This example demonstrates how to simulate a dipole using Neurons.
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
-import os.path as op
-
 import sys
-import time
+import os.path as op
 
 from neuron import h
 
@@ -31,7 +29,6 @@ from mne_neuron.conf import readconf
 
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
-h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
 dconf = readconf(op.join(mne_neuron_root, 'hnn.cfg'))
 
@@ -46,16 +43,6 @@ f_psim = op.join(mne_neuron_root, 'param', 'default.param')
 
 simstr = f_psim.split(op.sep)[-1].split('.param')[0]
 datdir = op.join(dproj, simstr)
-
-
-# callback function for printing out time during simulation run
-printdt = 10
-
-
-def prsimtime():
-    sys.stdout.write('\rSimulation time: {0} ms...'.format(round(h.t, 2)))
-    sys.stdout.flush()
-
 
 # creates p_exp.sim_prefix and other param structures
 p_exp = paramrw.ExpParams(f_psim, debug=debug)
@@ -99,15 +86,20 @@ dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 net.movecellstopos()  # position cells in 2D grid
 pc.barrier()
 
-# All units for time: ms
-
-t0 = time.time()  # clock start time
-
 # sets the default max solver step in ms (purposefully large)
 pc.set_maxstep(10)
 
 h.finitialize()  # initialize cells to -65 mV, after all the NetCon delays have been specified
 
+
+###############################################################################
+# We define a callback function for printing out time during simulation run
+def prsimtime():
+    sys.stdout.write('\rSimulation time: {0} ms...'.format(round(h.t, 2)))
+    sys.stdout.flush()
+
+
+printdt = 10
 for tt in range(0, int(h.tstop), printdt):
     h.cvode.event(tt, prsimtime)  # print time callbacks
 
