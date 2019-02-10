@@ -47,4 +47,4 @@ install:
       make
       python setup.py develop
 script:
-    - python plot_simulate_evoked.py
+    - python examples/plot_simulate_evoked.py
