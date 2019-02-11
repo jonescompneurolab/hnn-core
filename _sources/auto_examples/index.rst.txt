@@ -5,7 +5,7 @@
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole using Neurons. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole using the Neuron simulator. ">
 
 .. only:: html
 

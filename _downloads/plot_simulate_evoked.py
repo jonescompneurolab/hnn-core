@@ -3,7 +3,8 @@
 Simulate dipole
 ===============
 
-This example demonstrates how to simulate a dipole using Neurons.
+This example demonstrates how to simulate a dipole using the Neuron
+simulator.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
