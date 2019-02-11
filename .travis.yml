@@ -23,6 +23,7 @@ install:
     - conda create -n testenv --yes pip python=${PYTHON_VERSION}
     - source activate testenv
     - conda install --yes scipy numpy matplotlib
+    - pip install flake8
     - pip install mpi4py
     - pip install coverage coveralls
     - |
@@ -46,5 +47,6 @@ install:
       export PATH=$PATH:${install_prefix}/x86_64/bin
       make
       python setup.py develop
+      flake8 --count mne_neuron
 script:
     - python examples/plot_simulate_evoked.py
