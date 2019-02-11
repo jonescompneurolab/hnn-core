@@ -22,30 +22,24 @@ import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
 from mne_neuron.dipole import Dipole
 from mne_neuron import network
-from mne_neuron.conf import readconf
 
 ###############################################################################
 # Then we setup the directories
-
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
 
-dconf = readconf(op.join(mne_neuron_root, 'hnn.cfg'))
-
 # data directory - ./data
-dproj = dconf['datdir']  # fio.return_data_dir(dconf['datdir'])
-debug = dconf['debug']
+dproj = op.join(mne_neuron_root, 'data')
 pc = h.ParallelContext(1)
 f_psim = ''
 ntrial = 1
-
 f_psim = op.join(mne_neuron_root, 'param', 'default.param')
 
 simstr = f_psim.split(op.sep)[-1].split('.param')[0]
 datdir = op.join(dproj, simstr)
 
 # creates p_exp.sim_prefix and other param structures
-p_exp = paramrw.ExpParams(f_psim, debug=debug)
+p_exp = paramrw.ExpParams(f_psim)
 
 # one directory for all experiments
 ddir = fio.SimulationPaths()
