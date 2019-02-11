@@ -10,6 +10,7 @@ This example demonstrates how to simulate a dipole using Neurons.
 #          Sam Neymotin <samnemo@gmail.com>
 
 import sys
+import os
 import os.path as op
 
 from neuron import h
@@ -37,6 +38,8 @@ f_psim = op.join(mne_neuron_root, 'param', 'default.param')
 
 simstr = f_psim.split(op.sep)[-1].split('.param')[0]
 datdir = op.join(dproj, simstr)
+if not op.exists(op.join(mne_neuron_root, 'data', 'default')):
+    os.mkdir(op.join(mne_neuron_root, 'data', 'default'))
 
 # creates p_exp.sim_prefix and other param structures
 p_exp = paramrw.ExpParams(f_psim)
@@ -130,8 +133,7 @@ with open(doutf['file_dpl'], 'w') as f:
 dpl = Dipole(doutf['file_dpl'])
 dpl.baseline_renormalize(doutf['file_param'])
 dpl.convert_fAm_to_nAm()
-dconf['dipole_scalefctr'] = dpl.scale(
-    paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
+dpl.scale(paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
 dpl.smooth(paramrw.find_param(
     doutf['file_param'], 'dipole_smooth_win') / h.dt)
 dpl.plot()
