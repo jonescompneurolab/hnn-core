@@ -3,7 +3,8 @@
 Simulate dipole
 ===============
 
-This example demonstrates how to simulate a dipole using Neurons.
+This example demonstrates how to simulate a dipole using the Neuron
+simulator.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
@@ -84,7 +85,6 @@ dp_rec_L5 = h.Vector()
 dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 
 net.movecellstopos()  # position cells in 2D grid
-pc.barrier()
 
 # sets the default max solver step in ms (purposefully large)
 pc.set_maxstep(10)
@@ -106,7 +106,6 @@ for tt in range(0, int(h.tstop), printdt):
 h.fcurrent()
 h.frecord_init()  # set state variables if they have been changed since h.finitialize
 pc.psolve(h.tstop)  # actual simulation - run the solver
-pc.barrier()
 
 # these calls aggregate data across procs/nodes
 pc.allreduce(dp_rec_L2, 1)
@@ -117,20 +116,16 @@ net.aggregate_currents()  # aggregate the currents independently on each proc
 pc.allreduce(net.current['L5Pyr_soma'], 1)
 pc.allreduce(net.current['L2Pyr_soma'], 1)
 
-pc.barrier()
-
-# write time and calculated dipole to data file only if on the first proc
-# only execute this statement on one proc
-
-# write params to the file
+###############################################################################
+# write the dipole recordings to a file
 paramrw.write(doutf['file_param'], p, net.gid_dict)
 dpl_data = np.c_[t_vec.as_numpy(),
                  dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
                  dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
 np.savetxt(doutf['file_dpl'], dpl_data, fmt='%5.4f')
 
-# renormalize the dipole
-# fix to allow init from data rather than file
+###############################################################################
+# Renormalize the dipole and read the dipole back from file
 dpl = Dipole(doutf['file_dpl'])
 dpl.baseline_renormalize(doutf['file_param'])
 dpl.convert_fAm_to_nAm()
@@ -138,8 +133,6 @@ dpl.scale(paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
 dpl.smooth(paramrw.find_param(
     doutf['file_param'], 'dipole_smooth_win') / h.dt)
 dpl.plot()
-
-pc.barrier()  # make sure all done in case multiple trials
 
 pc.runworker()
 pc.done()

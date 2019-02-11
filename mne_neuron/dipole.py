@@ -70,7 +70,6 @@ class Dipole():
     def smooth(self, winsz):
         if winsz <= 1:
             return
-        #for key in self.dpl.keys(): self.dpl[key] = boxfilt(self.dpl[key],winsz)
         for key in self.dpl.keys():
             self.dpl[key] = hammfilt(self.dpl[key], winsz)
 
@@ -90,6 +89,7 @@ class Dipole():
         import matplotlib.pyplot as plt
         if layer in self.dpl.keys():
             fig = plt.plot(self.t, self.dpl[layer])
+            plt.xlabel('Time (ms)')
         plt.show()
         return fig
 
