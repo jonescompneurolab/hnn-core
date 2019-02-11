@@ -9,11 +9,11 @@ This example demonstrates how to simulate a dipole using Neurons.
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import sys
+import os
 import os.path as op
 
-import sys
-import time
-
+import numpy as np
 from neuron import h
 
 ###############################################################################
@@ -24,41 +24,27 @@ import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
 from mne_neuron.dipole import Dipole
 from mne_neuron import network
-from mne_neuron.conf import readconf
 
 ###############################################################################
 # Then we setup the directories
-
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
 h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
-dconf = readconf(op.join(mne_neuron_root, 'hnn.cfg'))
-
 # data directory - ./data
-dproj = dconf['datdir']  # fio.return_data_dir(dconf['datdir'])
-debug = dconf['debug']
+dproj = op.join(mne_neuron_root, 'data')
 pc = h.ParallelContext(1)
 f_psim = ''
 ntrial = 1
-
 f_psim = op.join(mne_neuron_root, 'param', 'default.param')
 
 simstr = f_psim.split(op.sep)[-1].split('.param')[0]
 datdir = op.join(dproj, simstr)
-
-
-# callback function for printing out time during simulation run
-printdt = 10
-
-
-def prsimtime():
-    sys.stdout.write('\rSimulation time: {0} ms...'.format(round(h.t, 2)))
-    sys.stdout.flush()
-
+if not op.exists(datdir):
+    os.mkdir(op.join(mne_neuron_root, 'data'))
 
 # creates p_exp.sim_prefix and other param structures
-p_exp = paramrw.ExpParams(f_psim, debug=debug)
+p_exp = paramrw.ExpParams(f_psim)
 
 # one directory for all experiments
 ddir = fio.SimulationPaths()
@@ -89,6 +75,8 @@ h.dt = p['dt']  # simulation duration and time-step
 h.celsius = p['celsius']  # 37.0 - set temperature
 net = network.NetworkOnNode(p)  # create node-specific network
 
+###############################################################################
+# We define the arrays (Vector in numpy) for recording the signals
 t_vec = h.Vector()
 t_vec.record(h._ref_t)  # time recording
 dp_rec_L2 = h.Vector()
@@ -99,15 +87,20 @@ dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 net.movecellstopos()  # position cells in 2D grid
 pc.barrier()
 
-# All units for time: ms
-
-t0 = time.time()  # clock start time
-
 # sets the default max solver step in ms (purposefully large)
 pc.set_maxstep(10)
 
 h.finitialize()  # initialize cells to -65 mV, after all the NetCon delays have been specified
 
+
+###############################################################################
+# We define a callback function for printing out time during simulation run
+def prsimtime():
+    sys.stdout.write('\rSimulation time: {0} ms...'.format(round(h.t, 2)))
+    sys.stdout.flush()
+
+
+printdt = 10
 for tt in range(0, int(h.tstop), printdt):
     h.cvode.event(tt, prsimtime)  # print time callbacks
 
@@ -132,20 +125,17 @@ pc.barrier()
 
 # write params to the file
 paramrw.write(doutf['file_param'], p, net.gid_dict)
-# write the raw dipole
-with open(doutf['file_dpl'], 'w') as f:
-    for k in range(int(t_vec.size())):
-        f.write("%03.3f\t" % t_vec.x[k])
-        f.write("%5.4f\t" % (dp_rec_L2.x[k] + dp_rec_L5.x[k]))
-        f.write("%5.4f\t" % dp_rec_L2.x[k])
-        f.write("%5.4f\n" % dp_rec_L5.x[k])
-# renormalize the dipole and save
+dpl_data = np.c_[t_vec.as_numpy(),
+                 dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
+                 dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
+np.savetxt(doutf['file_dpl'], dpl_data, fmt='%5.4f')
+
+# renormalize the dipole
 # fix to allow init from data rather than file
 dpl = Dipole(doutf['file_dpl'])
 dpl.baseline_renormalize(doutf['file_param'])
 dpl.convert_fAm_to_nAm()
-dconf['dipole_scalefctr'] = dpl.scale(
-    paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
+dpl.scale(paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
 dpl.smooth(paramrw.find_param(
     doutf['file_param'], 'dipole_smooth_win') / h.dt)
 dpl.plot()
