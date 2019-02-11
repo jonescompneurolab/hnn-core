@@ -1,4 +1,5 @@
-# params_default.py - master list of changeable params. most set to default val of inactive
+# params_default.py - master list of changeable params. most set to
+# default val of inactive
 #
 # v 1.9.01
 # rev 2015-12-08 (RL: added t0_pois)
@@ -129,7 +130,8 @@ def get_params_default(nprox=2, ndist=1):
         # times and stdevs for evoked responses
         'dt_evprox0_evdist': -1,  # not used in GUI
         'dt_evprox0_evprox1': -1,  # not used in GUI
-        'sync_evinput': 1,  # whether evoked inputs arrive at same time to all cells
+        # whether evoked inputs arrive at same time to all cells
+        'sync_evinput': 1,
         # increment (ms) for avg evoked input start (for trial n, avg start
         # time is n * evinputinc
         'inc_evinput': 0.0,
@@ -138,7 +140,8 @@ def get_params_default(nprox=2, ndist=1):
         'save_spec_data': 0,
         'f_max_spec': 40.,
         'dipole_scalefctr': 30e3,  # scale factor for dipole - default at 30e3
-        # based on scaling needed to match model ongoing rhythms from jones 2009 - for ERPs can use 300
+        # based on scaling needed to match model ongoing rhythms from
+        # jones 2009 - for ERPs can use 300
         # for ongoing rhythms + ERPs ... use ... ?
         # window for smoothing (box filter) - 15 ms from jones 2009; shorten
         'dipole_smooth_win': 15.0,
@@ -170,7 +173,8 @@ def get_params_default(nprox=2, ndist=1):
         # N_trials of 1 means that seed is set by rank
         'N_trials': 1,
 
-        # prng_state is a string for a filename containing the random state one wants to use
+        # prng_state is a string for a filename containing the
+        # random state one wants to use
         # prng seed cores are the base integer seed for the specific
         # prng object for a specific random number stream
         # 'prng_state': None,
@@ -201,7 +205,8 @@ def get_params_default(nprox=2, ndist=1):
 
     return p
 
-# return dict with default params (empty) for evoked inputs; n is number of evoked inputs
+# return dict with default params (empty) for evoked inputs;
+# n is number of evoked inputs
 # isprox == True iff proximal (otherwise distal)
 
 
@@ -217,7 +222,7 @@ def get_ev_params_default(n, isprox):
         lty.append('L5Basket')
     lsy = ['ampa', 'nmda']  # allow changing both ampa and nmda weights
     for i in range(n):
-        tystr = pref + '_' + str(i+1)  # this string includes input number
+        tystr = pref + '_' + str(i + 1)  # this string includes input number
         for ty in lty:
             for sy in lsy:
                 dout['gbar_' + tystr + '_' + ty +

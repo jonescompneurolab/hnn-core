@@ -113,9 +113,9 @@ class Cell(object):
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
     def dipole_insert(self, yscale):
-            # insert dipole into each section of this cell
-            # dends must have already been created!!
-            # it's easier to use wholetree here, this includes soma
+        # insert dipole into each section of this cell
+        # dends must have already been created!!
+        # it's easier to use wholetree here, this includes soma
         seclist = h.SectionList()
         seclist.wholetree(sec=self.soma)
         # create a python section list list_all
@@ -147,12 +147,14 @@ class Cell(object):
             # diff values calculate length between successive section points
             y_diff = np.diff(y_scale)
             # y_diff = np.diff(y_long)
-            # doing range to index multiple values of the same np.array simultaneously
+            # doing range to index multiple values of the same
+            # np.array simultaneously
             for i in range(len(loc)):
                 # assign the ri value to the dipole
                 sect(loc[i]).dipole.ri = h.ri(loc[i], sec=sect)
                 # range variable 'dipole'
-                # set pointers to previous segment's voltage, with boundary condition
+                # set pointers to previous segment's voltage, with
+                # boundary condition
                 if i:
                     h.setpointer(sect(loc[i - 1])._ref_v,
                                  'pv', sect(loc[i]).dipole)
@@ -206,7 +208,8 @@ class Cell(object):
                 self.dict_currents[key].record(self.synapses[key]._ref_i)
         except:
             print(
-                "Warning in Cell(): record_current_soma() was called, but no self.synapses dict was found")
+                "Warning in Cell(): record_current_soma() was called,"
+                " but no self.synapses dict was found")
             pass
 
     # General fn that creates any Exp2Syn synapse type
@@ -309,7 +312,8 @@ class Cell(object):
 
         return nc
 
-    # pardistance function requires pre position, since it is calculated on POST cell
+    # pardistance function requires pre position, since it is
+    # calculated on POST cell
     def __pardistance(self, pos_pre):
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
@@ -358,7 +362,8 @@ class Cell(object):
             'amp': p['Itonic_A_%s' % name_key]
         }
 
-        # iterate through list of sect_list_IClamp to create a persistent IClamp object
+        # iterate through list of sect_list_IClamp to create a persistent
+        # IClamp object
         # the insert_IClamp procedure is in Cell() and checks on names
         # so names must be actual section names, or else it will fail silently
         self.list_IClamp = [self.insert_IClamp(

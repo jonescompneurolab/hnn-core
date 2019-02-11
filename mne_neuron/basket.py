@@ -86,7 +86,8 @@ class L2Basket(BasketSingle):
     # par: receive from external inputs
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
         # for some gid relating to the input feed:
-        for gid_src, p_src, pos in zip(gid_dict['extinput'], p_ext, pos_dict['extinput']):
+        for gid_src, p_src, pos in zip(gid_dict['extinput'],
+                                       p_ext, pos_dict['extinput']):
             # check if AMPA params are defined in the p_src
             if 'L2Basket_ampa' in p_src.keys():
                 # create an nc_dict
@@ -145,15 +146,17 @@ class L2Basket(BasketSingle):
                     'type_src': type
                 }
 
-                # connections depend on location of input - why only for L2 basket and not L5 basket?
-                if p_ext['loc'] is 'proximal':
+                # connections depend on location of input - why only
+                # for L2 basket and not L5 basket?
+                if p_ext['loc'] == 'proximal':
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_ampa, self.soma_ampa))
-                    # NEW: note that default/original is 0 nmda weight for the soma (for prox evoked)
+                    # NEW: note that default/original is 0 nmda weight for
+                    # the soma (for prox evoked)
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_nmda, self.soma_nmda))
 
-                elif p_ext['loc'] is 'distal':
+                elif p_ext['loc'] == 'distal':
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_ampa, self.soma_ampa))
                     self.ncfrom_ev.append(self.parconnect_from_src(
@@ -161,7 +164,8 @@ class L2Basket(BasketSingle):
 
         elif type == 'extgauss':
             # gid is this cell's gid
-            # gid_dict is the whole dictionary, including the gids of the extgauss
+            # gid_dict is the whole dictionary, including the gids
+            # of the extgauss
             # pos_list is also the pos of the extgauss (net origin)
             # p_ext_gauss are the params (strength, etc.)
             # I recognize this is ugly (hack)
@@ -173,7 +177,8 @@ class L2Basket(BasketSingle):
                 # this is a dumb place to put this information
                 gid_extgauss = gid + gid_dict['extgauss'][0]
 
-                # gid works here because there are as many pos items in pos_dict['extgauss'] as there are cells
+                # gid works here because there are as many pos
+                # items in pos_dict['extgauss'] as there are cells
                 nc_dict = {
                     'pos_src': pos_dict['extgauss'][gid],
                     # index 0 is ampa weight
@@ -296,13 +301,15 @@ class L5Basket(BasketSingle):
                 self.ncfrom_ev.append(self.parconnect_from_src(
                     gid_ev, nc_dict_ampa, self.soma_ampa))
 
-                # NEW: note that default/original is 0 nmda weight for the soma (both prox and distal evoked)
+                # NEW: note that default/original is 0 nmda weight
+                # for the soma (both prox and distal evoked)
                 self.ncfrom_ev.append(self.parconnect_from_src(
                     gid_ev, nc_dict_nmda, self.soma_nmda))
 
         elif type == 'extgauss':
             # gid is this cell's gid
-            # gid_dict is the whole dictionary, including the gids of the extgauss
+            # gid_dict is the whole dictionary, including the gids
+            # of the extgauss
             # pos_dict is also the pos of the extgauss (net origin)
             # p_ext_gauss are the params (strength, etc.)
             if 'L5_basket' in p_ext.keys():

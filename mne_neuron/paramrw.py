@@ -117,7 +117,7 @@ class ExpParams(object):
         lines = clean_lines(f_psim)
 
         # ignore comments
-        lines = [line for line in lines if line[0] is not '#']
+        lines = [line for line in lines if line[0] != '#']
         p = {}
 
         for line in lines:
@@ -160,9 +160,9 @@ class ExpParams(object):
 
             else:
                 # assign group params first
-                if val[0] is '{':
+                if val[0] == '{':
                     # check for a linspace as a param!
-                    if val[1] is 'L':
+                    if val[1] == 'L':
                         # in this case, val_range must be as long as the
                         # correct expmt_group length
                         # everything beyond that will be truncated by the zip
@@ -184,14 +184,14 @@ class ExpParams(object):
 
                 # interpret this as a list of vals
                 # type floats to a np array
-                elif val[0] is '[':
+                elif val[0] == '[':
                     p[param] = self.__expand_array(val)
 
                 # interpret as a linspace
-                elif val[0] is 'L':
+                elif val[0] == 'L':
                     p[param] = self.__expand_linspace(val)
 
-                elif val[0] is 'A':
+                elif val[0] == 'A':
                     p[param] = self.__expand_arange(val)
 
                 else:
@@ -292,8 +292,8 @@ class ExpParams(object):
         # now find ONLY the values that are present in the supplied p_all_input
         # based on the default dict
         for key in p_all.keys():
-            # automatically expects that keys are either in p_all_input OR will resort
-            # to default value
+            # automatically expects that keys are either in
+            # p_all_input OR will resort to default value
             if key in p_all_input:
                 # pop val off so the remaining items in p_all_input are
                 # extraneous
@@ -302,8 +302,8 @@ class ExpParams(object):
         # now display extraneous keys, if there were any
         if len(p_all_input):
             if self.debug:
-                print("Invalid keys from param file not found in default params: %s" % str(
-                    p_all_input.keys()))
+                print("Invalid keys from param file not found in "
+                      "default params: %s" % str(p_all_input.keys()))
 
         return p_all
 
@@ -349,9 +349,9 @@ def read(fparam):
             continue
         keystring, val = line.split(": ")
         key = keystring.strip()
-        if val[0] is '[':
+        if val[0] == '[':
             val_range = val[1:-1].split(', ')
-            if len(val_range) is 2:
+            if len(val_range) == 2:
                 ind_start = int(val_range[0])
                 ind_end = int(val_range[1]) + 1
                 gid_dict[key] = np.arange(ind_start, ind_end)
@@ -490,16 +490,17 @@ def checkevokedsynkeys(p, nprox, ndist):
     # evoked proximal target cell types
     lctdist = ['L2Pyr', 'L5Pyr', 'L2Basket']
     lsy = ['ampa', 'nmda']  # synapse types used in evoked inputs
-    for nev, pref, lct in zip([nprox, ndist], ['evprox_', 'evdist_'], [lctprox, lctdist]):
+    for nev, pref, lct in zip([nprox, ndist], ['evprox_', 'evdist_'],
+                              [lctprox, lctdist]):
         for i in range(nev):
-            skey = pref + str(i+1)
+            skey = pref + str(i + 1)
             for sy in lsy:
                 for ct in lct:
-                    k = 'gbar_'+skey+'_'+ct+'_'+sy
+                    k = 'gbar_' + skey + '_' + ct + '_' + sy
                     # if the synapse-specific gbar not present, use the
                     # existing weight for both ampa,nmda
                     if k not in p:
-                        p[k] = p['gbar_'+skey+'_'+ct]
+                        p[k] = p['gbar_' + skey + '_' + ct]
 
 #
 
@@ -639,12 +640,18 @@ def create_pext(p, tstop):
     # Create distal evoked response parameters
     # f_input needs to be defined as 0
     for i in range(ndist):
-        skey = 'evdist_' + str(i+1)
-        p_unique['evdist' + str(i+1)] = {
+        skey = 'evdist_' + str(i + 1)
+        p_unique['evdist' + str(i + 1)] = {
             't0': p['t_' + skey],
-            'L2_pyramidal': (p['gbar_'+skey+'_L2Pyr_ampa'], p['gbar_'+skey+'_L2Pyr_nmda'], 0.1, p['sigma_t_'+skey]),
-            'L5_pyramidal': (p['gbar_'+skey+'_L5Pyr_ampa'], p['gbar_'+skey+'_L5Pyr_nmda'], 0.1, p['sigma_t_'+skey]),
-            'L2_basket': (p['gbar_'+skey+'_L2Basket_ampa'], p['gbar_'+skey+'_L2Basket_nmda'], 0.1, p['sigma_t_' + skey]),
+            'L2_pyramidal': (p['gbar_' + skey + '_L2Pyr_ampa'],
+                             p['gbar_' + skey + '_L2Pyr_nmda'],
+                             0.1, p['sigma_t_' + skey]),
+            'L5_pyramidal': (p['gbar_' + skey + '_L5Pyr_ampa'],
+                             p['gbar_' + skey + '_L5Pyr_nmda'],
+                             0.1, p['sigma_t_' + skey]),
+            'L2_basket': (p['gbar_' + skey + '_L2Basket_ampa'],
+                          p['gbar_' + skey + '_L2Basket_nmda'],
+                          0.1, p['sigma_t_' + skey]),
             'prng_seedcore': int(p['prng_seedcore_' + skey]),
             'lamtha_space': 3.,
             'loc': 'distal',
@@ -655,12 +662,23 @@ def create_pext(p, tstop):
 
     # this needs to create many feeds
     # (amplitude, delay, mu, sigma). ordered this way to preserve compatibility
-    p_unique['extgauss'] = {  # NEW: note double weight specification since only use ampa for gauss inputs
+    # NEW: note double weight specification since only use ampa for gauss
+    # inputs
+    p_unique['extgauss'] = {
         'stim': 'gaussian',
-        'L2_basket': (p['L2Basket_Gauss_A_weight'], p['L2Basket_Gauss_A_weight'], 1., p['L2Basket_Gauss_mu'], p['L2Basket_Gauss_sigma']),
-        'L2_pyramidal': (p['L2Pyr_Gauss_A_weight'], p['L2Pyr_Gauss_A_weight'], 0.1, p['L2Pyr_Gauss_mu'], p['L2Pyr_Gauss_sigma']),
-        'L5_basket': (p['L5Basket_Gauss_A_weight'], p['L5Basket_Gauss_A_weight'], 1., p['L5Basket_Gauss_mu'], p['L5Basket_Gauss_sigma']),
-        'L5_pyramidal': (p['L5Pyr_Gauss_A_weight'], p['L5Pyr_Gauss_A_weight'], 1., p['L5Pyr_Gauss_mu'], p['L5Pyr_Gauss_sigma']),
+        'L2_basket': (p['L2Basket_Gauss_A_weight'],
+                      p['L2Basket_Gauss_A_weight'],
+                      1., p['L2Basket_Gauss_mu'],
+                      p['L2Basket_Gauss_sigma']),
+        'L2_pyramidal': (p['L2Pyr_Gauss_A_weight'],
+                         p['L2Pyr_Gauss_A_weight'],
+                         0.1, p['L2Pyr_Gauss_mu'], p['L2Pyr_Gauss_sigma']),
+        'L5_basket': (p['L5Basket_Gauss_A_weight'],
+                      p['L5Basket_Gauss_A_weight'],
+                      1., p['L5Basket_Gauss_mu'], p['L5Basket_Gauss_sigma']),
+        'L5_pyramidal': (p['L5Pyr_Gauss_A_weight'],
+                         p['L5Pyr_Gauss_A_weight'],
+                         1., p['L5Pyr_Gauss_mu'], p['L5Pyr_Gauss_sigma']),
         'lamtha': 100.,
         'prng_seedcore': int(p['prng_seedcore_extgauss']),
         'loc': 'proximal',
@@ -674,12 +692,21 @@ def create_pext(p, tstop):
         p['T_pois'] = tstop
 
     # Poisson distributed inputs to proximal
-    p_unique['extpois'] = {  # NEW: setting up AMPA and NMDA for Poisson inputs; why delays differ?
+    # NEW: setting up AMPA and NMDA for Poisson inputs; why delays differ?
+    p_unique['extpois'] = {
         'stim': 'poisson',
-        'L2_basket': (p['L2Basket_Pois_A_weight_ampa'], p['L2Basket_Pois_A_weight_nmda'], 1., p['L2Basket_Pois_lamtha']),
-        'L2_pyramidal': (p['L2Pyr_Pois_A_weight_ampa'], p['L2Pyr_Pois_A_weight_nmda'], 0.1, p['L2Pyr_Pois_lamtha']),
-        'L5_basket': (p['L5Basket_Pois_A_weight_ampa'], p['L5Basket_Pois_A_weight_nmda'], 1., p['L5Basket_Pois_lamtha']),
-        'L5_pyramidal': (p['L5Pyr_Pois_A_weight_ampa'], p['L5Pyr_Pois_A_weight_nmda'], 1., p['L5Pyr_Pois_lamtha']),
+        'L2_basket': (p['L2Basket_Pois_A_weight_ampa'],
+                      p['L2Basket_Pois_A_weight_nmda'],
+                      1., p['L2Basket_Pois_lamtha']),
+        'L2_pyramidal': (p['L2Pyr_Pois_A_weight_ampa'],
+                         p['L2Pyr_Pois_A_weight_nmda'],
+                         0.1, p['L2Pyr_Pois_lamtha']),
+        'L5_basket': (p['L5Basket_Pois_A_weight_ampa'],
+                      p['L5Basket_Pois_A_weight_nmda'],
+                      1., p['L5Basket_Pois_lamtha']),
+        'L5_pyramidal': (p['L5Pyr_Pois_A_weight_ampa'],
+                         p['L5Pyr_Pois_A_weight_nmda'],
+                         1., p['L5Pyr_Pois_lamtha']),
         'lamtha_space': 100.,
         'prng_seedcore': int(p['prng_seedcore_extpois']),
         't_interval': (p['t0_pois'], p['T_pois']),
@@ -696,7 +723,7 @@ def create_pext(p, tstop):
 def compare_dictionaries(d1, d2):
     # iterate over intersection of key sets (i.e. any common keys)
     for key in d1.keys() and d2.keys():
-                # update d1 to have same (key, value) pair as d2
+        # update d1 to have same (key, value) pair as d2
         d1[key] = d2[key]
 
     return d1
