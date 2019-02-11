@@ -13,6 +13,7 @@ import sys
 import os
 import os.path as op
 
+import numpy as np
 from neuron import h
 
 ###############################################################################
@@ -38,8 +39,8 @@ f_psim = op.join(mne_neuron_root, 'param', 'default.param')
 
 simstr = f_psim.split(op.sep)[-1].split('.param')[0]
 datdir = op.join(dproj, simstr)
-if not op.exists(op.join(mne_neuron_root, 'data', 'default')):
-    os.mkdir(op.join(mne_neuron_root, 'data', 'default'))
+if not op.exists(datdir):
+    os.mkdir(op.join(mne_neuron_root, 'data'))
 
 # creates p_exp.sim_prefix and other param structures
 p_exp = paramrw.ExpParams(f_psim)
@@ -73,6 +74,8 @@ h.dt = p['dt']  # simulation duration and time-step
 h.celsius = p['celsius']  # 37.0 - set temperature
 net = network.NetworkOnNode(p)  # create node-specific network
 
+###############################################################################
+# We define the arrays (Vector in numpy) for recording the signals
 t_vec = h.Vector()
 t_vec.record(h._ref_t)  # time recording
 dp_rec_L2 = h.Vector()
@@ -121,14 +124,12 @@ pc.barrier()
 
 # write params to the file
 paramrw.write(doutf['file_param'], p, net.gid_dict)
-# write the raw dipole
-with open(doutf['file_dpl'], 'w') as f:
-    for k in range(int(t_vec.size())):
-        f.write("%03.3f\t" % t_vec.x[k])
-        f.write("%5.4f\t" % (dp_rec_L2.x[k] + dp_rec_L5.x[k]))
-        f.write("%5.4f\t" % dp_rec_L2.x[k])
-        f.write("%5.4f\n" % dp_rec_L5.x[k])
-# renormalize the dipole and save
+dpl_data = np.c_[t_vec.as_numpy(),
+                 dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
+                 dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
+np.savetxt(doutf['file_dpl'], dpl_data, fmt='%5.4f')
+
+# renormalize the dipole
 # fix to allow init from data rather than file
 dpl = Dipole(doutf['file_dpl'])
 dpl.baseline_renormalize(doutf['file_param'])
