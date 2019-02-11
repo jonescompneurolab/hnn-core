@@ -222,34 +222,8 @@ simulator.</p>
 <span class="n">pc</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="s1">&#39;L2Pyr_soma&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="n">pc</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
-
-<span class="c1"># write time and calculated dipole to data file only if on the first proc</span>
-<span class="c1"># only execute this statement on one proc</span>
-
-<span class="c1"># write params to the file</span>
-<span class="n">paramrw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">gid_dict</span><span class="p">)</span>
-<span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">t_vec</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span>
-                 <span class="n">dp_rec_L2</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">()</span> <span class="o">+</span> <span class="n">dp_rec_L5</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span>
-                 <span class="n">dp_rec_L2</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span> <span class="n">dp_rec_L5</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">()]</span>
-<span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_dpl&#39;</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">)</span>
-
-<span class="c1"># renormalize the dipole</span>
-<span class="c1"># fix to allow init from data rather than file</span>
-<span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_dpl&#39;</span><span class="p">])</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">baseline_renormalize</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">])</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">convert_fAm_to_nAm</span><span class="p">()</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">paramrw</span><span class="o">.</span><span class="n">find_param</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="s1">&#39;dipole_scalefctr&#39;</span><span class="p">))</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">paramrw</span><span class="o">.</span><span class="n">find_param</span><span class="p">(</span>
-    <span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="s1">&#39;dipole_smooth_win&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">h</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-
-<span class="n">pc</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># make sure all done in case multiple trials</span>
-
-<span class="n">pc</span><span class="o">.</span><span class="n">runworker</span><span class="p">()</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">done</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
@@ -270,7 +244,31 @@ Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  41.439 seconds)</p>
+<p>write the dipole recordings to a file</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">paramrw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">gid_dict</span><span class="p">)</span>
+<span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">t_vec</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span>
+                 <span class="n">dp_rec_L2</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">()</span> <span class="o">+</span> <span class="n">dp_rec_L5</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span>
+                 <span class="n">dp_rec_L2</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span> <span class="n">dp_rec_L5</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">()]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_dpl&#39;</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Renormalize the dipole and read the dipole back from file</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_dpl&#39;</span><span class="p">])</span>
+<span class="n">dpl</span><span class="o">.</span><span class="n">baseline_renormalize</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">])</span>
+<span class="n">dpl</span><span class="o">.</span><span class="n">convert_fAm_to_nAm</span><span class="p">()</span>
+<span class="n">dpl</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">paramrw</span><span class="o">.</span><span class="n">find_param</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="s1">&#39;dipole_scalefctr&#39;</span><span class="p">))</span>
+<span class="n">dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">paramrw</span><span class="o">.</span><span class="n">find_param</span><span class="p">(</span>
+    <span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="s1">&#39;dipole_smooth_win&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">h</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+<span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="n">pc</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># make sure all done in case multiple trials</span>
+
+<span class="n">pc</span><span class="o">.</span><span class="n">runworker</span><span class="p">()</span>
+<span class="n">pc</span><span class="o">.</span><span class="n">done</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
+<p><strong>Total running time of the script:</strong> ( 0 minutes  41.484 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_simulate_evoked.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_evoked.py</span></code></a></div>

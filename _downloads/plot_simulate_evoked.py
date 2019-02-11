@@ -121,18 +121,16 @@ pc.allreduce(net.current['L2Pyr_soma'], 1)
 
 pc.barrier()
 
-# write time and calculated dipole to data file only if on the first proc
-# only execute this statement on one proc
-
-# write params to the file
+###############################################################################
+# write the dipole recordings to a file
 paramrw.write(doutf['file_param'], p, net.gid_dict)
 dpl_data = np.c_[t_vec.as_numpy(),
                  dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
                  dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
 np.savetxt(doutf['file_dpl'], dpl_data, fmt='%5.4f')
 
-# renormalize the dipole
-# fix to allow init from data rather than file
+###############################################################################
+# Renormalize the dipole and read the dipole back from file
 dpl = Dipole(doutf['file_dpl'])
 dpl.baseline_renormalize(doutf['file_param'])
 dpl.convert_fAm_to_nAm()
