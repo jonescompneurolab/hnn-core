@@ -363,7 +363,7 @@ class NetworkOnNode(object):
         for gid, cell in zip(self.__gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
             if self.pc.gid_exists(gid) and self.gid_to_type(gid) \
-                    is not 'extinput':
+                    != 'extinput':
                 # for each gid, find all the other cells connected to it,
                 # based on gid
                 # this MUST be defined in EACH class of cell in self.cells

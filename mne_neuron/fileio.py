@@ -110,7 +110,8 @@ class SimulationPaths(object):
         fname = os.path.join(self.dfig[expmt_group][datatype], fname_short)
         return fname
 
-    # creates a dict of dicts for each experiment and all the datatype directories
+    # creates a dict of dicts for each experiment and all the
+    # datatype directories
     # this is the empty template that gets filled in later.
     def __ddata_dict_template(self):
         dfig = dict.fromkeys(self.expmt_groups)

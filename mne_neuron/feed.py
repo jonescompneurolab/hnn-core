@@ -155,8 +155,8 @@ class ParFeedAll(object):
         # print("__create_extgauss")
         # assign the params
         if self.p_ext[self.celltype][0] <= 0.0 and \
-           self.p_ext[self.celltype][1] <= 0.0:
-                return False  # 0 ampa and 0 nmda weight
+                self.p_ext[self.celltype][1] <= 0.0:
+            return False  # 0 ampa and 0 nmda weight
         # print('gauss params:',self.p_ext[self.celltype])
         mu = self.p_ext[self.celltype][3]
         sigma = self.p_ext[self.celltype][4]
