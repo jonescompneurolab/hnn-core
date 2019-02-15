@@ -114,8 +114,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install numpy matplotlib scipy
 </pre></div>
 </div>
-<p>Additionally, you would need Neuron which is available here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a>
-If you want to install the latest version of the code (nightly) use:</p>
+<p>Additionally, you would need Neuron which is available here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a></p>
+<p>If you want to install the latest version of the code (nightly) use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install https://api.github.com/repos/jasmainak/mne-neuron/zipball/master
 </pre></div>
 </div>
@@ -126,6 +126,12 @@ with <cite>pip</cite>. To upgrade, use the <code class="docutils literal notrans
 </pre></div>
 </div>
 <p>and it should not give any error messages.</p>
+<p>A final step to the installation process is to compile custom ionic channel
+mechanisms using <cite>nrnivmodl</cite> from Neuron. To do this, simple do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make
+</pre></div>
+</div>
+<p>It should create a directory with the compiled mechanisms.</p>
 </div>
 <div class="section" id="bug-reports">
 <h1>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h1>
