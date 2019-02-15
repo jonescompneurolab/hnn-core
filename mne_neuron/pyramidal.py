@@ -882,11 +882,6 @@ class L5Pyr(Pyr):
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='ampa',
                       postsyns=postsyns)
-        postsyns = [self.basal2_nmda, self.basal3_nmda, self.apicaltuft_nmda,
-                    self.apicaloblique_nmda]
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='nmda',
-                      postsyns=postsyns)
 
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=3., receptor='nmda',
