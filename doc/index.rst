@@ -14,6 +14,7 @@ We recommend the `Anaconda Python distribution <https://www.continuum.io/downloa
 	$ conda install numpy matplotlib scipy
 
 Additionally, you would need Neuron which is available here: `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_
+
 If you want to install the latest version of the code (nightly) use::
 
 	$ pip install https://api.github.com/repos/jasmainak/mne-neuron/zipball/master
@@ -26,6 +27,13 @@ To check if everything worked fine, you can do::
 	$ python -c 'import mne-neuron'
 
 and it should not give any error messages.
+
+A final step to the installation process is to compile custom ionic channel
+mechanisms using `nrnivmodl` from Neuron. To do this, simple do::
+
+	$ make
+
+It should create a directory with the compiled mechanisms.
 
 Bug reports
 ===========

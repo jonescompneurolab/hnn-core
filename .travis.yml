@@ -27,17 +27,10 @@ install:
     - pip install mpi4py
     - pip install coverage coveralls
     - |
-      git clone https://github.com/neuronsimulator/iv
-      cd iv
-      ./build.sh
-      ./configure --prefix=${install_prefix}
-      make -j4
-      make install -j4
-    - |
       git clone https://github.com/neuronsimulator/nrn
       cd nrn
       ./build.sh
-      ./configure --with-nrnpython=python3 --with-paranrn --with-iv=${install_prefix} --prefix=${install_prefix}
+      ./configure --with-nrnpython=python3 --without-iv --prefix=${install_prefix}
       make -j4
       make install -j4
       cd src/nrnpython/
