@@ -119,7 +119,7 @@ class Dipole(object):
         The dipole with keys 'agg', 'L2' and 'L5'
     """
 
-    def __init__(self, times, data): # noqa: D102
+    def __init__(self, times, data):  # noqa: D102
         self.units = 'fAm'
         self.N = data.shape[0]
         self.t = times
@@ -131,7 +131,6 @@ class Dipole(object):
         """
         for key in self.dpl.keys():
             self.dpl[key] *= 1e-6
-        # change the units string
         self.units = 'nAm'
 
     def scale(self, fctr):
