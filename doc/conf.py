@@ -171,5 +171,8 @@ sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'auto_examples',
-    'backreferences_dir': False
+    'backreferences_dir': False,
+    'reference_url': {
+        'mne_neuron': 'https://jasmainak.github.io/mne-neuron/'
+    }
 }
