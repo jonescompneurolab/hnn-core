@@ -8,7 +8,6 @@ from numpy import convolve, hamming
 
 from neuron import h
 
-from .paramrw import find_param
 from .network import NetworkOnNode
 
 
@@ -84,8 +83,7 @@ def simulate_dipole(params):
     pc.allreduce(net.current['L5Pyr_soma'], 1)
     pc.allreduce(net.current['L2Pyr_soma'], 1)
 
-    dpl_data = np.c_[t_vec.as_numpy(),
-                     dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
+    dpl_data = np.c_[dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
                      dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
 
     pc.barrier()  # get all nodes to this place before continuing
@@ -94,42 +92,38 @@ def simulate_dipole(params):
     pc.runworker()
     pc.done()
 
-    np.savetxt(doutf['file_dpl'], dpl_data, fmt='%5.4f')
-
-    dpl = Dipole(doutf['file_dpl'])
-    dpl.baseline_renormalize(doutf['file_param'])
+    dpl = Dipole(t_vec.as_numpy(), dpl_data)
+    dpl.baseline_renormalize(params)
     dpl.convert_fAm_to_nAm()
-    dpl.scale(paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
-    dpl.smooth(paramrw.find_param(
-        doutf['file_param'], 'dipole_smooth_win') / h.dt)
+    dpl.scale(params['dipole_scalefctr'])
+    dpl.smooth(params['dipole_smooth_win'] / h.dt)
     return dpl
 
 
-class Dipole():
-    """Dipole class."""
+class Dipole(object):
+    """Dipole class.
 
-    # fix to allow init from data in memory (not disk)
-    def __init__(self, f_dpl):
-        """ some usage: dpl = Dipole(file_dipole, file_param)
-            this gives dpl.t and dpl.dpl
-        """
-        self.units = None
-        self.N = None
-        self._parse_f(f_dpl)
+    Parameters
+    ----------
+    times : array (n_times,)
+        The time vector
+    data : array (n_times x 3)
+        The data. The first column represents 'agg',
+        the second 'L2' and the last one 'L5'
 
-    def _parse_f(self, f_dpl):
-        """Opens the file and sets units."""
-        x = np.loadtxt(open(f_dpl, 'r'))
-        # better implemented as a dict
-        self.t = x[:, 0]
-        self.dpl = {
-            'agg': x[:, 1],
-            'L2': x[:, 2],
-            'L5': x[:, 3],
-        }
-        self.N = self.dpl['agg'].shape[-1]
-        # string that holds the units
+    Attributes
+    ----------
+    t : array
+        The time vector
+    dpl : dict of array
+        The dipole with keys 'agg', 'L2' and 'L5'
+    """
+
+    def __init__(self, times, data): # noqa: D102
         self.units = 'fAm'
+        self.N = data.shape[0]
+        self.t = times
+        self.dpl = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
 
     # conversion from fAm to nAm
     def convert_fAm_to_nAm(self):
@@ -174,11 +168,17 @@ class Dipole():
     # ext function to renormalize
     # this function changes in place but does NOT write
     # the new values to the file
-    def baseline_renormalize(self, f_param):
-        # only baseline renormalize if the units are fAm
+    def baseline_renormalize(self, params):
+        """Only baseline renormalize if the units are fAm.
+
+        Parameters
+        ----------
+        params : dict
+            The parameters
+        """
         if self.units == 'fAm':
-            N_pyr_x = find_param(f_param, 'N_pyr_x')
-            N_pyr_y = find_param(f_param, 'N_pyr_y')
+            N_pyr_x = params['N_pyr_x']
+            N_pyr_y = params['N_pyr_y']
             # N_pyr cells in grid. This is PER LAYER
             N_pyr = N_pyr_x * N_pyr_y
             # dipole offset calculation: increasing number of pyr
@@ -223,14 +223,3 @@ class Dipole():
         else:
             print("Warning, no dipole renormalization done because units"
                   " were in %s" % (self.units))
-
-    # function to write to a file!
-    # f_dpl must be fully specified
-    def write(self, f_dpl):
-        with open(f_dpl, 'w') as f:
-            for t, x_agg, x_L2, x_L5 in zip(self.t, self.dpl['agg'],
-                                            self.dpl['L2'], self.dpl['L5']):
-                f.write("%03.3f\t" % t)
-                f.write("%5.4f\t" % x_agg)
-                f.write("%5.4f\t" % x_L2)
-                f.write("%5.4f\n" % x_L5)
