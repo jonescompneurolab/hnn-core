@@ -8,12 +8,19 @@ import numpy as np
 import itertools as it
 
 from .params_default import get_params_default
-from .fileio import clean_lines
 
-# get dict of ':' separated params from fn; ignore lines starting with #
+
+def clean_lines(file):
+    with open(file) as f_in:
+        lines = (line.rstrip() for line in f_in)
+        lines = [line for line in lines if line]
+    return lines
 
 
 def quickreadprm(fn):
+    """Get dict of ':' separated params from fn;
+       ignore lines starting with #."""
+
     d = {}
     with open(fn, 'r') as fp:
         ln = fp.readlines()
