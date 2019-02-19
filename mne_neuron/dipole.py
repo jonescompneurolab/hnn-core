@@ -1,17 +1,24 @@
-# dipole.py - dipole-based analysis functions
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: itertools and return data dir)
-# last major: (SL: toward python3)
+"""Class to handle the dipoles."""
+
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
+
 import numpy as np
+from numpy import convolve, hamming
 
 from .paramrw import find_param
-from .filt import hammfilt
 
-# class Dipole() is for a single set of f_dpl and f_param
+
+def _hammfilt(x, winsz):
+    """Convolve with a hamming window."""
+    win = hamming(winsz)
+    win /= sum(win)
+    return convolve(x, win, 'same')
 
 
 class Dipole():
+    """Dipole class."""
+
     # fix to allow init from data in memory (not disk)
     def __init__(self, f_dpl):
         """ some usage: dpl = Dipole(file_dipole, file_param)
@@ -19,10 +26,10 @@ class Dipole():
         """
         self.units = None
         self.N = None
-        self.__parse_f(f_dpl)
+        self._parse_f(f_dpl)
 
-    # opens the file and sets units
-    def __parse_f(self, f_dpl):
+    def _parse_f(self, f_dpl):
+        """Opens the file and sets units."""
         x = np.loadtxt(open(f_dpl, 'r'))
         # better implemented as a dict
         self.t = x[:, 0]
@@ -34,26 +41,6 @@ class Dipole():
         self.N = self.dpl['agg'].shape[-1]
         # string that holds the units
         self.units = 'fAm'
-
-    # truncate to a length and save here
-    def truncate(self, t0, T):
-        """ this is independent of the other stuff
-            moved to an external function so as to not disturb
-            the delicate genius of this object
-        """
-        self.t, self.dpl = self.truncate_ext(t0, T)
-
-    # just return the values, do not modify the class internally
-    def truncate_ext(self, t0, T):
-        # only do this if the limits make sense
-        if (t0 >= self.t[0]) & (T <= self.t[-1]):
-            dpl_truncated = dict.fromkeys(self.dpl)
-            # do this for each dpl
-            for key in self.dpl.keys():
-                dpl_truncated[key] = self.dpl[key][(
-                    self.t >= t0) & (self.t <= T)]
-            t_truncated = self.t[(self.t >= t0) & (self.t <= T)]
-        return t_truncated, dpl_truncated
 
     # conversion from fAm to nAm
     def convert_fAm_to_nAm(self):
@@ -73,7 +60,7 @@ class Dipole():
         if winsz <= 1:
             return
         for key in self.dpl.keys():
-            self.dpl[key] = hammfilt(self.dpl[key], winsz)
+            self.dpl[key] = _hammfilt(self.dpl[key], winsz)
 
     def plot(self, layer='agg'):
         """Simple layer-specific plot function.
