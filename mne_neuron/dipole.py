@@ -6,7 +6,10 @@
 import numpy as np
 from numpy import convolve, hamming
 
+from neuron import h
+
 from .paramrw import find_param
+from .network import NetworkOnNode
 
 
 def _hammfilt(x, winsz):
@@ -14,6 +17,92 @@ def _hammfilt(x, winsz):
     win = hamming(winsz)
     win /= sum(win)
     return convolve(x, win, 'same')
+
+
+def simulate_dipole(params):
+    """Simulate a dipole given the experiment parameters.
+
+    Parameters
+    ----------
+    params : dict
+        The experiment parameters
+
+    Returns
+    -------
+    dpl: instance of Dipole
+        The dipole object
+    """
+    pc = h.ParallelContext(1)
+
+    # global variables, should be node-independent
+    h("dp_total_L2 = 0.")
+    h("dp_total_L5 = 0.")
+
+    # Set tstop before instantiating any classes
+    h.tstop = params['tstop']
+    h.dt = params['dt']  # simulation duration and time-step
+    h.celsius = params['celsius']  # 37.0 - set temperature
+    net = NetworkOnNode(params)  # create node-specific network
+
+    # We define the arrays (Vector in numpy) for recording the signals
+    t_vec = h.Vector()
+    t_vec.record(h._ref_t)  # time recording
+    dp_rec_L2 = h.Vector()
+    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
+    dp_rec_L5 = h.Vector()
+    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
+
+    net.movecellstopos()  # position cells in 2D grid
+
+    # sets the default max solver step in ms (purposefully large)
+    pc.set_maxstep(10)
+
+    # initialize cells to -65 mV, after all the NetCon
+    # delays have been specified
+    h.finitialize()
+
+    def prsimtime():
+        print('Simulation time: {0} ms...'.format(round(h.t, 2)))
+
+    printdt = 10
+    for tt in range(0, int(h.tstop), printdt):
+        h.cvode.event(tt, prsimtime)  # print time callbacks
+
+    h.fcurrent()
+    # set state variables if they have been changed since h.finitialize
+    h.frecord_init()
+    # actual simulation - run the solver
+    pc.psolve(h.tstop)
+
+    # these calls aggregate data across procs/nodes
+    pc.allreduce(dp_rec_L2, 1)
+    # combine dp_rec on every node, 1=add contributions together
+    pc.allreduce(dp_rec_L5, 1)
+    # aggregate the currents independently on each proc
+    net.aggregate_currents()
+    # combine net.current{} variables on each proc
+    pc.allreduce(net.current['L5Pyr_soma'], 1)
+    pc.allreduce(net.current['L2Pyr_soma'], 1)
+
+    dpl_data = np.c_[t_vec.as_numpy(),
+                     dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
+                     dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
+
+    pc.barrier()  # get all nodes to this place before continuing
+    pc.gid_clear()
+
+    pc.runworker()
+    pc.done()
+
+    np.savetxt(doutf['file_dpl'], dpl_data, fmt='%5.4f')
+
+    dpl = Dipole(doutf['file_dpl'])
+    dpl.baseline_renormalize(doutf['file_param'])
+    dpl.convert_fAm_to_nAm()
+    dpl.scale(paramrw.find_param(doutf['file_param'], 'dipole_scalefctr'))
+    dpl.smooth(paramrw.find_param(
+        doutf['file_param'], 'dipole_smooth_win') / h.dt)
+    return dpl
 
 
 class Dipole():
