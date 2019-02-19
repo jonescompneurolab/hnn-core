@@ -16,8 +16,7 @@ import os.path as op
 # Let us import mne_neuron
 
 import mne_neuron
-from mne_neuron.paramrw import ExpParams
-from mne_neuron import simulate_dipole
+from mne_neuron import simulate_dipole, Params
 
 from neuron import h
 
@@ -28,10 +27,10 @@ h.load_file("stdrun.hoc")
 h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
 ###############################################################################
-# Then we setup the directories
+# Then we read the parameters file
 params_fname = op.join(mne_neuron_root, 'param', 'default.param')
-p_exp = ExpParams(params_fname)
-params = p_exp.return_pdict('default', 0)
+params = Params(params_fname)
+print(params)
 
 ###############################################################################
 # Now let's simulate the dipole and plot it
