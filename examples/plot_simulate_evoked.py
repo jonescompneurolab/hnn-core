@@ -26,9 +26,10 @@ mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
 
 ###############################################################################
-# Then we setup the directories
+# Then we read the parameters file
 params_fname = op.join(mne_neuron_root, 'param', 'default.param')
 params = Params(params_fname)
+print(params)
 
 ###############################################################################
 # Now let's simulate the dipole and plot it

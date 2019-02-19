@@ -74,6 +74,11 @@ class Params(dict):
                 params[key] = params_input.pop(key)
             self[key] = params[key]
 
+    def __repr__(self):
+        """Display the params nicely."""
+        return json.dumps(self, sort_keys=True, indent=4)
+
+
 # class controlling multiple simulation files (.param)
 
 
