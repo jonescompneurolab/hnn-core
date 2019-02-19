@@ -114,112 +114,35 @@ simulator.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Mainak Jas &lt;mainak.jas@telecom-paristech.fr&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="kn">as</span> <span class="nn">op</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">neuron</span> <span class="kn">import</span> <span class="n">h</span>
 </pre></div>
 </div>
 <p>Let us import mne_neuron</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mne_neuron</span>
-<span class="kn">import</span> <span class="nn">mne_neuron.fileio</span> <span class="kn">as</span> <span class="nn">fio</span>
-<span class="kn">import</span> <span class="nn">mne_neuron.paramrw</span> <span class="kn">as</span> <span class="nn">paramrw</span>
-<span class="kn">from</span> <span class="nn">mne_neuron.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
-<span class="kn">from</span> <span class="nn">mne_neuron</span> <span class="kn">import</span> <span class="n">network</span>
+<span class="kn">from</span> <span class="nn">mne_neuron.paramrw</span> <span class="kn">import</span> <span class="n">ExpParams</span>
+<span class="kn">from</span> <span class="nn">mne_neuron</span> <span class="kn">import</span> <span class="n">simulate_dipole</span>
+
+<span class="kn">from</span> <span class="nn">neuron</span> <span class="kn">import</span> <span class="n">h</span>
 </pre></div>
 </div>
-<p>Then we setup the directories</p>
+<p>Then we setup the directories and Neuron</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mne_neuron_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">mne_neuron</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
 <span class="n">h</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;stdrun.hoc&quot;</span><span class="p">)</span>
 <span class="n">h</span><span class="o">.</span><span class="n">nrn_load_dll</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s2">&quot;x86_64/.libs/libnrnmech.so&quot;</span><span class="p">))</span>
-
-<span class="c1"># data directory - ./data</span>
-<span class="n">dproj</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
-<span class="n">pc</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">ParallelContext</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">f_psim</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-<span class="n">ntrial</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">f_psim</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.param&#39;</span><span class="p">)</span>
-
-<span class="n">simstr</span> <span class="o">=</span> <span class="n">f_psim</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.param&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">datdir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dproj</span><span class="p">,</span> <span class="n">simstr</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">datdir</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">))</span>
-
-<span class="c1"># creates p_exp.sim_prefix and other param structures</span>
-<span class="n">p_exp</span> <span class="o">=</span> <span class="n">paramrw</span><span class="o">.</span><span class="n">ExpParams</span><span class="p">(</span><span class="n">f_psim</span><span class="p">)</span>
-
-<span class="c1"># one directory for all experiments</span>
-<span class="n">ddir</span> <span class="o">=</span> <span class="n">fio</span><span class="o">.</span><span class="n">SimulationPaths</span><span class="p">()</span>
-<span class="n">ddir</span><span class="o">.</span><span class="n">create_new_sim</span><span class="p">(</span><span class="n">dproj</span><span class="p">,</span> <span class="n">p_exp</span><span class="o">.</span><span class="n">expmt_groups</span><span class="p">,</span> <span class="n">p_exp</span><span class="o">.</span><span class="n">sim_prefix</span><span class="p">)</span>
-<span class="n">ddir</span><span class="o">.</span><span class="n">create_datadir</span><span class="p">()</span>
-
-<span class="c1"># create rotating data files</span>
-<span class="n">doutf</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_dpl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datdir</span><span class="p">,</span> <span class="s1">&#39;rawdpl.txt&#39;</span><span class="p">)</span>
-<span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datdir</span><span class="p">,</span> <span class="s1">&#39;param.txt&#39;</span><span class="p">)</span>
-
-<span class="c1"># core iterator through experimental groups</span>
-<span class="n">expmt_group</span> <span class="o">=</span> <span class="n">p_exp</span><span class="o">.</span><span class="n">expmt_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="c1"># return the param dict for this simulation</span>
-<span class="n">simparams</span> <span class="o">=</span> <span class="n">p</span> <span class="o">=</span> <span class="n">p_exp</span><span class="o">.</span><span class="n">return_pdict</span><span class="p">(</span><span class="n">expmt_group</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-<span class="n">pc</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># get all nodes to this place before continuing</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">gid_clear</span><span class="p">()</span>
-
-<span class="c1"># global variables, should be node-independent</span>
-<span class="n">h</span><span class="p">(</span><span class="s2">&quot;dp_total_L2 = 0.&quot;</span><span class="p">)</span>
-<span class="n">h</span><span class="p">(</span><span class="s2">&quot;dp_total_L5 = 0.&quot;</span><span class="p">)</span>
-
-<span class="c1"># Set tstop before instantiating any classes</span>
-<span class="n">h</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span>
-<span class="n">h</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>  <span class="c1"># simulation duration and time-step</span>
-<span class="n">h</span><span class="o">.</span><span class="n">celsius</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;celsius&#39;</span><span class="p">]</span>  <span class="c1"># 37.0 - set temperature</span>
-<span class="n">net</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">NetworkOnNode</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>  <span class="c1"># create node-specific network</span>
 </pre></div>
 </div>
-<p>We define the arrays (Vector in numpy) for recording the signals</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t_vec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
-<span class="n">t_vec</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_t</span><span class="p">)</span>  <span class="c1"># time recording</span>
-<span class="n">dp_rec_L2</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
-<span class="n">dp_rec_L2</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_dp_total_L2</span><span class="p">)</span>  <span class="c1"># L2 dipole recording</span>
-<span class="n">dp_rec_L5</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
-<span class="n">dp_rec_L5</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_dp_total_L5</span><span class="p">)</span>  <span class="c1"># L5 dipole recording</span>
-
-<span class="n">net</span><span class="o">.</span><span class="n">movecellstopos</span><span class="p">()</span>  <span class="c1"># position cells in 2D grid</span>
-
-<span class="c1"># sets the default max solver step in ms (purposefully large)</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">set_maxstep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="n">h</span><span class="o">.</span><span class="n">finitialize</span><span class="p">()</span>  <span class="c1"># initialize cells to -65 mV, after all the NetCon delays have been specified</span>
+<p>Then we setup the directories</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.param&#39;</span><span class="p">)</span>
+<span class="n">p_exp</span> <span class="o">=</span> <span class="n">ExpParams</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">p_exp</span><span class="o">.</span><span class="n">return_pdict</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We define a callback function for printing out time during simulation run</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">prsimtime</span><span class="p">():</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">Simulation time: {0} ms...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-
-<span class="n">printdt</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="k">for</span> <span class="n">tt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">tstop</span><span class="p">),</span> <span class="n">printdt</span><span class="p">):</span>
-    <span class="n">h</span><span class="o">.</span><span class="n">cvode</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">prsimtime</span><span class="p">)</span>  <span class="c1"># print time callbacks</span>
-
-<span class="n">h</span><span class="o">.</span><span class="n">fcurrent</span><span class="p">()</span>
-<span class="n">h</span><span class="o">.</span><span class="n">frecord_init</span><span class="p">()</span>  <span class="c1"># set state variables if they have been changed since h.finitialize</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">psolve</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">tstop</span><span class="p">)</span>  <span class="c1"># actual simulation - run the solver</span>
-
-<span class="c1"># these calls aggregate data across procs/nodes</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">dp_rec_L2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="c1"># combine dp_rec on every node, 1=add contributions together</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">dp_rec_L5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">net</span><span class="o">.</span><span class="n">aggregate_currents</span><span class="p">()</span>  <span class="c1"># aggregate the currents independently on each proc</span>
-<span class="c1"># combine net.current{} variables on each proc</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="s1">&#39;L5Pyr_soma&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">current</span><span class="p">[</span><span class="s1">&#39;L2Pyr_soma&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<p>Now let’s simulate the dipole and plot it</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
@@ -240,29 +163,7 @@ Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
 </pre></div>
 </div>
-<p>write the dipole recordings to a file</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">paramrw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="n">p</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">gid_dict</span><span class="p">)</span>
-<span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">t_vec</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span>
-                 <span class="n">dp_rec_L2</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">()</span> <span class="o">+</span> <span class="n">dp_rec_L5</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span>
-                 <span class="n">dp_rec_L2</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">(),</span> <span class="n">dp_rec_L5</span><span class="o">.</span><span class="n">as_numpy</span><span class="p">()]</span>
-<span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_dpl&#39;</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Renormalize the dipole and read the dipole back from file</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_dpl&#39;</span><span class="p">])</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">baseline_renormalize</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">])</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">convert_fAm_to_nAm</span><span class="p">()</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">paramrw</span><span class="o">.</span><span class="n">find_param</span><span class="p">(</span><span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="s1">&#39;dipole_scalefctr&#39;</span><span class="p">))</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">paramrw</span><span class="o">.</span><span class="n">find_param</span><span class="p">(</span>
-    <span class="n">doutf</span><span class="p">[</span><span class="s1">&#39;file_param&#39;</span><span class="p">],</span> <span class="s1">&#39;dipole_smooth_win&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">h</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-
-<span class="n">pc</span><span class="o">.</span><span class="n">runworker</span><span class="p">()</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">done</span><span class="p">()</span>
-</pre></div>
-</div>
-<img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
-<p><strong>Total running time of the script:</strong> ( 1 minutes  6.102 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  50.799 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_simulate_evoked.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_evoked.py</span></code></a></div>
