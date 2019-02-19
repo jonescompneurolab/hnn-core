@@ -1,1 +1,1 @@
-from .cell import Cell
+from .dipole import simulate_dipole

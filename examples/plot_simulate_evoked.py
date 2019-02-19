@@ -21,15 +21,16 @@ import mne_neuron.fileio as fio
 import mne_neuron.paramrw as paramrw
 from mne_neuron import simulate_dipole
 
+from neuron import h
+
 ###############################################################################
 # Then we setup the directories
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+
 h.load_file("stdrun.hoc")
 
 # data directory - ./data
 dproj = op.join(mne_neuron_root, 'data')
-f_psim = ''
-ntrial = 1
 f_psim = op.join(mne_neuron_root, 'param', 'default.param')
 
 simstr = f_psim.split(op.sep)[-1].split('.param')[0]
@@ -45,13 +46,10 @@ ddir = fio.SimulationPaths()
 ddir.create_new_sim(dproj, p_exp.expmt_groups, p_exp.sim_prefix)
 ddir.create_datadir()
 
-# create rotating data files
-doutf = {}
-doutf['file_dpl'] = op.join(datdir, 'rawdpl.txt')
-doutf['file_param'] = op.join(datdir, 'param.txt')
-
 # return the param dict for this simulation
 params = p_exp.return_pdict('default', 0)
 
+###############################################################################
+# Now let's simulate the dipole and plot it
 dpl = simulate_dipole(params)
 dpl.plot()
