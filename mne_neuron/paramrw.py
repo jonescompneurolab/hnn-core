@@ -5,7 +5,7 @@
 # last major: (SL: cleanup of self.p_all)
 
 import numpy as np
-import itertools as it
+import json
 
 from .params_default import get_params_default
 
@@ -38,7 +38,7 @@ def quickreadprm(fn):
 # filename d)
 
 
-def countEvokedInputs(d):
+def count_evoked_inputs(d):
     if type(d) == str:
         d = quickreadprm(d)
     nprox = ndist = 0
@@ -50,301 +50,31 @@ def countEvokedInputs(d):
                 ndist += 1
     return nprox, ndist
 
-# class controlling multiple simulation files (.param)
 
+class Params(dict):
+    """Params object.
 
-class ExpParams(object):
-    """Class for getting the experiment parameters.
+    Parameters
+    ----------
+    params_fname : str
+        The parameters file
     """
 
-    def __init__(self, f_psim, debug=False):
+    def __init__(self, params_fname):
+        with open(params_fname) as json_data:
+            params_input = json.load(json_data)
 
-        self.debug = debug
-
-        self.expmt_group_params = []
-
-        # self.prng_seedcore = {}
-        # this list is simply to access these easily
-        self.prng_seed_list = []
-
-        # read in params from a file
-        p_all_input = self.__read_sim(f_psim)
-        self.p_template = dict.fromkeys(self.expmt_group_params)
-
-        # create non-exp params dict from default dict
-        self.p_all = self.__create_dict_from_default(p_all_input)
-
-        # pop off fixed known vals and create experimental prefix templates
-        self.__pop_known_values()
-
-        # make dict of coupled params
-        self.coupled_params = self.__find_coupled_params()
-
-        # create the list of iterated params
-        self.list_params = self.__create_paramlist()
-        self.N_sims = len(self.list_params[0][1])
-
-    def return_pdict(self, expmt_group, i):
-        """Return pdict based on that one value, PLUS append the p_ext here ...
-           yes, hack-y
-
-        Parameters
-        ----------
-        expmt_group : str
-            The experiment group (e.g., 'default')
-        i : int
-            An integer
-        """
-        # p_template was always updated to include the ones from exp and others
-        p_sim = dict.fromkeys(self.p_template)
-
-        # go through params in list_params
-        for param, val_list in self.list_params:
-            if param.startswith('prng_seedcore_'):
-                p_sim[param] = int(val_list[i])
-            else:
-                p_sim[param] = val_list[i]
-
-        # go through the expmt group-based params
-        for param, val in self.p_group[expmt_group].items():
-            p_sim[param] = val
-
-        # add alpha distributions. A bit hack-y
-        for param, val in self.alpha_distributions.items():
-            p_sim[param] = val
-
-        # Add coupled params
-        for coupled_param, val_param in self.coupled_params.items():
-            p_sim[coupled_param] = p_sim[val_param]
-
-        return p_sim
-
-    # reads .param file and returns p_all_input dict
-    def __read_sim(self, f_psim):
-        lines = clean_lines(f_psim)
-
-        # ignore comments
-        lines = [line for line in lines if line[0] != '#']
-        p = {}
-
-        for line in lines:
-            # splits line by ':'
-            param, val = line.split(": ")
-
-            # sim_prefix is not a rotated variable
-            # not sure why `if param is 'sim_prefix':` does not work here
-            if param == 'sim_prefix':
-                p[param] = str(val)
-
-            # expmt_groups must be listed before other vals
-            elif param == 'expmt_groups':
-                # this list will be the preservation of the original order
-                self.expmt_groups = [
-                    expmt_group for expmt_group in val[1:-1].split(', ')]
-
-                # this dict here for easy access
-                # p_group saves each of the changed params per group
-                self.p_group = dict.fromkeys(self.expmt_groups)
-
-                # create empty dicts in each
-                for group in self.p_group:
-                    self.p_group[group] = {}
-
-            elif param.startswith('prng_seedcore_'):
-                p[param] = int(val)
-                # key = param.split('prng_seedcore_')[-1]
-                # self.prng_seedcore[key] = val
-
-                # only add values that will change
-                if p[param] == -1:
-                    self.prng_seed_list.append(param)
-
-            elif param.startswith('distribution_'):
-                p[param] = str(val)
-
-            elif param == 'Run_Date':
-                pass
-
-            else:
-                # assign group params first
-                if val[0] == '{':
-                    # check for a linspace as a param!
-                    if val[1] == 'L':
-                        # in this case, val_range must be as long as the
-                        # correct expmt_group length
-                        # everything beyond that will be truncated by the zip
-                        # operation below
-                        # param passed will strip away the curly braces and
-                        # just pass the linspace
-                        val_range = self.__expand_linspace(val[1:-1])
-                    else:
-                        val_range = self.__expand_array(val)
-
-                    # add the expmt_group param to the list if it's not already
-                    # present
-                    if param not in self.expmt_group_params:
-                        self.expmt_group_params.append(param)
-
-                    # parcel out vals to exp groups with assigned param names
-                    for expmt_group, val in zip(self.expmt_groups, val_range):
-                        self.p_group[expmt_group][param] = val
-
-                # interpret this as a list of vals
-                # type floats to a np array
-                elif val[0] == '[':
-                    p[param] = self.__expand_array(val)
-
-                # interpret as a linspace
-                elif val[0] == 'L':
-                    p[param] = self.__expand_linspace(val)
-
-                elif val[0] == 'A':
-                    p[param] = self.__expand_arange(val)
-
-                else:
-                    try:
-                        p[param] = float(val)
-                    except ValueError:
-                        p[param] = str(val)
-
-        # hack-y. sorry, future
-        # tstop_* = 0 is valid now, resets to the actual tstop
-        # with the added bonus of saving this time to the indiv params
-        for param, val in p.items():
-            if param.startswith('tstop_'):
-                if isinstance(val, float):
-                    if val == 0:
-                        p[param] = p['tstop']
-                elif isinstance(val, np.ndarray):
-                    p[param][p[param] == 0] = p['tstop']
-
-        return p
-
-    # general function to expand a list of values
-    def __expand_array(self, str_val):
-        val_list = str_val[1:-1].split(', ')
-        val_range = np.array([float(item) for item in val_list])
-
-        return val_range
-
-    # general function to expand the arange
-    def __expand_arange(self, str_val):
-        # strip away the leading character along with the brackets and split
-        # the csv values
-        val_list = str_val[2:-1].split(', ')
-
-        # use the values in val_list as params for np.linspace
-        val_range = np.arange(float(val_list[0]), float(
-            val_list[1]), float(val_list[2]))
-
-        # return the final linspace expanded
-        return val_range
-
-    # general function to expand the linspace
-    def __expand_linspace(self, str_val):
-        # strip away the leading character along with the brackets and split
-        # the csv values
-        val_list = str_val[2:-1].split(', ')
-
-        # use the values in val_list as params for np.linspace
-        val_range = np.linspace(float(val_list[0]), float(
-            val_list[1]), int(val_list[2]))
-
-        # return the final linspace expanded
-        return val_range
-
-    # creates dict of params whose values are to be coupled
-    def __find_coupled_params(self):
-        coupled_params = {}
-        # iterates over all key/value pairs to find vals that are strings
-        for key, val in self.p_all.items():
-            if isinstance(val, str):
-                # check that string is another param in p_all
-                if val in self.p_all.keys():
-                    coupled_params[key] = val
-                else:
-                    print("Unknown key: %s. Probably going to error." % (val))
-
-        # Pop coupled params
-        for key in coupled_params:
-            self.p_all.pop(key)
-
-        return coupled_params
-
-    # pop known values & strings off of the params list
-    def __pop_known_values(self):
-        self.sim_prefix = self.p_all.pop('sim_prefix')
-
-        # create an experimental string prefix template
-        self.exp_prefix_str = self.sim_prefix + "-%03d"
-        self.trial_prefix_str = self.exp_prefix_str + "-T%02d"
-
-        # self.N_trials = int(self.p_all.pop('N_trials'))
-        # self.prng_state = self.p_all.pop('prng_state')[1:-1]
-
-        # Save alpha distribution types in dict for later use
-        self.alpha_distributions = {
-            'distribution_prox': self.p_all.pop('distribution_prox'),
-            'distribution_dist': self.p_all.pop('distribution_dist'),
-        }
-
-    # create the dict based on the default param dict
-    def __create_dict_from_default(self, p_all_input):
-        nprox, ndist = countEvokedInputs(p_all_input)
-        # print('found nprox,ndist ev inputs:', nprox, ndist)
+        nprox, ndist = count_evoked_inputs(params_input)
 
         # create a copy of params_default through which to iterate
-        p_all = get_params_default(nprox, ndist)
+        params = get_params_default(nprox, ndist)
 
-        # now find ONLY the values that are present in the supplied p_all_input
-        # based on the default dict
-        for key in p_all.keys():
-            # automatically expects that keys are either in
-            # p_all_input OR will resort to default value
-            if key in p_all_input:
-                # pop val off so the remaining items in p_all_input are
-                # extraneous
-                p_all[key] = p_all_input.pop(key)
+        for key in params.keys():
+            if key in params_input:
+                params[key] = params_input.pop(key)
+            self[key] = params[key]
 
-        # now display extraneous keys, if there were any
-        if len(p_all_input):
-            if self.debug:
-                print("Invalid keys from param file not found in "
-                      "default params: %s" % str(p_all_input.keys()))
-
-        return p_all
-
-    # creates all combination of non-exp params
-    def __create_paramlist(self):
-        # p_all is the dict specifying all of the changing params
-        plist = []
-
-        # get all key/val pairs from the all dict
-        list_sorted = [item for item in self.p_all.items()]
-
-        # sort the list by the key (alpha)
-        list_sorted.sort(key=lambda x: x[0])
-
-        # grab just the keys (but now in order)
-        self.keys_sorted = [item[0] for item in list_sorted]
-        self.p_template.update(dict.fromkeys(self.keys_sorted))
-
-        # grab just the values (but now in order)
-        # plist = [item[1] for item in list_sorted]
-        for item in list_sorted:
-            if isinstance(item[1], np.ndarray):
-                plist.append(item[1])
-            else:
-                plist.append(np.array([item[1]]))
-
-        # print(plist)
-        # vals_all = cartesian(plist)
-        vals_new = np.array([np.array(val) for val in it.product(*plist)])
-        vals_new = vals_new.transpose()
-
-        return [item for item in zip(self.keys_sorted, vals_new)]
-
-# reads params from a generated txt file and returns gid dict and p dict
+# class controlling multiple simulation files (.param)
 
 
 def read(fparam):
@@ -365,10 +95,7 @@ def read(fparam):
             else:
                 gid_dict[key] = np.array([])
         else:
-            try:
-                p[key] = float(val)
-            except ValueError:
-                p[key] = str(val)
+            p[key] = float(val)
     return gid_dict, p
 
 # write the params to a filename
@@ -404,46 +131,6 @@ def write(fparam, p, gid_list):
                 f.write('%i\n' % val)
             else:
                 f.write(str(val) + '\n')
-
-# Searches f_param for any match of p
-
-
-def find_param(fparam, param_key):
-    _, p = read(fparam)
-
-    try:
-        return p[param_key]
-
-    except KeyError:
-        return "There is no key by the name %s" % param_key
-
-# reads the simgroup name from fparam
-
-
-def read_sim_prefix(fparam):
-    lines = clean_lines(fparam)
-    param_list = [line for line in lines if line.split(
-        ': ')[0].startswith('sim_prefix')]
-
-    # Assume we found something ...
-    if param_list:
-        return param_list[0].split(" ")[1]
-    else:
-        print("No sim_prefix found")
-        return 0
-
-# Finds the experiments list from the simulation param file (.param)
-
-
-def read_expmt_groups(fparam):
-    lines = clean_lines(fparam)
-    lines = [line for line in lines if line.split(': ')[0] == 'expmt_groups']
-
-    try:
-        return lines[0].split(': ')[1][1:-1].split(', ')
-    except:
-        print("Couldn't get a handle on expmts")
-        return 0
 
 # qnd function to add feeds if they are sensible
 
@@ -486,10 +173,8 @@ def feed_validate(p_ext, d, tstop):
 
     return p_ext
 
-#
 
-
-def checkevokedsynkeys(p, nprox, ndist):
+def check_evoked_synkeys(p, nprox, ndist):
     # make sure ampa,nmda gbar values are in the param dict for evoked
     # inputs(for backwards compatibility)
     # evoked distal target cell types
@@ -512,7 +197,7 @@ def checkevokedsynkeys(p, nprox, ndist):
 #
 
 
-def checkpoissynkeys(p):
+def check_pois_synkeys(p):
     # make sure ampa,nmda gbar values are in the param dict for Poisson inputs
     # (for backwards compatibility)
     lct = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']  # target cell types
@@ -609,14 +294,14 @@ def create_pext(p, tstop):
 
     p_ext = feed_validate(p_ext, feed_dist, tstop)
 
-    nprox, ndist = countEvokedInputs(p)
+    nprox, ndist = count_evoked_inputs(p)
     # print('nprox,ndist evoked inputs:', nprox, ndist)
 
     # NEW: make sure all evoked synaptic weights present
     # (for backwards compatibility)
     # could cause differences between output of param files
     # since some nmda weights should be 0 while others > 0
-    checkevokedsynkeys(p, nprox, ndist)
+    check_evoked_synkeys(p, nprox, ndist)
 
     # Create proximal evoked response parameters
     # f_input needs to be defined as 0
@@ -692,7 +377,7 @@ def create_pext(p, tstop):
         'threshold': p['threshold']
     }
 
-    checkpoissynkeys(p)
+    check_pois_synkeys(p)
 
     # define T_pois as 0 or -1 to reset automatically to tstop
     if p['T_pois'] in (0, -1):
@@ -739,4 +424,3 @@ def compare_dictionaries(d1, d2):
 # debug test function
 if __name__ == '__main__':
     fparam = 'param/debug.param'
-    p = ExpParams(fparam, debug=True)
