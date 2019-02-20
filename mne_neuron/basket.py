@@ -1,17 +1,17 @@
 """Model for inhibitory cell class."""
 
-from .cell import Cell
+from .cell import _Cell
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
 
 
-class BasketSingle(Cell):
+class BasketSingle(_Cell):
     """Inhibitory cell class."""
 
     def __init__(self, gid, pos, cell_name='Basket'):
         self.props = self.__set_props(cell_name, pos)
-        Cell.__init__(self, gid, self.props)
+        _Cell.__init__(self, gid, self.props)
         # store cell name for later
         self.name = cell_name
         # set 3D shape - unused for now but a prototype

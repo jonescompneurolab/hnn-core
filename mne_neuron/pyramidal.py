@@ -4,9 +4,9 @@ import numpy as np
 
 from neuron import h
 
-from .cell import Cell
+from .cell import _Cell
 
-from .paramrw import compare_dictionaries
+from .params import compare_dictionaries
 from .params_default import (get_L2Pyr_params_default,
                              get_L5Pyr_params_default)
 
@@ -14,9 +14,9 @@ from .params_default import (get_L2Pyr_params_default,
 # Units for gbar: S/cm^2 unless otherwise noted
 
 
-class Pyr(Cell):
+class Pyr(_Cell):
     def __init__(self, gid, soma_props):
-        Cell.__init__(self, gid, soma_props)
+        _Cell.__init__(self, gid, soma_props)
         # store cell_name as self variable for later use
         self.name = soma_props['name']
         # preallocate dict to store dends
