@@ -1,8 +1,7 @@
-# cell.py - establish class def for general cell features
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: python3 compatibility)
-# last rev: (SL: added list_IClamp as a pre-defined variable)
+"""Establish class def for general cell features."""
+
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
 from neuron import h

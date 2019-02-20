@@ -43,6 +43,6 @@ install:
 script:
     - python examples/plot_simulate_evoked.py
     - flake8 --count mne_neuron
-    - py.test --cov=mne_neuron tests/
+    - py.test mne_neuron
 after_success:
     - bash <(curl -s https://codecov.io/bash)
