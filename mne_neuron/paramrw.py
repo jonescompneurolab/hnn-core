@@ -8,42 +8,13 @@ import json
 import fnmatch
 from copy import deepcopy
 
-import numpy as np
-
 from .params_default import get_params_default
 
-
-def clean_lines(file):
-    with open(file) as f_in:
-        lines = (line.rstrip() for line in f_in)
-        lines = [line for line in lines if line]
-    return lines
-
-
-def quickreadprm(fn):
-    """Get dict of ':' separated params from fn;
-       ignore lines starting with #."""
-
-    d = {}
-    with open(fn, 'r') as fp:
-        ln = fp.readlines()
-        for l in ln:
-            s = l.strip()
-            if s.startswith('#'):
-                continue
-            sp = s.split(':')
-            if len(sp) > 1:
-                d[sp[0].strip()] = str(sp[1]).strip()
-    return d
 
 # return number of evoked inputs (proximal, distal)
 # using dictionary d (or if d is a string, first load the dictionary from
 # filename d)
-
-
-def count_evoked_inputs(d):
-    if type(d) == str:
-        d = quickreadprm(d)
+def _count_evoked_inputs(d):
     nprox = ndist = 0
     for k, v in d.items():
         if k.startswith('t_'):
@@ -67,7 +38,7 @@ class Params(dict):
         with open(params_fname) as json_data:
             params_input = json.load(json_data)
 
-        nprox, ndist = count_evoked_inputs(params_input)
+        nprox, ndist = _count_evoked_inputs(params_input)
 
         # create a copy of params_default through which to iterate
         params = get_params_default(nprox, ndist)
@@ -85,76 +56,17 @@ class Params(dict):
         """Return a subset of parameters."""
         keys = self.keys()
         if key in keys:
-            return self[key]
+            return dict.__getitem__(self, key)
         else:
             matches = fnmatch.filter(keys, key)
             if len(matches) == 0:
-                raise(KeyError, 'Pattern does not match'
-                      'parameter keys')
+                return dict.__getitem__(self, key)
             params = deepcopy(self)
             for key in keys:
                 if key not in matches:
                     params.pop(key)
             return params
 
-
-# class controlling multiple simulation files (.param)
-
-
-def read(fparam):
-    lines = clean_lines(fparam)
-    p = {}
-    gid_dict = {}
-    for line in lines:
-        if line.startswith('#'):
-            continue
-        keystring, val = line.split(": ")
-        key = keystring.strip()
-        if val[0] == '[':
-            val_range = val[1:-1].split(', ')
-            if len(val_range) == 2:
-                ind_start = int(val_range[0])
-                ind_end = int(val_range[1]) + 1
-                gid_dict[key] = np.arange(ind_start, ind_end)
-            else:
-                gid_dict[key] = np.array([])
-        else:
-            p[key] = float(val)
-    return gid_dict, p
-
-# write the params to a filename
-
-
-def write(fparam, p, gid_list):
-    """ now sorting
-    """
-    # sort the items in the dict by key
-    # p_sorted = [item for item in p.items()]
-    p_keys = [key for key, val in p.items()]
-    p_sorted = [(key, p[key]) for key in p_keys]
-    # for some reason this is now crashing in python/mpi
-    # specifically, lambda sorting in place?
-    # p_sorted = [item for item in p.items()]
-    # p_sorted.sort(key=lambda x: x[0])
-    # open the file for writing
-    with open(fparam, 'w') as f:
-        pstring = '%26s: '
-        # write the gid info first
-        for key in gid_list.keys():
-            f.write(pstring % key)
-            if len(gid_list[key]):
-                f.write('[%4i, %4i] ' % (gid_list[key][0], gid_list[key][-1]))
-            else:
-                f.write('[]')
-            f.write('\n')
-        # do the params in p_sorted
-        for param in p_sorted:
-            key, val = param
-            f.write(pstring % key)
-            if key.startswith('N_'):
-                f.write('%i\n' % val)
-            else:
-                f.write(str(val) + '\n')
 
 # qnd function to add feeds if they are sensible
 
@@ -318,7 +230,7 @@ def create_pext(p, tstop):
 
     p_ext = feed_validate(p_ext, feed_dist, tstop)
 
-    nprox, ndist = count_evoked_inputs(p)
+    nprox, ndist = _count_evoked_inputs(p)
     # print('nprox,ndist evoked inputs:', nprox, ndist)
 
     # NEW: make sure all evoked synaptic weights present
