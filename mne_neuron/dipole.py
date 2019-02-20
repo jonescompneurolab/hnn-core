@@ -82,7 +82,6 @@ def simulate_dipole(params):
     # combine net.current{} variables on each proc
     pc.allreduce(net.current['L5Pyr_soma'], 1)
     pc.allreduce(net.current['L2Pyr_soma'], 1)
-
     dpl_data = np.c_[dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
                      dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
 
@@ -97,7 +96,7 @@ def simulate_dipole(params):
     dpl.convert_fAm_to_nAm()
     dpl.scale(params['dipole_scalefctr'])
     dpl.smooth(params['dipole_smooth_win'] / h.dt)
-    return dpl
+    return dpl, net
 
 
 class Dipole(object):

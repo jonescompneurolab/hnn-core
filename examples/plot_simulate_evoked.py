@@ -38,5 +38,17 @@ print(params['L2Pyr_soma*'])
 
 ###############################################################################
 # Now let's simulate the dipole and plot it
-dpl = simulate_dipole(params)
+dpl, net = simulate_dipole(params)
 dpl.plot()
+
+import numpy as np
+import matplotlib.pyplot as plt
+spikes = net.spiketimes.as_numpy()
+gids = net.spikegids.as_numpy()
+valid_gids = np.r_[net.gid_dict['evprox1'],
+                   net.gid_dict['evprox2']]
+mask_evprox = np.in1d(gids, valid_gids)
+mask_evdist = np.in1d(gids, net.gid_dict['evdist1'])
+plt.figure()
+plt.hist(spikes[mask_evprox], 50, color='r')
+plt.hist(spikes[mask_evdist], 10, color='g')
