@@ -32,6 +32,11 @@ params = Params(params_fname)
 print(params)
 
 ###############################################################################
+# This is a lot of parameters! We can also filter the
+# parameters using unix-style wildcard characters
+print(params['L2Pyr_soma*'])
+
+###############################################################################
 # Now let's simulate the dipole and plot it
 dpl = simulate_dipole(params)
 dpl.plot()

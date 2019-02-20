@@ -4,8 +4,11 @@
 # rev 2016-05-01 (SL: removed dependence on cartesian, updated for python3)
 # last major: (SL: cleanup of self.p_all)
 
-import numpy as np
 import json
+import fnmatch
+from copy import deepcopy
+
+import numpy as np
 
 from .params_default import get_params_default
 
@@ -77,6 +80,22 @@ class Params(dict):
     def __repr__(self):
         """Display the params nicely."""
         return json.dumps(self, sort_keys=True, indent=4)
+
+    def __getitem__(self, key):
+        """Return a subset of parameters."""
+        keys = self.keys()
+        if key in keys:
+            return self[key]
+        else:
+            matches = fnmatch.filter(keys, key)
+            if len(matches) == 0:
+                raise(KeyError, 'Pattern does not match'
+                      'parameter keys')
+            params = deepcopy(self)
+            for key in keys:
+                if key not in matches:
+                    params.pop(key)
+            return params
 
 
 # class controlling multiple simulation files (.param)
