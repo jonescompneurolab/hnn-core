@@ -1,6 +1,7 @@
 # mne-neuron
 
 [![Travis](https://api.travis-ci.org/jasmainak/mne-neuron.svg?branch=master "Travis")](https://travis-ci.org/jasmainak/mne-neuron)
+[![codecov](https://codecov.io/gh/jasmainak/mne-neuron/branch/master/graph/badge.svg)](https://codecov.io/gh/jasmainak/mne-neuron)
 
 Dependencies
 ------------

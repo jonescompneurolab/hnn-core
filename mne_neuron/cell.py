@@ -15,7 +15,7 @@ h("dp_total_L5 = 0.")  # put here since these variables used in cells
 # Units for gbar: S/cm^2
 
 
-class Cell(object):
+class _Cell(object):
     """Create a cell object.
 
     Parameters
