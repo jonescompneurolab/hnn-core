@@ -31,7 +31,7 @@ class NetworkOnNode(object):
         # Originally used to create the empty vec for synaptic currents,
         # ensuring that they exist on this node irrespective of whether
         # or not cells of relevant type actually do
-        self.N_t = np.arange(0., h.tstop, self.p['dt']).size + 1
+        self.N_t = np.arange(0., p['tstop'], self.p['dt']).size + 1
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
             'L5Pyr_soma': h.Vector(self.N_t, 0),
@@ -61,7 +61,7 @@ class NetworkOnNode(object):
         # Global number of external inputs ... automatic counting
         # makes more sense
         # p_unique represent ext inputs that are going to go to each cell
-        self.p_ext, self.p_unique = create_pext(self.p, h.tstop)
+        self.p_ext, self.p_unique = create_pext(self.p, p['tstop'])
         self.N_extinput = len(self.p_ext)
         # Source list of names
         # in particular order (cells, extinput, alpha names of unique inputs)

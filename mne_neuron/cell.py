@@ -344,7 +344,7 @@ class _Cell(object):
 
         # T = -1 means use h.tstop
         if p['Itonic_T_%s' % name_key] == -1:
-            t_dur = h.tstop - t_delay
+            t_dur = p['tstop'] - t_delay
 
         else:
             t_dur = p['Itonic_T_%s' % name_key] - t_delay
