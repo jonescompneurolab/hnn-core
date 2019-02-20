@@ -1,8 +1,7 @@
-# paramrw.py - routines for reading the param files
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: removed dependence on cartesian, updated for python3)
-# last major: (SL: cleanup of self.p_all)
+"""Handling of parameters."""
+
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
 
 import json
 import fnmatch

@@ -1,5 +1,8 @@
 """Model for inhibitory cell class."""
 
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
+
 from .cell import _Cell
 
 # Units for e: mV

@@ -1,8 +1,7 @@
-# feed.py - establishes FeedExt(), ParFeedAll()
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: updated for python3)
-# last major: (SL: toward python3)
+"""External feed to network."""
+
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
 from neuron import h

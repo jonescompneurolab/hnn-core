@@ -1,5 +1,8 @@
 """Model for Pyramidal cell class."""
 
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
+
 import numpy as np
 
 from neuron import h

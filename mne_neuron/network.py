@@ -1,8 +1,7 @@
-# class_net.py - establishes the Network class and related methods
-#
-# v 1.10.0-py35
-# rev 2016-05-01 (SL: removed izip)
-# last major: (SL: toward python3)
+"""Network class."""
+
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
 
 import itertools as it
 import numpy as np

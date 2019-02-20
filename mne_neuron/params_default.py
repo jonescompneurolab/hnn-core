@@ -1,11 +1,7 @@
-# params_default.py - master list of changeable params. most set to
-# default val of inactive
-#
-# v 1.9.01
-# rev 2015-12-08 (RL: added t0_pois)
-# last major: (SL: Added default params for L2Basket and L5Basket cells)
+"""Master list of changeable params."""
 
-# returns default params - see note
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Sam Neymotin <samnemo@gmail.com>
 
 
 def get_params_default(nprox=2, ndist=1):
