@@ -327,6 +327,38 @@ Then we read the parameters file
     }
 
 
+This is a lot of parameters! We can also filter the
+parameters using unix-style wildcard characters
+
+
+
+.. code-block:: python
+
+    print(params['L2Pyr_soma*'])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    {
+        "L2Pyr_soma_L": 22.1,
+        "L2Pyr_soma_Ra": 200.0,
+        "L2Pyr_soma_cm": 0.6195,
+        "L2Pyr_soma_diam": 23.4,
+        "L2Pyr_soma_el_hh2": -65.0,
+        "L2Pyr_soma_gbar_km": 250.0,
+        "L2Pyr_soma_gkbar_hh2": 0.01,
+        "L2Pyr_soma_gl_hh2": 4.26e-05,
+        "L2Pyr_soma_gnabar_hh2": 0.18
+    }
+
+
 Now let's simulate the dipole and plot it
 
 
@@ -367,7 +399,7 @@ Now let's simulate the dipole and plot it
     Simulation time: 160.0 ms...
 
 
-**Total running time of the script:** ( 0 minutes  59.204 seconds)
+**Total running time of the script:** ( 0 minutes  46.670 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

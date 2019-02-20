@@ -380,6 +380,25 @@ simulator.</p>
 }
 </pre></div>
 </div>
+<p>This is a lot of parameters! We can also filter the
+parameters using unix-style wildcard characters</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;L2Pyr_soma*&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{
+    &quot;L2Pyr_soma_L&quot;: 22.1,
+    &quot;L2Pyr_soma_Ra&quot;: 200.0,
+    &quot;L2Pyr_soma_cm&quot;: 0.6195,
+    &quot;L2Pyr_soma_diam&quot;: 23.4,
+    &quot;L2Pyr_soma_el_hh2&quot;: -65.0,
+    &quot;L2Pyr_soma_gbar_km&quot;: 250.0,
+    &quot;L2Pyr_soma_gkbar_hh2&quot;: 0.01,
+    &quot;L2Pyr_soma_gl_hh2&quot;: 4.26e-05,
+    &quot;L2Pyr_soma_gnabar_hh2&quot;: 0.18
+}
+</pre></div>
+</div>
 <p>Now let’s simulate the dipole and plot it</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -406,7 +425,7 @@ Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  59.204 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  46.670 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_simulate_evoked.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_evoked.py</span></code></a></div>
