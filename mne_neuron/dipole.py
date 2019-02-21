@@ -139,6 +139,8 @@ class Dipole(object):
         return fctr
 
     def smooth(self, winsz):
+        # XXX: add check to make sure self.t is
+        # not smaller than winsz
         if winsz <= 1:
             return
         for key in self.dpl.keys():
