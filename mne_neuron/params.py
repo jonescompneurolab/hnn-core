@@ -30,7 +30,7 @@ class Params(dict):
     Parameters
     ----------
     params_fname : str
-        The parameters file
+        The parameters json file
     """
 
     def __init__(self, params_fname):
