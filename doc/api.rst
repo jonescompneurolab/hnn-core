@@ -6,20 +6,18 @@
 API Documentation
 =================
 
-Cell classes (:py:mod:`mne_neuron.mne_neuron`):
+Simulation (:py:mod:`mne_neuron`):
 
-.. currentmodule:: mne_neuron.basket
-
-.. autosummary::
-   :toctree: generated/
-
-   L5Basket
-   L2Basket
-
-.. currentmodule:: mne_neuron.pyramidal
+.. currentmodule:: mne_neuron
 
 .. autosummary::
    :toctree: generated/
 
-   L5Pyr
-   L2Pyr
+   simulate_dipole
+
+.. currentmodule:: mne_neuron.params
+
+.. autosummary::
+   :toctree: generated/
+
+   Params
