@@ -28,7 +28,7 @@ h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
 ###############################################################################
 # Then we read the parameters file
-params_fname = op.join(mne_neuron_root, 'param', 'default.param')
+params_fname = op.join(mne_neuron_root, 'param', 'default.json')
 params = Params(params_fname)
 print(params)
 

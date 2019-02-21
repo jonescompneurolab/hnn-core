@@ -1,0 +1,6 @@
+mne\_neuron.simulate\_dipole
+============================
+
+.. currentmodule:: mne_neuron
+
+.. autofunction:: simulate_dipole
