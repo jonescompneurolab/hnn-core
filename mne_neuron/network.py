@@ -8,7 +8,7 @@ import numpy as np
 
 from neuron import h
 
-from .feed import ParFeedAll
+from .feed import ExtFeed
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import create_pext
@@ -245,30 +245,6 @@ class NetworkOnNode(object):
             if gid in gids:
                 return gidtype
 
-    # reset src (source/external) event times
-    # evinputinc is an offset for evoked inputs
-    # (added to mean start time - e.g. per trial increment)
-    def reset_src_event_times(self, seed=None, debug=False, inc_evinput=0.0):
-        if debug:
-            print('in reset_src_input_times')
-            print('self.extinput_list:', self.extinput_list)
-            print('self.ext_list:', type(self.ext_list), self.ext_list)
-
-        for feed in self.extinput_list:
-            if seed is None:
-                feed.inc_prng(1000)
-            else:
-                feed.set_prng(seed)
-            feed.set_event_times(inc_evinput)  # uses feed.seed
-
-        for k, lfeed in self.ext_list.items():  # dictionary of lists...
-            for feed in lfeed:  # of feeds
-                if seed is None:
-                    feed.inc_prng(1)
-                else:
-                    feed.set_prng(seed)
-                feed.set_event_times(inc_evinput)  # uses feed.seed
-
     # parallel create cells AND external inputs (feeds)
     # these are spike SOURCES but cells are also targets
     # external inputs are not targets
@@ -329,7 +305,7 @@ class NetworkOnNode(object):
                     p_ind = gid - self.gid_dict['extinput'][0]
                     # now use the param index in the params and create
                     # the cell and artificial NetCon
-                    self.extinput_list.append(ParFeedAll(
+                    self.extinput_list.append(ExtFeed(
                         type, None, self.p_ext[p_ind], gid))
                     self.pc.cell(
                         gid, self.extinput_list[-1].connect_to_target(
@@ -338,7 +314,7 @@ class NetworkOnNode(object):
                     gid_post = gid - self.gid_dict[type][0]
                     cell_type = self.gid_to_type(gid_post)
                     # create dictionary entry, append to list
-                    self.ext_list[type].append(ParFeedAll(
+                    self.ext_list[type].append(ExtFeed(
                         type, cell_type, self.p_unique[type], gid))
                     self.pc.cell(
                         gid, self.ext_list[type][-1].connect_to_target(
