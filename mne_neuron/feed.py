@@ -7,8 +7,8 @@ import numpy as np
 from neuron import h
 
 
-class ParFeedAll(object):
-    """"The ParFeedAll class.
+class ExtFeed(object):
+    """"The ExtFeed class.
 
     Parameters
     ----------
@@ -22,7 +22,6 @@ class ParFeedAll(object):
         usually, p_ext is a dict of cell types
     gid : int
         The gid.
-
     """
 
     def __init__(self, ty, celltype, p_ext, gid):
@@ -37,14 +36,6 @@ class ParFeedAll(object):
         self.set_prng()  # sets seeds for random num generator
         # sets event times into self.eventvec and plays into self.vs (VecStim)
         self.set_event_times()
-
-    # inc random number generator seeds
-    def inc_prng(self, inc):
-        self.seed += inc
-        self.prng = np.random.RandomState(self.seed)
-        if hasattr(self, 'seed2'):
-            self.seed2 += inc
-            self.prng2 = np.random.RandomState(self.seed2)
 
     def set_prng(self, seed=None):
         if seed is None:  # no seed specified then use p_ext to determine seed
