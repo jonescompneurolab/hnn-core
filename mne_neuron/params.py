@@ -60,14 +60,27 @@ class Params(dict):
             matches = fnmatch.filter(keys, key)
             if len(matches) == 0:
                 return dict.__getitem__(self, key)
-            params = deepcopy(self)
+            params = self.copy()
             for key in keys:
                 if key not in matches:
                     params.pop(key)
             return params
 
+    def __setitem__(self, key, value):
+        """Set the value for a subset of parameters."""
+        keys = self.keys()
+        if key in keys:
+            return dict.__setitem__(self, key, value)
+        else:
+            matches = fnmatch.filter(keys, key)
+            if len(matches) == 0:
+                return dict.__setitem__(self, key, value)
+            for key in keys:
+                if key in matches:
+                    self.update({key: value})
 
-# qnd function to add feeds if they are sensible
+    def copy(self):
+        return deepcopy(self)
 
 
 def feed_validate(p_ext, d, tstop):

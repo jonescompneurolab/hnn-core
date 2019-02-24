@@ -212,7 +212,6 @@ def get_ev_params_default(n, isprox):
         pref = 'evprox'
     else:
         pref = 'evdist'
-    # print('isprox:',isprox,'n:',n)
     lty = ['L2Pyr', 'L5Pyr', 'L2Basket']
     if isprox:
         lty.append('L5Basket')
