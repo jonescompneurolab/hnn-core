@@ -351,7 +351,6 @@ class NetworkOnNode(object):
                 # external inputs
                 for type in self.p_unique.keys():
                     p_type = self.p_unique[type]
-                    # print('parnet_connect p_type:',p_type)
                     cell.parreceive_ext(
                         type, gid, self.gid_dict, self.pos_dict, p_type)
 
