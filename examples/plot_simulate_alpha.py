@@ -53,10 +53,28 @@ params.update({
 })
 
 ###############################################################################
-# And we update a few parameters by using wildcard characters
+# And we update all the conductances gbar related to the inputs
+# by using the pattern gbar_ev*
 params['gbar_ev*'] = 0.0
 
 ###############################################################################
 # Now let's simulate the dipole and plot it
 dpl = simulate_dipole(params)
 dpl.plot()
+
+###############################################################################
+# We can confirm that what we simulate is indeed 10 Hz activity.
+import matplotlib.pyplot as plt
+from scipy.signal import spectrogram
+import numpy as np
+sfreq = 1000. / params['dt']
+n_fft = 1024 * 8
+freqs, _, psds = spectrogram(
+    dpl.dpl['agg'], sfreq, window='hamming', nfft=n_fft,
+    nperseg=n_fft, noverlap=0)
+plt.figure()
+plt.plot(freqs, np.mean(psds, axis=-1))
+plt.xlim((0, 40))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('PSD')
+plt.show()
