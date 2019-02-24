@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Simulate dipole &#8212; mne-neuron  documentation</title>
+    <title>Simulate alpha waves &#8212; mne-neuron  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -67,7 +67,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Simulate dipole</a></li>
+<li><a class="reference internal" href="#">Simulate alpha waves</a></li>
 </ul>
 </ul>
 </li>
@@ -79,7 +79,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/auto_examples/plot_simulate_evoked.rst.txt"
+  <a href="../_sources/auto_examples/plot_simulate_alpha.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -105,12 +105,12 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="simulate-dipole">
-<span id="sphx-glr-auto-examples-plot-simulate-evoked-py"></span><h1>Simulate dipole<a class="headerlink" href="#simulate-dipole" title="Permalink to this headline">¶</a></h1>
-<p>This example demonstrates how to simulate a dipole for evoked-like
-waveforms using MNE-Neuron.</p>
+<div class="sphx-glr-example-title section" id="simulate-alpha-waves">
+<span id="sphx-glr-auto-examples-plot-simulate-alpha-py"></span><h1>Simulate alpha waves<a class="headerlink" href="#simulate-alpha-waves" title="Permalink to this headline">¶</a></h1>
+<p>This example demonstrates how to simulate alpha waves using
+MNE-Neuron.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Mainak Jas &lt;mainak.jas@telecom-paristech.fr&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 
@@ -127,10 +127,9 @@ waveforms using MNE-Neuron.</p>
 <p>Then we setup the directories and Neuron</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mne_neuron_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">mne_neuron</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
 <span class="n">h</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;stdrun.hoc&quot;</span><span class="p">)</span>
-<span class="n">h</span><span class="o">.</span><span class="n">nrn_load_dll</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s2">&quot;x86_64/.libs/libnrnmech.so&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Then we read the parameters file</p>
+<p>Then we read the default parameters file</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.json&#39;</span><span class="p">)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -380,23 +379,30 @@ waveforms using MNE-Neuron.</p>
 }
 </pre></div>
 </div>
-<p>This is a lot of parameters! We can also filter the
-parameters using unix-style wildcard characters</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;L2Pyr_soma*&#39;</span><span class="p">])</span>
+<p>Now, we update a few parameters</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+    <span class="s1">&#39;dipole_scalefctr&#39;</span><span class="p">:</span> <span class="mf">150000.0</span><span class="p">,</span>
+    <span class="s1">&#39;dipole_smooth_win&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mf">710.0</span><span class="p">,</span>
+    <span class="s1">&#39;t0_input_prox&#39;</span><span class="p">:</span> <span class="mf">2000.0</span><span class="p">,</span>
+    <span class="s1">&#39;tstop_input_prox&#39;</span><span class="p">:</span> <span class="mf">710.0</span><span class="p">,</span>
+    <span class="s1">&#39;t0_input_dist&#39;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span>
+    <span class="s1">&#39;tstop_input_dist&#39;</span><span class="p">:</span> <span class="mf">1001.0</span><span class="p">,</span>
+    <span class="s1">&#39;t_evprox_1&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="s1">&#39;sigma_t_evprox_1&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
+    <span class="s1">&#39;t_evprox_2&#39;</span><span class="p">:</span> <span class="mf">2000.0</span><span class="p">,</span>
+    <span class="s1">&#39;sigma_t_evprox_2&#39;</span><span class="p">:</span> <span class="mf">7.0</span><span class="p">,</span>
+    <span class="s1">&#39;t_evdist_1&#39;</span><span class="p">:</span> <span class="mf">2000.0</span><span class="p">,</span>
+    <span class="s1">&#39;sigma_t_evdist_1&#39;</span><span class="p">:</span> <span class="mf">6.0</span><span class="p">,</span>
+    <span class="s1">&#39;input_dist_A_weight_L2Pyr_ampa&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">,</span>
+    <span class="s1">&#39;input_dist_A_weight_L5Pyr_ampa&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">,</span>
+    <span class="s1">&#39;sync_evinput&#39;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="p">})</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{
-    &quot;L2Pyr_soma_L&quot;: 22.1,
-    &quot;L2Pyr_soma_Ra&quot;: 200.0,
-    &quot;L2Pyr_soma_cm&quot;: 0.6195,
-    &quot;L2Pyr_soma_diam&quot;: 23.4,
-    &quot;L2Pyr_soma_el_hh2&quot;: -65.0,
-    &quot;L2Pyr_soma_gbar_km&quot;: 250.0,
-    &quot;L2Pyr_soma_gkbar_hh2&quot;: 0.01,
-    &quot;L2Pyr_soma_gl_hh2&quot;: 4.26e-05,
-    &quot;L2Pyr_soma_gnabar_hh2&quot;: 0.18
-}
+<p>And we update all the conductances gbar related to the inputs
+by using the pattern gbar_ev*</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;gbar_ev*&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 </pre></div>
 </div>
 <p>Now let’s simulate the dipole and plot it</p>
@@ -404,7 +410,7 @@ parameters using unix-style wildcard characters</p>
 <span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
+<img alt="../_images/sphx_glr_plot_simulate_alpha_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
@@ -423,14 +429,86 @@ Simulation time: 130.0 ms...
 Simulation time: 140.0 ms...
 Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
+Simulation time: 170.0 ms...
+Simulation time: 180.0 ms...
+Simulation time: 190.0 ms...
+Simulation time: 200.0 ms...
+Simulation time: 210.0 ms...
+Simulation time: 220.0 ms...
+Simulation time: 230.0 ms...
+Simulation time: 240.0 ms...
+Simulation time: 250.0 ms...
+Simulation time: 260.0 ms...
+Simulation time: 270.0 ms...
+Simulation time: 280.0 ms...
+Simulation time: 290.0 ms...
+Simulation time: 300.0 ms...
+Simulation time: 310.0 ms...
+Simulation time: 320.0 ms...
+Simulation time: 330.0 ms...
+Simulation time: 340.0 ms...
+Simulation time: 350.0 ms...
+Simulation time: 360.0 ms...
+Simulation time: 370.0 ms...
+Simulation time: 380.0 ms...
+Simulation time: 390.0 ms...
+Simulation time: 400.0 ms...
+Simulation time: 410.0 ms...
+Simulation time: 420.0 ms...
+Simulation time: 430.0 ms...
+Simulation time: 440.0 ms...
+Simulation time: 450.0 ms...
+Simulation time: 460.0 ms...
+Simulation time: 470.0 ms...
+Simulation time: 480.0 ms...
+Simulation time: 490.0 ms...
+Simulation time: 500.0 ms...
+Simulation time: 510.0 ms...
+Simulation time: 520.0 ms...
+Simulation time: 530.0 ms...
+Simulation time: 540.0 ms...
+Simulation time: 550.0 ms...
+Simulation time: 560.0 ms...
+Simulation time: 570.0 ms...
+Simulation time: 580.0 ms...
+Simulation time: 590.0 ms...
+Simulation time: 600.0 ms...
+Simulation time: 610.0 ms...
+Simulation time: 620.0 ms...
+Simulation time: 630.0 ms...
+Simulation time: 640.0 ms...
+Simulation time: 650.0 ms...
+Simulation time: 660.0 ms...
+Simulation time: 670.0 ms...
+Simulation time: 680.0 ms...
+Simulation time: 690.0 ms...
+Simulation time: 700.0 ms...
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 1 minutes  17.273 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
+<p>We can confirm that what we simulate is indeed 10 Hz activity.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">spectrogram</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+<span class="n">n_fft</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span>
+<span class="n">freqs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">psds</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span>
+    <span class="n">dpl</span><span class="o">.</span><span class="n">dpl</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">],</span> <span class="n">sfreq</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+    <span class="n">nperseg</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">psds</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PSD&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_simulate_alpha_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_002.png" />
+<p><strong>Total running time of the script:</strong> ( 4 minutes  56.912 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-alpha-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../_downloads/plot_simulate_evoked.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_evoked.py</span></code></a></div>
+<a class="reference download internal" href="../_downloads/plot_simulate_alpha.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_alpha.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" href="../_downloads/plot_simulate_evoked.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_evoked.ipynb</span></code></a></div>
+<a class="reference download internal" href="../_downloads/plot_simulate_alpha.ipynb" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_alpha.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>

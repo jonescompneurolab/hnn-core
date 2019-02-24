@@ -1,18 +1,18 @@
 .. note::
     :class: sphx-glr-download-link-note
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_evoked.py>` to download the full example code
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_alpha.py>` to download the full example code
 .. rst-class:: sphx-glr-example-title
 
-.. _sphx_glr_auto_examples_plot_simulate_evoked.py:
+.. _sphx_glr_auto_examples_plot_simulate_alpha.py:
 
 
-===============
-Simulate dipole
-===============
+====================
+Simulate alpha waves
+====================
 
-This example demonstrates how to simulate a dipole for evoked-like
-waveforms using MNE-Neuron.
+This example demonstrates how to simulate alpha waves using
+MNE-Neuron.
 
 
 
@@ -56,7 +56,6 @@ Then we setup the directories and Neuron
 
     mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
     h.load_file("stdrun.hoc")
-    h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
 
 
@@ -64,7 +63,7 @@ Then we setup the directories and Neuron
 
 
 
-Then we read the parameters file
+Then we read the default parameters file
 
 
 
@@ -327,36 +326,50 @@ Then we read the parameters file
     }
 
 
-This is a lot of parameters! We can also filter the
-parameters using unix-style wildcard characters
+Now, we update a few parameters
 
 
 
 .. code-block:: python
 
-    print(params['L2Pyr_soma*'])
+    params.update({
+        'dipole_scalefctr': 150000.0,
+        'dipole_smooth_win': 0,
+        'tstop': 710.0,
+        't0_input_prox': 2000.0,
+        'tstop_input_prox': 710.0,
+        't0_input_dist': 50.0,
+        'tstop_input_dist': 1001.0,
+        't_evprox_1': 1000,
+        'sigma_t_evprox_1': 2.5,
+        't_evprox_2': 2000.0,
+        'sigma_t_evprox_2': 7.0,
+        't_evdist_1': 2000.0,
+        'sigma_t_evdist_1': 6.0,
+        'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
+        'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
+        'sync_evinput': 1
+    })
 
 
 
 
 
-.. rst-class:: sphx-glr-script-out
 
- Out:
 
- .. code-block:: none
+And we update all the conductances gbar related to the inputs
+by using the pattern gbar_ev*
 
-    {
-        "L2Pyr_soma_L": 22.1,
-        "L2Pyr_soma_Ra": 200.0,
-        "L2Pyr_soma_cm": 0.6195,
-        "L2Pyr_soma_diam": 23.4,
-        "L2Pyr_soma_el_hh2": -65.0,
-        "L2Pyr_soma_gbar_km": 250.0,
-        "L2Pyr_soma_gkbar_hh2": 0.01,
-        "L2Pyr_soma_gl_hh2": 4.26e-05,
-        "L2Pyr_soma_gnabar_hh2": 0.18
-    }
+
+
+.. code-block:: python
+
+    params['gbar_ev*'] = 0.0
+
+
+
+
+
 
 
 Now let's simulate the dipole and plot it
@@ -370,7 +383,8 @@ Now let's simulate the dipole and plot it
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
+
+.. image:: /auto_examples/images/sphx_glr_plot_simulate_alpha_001.png
     :class: sphx-glr-single-img
 
 
@@ -397,12 +411,95 @@ Now let's simulate the dipole and plot it
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
+    Simulation time: 170.0 ms...
+    Simulation time: 180.0 ms...
+    Simulation time: 190.0 ms...
+    Simulation time: 200.0 ms...
+    Simulation time: 210.0 ms...
+    Simulation time: 220.0 ms...
+    Simulation time: 230.0 ms...
+    Simulation time: 240.0 ms...
+    Simulation time: 250.0 ms...
+    Simulation time: 260.0 ms...
+    Simulation time: 270.0 ms...
+    Simulation time: 280.0 ms...
+    Simulation time: 290.0 ms...
+    Simulation time: 300.0 ms...
+    Simulation time: 310.0 ms...
+    Simulation time: 320.0 ms...
+    Simulation time: 330.0 ms...
+    Simulation time: 340.0 ms...
+    Simulation time: 350.0 ms...
+    Simulation time: 360.0 ms...
+    Simulation time: 370.0 ms...
+    Simulation time: 380.0 ms...
+    Simulation time: 390.0 ms...
+    Simulation time: 400.0 ms...
+    Simulation time: 410.0 ms...
+    Simulation time: 420.0 ms...
+    Simulation time: 430.0 ms...
+    Simulation time: 440.0 ms...
+    Simulation time: 450.0 ms...
+    Simulation time: 460.0 ms...
+    Simulation time: 470.0 ms...
+    Simulation time: 480.0 ms...
+    Simulation time: 490.0 ms...
+    Simulation time: 500.0 ms...
+    Simulation time: 510.0 ms...
+    Simulation time: 520.0 ms...
+    Simulation time: 530.0 ms...
+    Simulation time: 540.0 ms...
+    Simulation time: 550.0 ms...
+    Simulation time: 560.0 ms...
+    Simulation time: 570.0 ms...
+    Simulation time: 580.0 ms...
+    Simulation time: 590.0 ms...
+    Simulation time: 600.0 ms...
+    Simulation time: 610.0 ms...
+    Simulation time: 620.0 ms...
+    Simulation time: 630.0 ms...
+    Simulation time: 640.0 ms...
+    Simulation time: 650.0 ms...
+    Simulation time: 660.0 ms...
+    Simulation time: 670.0 ms...
+    Simulation time: 680.0 ms...
+    Simulation time: 690.0 ms...
+    Simulation time: 700.0 ms...
 
 
-**Total running time of the script:** ( 1 minutes  17.273 seconds)
+We can confirm that what we simulate is indeed 10 Hz activity.
 
 
-.. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:
+
+.. code-block:: python
+
+    import matplotlib.pyplot as plt
+    from scipy.signal import spectrogram
+    import numpy as np
+    sfreq = 1000. / params['dt']
+    n_fft = 1024 * 8
+    freqs, _, psds = spectrogram(
+        dpl.dpl['agg'], sfreq, window='hamming', nfft=n_fft,
+        nperseg=n_fft, noverlap=0)
+    plt.figure()
+    plt.plot(freqs, np.mean(psds, axis=-1))
+    plt.xlim((0, 40))
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('PSD')
+    plt.show()
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_simulate_alpha_002.png
+    :class: sphx-glr-single-img
+
+
+
+
+**Total running time of the script:** ( 4 minutes  56.912 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:
 
 
 .. only :: html
@@ -414,13 +511,13 @@ Now let's simulate the dipole and plot it
 
   .. container:: sphx-glr-download
 
-     :download:`Download Python source code: plot_simulate_evoked.py <plot_simulate_evoked.py>`
+     :download:`Download Python source code: plot_simulate_alpha.py <plot_simulate_alpha.py>`
 
 
 
   .. container:: sphx-glr-download
 
-     :download:`Download Jupyter notebook: plot_simulate_evoked.ipynb <plot_simulate_evoked.ipynb>`
+     :download:`Download Jupyter notebook: plot_simulate_alpha.ipynb <plot_simulate_alpha.ipynb>`
 
 
 .. only:: html

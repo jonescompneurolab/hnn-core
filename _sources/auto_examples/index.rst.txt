@@ -5,7 +5,7 @@
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole using the Neuron simulator. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using MNE-Neuron. ">
 
 .. only:: html
 
@@ -22,6 +22,26 @@
    :hidden:
 
    /auto_examples/plot_simulate_evoked
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using MNE-Neuron. ">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_simulate_alpha
 .. raw:: html
 
     <div style='clear:both'></div>
@@ -36,13 +56,13 @@
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//autofs/homes/001/mj513/Desktop/github_repos/mne-neuron/doc/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//home/mainak/Desktop/projects/github_repos/mne-neuron/doc/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//autofs/homes/001/mj513/Desktop/github_repos/mne-neuron/doc/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//home/mainak/Desktop/projects/github_repos/mne-neuron/doc/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

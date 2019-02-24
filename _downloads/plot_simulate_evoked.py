@@ -3,8 +3,8 @@
 Simulate dipole
 ===============
 
-This example demonstrates how to simulate a dipole using the Neuron
-simulator.
+This example demonstrates how to simulate a dipole for evoked-like
+waveforms using MNE-Neuron.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
