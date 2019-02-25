@@ -142,7 +142,6 @@ class ExtFeed(object):
         return self.eventvec.size() > 0
 
     def __create_extgauss(self):
-        # print("__create_extgauss")
         # assign the params
         if self.p_ext[self.celltype][0] <= 0.0 and \
                 self.p_ext[self.celltype][1] <= 0.0:

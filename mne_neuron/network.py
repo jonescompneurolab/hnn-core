@@ -47,10 +47,6 @@ class NetworkOnNode(object):
         self.n_hosts = int(self.pc.nhost())
         self.rank = int(self.pc.id())
         self.N_src = 0
-        # seed debugging
-        # for key, val in self.p.items():
-        #     if key.startswith('prng_seedcore_'):
-        #         print("in net: %i, %s, %i" % (self.rank, key, val))
         self.N = {}  # numbers of sources
         self.N_cells = 0  # init self.N_cells
         # zdiff is expressed as a positive DEPTH of L5 relative to L2
@@ -72,8 +68,8 @@ class NetworkOnNode(object):
         # sort of a hack bc of redundancy
         self.pos_dict = dict.fromkeys(self.src_list_new)
         # create coords in pos_dict for all cells first
-        self.__create_coords_pyr()
-        self.__create_coords_basket()
+        self._create_coords_pyr()
+        self._create_coords_basket()
         self.__count_cells()
         # create coords for all other sources
         self.__create_coords_extinput()
@@ -82,7 +78,7 @@ class NetworkOnNode(object):
         # create dictionary of GIDs according to cell type
         # global dictionary of gid and cell type
         self.gid_dict = {}
-        self.__create_gid_dict()
+        self._create_gid_dict()
         # assign gid to hosts, creates list of gids for this node in __gid_list
         # __gid_list length is number of cells assigned to this id()
         self.__gid_list = []
@@ -96,14 +92,14 @@ class NetworkOnNode(object):
         for key in self.ext_list.keys():
             self.ext_list[key] = []
         # create sources and init
-        self.__create_all_src()
+        self._create_all_src()
         self.state_init()
         # parallel network connector
         self.__parnet_connect()
         # set to record spikes
         self.spiketimes = h.Vector()
         self.spikegids = h.Vector()
-        self.__record_spikes()
+        self._record_spikes()
 
     # creates the immutable source list along with corresponding numbers
     # of cells
@@ -127,7 +123,7 @@ class NetworkOnNode(object):
         return src_list
 
     # Creates cells and grid
-    def __create_coords_pyr(self):
+    def _create_coords_pyr(self):
         """ pyr grid is the immutable grid, origin now calculated in relation to feed
         """
         xrange = np.arange(self.gridpyr['x'])
@@ -138,8 +134,8 @@ class NetworkOnNode(object):
         self.pos_dict['L5_pyramidal'] = [
             pos for pos in it.product(xrange, yrange, [self.zdiff])]
 
-    # create basket cell coords based on pyr grid
-    def __create_coords_basket(self):
+    def _create_coords_basket(self):
+        """Create basket cell coords based on pyr grid."""
         # define relevant x spacings for basket cells
         xzero = np.arange(0, self.gridpyr['x'], 3)
         xone = np.arange(1, self.gridpyr['x'], 3)
@@ -193,8 +189,8 @@ class NetworkOnNode(object):
         for src in self.extname_list:
             self.N[src] = len(self.pos_dict[src])
 
-    def __create_gid_dict(self):
-        """creates gid dicts and pos_lists."""
+    def _create_gid_dict(self):
+        """Creates gid dicts and pos_lists."""
         # initialize gid index gid_ind to start at 0
         gid_ind = [0]
         # append a new gid_ind based on previous and next cell count
@@ -240,90 +236,90 @@ class NetworkOnNode(object):
         self.__gid_list.sort()
 
     def gid_to_type(self, gid):
-        """reverse lookup of gid to type."""
+        """Reverse lookup of gid to type."""
         for gidtype, gids in self.gid_dict.items():
             if gid in gids:
                 return gidtype
 
-    # parallel create cells AND external inputs (feeds)
-    # these are spike SOURCES but cells are also targets
-    # external inputs are not targets
-    def __create_all_src(self):
+    def _create_all_src(self):
+        """Parallel create cells AND external inputs (feeds)
+           these are spike SOURCES but cells are also targets
+           external inputs are not targets.
+        """
         # loop through gids on this node
         for gid in self.__gid_list:
-            # check existence of gid with Neuron
-            if self.pc.gid_exists(gid):
-                # get type of cell and pos via gid
-                # now should be valid for ext inputs
-                type = self.gid_to_type(gid)
-                type_pos_ind = gid - self.gid_dict[type][0]
-                pos = self.pos_dict[type][type_pos_ind]
-                # figure out which cell type is assoc with the gid
-                # create cells based on loc property
-                # creates a NetCon object internally to Neuron
-                if type == 'L2_pyramidal':
-                    self.cells.append(L2Pyr(gid, pos, self.p))
-                    self.pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.p['threshold']))
-                    # run the IClamp function here
-                    # create_all_IClamp() is defined in L2Pyr (etc)
-                    self.cells[-1].create_all_IClamp(self.p)
-                    if self.p['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
-                elif type == 'L5_pyramidal':
-                    self.cells.append(L5Pyr(gid, pos, self.p))
-                    self.pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.p['threshold']))
-                    # run the IClamp function here
-                    self.cells[-1].create_all_IClamp(self.p)
-                    if self.p['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
-                elif type == 'L2_basket':
-                    self.cells.append(L2Basket(gid, pos))
-                    self.pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.p['threshold']))
-                    # also run the IClamp for L2_basket
-                    self.cells[-1].create_all_IClamp(self.p)
-                    if self.p['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
-                elif type == 'L5_basket':
-                    self.cells.append(L5Basket(gid, pos))
-                    self.pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.p['threshold']))
-                    # run the IClamp function here
-                    self.cells[-1].create_all_IClamp(self.p)
-                    if self.p['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
-                elif type == 'extinput':
-                    # print('type',type)
-                    # to find param index, take difference between REAL gid
-                    # here and gid start point of the items
-                    p_ind = gid - self.gid_dict['extinput'][0]
-                    # now use the param index in the params and create
-                    # the cell and artificial NetCon
-                    self.extinput_list.append(ExtFeed(
-                        type, None, self.p_ext[p_ind], gid))
-                    self.pc.cell(
-                        gid, self.extinput_list[-1].connect_to_target(
-                            self.p['threshold']))
-                elif type in self.p_unique.keys():
-                    gid_post = gid - self.gid_dict[type][0]
-                    cell_type = self.gid_to_type(gid_post)
-                    # create dictionary entry, append to list
-                    self.ext_list[type].append(ExtFeed(
-                        type, cell_type, self.p_unique[type], gid))
-                    self.pc.cell(
-                        gid, self.ext_list[type][-1].connect_to_target(
-                            self.p['threshold']))
-                else:
-                    print("None of these types in Net()")
-                    exit()
+
+            if not self.pc.gid_exists(gid):
+                raise ValueError('GID does not exist. See Cell()')
+
+            # get type of cell and pos via gid
+            # now should be valid for ext inputs
+            type = self.gid_to_type(gid)
+            type_pos_ind = gid - self.gid_dict[type][0]
+            pos = self.pos_dict[type][type_pos_ind]
+            # figure out which cell type is assoc with the gid
+            # create cells based on loc property
+            # creates a NetCon object internally to Neuron
+            if type == 'L2_pyramidal':
+                self.cells.append(L2Pyr(gid, pos, self.p))
+                self.pc.cell(
+                    gid, self.cells[-1].connect_to_target(
+                        None, self.p['threshold']))
+                # run the IClamp function here
+                # create_all_IClamp() is defined in L2Pyr (etc)
+                self.cells[-1].create_all_IClamp(self.p)
+                if self.p['save_vsoma']:
+                    self.cells[-1].record_volt_soma()
+            elif type == 'L5_pyramidal':
+                self.cells.append(L5Pyr(gid, pos, self.p))
+                self.pc.cell(
+                    gid, self.cells[-1].connect_to_target(
+                        None, self.p['threshold']))
+                # run the IClamp function here
+                self.cells[-1].create_all_IClamp(self.p)
+                if self.p['save_vsoma']:
+                    self.cells[-1].record_volt_soma()
+            elif type == 'L2_basket':
+                self.cells.append(L2Basket(gid, pos))
+                self.pc.cell(
+                    gid, self.cells[-1].connect_to_target(
+                        None, self.p['threshold']))
+                # also run the IClamp for L2_basket
+                self.cells[-1].create_all_IClamp(self.p)
+                if self.p['save_vsoma']:
+                    self.cells[-1].record_volt_soma()
+            elif type == 'L5_basket':
+                self.cells.append(L5Basket(gid, pos))
+                self.pc.cell(
+                    gid, self.cells[-1].connect_to_target(
+                        None, self.p['threshold']))
+                # run the IClamp function here
+                self.cells[-1].create_all_IClamp(self.p)
+                if self.p['save_vsoma']:
+                    self.cells[-1].record_volt_soma()
+            elif type == 'extinput':
+                # print('type',type)
+                # to find param index, take difference between REAL gid
+                # here and gid start point of the items
+                p_ind = gid - self.gid_dict['extinput'][0]
+                # now use the param index in the params and create
+                # the cell and artificial NetCon
+                self.extinput_list.append(ExtFeed(
+                    type, None, self.p_ext[p_ind], gid))
+                self.pc.cell(
+                    gid, self.extinput_list[-1].connect_to_target(
+                        self.p['threshold']))
+            elif type in self.p_unique.keys():
+                gid_post = gid - self.gid_dict[type][0]
+                cell_type = self.gid_to_type(gid_post)
+                # create dictionary entry, append to list
+                self.ext_list[type].append(ExtFeed(
+                    type, cell_type, self.p_unique[type], gid))
+                self.pc.cell(
+                    gid, self.ext_list[type][-1].connect_to_target(
+                        self.p['threshold']))
             else:
-                print("GID does not exist. See Cell()")
+                print("None of these types in Net()")
                 exit()
 
     # connections:
@@ -355,7 +351,7 @@ class NetworkOnNode(object):
                         type, gid, self.gid_dict, self.pos_dict, p_type)
 
     # setup spike recording for this node
-    def __record_spikes(self):
+    def _record_spikes(self):
         # iterate through gids on this node and
         # set to record spikes in spike time vec and id vec
         # agnostic to type of source, will sort that out later
@@ -388,20 +384,8 @@ class NetworkOnNode(object):
                     # in parallel, each node has its own Net()
                     self.current['L2Pyr_soma'].add(I_soma)
 
-    # recording debug function
-    def rec_debug(self, rank_exec, gid):
-        # only execute on this rank, make sure called properly
-        if rank_exec == self.rank:
-            # only if the gid exists here
-            # this will break if non-cell source is attempted
-            if gid in self.__gid_list:
-                n = self.__gid_list.index(gid)
-                v = h.Vector()
-                v.record(self.cells[n].soma(0.5)._ref_v)
-                return v
-
-    # initializes the state closer to baseline
     def state_init(self):
+        """Initializes the state closer to baseline."""
         for cell in self.cells:
             seclist = h.SectionList()
             seclist.wholetree(sec=cell.soma)
@@ -423,7 +407,7 @@ class NetworkOnNode(object):
                     elif cell.celltype == 'L5_basket':
                         seg.v = -64.9737
 
-    # move cells 3d positions to positions used for wiring
     def movecellstopos(self):
+        """Move cells 3d positions to positions used for wiring."""
         for cell in self.cells:
             cell.movetopos()

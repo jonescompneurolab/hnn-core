@@ -58,7 +58,7 @@ class Pyr(_Cell):
                            'basal_3'] if key in self.dends]
 
     def set_dend_props(self, p_dend_props):
-        # iterate over keys in p_dend_props. Create dend for each key.
+        """"Iterate over keys in p_dend_props. Create dend for each key."""
         for key in p_dend_props:
             # set dend props
             self.dends[key].L = p_dend_props[key]['L']
@@ -271,14 +271,13 @@ class L2Pyr(Pyr):
         self.p_all = compare_dictionaries(p_all_default, p)
 
         # Get somatic, dendritic, and synapse properties
-        p_soma = self.__get_soma_props(pos)
+        p_soma = self._get_soma_props(pos)
 
         # usage: Pyr.__init__(self, soma_props)
         Pyr.__init__(self, gid, p_soma)
 
         p_dend = self._get_dend_props()
         p_syn = self._get_syn_props()
-        # p_dend_props, dend_names = self.__get_dend_props()
 
         self.celltype = 'L2_pyramidal'
 
@@ -291,8 +290,8 @@ class L2Pyr(Pyr):
         self.geom(p_dend)
 
         # biophysics
-        self.__biophys_soma()
-        self.__biophys_dends()
+        self._biophys_soma()
+        self._biophys_dends()
 
         # dipole_insert() comes from Cell()
         self.yscale = self.get_sectnames()
@@ -306,7 +305,7 @@ class L2Pyr(Pyr):
         self.record_current_soma()
 
     # Returns hardcoded somatic properties
-    def __get_soma_props(self, pos):
+    def _get_soma_props(self, pos):
         return {
             'pos': pos,
             'L': self.p_all['L2Pyr_soma_L'],
@@ -339,17 +338,8 @@ class L2Pyr(Pyr):
         # resets length,diam,etc. based on param specification
         self.set_dend_props(p_dend)
 
-    # Connects sections of THIS cell together
     def topol(self):
-        """ original topol
-        connect dend(0), soma(1)
-        for i = 1, 2 connect dend[i](0), dend(1)
-        connect dend[3](0), dend[2](1)
-        connect dend[4](0), soma(0) //was soma(1), 0 is correct!
-        for i = 5, 6 connect dend[i](0), dend[4](1)
-
-        """
-
+        """Connects sections of THIS cell together."""
         # child.connect(parent, parent_end, {child_start=0})
         # Distal (Apical)
         self.dends['apical_trunk'].connect(self.soma, 1, 0)
@@ -397,8 +387,8 @@ class L2Pyr(Pyr):
         pt3dadd(-50, 715, 0, 1, sec=dend[6])
         pt3dadd(56, 609, 0, 1, sec=dend[6])
 
-    # Adds biophysics to soma
-    def __biophys_soma(self):
+    def _biophys_soma(self):
+        """Adds biophysics to soma."""
         # set soma biophysics specified in Pyr
         # self.pyr_biophys_soma()
 
@@ -414,8 +404,8 @@ class L2Pyr(Pyr):
         self.soma.insert('km')
         self.soma.gbar_km = self.p_all['L2Pyr_soma_gbar_km']
 
-    # Defining biophysics for dendrites
-    def __biophys_dends(self):
+    def _biophys_dends(self):
+        """Defining biophysics for dendrites."""
         # set dend biophysics
         # iterate over keys in self.dends and set biophysics for each dend
         for key in self.dends:
@@ -631,6 +621,49 @@ class L2Pyr(Pyr):
 # units for taur: ms
 
 class L5Pyr(Pyr):
+    """Layer 5 Pyramidal class."""
+
+    def __init__(self, gid=-1, pos=-1, p={}):
+        """Get default L5Pyr params and update them with
+            corresponding params in p."""
+        p_all_default = get_L5Pyr_params_default()
+        self.p_all = compare_dictionaries(p_all_default, p)
+
+        # Get somatic, dendirtic, and synapse properties
+        p_soma = self.__get_soma_props(pos)
+
+        Pyr.__init__(self, gid, p_soma)
+        p_dend = self._get_dend_props()
+        p_syn = self._get_syn_props()
+
+        self.celltype = 'L5_pyramidal'
+
+        # Geometry
+        # dend Cm and dend Ra set using soma Cm and soma Ra
+        self.create_dends(p_dend)  # just creates the sections
+        self.topol()  # sets the connectivity between sections
+        # sets geom properties; adjusted after translation from
+        # hoc (2009 model)
+        self.geom(p_dend)
+
+        # biophysics
+        self.__biophys_soma()
+        self.__biophys_dends()
+
+        # Dictionary of length scales to calculate dipole without
+        # 3d shape. Comes from Pyr().
+        # dipole_insert() comes from Cell()
+        self.yscale = self.get_sectnames()
+        self.dipole_insert(self.yscale)
+
+        # create synapses
+        self._synapse_create(p_syn)
+
+        # insert iclamp
+        self.list_IClamp = []
+
+        # run record current soma, defined in Cell()
+        self.record_current_soma()
 
     def basic_shape(self):
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
@@ -691,50 +724,8 @@ class L5Pyr(Pyr):
         # resets length,diam,etc. based on param specification
         self.set_dend_props(p_dend)
 
-    def __init__(self, gid=-1, pos=-1, p={}):
-        """.Get default L5Pyr params and update them with
-            corresponding params in p."""
-        p_all_default = get_L5Pyr_params_default()
-        self.p_all = compare_dictionaries(p_all_default, p)
-
-        # Get somatic, dendirtic, and synapse properties
-        p_soma = self.__get_soma_props(pos)
-
-        Pyr.__init__(self, gid, p_soma)
-        p_dend = self._get_dend_props()
-        p_syn = self._get_syn_props()
-
-        self.celltype = 'L5_pyramidal'
-
-        # Geometry
-        # dend Cm and dend Ra set using soma Cm and soma Ra
-        self.create_dends(p_dend)  # just creates the sections
-        self.topol()  # sets the connectivity between sections
-        # sets geom properties; adjusted after translation from
-        # hoc (2009 model)
-        self.geom(p_dend)
-
-        # biophysics
-        self.__biophys_soma()
-        self.__biophys_dends()
-
-        # Dictionary of length scales to calculate dipole without
-        # 3d shape. Comes from Pyr().
-        # dipole_insert() comes from Cell()
-        self.yscale = self.get_sectnames()
-        self.dipole_insert(self.yscale)
-
-        # create synapses
-        self._synapse_create(p_syn)
-
-        # insert iclamp
-        self.list_IClamp = []
-
-        # run record current soma, defined in Cell()
-        self.record_current_soma()
-
-    # Sets somatic properties. Returns dictionary.
     def __get_soma_props(self, pos):
+        """Sets somatic properties. Returns dictionary."""
         return {
             'pos': pos,
             'L': self.p_all['L5Pyr_soma_L'],
@@ -744,9 +735,8 @@ class L5Pyr(Pyr):
             'name': 'L5Pyr',
         }
 
-    # connects sections of this cell together
     def topol(self):
-        """Original topol"""
+        """Connects sections of this cell together."""
 
         # child.connect(parent, parent_end, {child_start=0})
         # Distal (apical)
