@@ -1,3 +1,18 @@
+"""
+====================
+Simulate somato data
+====================
+
+This example demonstrates how to simulate the source time
+courses obtained during median nerve stimulation in the MNE
+somatosensory dataset.
+"""
+
+# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+
+###############################################################################
+# First, we will import the packages and define the paths
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -9,6 +24,9 @@ data_path = somato.data_path()
 raw_fname = data_path + '/MEG/somato/sef_raw_sss.fif'
 fwd_fname = data_path + '/MEG/somato/somato-meg-oct-6-fwd.fif'
 subjects_dir = data_path + '/subjects'
+
+###############################################################################
+# Then, we get the raw data and estimage the source time course
 
 raw = mne.io.read_raw_fif(raw_fname, preload=True)
 raw.filter(1, 40)
