@@ -14,7 +14,7 @@ raw = mne.io.read_raw_fif(raw_fname, preload=True)
 raw.filter(1, 40)
 
 events = mne.find_events(raw, stim_channel='STI 014')
-event_id, tmin, tmax = 1, -.2, .2
+event_id, tmin, tmax = 1, -.2, .15
 baseline = None
 epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline=baseline,
                     reject=dict(grad=4000e-13, eog=350e-6), preload=True)
@@ -24,7 +24,7 @@ fwd = mne.read_forward_solution(fwd_fname)
 cov = mne.compute_covariance(epochs)
 inv = make_inverse_operator(epochs.info, fwd, cov)
 
-method = "dSPM"
+method = "MNE"
 snr = 3.
 lambda2 = 1. / snr ** 2
 stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
@@ -33,9 +33,9 @@ stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
 pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
 
 plt.figure()
-plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T, 'bo-')
+plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'bo-')
 plt.xlabel('time (ms)')
-plt.ylabel('%s value' % method)
-plt.xlim((0, 200))
+plt.ylabel('%s value (nAM)' % method)
+plt.xlim((0, 150))
 plt.axhline(0)
 plt.show()
