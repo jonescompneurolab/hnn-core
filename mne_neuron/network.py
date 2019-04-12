@@ -415,8 +415,19 @@ class Network(object):
         for cell in self.cells:
             cell.movetopos()
 
-    def plot_input(self):
-        """Plot the histogram of input."""
+    def plot_input(self, show=True):
+        """Plot the histogram of input.
+
+        Parameters
+        ----------
+        show : bool
+            If True, show the figure
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
         import matplotlib.pyplot as plt
         spikes = self.spiketimes.as_numpy()
         gids = self.spikegids.as_numpy()
@@ -424,6 +435,9 @@ class Network(object):
                            self.gid_dict['evprox2']]
         mask_evprox = np.in1d(gids, valid_gids)
         mask_evdist = np.in1d(gids, self.gid_dict['evdist1'])
-        plt.figure()
+        fig = plt.figure()
         plt.hist(spikes[mask_evprox], 50, color='r')
         plt.hist(spikes[mask_evdist], 10, color='g')
+        if show:
+            plt.show()
+        return fig
