@@ -59,7 +59,8 @@ class Network(object):
         # Global number of external inputs ... automatic counting
         # makes more sense
         # p_unique represent ext inputs that are going to go to each cell
-        self.p_ext, self.p_unique = create_pext(self.params, h.tstop)
+        self.p_ext, self.p_unique = create_pext(self.params,
+                                                self.params['tstop'])
         self.N_extinput = len(self.p_ext)
         # Source list of names
         # in particular order (cells, extinput, alpha names of unique inputs)
@@ -435,9 +436,9 @@ class Network(object):
                            self.gid_dict['evprox2']]
         mask_evprox = np.in1d(gids, valid_gids)
         mask_evdist = np.in1d(gids, self.gid_dict['evdist1'])
-        fig = plt.figure()
-        plt.hist(spikes[mask_evprox], 50, color='r')
-        plt.hist(spikes[mask_evdist], 10, color='g')
+        fig, ax = plt.subplots(1, 1)
+        ax.hist(spikes[mask_evprox], 50, color='r')
+        ax.hist(spikes[mask_evdist], 10, color='g')
         if show:
             plt.show()
         return fig
