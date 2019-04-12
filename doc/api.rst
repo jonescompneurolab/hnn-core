@@ -14,6 +14,7 @@ Simulation (:py:mod:`mne_neuron`):
    :toctree: generated/
 
    simulate_dipole
+   Network
 
 .. currentmodule:: mne_neuron.params
 

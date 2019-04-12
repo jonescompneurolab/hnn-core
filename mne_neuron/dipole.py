@@ -8,8 +8,6 @@ from numpy import convolve, hamming
 
 from neuron import h
 
-from .network import NetworkOnNode
-
 
 def _hammfilt(x, winsz):
     """Convolve with a hamming window."""
@@ -18,13 +16,14 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def simulate_dipole(params):
+def simulate_dipole(net):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
     ----------
-    params : dict
-        The experiment parameters
+    net : Network object
+        The Network object specifying how cells are
+        connected.
 
     Returns
     -------
@@ -38,10 +37,9 @@ def simulate_dipole(params):
     h("dp_total_L5 = 0.")
 
     # Set tstop before instantiating any classes
-    h.tstop = params['tstop']
-    h.dt = params['dt']  # simulation duration and time-step
-    h.celsius = params['celsius']  # 37.0 - set temperature
-    net = NetworkOnNode(params)  # create node-specific network
+    h.tstop = net.params['tstop']
+    h.dt = net.params['dt']  # simulation duration and time-step
+    h.celsius = net.params['celsius']  # 37.0 - set temperature
 
     # We define the arrays (Vector in numpy) for recording the signals
     t_vec = h.Vector()
@@ -92,11 +90,11 @@ def simulate_dipole(params):
     pc.done()
 
     dpl = Dipole(t_vec.as_numpy(), dpl_data)
-    dpl.baseline_renormalize(params)
+    dpl.baseline_renormalize(net.params)
     dpl.convert_fAm_to_nAm()
-    dpl.scale(params['dipole_scalefctr'])
-    dpl.smooth(params['dipole_smooth_win'] / h.dt)
-    return dpl, net
+    dpl.scale(net.params['dipole_scalefctr'])
+    dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
+    return dpl
 
 
 class Dipole(object):

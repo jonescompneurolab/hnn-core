@@ -16,7 +16,7 @@ import os.path as op
 # Let us import mne_neuron
 
 import mne_neuron
-from mne_neuron import simulate_dipole, Params
+from mne_neuron import simulate_dipole, Params, Network
 
 from neuron import h
 
@@ -59,8 +59,10 @@ params['gbar_ev*'] = 0.0
 
 ###############################################################################
 # Now let's simulate the dipole and plot it
-dpl = simulate_dipole(params)
+net = Network(params)
+dpl = simulate_dipole(net)
 dpl.plot()
+net.plot_input()
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity.
