@@ -119,7 +119,7 @@ waveforms using MNE-Neuron.</p>
 </div>
 <p>Let us import mne_neuron</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mne_neuron</span>
-<span class="kn">from</span> <span class="nn">mne_neuron</span> <span class="kn">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">Params</span>
+<span class="kn">from</span> <span class="nn">mne_neuron</span> <span class="kn">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">Params</span><span class="p">,</span> <span class="n">Network</span>
 
 <span class="kn">from</span> <span class="nn">neuron</span> <span class="kn">import</span> <span class="n">h</span>
 </pre></div>
@@ -127,7 +127,6 @@ waveforms using MNE-Neuron.</p>
 <p>Then we setup the directories and Neuron</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mne_neuron_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">mne_neuron</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
 <span class="n">h</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s2">&quot;stdrun.hoc&quot;</span><span class="p">)</span>
-<span class="n">h</span><span class="o">.</span><span class="n">nrn_load_dll</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mne_neuron_root</span><span class="p">,</span> <span class="s2">&quot;x86_64/.libs/libnrnmech.so&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Then we read the parameters file</p>
@@ -400,11 +399,18 @@ parameters using unix-style wildcard characters</p>
 </pre></div>
 </div>
 <p>Now let’s simulate the dipole and plot it</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 <span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">net</span><span class="o">.</span><span class="n">plot_input</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
+<ul class="sphx-glr-horizontal">
+<li><img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_simulate_evoked_002.png" class="sphx-glr-multi-img first" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
+</li>
+</ul>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
@@ -425,7 +431,7 @@ Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
 </pre></div>
 </div>
-<p><strong>Total running time of the script:</strong> ( 1 minutes  17.273 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  59.382 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_simulate_evoked.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_evoked.py</span></code></a></div>

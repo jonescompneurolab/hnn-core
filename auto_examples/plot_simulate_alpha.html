@@ -119,7 +119,7 @@ MNE-Neuron.</p>
 </div>
 <p>Let us import mne_neuron</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mne_neuron</span>
-<span class="kn">from</span> <span class="nn">mne_neuron</span> <span class="kn">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">Params</span>
+<span class="kn">from</span> <span class="nn">mne_neuron</span> <span class="kn">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">Params</span><span class="p">,</span> <span class="n">Network</span>
 
 <span class="kn">from</span> <span class="nn">neuron</span> <span class="kn">import</span> <span class="n">h</span>
 </pre></div>
@@ -406,7 +406,8 @@ by using the pattern gbar_ev*</p>
 </pre></div>
 </div>
 <p>Now let’s simulate the dipole and plot it</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 <span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -494,7 +495,6 @@ Simulation time: 700.0 ms...
 <span class="n">freqs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">psds</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span>
     <span class="n">dpl</span><span class="o">.</span><span class="n">dpl</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">],</span> <span class="n">sfreq</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
     <span class="n">nperseg</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">psds</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
@@ -503,7 +503,7 @@ Simulation time: 700.0 ms...
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_alpha_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_002.png" />
-<p><strong>Total running time of the script:</strong> ( 4 minutes  56.912 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 3 minutes  49.105 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-alpha-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" href="../_downloads/plot_simulate_alpha.py" download=""><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_alpha.py</span></code></a></div>

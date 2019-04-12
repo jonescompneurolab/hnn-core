@@ -38,7 +38,7 @@ Let us import mne_neuron
 
 
     import mne_neuron
-    from mne_neuron import simulate_dipole, Params
+    from mne_neuron import simulate_dipole, Params, Network
 
     from neuron import h
 
@@ -378,7 +378,8 @@ Now let's simulate the dipole and plot it
 
 .. code-block:: python
 
-    dpl = simulate_dipole(params)
+    net = Network(params)
+    dpl = simulate_dipole(net)
     dpl.plot()
 
 
@@ -481,7 +482,6 @@ We can confirm that what we simulate is indeed 10 Hz activity.
     freqs, _, psds = spectrogram(
         dpl.dpl['agg'], sfreq, window='hamming', nfft=n_fft,
         nperseg=n_fft, noverlap=0)
-    plt.figure()
     plt.plot(freqs, np.mean(psds, axis=-1))
     plt.xlim((0, 40))
     plt.xlabel('Frequency (Hz)')
@@ -496,7 +496,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 
 
-**Total running time of the script:** ( 4 minutes  56.912 seconds)
+**Total running time of the script:** ( 3 minutes  49.105 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

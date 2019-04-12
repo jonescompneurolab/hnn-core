@@ -1,0 +1,11 @@
+mne_neuron.Network
+==================
+
+.. currentmodule:: mne_neuron
+
+.. autoclass:: Network
+   :members:
+   :special-members: __getitem__, __repr__
+
+   
+   

@@ -38,7 +38,7 @@ Let us import mne_neuron
 
 
     import mne_neuron
-    from mne_neuron import simulate_dipole, Params
+    from mne_neuron import simulate_dipole, Params, Network
 
     from neuron import h
 
@@ -56,7 +56,6 @@ Then we setup the directories and Neuron
 
     mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
     h.load_file("stdrun.hoc")
-    h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
 
 
@@ -365,13 +364,25 @@ Now let's simulate the dipole and plot it
 
 .. code-block:: python
 
-    dpl = simulate_dipole(params)
+    net = Network(params)
+    dpl = simulate_dipole(net)
     dpl.plot()
+    net.plot_input()
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
-    :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_002.png
+            :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -399,7 +410,7 @@ Now let's simulate the dipole and plot it
     Simulation time: 160.0 ms...
 
 
-**Total running time of the script:** ( 1 minutes  17.273 seconds)
+**Total running time of the script:** ( 0 minutes  59.382 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

@@ -16,7 +16,7 @@ import os.path as op
 # Let us import mne_neuron
 
 import mne_neuron
-from mne_neuron import simulate_dipole, Params
+from mne_neuron import simulate_dipole, Params, Network
 
 from neuron import h
 
@@ -59,7 +59,8 @@ params['gbar_ev*'] = 0.0
 
 ###############################################################################
 # Now let's simulate the dipole and plot it
-dpl = simulate_dipole(params)
+net = Network(params)
+dpl = simulate_dipole(net)
 dpl.plot()
 
 ###############################################################################
@@ -72,7 +73,6 @@ n_fft = 1024 * 8
 freqs, _, psds = spectrogram(
     dpl.dpl['agg'], sfreq, window='hamming', nfft=n_fft,
     nperseg=n_fft, noverlap=0)
-plt.figure()
 plt.plot(freqs, np.mean(psds, axis=-1))
 plt.xlim((0, 40))
 plt.xlabel('Frequency (Hz)')

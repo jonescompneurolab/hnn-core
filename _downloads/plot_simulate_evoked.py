@@ -16,7 +16,7 @@ import os.path as op
 # Let us import mne_neuron
 
 import mne_neuron
-from mne_neuron import simulate_dipole, Params
+from mne_neuron import simulate_dipole, Params, Network
 
 from neuron import h
 
@@ -24,7 +24,6 @@ from neuron import h
 # Then we setup the directories and Neuron
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
-h.nrn_load_dll(op.join(mne_neuron_root, "x86_64/.libs/libnrnmech.so"))
 
 ###############################################################################
 # Then we read the parameters file
@@ -39,5 +38,7 @@ print(params['L2Pyr_soma*'])
 
 ###############################################################################
 # Now let's simulate the dipole and plot it
-dpl = simulate_dipole(params)
+net = Network(params)
+dpl = simulate_dipole(net)
 dpl.plot()
+net.plot_input()
