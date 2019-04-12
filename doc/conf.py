@@ -181,3 +181,7 @@ sphinx_gallery_conf = {
         'mne_neuron': 'https://jasmainak.github.io/mne-neuron/'
     }
 }
+
+from neuron import h
+
+h.nrn_load_dll("../x86_64/.libs/libnrnmech.so")
