@@ -138,7 +138,7 @@
 <tr class="row-odd"><td><a class="reference internal" href="#mne_neuron.Network.movecellstopos" title="mne_neuron.Network.movecellstopos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">movecellstopos</span></code></a>()</td>
 <td>Move cells 3d positions to positions used for wiring.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#mne_neuron.Network.plot_input" title="mne_neuron.Network.plot_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_input</span></code></a>([show])</td>
+<tr class="row-even"><td><a class="reference internal" href="#mne_neuron.Network.plot_input" title="mne_neuron.Network.plot_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_input</span></code></a>([ax,&nbsp;show])</td>
 <td>Plot the histogram of input.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#mne_neuron.Network.state_init" title="mne_neuron.Network.state_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_init</span></code></a>()</td>
@@ -177,15 +177,19 @@
 
 <dl class="method">
 <dt id="mne_neuron.Network.plot_input">
-<code class="descname">plot_input</code><span class="sig-paren">(</span><em>show=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.Network.plot_input" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_input</code><span class="sig-paren">(</span><em>ax=None</em>, <em>show=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.Network.plot_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the histogram of input.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">instance of matplotlib axis | None</span></dt>
+<dd><p class="first last">An axis object from matplotlib. If None,
+a new figure is created.</p>
+</dd>
 <dt><strong>show</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">If True, show the figure</p>
+<dd><p class="first last">If True, show the figure.</p>
 </dd>
 </dl>
 </td>

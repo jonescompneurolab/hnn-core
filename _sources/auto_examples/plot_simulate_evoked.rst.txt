@@ -358,7 +358,7 @@ parameters using unix-style wildcard characters
     }
 
 
-Now let's simulate the dipole and plot it
+Now let's simulate the dipole
 
 
 
@@ -366,23 +366,9 @@ Now let's simulate the dipole and plot it
 
     net = Network(params)
     dpl = simulate_dipole(net)
-    dpl.plot()
-    net.plot_input()
 
 
 
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_002.png
-            :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -410,7 +396,26 @@ Now let's simulate the dipole and plot it
     Simulation time: 160.0 ms...
 
 
-**Total running time of the script:** ( 0 minutes  59.382 seconds)
+and then plot it
+
+
+
+.. code-block:: python
+
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(2, 1, figsize=(6, 6))
+    dpl.plot(ax=axes[0])
+    net.plot_input(ax=axes[1])
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
+    :class: sphx-glr-single-img
+
+
+
+
+**Total running time of the script:** ( 1 minutes  4.398 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:
