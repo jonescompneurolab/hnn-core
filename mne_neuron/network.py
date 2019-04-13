@@ -448,3 +448,42 @@ class Network(object):
         if show:
             plt.show()
         return ax.get_figure()
+
+    def plot_spikes(self, ax=None, show=True):
+        """Plot the spiking activity for each cell type.
+
+        Parameters
+        ----------
+        ax : instance of matplotlib axis | None
+            An axis object from matplotlib. If None,
+            a new figure is created.
+        show : bool
+            If True, show the figure.
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure object
+        """
+        import matplotlib.pyplot as plt
+        spikes = np.array(self.spiketimes.to_python())
+        gids = np.array(self.spikegids.to_python())
+        spike_times = np.zeros((4, spikes.shape[0]))
+        cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+        for idx, key in enumerate(cell_types):
+            mask = np.in1d(gids, self.gid_dict[key])
+            spike_times[idx, mask] = spikes[mask]
+
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
+
+        ax.eventplot(spike_times, colors=['r', 'b', 'g', 'w'])
+        ax.legend(cell_types, ncol=2)
+        ax.set_facecolor('k')
+        ax.set_xlabel('Time (ms)')
+        ax.get_yaxis().set_visible(False)
+        ax.set_ylim((-1, 4.5))
+
+        if show:
+            plt.show()
+        return ax.get_figure()
