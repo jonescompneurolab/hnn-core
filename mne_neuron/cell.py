@@ -28,7 +28,6 @@ class _Cell(object):
 
     def __init__(self, gid, soma_props):
         self.gid = gid
-        self.pc = h.ParallelContext()  # Parallel methods
         # make L_soma and diam_soma elements of self
         # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
         self.L = soma_props['L']
