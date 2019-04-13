@@ -416,13 +416,16 @@ class Network(object):
         for cell in self.cells:
             cell.movetopos()
 
-    def plot_input(self, show=True):
+    def plot_input(self, ax=None, show=True):
         """Plot the histogram of input.
 
         Parameters
         ----------
+        ax : instance of matplotlib axis | None
+            An axis object from matplotlib. If None,
+            a new figure is created.
         show : bool
-            If True, show the figure
+            If True, show the figure.
 
         Returns
         -------
@@ -430,15 +433,18 @@ class Network(object):
             The matplotlib figure handle.
         """
         import matplotlib.pyplot as plt
-        spikes = self.spiketimes.as_numpy()
-        gids = self.spikegids.as_numpy()
+        spikes = np.array(self.spiketimes.to_python())
+        gids = np.array(self.spikegids.to_python())
         valid_gids = np.r_[self.gid_dict['evprox1'],
                            self.gid_dict['evprox2']]
         mask_evprox = np.in1d(gids, valid_gids)
         mask_evdist = np.in1d(gids, self.gid_dict['evdist1'])
-        fig, ax = plt.subplots(1, 1)
-        ax.hist(spikes[mask_evprox], 50, color='r')
-        ax.hist(spikes[mask_evdist], 10, color='g')
+
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
+        ax.hist(spikes[mask_evprox], 50, color='r', label='Proximal')
+        ax.hist(spikes[mask_evdist], 10, color='g', label='Distal')
+        plt.legend()
         if show:
             plt.show()
-        return fig
+        return ax.get_figure()

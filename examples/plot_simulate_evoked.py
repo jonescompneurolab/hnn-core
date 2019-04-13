@@ -37,8 +37,13 @@ print(params)
 print(params['L2Pyr_soma*'])
 
 ###############################################################################
-# Now let's simulate the dipole and plot it
+# Now let's simulate the dipole
 net = Network(params)
 dpl = simulate_dipole(net)
-dpl.plot()
-net.plot_input()
+
+###############################################################################
+# and then plot it
+import matplotlib.pyplot as plt
+fig, axes = plt.subplots(2, 1, figsize=(6, 6))
+dpl.plot(ax=axes[0])
+net.plot_input(ax=axes[1])

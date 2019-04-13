@@ -80,8 +80,10 @@ def simulate_dipole(net):
     # combine net.current{} variables on each proc
     pc.allreduce(net.current['L5Pyr_soma'], 1)
     pc.allreduce(net.current['L2Pyr_soma'], 1)
-    dpl_data = np.c_[dp_rec_L2.as_numpy() + dp_rec_L5.as_numpy(),
-                     dp_rec_L2.as_numpy(), dp_rec_L5.as_numpy()]
+    dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
+                     np.array(dp_rec_L5.to_python()),
+                     np.array(dp_rec_L2.to_python()),
+                     np.array(dp_rec_L5.to_python())]
 
     pc.barrier()  # get all nodes to this place before continuing
     pc.gid_clear()
@@ -89,7 +91,7 @@ def simulate_dipole(net):
     pc.runworker()
     pc.done()
 
-    dpl = Dipole(t_vec.as_numpy(), dpl_data)
+    dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
     dpl.baseline_renormalize(net.params)
     dpl.convert_fAm_to_nAm()
     dpl.scale(net.params['dipole_scalefctr'])
@@ -143,13 +145,17 @@ class Dipole(object):
         for key in self.dpl.keys():
             self.dpl[key] = _hammfilt(self.dpl[key], winsz)
 
-    def plot(self, layer='agg'):
+    def plot(self, ax=None, layer='agg'):
         """Simple layer-specific plot function.
 
         Parameters
         ----------
+        ax : instance of matplotlib figure | None
+            The matplotlib axis
         layer : str
             The layer to plot
+        show : bool
+            If True, show the figure
 
         Returns
         -------
@@ -157,11 +163,14 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         import matplotlib.pyplot as plt
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
         if layer in self.dpl.keys():
-            fig = plt.plot(self.t, self.dpl[layer])
-            plt.xlabel('Time (ms)')
-        plt.show()
-        return fig
+            ax.plot(self.t, self.dpl[layer])
+            ax.set_xlabel('Time (ms)')
+        if True:
+            plt.show()
+        return ax.get_figure()
 
     def baseline_renormalize(self, params):
         """Only baseline renormalize if the units are fAm.
