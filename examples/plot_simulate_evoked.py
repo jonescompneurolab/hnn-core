@@ -47,6 +47,7 @@ import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 dpl.plot(ax=axes[0])
 net.plot_input(ax=axes[1])
+
 ###############################################################################
 # Finally, we can also plot the spikes.
 net.plot_spikes()

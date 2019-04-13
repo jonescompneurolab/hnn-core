@@ -30,8 +30,6 @@ def simulate_dipole(net):
     dpl: instance of Dipole
         The dipole object
     """
-    pc = h.ParallelContext(1)
-
     # global variables, should be node-independent
     h("dp_total_L2 = 0.")
     h("dp_total_L5 = 0.")
@@ -51,9 +49,6 @@ def simulate_dipole(net):
 
     net.movecellstopos()  # position cells in 2D grid
 
-    # sets the default max solver step in ms (purposefully large)
-    pc.set_maxstep(10)
-
     # initialize cells to -65 mV, after all the NetCon
     # delays have been specified
     h.finitialize()
@@ -69,27 +64,15 @@ def simulate_dipole(net):
     # set state variables if they have been changed since h.finitialize
     h.frecord_init()
     # actual simulation - run the solver
-    pc.psolve(h.tstop)
+    h.stdinit()
+    h.continuerun(h.tstop)
 
-    # these calls aggregate data across procs/nodes
-    pc.allreduce(dp_rec_L2, 1)
-    # combine dp_rec on every node, 1=add contributions together
-    pc.allreduce(dp_rec_L5, 1)
     # aggregate the currents independently on each proc
     net.aggregate_currents()
-    # combine net.current{} variables on each proc
-    pc.allreduce(net.current['L5Pyr_soma'], 1)
-    pc.allreduce(net.current['L2Pyr_soma'], 1)
     dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
                      np.array(dp_rec_L5.to_python()),
                      np.array(dp_rec_L2.to_python()),
                      np.array(dp_rec_L5.to_python())]
-
-    pc.barrier()  # get all nodes to this place before continuing
-    pc.gid_clear()
-
-    pc.runworker()
-    pc.done()
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
     dpl.baseline_renormalize(net.params)

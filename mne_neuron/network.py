@@ -388,6 +388,16 @@ class Network(object):
                     # in parallel, each node has its own Net()
                     self.current['L2Pyr_soma'].add(I_soma)
 
+    def reset_src_event_times(self, seed=None, inc_evinput=0.0):
+        for feed in self.extinput_list:
+            feed.set_prng(seed)
+            feed.set_event_times(inc_evinput)
+
+        for k, lfeed in self.ext_list.items():
+            for feed in lfeed:
+                feed.set_prng(seed)
+        feed.set_event_times(inc_evinput)
+
     def state_init(self):
         """Initializes the state closer to baseline."""
         for cell in self.cells:
