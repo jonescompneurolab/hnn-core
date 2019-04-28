@@ -4,7 +4,9 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
-from numpy import convolve, hamming
+from numpy import convolve, hamming, array, loadtxt, sqrt
+from scipy import signal
+import time
 
 from neuron import h
 
@@ -15,7 +17,6 @@ def _hammfilt(x, winsz):
     win /= sum(win)
     return convolve(x, win, 'same')
 
-
 def simulate_dipole(net):
     """Simulate a dipole given the experiment parameters.
 
@@ -24,13 +25,20 @@ def simulate_dipole(net):
     net : Network object
         The Network object specifying how cells are
         connected.
-
     Returns
     -------
     dpl: instance of Dipole
         The dipole object
     """
-    pc = h.ParallelContext(1)
+    from . import Network, Params, sim
+
+    # load neuron
+    from neuron import h
+    h.load_file("stdrun.hoc")
+
+    # Now let's simulate the dipole
+    if sim.rank==0:
+      print("running on %d cores"%sim.nhosts)
 
     # global variables, should be node-independent
     h("dp_total_L2 = 0.")
@@ -51,8 +59,10 @@ def simulate_dipole(net):
 
     net.movecellstopos()  # position cells in 2D grid
 
+    t0 = time.time() # clock start time
+
     # sets the default max solver step in ms (purposefully large)
-    pc.set_maxstep(10)
+    sim.pc.set_maxstep(10)
 
     # initialize cells to -65 mV, after all the NetCon
     # delays have been specified
@@ -62,40 +72,51 @@ def simulate_dipole(net):
         print('Simulation time: {0} ms...'.format(round(h.t, 2)))
 
     printdt = 10
-    for tt in range(0, int(h.tstop), printdt):
-        h.cvode.event(tt, prsimtime)  # print time callbacks
+    if sim.rank == 0:
+        for tt in range(0, int(h.tstop), printdt):
+            sim.cvode.event(tt, prsimtime)  # print time callbacks
 
     h.fcurrent()
     # set state variables if they have been changed since h.finitialize
     h.frecord_init()
     # actual simulation - run the solver
-    pc.psolve(h.tstop)
+    sim.pc.psolve(h.tstop)
+
+    sim.pc.barrier()
 
     # these calls aggregate data across procs/nodes
-    pc.allreduce(dp_rec_L2, 1)
+    sim.pc.allreduce(dp_rec_L2, 1)
     # combine dp_rec on every node, 1=add contributions together
-    pc.allreduce(dp_rec_L5, 1)
+    sim.pc.allreduce(dp_rec_L5, 1)
     # aggregate the currents independently on each proc
     net.aggregate_currents()
     # combine net.current{} variables on each proc
-    pc.allreduce(net.current['L5Pyr_soma'], 1)
-    pc.allreduce(net.current['L2Pyr_soma'], 1)
+    sim.pc.allreduce(net.current['L5Pyr_soma'], 1)
+    sim.pc.allreduce(net.current['L2Pyr_soma'], 1)
+
+    sim.pc.barrier()  # get all nodes to this place before continuing
+
     dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
                      np.array(dp_rec_L5.to_python()),
                      np.array(dp_rec_L2.to_python()),
                      np.array(dp_rec_L5.to_python())]
 
-    pc.barrier()  # get all nodes to this place before continuing
-    pc.gid_clear()
+    if sim.rank==0:
+        print("Simulation run time: %4.4f s" % (time.time()-t0))
 
-    pc.runworker()
-    pc.done()
+    sim.pc.gid_clear()
+    #pc.runworker()
+    sim.pc.done()
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
-    dpl.baseline_renormalize(net.params)
-    dpl.convert_fAm_to_nAm()
-    dpl.scale(net.params['dipole_scalefctr'])
-    dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
+
+    err = 0
+    if sim.rank==0:
+        dpl.baseline_renormalize(net.params)
+        dpl.convert_fAm_to_nAm()
+        dpl.scale(net.params['dipole_scalefctr'])
+        dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
+
     return dpl
 
 
@@ -162,7 +183,12 @@ class Dipole(object):
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        import matplotlib.pyplot as plt
+        from sys import platform as sys_pf
+        if sys_pf == 'darwin':
+            import matplotlib
+            matplotlib.use("TkAgg")
+        from matplotlib import pyplot as plt
+
         if ax is None:
             fig, ax = plt.subplots(1, 1)
         if layer in self.dpl.keys():
