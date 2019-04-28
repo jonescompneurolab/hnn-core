@@ -28,7 +28,6 @@ class _Cell(object):
 
     def __init__(self, gid, soma_props):
         self.gid = gid
-        self.pc = h.ParallelContext()  # Parallel methods
         # make L_soma and diam_soma elements of self
         # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
         self.L = soma_props['L']
@@ -299,7 +298,9 @@ class _Cell(object):
         nc : instance of h.NetCon
             A network connection object.
         """
-        nc = self.pc.gid_connect(gid_presyn, postsyn)
+        from mne_neuron import sim
+
+        nc = sim.pc.gid_connect(gid_presyn, postsyn)
         # calculate distance between cell positions with pardistance()
         d = self.__pardistance(nc_dict['pos_src'])
         # set props here
