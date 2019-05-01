@@ -51,9 +51,64 @@ stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
 pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
 
 plt.figure()
-plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'bo-')
+plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'ro-')
 plt.xlabel('time (ms)')
 plt.ylabel('%s value (nAM)' % method)
 plt.xlim((0, 150))
 plt.axhline(0)
 plt.show()
+
+###############################################################################
+# Now, let us try to simulate the same with MNE-neuron
+
+import os.path as op
+
+import mne_neuron
+from mne_neuron import simulate_dipole, Params, Network
+
+from neuron import h
+
+mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+h.load_file("stdrun.hoc")
+
+params_fname = op.join(mne_neuron_root, 'param', 'default.json')
+params = Params(params_fname)
+
+params.update({
+    "tstop": 120,
+    "gbar_L2Pyr_L2Pyr_ampa": 0.0002,
+    "gbar_L2Pyr_L2Pyr_nmda": 0.0002,
+    "gbar_L5Pyr_L5Pyr_ampa": 0.001,
+    "gbar_L2Pyr_L5Pyr": 0.0002,
+    "gbar_L2Basket_L5Pyr": 0.002,
+    "gbar_L5Basket_L5Pyr_gabaa": 0.02,
+    "gbar_L5Basket_L5Pyr_gabab": 0.06,
+    "t0_input_prox": 50.0,
+    "tstop_input_prox": 710.0,
+    "t0_input_dist": 50.0,
+    "tstop_input_dist": 710.0,
+    "sync_evinput": 1,
+    "f_max_spec": 40.0,
+    "dipole_scalefctr": 30,
+    "dipole_smooth_win": 5,
+    "gbar_evprox_1_L2Pyr_ampa": 0.0025,
+    "gbar_evprox_1_L5Pyr_ampa": 0.001,
+    "gbar_evprox_1_L2Basket_ampa": 0.003,
+    "gbar_evprox_1_L2Basket_nmda": 0.003,
+    "gbar_evprox_1_L5Basket_ampa": 0.004,
+    "gbar_evprox_1_L5Basket_nmda": 0.004,
+    "t_evprox_1": 20,
+    "sigma_t_evprox_1": 3.0,
+    "gbar_evdist_1_L2Pyr_ampa": 0.0045,
+    "gbar_evdist_1_L2Pyr_nmda": 0.0045,
+    "gbar_evdist_1_L5Pyr_ampa": 0.001,
+    "gbar_evdist_1_L5Pyr_nmda": 0.001,
+    "gbar_evdist_1_L2Basket_ampa": 0.003,
+    "gbar_evdist_1_L2Basket_nmda": 0.003,
+    "t_evdist_1": 32,
+    "sigma_t_evdist_1": 3.0,
+})
+
+net = Network(params)
+dpl = simulate_dipole(net)
+dpl.plot(ax=plt.gca())
