@@ -66,10 +66,7 @@ import os.path as op
 import mne_neuron
 from mne_neuron import simulate_dipole, Params, Network
 
-from neuron import h
-
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
-h.load_file("stdrun.hoc")
 
 params_fname = op.join(mne_neuron_root, 'param', 'N20.json')
 params = Params(params_fname)
