@@ -1,0 +1,280 @@
+.. note::
+    :class: sphx-glr-download-link-note
+
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_somato.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
+
+.. _sphx_glr_auto_examples_plot_simulate_somato.py:
+
+
+====================
+Simulate somato data
+====================
+
+This example demonstrates how to simulate the source time
+courses obtained during median nerve stimulation in the MNE
+somatosensory dataset.
+
+
+
+.. code-block:: python
+
+
+    # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+
+
+
+
+
+
+
+First, we will import the packages and define the paths
+
+
+
+.. code-block:: python
+
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    import mne
+    from mne.datasets import somato
+    from mne.minimum_norm import apply_inverse, make_inverse_operator
+
+    data_path = somato.data_path()
+    raw_fname = data_path + '/MEG/somato/sef_raw_sss.fif'
+    fwd_fname = data_path + '/MEG/somato/somato-meg-oct-6-fwd.fif'
+    subjects_dir = data_path + '/subjects'
+
+
+
+
+
+
+
+Then, we get the raw data and estimage the source time course
+
+
+
+.. code-block:: python
+
+
+    raw = mne.io.read_raw_fif(raw_fname, preload=True)
+    raw.filter(1, 40)
+
+    events = mne.find_events(raw, stim_channel='STI 014')
+    event_id, tmin, tmax = 1, -.2, .15
+    baseline = None
+    epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline=baseline,
+                        reject=dict(grad=4000e-13, eog=350e-6), preload=True)
+    evoked = epochs.average()
+
+    fwd = mne.read_forward_solution(fwd_fname)
+    cov = mne.compute_covariance(epochs)
+    inv = make_inverse_operator(epochs.info, fwd, cov)
+
+    method = "MNE"
+    snr = 3.
+    lambda2 = 1. / snr ** 2
+    stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
+                        return_residual=False, verbose=True)
+
+    pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
+
+    plt.figure()
+    plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'ro-')
+    plt.xlabel('time (ms)')
+    plt.ylabel('%s value (nAM)' % method)
+    plt.xlim((0, 150))
+    plt.axhline(0)
+    plt.show()
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_simulate_somato_001.png
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Opening raw data file /local_mount/space/meghnn/1/users/mjas/mne_data/MNE-somato-data/MEG/somato/sef_raw_sss.fif...
+        Range : 237600 ... 506999 =    791.189 ...  1688.266 secs
+    Ready.
+    Current compensation grade : 0
+    Reading 0 ... 269399  =      0.000 ...   897.077 secs...
+    Filtering raw data in 1 contiguous segment
+    Setting up band-pass filter from 1 - 40 Hz
+    l_trans_bandwidth chosen to be 1.0 Hz
+    h_trans_bandwidth chosen to be 10.0 Hz
+    Filter length of 991 samples (3.300 sec) selected
+    111 events found
+    Event IDs: [1]
+    111 matching events found
+    No baseline correction applied
+    Not setting metadata
+    0 projection items activated
+    Loading data for 111 events and 106 original time points ...
+    0 bad epochs dropped
+    Reading forward solution from /local_mount/space/meghnn/1/users/mjas/mne_data/MNE-somato-data/MEG/somato/somato-meg-oct-6-fwd.fif...
+        Reading a source space...
+        [done]
+        Reading a source space...
+        [done]
+        2 source spaces read
+        Desired named matrix (kind = 3523) not available
+        Read MEG forward solution (8155 sources, 306 channels, free orientations)
+        Source spaces transformed to the forward solution coordinate frame
+    Computing data rank from raw with rank=None
+    Using tolerance 1.4e-08 (2.2e-16 eps * 306 dim * 2.1e+05 max  singular value)
+    Estimated rank (mag + grad): 306
+        MEG: rank 306 computed from 0s data channels with 306 projectors
+    Reducing data rank from 306 -> 306
+    Estimating covariance using EMPIRICAL
+    Done.
+    Number of samples used : 11766
+    [done]
+    Converting forward solution to surface orientation
+        No patch info available. The standard source space normals will be employed in the rotation to the local surface coordinates....
+        Converting to surface-based source orientations...
+        [done]
+    Computing inverse operator with 306 channels.
+        306 out of 306 channels remain after picking
+    Selected 306 channels
+    Creating the depth weighting matrix...
+        204 planar channels
+        limit = 7615/8155 = 10.004172
+        scale = 5.17919e-08 exp = 0.8
+    Applying loose dipole orientations. Loose value of 0.2.
+    Whitening the forward solution.
+    Computing data rank from covariance with rank=None
+    Using tolerance 2e-12 (2.2e-16 eps * 306 dim * 29 max  singular value)
+    estimated rank (mag + grad): 64
+        MEG: rank 64 computed from 0s data channels with 306 projectors
+    Setting small MEG eigenvalues to zero.
+    Not doing PCA for MEG.
+    Computing data rank from covariance with rank=None
+    Using tolerance 2e-12 (2.2e-16 eps * 306 dim * 29 max  singular value)
+    estimated rank (mag + grad): 64
+        MEG: rank 64 computed from 0s data channels with 306 projectors
+    Setting small MEG eigenvalues to zero.
+    Not doing PCA for MEG.
+        Created the whitener using a noise covariance matrix with rank 64 (242 small eigenvalues omitted)
+    Creating the source covariance matrix
+    Adjusting source covariance matrix.
+    Computing SVD of whitened and weighted lead field matrix.
+        largest singular value = 2.41945
+        scaling factor to adjust the trace = 3.87864e+18
+    Preparing the inverse operator for use...
+        Scaled noise and source covariance from nave = 1 to nave = 111
+        Created the regularized inverter
+        The projection vectors do not apply to these channels.
+        Created the whitener using a noise covariance matrix with rank 64 (242 small eigenvalues omitted)
+    Applying inverse operator to "1"...
+        Picked 306 channels from the data
+        Computing inverse...
+        Eigenleads need to be weighted ...
+        Computing residual...
+        Explained  86.1% variance
+    [done]
+
+
+Now, let us try to simulate the same with MNE-neuron
+
+
+
+.. code-block:: python
+
+
+    import os.path as op
+
+    import mne_neuron
+    from mne_neuron import simulate_dipole, Params, Network
+
+    from neuron import h
+
+    mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+    h.load_file("stdrun.hoc")
+
+    params_fname = op.join(mne_neuron_root, 'param', 'N20.json')
+    params = Params(params_fname)
+
+    net = Network(params)
+    dpl = simulate_dipole(net)
+
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
+    dpl.plot(ax=axes[0])
+    net.plot_input(ax=axes[1])
+    net.plot_spikes()
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_somato_002.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_somato_003.png
+            :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Simulation time: 0.03 ms...
+    Simulation time: 10.0 ms...
+    Simulation time: 20.0 ms...
+    Simulation time: 30.0 ms...
+    Simulation time: 40.0 ms...
+    Simulation time: 50.0 ms...
+    Simulation time: 60.0 ms...
+    Simulation time: 70.0 ms...
+    Simulation time: 80.0 ms...
+    Simulation time: 90.0 ms...
+    Simulation time: 100.0 ms...
+    Simulation time: 110.0 ms...
+
+
+**Total running time of the script:** ( 0 minutes  41.730 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_simulate_somato.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: plot_simulate_somato.py <plot_simulate_somato.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: plot_simulate_somato.ipynb <plot_simulate_somato.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
