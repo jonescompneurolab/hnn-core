@@ -435,15 +435,18 @@ class Network(object):
         import matplotlib.pyplot as plt
         spikes = np.array(self.spiketimes.to_python())
         gids = np.array(self.spikegids.to_python())
-        valid_gids = np.r_[self.gid_dict['evprox1'],
-                           self.gid_dict['evprox2']]
+        valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
+                            if k.startswith('evprox')]]
         mask_evprox = np.in1d(gids, valid_gids)
-        mask_evdist = np.in1d(gids, self.gid_dict['evdist1'])
+        valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
+                            if k.startswith('evdist')]]
+        mask_evdist = np.in1d(gids, valid_gids)
+        bins = np.linspace(0, self.params['tstop'], 50)
 
         if ax is None:
             fig, ax = plt.subplots(1, 1)
-        ax.hist(spikes[mask_evprox], 50, color='r', label='Proximal')
-        ax.hist(spikes[mask_evdist], 10, color='g', label='Distal')
+        ax.hist(spikes[mask_evprox], bins, color='r', label='Proximal')
+        ax.hist(spikes[mask_evdist], bins, color='g', label='Distal')
         plt.legend()
         if show:
             plt.show()

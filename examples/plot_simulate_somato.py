@@ -71,44 +71,14 @@ from neuron import h
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
 
-params_fname = op.join(mne_neuron_root, 'param', 'default.json')
+params_fname = op.join(mne_neuron_root, 'param', 'N20.json')
 params = Params(params_fname)
-
-params.update({
-    "tstop": 120,
-    "gbar_L2Pyr_L2Pyr_ampa": 0.0002,
-    "gbar_L2Pyr_L2Pyr_nmda": 0.0002,
-    "gbar_L5Pyr_L5Pyr_ampa": 0.001,
-    "gbar_L2Pyr_L5Pyr": 0.0002,
-    "gbar_L2Basket_L5Pyr": 0.002,
-    "gbar_L5Basket_L5Pyr_gabaa": 0.02,
-    "gbar_L5Basket_L5Pyr_gabab": 0.06,
-    "t0_input_prox": 50.0,
-    "tstop_input_prox": 710.0,
-    "t0_input_dist": 50.0,
-    "tstop_input_dist": 710.0,
-    "sync_evinput": 1,
-    "f_max_spec": 40.0,
-    "dipole_scalefctr": 30,
-    "dipole_smooth_win": 5,
-    "gbar_evprox_1_L2Pyr_ampa": 0.0025,
-    "gbar_evprox_1_L5Pyr_ampa": 0.001,
-    "gbar_evprox_1_L2Basket_ampa": 0.003,
-    "gbar_evprox_1_L2Basket_nmda": 0.003,
-    "gbar_evprox_1_L5Basket_ampa": 0.004,
-    "gbar_evprox_1_L5Basket_nmda": 0.004,
-    "t_evprox_1": 20,
-    "sigma_t_evprox_1": 3.0,
-    "gbar_evdist_1_L2Pyr_ampa": 0.0045,
-    "gbar_evdist_1_L2Pyr_nmda": 0.0045,
-    "gbar_evdist_1_L5Pyr_ampa": 0.001,
-    "gbar_evdist_1_L5Pyr_nmda": 0.001,
-    "gbar_evdist_1_L2Basket_ampa": 0.003,
-    "gbar_evdist_1_L2Basket_nmda": 0.003,
-    "t_evdist_1": 32,
-    "sigma_t_evdist_1": 3.0,
-})
 
 net = Network(params)
 dpl = simulate_dipole(net)
-dpl.plot(ax=plt.gca())
+
+import matplotlib.pyplot as plt
+fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
+dpl.plot(ax=axes[0])
+net.plot_input(ax=axes[1])
+net.plot_spikes()
