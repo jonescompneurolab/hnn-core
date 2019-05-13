@@ -4,11 +4,7 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
-from numpy import convolve, hamming, array, loadtxt, sqrt
-from scipy import signal
-import time
-
-from neuron import h
+from numpy import convolve, hamming
 
 
 def _hammfilt(x, winsz):
@@ -16,6 +12,7 @@ def _hammfilt(x, winsz):
     win = hamming(winsz)
     win /= sum(win)
     return convolve(x, win, 'same')
+
 
 def simulate_dipole(net):
     """Simulate a dipole given the experiment parameters.
@@ -30,15 +27,13 @@ def simulate_dipole(net):
     dpl: instance of Dipole
         The dipole object
     """
-    from . import Network, Params, sim
-
-    # load neuron
+    from .sim import rank, nhosts, pc, cvode
     from neuron import h
     h.load_file("stdrun.hoc")
 
     # Now let's simulate the dipole
-    if sim.rank==0:
-      print("running on %d cores"%sim.nhosts)
+    if rank == 0:
+        print("running on %d cores" % nhosts)
 
     # global variables, should be node-independent
     h("dp_total_L2 = 0.")
@@ -59,10 +54,8 @@ def simulate_dipole(net):
 
     net.movecellstopos()  # position cells in 2D grid
 
-    t0 = time.time() # clock start time
-
     # sets the default max solver step in ms (purposefully large)
-    sim.pc.set_maxstep(10)
+    pc.set_maxstep(10)
 
     # initialize cells to -65 mV, after all the NetCon
     # delays have been specified
@@ -72,46 +65,41 @@ def simulate_dipole(net):
         print('Simulation time: {0} ms...'.format(round(h.t, 2)))
 
     printdt = 10
-    if sim.rank == 0:
+    if rank == 0:
         for tt in range(0, int(h.tstop), printdt):
-            sim.cvode.event(tt, prsimtime)  # print time callbacks
+            cvode.event(tt, prsimtime)  # print time callbacks
 
     h.fcurrent()
     # set state variables if they have been changed since h.finitialize
     h.frecord_init()
     # actual simulation - run the solver
-    sim.pc.psolve(h.tstop)
+    pc.psolve(h.tstop)
 
-    sim.pc.barrier()
+    pc.barrier()
 
     # these calls aggregate data across procs/nodes
-    sim.pc.allreduce(dp_rec_L2, 1)
+    pc.allreduce(dp_rec_L2, 1)
     # combine dp_rec on every node, 1=add contributions together
-    sim.pc.allreduce(dp_rec_L5, 1)
+    pc.allreduce(dp_rec_L5, 1)
     # aggregate the currents independently on each proc
     net.aggregate_currents()
     # combine net.current{} variables on each proc
-    sim.pc.allreduce(net.current['L5Pyr_soma'], 1)
-    sim.pc.allreduce(net.current['L2Pyr_soma'], 1)
+    pc.allreduce(net.current['L5Pyr_soma'], 1)
+    pc.allreduce(net.current['L2Pyr_soma'], 1)
 
-    sim.pc.barrier()  # get all nodes to this place before continuing
+    pc.barrier()  # get all nodes to this place before continuing
 
     dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
                      np.array(dp_rec_L5.to_python()),
                      np.array(dp_rec_L2.to_python()),
                      np.array(dp_rec_L5.to_python())]
 
-    if sim.rank==0:
-        print("Simulation run time: %4.4f s" % (time.time()-t0))
-
-    sim.pc.gid_clear()
-    #pc.runworker()
-    sim.pc.done()
+    pc.gid_clear()
+    pc.done()
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
 
-    err = 0
-    if sim.rank==0:
+    if rank == 0:
         dpl.baseline_renormalize(net.params)
         dpl.convert_fAm_to_nAm()
         dpl.scale(net.params['dipole_scalefctr'])
@@ -183,11 +171,7 @@ class Dipole(object):
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        from sys import platform as sys_pf
-        if sys_pf == 'darwin':
-            import matplotlib
-            matplotlib.use("TkAgg")
-        from matplotlib import pyplot as plt
+        import matplotlib.pyplot as plt
 
         if ax is None:
             fig, ax = plt.subplots(1, 1)

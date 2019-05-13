@@ -18,12 +18,9 @@ import os.path as op
 import mne_neuron
 from mne_neuron import simulate_dipole, Params, Network
 
-from neuron import h
-
 ###############################################################################
 # Then we setup the directories and Neuron
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
-h.load_file("stdrun.hoc")
 
 ###############################################################################
 # Then we read the default parameters file
