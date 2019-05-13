@@ -79,6 +79,21 @@ class Params(dict):
                 if key in matches:
                     self.update({key: value})
 
+    def __sub__(self, other):
+        """See the difference between two parameter objects."""
+        diff = self.copy()
+        for key in self:
+            diffkey = "+" + key
+            if key not in other:
+                diff.update({diffkey: self[key]})
+            elif self[key] == other[key]:
+                diff.pop(key)
+        for key in other:
+            diffkey = "-" + key
+            if key not in self:
+                diff.update({diffkey: other[key]})
+        return diff
+
     def copy(self):
         return deepcopy(self)
 

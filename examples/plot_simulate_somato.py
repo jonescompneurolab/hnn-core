@@ -68,11 +68,22 @@ from mne_neuron import simulate_dipole, Params, Network
 
 from neuron import h
 
+###############################################################################
+# Let us first look at the diff between this param file and the default
+
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 h.load_file("stdrun.hoc")
 
 params_fname = op.join(mne_neuron_root, 'param', 'N20.json')
 params = Params(params_fname)
+
+params_fname = op.join(mne_neuron_root, 'param', 'default.json')
+params_default = Params(params_fname)
+
+print(params - params_default)
+
+###############################################################################
+# Now we can construct the network and simulate
 
 net = Network(params)
 dpl = simulate_dipole(net)
