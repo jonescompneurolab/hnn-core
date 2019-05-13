@@ -21,12 +21,14 @@ class Network(object):
     ----------
     params : dict
         The parameters
+    n_jobs : int
+        The number of jobs to run in parallel
     """
 
-    def __init__(self, params):
-        from .sim import create_parallel_context
+    def __init__(self, params, n_jobs=1):
+        from .parallel import create_parallel_context
         # setup simulation (ParallelContext)
-        create_parallel_context()
+        create_parallel_context(n_jobs=n_jobs)
 
         # set the params internally for this net
         # better than passing it around like ...
@@ -215,7 +217,7 @@ class Network(object):
     # this happens on EACH node
     # creates self.__gid_list for THIS node
     def __gid_assign(self):
-        from .sim import nhosts, rank, pc
+        from .parallel import nhosts, rank, pc
 
         # round robin assignment of gids
         for gid in range(rank, self.N_cells, nhosts):
@@ -252,7 +254,7 @@ class Network(object):
            external inputs are not targets.
         """
 
-        from .sim import pc
+        from .parallel import pc
 
         # loop through gids on this node
         for gid in self.__gid_list:
@@ -338,7 +340,7 @@ class Network(object):
     # nc = pc.gid_connect(source_gid, target_syn), weight,delay
     # Both for synapses AND for external inputs
     def __parnet_connect(self):
-        from .sim import pc
+        from .parallel import pc
 
         # loop over target zipped gids and cells
         # cells has NO extinputs anyway. also no extgausses
@@ -363,7 +365,7 @@ class Network(object):
 
     # setup spike recording for this node
     def _record_spikes(self):
-        from .sim import pc
+        from .parallel import pc
 
         # iterate through gids on this node and
         # set to record spikes in spike time vec and id vec
