@@ -82,6 +82,7 @@ class Params(dict):
     def copy(self):
         return deepcopy(self)
 
+
 def feed_validate(p_ext, d, tstop):
     """Whips into shape ones that are not
        could be properly made into a meaningful class.

@@ -14,7 +14,7 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def simulate_dipole(net):
+def simulate_dipole(net, n_jobs=1):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -22,14 +22,21 @@ def simulate_dipole(net):
     net : Network object
         The Network object specifying how cells are
         connected.
+    n_jobs : int
+        The number of jobs to run in parallel
+
     Returns
     -------
     dpl: instance of Dipole
         The dipole object
     """
-    from .sim import rank, nhosts, pc, cvode
+    from .parallel import rank, nhosts, pc, cvode
+    from .network import Network
+
     from neuron import h
     h.load_file("stdrun.hoc")
+
+    net = Network(net.params, n_jobs=n_jobs)
 
     # Now let's simulate the dipole
     if rank == 0:

@@ -34,7 +34,7 @@ print(params['L2Pyr_soma*'])
 ###############################################################################
 # Now let's simulate the dipole
 net = Network(params)
-dpl = simulate_dipole(net)
+dpl = simulate_dipole(net, n_jobs=1)
 
 ###############################################################################
 # and then plot it
