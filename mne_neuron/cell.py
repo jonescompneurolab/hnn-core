@@ -298,9 +298,9 @@ class _Cell(object):
         nc : instance of h.NetCon
             A network connection object.
         """
-        from mne_neuron import sim
+        from .sim import pc
 
-        nc = sim.pc.gid_connect(gid_presyn, postsyn)
+        nc = pc.gid_connect(gid_presyn, postsyn)
         # calculate distance between cell positions with pardistance()
         d = self.__pardistance(nc_dict['pos_src'])
         # set props here

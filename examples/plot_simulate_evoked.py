@@ -24,15 +24,21 @@ mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 # Then we read the parameters file
 params_fname = op.join(mne_neuron_root, 'param', 'default.json')
 params = Params(params_fname)
+print(params)
 
+###############################################################################
+# This is a lot of parameters! We can also filter the
+# parameters using unix-style wildcard characters
+print(params['L2Pyr_soma*'])
+
+###############################################################################
 # Now let's simulate the dipole
 net = Network(params)
 dpl = simulate_dipole(net)
 
 ###############################################################################
 # and then plot it
-import matplotlib
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 dpl.plot(ax=axes[0])
 

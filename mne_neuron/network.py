@@ -24,9 +24,9 @@ class Network(object):
     """
 
     def __init__(self, params):
-        from . import sim
+        from .sim import create_parallel_context
         # setup simulation (ParallelContext)
-        sim.createParallelContext()
+        create_parallel_context()
 
         # set the params internally for this net
         # better than passing it around like ...
@@ -215,27 +215,27 @@ class Network(object):
     # this happens on EACH node
     # creates self.__gid_list for THIS node
     def __gid_assign(self):
-        from . import sim
+        from .sim import nhosts, rank, pc
 
         # round robin assignment of gids
-        for gid in range(sim.rank, self.N_cells, sim.nhosts):
+        for gid in range(rank, self.N_cells, nhosts):
             # set the cell gid
-            sim.pc.set_gid2node(gid, sim.rank)
+            pc.set_gid2node(gid, rank)
             self.__gid_list.append(gid)
             # now to do the cell-specific external input gids on the same proc
             # these are guaranteed to exist because all of
             # these inputs were created for each cell
             for key in self.p_unique.keys():
                 gid_input = gid + self.gid_dict[key][0]
-                sim.pc.set_gid2node(gid_input, sim.rank)
+                pc.set_gid2node(gid_input, rank)
                 self.__gid_list.append(gid_input)
         # legacy handling of the external inputs
         # NOT perfectly balanced for now
-        for gid_base in range(sim.rank, self.N_extinput, sim.nhosts):
+        for gid_base in range(rank, self.N_extinput, nhosts):
             # shift the gid_base to the extinput gid
             gid = gid_base + self.gid_dict['extinput'][0]
             # set as usual
-            sim.pc.set_gid2node(gid, sim.rank)
+            pc.set_gid2node(gid, rank)
             self.__gid_list.append(gid)
         # extremely important to get the gids in the right order
         self.__gid_list.sort()
@@ -252,12 +252,12 @@ class Network(object):
            external inputs are not targets.
         """
 
-        from . import sim
+        from .sim import pc
 
         # loop through gids on this node
         for gid in self.__gid_list:
             # check existence of gid with Neuron
-            if sim.pc.gid_exists(gid):
+            if pc.gid_exists(gid):
                 # get type of cell and pos via gid
                 # now should be valid for ext inputs
                 type = self.gid_to_type(gid)
@@ -268,7 +268,7 @@ class Network(object):
                 # creates a NetCon object internally to Neuron
                 if type == 'L2_pyramidal':
                     self.cells.append(L2Pyr(gid, pos, self.params))
-                    sim.pc.cell(
+                    pc.cell(
                         gid, self.cells[-1].connect_to_target(
                             None, self.params['threshold']))
                     # run the IClamp function here
@@ -278,7 +278,7 @@ class Network(object):
                         self.cells[-1].record_volt_soma()
                 elif type == 'L5_pyramidal':
                     self.cells.append(L5Pyr(gid, pos, self.params))
-                    sim.pc.cell(
+                    pc.cell(
                         gid, self.cells[-1].connect_to_target(
                             None, self.params['threshold']))
                     # run the IClamp function here
@@ -287,7 +287,7 @@ class Network(object):
                         self.cells[-1].record_volt_soma()
                 elif type == 'L2_basket':
                     self.cells.append(L2Basket(gid, pos))
-                    sim.pc.cell(
+                    pc.cell(
                         gid, self.cells[-1].connect_to_target(
                             None, self.params['threshold']))
                     # also run the IClamp for L2_basket
@@ -296,7 +296,7 @@ class Network(object):
                         self.cells[-1].record_volt_soma()
                 elif type == 'L5_basket':
                     self.cells.append(L5Basket(gid, pos))
-                    sim.pc.cell(
+                    pc.cell(
                         gid, self.cells[-1].connect_to_target(
                             None, self.params['threshold']))
                     # run the IClamp function here
@@ -312,7 +312,7 @@ class Network(object):
                     # the cell and artificial NetCon
                     self.extinput_list.append(ExtFeed(
                         type, None, self.p_ext[p_ind], gid))
-                    sim.pc.cell(
+                    pc.cell(
                         gid, self.extinput_list[-1].connect_to_target(
                             self.params['threshold']))
                 elif type in self.p_unique.keys():
@@ -321,7 +321,7 @@ class Network(object):
                     # create dictionary entry, append to list
                     self.ext_list[type].append(ExtFeed(
                         type, cell_type, self.p_unique[type], gid))
-                    sim.pc.cell(
+                    pc.cell(
                         gid, self.ext_list[type][-1].connect_to_target(
                             self.params['threshold']))
                 else:
@@ -338,13 +338,13 @@ class Network(object):
     # nc = pc.gid_connect(source_gid, target_syn), weight,delay
     # Both for synapses AND for external inputs
     def __parnet_connect(self):
-        from . import sim
+        from .sim import pc
 
         # loop over target zipped gids and cells
         # cells has NO extinputs anyway. also no extgausses
         for gid, cell in zip(self.__gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
-            if sim.pc.gid_exists(gid) and self.gid_to_type(gid) \
+            if pc.gid_exists(gid) and self.gid_to_type(gid) \
                     != 'extinput':
                 # for each gid, find all the other cells connected to it,
                 # based on gid
@@ -363,14 +363,14 @@ class Network(object):
 
     # setup spike recording for this node
     def _record_spikes(self):
-        from . import sim
+        from .sim import pc
 
         # iterate through gids on this node and
         # set to record spikes in spike time vec and id vec
         # agnostic to type of source, will sort that out later
         for gid in self.__gid_list:
-            if sim.pc.gid_exists(gid):
-                sim.pc.spike_record(gid, self.spiketimes, self.spikegids)
+            if pc.gid_exists(gid):
+                pc.spike_record(gid, self.spiketimes, self.spikegids)
 
     def get_vsoma(self):
         dsoma = {}
