@@ -2,19 +2,39 @@
 
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 
+from warnings import warn
+
 from neuron import h
+
+rank = 0
+nhosts = 1
+pc = h.ParallelContext(nhosts)
+pc.done()
+rank = int(pc.id())
+cvode = h.CVode()
 
 
 def create_parallel_context(n_jobs=1):
     """Create parallel context."""
-    global rank, nhosts, cvode, pc
-    nhosts = n_jobs
-    rank = 0
-    pc = h.ParallelContext(nhosts)  # MPI: Initialize the ParallelContext class
-    pc.done()
-    nhosts = int(pc.nhost())  # Find number of hosts
     rank = int(pc.id())     # rank or node number (0 will be the master)
-    cvode = h.CVode()
 
     if rank == 0:
         pc.gid_clear()
+
+
+def _parallel_func(func, n_jobs):
+    if n_jobs != 1:
+        try:
+            from joblib import Parallel, delayed
+        except ImportError:
+            warn('joblib not installed. Cannot run in parallel.')
+            n_jobs = 1
+    if n_jobs == 1:
+        n_jobs = 1
+        my_func = func
+        parallel = list
+    else:
+        parallel = Parallel(n_jobs)
+        my_func = delayed(func)
+
+    return parallel, my_func

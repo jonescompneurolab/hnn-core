@@ -24,6 +24,7 @@ Dependencies
 * scipy
 * numpy
 * matplotlib
+* joblib (optional for parallel processing)
 
 Installation
 ============
@@ -31,6 +32,10 @@ Installation
 We recommend the `Anaconda Python distribution <https://www.continuum.io/downloads>`_. To install ``mne-neuron``, you first need to install its dependencies::
 
 	$ conda install numpy matplotlib scipy
+
+For joblib, you can do::
+
+	$ pip install joblib
 
 Additionally, you would need Neuron which is available here: `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_
 

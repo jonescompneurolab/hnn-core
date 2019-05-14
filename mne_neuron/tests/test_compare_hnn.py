@@ -25,7 +25,7 @@ def test_mne_neuron():
     params = Params(params_fname)
 
     net = Network(params, n_jobs=1)
-    dpl = simulate_dipole(net)
+    dpl = simulate_dipole(net)[0]
 
     fname = './dpl2.txt'
     dpl.write(fname)
