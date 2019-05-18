@@ -42,6 +42,7 @@ USER ${NB_UID}
 
 RUN pip install numpy && \
     pip install scipy && \
+    pip install matplotlib && \
     pip install pyqt5 && \
 	pip install ipywidgets && \
     pip install pillow && \
