@@ -246,7 +246,7 @@ Now, let us try to simulate the same with MNE-neuron
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  28.836 seconds)
+   **Total running time of the script:** ( 2 minutes  33.979 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_somato.py:

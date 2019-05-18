@@ -59,15 +59,18 @@ RUN git clone https://github.com/neuronsimulator/nrn && \
 	cd src/nrnpython/ && \
 	python3 setup.py install
 
-RUN git init . && \
-    git remote add origin https://github.com/jasmainak/mne-neuron.git && \
-    git fetch origin master && \
-    git checkout master && \
-    export PATH=$PATH:${HOME}/x86_64/bin && \
+ENV PATH=${PATH}:${HOME}/x86_64/bin
+
+RUN git clone https://github.com/jasmainak/mne-neuron.git && \
+	cd mne-neuron && \
     make && \
     python setup.py develop
 
-RUN git fetch origin gh-pages && \
+ENV PATH=${PATH}:${HOME}/mne-neuron/x86_64/
+
+RUN git init . && \
+    git remote add origin https://github.com/jasmainak/mne-neuron.git && \
+	git fetch origin gh-pages && \
 	git checkout gh-pages
 
 # Add an x-server to the entrypoint. This is needed by Mayavi
