@@ -179,7 +179,14 @@ sphinx_gallery_conf = {
     'backreferences_dir': False,
     'reference_url': {
         'mne_neuron': 'https://jasmainak.github.io/mne-neuron/'
-    }
+    },
+    'binder': {'org': 'jasmainak',
+               'repo': 'mne-neuron',
+               'branch': 'gh-pages',
+               'binderhub_url': 'https://mybinder.org',
+               'notebooks_dir': 'stable/notebooks',
+               'dependencies': 'Dockerfile'
+               }
 }
 
 from neuron import h
