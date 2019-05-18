@@ -1,7 +1,7 @@
 .. note::
     :class: sphx-glr-download-link-note
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_somato.py>` to download the full example code
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_somato.py>` to download the full example code or run this example in your browser via Binder
 .. rst-class:: sphx-glr-example-title
 
 .. _sphx_glr_auto_examples_plot_simulate_somato.py:
@@ -246,7 +246,7 @@ Now, let us try to simulate the same with MNE-neuron
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  38.568 seconds)
+   **Total running time of the script:** ( 2 minutes  31.869 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_somato.py:
@@ -257,6 +257,12 @@ Now, let us try to simulate the same with MNE-neuron
  .. container:: sphx-glr-footer
     :class: sphx-glr-footer-example
 
+
+  .. container:: binder-badge
+
+    .. image:: https://mybinder.org/badge_logo.svg
+      :target: https://mybinder.org/v2/gh/jasmainak/mne-neuron.github.io/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_somato.ipynb
+      :width: 150 px
 
 
   .. container:: sphx-glr-download
