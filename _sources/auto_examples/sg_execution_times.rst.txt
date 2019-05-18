@@ -5,8 +5,8 @@
 
 Computation times
 =================
-**18:22.399** total execution time for **auto_examples** files:
+**18:20.505** total execution time for **auto_examples** files:
 
-- **12:50.724**: :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)
-- **02:59.807**: :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` (``plot_simulate_evoked.py``)
-- **02:31.869**: :ref:`sphx_glr_auto_examples_plot_simulate_somato.py` (``plot_simulate_somato.py``)
+- **12:47.403**: :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)
+- **03:04.266**: :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` (``plot_simulate_evoked.py``)
+- **02:28.836**: :ref:`sphx_glr_auto_examples_plot_simulate_somato.py` (``plot_simulate_somato.py``)

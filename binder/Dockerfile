@@ -66,6 +66,9 @@ RUN git init . && \
     make && \
     python setup.py develop
 
+RUN git fetch origin gh-pages && \
+	git checkout gh-pages
+
 # Add an x-server to the entrypoint. This is needed by Mayavi
 ENTRYPOINT ["tini", "-g", "--", "xvfb-run"] 
 
