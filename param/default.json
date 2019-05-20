@@ -4,6 +4,7 @@
     "celsius": 37.0,
     "N_trials": 1,
     "threshold": 0.0,
+    "save_dpl" : 0,
     "save_figs": 0,
     "save_spec_data": 0,
     "f_max_spec": 100,
