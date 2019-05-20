@@ -144,6 +144,7 @@ def get_params_default(nprox=2, ndist=1):
         # in case want to look at higher frequency activity
         'save_figs': 0,
         'save_vsoma': 0,  # whether to record/save somatic voltage
+        'save_dpl': 0, # whether to write dipole output to a file
 
         # IClamp params for L2Pyr
         'Itonic_A_L2Pyr_soma': 0.,

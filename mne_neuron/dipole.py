@@ -107,6 +107,9 @@ def simulate_dipole(net, n_jobs=1):
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
 
     if rank == 0:
+        if net.params['save_dpl']:
+            dpl.write('rawdpl.txt')
+
         dpl.baseline_renormalize(net.params)
         dpl.convert_fAm_to_nAm()
         dpl.scale(net.params['dipole_scalefctr'])
@@ -245,3 +248,19 @@ class Dipole(object):
         # recalculate the aggregate dipole based on the baseline
         # normalized ones
         self.dpl['agg'] = self.dpl['L2'] + self.dpl['L5']
+
+    def write(self, fname = 'dpl.txt'):
+        """Write dipole values to a file.
+
+        Parameters
+        ----------
+        fname : str
+            Output filename. Must be fully specified
+        """
+
+        with open(fname, 'w') as f:
+            for t, x_agg, x_L2, x_L5 in zip(self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']):
+                f.write("%03.3f\t" % t)
+                f.write("%5.4f\t" % x_agg)
+                f.write("%5.4f\t" % x_L2)
+                f.write("%5.4f\n" % x_L5)
