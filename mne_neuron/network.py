@@ -21,11 +21,13 @@ class Network(object):
     ----------
     params : dict
         The parameters
-    n_jobs : int
-        The number of jobs to run in parallel
+    n_jobs : int | None
+        The number of jobs to run in parallel. A value
+        of None will allow NEURON to use all available
+        processors.
     """
 
-    def __init__(self, params, n_jobs=1):
+    def __init__(self, params, n_jobs=None):
         from .parallel import create_parallel_context
         # setup simulation (ParallelContext)
         create_parallel_context(n_jobs=n_jobs)
