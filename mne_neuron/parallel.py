@@ -4,6 +4,14 @@
 
 from neuron import h
 
+def shutdown():
+    pc.done()
+    h.quit()
+
+
+def get_rank():
+    return rank
+
 
 def create_parallel_context(n_jobs=None):
     """Create parallel context.
@@ -21,10 +29,10 @@ def create_parallel_context(n_jobs=None):
     rank = 0
 
     if n_jobs == None:
-      # MPI: Initialize the ParallelContext class
-      pc = h.ParallelContext()
+        # MPI: Initialize the ParallelContext class
+        pc = h.ParallelContext()
     else:
-      pc = h.ParallelContext(n_jobs)
+        pc = h.ParallelContext(n_jobs)
 
     pc.done()
     nhosts = int(pc.nhost())  # Find number of hosts
@@ -33,3 +41,6 @@ def create_parallel_context(n_jobs=None):
 
     if rank == 0:
         pc.gid_clear()
+
+    # sets the default max solver step in ms (purposefully large)
+    pc.set_maxstep(10)
