@@ -30,7 +30,7 @@ class Network(object):
         The list of cells
     """
 
-    def __init__(self, params, n_jobs=1):
+    def __init__(self, params, n_jobs=None):
         from .parallel import create_parallel_context
         # setup simulation (ParallelContext)
         create_parallel_context(n_jobs=n_jobs)
