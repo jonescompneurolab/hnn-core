@@ -20,7 +20,7 @@ import os.path as op
 # Let us import mne_neuron
 
 import mne_neuron
-from mne_neuron import simulate_dipole, Params, Network, get_rank, shutdown
+from mne_neuron import simulate_dipole, average_dipoles, Params, Network, get_rank, shutdown
 
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 
@@ -39,7 +39,10 @@ ntrials = 3
 if get_rank() == 0:
     print("Running %d trials" % ntrials)
 
+dpls = []
 for trial in range(ntrials):
-    simulate_dipole(net, trial, net.params['inc_evinput'], print_progress=False)
+    dpls.append(simulate_dipole(net, trial, net.params['inc_evinput'], print_progress=False))
+
+average_dipoles(dpls).write('avgdpl.txt')
 
 shutdown()

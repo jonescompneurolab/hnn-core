@@ -148,6 +148,33 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, print_progress=True):
     return dpl
 
 
+def average_dipoles(dpls):
+    """Compute average over a list of Dipole objects.
+
+    Parameters
+    ----------
+    dpls: list of Dipole objects
+        Contains list of dipole results to be averaged
+
+    Returns
+    -------
+    dpl: instance of Dipole
+        A dipole object with averages of the dipole data
+    """
+
+    agg_avg = np.mean(np.array([dpl.dpl['agg'] for dpl in dpls]), axis=0)
+    L5_avg = np.mean(np.array([dpl.dpl['L5'] for dpl in dpls]), axis=0)
+    L2_avg = np.mean(np.array([dpl.dpl['L2'] for dpl in dpls]), axis=0)
+
+    avg_dpl_data = np.c_[agg_avg,
+                         L2_avg,
+                         L5_avg]
+
+    avg_dpl = Dipole(np.array(t_vec.to_python()), avg_dpl_data)
+
+    return avg_dpl
+
+
 class Dipole(object):
     """Dipole class.
 
@@ -291,6 +318,6 @@ class Dipole(object):
         with open(fname, 'w') as f:
             for t, x_agg, x_L2, x_L5 in zip(self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']):
                 f.write("%03.3f\t" % t)
-                f.write("%5.4f\t" % x_agg)
-                f.write("%5.4f\t" % x_L2)
-                f.write("%5.4f\n" % x_L5)
+                f.write("%5.8f\t" % x_agg)
+                f.write("%5.8f\t" % x_L2)
+                f.write("%5.8f\n" % x_L5)
