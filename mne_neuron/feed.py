@@ -37,6 +37,14 @@ class ExtFeed(object):
         # sets event times into self.eventvec and plays into self.vs (VecStim)
         self.set_event_times()
 
+    # inc random number generator seeds
+    def inc_prng (self, inc):
+        self.seed += inc
+        self.prng = np.random.RandomState(self.seed)
+        if hasattr(self,'seed2'):
+            self.seed2 += inc
+            self.prng2 = np.random.RandomState(self.seed2)
+
     def set_prng(self, seed=None):
         if seed is None:  # no seed specified then use p_ext to determine seed
             # random generator for this instance

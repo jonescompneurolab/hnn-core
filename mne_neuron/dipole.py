@@ -14,7 +14,41 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def simulate_dipole(net):
+def initialize_sim_once(net):
+    """
+    Initialize NEURON simulation variables
+
+    Parameters
+    ----------
+    net : Network object
+        The Network object with parameter values
+    """
+
+    from .parallel import pc
+    from neuron import h
+    h.load_file("stdrun.hoc")
+
+    global t_vec, dp_rec_L2, dp_rec_L5
+
+    t_vec = h.Vector()
+    dp_rec_L2 = h.Vector()
+    dp_rec_L5 = h.Vector()
+
+    # global variables, should be node-independent
+    h("dp_total_L2 = 0.")
+    h("dp_total_L5 = 0.")
+
+    t_vec.record(h._ref_t)  # time recording
+    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
+    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
+
+    # Set tstop before instantiating any classes
+    h.tstop = net.params['tstop']
+    h.dt = net.params['dt']  # simulation duration and time-step
+    h.celsius = net.params['celsius']  # 37.0 - set temperature
+
+
+def simulate_dipole(net, trial=0, inc_evinput=0.0, print_progress=True):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -22,6 +56,17 @@ def simulate_dipole(net):
     net : Network object
         The Network object specifying how cells are
         connected.
+
+    trial : int
+        Current trial number
+
+    evinputinc : float
+        An increment (in milliseconds) that gets added
+        to the evoked inputs on each successive trial.
+        The default value is 0.0.
+
+    print_progress : bool
+        False will turn off "Simulation time" messages
 
     Returns
     -------
@@ -34,31 +79,21 @@ def simulate_dipole(net):
     from neuron import h
     h.load_file("stdrun.hoc")
 
+    # maintain vectors across trials
+    global t_vec, dp_rec_L2, dp_rec_L5
+
+    if trial == 0:
+        initialize_sim_once(net)
+    else:
+        net.state_init()
+        # adjusts the rng seeds and then the feed/event input times
+        net.reset_src_event_times(inc_evinput = inc_evinput * (trial + 1))
+
     # Now let's simulate the dipole
+
+    pc.barrier() # sync for output to screen
     if rank == 0:
-        print("running on %d cores" % nhosts)
-
-    # global variables, should be node-independent
-    h("dp_total_L2 = 0.")
-    h("dp_total_L5 = 0.")
-
-    # Set tstop before instantiating any classes
-    h.tstop = net.params['tstop']
-    h.dt = net.params['dt']  # simulation duration and time-step
-    h.celsius = net.params['celsius']  # 37.0 - set temperature
-
-    # We define the arrays (Vector in numpy) for recording the signals
-    t_vec = h.Vector()
-    t_vec.record(h._ref_t)  # time recording
-    dp_rec_L2 = h.Vector()
-    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
-    dp_rec_L5 = h.Vector()
-    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
-
-    net.movecellstopos()  # position cells in 2D grid
-
-    # sets the default max solver step in ms (purposefully large)
-    pc.set_maxstep(10)
+        print("Running trial %d (on %d cores)" % (trial+1, nhosts))
 
     # initialize cells to -65 mV, after all the NetCon
     # delays have been specified
@@ -68,13 +103,14 @@ def simulate_dipole(net):
         print('Simulation time: {0} ms...'.format(round(h.t, 2)))
 
     printdt = 10
-    if rank == 0:
+    if print_progress and rank == 0:
         for tt in range(0, int(h.tstop), printdt):
             cvode.event(tt, prsimtime)  # print time callbacks
 
     h.fcurrent()
-    # set state variables if they have been changed since h.finitialize
-    h.frecord_init()
+
+    pc.barrier()  # get all nodes to this place before continuing
+
     # actual simulation - run the solver
     pc.psolve(h.tstop)
 
@@ -97,14 +133,12 @@ def simulate_dipole(net):
                      np.array(dp_rec_L2.to_python()),
                      np.array(dp_rec_L5.to_python())]
 
-    pc.gid_clear()
-    pc.done()
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
 
     if rank == 0:
         if net.params['save_dpl']:
-            dpl.write('rawdpl.txt')
+            dpl.write('rawdpl_%d.txt' % trial)
 
         dpl.baseline_renormalize(net.params)
         dpl.convert_fAm_to_nAm()
