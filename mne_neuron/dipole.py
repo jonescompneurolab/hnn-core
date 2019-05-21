@@ -144,6 +144,36 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True):
     return dpl
 
 
+def average_dipoles(dpls):
+    """Compute average over a list of Dipole objects.
+
+    Parameters
+    ----------
+    dpls: list of Dipole objects
+        Contains list of dipole results to be averaged
+
+    Returns
+    -------
+    dpl: instance of Dipole
+        A dipole object with averages of the dipole data
+    """
+
+    # need at least on Dipole to get times
+    assert (len(dpls > 0))
+
+    agg_avg = np.mean(np.array([dpl.dpl['agg'] for dpl in dpls]), axis=0)
+    L5_avg = np.mean(np.array([dpl.dpl['L5'] for dpl in dpls]), axis=0)
+    L2_avg = np.mean(np.array([dpl.dpl['L2'] for dpl in dpls]), axis=0)
+
+    avg_dpl_data = np.c_[agg_avg,
+                         L2_avg,
+                         L5_avg]
+
+    avg_dpl = Dipole(dpls[0].t, avg_dpl_data)
+
+    return avg_dpl
+
+
 class Dipole(object):
     """Dipole class.
 
