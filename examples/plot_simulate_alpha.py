@@ -57,7 +57,7 @@ params['gbar_ev*'] = 0.0
 ###############################################################################
 # Now let's simulate the dipole and plot it
 net = Network(params)
-dpl = simulate_dipole(net)
+dpl, = simulate_dipole(net)
 dpl.plot()
 
 ###############################################################################

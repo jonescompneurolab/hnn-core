@@ -41,7 +41,8 @@ if get_rank() == 0:
 
 dpls = []
 for trial in range(ntrials):
-    dpls.append(simulate_dipole(net, trial, net.params['inc_evinput'], verbose=False))
+    dpl, = simulate_dipole(net, trial, net.params['inc_evinput'], verbose=False)
+    dpls.append(dpl)
 
 average_dipoles(dpls).write('avgdpl.txt')
 
