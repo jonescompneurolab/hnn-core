@@ -72,7 +72,7 @@ params_fname = op.join(mne_neuron_root, 'param', 'N20.json')
 params = Params(params_fname)
 
 net = Network(params)
-dpl = simulate_dipole(net)
+dpl, = simulate_dipole(net)
 
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))

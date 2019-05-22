@@ -14,6 +14,25 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
+def rmse (a1, a2):
+    from numpy import sqrt
+
+    # return root mean squared error between a1, a2; assumes same lengths, sampling rates
+    len1,len2 = len(a1),len(a2)
+    sz = min(len1,len2)
+    return sqrt(((a1[0:sz] - a2[0:sz]) ** 2).mean())
+
+
+def calcerr (ddat):
+    from scipy import signal
+
+    # calculates RMSE error from ddat
+    # first downsample simulation timeseries to 600 Hz (assumes same time length as data)
+    dpldown = signal.resample(ddat['dpl']['agg'], len(ddat['dextdata']))
+    err0 = rmse(ddat['dextdata'][:,1], dpldown)
+    return err0
+
+
 def initialize_sim_once(net):
     """
     Initialize NEURON simulation variables
@@ -48,7 +67,7 @@ def initialize_sim_once(net):
     h.celsius = net.params['celsius']  # 37.0 - set temperature
 
 
-def simulate_dipole(net, trial=0, inc_evinput=0.0, print_progress=True):
+def simulate_dipole(net, trial=0, inc_evinput=0.0, print_progress=True, extdata=None):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -67,6 +86,10 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, print_progress=True):
 
     print_progress : bool
         False will turn off "Simulation time" messages
+
+    extdata : np.Array | None
+        Array with preloaded data to compare simulation
+        results against
 
     Returns
     -------
@@ -136,6 +159,7 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, print_progress=True):
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
 
+    err = None
     if rank == 0:
         if net.params['save_dpl']:
             dpl.write('rawdpl_%d.txt' % trial)
@@ -145,7 +169,16 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, print_progress=True):
         dpl.scale(net.params['dipole_scalefctr'])
         dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
 
-    return dpl
+        try:
+            if extdata.any():
+                ddat = {'dpl' : dpl.dpl, 'dextdata' : extdata}
+                err = calcerr(ddat)
+                print("RMSE:", err)
+        except AttributeError:
+            # extdata is not an array
+            pass
+
+    return dpl, err
 
 
 def average_dipoles(dpls):
