@@ -94,6 +94,7 @@ html_theme_options = {
     'navbar_links': [
         ("Examples", "auto_examples/index"),
         ("API", "api"),
+        ("Whats new", "whats_new"),
         ("GitHub", "https://github.com/jasmainak/mne-neuron", True)
     ],
     'bootswatch_theme': "united"
