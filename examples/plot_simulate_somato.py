@@ -8,7 +8,8 @@ courses obtained during median nerve stimulation in the MNE
 somatosensory dataset.
 """
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mainakjas@gmail.com>
+#          Ryan Thorpe <ryan_thorpe@brown.edu>
 
 ###############################################################################
 # First, we will import the packages and define the paths

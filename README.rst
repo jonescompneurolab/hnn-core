@@ -1,6 +1,10 @@
 mne-neuron
 ==========
 
+.. image:: https://badges.gitter.im/mne-neuron/mne-neuron.svg
+   :target: https://gitter.im/mne-neuron/mne-neuron?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+   :alt: Gitter
+
 .. image:: https://api.travis-ci.org/jasmainak/mne-neuron.svg?branch=master
     :target: https://travis-ci.org/jasmainak/mne-neuron
     :alt: Build Status
