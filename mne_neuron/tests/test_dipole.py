@@ -24,3 +24,4 @@ def test_dipole():
     dipole.scale(params['dipole_scalefctr'])
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
     dipole.plot(layer='agg')
+    dipole.write('/tmp/dpl1.txt')
