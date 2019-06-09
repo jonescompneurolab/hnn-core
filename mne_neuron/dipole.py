@@ -245,18 +245,14 @@ class Dipole(object):
         # normalized ones
         self.dpl['agg'] = self.dpl['L2'] + self.dpl['L5']
 
-    def write(self, fname = 'dpl.txt'):
+    def write(self, fname):
         """Write dipole values to a file.
 
         Parameters
         ----------
         fname : str
-            Output filename. Must be fully specified
+            Full path to the output file (.txt)
         """
-
-        with open(fname, 'w') as f:
-            for t, x_agg, x_L2, x_L5 in zip(self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']):
-                f.write("%03.3f\t" % t)
-                f.write("%5.4f\t" % x_agg)
-                f.write("%5.4f\t" % x_L2)
-                f.write("%5.4f\n" % x_L5)
+        X = np.r_[[self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']]].T
+        np.savetxt('dpl2.txt', X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
+                   delimiter='\t')
