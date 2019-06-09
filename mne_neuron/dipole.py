@@ -29,7 +29,6 @@ def simulate_dipole(net):
         The dipole object
     """
     from .parallel import rank, nhosts, pc, cvode
-    from .network import Network
 
     from neuron import h
     h.load_file("stdrun.hoc")
