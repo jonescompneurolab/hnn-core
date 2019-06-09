@@ -47,10 +47,10 @@ class BasketSingle(_Cell):
         self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
 
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
-                 lamtha=3., receptor='ampa'):
+                 lamtha=3., receptor='ampa', autapses=True):
         for gid_src, pos in zip(gid_dict[type_src],
                                 pos_dict[type_src]):
-            if gid_src == gid:
+            if not autapses and gid_src == gid:
                 continue
             nc_dict = {
                 'pos_src': pos,
@@ -235,7 +235,7 @@ class L5Basket(BasketSingle):
     # there are no connections from the L2Basket cells. congrats!
     def parconnect(self, gid, gid_dict, pos_dict, p):
         self._connect(gid, gid_dict, pos_dict, p, 'L5_basket', 'L5Basket',
-                      lamtha=20., receptor='gabaa')
+                      lamtha=20., receptor='gabaa', autapses=False)
         self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr')
         self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr')
 
