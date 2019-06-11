@@ -15,7 +15,8 @@ def test_mne_neuron():
     # pollute the history.
     data_url = ('https://raw.githubusercontent.com/jasmainak/'
                 'mne-neuron/test_data/dpl.txt')
-    _fetch_file(data_url, 'dpl.txt')
+    if not op.exists('dpl.txt'):
+        _fetch_file(data_url, 'dpl.txt')
     dpl_master = loadtxt('dpl.txt')
 
     mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
@@ -30,4 +31,5 @@ def test_mne_neuron():
     dpl.write(fname)
 
     dpl_pr = loadtxt(fname)
-    assert_array_equal(dpl_pr, dpl_master)
+    assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
+    assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
