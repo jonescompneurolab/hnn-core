@@ -234,7 +234,7 @@ class Pyr(_Cell):
                  lamtha=3., receptor='ampa', postsyns=None, autapses=True):
         for gid_src, pos in zip(gid_dict[type_src],
                                 pos_dict[type_src]):
-            if gid_src == gid:
+            if not autapses and gid_src == gid:
                 continue
             A_weight = p.get('gbar_%s_%s_%s' % (name_src, self.name, receptor),
                              p.get('gbar_%s_%s' % (name_src, self.name), None))
@@ -433,12 +433,12 @@ class L2Pyr(Pyr):
                     self.basal3_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='ampa',
-                      postsyns=postsyns)
+                      postsyns=postsyns, autapses=False)
         postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
                     self.basal3_nmda]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='nmda',
-                      postsyns=postsyns)
+                      postsyns=postsyns, autapses=False)
 
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50., receptor='gabaa',
@@ -856,12 +856,12 @@ class L5Pyr(Pyr):
                     self.basal3_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='ampa',
-                      postsyns=postsyns)
+                      postsyns=postsyns, autapses=False)
         postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
                     self.basal3_nmda]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='nmda',
-                      postsyns=postsyns)
+                      postsyns=postsyns, autapses=False)
 
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_basket', 'L5Basket', lamtha=70., receptor='gabaa',
