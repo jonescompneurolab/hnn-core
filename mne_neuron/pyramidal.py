@@ -236,8 +236,10 @@ class Pyr(_Cell):
                                 pos_dict[type_src]):
             if not autapses and gid_src == gid:
                 continue
-            A_weight = p.get('gbar_%s_%s_%s' % (name_src, self.name, receptor),
-                             p.get('gbar_%s_%s' % (name_src, self.name), None))
+            if receptor != '':
+                A_weight = p['gbar_%s_%s_%s' % (name_src, self.name, receptor)]
+            else:
+                A_weight = p['gbar_%s_%s' % (name_src, self.name)]
             nc_dict = {
                 'pos_src': pos,
                 'A_weight': A_weight,
@@ -857,7 +859,7 @@ class L5Pyr(Pyr):
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='ampa',
                       postsyns=postsyns, autapses=False)
-        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
+        postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
                     self.basal3_nmda]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='nmda',
@@ -873,11 +875,11 @@ class L5Pyr(Pyr):
         postsyns = [self.basal2_ampa, self.basal3_ampa, self.apicaltuft_ampa,
                     self.apicaloblique_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='ampa',
+                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='',
                       postsyns=postsyns)
 
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_basket', 'L2Basket', lamtha=3., receptor='nmda',
+                      'L2_basket', 'L2Basket', lamtha=50., receptor='',
                       postsyns=[self.apicaltuft_gabaa])
 
     # receive from external inputs
