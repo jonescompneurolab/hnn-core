@@ -18,6 +18,8 @@ Changelog
 Bug
 ~~~
 
+- Fix missing autapses in network construction, by `Mainak Jas`_ in `#50 <https://github.com/jasmainak/mne-neuron/pull/50>`_
+
 API
 ~~~
 
