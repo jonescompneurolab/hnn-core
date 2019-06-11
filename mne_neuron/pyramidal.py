@@ -231,7 +231,7 @@ class Pyr(_Cell):
                 self.dends['apical_tuft'](0.5), p_syn['gabaa'])
 
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
-                 lamtha=3., receptor='ampa', postsyns=None):
+                 lamtha=3., receptor='ampa', postsyns=None, autapses=True):
         for gid_src, pos in zip(gid_dict[type_src],
                                 pos_dict[type_src]):
             if gid_src == gid:
