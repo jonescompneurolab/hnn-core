@@ -28,19 +28,10 @@ class _Cell(object):
 
     def __init__(self, gid, soma_props):
         self.gid = gid
-        # make L_soma and diam_soma elements of self
-        # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
-        self.L = soma_props['L']
-        self.diam = soma_props['diam']
-        self.pos = soma_props['pos']
-        # create soma and set geometry
-        self.soma = h.Section(cell=self, name=soma_props['name'] + '_soma')
-        self.soma.L = soma_props['L']
-        self.soma.diam = soma_props['diam']
-        self.soma.Ra = soma_props['Ra']
-        self.soma.cm = soma_props['cm']
         # variable for the list_IClamp
         self.list_IClamp = None
+        self.soma_props = soma_props
+        self.create_soma()
         # par: create arbitrary lists of connections FROM other cells
         # TO this cell instantiation
         # these lists are allowed to be empty
@@ -54,11 +45,29 @@ class _Cell(object):
         self.ncfrom_extpois = []
         self.ncfrom_ev = []
 
-    # def __repr__(self):
-    #     class_name = self.__class__.__name__
-    #     s = ('soma: L %f, diam %f, Ra %f, cm %f' %
-    #          (self.soma.L, self.soma.diam, self.soma.Ra, self.soma.cm))
-    #     return '<%s | %s>' % (class_name, s)
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        soma_props = self.soma_props
+        s = ('soma: L %f, diam %f, Ra %f, cm %f' %
+             (soma_props['L'], soma_props['diam'],
+              soma_props['Ra'], soma_props['cm']))
+        return '<%s | %s>' % (class_name, s)
+
+    def create_soma(self):
+        """Create soma and set geometry."""
+        # make L_soma and diam_soma elements of self
+        # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
+        soma_props = self.soma_props
+
+        self.L = soma_props['L']
+        self.diam = soma_props['diam']
+        self.pos = soma_props['pos']
+
+        self.soma = h.Section(cell=self, name=soma_props['name'] + '_soma')
+        self.soma.L = soma_props['L']
+        self.soma.diam = soma_props['diam']
+        self.soma.Ra = soma_props['Ra']
+        self.soma.cm = soma_props['cm']
 
     def record_volt_soma(self):
         self.vsoma = h.Vector()

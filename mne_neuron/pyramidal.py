@@ -20,6 +20,7 @@ from .params_default import (get_L2Pyr_params_default,
 class Pyr(_Cell):
     def __init__(self, gid, soma_props):
         _Cell.__init__(self, gid, soma_props)
+        self.create_soma()
         # store cell_name as self variable for later use
         self.name = soma_props['name']
         # preallocate dict to store dends

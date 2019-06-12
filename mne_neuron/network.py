@@ -26,7 +26,7 @@ class Network(object):
 
     Attributes
     ----------
-    cells : list of Cell
+    cells : list of Cell objects.
         The list of cells
     """
 
@@ -110,6 +110,11 @@ class Network(object):
         self.spiketimes = h.Vector()
         self.spikegids = h.Vector()
         self._record_spikes()
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        s = '%d x %d cell grid' % (self.gridpyr['x'], self.gridpyr['y'])
+        return '<%s | %s>' % (class_name, s)
 
     # creates the immutable source list along with corresponding numbers
     # of cells
