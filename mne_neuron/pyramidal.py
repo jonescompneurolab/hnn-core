@@ -230,30 +230,6 @@ class Pyr(_Cell):
             self.apicaltuft_gabaa = self.syn_create(
                 self.dends['apical_tuft'](0.5), p_syn['gabaa'])
 
-    def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
-                 lamtha=3., receptor='ampa', postsyns=None, autapses=True):
-        for gid_src, pos in zip(gid_dict[type_src],
-                                pos_dict[type_src]):
-            if not autapses and gid_src == gid:
-                continue
-            if receptor != '':
-                A_weight = p['gbar_%s_%s_%s' % (name_src, self.name, receptor)]
-            else:
-                A_weight = p['gbar_%s_%s' % (name_src, self.name)]
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': A_weight,
-                'A_delay': 1.,
-                'lamtha': lamtha,
-                'threshold': p['threshold'],
-                'type_src': type_src
-            }
-
-            for postsyn in postsyns:
-                getattr(self, 'ncfrom_%s' % name_src).append(
-                    self.parconnect_from_src(
-                        gid_src, nc_dict, postsyn))
-
 
 class L2Pyr(Pyr):
     """Layer 2 pyramidal cell class.
@@ -875,11 +851,10 @@ class L5Pyr(Pyr):
         postsyns = [self.basal2_ampa, self.basal3_ampa, self.apicaltuft_ampa,
                     self.apicaloblique_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='',
-                      postsyns=postsyns)
+                      'L2_pyramidal', 'L2Pyr', lamtha=3., postsyns=postsyns)
 
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_basket', 'L2Basket', lamtha=50., receptor='',
+                      'L2_basket', 'L2Basket', lamtha=50.,
                       postsyns=[self.apicaltuft_gabaa])
 
     # receive from external inputs

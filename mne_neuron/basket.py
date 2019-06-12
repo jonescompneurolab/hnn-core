@@ -17,8 +17,11 @@ class BasketSingle(_Cell):
         _Cell.__init__(self, gid, self.props)
         # store cell name for later
         self.name = cell_name
-        # set 3D shape - unused for now but a prototype
-        self.__shape_change()
+
+        # Define 3D shape and position of cell. By default neuron uses xy plane
+        # for height and xz plane for depth. This is opposite for model as a
+        # whole, but convention is followed in this function ease use of gui.
+        self.shape_soma()
 
     def _biophysics(self):
         self.soma.insert('hh2')
@@ -33,37 +36,12 @@ class BasketSingle(_Cell):
             'name': cell_name,
         }
 
-    # Define 3D shape and position of cell. By default neuron uses xy plane for
-    # height and xz plane for depth. This is opposite for model as a whole, but
-    # convention is followed in this function ease use of gui.
-    def __shape_change(self):
-        self.shape_soma()
-
     # creation of synapses
     def _synapse_create(self):
         # creates synapses onto this cell
         self.soma_ampa = self.syn_ampa_create(self.soma(0.5))
         self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
         self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
-
-    def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
-                 lamtha=3., receptor='ampa', autapses=True):
-        for gid_src, pos in zip(gid_dict[type_src],
-                                pos_dict[type_src]):
-            if not autapses and gid_src == gid:
-                continue
-            nc_dict = {
-                'pos_src': pos,
-                'A_weight': p['gbar_%s_%s' % (name_src, self.name)],
-                'A_delay': 1.,
-                'lamtha': lamtha,
-                'threshold': p['threshold'],
-                'type_src': type_src
-            }
-
-            getattr(self, 'ncfrom_%s' % name_src).append(
-                self.parconnect_from_src(
-                    gid_src, nc_dict, getattr(self, 'soma_%s' % receptor)))
 
 
 class L2Basket(BasketSingle):
@@ -81,9 +59,10 @@ class L2Basket(BasketSingle):
     # par connect between all presynaptic cells
     # no connections from L5Pyr or L5Basket to L2Baskets
     def parconnect(self, gid, gid_dict, pos_dict, p):
-        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr')
+        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr',
+                      postsyns=[self.soma_ampa])
         self._connect(gid, gid_dict, pos_dict, p, 'L2_basket', 'L2Basket',
-                      lamtha=20., receptor='gabaa')
+                      lamtha=20., postsyns=[self.soma_gabaa])
 
     # this function might make more sense as a method of net?
     # par: receive from external inputs
@@ -235,9 +214,12 @@ class L5Basket(BasketSingle):
     # there are no connections from the L2Basket cells. congrats!
     def parconnect(self, gid, gid_dict, pos_dict, p):
         self._connect(gid, gid_dict, pos_dict, p, 'L5_basket', 'L5Basket',
-                      lamtha=20., receptor='gabaa', autapses=False)
-        self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr')
-        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr')
+                      lamtha=20., autapses=False,
+                      postsyns=[self.soma_gabaa])
+        self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr',
+                      postsyns=[self.soma_ampa])
+        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr',
+                      postsyns=[self.soma_ampa])
 
     # parallel receive function parreceive()
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):

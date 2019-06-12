@@ -54,6 +54,12 @@ class _Cell(object):
         self.ncfrom_extpois = []
         self.ncfrom_ev = []
 
+    # def __repr__(self):
+    #     class_name = self.__class__.__name__
+    #     s = ('soma: L %f, diam %f, Ra %f, cm %f' %
+    #          (self.soma.L, self.soma.diam, self.soma.Ra, self.soma.cm))
+    #     return '<%s | %s>' % (class_name, s)
+
     def record_volt_soma(self):
         self.vsoma = h.Vector()
         self.vsoma.record(self.soma(0.5)._ref_v)
@@ -104,6 +110,31 @@ class _Cell(object):
 
     def move_to_pos(self):
         self.translate_to(self.pos[0] * 100, self.pos[2], self.pos[1] * 100)
+
+    def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
+                 lamtha=3., receptor=None, postsyns=None, autapses=True):
+        for gid_src, pos in zip(gid_dict[type_src],
+                                pos_dict[type_src]):
+            if not autapses and gid_src == gid:
+                continue
+            if receptor is not None:
+                A_weight = p['gbar_%s_%s_%s' %
+                             (name_src, self.name, receptor)]
+            else:
+                A_weight = p['gbar_%s_%s' % (name_src, self.name)]
+            nc_dict = {
+                'pos_src': pos,
+                'A_weight': A_weight,
+                'A_delay': 1.,
+                'lamtha': lamtha,
+                'threshold': p['threshold'],
+                'type_src': type_src
+            }
+
+            for postsyn in postsyns:
+                getattr(self, 'ncfrom_%s' % name_src).append(
+                    self.parconnect_from_src(
+                        gid_src, nc_dict, postsyn))
 
     # two things need to happen here for h:
     # 1. dipole needs to be inserted into each section

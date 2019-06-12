@@ -23,6 +23,11 @@ class Network(object):
         The parameters
     n_jobs : int
         The number of jobs to run in parallel
+
+    Attributes
+    ----------
+    cells : list of Cell
+        The list of cells
     """
 
     def __init__(self, params, n_jobs=1):
