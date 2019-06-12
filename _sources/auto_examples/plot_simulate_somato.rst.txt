@@ -19,7 +19,8 @@ somatosensory dataset.
 .. code-block:: default
 
 
-    # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+    # Authors: Mainak Jas <mainakjas@gmail.com>
+    #          Ryan Thorpe <ryan_thorpe@brown.edu>
 
 
 
@@ -107,9 +108,18 @@ Then, we get the raw data and estimage the source time course
     Reading 0 ... 269399  =      0.000 ...   897.077 secs...
     Filtering raw data in 1 contiguous segment
     Setting up band-pass filter from 1 - 40 Hz
-    l_trans_bandwidth chosen to be 1.0 Hz
-    h_trans_bandwidth chosen to be 10.0 Hz
-    Filter length of 991 samples (3.300 sec) selected
+
+    FIR filter parameters
+    ---------------------
+    Designing a one-pass, zero-phase, non-causal bandpass filter:
+    - Windowed time-domain design (firwin) method
+    - Hamming window with 0.0194 passband ripple and 53 dB stopband attenuation
+    - Lower passband edge: 1.00
+    - Lower transition bandwidth: 1.00 Hz (-6 dB cutoff frequency: 0.50 Hz)
+    - Upper passband edge: 40.00 Hz
+    - Upper transition bandwidth: 10.00 Hz (-6 dB cutoff frequency: 45.00 Hz)
+    - Filter length: 991 samples (3.300 sec)
+
     111 events found
     Event IDs: [1]
     111 matching events found
@@ -128,9 +138,9 @@ Then, we get the raw data and estimage the source time course
         Read MEG forward solution (8155 sources, 306 channels, free orientations)
         Source spaces transformed to the forward solution coordinate frame
     Computing data rank from raw with rank=None
-    Using tolerance 1.4e-08 (2.2e-16 eps * 306 dim * 2.1e+05 max  singular value)
-    Estimated rank (mag + grad): 306
-        MEG: rank 306 computed from 0s data channels with 306 projectors
+        Using tolerance 1.4e-08 (2.2e-16 eps * 306 dim * 2.1e+05  max singular value)
+        Estimated rank (mag + grad): 306
+        MEG: rank 306 computed from 306 data channels with 0 projectors
     Reducing data rank from 306 -> 306
     Estimating covariance using EMPIRICAL
     Done.
@@ -150,18 +160,10 @@ Then, we get the raw data and estimage the source time course
     Applying loose dipole orientations. Loose value of 0.2.
     Whitening the forward solution.
     Computing data rank from covariance with rank=None
-    Using tolerance 2e-12 (2.2e-16 eps * 306 dim * 29 max  singular value)
-    estimated rank (mag + grad): 64
-        MEG: rank 64 computed from 0s data channels with 306 projectors
-    Setting small MEG eigenvalues to zero.
-    Not doing PCA for MEG.
-    Computing data rank from covariance with rank=None
-    Using tolerance 2e-12 (2.2e-16 eps * 306 dim * 29 max  singular value)
-    estimated rank (mag + grad): 64
-        MEG: rank 64 computed from 0s data channels with 306 projectors
-    Setting small MEG eigenvalues to zero.
-    Not doing PCA for MEG.
-        Created the whitener using a noise covariance matrix with rank 64 (242 small eigenvalues omitted)
+        Using tolerance 2e-12 (2.2e-16 eps * 306 dim * 29  max singular value)
+        Estimated rank (mag + grad): 64
+        MEG: rank 64 computed from 306 data channels with 0 projectors
+        Setting small MEG eigenvalues to zero (without PCA)
     Creating the source covariance matrix
     Adjusting source covariance matrix.
     Computing SVD of whitened and weighted lead field matrix.
@@ -246,7 +248,7 @@ Now, let us try to simulate the same with MNE-neuron
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  33.979 seconds)
+   **Total running time of the script:** ( 1 minutes  0.967 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_somato.py:

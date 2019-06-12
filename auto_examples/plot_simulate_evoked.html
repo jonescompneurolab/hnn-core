@@ -44,6 +44,7 @@
             
                 <li><a href="index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jasmainak/mne-neuron">GitHub</a></li>
             
             
@@ -351,6 +352,7 @@ waveforms using MNE-Neuron.</p>
     &quot;prng_seedcore_input_prox&quot;: 4,
     &quot;repeats_dist&quot;: 10,
     &quot;repeats_prox&quot;: 10,
+    &quot;save_dpl&quot;: 0,
     &quot;save_figs&quot;: 0,
     &quot;save_spec_data&quot;: 0,
     &quot;save_vsoma&quot;: 0,
@@ -394,8 +396,8 @@ parameters using unix-style wildcard characters</p>
 </pre></div>
 </div>
 <p>Now let’s simulate the dipole</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -431,7 +433,7 @@ Simulation time: 160.0 ms...
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_evoked_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  2.601 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  10.237 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jasmainak/mne-neuron/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>

@@ -1,0 +1,11 @@
+mne_neuron.L5Basket
+===================
+
+.. currentmodule:: mne_neuron
+
+.. autoclass:: L5Basket
+   :members:
+   :special-members: __getitem__, __repr__
+
+   
+   

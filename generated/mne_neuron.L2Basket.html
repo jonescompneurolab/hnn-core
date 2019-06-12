@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>mne_neuron.params.Params &#8212; mne-neuron  documentation</title>
+    <title>mne_neuron.L2Basket &#8212; mne-neuron  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -68,7 +68,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">mne_neuron.params.Params</a></li>
+<li><a class="reference internal" href="#">mne_neuron.L2Basket</a></li>
 </ul>
 </ul>
 </li>
@@ -80,7 +80,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/generated/mne_neuron.params.Params.rst.txt"
+  <a href="../_sources/generated/mne_neuron.L2Basket.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -104,20 +104,12 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="mne-neuron-params-params">
-<h1>mne_neuron.params.Params<a class="headerlink" href="#mne-neuron-params-params" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="mne-neuron-l2basket">
+<h1>mne_neuron.L2Basket<a class="headerlink" href="#mne-neuron-l2basket" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="mne_neuron.params.Params">
-<em class="property">class </em><code class="descclassname">mne_neuron.params.</code><code class="descname">Params</code><span class="sig-paren">(</span><em>params_fname</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.params.Params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Params object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>params_fname</strong><span class="classifier">str</span></dt><dd><p>The parameters json file</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dt id="mne_neuron.L2Basket">
+<em class="property">class </em><code class="descclassname">mne_neuron.</code><code class="descname">L2Basket</code><span class="sig-paren">(</span><em>gid=-1</em>, <em>pos=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.L2Basket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for layer 2 basket cells.</p>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-center">
 <colgroup>
@@ -125,58 +117,85 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(target, threshold)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#mne_neuron.params.Params.copy" title="mne_neuron.params.Params.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_all_IClamp</span></code>(p)</p></td>
+<td><p>temporarily an external function taking the p dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_soma</span></code>()</p></td>
+<td><p>Create soma and set geometry.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(yscale)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code>($type, iterable[, value])</p></td>
-<td><p>Returns a new dict with keys from iterable and values equal to value.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>()</p></td>
+<td><p>Get cell’s bounding box.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code>(k[,d])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert_IClamp</span></code>(sect_name, props_IClamp)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code>(gid, gid_dict, pos_dict, p)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(gid_presyn, nc_dict, postsyn)</p></td>
+<td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code>(gid, gid_dict, pos_dict, p_ext)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(k[,d])</p></td>
-<td><p>If key is not found, d is returned if given, otherwise KeyError is raised</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>()</p></td>
-<td><p>2-tuple; but raise KeyError if D is empty.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(k[,d])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code>(type, gid, gid_dict, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>([E, ]**F)</p></td>
-<td><p>If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k] If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v In either case, this is followed by: for k in F:  D[k] = F[k]</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>()</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_ampa_create</span></code>(secloc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(secloc, p)</p></td>
+<td><p>Create an h.Exp2Syn synapse.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabaa_create</span></code>(secloc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabab_create</span></code>(secloc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_nmda_create</span></code>(secloc)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="mne_neuron.params.Params.__getitem__">
-<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.params.Params.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a subset of parameters.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="mne_neuron.params.Params.__repr__">
-<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.params.Params.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display the params nicely.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="mne_neuron.params.Params.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; a shallow copy of D<a class="headerlink" href="#mne_neuron.params.Params.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>get3dinfo</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_sections</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>move_to_pos</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>record_volt_soma</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>translate3d</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>translate_to</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

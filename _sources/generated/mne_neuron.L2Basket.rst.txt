@@ -1,0 +1,11 @@
+mne_neuron.L2Basket
+===================
+
+.. currentmodule:: mne_neuron
+
+.. autoclass:: L2Basket
+   :members:
+   :special-members: __getitem__, __repr__
+
+   
+   

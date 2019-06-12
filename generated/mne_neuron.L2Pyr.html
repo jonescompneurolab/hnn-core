@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>mne_neuron.L2Pyr &#8212; mne-neuron  documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          mne-neuron</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../auto_examples/index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jasmainak/mne-neuron">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">mne_neuron.L2Pyr</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/generated/mne_neuron.L2Pyr.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="mne-neuron-l2pyr">
+<h1>mne_neuron.L2Pyr<a class="headerlink" href="#mne-neuron-l2pyr" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mne_neuron.L2Pyr">
+<em class="property">class </em><code class="descclassname">mne_neuron.</code><code class="descname">L2Pyr</code><span class="sig-paren">(</span><em>gid=-1</em>, <em>pos=-1</em>, <em>p={}</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.L2Pyr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Layer 2 pyramidal cell class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>The cell id.</p>
+</dd>
+<dt><strong>p</strong><span class="classifier">dict</span></dt><dd><p>The parameters dictionary.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(target, threshold)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_all_IClamp</span></code>(p)</p></td>
+<td><p>temporarily an external function taking the p dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dends_new</span></code>(p_dend_props)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_soma</span></code>()</p></td>
+<td><p>Create soma and set geometry.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(yscale)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sectnames</span></code>()</p></td>
+<td><p>Create dictionary of section names with entries to scale section lengths to length along z-axis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>()</p></td>
+<td><p>Get cell’s bounding box.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert_IClamp</span></code>(sect_name, props_IClamp)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mne_neuron.L2Pyr.parconnect" title="mne_neuron.L2Pyr.parconnect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code></a>(gid, gid_dict, pos_dict, p)</p></td>
+<td><p>Collect receptor-type-based connections here.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(gid_presyn, nc_dict, postsyn)</p></td>
+<td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code>(gid, gid_dict, pos_dict, p_ext)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code>(type, gid, gid_dict, …)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_dend_props</span></code>(p_dend_props)</p></td>
+<td><p>“Iterate over keys in p_dend_props.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_ampa_create</span></code>(secloc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(secloc, p)</p></td>
+<td><p>Create an h.Exp2Syn synapse.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabaa_create</span></code>(secloc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabab_create</span></code>(secloc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_nmda_create</span></code>(secloc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mne_neuron.L2Pyr.topol" title="mne_neuron.L2Pyr.topol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topol</span></code></a>()</p></td>
+<td><p>Connects sections of THIS cell together.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 68%" />
+<col style="width: 32%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>basic_shape</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>create_dends</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>geom</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get3dinfo</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>get_section_names</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_sections</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>move_to_pos</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>record_volt_soma</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>translate3d</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>translate_to</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="mne_neuron.L2Pyr.parconnect">
+<code class="descname">parconnect</code><span class="sig-paren">(</span><em>gid</em>, <em>gid_dict</em>, <em>pos_dict</em>, <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.L2Pyr.parconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect receptor-type-based connections here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mne_neuron.L2Pyr.topol">
+<code class="descname">topol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.L2Pyr.topol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects sections of THIS cell together.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Mainak Jas.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

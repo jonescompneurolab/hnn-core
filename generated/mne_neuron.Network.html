@@ -44,6 +44,7 @@
             
                 <li><a href="../auto_examples/index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jasmainak/mne-neuron">GitHub</a></li>
             
             
@@ -118,6 +119,12 @@
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>cells</strong><span class="classifier">list of Cell objects.</span></dt><dd><p>The list of cells</p>
+</dd>
+</dl>
+</dd>
 </dl>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-center">
@@ -132,7 +139,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#mne_neuron.Network.gid_to_type" title="mne_neuron.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
 <td><p>Reverse lookup of gid to type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#mne_neuron.Network.movecellstopos" title="mne_neuron.Network.movecellstopos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">movecellstopos</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mne_neuron.Network.move_cells_to_pos" title="mne_neuron.Network.move_cells_to_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_cells_to_pos</span></code></a>()</p></td>
 <td><p>Move cells 3d positions to positions used for wiring.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#mne_neuron.Network.plot_input" title="mne_neuron.Network.plot_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_input</span></code></a>([ax, show])</p></td>
@@ -146,17 +153,12 @@
 </tr>
 </tbody>
 </table>
-<table class="docutils align-center">
-<colgroup>
-<col style="width: 57%" />
-<col style="width: 43%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><strong>get_vsoma</strong></p></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="mne_neuron.Network.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.Network.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="mne_neuron.Network.aggregate_currents">
 <code class="descname">aggregate_currents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.Network.aggregate_currents" title="Permalink to this definition">¶</a></dt>
@@ -170,8 +172,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="mne_neuron.Network.movecellstopos">
-<code class="descname">movecellstopos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.Network.movecellstopos" title="Permalink to this definition">¶</a></dt>
+<dt id="mne_neuron.Network.move_cells_to_pos">
+<code class="descname">move_cells_to_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.Network.move_cells_to_pos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move cells 3d positions to positions used for wiring.</p>
 </dd></dl>
 
