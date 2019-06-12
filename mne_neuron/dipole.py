@@ -54,7 +54,7 @@ def simulate_dipole(net):
     dp_rec_L5 = h.Vector()
     dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 
-    net.movecellstopos()  # position cells in 2D grid
+    net.move_cells_to_pos()  # position cells in 2D grid
 
     # sets the default max solver step in ms (purposefully large)
     pc.set_maxstep(10)
