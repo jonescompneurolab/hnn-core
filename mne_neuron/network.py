@@ -66,7 +66,7 @@ class Network(object):
         self.N_extinput = len(self.p_ext)
         # Source list of names
         # in particular order (cells, extinput, alpha names of unique inputs)
-        self.src_list_new = self.__create_src_list()
+        self.src_list_new = self._create_src_list()
         # cell position lists, also will give counts: must be known
         # by ALL nodes
         # extinput positions are all located at origin.
@@ -75,19 +75,19 @@ class Network(object):
         # create coords in pos_dict for all cells first
         self._create_coords_pyr()
         self._create_coords_basket()
-        self.__count_cells()
+        self._count_cells()
         # create coords for all other sources
-        self.__create_coords_extinput()
+        self._create_coords_extinput()
         # count external sources
-        self.__count_extsrcs()
+        self._count_extsrcs()
         # create dictionary of GIDs according to cell type
         # global dictionary of gid and cell type
         self.gid_dict = {}
         self._create_gid_dict()
-        # assign gid to hosts, creates list of gids for this node in __gid_list
-        # __gid_list length is number of cells assigned to this id()
-        self.__gid_list = []
-        self.__gid_assign()
+        # assign gid to hosts, creates list of gids for this node in _gid_list
+        # _gid_list length is number of cells assigned to this id()
+        self._gid_list = []
+        self._gid_assign()
         # create cells (and create self.origin in create_cells_pyr())
         self.cells = []
         self.extinput_list = []
@@ -100,7 +100,7 @@ class Network(object):
         self._create_all_src()
         self.state_init()
         # parallel network connector
-        self.__parnet_connect()
+        self._parnet_connect()
         # set to record spikes
         self.spiketimes = h.Vector()
         self.spikegids = h.Vector()
@@ -108,7 +108,7 @@ class Network(object):
 
     # creates the immutable source list along with corresponding numbers
     # of cells
-    def __create_src_list(self):
+    def _create_src_list(self):
         # base source list of tuples, name and number, in this order
         self.cellname_list = [
             'L2_basket',
@@ -159,7 +159,7 @@ class Network(object):
             pos_xy + (self.zdiff,) for pos_xy in coords_sorted]
 
     # creates origin AND creates external input coords
-    def __create_coords_extinput(self):
+    def _create_coords_extinput(self):
         """ (same thing for now but won't fix because could change)
         """
         xrange = np.arange(self.gridpyr['x'])
@@ -178,7 +178,7 @@ class Network(object):
             # create the pos_dict for all the sources
             self.pos_dict[key] = [self.origin for i in range(self.N_cells)]
 
-    def __count_cells(self):
+    def _count_cells(self):
         """Cell counting routine."""
         # cellname list is used *only* for this purpose for now
         for src in self.cellname_list:
@@ -188,7 +188,7 @@ class Network(object):
 
     # general counting method requires pos_dict is correct for each source
     # and that all sources are represented
-    def __count_extsrcs(self):
+    def _count_extsrcs(self):
         # all src numbers are based off of length of pos_dict entry
         # generally done here in lieu of upstream changes
         for src in self.extname_list:
@@ -215,22 +215,22 @@ class Network(object):
             self.gid_dict[src] = range(gid_ind[i], gid_ind[i + 1])
 
     # this happens on EACH node
-    # creates self.__gid_list for THIS node
-    def __gid_assign(self):
+    # creates self._gid_list for THIS node
+    def _gid_assign(self):
         from .parallel import nhosts, rank, pc
 
         # round robin assignment of gids
         for gid in range(rank, self.N_cells, nhosts):
             # set the cell gid
             pc.set_gid2node(gid, rank)
-            self.__gid_list.append(gid)
+            self._gid_list.append(gid)
             # now to do the cell-specific external input gids on the same proc
             # these are guaranteed to exist because all of
             # these inputs were created for each cell
             for key in self.p_unique.keys():
                 gid_input = gid + self.gid_dict[key][0]
                 pc.set_gid2node(gid_input, rank)
-                self.__gid_list.append(gid_input)
+                self._gid_list.append(gid_input)
         # legacy handling of the external inputs
         # NOT perfectly balanced for now
         for gid_base in range(rank, self.N_extinput, nhosts):
@@ -238,9 +238,9 @@ class Network(object):
             gid = gid_base + self.gid_dict['extinput'][0]
             # set as usual
             pc.set_gid2node(gid, rank)
-            self.__gid_list.append(gid)
+            self._gid_list.append(gid)
         # extremely important to get the gids in the right order
-        self.__gid_list.sort()
+        self._gid_list.sort()
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
@@ -257,7 +257,7 @@ class Network(object):
         from .parallel import pc
 
         # loop through gids on this node
-        for gid in self.__gid_list:
+        for gid in self._gid_list:
             # check existence of gid with Neuron
             if pc.gid_exists(gid):
                 # get type of cell and pos via gid
@@ -268,40 +268,20 @@ class Network(object):
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 # creates a NetCon object internally to Neuron
-                if type == 'L2_pyramidal':
-                    self.cells.append(L2Pyr(gid, pos, self.params))
+                type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
+                              'L2_basket': L2Basket, 'L5_basket': L5Basket}
+                if type in ('L2_pyramidal', 'L5_pyramidal', 'L2_basket',
+                            'L5_basket'):
+                    Cell = type2class[type]
+                    if type in ('L2_pyramidal', 'L5_pyramidal'):
+                        self.cells.append(Cell(gid, pos, self.params))
+                    else:
+                        self.cells.append(Cell(gid, pos))
                     pc.cell(
                         gid, self.cells[-1].connect_to_target(
                             None, self.params['threshold']))
                     # run the IClamp function here
                     # create_all_IClamp() is defined in L2Pyr (etc)
-                    self.cells[-1].create_all_IClamp(self.params)
-                    if self.params['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
-                elif type == 'L5_pyramidal':
-                    self.cells.append(L5Pyr(gid, pos, self.params))
-                    pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.params['threshold']))
-                    # run the IClamp function here
-                    self.cells[-1].create_all_IClamp(self.params)
-                    if self.params['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
-                elif type == 'L2_basket':
-                    self.cells.append(L2Basket(gid, pos))
-                    pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.params['threshold']))
-                    # also run the IClamp for L2_basket
-                    self.cells[-1].create_all_IClamp(self.params)
-                    if self.params['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
-                elif type == 'L5_basket':
-                    self.cells.append(L5Basket(gid, pos))
-                    pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.params['threshold']))
-                    # run the IClamp function here
                     self.cells[-1].create_all_IClamp(self.params)
                     if self.params['save_vsoma']:
                         self.cells[-1].record_volt_soma()
@@ -339,12 +319,12 @@ class Network(object):
     # for each item in the list, do a:
     # nc = pc.gid_connect(source_gid, target_syn), weight,delay
     # Both for synapses AND for external inputs
-    def __parnet_connect(self):
+    def _parnet_connect(self):
         from .parallel import pc
 
         # loop over target zipped gids and cells
         # cells has NO extinputs anyway. also no extgausses
-        for gid, cell in zip(self.__gid_list, self.cells):
+        for gid, cell in zip(self._gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
             if pc.gid_exists(gid) and self.gid_to_type(gid) \
                     != 'extinput':
@@ -370,15 +350,9 @@ class Network(object):
         # iterate through gids on this node and
         # set to record spikes in spike time vec and id vec
         # agnostic to type of source, will sort that out later
-        for gid in self.__gid_list:
+        for gid in self._gid_list:
             if pc.gid_exists(gid):
                 pc.spike_record(gid, self.spiketimes, self.spikegids)
-
-    def get_vsoma(self):
-        dsoma = {}
-        for cell in self.cells:
-            dsoma[cell.gid] = (cell.celltype, np.array(cell.vsoma.to_python()))
-        return dsoma
 
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
@@ -386,18 +360,13 @@ class Network(object):
         # this is quite ugly
         for cell in self.cells:
             # check for celltype
-            if cell.celltype == 'L5_pyramidal':
+            if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
                 # iterate over somatic currents, assumes this list exists
                 # is guaranteed in L5Pyr()
                 for key, I_soma in cell.dict_currents.items():
                     # self.current_L5Pyr_soma was created upon
                     # in parallel, each node has its own Net()
-                    self.current['L5Pyr_soma'].add(I_soma)
-            elif cell.celltype == 'L2_pyramidal':
-                for key, I_soma in cell.dict_currents.items():
-                    # self.current_L5Pyr_soma was created upon
-                    # in parallel, each node has its own Net()
-                    self.current['L2Pyr_soma'].add(I_soma)
+                    self.current['%s_soma' % cell.name].add(I_soma)
 
     def state_init(self):
         """Initializes the state closer to baseline."""
@@ -422,10 +391,10 @@ class Network(object):
                     elif cell.celltype == 'L5_basket':
                         seg.v = -64.9737
 
-    def movecellstopos(self):
+    def move_cells_to_pos(self):
         """Move cells 3d positions to positions used for wiring."""
         for cell in self.cells:
-            cell.movetopos()
+            cell.move_to_pos()
 
     def plot_input(self, ax=None, show=True):
         """Plot the histogram of input.

@@ -72,8 +72,8 @@ class _Cell(object):
                 ldiam.append(s.diam3d(i))
         return lx, ly, lz, ldiam
 
-    # get cell's bounding box
     def getbbox(self):
+        """Get cell's bounding box."""
         lx, ly, lz, ldiam = self.get3dinfo()
         minx, miny, minz = 1e9, 1e9, 1e9
         maxx, maxy, maxz = -1e9, -1e9, -1e9
@@ -92,7 +92,7 @@ class _Cell(object):
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
                              s.z3d(i) + dz, s.diam3d(i), sec=s)
 
-    def translateto(self, x, y, z):
+    def translate_to(self, x, y, z):
         x0 = self.soma.x3d(0)
         y0 = self.soma.y3d(0)
         z0 = self.soma.z3d(0)
@@ -102,8 +102,8 @@ class _Cell(object):
         # print('dx:',dx,'dy:',dy,'dz:',dz)
         self.translate3d(dx, dy, dz)
 
-    def movetopos(self):
-        self.translateto(self.pos[0] * 100, self.pos[2], self.pos[1] * 100)
+    def move_to_pos(self):
+        self.translate_to(self.pos[0] * 100, self.pos[2], self.pos[1] * 100)
 
     # two things need to happen here for h:
     # 1. dipole needs to be inserted into each section
