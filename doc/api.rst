@@ -13,6 +13,10 @@ Simulation (:py:mod:`mne_neuron`):
 .. autosummary::
    :toctree: generated/
 
+   L2Pyr
+   L5Pyr
+   L2Basket
+   L5Basket
    simulate_dipole
    Network
 

@@ -3,7 +3,7 @@
 import os.path as op
 
 import mne_neuron
-from mne_neuron import Params, Network
+from mne_neuron import Params
 
 
 def test_params():
@@ -12,6 +12,4 @@ def test_params():
     params_fname = op.join(mne_neuron_root, 'param', 'default.json')
     params = Params(params_fname)
     print(params)
-
-    Network(params)
     print(params['L2Pyr*'])
