@@ -34,3 +34,6 @@ You can build the documentation locally using the command:
 
     $ cd doc/
     $ make html
+
+You will also need to install mne to run all the examples and tests successfully. Please find
+the installation instructions on the [MNE website](http://martinos.org/mne/).
