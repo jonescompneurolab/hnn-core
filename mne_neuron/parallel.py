@@ -4,6 +4,7 @@
 
 from neuron import h
 
+
 def shutdown():
     pc.done()
     h.quit()
@@ -28,7 +29,7 @@ def create_parallel_context(n_jobs=None):
     nhosts = n_jobs
     rank = 0
 
-    if n_jobs == None:
+    if n_jobs is None:
         # MPI: Initialize the ParallelContext class
         pc = h.ParallelContext()
     else:

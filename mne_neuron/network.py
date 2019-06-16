@@ -260,7 +260,7 @@ class Network(object):
             if gid in gids:
                 return gidtype
 
-    def reset_src_event_times (self, seed=None,debug=False, inc_evinput = 0.0):
+    def reset_src_event_times(self, seed=None, debug=False, inc_evinput=0.0):
         """
         Reset src (source/external) event times
         evinputinc is an offset for evoked inputs (added to mean start
@@ -268,19 +268,19 @@ class Network(object):
         """
 
         for feed in self.extinput_list:
-          if seed is None:
-            feed.inc_prng(1000)
-          else:
-            feed.set_prng(seed)
-          feed.set_event_times(inc_evinput) # uses feed.seed
-
-        for k,lfeed in self.ext_list.items(): # dictionary of lists...
-          for feed in lfeed: # of feeds
             if seed is None:
-              feed.inc_prng(1)
+                feed.inc_prng(1000)
             else:
-              feed.set_prng(seed)
-            feed.set_event_times(inc_evinput) # uses feed.seed
+                feed.set_prng(seed)
+            feed.set_event_times(inc_evinput)  # uses feed.seed
+
+        for k, lfeed in self.ext_list.items():  # dictionary of lists...
+            for feed in lfeed:  # of feeds
+                if seed is None:
+                    feed.inc_prng(1)
+                else:
+                    feed.set_prng(seed)
+                feed.set_event_times(inc_evinput)  # uses feed.seed
 
     def _create_all_src(self):
         """Parallel create cells AND external inputs (feeds)

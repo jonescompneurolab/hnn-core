@@ -14,22 +14,24 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def rmse (a1, a2):
+def rmse(a1, a2):
     from numpy import sqrt
 
-    # return root mean squared error between a1, a2; assumes same lengths, sampling rates
-    len1,len2 = len(a1),len(a2)
-    sz = min(len1,len2)
+    # return root mean squared error between a1, a2; assumes same lengths
+    # and sampling rates
+    len1, len2 = len(a1), len(a2)
+    sz = min(len1, len2)
     return sqrt(((a1[0:sz] - a2[0:sz]) ** 2).mean())
 
 
-def calcerr (ddat):
+def calcerr(ddat):
     from scipy import signal
 
     # calculates RMSE error from ddat
-    # first downsample simulation timeseries to 600 Hz (assumes same time length as data)
+    # first downsample simulation timeseries to 600 Hz
+    # (assumes same time length as data)
     dpldown = signal.resample(ddat['dpl']['agg'], len(ddat['dextdata']))
-    err0 = rmse(ddat['dextdata'][:,1], dpldown)
+    err0 = rmse(ddat['dextdata'][:, 1], dpldown)
     return err0
 
 
@@ -51,7 +53,6 @@ def initialize_sim(net):
           Vector that has been connected to L5 dipole ref in NEURON
     """
 
-    from .parallel import pc
     from neuron import h
     h.load_file("stdrun.hoc")
 
@@ -71,6 +72,7 @@ def initialize_sim(net):
     h.celsius = net.params['celsius']  # 37.0 - set temperature
 
     return t_vec, dp_rec_L2, dp_rec_L5
+
 
 def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True, extdata=None):
     """Simulate a dipole given the experiment parameters.
@@ -115,9 +117,9 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True, extdata=None):
 
     # Now let's simulate the dipole
 
-    pc.barrier() # sync for output to screen
+    pc.barrier()  # sync for output to screen
     if rank == 0:
-        print("Running trial %d (on %d cores)" % (trial+1, nhosts))
+        print("Running trial %d (on %d cores)" % (trial + 1, nhosts))
 
     # initialize cells to -65 mV, after all the NetCon
     # delays have been specified
@@ -157,7 +159,6 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True, extdata=None):
                      np.array(dp_rec_L2.to_python()),
                      np.array(dp_rec_L5.to_python())]
 
-
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
 
     err = None
@@ -172,7 +173,7 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True, extdata=None):
 
         try:
             if extdata.any():
-                ddat = {'dpl' : dpl.dpl, 'dextdata' : extdata}
+                ddat = {'dpl': dpl.dpl, 'dextdata': extdata}
                 err = calcerr(ddat)
                 print("RMSE:", err)
         except AttributeError:

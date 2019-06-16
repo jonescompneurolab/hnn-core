@@ -19,7 +19,8 @@ import os.path as op
 # Let us import mne_neuron
 
 import mne_neuron
-from mne_neuron import simulate_dipole, average_dipoles, Params, Network, get_rank, shutdown
+from mne_neuron import simulate_dipole, average_dipoles, Params, Network
+from mne_neuron import get_rank, shutdown
 
 mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
 
@@ -41,7 +42,7 @@ try:
     extdata = comm.bcast(comm.Get_rank(), root=0)
 
     # merge communicators to prepare sending results
-    common_comm=comm.Merge(True)
+    common_comm = comm.Merge(True)
 
     # if run by MPI, suppress output
     verbose = False
@@ -81,7 +82,8 @@ if get_rank() == 0:
 dpls = []
 errs = []
 for trial in range(ntrials):
-    dpl, err = simulate_dipole(net, trial=trial, inc_evinput=net.params['inc_evinput'],
+    dpl, err = simulate_dipole(net, trial=trial,
+                               inc_evinput=net.params['inc_evinput'],
                                verbose=False, extdata=extdata)
     dpls.append(dpl)
     errs.append(err)

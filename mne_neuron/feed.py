@@ -38,10 +38,10 @@ class ExtFeed(object):
         self.set_event_times()
 
     # inc random number generator seeds
-    def inc_prng (self, inc):
+    def inc_prng(self, inc):
         self.seed += inc
         self.prng = np.random.RandomState(self.seed)
-        if hasattr(self,'seed2'):
+        if hasattr(self, 'seed2'):
             self.seed2 += inc
             self.prng2 = np.random.RandomState(self.seed2)
 
