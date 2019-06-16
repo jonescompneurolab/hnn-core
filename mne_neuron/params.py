@@ -327,9 +327,9 @@ def create_pext(p, tstop):
 
     check_pois_synkeys(p)
 
-    # define T_pois as 0 or -1 to reset automatically to tstop
-    if p['T_pois'] in (0, -1):
-        p['T_pois'] = tstop
+    # # define T_pois as 0 or -1 to reset automatically to tstop
+    # if p['T_pois'] in (0, -1):
+    #     p['T_pois'] = tstop
 
     # Poisson distributed inputs to proximal
     # NEW: setting up AMPA and NMDA for Poisson inputs; why delays differ?
