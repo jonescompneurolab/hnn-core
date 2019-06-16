@@ -96,6 +96,8 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True, extdata=None):
     -------
     dpl: instance of Dipole
         The dipole object
+    err: float
+        RMSE between trial and extdata or None if no extdata
     """
     from .parallel import rank, nhosts, pc, cvode
 
