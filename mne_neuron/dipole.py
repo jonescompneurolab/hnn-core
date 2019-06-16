@@ -33,7 +33,7 @@ def calcerr (ddat):
     return err0
 
 
-def initialize_sim_once(net):
+def initialize_sim(net):
     """
     Initialize NEURON simulation variables
 
@@ -41,31 +41,36 @@ def initialize_sim_once(net):
     ----------
     net : Network object
         The Network object with parameter values
+    Returns
+    -------
+    t_vec : Vector
+          Vector that has been connected to time ref in NEURON
+    dp_rec_L2 : Vector
+          Vector that has been connected to L2 dipole ref in NEURON
+    dp_rec_L5 : Vector
+          Vector that has been connected to L5 dipole ref in NEURON
     """
 
     from .parallel import pc
     from neuron import h
     h.load_file("stdrun.hoc")
 
-    global t_vec, dp_rec_L2, dp_rec_L5
-
-    t_vec = h.Vector()
-    dp_rec_L2 = h.Vector()
-    dp_rec_L5 = h.Vector()
-
-    # global variables, should be node-independent
+    # create or reinitialize scalars in NEURON (hoc) context
     h("dp_total_L2 = 0.")
     h("dp_total_L5 = 0.")
 
-    t_vec.record(h._ref_t)  # time recording
-    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
-    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
+    # Connect NEURON scalar references to python vectors
+    # TODO: initialize with Vector(size) to avoid dynamic resizing
+    t_vec = h.Vector().record(h._ref_t)  # time recording
+    dp_rec_L2 = h.Vector().record(h._ref_dp_total_L2)  # L2 dipole recording
+    dp_rec_L5 = h.Vector().record(h._ref_dp_total_L5)  # L5 dipole recording
 
     # Set tstop before instantiating any classes
     h.tstop = net.params['tstop']
     h.dt = net.params['dt']  # simulation duration and time-step
     h.celsius = net.params['celsius']  # 37.0 - set temperature
 
+    return t_vec, dp_rec_L2, dp_rec_L5
 
 def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True, extdata=None):
     """Simulate a dipole given the experiment parameters.
@@ -97,15 +102,14 @@ def simulate_dipole(net, trial=0, inc_evinput=0.0, verbose=True, extdata=None):
     from neuron import h
     h.load_file("stdrun.hoc")
 
-    # maintain vectors across trials
-    global t_vec, dp_rec_L2, dp_rec_L5
+    t_vec, dp_rec_L2, dp_rec_L5 = initialize_sim(net)
 
-    if trial == 0:
-        initialize_sim_once(net)
-    else:
-        net.state_init()
-        # adjusts the rng seeds and then the feed/event input times
-        net.reset_src_event_times(inc_evinput = inc_evinput * (trial + 1))
+    # make sure network state is consistent
+    net.state_init()
+
+    if trial != 0:
+        # for reproducibility of original HNN results
+        net.reset_src_event_times()
 
     # Now let's simulate the dipole
 
