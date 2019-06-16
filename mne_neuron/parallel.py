@@ -1,6 +1,7 @@
 """import NEURON module"""
 
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
+#          Mainak Jas <mainakjas@gmail.com>
 
 from warnings import warn
 

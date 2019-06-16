@@ -16,10 +16,15 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def _simulate_single_trial(params, trial_idx):
+def _clone_and_simulate(params, trial_idx):
+    from .network import Network
+    net = Network(params, n_jobs=1)
+    return _simulate_single_trial(net)
+
+
+def _simulate_single_trial(net):
     """Simulate one trial."""
     from .parallel import rank, nhosts, pc, cvode
-    from .network import Network
     from neuron import h
     h.load_file("stdrun.hoc")
 
@@ -27,9 +32,8 @@ def _simulate_single_trial(params, trial_idx):
     if rank == 0:
         print("running on %d cores" % nhosts)
 
-    if trial_idx != 1:
-        params['prng_*'] = trial_idx
-    net = Network(params, n_jobs=1)
+    # if trial_idx != 0:
+    #     params['prng_*'] = trial_idx
 
     # global variables, should be node-independent
     h("dp_total_L2 = 0.")
@@ -122,10 +126,14 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     dpl: list | instance of Dipole
         The dipole object or list of dipole objects if n_trials > 1
     """
-    parallel, myfunc = _parallel_func(_simulate_single_trial, n_jobs=n_jobs)
+    parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
     dpl = parallel(myfunc(net.params, idx) for idx in range(n_trials))
 
     return dpl
+
+# TODO: add crop method to dipole
+#       add read_dipole function
+#       add mechanism info to cell repr
 
 
 class Dipole(object):
