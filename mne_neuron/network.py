@@ -504,3 +504,10 @@ class Network(object):
         if show:
             plt.show()
         return ax.get_figure()
+
+    def gid_clear(self):
+        """Clear up NEURON internal gid information"""
+        from .parallel import pc, rank
+
+        if rank == 0:
+            pc.gid_clear()

@@ -40,8 +40,5 @@ def create_parallel_context(n_jobs=None):
     rank = int(pc.id())     # rank or node number (0 will be the master)
     cvode = h.CVode()
 
-    if rank == 0:
-        pc.gid_clear()
-
     # sets the default max solver step in ms (purposefully large)
     pc.set_maxstep(10)

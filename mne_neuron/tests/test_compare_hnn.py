@@ -27,6 +27,10 @@ def test_mne_neuron():
     net = Network(params, n_jobs=1)
     dpl, err = simulate_dipole(net)
 
+    # done with simulation, clear info in case
+    # Network is reinstantiated
+    net.gid_clear()
+
     fname = './dpl2.txt'
     dpl.write(fname)
 

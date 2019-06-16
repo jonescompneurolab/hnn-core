@@ -14,3 +14,7 @@ def test_network():
     net = Network(params, n_jobs=1)
     print(net)
     print(net.cells[:2])
+
+    # done with simulation, clear info in case
+    # Network is reinstantiated
+    net.gid_clear()
