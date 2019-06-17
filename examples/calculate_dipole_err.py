@@ -32,17 +32,8 @@ from mpi4py import MPI
 try:
     comm = MPI.Comm.Get_parent()
 
-    # receive params
-    params = comm.bcast(comm.Get_rank(), root=0)
-
-    # wait for master to send data to compare against
-    comm.Barrier()
-
-    # receive extdata
-    extdata = comm.bcast(comm.Get_rank(), root=0)
-
-    # merge communicators to prepare sending results
-    common_comm = comm.Merge(True)
+    # receive params and extdata
+    (params, extdata) = comm.bcast(comm.Get_rank(), root=0)
 
     # if run by MPI, suppress output
     verbose = False
@@ -51,6 +42,7 @@ try:
 # Otherwise read the params and exp file from disk
 
 except MPI.Exception:
+
     # Have to read the parameters from a file
     params_fname = op.join(mne_neuron_root, 'param', 'default.json')
     print("Reading parameters from file:", params_fname)
@@ -76,7 +68,7 @@ except KeyError:
 ###############################################################################
 # Now let's simulate the dipole
 
-if get_rank() == 0:
+if get_rank() == 0 and verbose:
     print("Running %d trials" % ntrials)
 
 dpls = []
@@ -90,13 +82,19 @@ for trial in range(ntrials):
 
 if get_rank() == 0:
     avg_rmse = mean(errs)
-    print("Avg. RMSE:", avg_rmse)
+    if verbose:
+       print("Avg. RMSE:", avg_rmse)
 
-    try:
+try:
+    if get_rank() == 0:
         # send results back to parent
-        common_comm.send((average_dipoles(dpls), avg_rmse), dest=0)
-    except NameError:
-        # don't fail if this script was called without MP`
-        pass
+        comm.send((average_dipoles(dpls), avg_rmse), dest=0)
+
+    comm.Barrier()
+    comm.Disconnect()
+
+except NameError:
+    # don't fail if this script was called without MP`
+    pass
 
 shutdown()

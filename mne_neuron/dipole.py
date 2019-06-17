@@ -198,7 +198,7 @@ def average_dipoles(dpls):
     """
 
     # need at least on Dipole to get times
-    assert (len(dpls > 0))
+    assert (len(dpls) > 0)
 
     agg_avg = np.mean(np.array([dpl.dpl['agg'] for dpl in dpls]), axis=0)
     L5_avg = np.mean(np.array([dpl.dpl['L5'] for dpl in dpls]), axis=0)
