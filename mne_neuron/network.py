@@ -28,11 +28,20 @@ class Network(object):
     ----------
     cells : list of Cell objects.
         The list of cells
+    gid_dict : dict
+        Dictionary with keys 'evprox1', 'evdist1' etc.
+        containing the range of Cell IDs of different cell types.
     ext_list : dictionary of list of ExtFeed.
         Keys are:
             'evprox1', 'evprox2', etc.
             'evdist1', etc.
             'extgauss', 'extpois'
+    spiketimes : tuple (n_trials, ) of list of float
+        Each element of the tuple is a trial.
+        The list contains the time stamps of spikes.
+    spikegids : tuple (n_trials, ) of list of float
+        Each element of the tuple is a trial.
+        The list contains the cell IDs of neurons that spiked.
     """
 
     def __init__(self, params, n_jobs=1):
@@ -422,8 +431,8 @@ class Network(object):
             The matplotlib figure handle.
         """
         import matplotlib.pyplot as plt
-        spikes = np.array(self.spiketimes.to_python())
-        gids = np.array(self.spikegids.to_python())
+        spikes = np.array(sum(self.spiketimes, []))
+        gids = np.array(sum(self.spikegids, []))
         valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
                             if k.startswith('evprox')]]
         mask_evprox = np.in1d(gids, valid_gids)
@@ -458,8 +467,8 @@ class Network(object):
             The matplotlib figure object
         """
         import matplotlib.pyplot as plt
-        spikes = np.array(self.spiketimes.to_python())
-        gids = np.array(self.spikegids.to_python())
+        spikes = np.array(sum(self.spiketimes, []))
+        gids = np.array(sum(self.spikegids, []))
         spike_times = np.zeros((4, spikes.shape[0]))
         cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
         for idx, key in enumerate(cell_types):
