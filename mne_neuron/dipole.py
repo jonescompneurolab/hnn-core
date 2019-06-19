@@ -18,13 +18,15 @@ def _hammfilt(x, winsz):
 
 def _clone_and_simulate(params, trial_idx):
     from .network import Network
+
+    if trial_idx != 0:
+        params['prng_*'] = trial_idx
+
     net = Network(params, n_jobs=1)
 
     from neuron import h
-    # create sources and init
     net._create_all_src()
     net.state_init()
-    # parallel network connector
     net._parnet_connect()
     # set to record spikes
     net.spiketimes = h.Vector()
@@ -43,9 +45,6 @@ def _simulate_single_trial(net):
     # Now let's simulate the dipole
     if rank == 0:
         print("running on %d cores" % nhosts)
-
-    # if trial_idx != 0:
-    #     params['prng_*'] = trial_idx
 
     # global variables, should be node-independent
     h("dp_total_L2 = 0.")
@@ -117,7 +116,7 @@ def _simulate_single_trial(net):
         dpl.convert_fAm_to_nAm()
         dpl.scale(net.params['dipole_scalefctr'])
         dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
-    return dpl
+    return dpl, net.spiketimes.to_python(), net.spikegids.to_python()
 
 
 def simulate_dipole(net, n_trials=1, n_jobs=1):
@@ -139,8 +138,10 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
         The dipole object or list of dipole objects if n_trials > 1
     """
     parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
-    dpl = parallel(myfunc(net.params, idx) for idx in range(n_trials))
-
+    out = parallel(myfunc(net.params, idx) for idx in range(n_trials))
+    dpl, spiketimes, spikegids = zip(*out)
+    net.spiketimes = spiketimes
+    net.spikegids = spikegids
     return dpl
 
 # TODO: add crop method to dipole
@@ -173,7 +174,6 @@ class Dipole(object):
         self.t = times
         self.dpl = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
 
-    # conversion from fAm to nAm
     def convert_fAm_to_nAm(self):
         """ must be run after baseline_renormalization()
         """
