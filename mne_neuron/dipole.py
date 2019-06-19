@@ -19,6 +19,18 @@ def _hammfilt(x, winsz):
 def _clone_and_simulate(params, trial_idx):
     from .network import Network
     net = Network(params, n_jobs=1)
+
+    from neuron import h
+    # create sources and init
+    net._create_all_src()
+    net.state_init()
+    # parallel network connector
+    net._parnet_connect()
+    # set to record spikes
+    net.spiketimes = h.Vector()
+    net.spikegids = h.Vector()
+    net._record_spikes()
+
     return _simulate_single_trial(net)
 
 
