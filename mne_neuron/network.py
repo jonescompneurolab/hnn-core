@@ -28,6 +28,11 @@ class Network(object):
     ----------
     cells : list of Cell objects.
         The list of cells
+    ext_list : dictionary of list of ExtFeed.
+        Keys are:
+            'evprox1', 'evprox2', etc.
+            'evdist1', etc.
+            'extgauss', 'extpois'
     """
 
     def __init__(self, params, n_jobs=1):
@@ -113,7 +118,10 @@ class Network(object):
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        s = '%d x %d cell grid' % (self.gridpyr['x'], self.gridpyr['y'])
+        s = ("%d x %d Pyramidal cells (L2, L5)"
+             % (self.gridpyr['x'], self.gridpyr['y']))
+        s += ("\n%d L2 basket cells\n%d L5 basket cells"
+              % (self.N['L2_basket'], self.N['L5_basket']))
         return '<%s | %s>' % (class_name, s)
 
     # creates the immutable source list along with corresponding numbers
