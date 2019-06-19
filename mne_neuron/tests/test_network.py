@@ -15,5 +15,6 @@ def test_network():
     net = Network(deepcopy(params))
     for p in params:
         assert params[p] == net.params[p]
+    assert len(params) == len(net.params)
     print(net)
     print(net.cells[:2])
