@@ -23,6 +23,13 @@ class ExtFeed(object):
         usually, p_ext is a dict of cell types
     gid : int
         The cell ID.
+
+    Attributes
+    ----------
+    seed : int
+        The seed
+    gid : int
+        The cell ID
     """
 
     def __init__(self, ty, celltype, p_ext, gid):
@@ -37,6 +44,11 @@ class ExtFeed(object):
         self.set_prng()  # sets seeds for random num generator
         # sets event times into self.eventvec and plays into self.vs (VecStim)
         self.set_event_times()
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        s = 'seed %d, gid %d' % (self.seed, self.gid)
+        return '<%s | %s>' % (class_name, s)
 
     def set_prng(self, seed=None):
         if seed is None:  # no seed specified then use p_ext to determine seed
