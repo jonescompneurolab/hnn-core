@@ -144,10 +144,6 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     net.spikegids = spikegids
     return dpl
 
-# TODO: add crop method to dipole
-#       add read_dipole function
-#       add mechanism info to cell repr
-
 
 class Dipole(object):
     """Dipole class.

@@ -15,6 +15,8 @@ Current
 Changelog
 ~~~~~~~~~
 
+- Add ability to simulate multiple trials in parallel using joblibs, by `Mainak Jas`_ in `#44 <https://github.com/jasmainak/mne-neuron/pull/44>`_
+
 Bug
 ~~~
 
