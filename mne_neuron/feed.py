@@ -13,7 +13,8 @@ class ExtFeed(object):
     Parameters
     ----------
     ty : str
-        The feed type.
+        The feed type. Can be:
+        'extpois', 'evprox', 'evdist', 'extgauss', 'extinput'
     celltype : str | None
         The cell type.
     p_ext : dict | list (XXX: check)
@@ -21,7 +22,7 @@ class ExtFeed(object):
         p_ext has a different structure for the extinput
         usually, p_ext is a dict of cell types
     gid : int
-        The gid.
+        The cell ID.
     """
 
     def __init__(self, ty, celltype, p_ext, gid):
