@@ -106,15 +106,6 @@ class Network(object):
         # initialize the lists in the dict
         for key in self.ext_list.keys():
             self.ext_list[key] = []
-        # create sources and init
-        self._create_all_src()
-        self.state_init()
-        # parallel network connector
-        self._parnet_connect()
-        # set to record spikes
-        self.spiketimes = h.Vector()
-        self.spikegids = h.Vector()
-        self._record_spikes()
 
     def __repr__(self):
         class_name = self.__class__.__name__
