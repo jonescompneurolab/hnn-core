@@ -17,6 +17,7 @@ Simulation (:py:mod:`mne_neuron`):
    L5Pyr
    L2Basket
    L5Basket
+   ExtFeed
    simulate_dipole
    Network
 

@@ -33,14 +33,17 @@ print(params['L2Pyr_soma*'])
 
 ###############################################################################
 # Now let's simulate the dipole
-net = Network(params, n_jobs=1)
-dpl = simulate_dipole(net)
+# You can simulate multiple trials in parallel by using n_jobs > 1
+net = Network(params)
+dpls = simulate_dipole(net, n_jobs=1, n_trials=2)
 
 ###############################################################################
 # and then plot it
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-dpl.plot(ax=axes[0])
+for dpl in dpls:
+    dpl.plot(ax=axes[0])
+net.plot_input(ax=axes[1])
 
 ###############################################################################
 # Finally, we can also plot the spikes.

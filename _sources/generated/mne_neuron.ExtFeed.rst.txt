@@ -1,0 +1,11 @@
+mne_neuron.ExtFeed
+==================
+
+.. currentmodule:: mne_neuron
+
+.. autoclass:: ExtFeed
+   :members:
+   :special-members: __getitem__, __repr__
+
+   
+   
