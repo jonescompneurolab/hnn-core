@@ -9,7 +9,7 @@ from .cell import _Cell
 # Units for gbar: S/cm^2 unless otherwise noted
 
 
-class BasketSingle(_Cell):
+class Basket(_Cell):
     """Inhibitory cell class."""
 
     def __init__(self, gid, pos, cell_name='Basket'):
@@ -44,13 +44,13 @@ class BasketSingle(_Cell):
         self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
 
 
-class L2Basket(BasketSingle):
+class L2Basket(Basket):
     """Class for layer 2 basket cells."""
 
     def __init__(self, gid=-1, pos=-1):
-        # BasketSingle.__init__(self, pos, L, diam, Ra, cm)
-        # Note: Basket cell properties set in BasketSingle())
-        BasketSingle.__init__(self, gid, pos, 'L2Basket')
+        # Basket.__init__(self, pos, L, diam, Ra, cm)
+        # Note: Basket cell properties set in Basket())
+        Basket.__init__(self, gid, pos, 'L2Basket')
         self.celltype = 'L2_basket'
 
         self._synapse_create()
@@ -201,10 +201,10 @@ class L2Basket(BasketSingle):
             print("Warning, type def not specified in L2Basket")
 
 
-class L5Basket(BasketSingle):
+class L5Basket(Basket):
     def __init__(self, gid=-1, pos=-1):
-        # Note: Cell properties are set in BasketSingle()
-        BasketSingle.__init__(self, gid, pos, 'L5Basket')
+        # Note: Cell properties are set in Basket()
+        Basket.__init__(self, gid, pos, 'L5Basket')
         self.celltype = 'L5_basket'
 
         self._synapse_create()

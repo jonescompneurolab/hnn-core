@@ -18,6 +18,12 @@ from .params_default import (get_L2Pyr_params_default,
 
 
 class Pyr(_Cell):
+    """
+    Attributes
+    ----------
+    dends : list
+
+    """
     def __init__(self, gid, soma_props):
         _Cell.__init__(self, gid, soma_props)
         self.create_soma()
@@ -27,6 +33,9 @@ class Pyr(_Cell):
         self.dends = {}
         # for legacy use with L5Pyr
         self.list_dend = []
+
+    def __repr__(self):
+        return ''
 
     def get_sectnames(self):
         """Create dictionary of section names with entries
@@ -107,14 +116,6 @@ class Pyr(_Cell):
                     'apical_oblique', 'basal_1', 'basal_2', 'basal_3']:
             if key in self.dends:
                 ls.append(self.dends[key])
-        return ls
-
-    def get_section_names(self):
-        ls = ['soma']
-        for key in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
-                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']:
-            if key in self.dends:
-                ls.append(key)
         return ls
 
     def _get_dend_props(self):

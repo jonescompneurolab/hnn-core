@@ -363,8 +363,3 @@ def compare_dictionaries(d1, d2):
         d1[key] = d2[key]
 
     return d1
-
-
-# debug test function
-if __name__ == '__main__':
-    fparam = 'param/debug.param'
