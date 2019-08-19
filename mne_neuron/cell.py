@@ -48,9 +48,18 @@ class _Cell(object):
     def __repr__(self):
         class_name = self.__class__.__name__
         soma_props = self.soma_props
-        s = ('soma: L %f, diam %f, Ra %f, cm %f' %
-             (soma_props['L'], soma_props['diam'],
-              soma_props['Ra'], soma_props['cm']))
+        s = 'gid=%s' % self.gid
+        s += ('\nsoma: L=%f, diam=%f, Ra=%f, cm=%f' %
+              (soma_props['L'], soma_props['diam'],
+               soma_props['Ra'], soma_props['cm']))
+
+        # count dendrites
+        if hasattr(self, 'list_dend'):
+            n_apical = len([d for d in self.list_dend if
+                            'apical' in d.name()])
+            n_basal = len([d for d in self.list_dend if
+                           'basal' in d.name()])
+            s += '\nDendrites: %s apical, %s basal' % (n_apical, n_basal)
         return '<%s | %s>' % (class_name, s)
 
     def create_soma(self):
@@ -342,7 +351,7 @@ class _Cell(object):
 
         nc = pc.gid_connect(gid_presyn, postsyn)
         # calculate distance between cell positions with pardistance()
-        d = self.__pardistance(nc_dict['pos_src'])
+        d = self._pardistance(nc_dict['pos_src'])
         # set props here
         nc.threshold = nc_dict['threshold']
         nc.weight[0] = nc_dict['A_weight'] * \
@@ -354,7 +363,7 @@ class _Cell(object):
 
     # pardistance function requires pre position, since it is
     # calculated on POST cell
-    def __pardistance(self, pos_pre):
+    def _pardistance(self, pos_pre):
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
         return np.sqrt(dx**2 + dy**2)

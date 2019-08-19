@@ -7,7 +7,7 @@ species: Physiological constraint for neuroimaging
 
 """
 
-from mne_neuron.pyramidal import Pyr
+from mne_neuron.pyramidal import L5Pyr
 from mne_neuron.basket import Basket
 
 pyr_props = dict(pos=0, L=39.0, diam=28.9,
@@ -17,5 +17,5 @@ basket_props = dict(pos=0, L=39.0, diam=20.0,
 
 pyrs, baskets = list(), list()
 for gid in range(100):
-    pyrs.append(Pyr(gid=gid, soma_props=pyr_props))
+    pyrs.append(L5Pyr(gid=gid))
     baskets.append(Basket(gid=gid + 100, pos=0))

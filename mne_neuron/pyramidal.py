@@ -21,9 +21,15 @@ class Pyr(_Cell):
     """
     Attributes
     ----------
-    dends : list
-
+    name : str
+        The name of the cell
+    dends : dict
+        The dendrites. The key is the name of the dendrite
+        and the value is an instance of h.Section.
+    list_dend : list of h.Section
+        List of dendrites.
     """
+
     def __init__(self, gid, soma_props):
         _Cell.__init__(self, gid, soma_props)
         self.create_soma()
@@ -34,12 +40,16 @@ class Pyr(_Cell):
         # for legacy use with L5Pyr
         self.list_dend = []
 
-    def __repr__(self):
-        return ''
-
     def get_sectnames(self):
         """Create dictionary of section names with entries
-           to scale section lengths to length along z-axis."""
+           to scale section lengths to length along z-axis.
+
+        Returns
+        -------
+        d : dict
+            Keys are the section names and values are the scaling
+            factors
+        """
         seclist = h.SectionList()
         seclist.wholetree(sec=self.soma)
         d = dict((sect.name(), 1.) for sect in seclist)
@@ -81,34 +91,6 @@ class Pyr(_Cell):
                 # make dend.nseg odd for all sections
                 if not self.dends[key].nseg % 2:
                     self.dends[key].nseg += 1
-
-    # Creates dendritic sections based only on dictionary of dendrite props
-    def create_dends_new(self, p_dend_props):
-        # iterate over keys in p_dend_props. Create dend for each key.
-        for key in p_dend_props:
-            # create dend
-            self.dends[key] = h.Section(name=self.name + '_' + key)
-
-            # set dend props
-            self.dends[key].L = p_dend_props[key]['L']
-            self.dends[key].diam = p_dend_props[key]['diam']
-            self.dends[key].Ra = p_dend_props[key]['Ra']
-            self.dends[key].cm = p_dend_props[key]['cm']
-
-            # set dend nseg
-            if p_dend_props[key]['L'] > 100.:
-                self.dends[key].nseg = int(p_dend_props[key]['L'] / 50.)
-
-                # make dend.nseg odd for all sections
-                if not self.dends[key].nseg % 2:
-                    self.dends[key].nseg += 1
-
-        # apical: 0--4
-        # basal: 5--7
-        self.list_dend = [self.dends[key] for key in
-                          ['apical_trunk', 'apical_oblique', 'apical_1',
-                           'apical_2', 'apical_tuft', 'basal_1', 'basal_2',
-                           'basal_3'] if key in self.dends]
 
     def get_sections(self):
         ls = [self.soma]
