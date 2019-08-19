@@ -190,7 +190,7 @@ class Dipole(object):
         for key in self.dpl.keys():
             self.dpl[key] = _hammfilt(self.dpl[key], winsz)
 
-    def plot(self, ax=None, layer='agg'):
+    def plot(self, ax=None, layer='agg', show=True):
         """Simple layer-specific plot function.
 
         Parameters
@@ -214,7 +214,7 @@ class Dipole(object):
         if layer in self.dpl.keys():
             ax.plot(self.t, self.dpl[layer])
             ax.set_xlabel('Time (ms)')
-        if True:
+        if show:
             plt.show()
         return ax.get_figure()
 

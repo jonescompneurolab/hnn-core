@@ -18,6 +18,19 @@ from .params_default import (get_L2Pyr_params_default,
 
 
 class Pyr(_Cell):
+    """Pyramidal neuron.
+
+    Attributes
+    ----------
+    name : str
+        The name of the cell
+    dends : dict
+        The dendrites. The key is the name of the dendrite
+        and the value is an instance of h.Section.
+    list_dend : list of h.Section
+        List of dendrites.
+    """
+
     def __init__(self, gid, soma_props):
         _Cell.__init__(self, gid, soma_props)
         self.create_soma()
@@ -49,6 +62,7 @@ class Pyr(_Cell):
         return d
 
     def create_dends(self, p_dend_props):
+        """Create dendrites."""
         for key in p_dend_props:
             self.dends[key] = h.Section(
                 name=self.name + '_' + key)  # create dend
@@ -73,34 +87,6 @@ class Pyr(_Cell):
                 if not self.dends[key].nseg % 2:
                     self.dends[key].nseg += 1
 
-    # Creates dendritic sections based only on dictionary of dendrite props
-    def create_dends_new(self, p_dend_props):
-        # iterate over keys in p_dend_props. Create dend for each key.
-        for key in p_dend_props:
-            # create dend
-            self.dends[key] = h.Section(name=self.name + '_' + key)
-
-            # set dend props
-            self.dends[key].L = p_dend_props[key]['L']
-            self.dends[key].diam = p_dend_props[key]['diam']
-            self.dends[key].Ra = p_dend_props[key]['Ra']
-            self.dends[key].cm = p_dend_props[key]['cm']
-
-            # set dend nseg
-            if p_dend_props[key]['L'] > 100.:
-                self.dends[key].nseg = int(p_dend_props[key]['L'] / 50.)
-
-                # make dend.nseg odd for all sections
-                if not self.dends[key].nseg % 2:
-                    self.dends[key].nseg += 1
-
-        # apical: 0--4
-        # basal: 5--7
-        self.list_dend = [self.dends[key] for key in
-                          ['apical_trunk', 'apical_oblique', 'apical_1',
-                           'apical_2', 'apical_tuft', 'basal_1', 'basal_2',
-                           'basal_3'] if key in self.dends]
-
     def get_sections(self):
         ls = [self.soma]
         for key in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
@@ -110,6 +96,7 @@ class Pyr(_Cell):
         return ls
 
     def get_section_names(self):
+        """Get section names."""
         ls = ['soma']
         for key in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
                     'apical_oblique', 'basal_1', 'basal_2', 'basal_3']:
@@ -241,6 +228,16 @@ class L2Pyr(Pyr):
         The cell id.
     p : dict
         The parameters dictionary.
+
+    Attributes
+    ----------
+    name : str
+        The name of the cell
+    dends : dict
+        The dendrites. The key is the name of the dendrite
+        and the value is an instance of h.Section.
+    list_dend : list of h.Section
+        List of dendrites.
     """
 
     def __init__(self, gid=-1, pos=-1, p={}):
@@ -295,6 +292,7 @@ class L2Pyr(Pyr):
         }
 
     def geom(self, p_dend):
+        """The geometry."""
         soma = self.soma
         dend = self.list_dend
         # increased by 70% for human
@@ -336,6 +334,7 @@ class L2Pyr(Pyr):
         self.basic_shape()  # translated from original hoc (2009 model)
 
     def basic_shape(self):
+        """Define shape of the neuron."""
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
         pt3dclear = h.pt3dclear
         pt3dadd = h.pt3dadd
@@ -428,6 +427,7 @@ class L2Pyr(Pyr):
 
     # may be reorganizable
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
+        """Connect cell."""
         for gid_src, p_src, pos in zip(gid_dict['extinput'], p_ext,
                                        pos_dict['extinput']):
             # Check if AMPA params defined in p_src
@@ -482,6 +482,7 @@ class L2Pyr(Pyr):
     # types must be defined explicitly here
     # this function handles evoked, gaussian, and poisson inputs
     def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
+        """Connect cell to external input."""
         if type.startswith(('evprox', 'evdist')):
             if self.celltype in p_ext.keys():
                 gid_ev = gid + gid_dict[type][0]
@@ -600,7 +601,18 @@ class L2Pyr(Pyr):
 # units for taur: ms
 
 class L5Pyr(Pyr):
-    """Layer 5 Pyramidal class."""
+    """Layer 5 Pyramidal class.
+
+    Attributes
+    ----------
+    name : str
+        The name of the cell
+    dends : dict
+        The dendrites. The key is the name of the dendrite
+        and the value is an instance of h.Section.
+    list_dend : list of h.Section
+        List of dendrites.
+    """
 
     def __init__(self, gid=-1, pos=-1, p={}):
         """Get default L5Pyr params and update them with
@@ -645,6 +657,7 @@ class L5Pyr(Pyr):
         self.record_current_soma()
 
     def basic_shape(self):
+        """The shape of the neuron."""
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
         pt3dclear = h.pt3dclear
         pt3dadd = h.pt3dadd
@@ -678,6 +691,7 @@ class L5Pyr(Pyr):
         pt3dadd(106, -156, 0, 1, sec=dend[7])
 
     def geom(self, p_dend):
+        """The geometry."""
         soma = self.soma
         dend = self.list_dend
         # soma.L = 13 # BUSH 1999 spike amp smaller
