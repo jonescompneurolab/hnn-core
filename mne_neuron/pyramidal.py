@@ -78,7 +78,7 @@ class Pyr(_Cell):
                            'basal_3'] if key in self.dends]
 
     def set_dend_props(self, p_dend_props):
-        """"Iterate over keys in p_dend_props. Create dend for each key."""
+        """Iterate over keys in p_dend_props. Create dend for each key."""
         for key in p_dend_props:
             # set dend props
             self.dends[key].L = p_dend_props[key]['L']

@@ -350,14 +350,14 @@ class _Cell(object):
         from .parallel import pc
 
         nc = pc.gid_connect(gid_presyn, postsyn)
-        # calculate distance between cell positions with pardistance()
-        d = self._pardistance(nc_dict['pos_src'])
-        # set props here
         nc.threshold = nc_dict['threshold']
-        nc.weight[0] = nc_dict['A_weight'] * \
-            np.exp(-(d**2) / (nc_dict['lamtha']**2))
-        nc.delay = nc_dict['A_delay'] / \
-            (np.exp(-(d**2) / (nc_dict['lamtha']**2)))
+
+        if 'pos_src' in nc_dict and 'A_weight' in nc_dict:
+            d = self._pardistance(nc_dict['pos_src'])
+            nc.weight[0] = nc_dict['A_weight'] * \
+                np.exp(-(d**2) / (nc_dict['lamtha']**2))
+            nc.delay = nc_dict['A_delay'] / \
+                (np.exp(-(d**2) / (nc_dict['lamtha']**2)))
 
         return nc
 
