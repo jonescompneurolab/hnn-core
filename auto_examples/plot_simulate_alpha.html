@@ -354,6 +354,7 @@ MNE-Neuron.</p>
     &quot;prng_seedcore_input_prox&quot;: 4,
     &quot;repeats_dist&quot;: 10,
     &quot;repeats_prox&quot;: 10,
+    &quot;save_dpl&quot;: 0,
     &quot;save_figs&quot;: 0,
     &quot;save_spec_data&quot;: 0,
     &quot;save_vsoma&quot;: 0,
@@ -406,7 +407,7 @@ by using the pattern gbar_ev*</p>
 <p>Now let’s simulate the dipole and plot it</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
-<span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_alpha_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_001.png" />
@@ -492,8 +493,9 @@ Simulation time: 700.0 ms...
 <span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
 <span class="n">n_fft</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span>
 <span class="n">freqs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">psds</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span>
-    <span class="n">dpl</span><span class="o">.</span><span class="n">dpl</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">],</span> <span class="n">sfreq</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+    <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dpl</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">],</span> <span class="n">sfreq</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
     <span class="n">nperseg</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">psds</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
@@ -502,7 +504,7 @@ Simulation time: 700.0 ms...
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_alpha_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_002.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 13 minutes  12.347 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  17.281 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-alpha-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jasmainak/mne-neuron/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_alpha.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>

@@ -117,7 +117,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(target, threshold)</p></td>
-<td><p></p></td>
+<td><p>Connect_to_target created for pc, used in Network()</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_all_IClamp</span></code>(p)</p></td>
 <td><p>temporarily an external function taking the p dict</p></td>
@@ -126,75 +126,79 @@
 <td><p>Create soma and set geometry.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(yscale)</p></td>
-<td><p></p></td>
+<td><p>Insert dipole into each section of this cell.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get3dinfo</span></code>()</p></td>
+<td><p>Get 3d info.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sections</span></code>()</p></td>
+<td><p>Get sections.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>()</p></td>
 <td><p>Get cell’s bounding box.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert_IClamp</span></code>(sect_name, props_IClamp)</p></td>
+<td><p>Add IClamp to a segment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code>()</p></td>
+<td><p>Move cell to position.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code>(gid, gid_dict, pos_dict, p)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code>(gid, gid_dict, pos_dict, p)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(gid_presyn, nc_dict, postsyn)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(gid_presyn, nc_dict, postsyn)</p></td>
 <td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code>(gid, gid_dict, pos_dict, p_ext)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#mne_neuron.L5Basket.parreceive" title="mne_neuron.L5Basket.parreceive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code></a>(gid, gid_dict, pos_dict, p_ext)</p></td>
+<td><p>Receive.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code>(type, gid, gid_dict, …)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mne_neuron.L5Basket.parreceive_ext" title="mne_neuron.L5Basket.parreceive_ext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code></a>(type, gid, gid_dict, …)</p></td>
+<td><p>Recieve external inputs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>()</p></td>
+<td><p>Record current at soma.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_volt_soma</span></code>()</p></td>
+<td><p>Record voltage at soma.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>()</p></td>
-<td><p></p></td>
+<td><p>Define 3D shape of soma.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_ampa_create</span></code>(secloc)</p></td>
-<td><p></p></td>
+<td><p>Create ampa receiving synapse.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(secloc, p)</p></td>
 <td><p>Create an h.Exp2Syn synapse.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabaa_create</span></code>(secloc)</p></td>
-<td><p></p></td>
+<td><p>Create gabaa receiving synapse.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabab_create</span></code>(secloc)</p></td>
-<td><p></p></td>
+<td><p>Create gabab receiving synapse.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_nmda_create</span></code>(secloc)</p></td>
-<td><p></p></td>
+<td><p>Create nmda receiving synapse.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate3d</span></code>(dx, dy, dz)</p></td>
+<td><p>Translate 3d.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_to</span></code>(x, y, z)</p></td>
+<td><p>Translate to position.</p></td>
 </tr>
 </tbody>
 </table>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 67%" />
-<col style="width: 33%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><strong>get3dinfo</strong></p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p><strong>get_sections</strong></p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p><strong>move_to_pos</strong></p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p><strong>record_volt_soma</strong></p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p><strong>translate3d</strong></p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p><strong>translate_to</strong></p></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="mne_neuron.L5Basket.parreceive">
+<code class="sig-name descname">parreceive</code><span class="sig-paren">(</span><em class="sig-param">gid</em>, <em class="sig-param">gid_dict</em>, <em class="sig-param">pos_dict</em>, <em class="sig-param">p_ext</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.L5Basket.parreceive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mne_neuron.L5Basket.parreceive_ext">
+<code class="sig-name descname">parreceive_ext</code><span class="sig-paren">(</span><em class="sig-param">type</em>, <em class="sig-param">gid</em>, <em class="sig-param">gid_dict</em>, <em class="sig-param">pos_dict</em>, <em class="sig-param">p_ext</em><span class="sig-paren">)</span><a class="headerlink" href="#mne_neuron.L5Basket.parreceive_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recieve external inputs.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>

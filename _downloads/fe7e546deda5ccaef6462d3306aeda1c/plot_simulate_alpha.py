@@ -58,7 +58,7 @@ params['gbar_ev*'] = 0.0
 # Now let's simulate the dipole and plot it
 net = Network(params)
 dpl = simulate_dipole(net)
-dpl.plot()
+dpl[0].plot()
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity.
@@ -68,8 +68,9 @@ import numpy as np
 sfreq = 1000. / params['dt']
 n_fft = 1024 * 8
 freqs, _, psds = spectrogram(
-    dpl.dpl['agg'], sfreq, window='hamming', nfft=n_fft,
+    dpl[0].dpl['agg'], sfreq, window='hamming', nfft=n_fft,
     nperseg=n_fft, noverlap=0)
+plt.figure()
 plt.plot(freqs, np.mean(psds, axis=-1))
 plt.xlim((0, 40))
 plt.xlabel('Frequency (Hz)')
