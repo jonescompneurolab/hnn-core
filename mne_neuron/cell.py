@@ -24,6 +24,11 @@ class _Cell(object):
     soma_props : dict
         The properties of the soma. Must contain
         keys 'L', 'diam', and 'pos'
+
+    Attributes
+    ----------
+    pos : list of length 3
+        The position of the cell.
     """
 
     def __init__(self, gid, soma_props):
@@ -70,13 +75,16 @@ class _Cell(object):
         self.soma.cm = soma_props['cm']
 
     def record_volt_soma(self):
+        """Record voltage at soma."""
         self.vsoma = h.Vector()
         self.vsoma.record(self.soma(0.5)._ref_v)
 
     def get_sections(self):
+        """Get sections."""
         return [self.soma]
 
     def get3dinfo(self):
+        """Get 3d info."""
         ls = self.get_sections()
         lx, ly, lz, ldiam = [], [], [], []
         for s in ls:
@@ -102,12 +110,14 @@ class _Cell(object):
         return ((minx, maxx), (miny, maxy), (minz, maxz))
 
     def translate3d(self, dx, dy, dz):
+        """Translate 3d."""
         for s in self.get_sections():
             for i in range(s.n3d()):
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
                              s.z3d(i) + dz, s.diam3d(i), sec=s)
 
     def translate_to(self, x, y, z):
+        """Translate to position."""
         x0 = self.soma.x3d(0)
         y0 = self.soma.y3d(0)
         z0 = self.soma.z3d(0)
@@ -118,6 +128,7 @@ class _Cell(object):
         self.translate3d(dx, dy, dz)
 
     def move_to_pos(self):
+        """Move cell to position."""
         self.translate_to(self.pos[0] * 100, self.pos[2], self.pos[1] * 100)
 
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
@@ -151,7 +162,7 @@ class _Cell(object):
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
     def dipole_insert(self, yscale):
-        # insert dipole into each section of this cell
+        """Insert dipole into each section of this cell."""
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma
         seclist = h.SectionList()
@@ -211,9 +222,8 @@ class _Cell(object):
             # set the pp dipole's ztan value to the last value from y_diff
             dpp.ztan = y_diff[-1]
 
-    # Add IClamp to a segment
     def insert_IClamp(self, sect_name, props_IClamp):
-        # def insert_iclamp(self, sect_name, seg_loc, tstart, tstop, weight):
+        """Add IClamp to a segment."""
         # gather list of all sections
         seclist = h.SectionList()
         seclist.wholetree(sec=self.soma)
@@ -229,9 +239,8 @@ class _Cell(object):
         # object must exist for NEURON somewhere and needs to be saved
         return stim
 
-    # simple function to record current
-    # for now only at the soma
     def record_current_soma(self):
+        """Record current at soma."""
         # a soma exists at self.soma
         self.rec_i = h.Vector()
         try:
@@ -279,6 +288,13 @@ class _Cell(object):
     # Might change in future
     # creates a RECEIVING inhibitory synapse at secloc
     def syn_gabaa_create(self, secloc):
+        """Create gabaa receiving synapse.
+
+        Parameters
+        ----------
+        secloc : float (0 to 1.0)
+            The section location
+        """
         syn_gabaa = h.Exp2Syn(secloc)
         syn_gabaa.e = -80
         syn_gabaa.tau1 = 0.5
@@ -288,6 +304,13 @@ class _Cell(object):
     # creates a RECEIVING slow inhibitory synapse at secloc
     # called: self.soma_gabab = syn_gabab_create(self.soma(0.5))
     def syn_gabab_create(self, secloc):
+        """Create gabab receiving synapse.
+
+        Parameters
+        ----------
+        secloc : float (0 to 1.0)
+            The section location.
+        """
         syn_gabab = h.Exp2Syn(secloc)
         syn_gabab.e = -80
         syn_gabab.tau1 = 1
@@ -297,6 +320,13 @@ class _Cell(object):
     # creates a RECEIVING excitatory synapse at secloc
     # def syn_ampa_create(self, secloc, tau_decay, prng_obj):
     def syn_ampa_create(self, secloc):
+        """Create ampa receiving synapse.
+
+        Parameters
+        ----------
+        secloc : float (0 to 1.0)
+            The section location.
+        """
         syn_ampa = h.Exp2Syn(secloc)
         syn_ampa.e = 0.
         syn_ampa.tau1 = 0.5
@@ -306,15 +336,30 @@ class _Cell(object):
     # creates a RECEIVING nmda synapse at secloc
     # this is a pretty fast NMDA, no?
     def syn_nmda_create(self, secloc):
+        """Create nmda receiving synapse.
+
+        Parameters
+        ----------
+        secloc : float (0 to 1.0)
+            The section location.
+        """
         syn_nmda = h.Exp2Syn(secloc)
         syn_nmda.e = 0.
         syn_nmda.tau1 = 1.
         syn_nmda.tau2 = 20.
         return syn_nmda
 
-    # connect_to_target created for pc, used in Network()
-    # these are SOURCES of spikes
     def connect_to_target(self, target, threshold):
+        """Connect_to_target created for pc, used in Network()
+           these are SOURCES of spikes.
+
+        Parameters
+        ----------
+        target : POINT_PROCESS | ARTIFICIAL_CELL | None
+            The target passed to connect to using h.NetCon
+        threshold : float
+            The voltage threshold for action potential.
+        """
         nc = h.NetCon(self.soma(0.5)._ref_v, target, sec=self.soma)
         nc.threshold = threshold
         return nc
@@ -342,7 +387,7 @@ class _Cell(object):
 
         nc = pc.gid_connect(gid_presyn, postsyn)
         # calculate distance between cell positions with pardistance()
-        d = self.__pardistance(nc_dict['pos_src'])
+        d = self._pardistance(nc_dict['pos_src'])
         # set props here
         nc.threshold = nc_dict['threshold']
         nc.weight[0] = nc_dict['A_weight'] * \
@@ -354,14 +399,17 @@ class _Cell(object):
 
     # pardistance function requires pre position, since it is
     # calculated on POST cell
-    def __pardistance(self, pos_pre):
+    def _pardistance(self, pos_pre):
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
         return np.sqrt(dx**2 + dy**2)
 
-    # Define 3D shape of soma -- is needed for gui representation of cell
-    # DO NOT need to call h.define_shape() explicitly!!
     def shape_soma(self):
+        """Define 3D shape of soma.
+
+        .. warning:: needed for gui representation of cell
+                     DO NOT need to call h.define_shape() explicitly!
+        """
         h.pt3dclear(sec=self.soma)
         # h.ptdadd(x, y, z, diam) -- if this function is run, clobbers
         # self.soma.diam set above

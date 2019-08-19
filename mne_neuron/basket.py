@@ -104,6 +104,7 @@ class L2Basket(BasketSingle):
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
     def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
+        """Receive external inputs."""
         if type.startswith(('evprox', 'evdist')):
             if self.celltype in p_ext.keys():
                 gid_ev = gid + gid_dict[type][0]
@@ -223,6 +224,7 @@ class L5Basket(BasketSingle):
 
     # parallel receive function parreceive()
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
+        """Receive."""
         for gid_src, p_src, pos in zip(gid_dict['extinput'], p_ext,
                                        pos_dict['extinput']):
             # Check if AMPA params are define in p_src
@@ -258,6 +260,7 @@ class L5Basket(BasketSingle):
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
     def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
+        """Recieve external inputs."""
         # shouldn't this just check for evprox?
         if type.startswith(('evprox', 'evdist')):
             if self.celltype in p_ext.keys():
