@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 
 descr = """Experimental code for simulating evoked using Neuron"""
 
-DISTNAME = 'mne-neuron'
+DISTNAME = 'hnn-core'
 DESCRIPTION = descr
 MAINTAINER = 'Mainak Jas'
 MAINTAINER_EMAIL = 'mainakjas@gmail.com'
 URL = ''
 LICENSE = 'BSD (3-clause)'
-DOWNLOAD_URL = 'http://github.com/mne-tools/mne-neuron'
+DOWNLOAD_URL = 'http://github.com/hnnsolver/hnn-core'
 VERSION = '0.1.dev0'
 
 if __name__ == "__main__":

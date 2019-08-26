@@ -21,7 +21,7 @@ import sphinx_bootstrap_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'mne-neuron'
+project = 'hnn-core'
 copyright = '2019, Mainak Jas'
 author = 'Mainak Jas'
 
@@ -95,7 +95,7 @@ html_theme_options = {
         ("Examples", "auto_examples/index"),
         ("API", "api"),
         ("Whats new", "whats_new"),
-        ("GitHub", "https://github.com/jasmainak/mne-neuron", True)
+        ("GitHub", "https://github.com/hnnsolver/hnn-core", True)
     ],
     'bootswatch_theme': "united"
 }
@@ -119,7 +119,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'mne-neurondoc'
+htmlhelp_basename = 'hnn-coredoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -146,7 +146,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'mne-neuron.tex', 'mne-neuron Documentation',
+    (master_doc, 'hnn-core.tex', 'hnn-core Documentation',
      'Mainak Jas', 'manual'),
 ]
 
@@ -156,7 +156,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'mne-neuron', 'mne-neuron Documentation',
+    (master_doc, 'hnn-core', 'hnn-core Documentation',
      [author], 1)
 ]
 
@@ -167,8 +167,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'mne-neuron', 'mne-neuron Documentation',
-     author, 'mne-neuron', 'One line description of project.',
+    (master_doc, 'hnn-core', 'hnn-core Documentation',
+     author, 'hnn-core', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -179,10 +179,10 @@ sphinx_gallery_conf = {
     'gallery_dirs': 'auto_examples',
     'backreferences_dir': False,
     'reference_url': {
-        'mne_neuron': 'https://jasmainak.github.io/mne-neuron/'
+        'hnn_core': 'https://hnnsolver.github.io/hnn-core/'
     },
-    'binder': {'org': 'jasmainak',
-               'repo': 'mne-neuron',
+    'binder': {'org': 'hnnsolver',
+               'repo': 'hnn-core',
                'branch': 'gh-pages',
                'binderhub_url': 'https://mybinder.org',
                'notebooks_dir': 'stable/notebooks',
@@ -193,7 +193,7 @@ sphinx_gallery_conf = {
          "import os\n"
          "from neuron import h\n"
          "h.nrn_load_dll(os.environ['HOME']"
-         " + '/mne-neuron/x86_64/.libs/libnrnmech.so')")
+         " + '/hnn-core/x86_64/.libs/libnrnmech.so')")
 }
 
 from neuron import h

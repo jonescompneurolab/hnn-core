@@ -97,20 +97,20 @@ coverage:
 		  "results in $(BUILDDIR)/coverage/python.txt."
 
 install:
-	rm -rf _build/doctrees _build/mne-neuron.github.io
-	# first clone the jasmainak/mne-neuron.github.io repo because it may ask
+	rm -rf _build/doctrees _build/hnn-core.github.io
+	# first clone the hnnsolver/hnn-core.github.io repo because it may ask
 	# for password and we don't want to delay this long build in
 	# the middle of it
 	# --no-checkout just fetches the root folder without content
 	# --depth 1 is a speed optimization since we don't need the
 	# history prior to the last commit
 	# -b gh-pages fetches only the branch for the gh-pages
-	git clone -b gh-pages --single-branch --no-checkout --depth 1 git@github.com:jasmainak/mne-neuron.git _build/mne-neuron.github.io
-	touch _build/mne-neuron.github.io/.nojekyll
+	git clone -b gh-pages --single-branch --no-checkout --depth 1 git@github.com:hnnsolver/hnn-core.git _build/hnn-core.github.io
+	touch _build/hnn-core.github.io/.nojekyll
 	make html
 	cd _build/ && \
-	cp -r html/* mne-neuron.github.io && \
-	cd mne-neuron.github.io && \
+	cp -r html/* hnn-core.github.io && \
+	cd hnn-core.github.io && \
 	git add * && \
 	git add .nojekyll && \
 	git commit -a -m 'Make install' && \

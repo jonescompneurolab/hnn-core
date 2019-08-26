@@ -1,5 +1,5 @@
-MNE-Neuron examples
+hnn-core examples
 -------------------
 
-Some introductory examples to get started with MNE-Neuron
+Some introductory examples to get started with hnn-core
 

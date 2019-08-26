@@ -7,16 +7,16 @@ Once the implementation of a piece of functionality is considered to be bug
 free and properly documented (both API docs and an example script),
 it can be incorporated into the master branch.
 
-To help developing `mne-neuron`, you will need a few adjustments to your
+To help developing `hnn-core`, you will need a few adjustments to your
 installation as shown below.
 
 ##### Running tests
 
-To run the tests using `pytest`, you need to have the git cloned `mne-neuron`
+To run the tests using `pytest`, you need to have the git cloned `hnn-core`
 repository with an editable pip install:
 
-    $ git clone https://github.com/jasmainak/mne-neuron --depth 1
-    $ cd mne-neuron
+    $ git clone https://github.com/hnnsolver/hnn-core --depth 1
+    $ cd hnn-core
     $ python setup.py develop
 
 Then, install the following python packages:
