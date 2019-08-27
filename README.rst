@@ -1,5 +1,5 @@
 hnn-core
-==========
+========
 
 .. image:: https://badges.gitter.im/hnn-core/hnn-core.svg
    :target: https://gitter.im/hnn-core/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
@@ -48,7 +48,7 @@ with `pip`. To upgrade, use the ``--upgrade`` flag provided by `pip`.
 
 To check if everything worked fine, you can do::
 
-	$ python -c 'import hnn-core'
+	$ python -c 'import hnn_core'
 
 and it should not give any error messages.
 
