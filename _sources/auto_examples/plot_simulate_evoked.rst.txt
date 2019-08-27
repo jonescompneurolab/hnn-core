@@ -29,16 +29,16 @@ waveforms using MNE-Neuron.
 
 
 
-Let us import mne_neuron
+Let us import hnn_core
 
 
 .. code-block:: default
 
 
-    import mne_neuron
-    from mne_neuron import simulate_dipole, Params, Network
+    import hnn_core
+    from hnn_core import simulate_dipole, Params, Network
 
-    mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+    mne_neuron_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 
 
@@ -309,6 +309,7 @@ Then we read the parameters file
     }
 
 
+
 This is a lot of parameters! We can also filter the
 parameters using unix-style wildcard characters
 
@@ -338,6 +339,7 @@ parameters using unix-style wildcard characters
         "L2Pyr_soma_gl_hh2": 4.26e-05,
         "L2Pyr_soma_gnabar_hh2": 0.18
     }
+
 
 
 Now let's simulate the dipole
@@ -397,6 +399,7 @@ You can simulate multiple trials in parallel by using n_jobs > 1
     Simulation time: 160.0 ms...
 
 
+
 and then plot it
 
 
@@ -415,6 +418,17 @@ and then plot it
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:218: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:450: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
+
 
 
 Finally, we can also plot the spikes.
@@ -430,12 +444,21 @@ Finally, we can also plot the spikes.
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:489: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  16.809 seconds)
+   **Total running time of the script:** ( 2 minutes  20.223 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

@@ -6,9 +6,9 @@
 API Documentation
 =================
 
-Simulation (:py:mod:`mne_neuron`):
+Simulation (:py:mod:`hnn_core`):
 
-.. currentmodule:: mne_neuron
+.. currentmodule:: hnn_core
 
 .. autosummary::
    :toctree: generated/
@@ -21,7 +21,7 @@ Simulation (:py:mod:`mne_neuron`):
    simulate_dipole
    Network
 
-.. currentmodule:: mne_neuron.params
+.. currentmodule:: hnn_core.params
 
 .. autosummary::
    :toctree: generated/

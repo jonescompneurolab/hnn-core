@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Computation times &#8212; hnn-core  documentation</title>
+    <title>hnn_core.simulate_dipole &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -42,7 +42,7 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="index.html">Examples</a></li>
+                <li><a href="../auto_examples/index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/hnnsolver/hnn-core">GitHub</a></li>
@@ -68,7 +68,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Computation times</a></li>
+<li><a class="reference internal" href="#">hnn_core.simulate_dipole</a></li>
 </ul>
 </ul>
 </li>
@@ -80,7 +80,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/auto_examples/sg_execution_times.rst.txt"
+  <a href="../_sources/generated/hnn_core.simulate_dipole.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -104,14 +104,33 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>10:49.501</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<ul class="simple">
-<li><p><strong>05:01.454</strong>: <a class="reference internal" href="plot_simulate_alpha.html#sphx-glr-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">Simulate alpha waves</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_alpha.py</span></code>)</p></li>
-<li><p><strong>03:27.824</strong>: <a class="reference internal" href="plot_simulate_somato.html#sphx-glr-auto-examples-plot-simulate-somato-py"><span class="std std-ref">Simulate somato data</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_somato.py</span></code>)</p></li>
-<li><p><strong>02:20.223</strong>: <a class="reference internal" href="plot_simulate_evoked.html#sphx-glr-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">Simulate dipole</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_evoked.py</span></code>)</p></li>
-</ul>
+  <div class="section" id="hnn-core-simulate-dipole">
+<h1>hnn_core.simulate_dipole<a class="headerlink" href="#hnn-core-simulate-dipole" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="hnn_core.simulate_dipole">
+<code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">simulate_dipole</code><span class="sig-paren">(</span><em class="sig-param">net</em>, <em class="sig-param">n_trials=1</em>, <em class="sig-param">n_jobs=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.simulate_dipole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate a dipole given the experiment parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">Network object</span></dt><dd><p>The Network object specifying how cells are
+connected.</p>
+</dd>
+<dt><strong>n_trials</strong><span class="classifier">int</span></dt><dd><p>The number of trials to simulate.</p>
+</dd>
+<dt><strong>n_jobs</strong><span class="classifier">int</span></dt><dd><p>The number of jobs to run in parallel.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>dpl: list | instance of Dipole</dt><dd><p>The dipole object or list of dipole objects if n_trials &gt; 1</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

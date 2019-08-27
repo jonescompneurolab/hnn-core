@@ -29,14 +29,14 @@ MNE-Neuron.
 
 
 
-Let us import mne_neuron
+Let us import hnn_core
 
 
 .. code-block:: default
 
 
-    import mne_neuron
-    from mne_neuron import simulate_dipole, Params, Network
+    import hnn_core
+    from hnn_core import simulate_dipole, Params, Network
 
 
 
@@ -49,7 +49,7 @@ Then we setup the directories and Neuron
 
 .. code-block:: default
 
-    mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 
 
@@ -62,7 +62,7 @@ Then we read the default parameters file
 
 .. code-block:: default
 
-    params_fname = op.join(mne_neuron_root, 'param', 'default.json')
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = Params(params_fname)
     print(params)
 
@@ -320,6 +320,7 @@ Then we read the default parameters file
     }
 
 
+
 Now, we update a few parameters
 
 
@@ -458,6 +459,9 @@ Now let's simulate the dipole and plot it
     Simulation time: 680.0 ms...
     Simulation time: 690.0 ms...
     Simulation time: 700.0 ms...
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:218: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
+
 
 
 We can confirm that what we simulate is indeed 10 Hz activity.
@@ -486,12 +490,21 @@ We can confirm that what we simulate is indeed 10 Hz activity.
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_alpha.py:78: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
+
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 4 minutes  17.281 seconds)
+   **Total running time of the script:** ( 5 minutes  1.454 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

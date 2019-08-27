@@ -1,0 +1,11 @@
+hnn_core.L2Pyr
+==============
+
+.. currentmodule:: hnn_core
+
+.. autoclass:: L2Pyr
+   :members:
+   :special-members: __getitem__, __repr__
+
+   
+   

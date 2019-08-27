@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Computation times &#8212; hnn-core  documentation</title>
+    <title>hnn_core.ExtFeed &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -42,7 +42,7 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="index.html">Examples</a></li>
+                <li><a href="../auto_examples/index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/hnnsolver/hnn-core">GitHub</a></li>
@@ -68,7 +68,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Computation times</a></li>
+<li><a class="reference internal" href="#">hnn_core.ExtFeed</a></li>
 </ul>
 </ul>
 </li>
@@ -80,7 +80,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/auto_examples/sg_execution_times.rst.txt"
+  <a href="../_sources/generated/hnn_core.ExtFeed.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -104,14 +104,71 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>10:49.501</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<ul class="simple">
-<li><p><strong>05:01.454</strong>: <a class="reference internal" href="plot_simulate_alpha.html#sphx-glr-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">Simulate alpha waves</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_alpha.py</span></code>)</p></li>
-<li><p><strong>03:27.824</strong>: <a class="reference internal" href="plot_simulate_somato.html#sphx-glr-auto-examples-plot-simulate-somato-py"><span class="std std-ref">Simulate somato data</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_somato.py</span></code>)</p></li>
-<li><p><strong>02:20.223</strong>: <a class="reference internal" href="plot_simulate_evoked.html#sphx-glr-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">Simulate dipole</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_evoked.py</span></code>)</p></li>
-</ul>
+  <div class="section" id="hnn-core-extfeed">
+<h1>hnn_core.ExtFeed<a class="headerlink" href="#hnn-core-extfeed" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="hnn_core.ExtFeed">
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">ExtFeed</code><span class="sig-paren">(</span><em class="sig-param">ty</em>, <em class="sig-param">celltype</em>, <em class="sig-param">p_ext</em>, <em class="sig-param">gid</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.ExtFeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>“The ExtFeed class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ty</strong><span class="classifier">str</span></dt><dd><p>The feed type. Can be:
+‘extpois’, ‘evprox’, ‘evdist’, ‘extgauss’, ‘extinput’</p>
+</dd>
+<dt><strong>celltype</strong><span class="classifier">str | None</span></dt><dd><p>The cell type.</p>
+</dd>
+<dt><strong>p_ext</strong><span class="classifier">dict | list (XXX: check)</span></dt><dd><p>Parameters of external input.
+p_ext has a different structure for the extinput
+usually, p_ext is a dict of cell types</p>
+</dd>
+<dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>The cell ID.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>seed</strong><span class="classifier">int</span></dt><dd><p>The seed</p>
+</dd>
+<dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>The cell ID</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(self, threshold)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 34%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>set_event_times</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>set_prng</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="hnn_core.ExtFeed.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.ExtFeed.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

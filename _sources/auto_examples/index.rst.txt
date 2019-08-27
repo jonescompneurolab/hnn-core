@@ -4,17 +4,17 @@
 
 .. _sphx_glr_auto_examples:
 
-MNE-Neuron examples
+hnn-core examples
 -------------------
 
-Some introductory examples to get started with MNE-Neuron
+Some introductory examples to get started with hnn-core
 
 
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using MNE-Neuron. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using MNE-Neuron.">
 
 .. only:: html
 
@@ -34,7 +34,7 @@ Some introductory examples to get started with MNE-Neuron
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using MNE-Neuron. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using MNE-Neuron.">
 
 .. only:: html
 
@@ -85,13 +85,13 @@ Some introductory examples to get started with MNE-Neuron
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//home/mainak/Desktop/projects/github_repos/mne-neuron/doc/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/mainak/Documents/github_repos/hnn-core/doc/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//home/mainak/Desktop/projects/github_repos/mne-neuron/doc/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/mainak/Documents/github_repos/hnn-core/doc/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html
