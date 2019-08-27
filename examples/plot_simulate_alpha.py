@@ -13,18 +13,18 @@ MNE-Neuron.
 import os.path as op
 
 ###############################################################################
-# Let us import mne_neuron
+# Let us import hnn_core
 
-import mne_neuron
-from mne_neuron import simulate_dipole, Params, Network
+import hnn_core
+from hnn_core import simulate_dipole, Params, Network
 
 ###############################################################################
 # Then we setup the directories and Neuron
-mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 ###############################################################################
 # Then we read the default parameters file
-params_fname = op.join(mne_neuron_root, 'param', 'default.json')
+params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = Params(params_fname)
 print(params)
 

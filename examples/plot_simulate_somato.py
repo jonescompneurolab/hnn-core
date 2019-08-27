@@ -64,12 +64,12 @@ plt.show()
 
 import os.path as op
 
-import mne_neuron
-from mne_neuron import simulate_dipole, Params, Network
+import hnn_core
+from hnn_core import simulate_dipole, Params, Network
 
-mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
-params_fname = op.join(mne_neuron_root, 'param', 'N20.json')
+params_fname = op.join(hnn_core_root, 'param', 'N20.json')
 params = Params(params_fname)
 
 net = Network(params)

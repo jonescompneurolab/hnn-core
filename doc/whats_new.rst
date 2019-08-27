@@ -5,7 +5,7 @@
 What's new?
 ===========
 
-.. currentmodule:: mne_neuron
+.. currentmodule:: hnn_core
 
 .. _current:
 
@@ -15,12 +15,12 @@ Current
 Changelog
 ~~~~~~~~~
 
-- Add ability to simulate multiple trials in parallel using joblibs, by `Mainak Jas`_ in `#44 <https://github.com/jasmainak/mne-neuron/pull/44>`_
+- Add ability to simulate multiple trials in parallel using joblibs, by `Mainak Jas`_ in `#44 <https://github.com/jasmainak/hnn-core/pull/44>`_
 
 Bug
 ~~~
 
-- Fix missing autapses in network construction, by `Mainak Jas`_ in `#50 <https://github.com/jasmainak/mne-neuron/pull/50>`_
+- Fix missing autapses in network construction, by `Mainak Jas`_ in `#50 <https://github.com/jasmainak/hnn-core/pull/50>`_
 
 API
 ~~~

@@ -13,12 +13,12 @@ waveforms using MNE-Neuron.
 import os.path as op
 
 ###############################################################################
-# Let us import mne_neuron
+# Let us import hnn_core
 
-import mne_neuron
-from mne_neuron import simulate_dipole, Params, Network
+import hnn_core
+from hnn_core import simulate_dipole, Params, Network
 
-mne_neuron_root = op.join(op.dirname(mne_neuron.__file__), '..')
+mne_neuron_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 ###############################################################################
 # Then we read the parameters file
