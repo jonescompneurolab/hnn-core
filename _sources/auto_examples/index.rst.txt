@@ -14,7 +14,7 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using MNE-Neuron.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core.">
 
 .. only:: html
 
@@ -34,7 +34,7 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using MNE-Neuron.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using HNN-core.">
 
 .. only:: html
 

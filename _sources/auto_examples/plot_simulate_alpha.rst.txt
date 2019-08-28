@@ -12,7 +12,7 @@ Simulate alpha waves
 ====================
 
 This example demonstrates how to simulate alpha waves using
-MNE-Neuron.
+HNN-core.
 
 
 .. code-block:: default
@@ -304,7 +304,7 @@ Then we read the default parameters file
         "sigma_t_evprox_1": 2.47,
         "sigma_t_evprox_2": 8.33,
         "sim_prefix": "default",
-        "sync_evinput": 0,
+        "sync_evinput": false,
         "t0_input_dist": 1000,
         "t0_input_prox": 1000.0,
         "t0_input_stdev_dist": 0.0,
@@ -459,7 +459,7 @@ Now let's simulate the dipole and plot it
     Simulation time: 680.0 ms...
     Simulation time: 690.0 ms...
     Simulation time: 700.0 ms...
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:218: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:220: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
 
 
@@ -504,7 +504,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 5 minutes  1.454 seconds)
+   **Total running time of the script:** ( 4 minutes  35.257 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:
@@ -519,7 +519,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
   .. container:: binder-badge
 
     .. image:: https://mybinder.org/badge_logo.svg
-      :target: https://mybinder.org/v2/gh/jasmainak/mne-neuron/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_alpha.ipynb
+      :target: https://mybinder.org/v2/gh/hnnsolver/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_alpha.ipynb
       :width: 150 px
 
 
