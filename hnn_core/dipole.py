@@ -198,7 +198,8 @@ class Dipole(object):
         ax : instance of matplotlib figure | None
             The matplotlib axis
         layer : str
-            The layer to plot
+            The layer to plot. Can be one of
+            'agg', 'L2', and 'L5'
         show : bool
             If True, show the figure
 
@@ -214,6 +215,7 @@ class Dipole(object):
         if layer in self.dpl.keys():
             ax.plot(self.t, self.dpl[layer])
             ax.set_xlabel('Time (ms)')
+            ax.set_title(layer)
         if show:
             plt.show()
         return ax.get_figure()
