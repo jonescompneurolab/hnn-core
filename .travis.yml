@@ -41,7 +41,7 @@ install:
       make
       python setup.py develop
 script:
-    - flake8 --count mne_neuron
-    - py.test --cov=mne_neuron mne_neuron/tests/
+    - flake8 --count hnn_core
+    - py.test --cov=hnn_core hnn_core/tests/
 after_success:
     - bash <(curl -s https://codecov.io/bash)
