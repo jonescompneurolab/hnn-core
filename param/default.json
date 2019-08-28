@@ -195,7 +195,7 @@
     "gbar_evprox_2_L5Pyr_nmda": 0.0,
     "gbar_evprox_2_L5Basket_ampa": 0.008958,
     "gbar_evprox_2_L5Basket_nmda": 0.0,
-    "sync_evinput": 0,
+    "sync_evinput": false,
     "inc_evinput": 0.0,
     "L2Pyr_Pois_A_weight_ampa": 0.0,
     "L2Pyr_Pois_A_weight_nmda": 0.0,

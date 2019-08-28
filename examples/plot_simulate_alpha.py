@@ -4,7 +4,7 @@ Simulate alpha waves
 ====================
 
 This example demonstrates how to simulate alpha waves using
-MNE-Neuron.
+HNN-core.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>

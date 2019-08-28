@@ -87,6 +87,7 @@ def feed_validate(p_ext, d, tstop):
     """Whips into shape ones that are not
        could be properly made into a meaningful class.
     """
+
     # only append if t0 is less than simulation tstop
     if tstop > d['t0']:
         # # reset tstop if the specified tstop exceeds the
