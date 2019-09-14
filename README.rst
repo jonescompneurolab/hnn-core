@@ -13,7 +13,11 @@ hnn-core
 	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
 	:alt: Test coverage
 
-This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_. However, a Graphical User Interface is not supported at the moment in this repository.
+.. image:: https://user-images.githubusercontent.com/15852194/115123685-2df1ef00-9f8c-11eb-8f3b-663486466193.png
+   :target: https://user-images.githubusercontent.com/15852194/115123685-2df1ef00-9f8c-11eb-8f3b-663486466193.png
+   :alt: HNN-core GUI
+
+This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
 It is early Work in Progress. Contributors are very welcome.
 
@@ -27,6 +31,15 @@ Dependencies
 
 Optional dependencies
 ---------------------
+
+GUI
+~~~
+
+* ipywidgets
+* voila
+
+Parallel processing
+~~~~~~~~~~~~~~~~~~~
 
 * joblib (for simulating trials simultaneously)
 * mpi4py (for simulating the cells in parallel for a single trial). Also depends on:
@@ -57,6 +70,12 @@ To check if everything worked fine, you can do::
 	$ python -c 'import hnn_core'
 
 and it should not give any error messages.
+
+**GUI installation**
+
+To install the GUI dependencies along with ``hnn-core``, a simple tweak to the above command is needed::
+
+   $ pip install hnn_core[gui]
 
 **Parallel backends**
 

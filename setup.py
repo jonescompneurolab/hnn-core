@@ -105,6 +105,9 @@ if __name__ == "__main__":
               'matplotlib',
               'scipy'
           ],
+          extra_requires={
+              'gui': ['ipywidgets', 'voila']
+          },
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',
