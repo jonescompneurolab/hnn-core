@@ -145,6 +145,101 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     return dpl
 
 
+def average_dipoles(dpls):
+    """Compute average over a list of Dipole objects.
+    Parameters
+    ----------
+    dpls: list of Dipole objects
+        Contains list of dipole results to be averaged
+
+    Returns
+    -------
+    dpl: instance of Dipole
+        A dipole object with averages of the dipole data
+    """
+    # need at least on Dipole to get times
+    assert (len(dpls) > 0)
+
+    agg_avg = np.mean(np.array([dpl.dpl['agg'] for dpl in dpls]), axis=0)
+    L5_avg = np.mean(np.array([dpl.dpl['L5'] for dpl in dpls]), axis=0)
+    L2_avg = np.mean(np.array([dpl.dpl['L2'] for dpl in dpls]), axis=0)
+
+    avg_dpl_data = np.c_[agg_avg,
+                         L2_avg,
+                         L5_avg]
+
+    avg_dpl = Dipole(dpls[0].t, avg_dpl_data)
+
+    return avg_dpl
+
+
+def rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """ Calculates RMSE between data in dpl and exp_dpl
+    Parameters
+    ----------
+    dpl: instance of Dipole
+        A dipole object with simulated data
+    exp_dpl: instance of Dipole
+        A dipole object with experimental data
+    tstart | None: float
+        Time at beginning of range over which to calculate RMSE
+    tstop | None: float
+        Time at end of range over which to calculate RMSE
+    weights | None: array
+        An array of weights to be applied to each point in
+        simulated dpl. Must have length >= dpl.dpl
+        If None, weights will be replaced with 1's for typical RMSE
+        calculation.
+
+    Returns
+    -------
+    err: float
+        Weighted RMSE between data in dpl and exp_dpl
+    """
+    from scipy import signal
+
+    exp_times = exp_dpl.t
+    sim_times = dpl.t
+
+    # do tstart and tstop fall within both datasets?
+    # if not, use the closest data point as the new tstop/tstart
+    for tseries in [exp_times, sim_times]:
+        if tstart < tseries[0]:
+            tstart = tseries[0]
+        if tstop > tseries[-1]:
+            tstop = tseries[-1]
+
+    # make sure start and end times are valid for both dipoles
+    exp_start_index = (np.abs(exp_times - tstart)).argmin()
+    exp_end_index = (np.abs(exp_times - tstop)).argmin()
+    exp_length = exp_end_index - exp_start_index
+
+    sim_start_index = (np.abs(sim_times - tstart)).argmin()
+    sim_end_index = (np.abs(sim_times - tstop)).argmin()
+    sim_length = sim_end_index - sim_start_index
+
+    if weights is None:
+        # weighted RMSE with weights of all 1's is equivalent to
+        # normal RMSE
+        weights = np.ones(len(sim_times[0:sim_end_index]))
+    weights = weights[sim_start_index:sim_end_index]
+
+    dpl1 = dpl.dpl['agg'][sim_start_index:sim_end_index]
+    dpl2 = exp_dpl.dpl['agg'][exp_start_index:exp_end_index]
+
+    if (sim_length > exp_length):
+        # downsample simulation timeseries to match exp data
+        dpl1 = signal.resample(dpl1, exp_length)
+        weights = signal.resample(weights, exp_length)
+        indices = np.where(weights < 1e-4)
+        weights[indices] = 0
+    elif (sim_length < exp_length):
+        # downsample exp timeseries to match simulation data
+        dpl2 = signal.resample(dpl2, sim_length)
+
+    return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
+
+
 class Dipole(object):
     """Dipole class.
 
