@@ -193,6 +193,12 @@ class Dipole(object):
         self.nave = nave
         self.sfreq = 1000. / (times[1] - times[0])  # NB assumes len > 1
         self.scale_applied = 1  # for visualisation
+        self.dpl = {}
+
+        shp = data.shape
+        keys = ['agg', 'L2', 'L5']
+        for key, tseries in zip(keys, range(shp[1])):
+            self.dpl[key] = data[:, tseries]
 
     def copy(self):
         """Return a copy of the Dipole instance
