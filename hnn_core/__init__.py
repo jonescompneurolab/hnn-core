@@ -1,4 +1,4 @@
-from .dipole import simulate_dipole, read_dipole, average_dipoles
+from .dipole import simulate_dipole, read_dipole, average_dipoles, rmse, Dipole
 from .drives import drive_event_times
 from .params import Params, read_params
 from .network import Network
