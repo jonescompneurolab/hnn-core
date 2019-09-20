@@ -1,4 +1,4 @@
-from .dipole import simulate_dipole, average_dipoles, rmse
+from .dipole import simulate_dipole, average_dipoles, rmse, Dipole
 from .feed import ExtFeed
 from .params import Params
 from .network import Network

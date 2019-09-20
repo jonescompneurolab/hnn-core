@@ -256,14 +256,19 @@ class Dipole(object):
     t : array
         The time vector
     dpl : dict of array
-        The dipole with keys 'agg', 'L2' and 'L5'
+        The dipole with keys 'agg' 'L2' (optional) and 'L5' (optional)
     """
 
     def __init__(self, times, data):  # noqa: D102
         self.units = 'fAm'
         self.N = data.shape[0]
         self.t = times
-        self.dpl = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
+        self.dpl = {}
+
+        shp = data.shape
+        keys = ['agg', 'L2', 'L5']
+        for key, tseries in zip(keys, range(shp[1])):
+            self.dpl[key] = data[:, tseries]
 
     def convert_fAm_to_nAm(self):
         """ must be run after baseline_renormalization()
