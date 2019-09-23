@@ -24,7 +24,7 @@ def test_hnn_core():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    net = Network(params, n_jobs=1)
+    net = Network(params)
     dpl = simulate_dipole(net)[0]
 
     fname = './dpl2.txt'
