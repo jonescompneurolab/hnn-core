@@ -35,7 +35,7 @@ Building the documentation
 The documentation can be built using sphinx. For that, please additionally
 install the following::
 
-    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow
+    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py psutil
 
 You can build the documentation locally using the command::
 

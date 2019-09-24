@@ -9,7 +9,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - libopenmpi-dev
-
+    - openmpi-bin
 
 before_install:
   - wget -q http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -24,13 +24,14 @@ install:
     - source activate testenv
     - conda install --yes scipy numpy matplotlib
     - pip install flake8 pytest pytest-cov
-    - pip install mpi4py mne
+    - pip install mpi4py mne psutil
     - pip install coverage coveralls
     - |
       git clone https://github.com/neuronsimulator/nrn
       cd nrn
       ./build.sh
-      ./configure --with-nrnpython=python3 --without-iv --prefix=${install_prefix}
+      ./configure --with-nrnpython=python3 --without-iv --prefix=${install_prefix} \
+        --with-paranrn --disable-rx3d --without-nrnoc-x11 --with-mpi
       make -j4
       make install -j4
       cd src/nrnpython/
