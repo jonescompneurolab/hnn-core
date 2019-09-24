@@ -5,6 +5,7 @@
 
 import json
 import fnmatch
+import os.path as op
 from copy import deepcopy
 
 from .params_default import get_params_default
@@ -33,9 +34,49 @@ class Params(dict):
         The parameters json file
     """
 
-    def __init__(self, params_fname):
+    def _read_json_file(self, params_fname):
+        """Read from a .json file (default)"""
         with open(params_fname) as json_data:
             params_input = json.load(json_data)
+
+        return params_input
+
+    def _read_param_file(self, params_fname):
+        """Read from a .param file (legacy)"""
+        params_input = {}
+        with open(params_fname, 'r') as fp:
+            ln = fp.readlines()
+            for l in ln:
+                s = l.lstrip()
+                if s.startswith('#'):
+                    continue
+                sp = s.split(':')
+                if len(sp) > 1:
+                    key = sp[0].strip()
+                    value = sp[1].strip()
+                    if '.' in value or 'e' in value:
+                        try:
+                            params_input[key] = float(value)
+                        except ValueError:
+                            params_input[key] = value
+                    else:
+                        try:
+                            params_input[key] = int(value)
+                        except ValueError:
+                            params_input[key] = value
+
+        return params_input
+
+    def __init__(self, params_fname):
+        try:
+            params_input = self._read_json_file(params_fname)
+        except json.decoder.JSONDecodeError:
+            params_input = self._read_param_file(params_fname)
+
+        if len(params_input) == 0:
+            print("WARN: Failed to read any parameters from file: %s\n" %
+                  op.normpath(params_fname) +
+                  "Using only base parameter set...")
 
         nprox, ndist = _count_evoked_inputs(params_input)
 
@@ -81,6 +122,17 @@ class Params(dict):
 
     def copy(self):
         return deepcopy(self)
+
+    def write(self, fname):
+        """Write param values to a file.
+        Parameters
+        ----------
+        fname : str
+            Full path to the output file (.json)
+        """
+
+        fp = open(fname, 'w')
+        json.dump(self, fp)
 
 
 def feed_validate(p_ext, d, tstop):
