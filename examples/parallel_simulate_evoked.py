@@ -59,22 +59,27 @@ proc = Popen(cmdargs, stdout=PIPE, stderr=PIPE, cwd=getcwd(),
 ###############################################################################
 # Read the output while waiting for job to finish
 
+failed = False
 while True:
     status = proc.poll()
     if status is not None:
         if not status == 0:
             print("Simulation exited with return code %d. Stderr:" % status)
-            for line in iter(proc.stderr.readline, ""):
-                print(line.strip())
-            proc.stderr.close()
-            break
+            failed = True
         else:
             # success
             break
 
     for line in iter(proc.stdout.readline, ""):
         print(line.strip())
-    proc.stdout.close()
+    for line in iter(proc.stderr.readline, ""):
+        print(line.strip())
+
+    if failed:
+        break
 
 # make sure spawn process is dead
 proc.kill()
+
+if failed:
+    exit(1)
