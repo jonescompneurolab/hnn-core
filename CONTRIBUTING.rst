@@ -23,6 +23,11 @@ Then, install the following python packages:
 
     $ pip install flake8 pytest pytest-cov
 
+Updating documentation
+#####
+
+Update `doc/api.rst` and `doc/whats_new.rst` as appropriate.
+
 ##### Building the documentation
 
 The documentation can be built using sphinx. For that, please additionally
@@ -37,3 +42,8 @@ You can build the documentation locally using the command:
 
 You will also need to install mne to run all the examples and tests successfully. Please find
 the installation instructions on the [MNE website](http://martinos.org/mne/).
+
+If you want to build the documentation locally without running all the examples,
+use the command:
+
+    $ make html-noplot
