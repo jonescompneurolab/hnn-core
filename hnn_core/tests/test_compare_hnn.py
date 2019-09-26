@@ -5,7 +5,7 @@ from numpy.testing import assert_array_equal
 
 from mne.utils import _fetch_file
 import hnn_core
-from hnn_core import simulate_dipole, Params, Network
+from hnn_core import simulate_dipole, read_params, Network
 
 
 def test_hnn_core():
@@ -22,7 +22,7 @@ def test_hnn_core():
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = Params(params_fname)
+    params = read_params(params_fname)
 
     net = Network(params, n_jobs=1)
     dpl = simulate_dipole(net)[0]

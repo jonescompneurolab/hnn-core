@@ -27,3 +27,4 @@ Simulation (:py:mod:`hnn_core`):
    :toctree: generated/
 
    Params
+   read_params

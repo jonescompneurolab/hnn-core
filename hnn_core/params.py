@@ -7,6 +7,7 @@ import json
 import fnmatch
 import os.path as op
 from copy import deepcopy
+from warnings import warn
 
 from .params_default import get_params_default
 
@@ -25,58 +26,97 @@ def _count_evoked_inputs(d):
     return nprox, ndist
 
 
+def _read_json(fname):
+    """Read param values from a .json file.
+    Parameters
+    ----------
+    fname : str
+        Full path to the file (.json)
+
+    Returns
+    -------
+    params_input : dict
+        Dictionary of parameters
+    """
+    with open(fname) as json_data:
+        params_input = json.load(json_data)
+
+    return params_input
+
+def _read_legacy_params(fname):
+    """Read param values from a .param file (legacy).
+    Parameters
+    ----------
+    fname : str
+        Full path to the file (.param)
+
+    Returns
+    -------
+    params_input : dict
+        Dictionary of parameters
+    """
+
+    params_input = {}
+    with open(fname, 'r') as fp:
+        ln = fp.readlines()
+        for l in ln:
+            s = l.lstrip()
+            if s.startswith('#'):
+                continue
+            sp = s.split(':')
+            if len(sp) > 1:
+                key = sp[0].strip()
+                value = sp[1].strip()
+                if '.' in value or 'e' in value:
+                    try:
+                        params_input[key] = float(value)
+                    except ValueError:
+                        params_input[key] = value
+                else:
+                    try:
+                        params_input[key] = int(value)
+                    except ValueError:
+                        params_input[key] = value
+
+    return params_input
+
+
+def read_params(params_fname):
+    split_fname = op.splitext(params_fname)
+    try:
+        ext = split_fname[1]
+    except KeyError:
+        ext = ''
+
+    if ext == '.json':
+        params_dict = _read_json(params_fname)
+    elif ext == '.param':
+        params_dict = _read_legacy_params(params_fname)
+    else:
+        raise ValueError('Unrecognized extension, expected one of' +
+                         ' .json, .param. Got %s' % ext)
+
+    if len(params_dict) == 0:
+        raise ValueError("Failed to read parameters from file: %s" %
+                         op.normpath(params_fname))
+
+    params = Params(params_dict)
+
+    return params
+
 class Params(dict):
     """Params object.
 
     Parameters
     ----------
-    params_fname : str
-        The parameters json file
+    params_input : dict
+        Dictionary of parameters
     """
 
-    def _read_json_file(self, params_fname):
-        """Read from a .json file (default)"""
-        with open(params_fname) as json_data:
-            params_input = json.load(json_data)
-
-        return params_input
-
-    def _read_param_file(self, params_fname):
-        """Read from a .param file (legacy)"""
-        params_input = {}
-        with open(params_fname, 'r') as fp:
-            ln = fp.readlines()
-            for l in ln:
-                s = l.lstrip()
-                if s.startswith('#'):
-                    continue
-                sp = s.split(':')
-                if len(sp) > 1:
-                    key = sp[0].strip()
-                    value = sp[1].strip()
-                    if '.' in value or 'e' in value:
-                        try:
-                            params_input[key] = float(value)
-                        except ValueError:
-                            params_input[key] = value
-                    else:
-                        try:
-                            params_input[key] = int(value)
-                        except ValueError:
-                            params_input[key] = value
-
-        return params_input
-
-    def __init__(self, params_fname):
-        try:
-            params_input = self._read_json_file(params_fname)
-        except json.decoder.JSONDecodeError:
-            params_input = self._read_param_file(params_fname)
-
+    def __init__(self, params_input):
         if len(params_input) == 0:
-            print("WARN: Failed to read any parameters from file: %s\n" %
-                  op.normpath(params_fname) +
-                  "Using only base parameter set...")
+            warn("Received an empty parameters dictionary."
+                 "Using base parameter set.")
 
         nprox, ndist = _count_evoked_inputs(params_input)
 
