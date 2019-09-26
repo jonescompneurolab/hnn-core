@@ -82,11 +82,20 @@ def _read_legacy_params(fname):
 
 
 def read_params(params_fname):
+    """Read param values from a file (.json or .param).
+    Parameters
+    ----------
+    params_fname : str
+        Full path to the file (.param)
+
+    Returns
+    -------
+    params : an instance of Params
+        Params containing paramter values from file
+    """
+
     split_fname = op.splitext(params_fname)
-    try:
-        ext = split_fname[1]
-    except KeyError:
-        ext = ''
+    ext = split_fname[1]
 
     if ext == '.json':
         params_dict = _read_json(params_fname)
@@ -109,24 +118,25 @@ class Params(dict):
 
     Parameters
     ----------
-    params_input : dict
-        Dictionary of parameters
+    params_input : dict | None
+        Dictionary of parameters. If None, use default parameters.
     """
 
-    def __init__(self, params_input):
-        if len(params_input) == 0:
-            warn("Received an empty parameters dictionary."
-                 "Using base parameter set.")
+    def __init__(self, params_input=None):
 
-        nprox, ndist = _count_evoked_inputs(params_input)
+        if params_input is None or isinstance(params_input, dict):
+            nprox, ndist = _count_evoked_inputs(params_input)
+            # create default params templated from params_input
+            params_default = get_params_default(nprox, ndist)
 
-        # create a copy of params_default through which to iterate
-        params = get_params_default(nprox, ndist)
-
-        for key in params.keys():
-            if key in params_input:
-                params[key] = params_input.pop(key)
-            self[key] = params[key]
+            for key in params_default.keys():
+                if key in params_input:
+                    self[key] = params_input[key]
+                else:
+                    self[key] = params_default[key]
+        else:
+            raise ValueError('params_input must be dict or None. Got %s'
+                             % type(params_input))
 
     def __repr__(self):
         """Display the params nicely."""
