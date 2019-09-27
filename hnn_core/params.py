@@ -7,7 +7,6 @@ import json
 import fnmatch
 import os.path as op
 from copy import deepcopy
-from warnings import warn
 
 from .params_default import get_params_default
 
@@ -43,6 +42,7 @@ def _read_json(fname):
 
     return params_input
 
+
 def _read_legacy_params(fname):
     """Read param values from a .param file (legacy).
     Parameters
@@ -58,15 +58,15 @@ def _read_legacy_params(fname):
 
     params_input = {}
     with open(fname, 'r') as fp:
-        ln = fp.readlines()
-        for l in ln:
-            s = l.lstrip()
-            if s.startswith('#'):
+        params_lines = fp.readlines()
+        for line in params_lines:
+            subline = line.lstrip()
+            if subline.startswith('#'):
                 continue
-            sp = s.split(':')
-            if len(sp) > 1:
-                key = sp[0].strip()
-                value = sp[1].strip()
+            split_line = subline.split(':')
+            if len(split_line) > 1:
+                key = split_line[0].strip()
+                value = split_line[1].strip()
                 if '.' in value or 'e' in value:
                     try:
                         params_input[key] = float(value)
@@ -112,6 +112,7 @@ def read_params(params_fname):
     params = Params(params_dict)
 
     return params
+
 
 class Params(dict):
     """Params object.
