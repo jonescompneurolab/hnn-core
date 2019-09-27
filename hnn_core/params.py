@@ -125,7 +125,10 @@ class Params(dict):
 
     def __init__(self, params_input=None):
 
-        if params_input is None or isinstance(params_input, dict):
+        if params_input is None:
+            params_input = {}
+
+        if isinstance(params_input, dict):
             nprox, ndist = _count_evoked_inputs(params_input)
             # create default params templated from params_input
             params_default = get_params_default(nprox, ndist)
