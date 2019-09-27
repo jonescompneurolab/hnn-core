@@ -1,25 +1,14 @@
+import os.path as op
+
+from numpy import loadtxt
+from numpy.testing import assert_array_equal
+
 from mne.utils import _fetch_file
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network
-
-
-def run_simulation(params, dpl_master):
-    net = Network(params)
-    dpls = simulate_dipole(net)
-
-    return dpls
+from hnn_core import simulate_dipole, Network, Params
 
 
 def test_hnn_core():
-    import os.path as op
-
-    from numpy import loadtxt
-    from numpy.testing import assert_array_equal
-
-    from mne.utils import _fetch_file
-    import hnn_core
-    from hnn_core import Params
-
     """Test to check if MNE neuron does not break."""
     # small snippet of data on data branch for now. To be deleted
     # later. Data branch should have only commit so it does not
@@ -37,7 +26,8 @@ def test_hnn_core():
     params = read_params(params_fname)
 
     # run the simulation
-    dpl = run_simulation(params, dpl_master)[0]
+    net = Network(params)
+    dpl = simulate_dipole(net)[0]
 
     # write the dipole to a file and compare
     fname = './dpl2.txt'
@@ -64,25 +54,3 @@ def test_hnn_core():
                                 'L5_basket': 85,
                                 'evdist1': 234,
                                 'evprox2': 269}
-
-if __name__ == '__main__':
-    # started as an MPI child from test_mpi_simulation.py
-
-    from mpi4py import MPI
-    comm = MPI.Comm.Get_parent()
-    print("child ready. waiting for parent")
-    # receive params and dpl_master
-    (params, dpl_master) = comm.bcast(comm.Get_rank(), root=0)
-    print("received params from parent")
-    # run the simulation
-    dpl = run_simulation(params, dpl_master)[0]
-    print("finished the simulation")
-
-    if comm.Get_rank() == 0:
-        # send results back to parent
-        comm.send(dpl, dest=0)
-
-    comm.Barrier()
-    comm.Disconnect()
-    MPI.Finalize()
-    exit(0)  # stop the child
