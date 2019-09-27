@@ -70,12 +70,13 @@ if __name__ == '__main__':
 
     from mpi4py import MPI
     comm = MPI.Comm.Get_parent()
-
+    print("child ready. waiting for parent")
     # receive params and dpl_master
     (params, dpl_master) = comm.bcast(comm.Get_rank(), root=0)
-
+    print("received params from parent")
     # run the simulation
     dpl = run_simulation(params, dpl_master)[0]
+    print("finished the simulation")
 
     if comm.Get_rank() == 0:
         # send results back to parent
