@@ -16,14 +16,12 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def _clone_and_simulate(params, trial_idx):
-    from .network import Network
+def _clone_and_simulate(net, trial_idx):
 
     if trial_idx != 0:
-        params['prng_*'] = trial_idx
+        net.params['prng_*'] = trial_idx
 
-    net = Network(params, n_jobs=1)
-    net.build()
+    net.build_in_neuron()
 
     return _simulate_single_trial(net)
 
@@ -132,20 +130,17 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     from .parallel import create_parallel_context, get_nhosts
 
     if n_jobs > 1:
-        # check whether NEURON is using parallel nrniv processes
-        create_parallel_context(n_cores=1)
+        # checking whether NEURON is using MPI parallelism requires
+        # instantiating ParallelContext and testing nhosts
+        create_parallel_context()
         if get_nhosts() > 1:
-            raise ValueError("Nested parallelism is not currently supported!\n" +
-                  "Please choose embarassinly parallel jobs (n_jobs > 1)\n" +
-                  "or multiple cores per simulation (with MPI)\n")
+            raise ValueError("Nested parallelism is not supported!\n" +
+                             "Please choose embarassinly parallel jobs " +
+                             "(n_jobs > 1)\n" +
+                             "or multiple cores per simulation (with MPI)\n")
 
-        parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
-        out = parallel(myfunc(net.params, idx) for idx in range(n_trials))
-    else:
-        out = []
-        for idx in range(n_trials):
-            out.append(_simulate_with_parallel_context(net, idx))
-
+    parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
+    out = parallel(myfunc(net, idx) for idx in range(n_trials))
     dpl, spike_times, spike_gids = zip(*out)
     net.spikes._times = list(spike_times)
     net.spikes._gids = list(spike_gids)
