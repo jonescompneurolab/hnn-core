@@ -9,6 +9,7 @@ from neuron import h
 
 pc = None
 last_network = None
+rank = None
 
 
 def shutdown():
@@ -25,6 +26,16 @@ def get_nhosts():
         Value from pc.nhost()
     """
     return nhosts
+
+
+def get_rank():
+    """Return the MPI rank from ParallelContext
+    Returns
+    -------
+    rank: int
+        Value from pc.id()
+    """
+    return rank
 
 
 def create_parallel_context(n_cores=None):
