@@ -134,9 +134,9 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
         # instantiating ParallelContext and testing nhosts
         create_parallel_context()
         if get_nhosts() > 1:
-            raise ValueError("Nested parallelism is not supported!\n" +
-                             "Please choose embarassinly parallel jobs " +
-                             "(n_jobs > 1)\n" +
+            raise ValueError("Nested parallelism is not currently supported!\n"
+                             "Please choose embarassinly parallel jobs (n_jobs"
+                             " > 1)\n"
                              "or multiple cores per simulation (with MPI)\n")
 
     parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
