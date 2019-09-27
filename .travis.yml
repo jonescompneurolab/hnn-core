@@ -1,15 +1,19 @@
 language: python
 
+dist: bionic
+
 env:
-  - PYTHON_VERSION=3.6
+  global:
+    - HYDRA_LAUNCHER=fork
+    - PYTHON_VERSION=3.6
 
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test
     packages:
-    - libopenmpi-dev
-    - openmpi-bin
+      - mpich
+      - libmpich-dev
 
 before_install:
   - wget -q http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -22,9 +26,9 @@ install:
     - install_prefix=~
     - conda create -n testenv --yes pip python=${PYTHON_VERSION}
     - source activate testenv
-    - conda install --yes scipy numpy matplotlib
+    - conda install --yes scipy numpy matplotlib mpi4py
     - pip install flake8 pytest pytest-cov
-    - pip install mpi4py mne psutil
+    - pip install mne psutil
     - pip install coverage coveralls
     - |
       git clone https://github.com/neuronsimulator/nrn
@@ -43,6 +47,8 @@ install:
       python setup.py develop
 script:
     - flake8 --count hnn_core
+    - export PYTHONHOME=/home/travis/miniconda/envs/testenv
+    - python -c 'from hnn_core.tests.test_mpi_simulation import test_simulate_dipole_mpi; test_simulate_dipole_mpi()'
     - py.test --cov=hnn_core hnn_core/tests/
 after_success:
     - bash <(curl -s https://codecov.io/bash)
