@@ -23,15 +23,7 @@ def _clone_and_simulate(params, trial_idx):
         params['prng_*'] = trial_idx
 
     net = Network(params, n_jobs=1)
-
-    from neuron import h
-    net._create_all_src()
-    net.state_init()
-    net._parnet_connect()
-    # set to record spikes
-    net.spiketimes = h.Vector()
-    net.spikegids = h.Vector()
-    net._record_spikes()
+    net.build_in_neuronpython()
 
     return _simulate_single_trial(net)
 
@@ -63,8 +55,6 @@ def _simulate_single_trial(net):
     dp_rec_L5 = h.Vector()
     dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 
-    net.move_cells_to_pos()  # position cells in 2D grid
-
     # sets the default max solver step in ms (purposefully large)
     pc.set_maxstep(10)
 
@@ -72,13 +62,12 @@ def _simulate_single_trial(net):
     # delays have been specified
     h.finitialize()
 
-    def prsimtime():
+    def simulation_time():
         print('Simulation time: {0} ms...'.format(round(h.t, 2)))
 
-    printdt = 10
     if rank == 0:
-        for tt in range(0, int(h.tstop), printdt):
-            cvode.event(tt, prsimtime)  # print time callbacks
+        for tt in range(0, int(h.tstop), 10):
+            cvode.event(tt, simulation_time)
 
     h.fcurrent()
     # set state variables if they have been changed since h.finitialize

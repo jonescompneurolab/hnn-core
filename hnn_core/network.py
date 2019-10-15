@@ -124,6 +124,20 @@ class Network(object):
               % (self.N['L2_basket'], self.N['L5_basket']))
         return '<%s | %s>' % (class_name, s)
 
+    def build(self):
+        """Building the cell in NEURON."""
+        print('Building the NEURON model')
+        from neuron import h
+        self._create_all_src()
+        self.state_init()
+        self._parnet_connect()
+        # set to record spikes
+        self.spiketimes = h.Vector()
+        self.spikegids = h.Vector()
+        self._record_spikes()
+        self.move_cells_to_pos()  # position cells in 2D grid
+        print('[Done]')
+
     # creates the immutable source list along with corresponding numbers
     # of cells
     def _create_src_list(self):
@@ -301,8 +315,7 @@ class Network(object):
                     # run the IClamp function here
                     # create_all_IClamp() is defined in L2Pyr (etc)
                     self.cells[-1].create_all_IClamp(self.params)
-                    if self.params['save_vsoma']:
-                        self.cells[-1].record_volt_soma()
+                    self.cells[-1].record_volt_soma()
                 elif type == 'extinput':
                     # print('type',type)
                     # to find param index, take difference between REAL gid
