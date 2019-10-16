@@ -133,18 +133,6 @@ waveforms using HNN-core.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{
-    &quot;Itonic_A_L2Basket&quot;: 0.0,
-    &quot;Itonic_A_L2Pyr_soma&quot;: 0.0,
-    &quot;Itonic_A_L5Basket&quot;: 0.0,
-    &quot;Itonic_A_L5Pyr_soma&quot;: 0.0,
-    &quot;Itonic_T_L2Basket&quot;: -1.0,
-    &quot;Itonic_T_L2Pyr_soma&quot;: -1.0,
-    &quot;Itonic_T_L5Basket&quot;: -1.0,
-    &quot;Itonic_T_L5Pyr_soma&quot;: -1.0,
-    &quot;Itonic_t0_L2Basket&quot;: 0.0,
-    &quot;Itonic_t0_L2Pyr_soma&quot;: 0.0,
-    &quot;Itonic_t0_L5Basket&quot;: 0.0,
-    &quot;Itonic_t0_L5Pyr_soma&quot;: 0.0,
     &quot;L2Basket_Gauss_A_weight&quot;: 0.0,
     &quot;L2Basket_Gauss_mu&quot;: 2000.0,
     &quot;L2Basket_Gauss_sigma&quot;: 3.6,
@@ -355,7 +343,6 @@ waveforms using HNN-core.</p>
     &quot;save_dpl&quot;: 0,
     &quot;save_figs&quot;: 0,
     &quot;save_spec_data&quot;: 0,
-    &quot;save_vsoma&quot;: 0,
     &quot;sigma_t_evdist_1&quot;: 3.85,
     &quot;sigma_t_evprox_1&quot;: 2.47,
     &quot;sigma_t_evprox_2&quot;: 8.33,
@@ -402,7 +389,9 @@ You can simulate multiple trials in parallel by using n_jobs &gt; 1</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>running on 1 cores
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Building the NEURON model
+[Done]
+running on 1 cores
 Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
 Simulation time: 20.0 ms...
@@ -420,6 +409,8 @@ Simulation time: 130.0 ms...
 Simulation time: 140.0 ms...
 Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
+Building the NEURON model
+[Done]
 running on 1 cores
 Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
@@ -450,9 +441,9 @@ Simulation time: 160.0 ms...
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:220: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
-/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:450: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:459: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
 </pre></div>
 </div>
@@ -462,7 +453,7 @@ Simulation time: 160.0 ms...
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_evoked_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:489: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:498: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
 </pre></div>
 </div>
@@ -482,7 +473,9 @@ synchronous and see what happens</p>
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>running on 1 cores
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Building the NEURON model
+[Done]
+running on 1 cores
 Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
 Simulation time: 20.0 ms...
@@ -502,7 +495,7 @@ Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  39.462 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  35.356 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/hnnsolver/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>

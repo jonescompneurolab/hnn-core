@@ -66,18 +66,6 @@ Then we read the parameters file
  .. code-block:: none
 
     {
-        "Itonic_A_L2Basket": 0.0,
-        "Itonic_A_L2Pyr_soma": 0.0,
-        "Itonic_A_L5Basket": 0.0,
-        "Itonic_A_L5Pyr_soma": 0.0,
-        "Itonic_T_L2Basket": -1.0,
-        "Itonic_T_L2Pyr_soma": -1.0,
-        "Itonic_T_L5Basket": -1.0,
-        "Itonic_T_L5Pyr_soma": -1.0,
-        "Itonic_t0_L2Basket": 0.0,
-        "Itonic_t0_L2Pyr_soma": 0.0,
-        "Itonic_t0_L5Basket": 0.0,
-        "Itonic_t0_L5Pyr_soma": 0.0,
         "L2Basket_Gauss_A_weight": 0.0,
         "L2Basket_Gauss_mu": 2000.0,
         "L2Basket_Gauss_sigma": 3.6,
@@ -288,7 +276,6 @@ Then we read the parameters file
         "save_dpl": 0,
         "save_figs": 0,
         "save_spec_data": 0,
-        "save_vsoma": 0,
         "sigma_t_evdist_1": 3.85,
         "sigma_t_evprox_1": 2.47,
         "sigma_t_evprox_2": 8.33,
@@ -361,6 +348,8 @@ You can simulate multiple trials in parallel by using n_jobs > 1
 
  .. code-block:: none
 
+    Building the NEURON model
+    [Done]
     running on 1 cores
     Simulation time: 0.03 ms...
     Simulation time: 10.0 ms...
@@ -379,6 +368,8 @@ You can simulate multiple trials in parallel by using n_jobs > 1
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
+    Building the NEURON model
+    [Done]
     running on 1 cores
     Simulation time: 0.03 ms...
     Simulation time: 10.0 ms...
@@ -424,9 +415,9 @@ and then plot it
 
  .. code-block:: none
 
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:220: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:450: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:459: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
 
 
@@ -451,7 +442,7 @@ Finally, we can also plot the spikes.
 
  .. code-block:: none
 
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:489: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:498: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
 
 
@@ -491,6 +482,8 @@ synchronous and see what happens
 
  .. code-block:: none
 
+    Building the NEURON model
+    [Done]
     running on 1 cores
     Simulation time: 0.03 ms...
     Simulation time: 10.0 ms...
@@ -515,7 +508,7 @@ synchronous and see what happens
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  39.462 seconds)
+   **Total running time of the script:** ( 4 minutes  35.356 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

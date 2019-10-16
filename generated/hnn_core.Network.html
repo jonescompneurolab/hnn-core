@@ -152,19 +152,22 @@ The list contains the cell IDs of neurons that spiked.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.aggregate_currents" title="hnn_core.Network.aggregate_currents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aggregate_currents</span></code></a>(self)</p></td>
 <td><p>This method must be run post-integration.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(self, gid)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.build" title="hnn_core.Network.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(self)</p></td>
+<td><p>Building the network in NEURON.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(self, gid)</p></td>
 <td><p>Reverse lookup of gid to type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.move_cells_to_pos" title="hnn_core.Network.move_cells_to_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_cells_to_pos</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.move_cells_to_pos" title="hnn_core.Network.move_cells_to_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_cells_to_pos</span></code></a>(self)</p></td>
 <td><p>Move cells 3d positions to positions used for wiring.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_input" title="hnn_core.Network.plot_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_input</span></code></a>(self[, ax, show])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.plot_input" title="hnn_core.Network.plot_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_input</span></code></a>(self[, ax, show])</p></td>
 <td><p>Plot the histogram of input.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.plot_spikes" title="hnn_core.Network.plot_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes</span></code></a>(self[, ax, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_spikes" title="hnn_core.Network.plot_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes</span></code></a>(self[, ax, show])</p></td>
 <td><p>Plot the spiking activity for each cell type.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.state_init" title="hnn_core.Network.state_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_init</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.state_init" title="hnn_core.Network.state_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_init</span></code></a>(self)</p></td>
 <td><p>Initializes the state closer to baseline.</p></td>
 </tr>
 </tbody>
@@ -179,6 +182,12 @@ The list contains the cell IDs of neurons that spiked.</p>
 <dt id="hnn_core.Network.aggregate_currents">
 <code class="sig-name descname">aggregate_currents</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.aggregate_currents" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method must be run post-integration.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hnn_core.Network.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Building the network in NEURON.</p>
 </dd></dl>
 
 <dl class="method">

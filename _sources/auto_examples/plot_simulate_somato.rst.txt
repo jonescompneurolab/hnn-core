@@ -235,6 +235,8 @@ Now, let us try to simulate the same with MNE-neuron
 
  .. code-block:: none
 
+    Building the NEURON model
+    [Done]
     running on 1 cores
     Simulation time: 0.03 ms...
     Simulation time: 10.0 ms...
@@ -248,11 +250,11 @@ Now, let us try to simulate the same with MNE-neuron
     Simulation time: 90.0 ms...
     Simulation time: 100.0 ms...
     Simulation time: 110.0 ms...
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:220: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:450: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:459: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:489: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:498: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
 
 
@@ -260,7 +262,7 @@ Now, let us try to simulate the same with MNE-neuron
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  5.395 seconds)
+   **Total running time of the script:** ( 1 minutes  19.884 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_somato.py:
