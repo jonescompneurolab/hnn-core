@@ -26,31 +26,26 @@ params = Params(params_fname)
 
 ###############################################################################
 # Now let's build the network
-# You can simulate multiple trials in parallel by using n_jobs > 1
-net = Network(params)
-net.build()
-
-###############################################################################
-# The cells are stored in the network object as a list
-cells = net.cells
-print(cells[:5])
-
-###############################################################################
-# We have different kinds of cells with different cell IDs (gids)
-gids = [0, 35, 135, 170]
-for gid in gids:
-    print(cells[gid].name)
-
-###############################################################################
-# We can plot the firing pattern of individual cells
 import matplotlib.pyplot as plt
 
-net.cells[0].plot_voltage()
-plt.title('%s (gid=%d)' % (cells[0].name, gid))
+with Network(params) as net:
+    net.build()
 
-###############################################################################
-# Let's do this for the rest of the cell types
-fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
-for gid, ax in zip([35, 170], axes):
-    net.cells[gid].plot_voltage(ax)
-    ax.set_title('%s (gid=%d)' % (cells[gid].name, gid))
+    # The cells are stored in the network object as a list
+    cells = net.cells
+    print(cells[:5])
+
+    # We have different kinds of cells with different cell IDs (gids)
+    gids = [0, 35, 135, 170]
+    for gid in gids:
+        print(cells[gid].name)
+
+    # We can plot the firing pattern of individual cells
+    net.cells[0].plot_voltage()
+    plt.title('%s (gid=%d)' % (cells[0].name, gid))
+
+    # Let's do this for the rest of the cell types
+    fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
+    for gid, ax in zip([35, 170], axes):
+        net.cells[gid].plot_voltage(ax)
+        ax.set_title('%s (gid=%d)' % (cells[gid].name, gid))

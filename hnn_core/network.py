@@ -125,18 +125,39 @@ class Network(object):
         return '<%s | %s>' % (class_name, s)
 
     def build(self):
-        """Building the cell in NEURON."""
+        """Building the network in NEURON."""
+
         print('Building the NEURON model')
         from neuron import h
         self._create_all_src()
         self.state_init()
         self._parnet_connect()
+
         # set to record spikes
         self.spiketimes = h.Vector()
         self.spikegids = h.Vector()
         self._record_spikes()
         self.move_cells_to_pos()  # position cells in 2D grid
         print('[Done]')
+
+    def __enter__(self):
+        """Context manager to cleanly build Network objects"""
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Clear up NEURON internal gid information.
+
+        Notes
+        -----
+        This function must be called from the context of the
+        Network instance that ran __enter__(). This is a bug or
+        peculiarity of NEURON. If this function is called from a different
+        context, then the next simulation will run very slow because nrniv
+        workers are still going for the old simulation. If pc.gid_clear() is
+        called from the right context, then those workers can exit.
+        """
+        from .parallel import pc
+        pc.gid_clear()
 
     # creates the immutable source list along with corresponding numbers
     # of cells

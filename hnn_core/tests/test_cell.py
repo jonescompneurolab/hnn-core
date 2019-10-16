@@ -13,7 +13,6 @@ def test_dipole():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = Params(params_fname)
 
-    net = Network(params)
-    net.build()
-
-    net.cells[0].plot_voltage()
+    with Network(params) as net:
+        net.build()
+        net.cells[0].plot_voltage()
