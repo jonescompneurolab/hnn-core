@@ -44,7 +44,11 @@ with Network(params) as net:
     net.cells[0].plot_voltage()
     plt.title('%s (gid=%d)' % (cells[0].name, gid))
 
-    # Let's do this for the rest of the cell types
+###############################################################################
+# Let's do this for the rest of the cell types with a new Network object
+with Network(params) as net:
+    net.build()
+
     fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
     for gid, ax in zip([35, 170], axes):
         net.cells[gid].plot_voltage(ax)

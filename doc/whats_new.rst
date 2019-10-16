@@ -27,4 +27,7 @@ Bug
 API
 ~~~
 
+- Make a context manager for Network class, by `Mainak Jas`_ and `Blake Caldwell`_ in `#86 <https://github.com/jasmainak/hnn-core/pull/86>`_
+
 .. _Mainak Jas: http://jasmainak.github.io/
+.. _Blake Caldwell: http://www.blakecaldwell.com/about-me.html
