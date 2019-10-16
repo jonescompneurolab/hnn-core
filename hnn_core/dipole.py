@@ -23,7 +23,7 @@ def _clone_and_simulate(params, trial_idx):
         params['prng_*'] = trial_idx
 
     net = Network(params, n_jobs=1)
-    net.build_in_neuronpython()
+    net.build()
 
     return _simulate_single_trial(net)
 
