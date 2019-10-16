@@ -312,10 +312,6 @@ class Network(object):
                     pc.cell(
                         gid, self.cells[-1].connect_to_target(
                             None, self.params['threshold']))
-                    # run the IClamp function here
-                    # create_all_IClamp() is defined in L2Pyr (etc)
-                    self.cells[-1].create_all_IClamp(self.params)
-                    self.cells[-1].record_volt_soma()
                 elif type == 'extinput':
                     # print('type',type)
                     # to find param index, take difference between REAL gid
