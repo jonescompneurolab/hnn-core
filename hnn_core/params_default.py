@@ -143,28 +143,7 @@ def get_params_default(nprox=2, ndist=1):
         'dipole_smooth_win': 15.0,
         # in case want to look at higher frequency activity
         'save_figs': 0,
-        'save_vsoma': 0,  # whether to record/save somatic voltage
         'save_dpl': 0,  # whether to write dipole output to a file
-
-        # IClamp params for L2Pyr
-        'Itonic_A_L2Pyr_soma': 0.,
-        'Itonic_t0_L2Pyr_soma': 0.,
-        'Itonic_T_L2Pyr_soma': -1.,
-
-        # IClamp param for L2Basket
-        'Itonic_A_L2Basket': 0.,
-        'Itonic_t0_L2Basket': 0.,
-        'Itonic_T_L2Basket': -1.,
-
-        # IClamp params for L5Pyr
-        'Itonic_A_L5Pyr_soma': 0.,
-        'Itonic_t0_L5Pyr_soma': 0.,
-        'Itonic_T_L5Pyr_soma': -1.,
-
-        # IClamp param for L5Basket
-        'Itonic_A_L5Basket': 0.,
-        'Itonic_t0_L5Basket': 0.,
-        'Itonic_T_L5Basket': -1.,
 
         # numerics
         # N_trials of 1 means that seed is set by rank

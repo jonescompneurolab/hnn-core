@@ -74,11 +74,6 @@ class _Cell(object):
         self.soma.Ra = soma_props['Ra']
         self.soma.cm = soma_props['cm']
 
-    def record_volt_soma(self):
-        """Record voltage at soma."""
-        self.vsoma = h.Vector()
-        self.vsoma.record(self.soma(0.5)._ref_v)
-
     def get_sections(self):
         """Get sections."""
         return [self.soma]
@@ -221,23 +216,6 @@ class _Cell(object):
                 sect(loc[i]).dipole.ztan = y_diff[i]
             # set the pp dipole's ztan value to the last value from y_diff
             dpp.ztan = y_diff[-1]
-
-    def insert_IClamp(self, sect_name, props_IClamp):
-        """Add IClamp to a segment."""
-        # gather list of all sections
-        seclist = h.SectionList()
-        seclist.wholetree(sec=self.soma)
-        # find specified sect in section list, insert IClamp, set props
-        for sect in seclist:
-            if sect_name in sect.name():
-                stim = h.IClamp(sect(props_IClamp['loc']))
-                stim.delay = props_IClamp['delay']
-                stim.dur = props_IClamp['dur']
-                stim.amp = props_IClamp['amp']
-                # stim.dur = tstop - tstart
-                # stim = h.IClamp(sect(seg_loc))
-        # object must exist for NEURON somewhere and needs to be saved
-        return stim
 
     def record_current_soma(self):
         """Record current at soma."""
@@ -474,44 +452,3 @@ class _Cell(object):
         ax.set_ylabel('Voltage (mV)')
         if show:
             plt.show()
-
-    # insert IClamps in all situations
-    def create_all_IClamp(self, p):
-        """ temporarily an external function taking the p dict
-        """
-        # list of sections for this celltype
-        sect_list_IClamp = [
-            'soma',
-        ]
-
-        name_key = self.name
-        if 'Pyr' in self.name:
-            name_key = '%s_soma' % self.name
-        # some parameters
-        t_delay = p['Itonic_t0_%s' % name_key]
-
-        # T = -1 means use h.tstop
-        if p['Itonic_T_%s' % name_key] == -1:
-            t_dur = p['tstop'] - t_delay
-
-        else:
-            t_dur = p['Itonic_T_%s' % name_key] - t_delay
-
-        # t_dur must be nonnegative, I imagine
-        if t_dur < 0.:
-            t_dur = 0.
-
-        # properties of the IClamp
-        props_IClamp = {
-            'loc': 0.5,
-            'delay': t_delay,
-            'dur': t_dur,
-            'amp': p['Itonic_A_%s' % name_key]
-        }
-
-        # iterate through list of sect_list_IClamp to create a persistent
-        # IClamp object
-        # the insert_IClamp procedure is in Cell() and checks on names
-        # so names must be actual section names, or else it will fail silently
-        self.list_IClamp = [self.insert_IClamp(
-            sect_name, props_IClamp) for sect_name in sect_list_IClamp]
