@@ -45,6 +45,7 @@ def _read_json(fname):
 
 def read_params(params_fname):
     """Read param values from a file (.json or .param).
+
     Parameters
     ----------
     params_fname : str
@@ -139,14 +140,14 @@ class Params(dict):
 
     def write(self, fname):
         """Write param values to a file.
+
         Parameters
         ----------
         fname : str
             Full path to the output file (.json)
         """
-
-        fp = open(fname, 'w')
-        json.dump(self, fp)
+        with open(fname, 'w') as fp:
+            json.dump(self, fp)
 
 
 def feed_validate(p_ext, d, tstop):
