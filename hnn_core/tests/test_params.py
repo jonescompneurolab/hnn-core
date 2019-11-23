@@ -20,21 +20,6 @@ def test_params():
     print(params['L2Pyr*'])
 
 
-def test_legacy_params():
-    """Test reading legacy .param file."""
-    param_url = ('https://raw.githubusercontent.com/hnnsolver/'
-                 'hnn-core/test_data/default.param')
-    params_legacy_fname = op.join(hnn_core_root, 'param', 'default.param')
-    if not op.exists(params_legacy_fname):
-        _fetch_file(param_url, params_legacy_fname)
-
-    params_new_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params_legacy = read_params(params_legacy_fname)
-    params_new = read_params(params_new_fname)
-
-    assert params_new == params_legacy
-
-
 def test_base_params():
     """Test params object with base params"""
     param_url = ('https://raw.githubusercontent.com/hnnsolver/'
