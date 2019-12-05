@@ -1,3 +1,7 @@
+from .utils import load_custom_mechanisms
+
+load_custom_mechanisms()
+
 from .dipole import simulate_dipole
 from .feed import ExtFeed
 from .params import Params, read_params

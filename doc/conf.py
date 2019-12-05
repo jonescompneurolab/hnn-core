@@ -187,15 +187,5 @@ sphinx_gallery_conf = {
                'binderhub_url': 'https://mybinder.org',
                'notebooks_dir': 'stable/notebooks',
                'dependencies': 'Dockerfile'
-               },
-    'first_notebook_cell':
-        ("%matplotlib inline\n"
-         "import os\n"
-         "from neuron import h\n"
-         "h.nrn_load_dll(os.environ['HOME']"
-         " + '/hnn-core/mod/x86_64/.libs/libnrnmech.so')")
+               }
 }
-
-from neuron import h
-
-h.nrn_load_dll("../mod/x86_64/.libs/libnrnmech.so")
