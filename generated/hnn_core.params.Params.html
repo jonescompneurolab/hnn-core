@@ -108,12 +108,12 @@
 <h1>hnn_core.params.Params<a class="headerlink" href="#hnn-core-params-params" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="hnn_core.params.Params">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.params.</code><code class="sig-name descname">Params</code><span class="sig-paren">(</span><em class="sig-param">params_fname</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.params.Params" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.params.</code><code class="sig-name descname">Params</code><span class="sig-paren">(</span><em class="sig-param">params_input=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.params.Params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Params object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>params_fname</strong><span class="classifier">str</span></dt><dd><p>The parameters json file</p>
+<dt><strong>params_input</strong><span class="classifier">dict | None</span></dt><dd><p>Dictionary of parameters. If None, use default parameters.</p>
 </dd>
 </dl>
 </dd>
@@ -158,6 +158,9 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.params.Params.write" title="hnn_core.params.Params.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(self, fname)</p></td>
+<td><p>Write param values to a file.</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="method">
@@ -176,6 +179,20 @@
 <dt id="hnn_core.params.Params.copy">
 <code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.params.Params.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="hnn_core.params.Params.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">fname</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.params.Params.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write param values to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>Full path to the output file (.json)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

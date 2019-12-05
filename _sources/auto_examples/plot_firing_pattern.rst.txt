@@ -35,13 +35,21 @@ Let us import hnn_core
 
 
     import hnn_core
-    from hnn_core import Params, Network
+    from hnn_core import read_params, Network
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Loading custom mechanism files from /Users/mainak/Documents/github_repos/hnn-core/hnn_core/../mod/x86_64/.libs/libnrnmech.so
 
 
 
@@ -51,7 +59,7 @@ Then we read the parameters file
 .. code-block:: default
 
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = Params(params_fname)
+    params = read_params(params_fname)
 
 
 
@@ -176,7 +184,7 @@ Let's do this for the rest of the cell types with a new Network object
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  47.135 seconds)
+   **Total running time of the script:** ( 0 minutes  45.715 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

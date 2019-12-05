@@ -118,7 +118,8 @@ somatosensory dataset.</p>
 </pre></div>
 </div>
 <p>First, we will import the packages and define the paths</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">import</span> <span class="nn">mne</span>
@@ -126,9 +127,13 @@ somatosensory dataset.</p>
 <span class="kn">from</span> <span class="nn">mne.minimum_norm</span> <span class="k">import</span> <span class="n">apply_inverse</span><span class="p">,</span> <span class="n">make_inverse_operator</span>
 
 <span class="n">data_path</span> <span class="o">=</span> <span class="n">somato</span><span class="o">.</span><span class="n">data_path</span><span class="p">()</span>
-<span class="n">raw_fname</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s1">&#39;/MEG/somato/sef_raw_sss.fif&#39;</span>
-<span class="n">fwd_fname</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s1">&#39;/MEG/somato/somato-meg-oct-6-fwd.fif&#39;</span>
-<span class="n">subjects_dir</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s1">&#39;/subjects&#39;</span>
+<span class="n">subject</span> <span class="o">=</span> <span class="s1">&#39;01&#39;</span>
+<span class="n">task</span> <span class="o">=</span> <span class="s1">&#39;somato&#39;</span>
+<span class="n">raw_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">),</span> <span class="s1">&#39;meg&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">_task-</span><span class="si">{}</span><span class="s1">_meg.fif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
+<span class="n">fwd_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">),</span>
+                    <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">_task-</span><span class="si">{}</span><span class="s1">-fwd.fif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
+<span class="n">subjects_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;freesurfer&#39;</span><span class="p">,</span> <span class="s1">&#39;subjects&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then, we get the raw data and estimage the source time course</p>
@@ -165,7 +170,7 @@ somatosensory dataset.</p>
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_somato_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_somato_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Opening raw data file /Users/mainak/mne_data/MNE-somato-data/MEG/somato/sef_raw_sss.fif...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Opening raw data file /Users/mainak/mne_data/MNE-somato-data/sub-01/meg/sub-01_task-somato_meg.fif...
     Range : 237600 ... 506999 =    791.189 ...  1688.266 secs
 Ready.
 Current compensation grade : 0
@@ -192,7 +197,7 @@ Not setting metadata
 0 projection items activated
 Loading data for 111 events and 106 original time points ...
 0 bad epochs dropped
-Reading forward solution from /Users/mainak/mne_data/MNE-somato-data/MEG/somato/somato-meg-oct-6-fwd.fif...
+Reading forward solution from /Users/mainak/mne_data/MNE-somato-data/derivatives/sub-01/sub-01_task-somato-fwd.fif...
     Reading a source space...
     [done]
     Reading a source space...
@@ -205,7 +210,7 @@ Computing data rank from raw with rank=None
     Using tolerance 1.4e-08 (2.2e-16 eps * 306 dim * 2.1e+05  max singular value)
     Estimated rank (mag + grad): 306
     MEG: rank 306 computed from 306 data channels with 0 projectors
-/Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_somato.py:43: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 &gt; 64). Consider setting rank to &quot;auto&quot; or setting it explicitly as an integer.
+/Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_somato.py:47: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 &gt; 64). Consider setting rank to &quot;auto&quot; or setting it explicitly as an integer.
   cov = mne.compute_covariance(epochs)
 Reducing data rank from 306 -&gt; 306
 Estimating covariance using EMPIRICAL
@@ -247,7 +252,7 @@ Applying inverse operator to &quot;1&quot;...
     Computing residual...
     Explained  86.1% variance
 [done]
-/Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_somato.py:60: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+/Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_somato.py:64: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
 </pre></div>
 </div>
@@ -255,12 +260,12 @@ Applying inverse operator to &quot;1&quot;...
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 
 <span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">Params</span><span class="p">,</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <span class="n">Network</span>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
 
 <span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hnn_core_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;N20.json&#39;</span><span class="p">)</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
 
 <span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="n">dpl</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
@@ -279,7 +284,8 @@ Applying inverse operator to &quot;1&quot;...
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Building the NEURON model
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loading custom mechanism files from /Users/mainak/Documents/github_repos/hnn-core/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+Building the NEURON model
 [Done]
 running on 1 cores
 Simulation time: 0.03 ms...
@@ -296,13 +302,13 @@ Simulation time: 100.0 ms...
 Simulation time: 110.0 ms...
 /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
-/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:459: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:480: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
-/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:498: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:519: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  19.884 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  23.746 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-somato-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/hnnsolver/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_somato.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>

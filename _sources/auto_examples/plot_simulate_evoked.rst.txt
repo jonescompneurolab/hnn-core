@@ -36,13 +36,21 @@ Let us import hnn_core
 
 
     import hnn_core
-    from hnn_core import simulate_dipole, Params, Network
+    from hnn_core import simulate_dipole, read_params, Network
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Loading custom mechanism files from /Users/mainak/Documents/github_repos/hnn-core/hnn_core/../mod/x86_64/.libs/libnrnmech.so
 
 
 
@@ -52,7 +60,7 @@ Then we read the parameters file
 .. code-block:: default
 
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = Params(params_fname)
+    params = read_params(params_fname)
     print(params)
 
 
@@ -417,7 +425,7 @@ and then plot it
 
     /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:459: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:480: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
 
 
@@ -442,7 +450,7 @@ Finally, we can also plot the spikes.
 
  .. code-block:: none
 
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:498: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:519: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
 
 
@@ -508,7 +516,7 @@ synchronous and see what happens
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 4 minutes  35.356 seconds)
+   **Total running time of the script:** ( 3 minutes  27.089 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

@@ -120,14 +120,18 @@ waveforms using HNN-core.</p>
 </div>
 <p>Let us import hnn_core</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">Params</span><span class="p">,</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <span class="n">Network</span>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loading custom mechanism files from /Users/mainak/Documents/github_repos/hnn-core/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+</pre></div>
+</div>
 <p>Then we read the parameters file</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hnn_core_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.json&#39;</span><span class="p">)</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -443,7 +447,7 @@ Simulation time: 160.0 ms...
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
-/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:459: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:480: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
 </pre></div>
 </div>
@@ -453,7 +457,7 @@ Simulation time: 160.0 ms...
 </div>
 <img alt="../_images/sphx_glr_plot_simulate_evoked_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:498: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:519: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
 </pre></div>
 </div>
@@ -495,7 +499,7 @@ Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  35.356 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  27.089 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/hnnsolver/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>

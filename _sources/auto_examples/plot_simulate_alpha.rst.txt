@@ -36,7 +36,7 @@ Let us import hnn_core
 
 
     import hnn_core
-    from hnn_core import simulate_dipole, Params, Network
+    from hnn_core import simulate_dipole, read_params, Network
 
 
 
@@ -63,7 +63,7 @@ Then we read the default parameters file
 .. code-block:: default
 
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = Params(params_fname)
+    params = read_params(params_fname)
     print(params)
 
 
@@ -493,7 +493,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 5 minutes  12.640 seconds)
+   **Total running time of the script:** ( 4 minutes  31.945 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

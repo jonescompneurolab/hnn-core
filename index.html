@@ -138,23 +138,24 @@
 </pre></div>
 </div>
 <p>Additionally, you would need Neuron which is available here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a></p>
-<p>If you want to install the latest version of the code (nightly) use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install https://api.github.com/repos/hnnsolver/hnn-core/zipball/master
+<p>Since <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.</p>
+<p>To install the latest version of the code (nightly) do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/hnnsolver/hnn-core.git
+$ cd hnn-core/
+$ python setup.py develop
 </pre></div>
 </div>
-<p>If you do not have admin privileges on the computer, use the <code class="docutils literal notranslate"><span class="pre">--user</span></code> flag
-with <cite>pip</cite>. To upgrade, use the <code class="docutils literal notranslate"><span class="pre">--upgrade</span></code> flag provided by <cite>pip</cite>.</p>
+<p>A final step to the installation process is to compile custom ionic channel
+mechanisms using <cite>nrnivmodl</cite> from Neuron. To do this, simple do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd mod/ &amp;&amp; nrnivmodl
+</pre></div>
+</div>
+<p>inside the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> directory. It should create the compiled custom mechanism files.</p>
 <p>To check if everything worked fine, you can do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -c &#39;import hnn_core&#39;
 </pre></div>
 </div>
 <p>and it should not give any error messages.</p>
-<p>A final step to the installation process is to compile custom ionic channel
-mechanisms using <cite>nrnivmodl</cite> from Neuron. To do this, simple do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make
-</pre></div>
-</div>
-<p>It should create a directory with the compiled mechanisms.</p>
 </div>
 <div class="section" id="bug-reports">
 <h1>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h1>

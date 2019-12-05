@@ -16,14 +16,14 @@ import os.path as op
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, Params, Network
+from hnn_core import simulate_dipole, read_params, Network
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 ###############################################################################
 # Then we read the parameters file
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = Params(params_fname)
+params = read_params(params_fname)
 print(params)
 
 ###############################################################################
