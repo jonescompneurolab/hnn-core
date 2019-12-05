@@ -1,14 +1,11 @@
 # Makefile for model - compiles mod files for use by NEURON
 # first rev: (SL: created)
 
-# macros
-UNAME := $(shell uname)
-
-vpath %.mod mod/
-
 # make rules
-x86_64/special : mod
-	nrnivmodl $<
+all: modl
+
+modl:
+	cd $(PWD)/mod/ && nrnivmodl
 
 # clean
 .PHONY: clean

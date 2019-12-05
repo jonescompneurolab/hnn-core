@@ -39,14 +39,13 @@ For joblib, you can do::
 
 Additionally, you would need Neuron which is available here: `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_
 
-If you want to install the latest version of the code (nightly) use::
+Since ``hnn-core`` does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.
+
+To install the latest version of the code (nightly) do::
 
 	$ git clone git@github.com:hnnsolver/hnn-core.git
 	$ cd hnn-core/
-	$ python setup.py install
-
-If you do not have admin privileges on the computer, use the ``--user`` flag
-with `pip`.
+	$ python setup.py develop
 
 To check if everything worked fine, you can do::
 
