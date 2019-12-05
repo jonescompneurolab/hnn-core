@@ -47,18 +47,18 @@ To install the latest version of the code (nightly) do::
 	$ cd hnn-core/
 	$ python setup.py develop
 
-To check if everything worked fine, you can do::
-
-	$ python -c 'import hnn_core'
-
-and it should not give any error messages.
-
 A final step to the installation process is to compile custom ionic channel
 mechanisms using `nrnivmodl` from Neuron. To do this, simple do::
 
 	$ cd mod/ && nrnivmodl
 
 inside the ``hnn-core`` directory. It should create the compiled custom mechanism files.
+
+To check if everything worked fine, you can do::
+
+	$ python -c 'import hnn_core'
+
+and it should not give any error messages.
 
 Bug reports
 ===========
