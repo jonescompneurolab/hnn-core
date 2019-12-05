@@ -41,10 +41,12 @@ Additionally, you would need Neuron which is available here: `https://neuron.yal
 
 If you want to install the latest version of the code (nightly) use::
 
-	$ pip install https://api.github.com/repos/hnnsolver/hnn-core/zipball/master
+	$ git clone git@github.com:hnnsolver/hnn-core.git
+	$ cd hnn-core/
+	$ python setup.py install
 
 If you do not have admin privileges on the computer, use the ``--user`` flag
-with `pip`. To upgrade, use the ``--upgrade`` flag provided by `pip`.
+with `pip`.
 
 To check if everything worked fine, you can do::
 
@@ -57,7 +59,7 @@ mechanisms using `nrnivmodl` from Neuron. To do this, simple do::
 
 	$ make
 
-It should create a directory with the compiled mechanisms.
+inside the ``hnn-core`` directory. It should create a directory with the compiled mechanisms.
 
 Bug reports
 ===========
