@@ -43,7 +43,7 @@ Since ``hnn-core`` does not yet have a stable release, we recommend installing t
 
 To install the latest version of the code (nightly) do::
 
-	$ git clone git@github.com:hnnsolver/hnn-core.git
+	$ git clone https://github.com/hnnsolver/hnn-core.git
 	$ cd hnn-core/
 	$ python setup.py develop
 
@@ -56,9 +56,9 @@ and it should not give any error messages.
 A final step to the installation process is to compile custom ionic channel
 mechanisms using `nrnivmodl` from Neuron. To do this, simple do::
 
-	$ make
+	$ cd mod/ && nrnivmodl
 
-inside the ``hnn-core`` directory. It should create a directory with the compiled mechanisms.
+inside the ``hnn-core`` directory. It should create the compiled custom mechanism files.
 
 Bug reports
 ===========
