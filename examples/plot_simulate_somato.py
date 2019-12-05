@@ -13,7 +13,7 @@ somatosensory dataset.
 
 ###############################################################################
 # First, we will import the packages and define the paths
-
+import os.path as op
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -22,9 +22,13 @@ from mne.datasets import somato
 from mne.minimum_norm import apply_inverse, make_inverse_operator
 
 data_path = somato.data_path()
-raw_fname = data_path + '/MEG/somato/sef_raw_sss.fif'
-fwd_fname = data_path + '/MEG/somato/somato-meg-oct-6-fwd.fif'
-subjects_dir = data_path + '/subjects'
+subject = '01'
+task = 'somato'
+raw_fname = op.join(data_path, 'sub-{}'.format(subject), 'meg',
+                    'sub-{}_task-{}_meg.fif'.format(subject, task))
+fwd_fname = op.join(data_path, 'derivatives', 'sub-{}'.format(subject),
+                    'sub-{}_task-{}-fwd.fif'.format(subject, task))
+subjects_dir = op.join(data_path, 'derivatives', 'freesurfer', 'subjects')
 
 ###############################################################################
 # Then, we get the raw data and estimage the source time course
