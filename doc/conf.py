@@ -193,9 +193,9 @@ sphinx_gallery_conf = {
          "import os\n"
          "from neuron import h\n"
          "h.nrn_load_dll(os.environ['HOME']"
-         " + '/hnn-core/x86_64/.libs/libnrnmech.so')")
+         " + '/hnn-core/mod/x86_64/.libs/libnrnmech.so')")
 }
 
 from neuron import h
 
-h.nrn_load_dll("../x86_64/.libs/libnrnmech.so")
+h.nrn_load_dll("../mod/x86_64/.libs/libnrnmech.so")
