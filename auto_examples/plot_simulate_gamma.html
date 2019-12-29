@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Simulate gamma rhythms &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/hnnsolver/hnn-core">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Simulate gamma rhythms</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/auto_examples/plot_simulate_gamma.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-gamma-py"><span class="std std-ref">here</span></a> to download the full example code or run this example in your browser via Binder</p>
+</div>
+<div class="sphx-glr-example-title section" id="simulate-gamma-rhythms">
+<span id="sphx-glr-auto-examples-plot-simulate-gamma-py"></span><h1>Simulate gamma rhythms<a class="headerlink" href="#simulate-gamma-rhythms" title="Permalink to this headline">¶</a></h1>
+<p>This example demonstrates how to simulate gamma rhythms using hnn-core.</p>
+<p>Replicates: <a class="reference external" href="https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma">https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Mainak Jas &lt;mainak.jas@telecom-paristech.fr&gt;</span>
+<span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+</pre></div>
+</div>
+<p>Let us import hnn_core</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <span class="n">Network</span>
+
+<span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loading custom mechanism files from /Users/mainak/Documents/github_repos/hnn-core/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+</pre></div>
+</div>
+<p>Then we read the parameters file</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hnn_core_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma_L5weak_L2weak.json&#39;</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{
+    &quot;L2Basket_Gauss_A_weight&quot;: 0.0,
+    &quot;L2Basket_Gauss_mu&quot;: 2000.0,
+    &quot;L2Basket_Gauss_sigma&quot;: 3.6,
+    &quot;L2Basket_Pois_A_weight_ampa&quot;: 0.0,
+    &quot;L2Basket_Pois_A_weight_nmda&quot;: 0.0,
+    &quot;L2Basket_Pois_lamtha&quot;: 0.0,
+    &quot;L2Pyr_Gauss_A_weight&quot;: 0.0,
+    &quot;L2Pyr_Gauss_mu&quot;: 2000.0,
+    &quot;L2Pyr_Gauss_sigma&quot;: 3.6,
+    &quot;L2Pyr_Pois_A_weight_ampa&quot;: 0.0008,
+    &quot;L2Pyr_Pois_A_weight_nmda&quot;: 0.0,
+    &quot;L2Pyr_Pois_lamtha&quot;: 140.0,
+    &quot;L2Pyr_ampa_e&quot;: 0.0,
+    &quot;L2Pyr_ampa_tau1&quot;: 0.5,
+    &quot;L2Pyr_ampa_tau2&quot;: 5.0,
+    &quot;L2Pyr_apical1_L&quot;: 306.0,
+    &quot;L2Pyr_apical1_diam&quot;: 4.08,
+    &quot;L2Pyr_apicaloblique_L&quot;: 340.0,
+    &quot;L2Pyr_apicaloblique_diam&quot;: 3.91,
+    &quot;L2Pyr_apicaltrunk_L&quot;: 59.5,
+    &quot;L2Pyr_apicaltrunk_diam&quot;: 4.25,
+    &quot;L2Pyr_apicaltuft_L&quot;: 238.0,
+    &quot;L2Pyr_apicaltuft_diam&quot;: 3.4,
+    &quot;L2Pyr_basal1_L&quot;: 85.0,
+    &quot;L2Pyr_basal1_diam&quot;: 4.25,
+    &quot;L2Pyr_basal2_L&quot;: 255.0,
+    &quot;L2Pyr_basal2_diam&quot;: 2.72,
+    &quot;L2Pyr_basal3_L&quot;: 255.0,
+    &quot;L2Pyr_basal3_diam&quot;: 2.72,
+    &quot;L2Pyr_dend_Ra&quot;: 200.0,
+    &quot;L2Pyr_dend_cm&quot;: 0.6195,
+    &quot;L2Pyr_dend_el_hh2&quot;: -65.0,
+    &quot;L2Pyr_dend_gbar_km&quot;: 250.0,
+    &quot;L2Pyr_dend_gkbar_hh2&quot;: 0.01,
+    &quot;L2Pyr_dend_gl_hh2&quot;: 4.26e-05,
+    &quot;L2Pyr_dend_gnabar_hh2&quot;: 0.15,
+    &quot;L2Pyr_gabaa_e&quot;: -80.0,
+    &quot;L2Pyr_gabaa_tau1&quot;: 0.5,
+    &quot;L2Pyr_gabaa_tau2&quot;: 5.0,
+    &quot;L2Pyr_gabab_e&quot;: -80.0,
+    &quot;L2Pyr_gabab_tau1&quot;: 1.0,
+    &quot;L2Pyr_gabab_tau2&quot;: 20.0,
+    &quot;L2Pyr_nmda_e&quot;: 0.0,
+    &quot;L2Pyr_nmda_tau1&quot;: 1.0,
+    &quot;L2Pyr_nmda_tau2&quot;: 20.0,
+    &quot;L2Pyr_soma_L&quot;: 22.1,
+    &quot;L2Pyr_soma_Ra&quot;: 200.0,
+    &quot;L2Pyr_soma_cm&quot;: 0.6195,
+    &quot;L2Pyr_soma_diam&quot;: 23.4,
+    &quot;L2Pyr_soma_el_hh2&quot;: -65.0,
+    &quot;L2Pyr_soma_gbar_km&quot;: 250.0,
+    &quot;L2Pyr_soma_gkbar_hh2&quot;: 0.01,
+    &quot;L2Pyr_soma_gl_hh2&quot;: 4.26e-05,
+    &quot;L2Pyr_soma_gnabar_hh2&quot;: 0.18,
+    &quot;L5Basket_Gauss_A_weight&quot;: 0.0,
+    &quot;L5Basket_Gauss_mu&quot;: 2000.0,
+    &quot;L5Basket_Gauss_sigma&quot;: 2.0,
+    &quot;L5Basket_Pois_A_weight_ampa&quot;: 0.0,
+    &quot;L5Basket_Pois_A_weight_nmda&quot;: 0.0,
+    &quot;L5Basket_Pois_lamtha&quot;: 0.0,
+    &quot;L5Pyr_Gauss_A_weight&quot;: 0.0,
+    &quot;L5Pyr_Gauss_mu&quot;: 2000.0,
+    &quot;L5Pyr_Gauss_sigma&quot;: 4.8,
+    &quot;L5Pyr_Pois_A_weight_ampa&quot;: 0.0075,
+    &quot;L5Pyr_Pois_A_weight_nmda&quot;: 0.0,
+    &quot;L5Pyr_Pois_lamtha&quot;: 40.0,
+    &quot;L5Pyr_ampa_e&quot;: 0.0,
+    &quot;L5Pyr_ampa_tau1&quot;: 0.5,
+    &quot;L5Pyr_ampa_tau2&quot;: 5.0,
+    &quot;L5Pyr_apical1_L&quot;: 680.0,
+    &quot;L5Pyr_apical1_diam&quot;: 7.48,
+    &quot;L5Pyr_apical2_L&quot;: 680.0,
+    &quot;L5Pyr_apical2_diam&quot;: 4.93,
+    &quot;L5Pyr_apicaloblique_L&quot;: 255.0,
+    &quot;L5Pyr_apicaloblique_diam&quot;: 5.1,
+    &quot;L5Pyr_apicaltrunk_L&quot;: 102.0,
+    &quot;L5Pyr_apicaltrunk_diam&quot;: 10.2,
+    &quot;L5Pyr_apicaltuft_L&quot;: 425.0,
+    &quot;L5Pyr_apicaltuft_diam&quot;: 3.4,
+    &quot;L5Pyr_basal1_L&quot;: 85.0,
+    &quot;L5Pyr_basal1_diam&quot;: 6.8,
+    &quot;L5Pyr_basal2_L&quot;: 255.0,
+    &quot;L5Pyr_basal2_diam&quot;: 8.5,
+    &quot;L5Pyr_basal3_L&quot;: 255.0,
+    &quot;L5Pyr_basal3_diam&quot;: 8.5,
+    &quot;L5Pyr_dend_Ra&quot;: 200.0,
+    &quot;L5Pyr_dend_cm&quot;: 0.85,
+    &quot;L5Pyr_dend_el_hh2&quot;: -71.0,
+    &quot;L5Pyr_dend_gbar_ar&quot;: 1e-06,
+    &quot;L5Pyr_dend_gbar_ca&quot;: 60.0,
+    &quot;L5Pyr_dend_gbar_cat&quot;: 0.0002,
+    &quot;L5Pyr_dend_gbar_kca&quot;: 0.0002,
+    &quot;L5Pyr_dend_gbar_km&quot;: 200.0,
+    &quot;L5Pyr_dend_gkbar_hh2&quot;: 0.01,
+    &quot;L5Pyr_dend_gl_hh2&quot;: 4.26e-05,
+    &quot;L5Pyr_dend_gnabar_hh2&quot;: 0.14,
+    &quot;L5Pyr_dend_taur_cad&quot;: 20.0,
+    &quot;L5Pyr_gabaa_e&quot;: -80.0,
+    &quot;L5Pyr_gabaa_tau1&quot;: 0.5,
+    &quot;L5Pyr_gabaa_tau2&quot;: 5.0,
+    &quot;L5Pyr_gabab_e&quot;: -80.0,
+    &quot;L5Pyr_gabab_tau1&quot;: 1.0,
+    &quot;L5Pyr_gabab_tau2&quot;: 20.0,
+    &quot;L5Pyr_nmda_e&quot;: 0.0,
+    &quot;L5Pyr_nmda_tau1&quot;: 1.0,
+    &quot;L5Pyr_nmda_tau2&quot;: 20.0,
+    &quot;L5Pyr_soma_L&quot;: 39.0,
+    &quot;L5Pyr_soma_Ra&quot;: 200.0,
+    &quot;L5Pyr_soma_cm&quot;: 0.85,
+    &quot;L5Pyr_soma_diam&quot;: 28.9,
+    &quot;L5Pyr_soma_el_hh2&quot;: -65.0,
+    &quot;L5Pyr_soma_gbar_ar&quot;: 1e-06,
+    &quot;L5Pyr_soma_gbar_ca&quot;: 60.0,
+    &quot;L5Pyr_soma_gbar_cat&quot;: 0.0002,
+    &quot;L5Pyr_soma_gbar_kca&quot;: 0.0002,
+    &quot;L5Pyr_soma_gbar_km&quot;: 200.0,
+    &quot;L5Pyr_soma_gkbar_hh2&quot;: 0.01,
+    &quot;L5Pyr_soma_gl_hh2&quot;: 4.26e-05,
+    &quot;L5Pyr_soma_gnabar_hh2&quot;: 0.16,
+    &quot;L5Pyr_soma_taur_cad&quot;: 20.0,
+    &quot;N_pyr_x&quot;: 10,
+    &quot;N_pyr_y&quot;: 10,
+    &quot;N_trials&quot;: 0,
+    &quot;T_pois&quot;: 250.0,
+    &quot;celsius&quot;: 37.0,
+    &quot;dipole_scalefctr&quot;: 30000.0,
+    &quot;dipole_smooth_win&quot;: 0.0,
+    &quot;distribution_dist&quot;: &quot;normal&quot;,
+    &quot;distribution_prox&quot;: &quot;normal&quot;,
+    &quot;dt&quot;: 0.025,
+    &quot;dt_evprox0_evdist&quot;: -1,
+    &quot;dt_evprox0_evprox1&quot;: -1,
+    &quot;events_per_cycle_dist&quot;: 2,
+    &quot;events_per_cycle_prox&quot;: 2,
+    &quot;f_input_dist&quot;: 10.0,
+    &quot;f_input_prox&quot;: 10.0,
+    &quot;f_max_spec&quot;: 100,
+    &quot;f_stdev_dist&quot;: 20.0,
+    &quot;f_stdev_prox&quot;: 20.0,
+    &quot;gbar_L2Basket_L2Basket&quot;: 0.01,
+    &quot;gbar_L2Basket_L2Pyr_gabaa&quot;: 0.007,
+    &quot;gbar_L2Basket_L2Pyr_gabab&quot;: 0.0,
+    &quot;gbar_L2Basket_L5Pyr&quot;: 0.0,
+    &quot;gbar_L2Pyr_L2Basket&quot;: 0.0012,
+    &quot;gbar_L2Pyr_L2Pyr_ampa&quot;: 0.0,
+    &quot;gbar_L2Pyr_L2Pyr_nmda&quot;: 0.0,
+    &quot;gbar_L2Pyr_L5Basket&quot;: 0.0,
+    &quot;gbar_L2Pyr_L5Pyr&quot;: 0.0,
+    &quot;gbar_L5Basket_L5Basket&quot;: 0.0075,
+    &quot;gbar_L5Basket_L5Pyr_gabaa&quot;: 0.08,
+    &quot;gbar_L5Basket_L5Pyr_gabab&quot;: 0.0,
+    &quot;gbar_L5Pyr_L5Basket&quot;: 0.00091,
+    &quot;gbar_L5Pyr_L5Pyr_ampa&quot;: 0.0,
+    &quot;gbar_L5Pyr_L5Pyr_nmda&quot;: 0.0,
+    &quot;gbar_evdist_1_L2Basket_ampa&quot;: 0.0,
+    &quot;gbar_evdist_1_L2Basket_nmda&quot;: 0.0,
+    &quot;gbar_evdist_1_L2Pyr_ampa&quot;: 0.0,
+    &quot;gbar_evdist_1_L2Pyr_nmda&quot;: 0.0,
+    &quot;gbar_evdist_1_L5Pyr_ampa&quot;: 0.0,
+    &quot;gbar_evdist_1_L5Pyr_nmda&quot;: 0.0,
+    &quot;gbar_evprox_1_L2Basket_ampa&quot;: 0.0,
+    &quot;gbar_evprox_1_L2Basket_nmda&quot;: 0.0,
+    &quot;gbar_evprox_1_L2Pyr_ampa&quot;: 0.0,
+    &quot;gbar_evprox_1_L2Pyr_nmda&quot;: 0.0,
+    &quot;gbar_evprox_1_L5Basket_ampa&quot;: 0.0,
+    &quot;gbar_evprox_1_L5Basket_nmda&quot;: 0.0,
+    &quot;gbar_evprox_1_L5Pyr_ampa&quot;: 0.0,
+    &quot;gbar_evprox_1_L5Pyr_nmda&quot;: 0.0,
+    &quot;gbar_evprox_2_L2Basket_ampa&quot;: 0.0,
+    &quot;gbar_evprox_2_L2Basket_nmda&quot;: 0.0,
+    &quot;gbar_evprox_2_L2Pyr_ampa&quot;: 0.0,
+    &quot;gbar_evprox_2_L2Pyr_nmda&quot;: 0.0,
+    &quot;gbar_evprox_2_L5Basket_ampa&quot;: 0.0,
+    &quot;gbar_evprox_2_L5Basket_nmda&quot;: 0.0,
+    &quot;gbar_evprox_2_L5Pyr_ampa&quot;: 0.0,
+    &quot;gbar_evprox_2_L5Pyr_nmda&quot;: 0.0,
+    &quot;inc_evinput&quot;: 0.0,
+    &quot;input_dist_A_delay_L2&quot;: 5.0,
+    &quot;input_dist_A_delay_L5&quot;: 5.0,
+    &quot;input_dist_A_weight_L2Basket_ampa&quot;: 0.0,
+    &quot;input_dist_A_weight_L2Basket_nmda&quot;: 0.0,
+    &quot;input_dist_A_weight_L2Pyr_ampa&quot;: 0.0,
+    &quot;input_dist_A_weight_L2Pyr_nmda&quot;: 0.0,
+    &quot;input_dist_A_weight_L5Pyr_ampa&quot;: 0.0,
+    &quot;input_dist_A_weight_L5Pyr_nmda&quot;: 0.0,
+    &quot;input_prox_A_delay_L2&quot;: 0.1,
+    &quot;input_prox_A_delay_L5&quot;: 1.0,
+    &quot;input_prox_A_weight_L2Basket_ampa&quot;: 0.0,
+    &quot;input_prox_A_weight_L2Basket_nmda&quot;: 0.0,
+    &quot;input_prox_A_weight_L2Pyr_ampa&quot;: 0.0,
+    &quot;input_prox_A_weight_L2Pyr_nmda&quot;: 0.0,
+    &quot;input_prox_A_weight_L5Basket_ampa&quot;: 0.0,
+    &quot;input_prox_A_weight_L5Basket_nmda&quot;: 0.0,
+    &quot;input_prox_A_weight_L5Pyr_ampa&quot;: 0.0,
+    &quot;input_prox_A_weight_L5Pyr_nmda&quot;: 0.0,
+    &quot;numspikes_evdist_1&quot;: 1,
+    &quot;numspikes_evprox_1&quot;: 1,
+    &quot;numspikes_evprox_2&quot;: 1,
+    &quot;prng_seedcore_evdist_1&quot;: 0,
+    &quot;prng_seedcore_evprox_1&quot;: 0,
+    &quot;prng_seedcore_evprox_2&quot;: 0,
+    &quot;prng_seedcore_extgauss&quot;: 0,
+    &quot;prng_seedcore_extpois&quot;: -1,
+    &quot;prng_seedcore_input_dist&quot;: 0,
+    &quot;prng_seedcore_input_prox&quot;: 0,
+    &quot;repeats_dist&quot;: 10,
+    &quot;repeats_prox&quot;: 10,
+    &quot;save_dpl&quot;: 0,
+    &quot;save_figs&quot;: 0,
+    &quot;save_spec_data&quot;: 1,
+    &quot;sigma_t_evdist_1&quot;: 6.0,
+    &quot;sigma_t_evprox_1&quot;: 2.5,
+    &quot;sigma_t_evprox_2&quot;: 7.0,
+    &quot;sim_prefix&quot;: &quot;default&quot;,
+    &quot;sync_evinput&quot;: 1,
+    &quot;t0_input_dist&quot;: 1000.0,
+    &quot;t0_input_prox&quot;: 1000.0,
+    &quot;t0_input_stdev_dist&quot;: 0.0,
+    &quot;t0_input_stdev_prox&quot;: 0.0,
+    &quot;t0_pois&quot;: 0.0,
+    &quot;t_evdist_1&quot;: 2000.0,
+    &quot;t_evprox_1&quot;: 2000.0,
+    &quot;t_evprox_2&quot;: 2000.0,
+    &quot;threshold&quot;: 0.0,
+    &quot;tstop&quot;: 250.0,
+    &quot;tstop_input_dist&quot;: 250.0,
+    &quot;tstop_input_prox&quot;: 250.0
+}
+</pre></div>
+</div>
+<p>Now let’s simulate the dipole
+You can simulate multiple trials in parallel by using n_jobs &gt; 1</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Building the NEURON model
+[Done]
+running on 1 cores
+Simulation time: 0.03 ms...
+Simulation time: 10.0 ms...
+Simulation time: 20.0 ms...
+Simulation time: 30.0 ms...
+Simulation time: 40.0 ms...
+Simulation time: 50.0 ms...
+Simulation time: 60.0 ms...
+Simulation time: 70.0 ms...
+Simulation time: 80.0 ms...
+Simulation time: 90.0 ms...
+Simulation time: 100.0 ms...
+Simulation time: 110.0 ms...
+Simulation time: 120.0 ms...
+Simulation time: 130.0 ms...
+Simulation time: 140.0 ms...
+Simulation time: 150.0 ms...
+Simulation time: 160.0 ms...
+Simulation time: 170.0 ms...
+Simulation time: 180.0 ms...
+Simulation time: 190.0 ms...
+Simulation time: 200.0 ms...
+Simulation time: 210.0 ms...
+Simulation time: 220.0 ms...
+Simulation time: 230.0 ms...
+Simulation time: 240.0 ms...
+</pre></div>
+</div>
+<p>We can plot the time-frequency response using MNE</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mne.time_frequency</span> <span class="k">import</span> <span class="n">tfr_array_multitaper</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">)</span>
+
+<span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+<span class="n">time_bandwidth</span> <span class="o">=</span> <span class="mf">4.0</span>
+<span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">20.</span><span class="p">,</span> <span class="mf">100.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+<span class="n">n_cycles</span> <span class="o">=</span> <span class="n">freqs</span> <span class="o">/</span> <span class="mf">4.</span>
+
+<span class="c1"># MNE expects an array of shape (n_trials, n_channels, n_times)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dpl</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">power</span> <span class="o">=</span> <span class="n">tfr_array_multitaper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
+                             <span class="n">n_cycles</span><span class="o">=</span><span class="n">n_cycles</span><span class="p">,</span>
+                             <span class="n">time_bandwidth</span><span class="o">=</span><span class="n">time_bandwidth</span><span class="p">,</span>
+                             <span class="n">output</span><span class="o">=</span><span class="s1">&#39;power&#39;</span><span class="p">)</span>
+<span class="c1"># stop = params[&#39;tstop&#39;] + params[&#39;dt&#39;] so last point is included</span>
+<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdBu_r&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_simulate_gamma_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_gamma_001.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+  plt.show()
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  1.680 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-gamma-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/hnnsolver/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_gamma.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/948d09932a7152fdeb6db0df412aa2ec/plot_simulate_gamma.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_gamma.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/74557d23d8586e4afa2865dcd5f2b93d/plot_simulate_gamma.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_gamma.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Mainak Jas.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
