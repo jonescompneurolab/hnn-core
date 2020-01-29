@@ -22,7 +22,7 @@ def test_params():
 
 def test_base_params():
     """Test params object with base params"""
-    param_url = ('https://raw.githubusercontent.com/hnnsolver/'
+    param_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
                  'hnn-core/test_data/base.json')
     params_base_fname = op.join(hnn_core_root, 'param', 'base.json')
     if not op.exists(params_base_fname):

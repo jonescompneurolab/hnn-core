@@ -15,7 +15,7 @@ installation as shown below.
 To run the tests using `pytest`, you need to have the git cloned `hnn-core`
 repository with an editable pip install:
 
-    $ git clone https://github.com/hnnsolver/hnn-core --depth 1
+    $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
     $ cd hnn-core
     $ python setup.py develop
 

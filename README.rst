@@ -5,12 +5,12 @@ hnn-core
    :target: https://gitter.im/hnn-core/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
    :alt: Gitter
 
-.. image:: https://api.travis-ci.org/hnnsolver/hnn-core.svg?branch=master
-    :target: https://travis-ci.org/hnnsolver/hnn-core
+.. image:: https://api.travis-ci.org/jonescompneurolab/hnn-core.svg?branch=master
+    :target: https://travis-ci.org/jonescompneurolab/hnn-core
     :alt: Build Status
 
-.. image:: https://codecov.io/gh/hnnsolver/hnn-core/branch/master/graph/badge.svg
-	:target: https://codecov.io/gh/hnnsolver/hnn-core
+.. image:: https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg
+	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
 	:alt: Test coverage
 
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_. However, a Graphical User Interface is not supported at the moment in this repository.
@@ -43,7 +43,7 @@ Since ``hnn-core`` does not yet have a stable release, we recommend installing t
 
 To install the latest version of the code (nightly) do::
 
-	$ git clone https://github.com/hnnsolver/hnn-core.git
+	$ git clone https://github.com/jonescompneurolab/hnn-core.git
 	$ cd hnn-core/
 	$ python setup.py develop
 
@@ -63,4 +63,4 @@ and it should not give any error messages.
 Bug reports
 ===========
 
-Use the `github issue tracker <https://github.com/hnnsolver/hnn-core/issues>`_ to report bugs.
+Use the `github issue tracker <https://github.com/jonescompneurolab/hnn-core/issues>`_ to report bugs.

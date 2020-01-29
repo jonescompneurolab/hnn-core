@@ -9,7 +9,7 @@ MAINTAINER = 'Mainak Jas'
 MAINTAINER_EMAIL = 'mainakjas@gmail.com'
 URL = ''
 LICENSE = 'BSD (3-clause)'
-DOWNLOAD_URL = 'http://github.com/hnnsolver/hnn-core'
+DOWNLOAD_URL = 'http://github.com/jonescompneurolab/hnn-core'
 VERSION = '0.1.dev0'
 
 if __name__ == "__main__":

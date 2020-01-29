@@ -13,7 +13,7 @@ def test_hnn_core():
     # small snippet of data on data branch for now. To be deleted
     # later. Data branch should have only commit so it does not
     # pollute the history.
-    data_url = ('https://raw.githubusercontent.com/hnnsolver/'
+    data_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
                 'hnn-core/test_data/dpl.txt')
     if not op.exists('dpl.txt'):
         _fetch_file(data_url, 'dpl.txt')

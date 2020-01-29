@@ -61,7 +61,7 @@ RUN git clone https://github.com/neuronsimulator/nrn && \
 
 ENV PATH=${PATH}:${HOME}/x86_64/bin
 
-RUN git clone https://github.com/hnnsolver/hnn-core.git && \
+RUN git clone https://github.com/jonescompneurolab/hnn-core.git && \
 	cd hnn-core && \
     make && \
     python setup.py develop
@@ -69,7 +69,7 @@ RUN git clone https://github.com/hnnsolver/hnn-core.git && \
 ENV PATH=${PATH}:${HOME}/hnn-core/x86_64/
 
 RUN git init . && \
-    git remote add origin https://github.com/hnnsolver/hnn-core.git && \
+    git remote add origin https://github.com/jonescompneurolab/hnn-core.git && \
 	git fetch origin gh-pages && \
 	git checkout gh-pages
 

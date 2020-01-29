@@ -95,7 +95,7 @@ html_theme_options = {
         ("Examples", "auto_examples/index"),
         ("API", "api"),
         ("Whats new", "whats_new"),
-        ("GitHub", "https://github.com/hnnsolver/hnn-core", True)
+        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
     ],
     'bootswatch_theme': "united"
 }
@@ -179,9 +179,9 @@ sphinx_gallery_conf = {
     'gallery_dirs': 'auto_examples',
     'backreferences_dir': False,
     'reference_url': {
-        'hnn_core': 'https://hnnsolver.github.io/hnn-core/'
+        'hnn_core': 'https://jonescompneurolab.github.io/hnn-core/'
     },
-    'binder': {'org': 'hnnsolver',
+    'binder': {'org': 'jonescompneurolab',
                'repo': 'hnn-core',
                'branch': 'gh-pages',
                'binderhub_url': 'https://mybinder.org',
