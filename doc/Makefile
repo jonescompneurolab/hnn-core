@@ -98,14 +98,14 @@ coverage:
 
 install:
 	rm -rf _build/doctrees _build/hnn-core.github.io
-	# first clone the hnnsolver/hnn-core.github.io repo because it may ask
+	# first clone the jonescompneurolab/hnn-core.github.io repo because it may ask
 	# for password and we don't want to delay this long build in
 	# the middle of it
 	# --no-checkout just fetches the root folder without content
 	# --depth 1 is a speed optimization since we don't need the
 	# history prior to the last commit
 	# -b gh-pages fetches only the branch for the gh-pages
-	git clone -b gh-pages --single-branch --no-checkout --depth 1 git@github.com:hnnsolver/hnn-core.git _build/hnn-core.github.io
+	git clone -b gh-pages --single-branch --no-checkout --depth 1 git@github.com:jonescompneurolab/hnn-core.git _build/hnn-core.github.io
 	touch _build/hnn-core.github.io/.nojekyll
 	make html
 	cd _build/ && \
