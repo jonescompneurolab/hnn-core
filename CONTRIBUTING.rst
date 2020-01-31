@@ -40,7 +40,8 @@ You can build the documentation locally using the command:
     $ cd doc/
     $ make html
 
-You will also need to install mne to run all the examples and tests successfully. Please find
+While MNE is not needed to install hnn-core, as a developer you will need to install it
+to run all the examples and tests successfully. Please find
 the installation instructions on the [MNE website](http://martinos.org/mne/).
 
 If you want to build the documentation locally without running all the examples,
