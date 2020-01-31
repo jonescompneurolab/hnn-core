@@ -7,44 +7,46 @@ Once the implementation of a piece of functionality is considered to be bug
 free and properly documented (both API docs and an example script),
 it can be incorporated into the master branch.
 
-To help developing `hnn-core`, you will need a few adjustments to your
+To help developing ``hnn-core``, you will need a few adjustments to your
 installation as shown below.
 
-##### Running tests
+Running tests
+=============
 
 To run the tests using `pytest`, you need to have the git cloned `hnn-core`
-repository with an editable pip install:
+repository with an editable pip install::
 
     $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
     $ cd hnn-core
     $ python setup.py develop
 
-Then, install the following python packages:
+Then, install the following python packages::
 
     $ pip install flake8 pytest pytest-cov
 
 Updating documentation
-#####
+======================
 
 Update `doc/api.rst` and `doc/whats_new.rst` as appropriate.
 
-##### Building the documentation
+Building the documentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The documentation can be built using sphinx. For that, please additionally
-install the following:
+install the following::
 
     $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow
 
-You can build the documentation locally using the command:
+You can build the documentation locally using the command::
 
     $ cd doc/
     $ make html
 
 While MNE is not needed to install hnn-core, as a developer you will need to install it
 to run all the examples and tests successfully. Please find
-the installation instructions on the [MNE website](http://martinos.org/mne/).
+the installation instructions on the `MNE website <https://mne.tools/stable/install/mne_python.html>`_.
 
 If you want to build the documentation locally without running all the examples,
-use the command:
+use the command::
 
     $ make html-noplot
