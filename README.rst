@@ -24,6 +24,7 @@ Dependencies
 * scipy
 * numpy
 * matplotlib
+* netpyne
 * joblib (optional for parallel processing)
 
 Installation
@@ -33,9 +34,9 @@ We recommend the `Anaconda Python distribution <https://www.continuum.io/downloa
 
 	$ conda install numpy matplotlib scipy
 
-For joblib, you can do::
+For joblib and netpyne, you can do::
 
-	$ pip install joblib
+	$ pip install joblib netpyne
 
 Additionally, you would need Neuron which is available here: `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_
 

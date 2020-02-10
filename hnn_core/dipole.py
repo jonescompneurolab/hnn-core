@@ -2,11 +2,10 @@
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
+#          Blake Caldwell <blake_caldwell@brown.edu>
 
 import numpy as np
 from numpy import convolve, hamming
-
-from .parallel import _parallel_func
 
 
 def _hammfilt(x, winsz):
@@ -16,121 +15,33 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def _clone_and_simulate(params, trial_idx):
-    from .network import Network
-
-    if trial_idx != 0:
-        params['prng_*'] = trial_idx
-
-    net = Network(params, n_jobs=1)
-    net.build()
-
-    return _simulate_single_trial(net)
-
-
-def _simulate_single_trial(net):
-    """Simulate one trial."""
-    from .parallel import rank, nhosts, pc, cvode
-    from neuron import h
-    h.load_file("stdrun.hoc")
-
-    # Now let's simulate the dipole
-    if rank == 0:
-        print("running on %d cores" % nhosts)
-
-    # global variables, should be node-independent
-    h("dp_total_L2 = 0.")
-    h("dp_total_L5 = 0.")
-
-    # Set tstop before instantiating any classes
-    h.tstop = net.params['tstop']
-    h.dt = net.params['dt']  # simulation duration and time-step
-    h.celsius = net.params['celsius']  # 37.0 - set temperature
-
-    # We define the arrays (Vector in numpy) for recording the signals
-    t_vec = h.Vector()
-    t_vec.record(h._ref_t)  # time recording
-    dp_rec_L2 = h.Vector()
-    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
-    dp_rec_L5 = h.Vector()
-    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
-
-    # sets the default max solver step in ms (purposefully large)
-    pc.set_maxstep(10)
-
-    # initialize cells to -65 mV, after all the NetCon
-    # delays have been specified
-    h.finitialize()
-
-    def simulation_time():
-        print('Simulation time: {0} ms...'.format(round(h.t, 2)))
-
-    if rank == 0:
-        for tt in range(0, int(h.tstop), 10):
-            cvode.event(tt, simulation_time)
-
-    h.fcurrent()
-    # set state variables if they have been changed since h.finitialize
-    h.frecord_init()
-    # actual simulation - run the solver
-    pc.psolve(h.tstop)
-
-    pc.barrier()
-
-    # these calls aggregate data across procs/nodes
-    pc.allreduce(dp_rec_L2, 1)
-    # combine dp_rec on every node, 1=add contributions together
-    pc.allreduce(dp_rec_L5, 1)
-    # aggregate the currents independently on each proc
-    net.aggregate_currents()
-    # combine net.current{} variables on each proc
-    pc.allreduce(net.current['L5Pyr_soma'], 1)
-    pc.allreduce(net.current['L2Pyr_soma'], 1)
-
-    pc.barrier()  # get all nodes to this place before continuing
-
-    dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
-                     np.array(dp_rec_L5.to_python()),
-                     np.array(dp_rec_L2.to_python()),
-                     np.array(dp_rec_L5.to_python())]
-
-    pc.gid_clear()
-    pc.done()
-    dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
-    if rank == 0:
-        if net.params['save_dpl']:
-            dpl.write('rawdpl.txt')
-
-        dpl.baseline_renormalize(net.params)
-        dpl.convert_fAm_to_nAm()
-        dpl.scale(net.params['dipole_scalefctr'])
-        dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
-    return dpl, net.spiketimes.to_python(), net.spikegids.to_python()
-
-
-def simulate_dipole(net, n_trials=1, n_jobs=1):
-    """Simulate a dipole given the experiment parameters.
+def _process_dipole(dipole_data, times, sim_cfg, trial_idx):
+    """Process raw dipole data
 
     Parameters
     ----------
-    net : Network object
-        The Network object specifying how cells are
-        connected.
-    n_trials : int
-        The number of trials to simulate.
-    n_jobs : int
-        The number of jobs to run in parallel.
-
-    Returns
-    -------
-    dpl: list | instance of Dipole
-        The dipole object or list of dipole objects if n_trials > 1
+    dipole_data : dict
+        dict of L2 and L5 dipole data
+    times: array
+        time indexes of simulation
+    sim_cfg : sim.cfg object
+        The NetPyNE configuration used for the simulation
     """
-    parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
-    out = parallel(myfunc(net.params, idx) for idx in range(n_trials))
-    dpl, spiketimes, spikegids = zip(*out)
-    net.spiketimes = spiketimes
-    net.spikegids = spikegids
+
+    # the last timestep doesn't get simulated in netpyne
+    L2_dpl = np.array(dipole_data['L2'])[0:-1]
+    L5_dpl = np.array(dipole_data['L5'])[0:-1]
+
+    dpl_data = np.c_[L2_dpl + L5_dpl, L2_dpl, L5_dpl]
+    dpl = Dipole(np.array(times), dpl_data)
+    if sim_cfg.save_dpl:
+        dpl.write('rawdpl_%s_%d.txt' % (sim_cfg.sim_prefix, trial_idx))
+
+    N_pyr = sim_cfg.N_pyr_x * sim_cfg.N_pyr_y
+    dpl.baseline_renormalize(N_pyr)
+    dpl.convert_fAm_to_nAm()
+    dpl.scale(sim_cfg.dipole_scalefctr)
+    dpl.smooth(sim_cfg.dipole_smooth_win / sim_cfg.dt)
     return dpl
 
 
@@ -209,23 +120,19 @@ class Dipole(object):
             plt.show()
         return ax.get_figure()
 
-    def baseline_renormalize(self, params):
+    def baseline_renormalize(self, N_pyr):
         """Only baseline renormalize if the units are fAm.
 
         Parameters
         ----------
-        params : dict
-            The parameters
+        N_pyr : int
+            Number of pyramidal neurons per layer in network
         """
         if self.units != 'fAm':
             print("Warning, no dipole renormalization done because units"
                   " were in %s" % (self.units))
             return
 
-        N_pyr_x = params['N_pyr_x']
-        N_pyr_y = params['N_pyr_y']
-        # N_pyr cells in grid. This is PER LAYER
-        N_pyr = N_pyr_x * N_pyr_y
         # dipole offset calculation: increasing number of pyr
         # cells (L2 and L5, simultaneously)
         # with no inputs resulted in an aggregate dipole over the
@@ -275,5 +182,5 @@ class Dipole(object):
             Full path to the output file (.txt)
         """
         X = np.r_[[self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']]].T
-        np.savetxt('dpl2.txt', X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
+        np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
                    delimiter='\t')

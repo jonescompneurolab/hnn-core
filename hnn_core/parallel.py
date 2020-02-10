@@ -1,26 +1,9 @@
-"""import NEURON module"""
+"""Functions for running in parallel"""
 
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 #          Mainak Jas <mainakjas@gmail.com>
 
 from warnings import warn
-
-from neuron import h
-
-rank = 0
-nhosts = 1
-pc = h.ParallelContext(nhosts)
-pc.done()
-rank = int(pc.id())
-cvode = h.CVode()
-
-
-def create_parallel_context(n_jobs=1):
-    """Create parallel context."""
-    rank = int(pc.id())     # rank or node number (0 will be the master)
-
-    if rank == 0:
-        pc.gid_clear()
 
 
 def _parallel_func(func, n_jobs):
