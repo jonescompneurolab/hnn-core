@@ -43,6 +43,44 @@ def _read_json(fname):
     return params_input
 
 
+def _read_legacy_params(fname):
+    """Read param values from a .param file (legacy).
+    Parameters
+    ----------
+    fname : str
+        Full path to the file (.param)
+
+    Returns
+    -------
+    params_input : dict
+        Dictionary of parameters
+    """
+
+    params_input = {}
+    with open(fname, 'r') as fp:
+        params_lines = fp.readlines()
+        for line in params_lines:
+            subline = line.lstrip()
+            if subline.startswith('#'):
+                continue
+            split_line = subline.split(':')
+            if len(split_line) > 1:
+                key = split_line[0].strip()
+                value = split_line[1].strip()
+                if '.' in value or 'e' in value:
+                    try:
+                        params_input[key] = float(value)
+                    except ValueError:
+                        params_input[key] = value
+                else:
+                    try:
+                        params_input[key] = int(value)
+                    except ValueError:
+                        params_input[key] = value
+
+    return params_input
+
+
 def read_params(params_fname):
     """Read param values from a file (.json or .param).
 
@@ -62,6 +100,8 @@ def read_params(params_fname):
 
     if ext == '.json':
         params_dict = _read_json(params_fname)
+    elif ext == '.param':
+        params_dict = _read_legacy_params(params_fname)
     else:
         raise ValueError('Unrecognized extension, expected one of' +
                          ' .json, .param. Got %s' % ext)
