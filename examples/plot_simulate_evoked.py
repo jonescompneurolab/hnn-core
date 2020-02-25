@@ -17,7 +17,7 @@ import tempfile
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network, read_spikes
+from hnn_core import simulate_dipole, read_params, Network, read_spikes, get_rank, shutdown
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
@@ -40,22 +40,24 @@ dpls = simulate_dipole(net, n_jobs=1, n_trials=2)
 
 ###############################################################################
 # and then plot it
-import matplotlib.pyplot as plt
-fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-for dpl in dpls:
-    dpl.plot(ax=axes[0], layer='agg', show=False)
-net.plot_input(ax=axes[1])
+if get_rank() == 0:
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
+    for dpl in dpls:
+        dpl.plot(ax=axes[0], layer='agg', show=False)
+    net.plot_input(ax=axes[1])
 
 ###############################################################################
 # Also, we can plot the spikes and write them to txt files.
 # Note that we can use formatting syntax to specify the filename pattern
 # with which each trial will be written. To read spikes back in, we can use
 # wildcard expressions.
-net.spikes.plot()
-with tempfile.TemporaryDirectory() as tmp_dir_name:
-    net.spikes.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-    spikes = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
-spikes.plot()
+if get_rank() == 0:
+    net.spikes.plot()
+    with tempfile.TemporaryDirectory() as tmp_dir_name:
+        net.spikes.write(op.join(tmp_dir_name, 'spk_%d.txt'))
+        spikes = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
+    spikes.plot()
 
 ###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
@@ -64,5 +66,8 @@ spikes.plot()
 params.update({'sync_evinput': True})
 net_sync = Network(params)
 dpls_sync = simulate_dipole(net_sync, n_jobs=1, n_trials=1)
-dpls_sync[0].plot()
-net_sync.plot_input()
+if get_rank() == 0:
+    dpls_sync[0].plot()
+    net_sync.plot_input()
+
+shutdown()
