@@ -58,25 +58,16 @@ def _read_legacy_params(fname):
 
     params_input = {}
     with open(fname, 'r') as fp:
-        params_lines = fp.readlines()
-        for line in params_lines:
-            subline = line.lstrip()
-            if subline.startswith('#'):
-                continue
-            split_line = subline.split(':')
-            if len(split_line) > 1:
-                key = split_line[0].strip()
-                value = split_line[1].strip()
+        for line in fp.readlines():
+            split_line = line.lstrip().split(':')
+            key, value = [field.strip() for field in split_line]
+            try:
                 if '.' in value or 'e' in value:
-                    try:
-                        params_input[key] = float(value)
-                    except ValueError:
-                        params_input[key] = value
+                    params_input[key] = float(value)
                 else:
-                    try:
-                        params_input[key] = int(value)
-                    except ValueError:
-                        params_input[key] = value
+                    params_input[key] = int(value)
+            except ValueError:
+                params_input[key] = str(value)
 
     return params_input
 
