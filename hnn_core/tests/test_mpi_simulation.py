@@ -10,12 +10,12 @@ import hnn_core
 
 
 def run_simulation(n_jobs):
-    from hnn_core import simulate_dipole, Params, Network, get_rank
+    from hnn_core import simulate_dipole, Network, get_rank
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = Params(params_fname)
+    params = hnn_core.read_params(params_fname)
     net = Network(params)
     dpl = simulate_dipole(net, n_jobs=n_jobs, n_trials=1)[0]
 
@@ -24,7 +24,7 @@ def run_simulation(n_jobs):
         fname = './dpl2.txt'
         dpl.write(fname)
 
-        data_url = ('https://raw.githubusercontent.com/hnnsolver/'
+        data_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
                     'hnn-core/test_data/dpl.txt')
         if not op.exists('dpl.txt'):
             _fetch_file(data_url, 'dpl.txt')
@@ -38,17 +38,38 @@ def run_simulation(n_jobs):
 def spawn_mpi_simulation(n_jobs):
     from subprocess import Popen, PIPE
     import shlex
+    import psutil
+    import multiprocessing
     from os import getcwd
     from sys import platform
 
-    import psutil
-    n_cores = psutil.cpu_count(logical=False)
+    physical_cores = psutil.cpu_count(logical=False)
+    logical_cores = multiprocessing.cpu_count()
 
-    mpicmd = 'mpiexec -np ' + str(n_cores) + ' '
+    hyperthreading = False
+    if logical_cores is not None and logical_cores > physical_cores:
+        hyperthreading = True
+        n_cores = logical_cores
+    else:
+        n_cores = physical_cores
+
+    mpicmd = 'mpiexec '
+
+    # we need to run on more than 1 core for tests, so oversubscribe when
+    # necessary (e.g. on Travis)
+    if n_cores == 1:
+        n_cores = 2
+        mpicmd += '--oversubscribe '
+
+    if hyperthreading:
+        mpicmd += '--use-hwthread-cpus '
+
+    mpicmd += '-np ' + str(n_cores) + ' '
     nrnivcmd = 'nrniv -python -mpi -nobanner ' + \
                op.join(op.dirname(hnn_core.__file__),
                        'tests',
-                       'test_compare_hnn.py')
+                       'test_mpi_simulation.py') + ' ' + \
+               str(n_jobs)
     cmd = mpicmd + nrnivcmd
 
     ###########################################################################
@@ -100,6 +121,8 @@ def test_mpi_joblibs_incompat():
 
 
 if __name__ == '__main__':
+    from mpi4py import MPI
+
     # read n_jobs, very long list of arguments with nrniv..
     try:
         n_jobs = int(sys.argv[-1])
@@ -107,3 +130,5 @@ if __name__ == '__main__':
         raise ValueError('Received bad argument for n_jobs: %s' % sys.argv[-1])
 
     run_simulation(n_jobs)
+    MPI.Finalize()
+    exit(0)  # stop the child

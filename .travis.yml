@@ -24,7 +24,7 @@ install:
     - source activate testenv
     - conda install --yes scipy numpy matplotlib
     - pip install flake8 pytest pytest-cov
-    - pip install mne psutil mpi4py
+    - pip install mne psutil mpi4py joblib
     - pip install coverage coveralls
     - |
       git clone https://github.com/neuronsimulator/nrn
@@ -43,11 +43,6 @@ install:
       python setup.py develop
 script:
     - flake8 --count hnn_core
-    - export PYTHONHOME=/home/travis/miniconda/envs/testenv
-    - python -c 'from hnn_core.tests.test_mpi_simulation import test_mpi_simulation; \
-        test_mpi_simulation()'
-    - python -c 'from hnn_core.tests.test_mpi_simulation import test_mpi_joblibs_incompat; \
-        test_mpi_joblibs_incompat()'
     - py.test --cov=hnn_core hnn_core/tests/
 after_success:
     - bash <(curl -s https://codecov.io/bash)

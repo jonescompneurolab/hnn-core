@@ -21,7 +21,7 @@ def _clone_and_simulate(net, trial_idx):
     if trial_idx != 0:
         net.params['prng_*'] = trial_idx
 
-    net.build_in_neuron()
+    net.build()
 
     return _simulate_single_trial(net)
 
@@ -134,6 +134,8 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
         # instantiating ParallelContext and testing nhosts
         create_parallel_context()
         if get_nhosts() > 1:
+            from mpi4py import MPI
+            MPI.Finalize()
             raise ValueError("Nested parallelism is not currently supported!\n"
                              "Please choose embarassinly parallel jobs (n_jobs"
                              " > 1)\n"

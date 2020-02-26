@@ -5,7 +5,7 @@ from numpy.testing import assert_array_equal
 
 from mne.utils import _fetch_file
 import hnn_core
-from hnn_core import simulate_dipole, Network, Params
+from hnn_core import simulate_dipole, Network, read_params
 
 
 def test_hnn_core():
