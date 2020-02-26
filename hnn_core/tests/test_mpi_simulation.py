@@ -1,41 +1,12 @@
 import os.path as op
 import sys
-
-from numpy import loadtxt
-from numpy.testing import assert_array_equal
 import pytest
 
-from mne.utils import _fetch_file
 import hnn_core
 
 
-def run_simulation(n_jobs):
-    from hnn_core import simulate_dipole, Network, get_rank
-
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
-
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = hnn_core.read_params(params_fname)
-    net = Network(params)
-    dpl = simulate_dipole(net, n_jobs=n_jobs, n_trials=1)[0]
-
-    if get_rank() == 0:
-        # write the dipole to a file and compare
-        fname = './dpl2.txt'
-        dpl.write(fname)
-
-        data_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
-                    'hnn-core/test_data/dpl.txt')
-        if not op.exists('dpl.txt'):
-            _fetch_file(data_url, 'dpl.txt')
-        dpl_master = loadtxt('dpl.txt')
-
-        dpl_pr = loadtxt(fname)
-        assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
-        assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
-
-
 def spawn_mpi_simulation(n_jobs):
+    """Start a nrniv processes on each core with mpiexec"""
     from subprocess import Popen, PIPE
     import shlex
     import psutil
@@ -72,19 +43,14 @@ def spawn_mpi_simulation(n_jobs):
                str(n_jobs)
     cmd = mpicmd + nrnivcmd
 
-    ###########################################################################
-    # Now we need to split the command into shell arguments for passing to
-    # subprocess.Popen
+    # Split the command into shell arguments for passing to Popen
     cmdargs = shlex.split(cmd, posix="win" not in platform)
 
-    ###########################################################################
     # Start the simulation in parallel!
     proc = Popen(cmdargs, stdout=PIPE, stderr=PIPE, cwd=getcwd(),
                  universal_newlines=True)
 
-    ###########################################################################
     # Read the output while waiting for job to finish
-
     failed = False
     while True:
         status = proc.poll()
@@ -113,15 +79,18 @@ def spawn_mpi_simulation(n_jobs):
 
 
 def test_mpi_simulation():
+    """Test that running hnn-core with MPI succeeds when n_jobs=1."""
     spawn_mpi_simulation(1)
 
 
 def test_mpi_joblibs_incompat():
+    """Test that running hnn-core with MPI fails when n_jobs=2."""
     pytest.raises(ValueError, spawn_mpi_simulation, 2)
 
 
 if __name__ == '__main__':
     from mpi4py import MPI
+    from hnn_core.tests.test_compare_hnn import test_hnn_core
 
     # read n_jobs, very long list of arguments with nrniv..
     try:
@@ -129,6 +98,6 @@ if __name__ == '__main__':
     except ValueError:
         raise ValueError('Received bad argument for n_jobs: %s' % sys.argv[-1])
 
-    run_simulation(n_jobs)
+    test_hnn_core(n_jobs)
     MPI.Finalize()
     exit(0)  # stop the child
