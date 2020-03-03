@@ -10,72 +10,128 @@ import numpy as np
 import itertools as it
 
 
-def _fill_netpyne_netParams(cfg):
-    netParams = specs.NetParams()  # object of class NetParams to store the network parameters
+def get_netpyne_netParams(cfg):
+    # object of class NetParams to store the network parameters
+    netParams = specs.NetParams()
 
-    #------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     # General network parameters
-    #------------------------------------------------------------------------------
-    netParams.sizeX = ((cfg.N_pyr_x * cfg.gridSpacingPyr) - 1) * cfg.xzScaling  # x-dimension (horizontal length) size in um
-    netParams.sizeY = cfg.sizeY # y-dimension (vertical height or cortical depth) size in um
-    netParams.sizeZ = ((cfg.N_pyr_y * cfg.gridSpacingPyr) - 1) * cfg.xzScaling # z-dimension (horizontal depth) size in um
+    # ------------------------------------------------------------------------
+
+    # x-dimension (horizontal length) size in um
+    netParams.sizeX = ((cfg.N_pyr_x * cfg.gridSpacingPyr) - 1) * cfg.xzScaling
+    # y-dimension (vertical height or cortical depth) size in um
+    netParams.sizeY = cfg.sizeY
+    # z-dimension (horizontal depth) size in um
+    netParams.sizeZ = ((cfg.N_pyr_y * cfg.gridSpacingPyr) - 1) * cfg.xzScaling
     netParams.shape = 'cuboid'
 
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Population parameters
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     # layer locations
-    layersE = {'L2': [0.0*cfg.sizeY, 0.0*cfg.sizeY], 'L5': [0.654*cfg.sizeY, 0.654*cfg.sizeY]} # 0.654 = 1308/2000
-    layersI = {'L2': [0.0*cfg.sizeY-00.0, 0.0*cfg.sizeY-00.0], 'L5': [0.654*cfg.sizeY-00.0, 0.654*cfg.sizeY-00.0]}
+    layersE = {'L2': [0.0 * cfg.sizeY, 0.0 * cfg.sizeY],
+               'L5': [0.654 * cfg.sizeY, 0.654 * cfg.sizeY]  # 0.654=1308/2000
+               }
+    layersI = {'L2': [0.0 * cfg.sizeY - 00.0, 0.0 * cfg.sizeY - 00.0],
+               'L5': [0.654 * cfg.sizeY - 00.0, 0.654 * cfg.sizeY - 00.0]
+               }
 
-    # Create list of locations for Basket cells based on original ad hoc rules 
+    # Create list of locations for Basket cells based on original ad hoc rules
     # define relevant x spacings for basket cells
     xzero = np.arange(0, cfg.N_pyr_x, 3)
     xone = np.arange(1, cfg.N_pyr_x, 3)
     yeven = np.arange(0, cfg.N_pyr_y, 2)
     yodd = np.arange(1, cfg.N_pyr_y, 2)
-    coords = [pos for pos in it.product(xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+    coords = [pos for pos in it.product(xzero, yeven)] + \
+             [pos for pos in it.product(xone, yodd)]
     coords_sorted = sorted(coords, key=lambda pos: pos[1])
-    L2BasketLocs = [{'x': coord[0]*cfg.xzScaling, 'y': layersI['L2'][0], 'z': coord[1]*cfg.xzScaling} for coord in coords_sorted]
-    L5BasketLocs = [{'x': coord[0]*cfg.xzScaling, 'y': layersI['L5'][0], 'z': coord[1]*cfg.xzScaling} for coord in coords_sorted]
+    L2BasketLocs = [{
+                    'x': coord[0] * cfg.xzScaling,
+                    'y': layersI['L2'][0],
+                    'z': coord[1] * cfg.xzScaling
+                    }
+                    for coord in coords_sorted]
+    L5BasketLocs = [{
+                    'x': coord[0] * cfg.xzScaling,
+                    'y': layersI['L5'][0],
+                    'z': coord[1] * cfg.xzScaling
+                    }
+                    for coord in coords_sorted]
 
     # create popParams
-    netParams.popParams['L2Basket'] = {'cellType':  'L2Basket', 'cellModel': 'HH_simple', 'numCells': len(L2BasketLocs), 'cellsList': L2BasketLocs} 
-    netParams.popParams['L2Pyr'] =    {'cellType':  'L2Pyr',    'cellModel': 'HH_reduced', 'yRange': layersE['L2'],  'gridSpacing': cfg.gridSpacingPyr*cfg.xzScaling} 
-    netParams.popParams['L5Basket'] = {'cellType':  'L5Basket', 'cellModel': 'HH_simple',  'numCells': len(L5BasketLocs), 'cellsList': L5BasketLocs} 
-    netParams.popParams['L5Pyr'] =    {'cellType':  'L5Pyr',    'cellModel': 'HH_reduced', 'yRange': layersE['L5'],  'gridSpacing': cfg.gridSpacingPyr*cfg.xzScaling} 
+    netParams.popParams['L2Basket'] = \
+        {'cellType': 'L2Basket',
+         'cellModel': 'HH_simple',
+         'numCells': len(L2BasketLocs),
+         'cellsList': L2BasketLocs}
+    netParams.popParams['L2Pyr'] = \
+        {'cellType': 'L2Pyr',
+         'cellModel': 'HH_reduced',
+         'yRange': layersE['L2'],
+         'gridSpacing': cfg.gridSpacingPyr * cfg.xzScaling}
+    netParams.popParams['L5Basket'] = \
+        {'cellType': 'L5Basket',
+         'cellModel': 'HH_simple',
+         'numCells': len(L5BasketLocs),
+         'cellsList': L5BasketLocs}
+    netParams.popParams['L5Pyr'] = \
+        {'cellType': 'L5Pyr',
+         'cellModel': 'HH_reduced',
+         'yRange': layersE['L5'],
+         'gridSpacing': cfg.gridSpacingPyr * cfg.xzScaling}
 
     # create variables useful for connectivity
     pops = list(netParams.popParams.keys())
     cellsPerPop = {}
-    cellsPerPop['L2Pyr'] = cellsPerPop['L5Pyr'] = int(cfg.N_pyr_x * cfg.N_pyr_x)
-    cellsPerPop['L2Basket'] = cellsPerPop['L5Basket'] = int(np.ceil(cfg.N_pyr_x * cfg.N_pyr_x / cfg.gridSpacingBasket[2]) + 1)
+    cellsPerPop['L2Pyr'] = cellsPerPop['L5Pyr'] = \
+        int(cfg.N_pyr_x * cfg.N_pyr_x)
+    cellsPerPop['L2Basket'] = cellsPerPop['L5Basket'] = \
+        int(np.ceil(cfg.N_pyr_x * cfg.N_pyr_x / cfg.gridSpacingBasket[2]) + 1)
 
-
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Synaptic mechanism parameters
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
-    netParams.synMechParams['L2Pyr_AMPA'] = {'mod':'Exp2Syn', 'tau1': cfg.L2Pyr_ampa_tau1, 'tau2': cfg.L2Pyr_ampa_tau2, 'e': cfg.L2Pyr_ampa_e}
-    netParams.synMechParams['L2Pyr_NMDA'] = {'mod': 'Exp2Syn', 'tau1': cfg.L2Pyr_nmda_tau1, 'tau2': cfg.L2Pyr_nmda_tau2, 'e': cfg.L2Pyr_nmda_e}
-    netParams.synMechParams['L2Pyr_GABAA'] = {'mod':'Exp2Syn', 'tau1': cfg.L2Pyr_gabaa_tau1, 'tau2': cfg.L2Pyr_gabaa_tau2, 'e': cfg.L2Pyr_gabaa_e}
-    netParams.synMechParams['L2Pyr_GABAB'] = {'mod':'Exp2Syn', 'tau1': cfg.L2Pyr_gabab_tau1, 'tau2': cfg.L2Pyr_gabab_tau2, 'e': cfg.L2Pyr_gabab_e}
+    netParams.synMechParams['L2Pyr_AMPA'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L2Pyr_ampa_tau1,
+         'tau2': cfg.L2Pyr_ampa_tau2, 'e': cfg.L2Pyr_ampa_e}
+    netParams.synMechParams['L2Pyr_NMDA'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L2Pyr_nmda_tau1,
+         'tau2': cfg.L2Pyr_nmda_tau2, 'e': cfg.L2Pyr_nmda_e}
+    netParams.synMechParams['L2Pyr_GABAA'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L2Pyr_gabaa_tau1,
+         'tau2': cfg.L2Pyr_gabaa_tau2, 'e': cfg.L2Pyr_gabaa_e}
+    netParams.synMechParams['L2Pyr_GABAB'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L2Pyr_gabab_tau1,
+         'tau2': cfg.L2Pyr_gabab_tau2, 'e': cfg.L2Pyr_gabab_e}
 
-    netParams.synMechParams['L5Pyr_AMPA'] = {'mod':'Exp2Syn', 'tau1': cfg.L5Pyr_ampa_tau1, 'tau2': cfg.L5Pyr_ampa_tau2, 'e': cfg.L5Pyr_ampa_e}
-    netParams.synMechParams['L5Pyr_NMDA'] = {'mod': 'Exp2Syn', 'tau1': cfg.L5Pyr_nmda_tau1, 'tau2': cfg.L5Pyr_nmda_tau2, 'e': cfg.L5Pyr_nmda_e}
-    netParams.synMechParams['L5Pyr_GABAA'] = {'mod':'Exp2Syn', 'tau1': cfg.L5Pyr_gabaa_tau1, 'tau2': cfg.L5Pyr_gabaa_tau2, 'e': cfg.L5Pyr_gabaa_e}
-    netParams.synMechParams['L5Pyr_GABAB'] = {'mod':'Exp2Syn', 'tau1': cfg.L5Pyr_gabab_tau1, 'tau2': cfg.L5Pyr_gabab_tau2, 'e': cfg.L5Pyr_gabab_e}
+    netParams.synMechParams['L5Pyr_AMPA'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L5Pyr_ampa_tau1,
+         'tau2': cfg.L5Pyr_ampa_tau2, 'e': cfg.L5Pyr_ampa_e}
+    netParams.synMechParams['L5Pyr_NMDA'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L5Pyr_nmda_tau1,
+         'tau2': cfg.L5Pyr_nmda_tau2, 'e': cfg.L5Pyr_nmda_e}
+    netParams.synMechParams['L5Pyr_GABAA'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L5Pyr_gabaa_tau1,
+         'tau2': cfg.L5Pyr_gabaa_tau2, 'e': cfg.L5Pyr_gabaa_e}
+    netParams.synMechParams['L5Pyr_GABAB'] = \
+        {'mod': 'Exp2Syn', 'tau1': cfg.L5Pyr_gabab_tau1,
+         'tau2': cfg.L5Pyr_gabab_tau2, 'e': cfg.L5Pyr_gabab_e}
 
-    netParams.synMechParams['AMPA'] = {'mod':'Exp2Syn', 'tau1': 0.5, 'tau2': 5.0, 'e': 0}
-    netParams.synMechParams['NMDA'] = {'mod': 'Exp2Syn', 'tau1': 1, 'tau2': 20, 'e': 0}
-    netParams.synMechParams['GABAA'] = {'mod':'Exp2Syn', 'tau1': 0.5, 'tau2': 5, 'e': -80}
-    netParams.synMechParams['GABAB'] = {'mod':'Exp2Syn', 'tau1': 1, 'tau2': 20, 'e': -80}
+    netParams.synMechParams['AMPA'] = \
+        {'mod': 'Exp2Syn', 'tau1': 0.5, 'tau2': 5.0, 'e': 0}
+    netParams.synMechParams['NMDA'] = \
+        {'mod': 'Exp2Syn', 'tau1': 1, 'tau2': 20, 'e': 0}
+    netParams.synMechParams['GABAA'] = \
+        {'mod': 'Exp2Syn', 'tau1': 0.5, 'tau2': 5, 'e': -80}
+    netParams.synMechParams['GABAB'] = \
+        {'mod': 'Exp2Syn', 'tau1': 1, 'tau2': 20, 'e': -80}
 
-
-    #------------------------------------------------------------------------------
-    # Local connectivity parameters 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # Local connectivity parameters
+    # -------------------------------------------------------------------------
 
     # Weight and delay distance-dependent functions (as strings) to use in conn rules
     weightDistFunc = '{A_weight} * exp(-(dist_2D**2) / ({lamtha}**2))'
@@ -496,9 +552,9 @@ def _fill_netpyne_netParams(cfg):
                 'sec': 'soma'}
 
 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Evoked proximal and distal inputs parameters 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     if cfg.evokedInputs:
 
@@ -700,9 +756,9 @@ def _fill_netpyne_netParams(cfg):
                     'sec': 'soma'}
 
 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Tonic input parameters 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     if cfg.tonicInputs:
 
@@ -746,9 +802,9 @@ def _fill_netpyne_netParams(cfg):
         netParams.stimTargetParams['ITonic->L5Basket'] = {'source': 'ITonic_L5Basket', 'sec':'soma', 'loc': 0.5, 'conds': {'pop': 'L5Basket'}}
 
 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Poisson-distributed input parameters 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     if cfg.poissonInputs:
 
@@ -892,9 +948,9 @@ def _fill_netpyne_netParams(cfg):
                 'sec': ['soma']}
 
 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Gaussian-distributed inputs parameters 
-    #------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     if cfg.gaussInputs:
 

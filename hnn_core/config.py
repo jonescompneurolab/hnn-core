@@ -4,8 +4,8 @@
 #          Salvador Dura-Bernal <salvadordura@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
-from .network import _fill_netpyne_netParams
-from .cell import _fill_netpyne_cellParams
+from .network import get_netpyne_netParams
+from .cell import _get_netpyne_cellParams
 
 
 class Config(object):
@@ -28,8 +28,8 @@ class Config(object):
             setattr(self.cfg, k, v)
         self.cfg.duration = self.cfg.tstop
 
-        self.net = _fill_netpyne_netParams(self.cfg)
-        self.net.cellParams = _fill_netpyne_cellParams(self.cfg)
+        self.net = get_netpyne_netParams(self.cfg)
+        self.net.cellParams = _get_netpyne_cellParams(self.cfg)
 
 
 def _fill_netpyne_cfg():

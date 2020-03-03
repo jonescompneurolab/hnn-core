@@ -27,7 +27,7 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 
 print(params)
- 
+
 ###############################################################################
 # This is a lot of parameters! We can also filter the
 # parameters using unix-style wildcard characters
@@ -40,11 +40,12 @@ config = Config(params)
 ###############################################################################
 # Now let's simulate the dipole
 # You can simulate multiple trials in parallel by using n_jobs > 1
-dpls, spks = simulate(config, n_trials=1, n_jobs=2)
+dpls, spks = simulate(config, n_trials=1, n_jobs=1)
 
 ###############################################################################
 # and then plot it
 import matplotlib.pyplot as plt
+
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 for dpl in dpls:
     dpl.plot(ax=axes[0], layer='agg')
