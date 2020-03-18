@@ -7,6 +7,7 @@ import numpy as np
 from numpy import convolve, hamming
 
 from .parallel import _parallel_func
+from .neuron import _neuron_network
 
 
 def _hammfilt(x, winsz):
@@ -21,16 +22,24 @@ def _clone_and_simulate(net, trial_idx):
     if trial_idx != 0:
         net.params['prng_*'] = trial_idx
 
-    net.build()
+    neuron_net = _neuron_network(net.params)
+    dpl = _simulate_single_trial(neuron_net)
 
-    return _simulate_single_trial(net)
+    (spiketimes, spikegids, net.gid_dict) = neuron_net.get_data_from_neuron()
+    net.spiketimes.append(spiketimes)
+    net.spikegids.append(spikegids)
+
+    return dpl
 
 
-def _simulate_single_trial(net):
+def _simulate_single_trial(neuron_net):
     """Simulate one trial."""
-    from .parallel import rank, nhosts, pc, cvode
+    from .parallel import pc, cvode, get_rank, get_nhosts
     from neuron import h
     h.load_file("stdrun.hoc")
+
+    rank = get_rank()
+    nhosts = get_nhosts()
 
     # Now let's simulate the dipole
 
@@ -43,9 +52,9 @@ def _simulate_single_trial(net):
     h("dp_total_L5 = 0.")
 
     # Set tstop before instantiating any classes
-    h.tstop = net.params['tstop']
-    h.dt = net.params['dt']  # simulation duration and time-step
-    h.celsius = net.params['celsius']  # 37.0 - set temperature
+    h.tstop = neuron_net.params['tstop']
+    h.dt = neuron_net.params['dt']  # simulation duration and time-step
+    h.celsius = neuron_net.params['celsius']  # 37.0 - set temperature
 
     # We define the arrays (Vector in numpy) for recording the signals
     t_vec = h.Vector()
@@ -84,10 +93,10 @@ def _simulate_single_trial(net):
     # combine dp_rec on every node, 1=add contributions together
     pc.allreduce(dp_rec_L5, 1)
     # aggregate the currents independently on each proc
-    net.aggregate_currents()
+    neuron_net.aggregate_currents()
     # combine net.current{} variables on each proc
-    pc.allreduce(net.current['L5Pyr_soma'], 1)
-    pc.allreduce(net.current['L2Pyr_soma'], 1)
+    pc.allreduce(neuron_net.current['L5Pyr_soma'], 1)
+    pc.allreduce(neuron_net.current['L2Pyr_soma'], 1)
 
     pc.barrier()  # get all nodes to this place before continuing
 
@@ -98,14 +107,16 @@ def _simulate_single_trial(net):
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
     if rank == 0:
-        if net.params['save_dpl']:
+        if neuron_net.params['save_dpl']:
             dpl.write('rawdpl.txt')
 
-        dpl.baseline_renormalize(net.params)
+        dpl.baseline_renormalize(neuron_net.params)
         dpl.convert_fAm_to_nAm()
-        dpl.scale(net.params['dipole_scalefctr'])
-        dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
-    return dpl, net.spikes._times.to_python(), net.spikes._gids.to_python()
+        dpl.scale(neuron_net.params['dipole_scalefctr'])
+        dpl.smooth(neuron_net.params['dipole_smooth_win'] / h.dt)
+
+    return (dpl, neuron_net.spikes._times.to_python(),
+            neuron_net.spikes._gids.to_python())
 
 
 def simulate_dipole(net, n_trials=1, n_jobs=1):

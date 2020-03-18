@@ -9,7 +9,6 @@ from neuron import h
 
 pc = None
 last_network = None
-rank = None
 
 
 def shutdown():
@@ -25,7 +24,7 @@ def get_nhosts():
     nhosts: int
         Value from pc.nhost()
     """
-    return nhosts
+    return int(pc.nhost())
 
 
 def get_rank():
@@ -35,7 +34,7 @@ def get_rank():
     rank: int
         Value from pc.id()
     """
-    return rank
+    return int(pc.id())
 
 
 def create_parallel_context(n_cores=None):
@@ -47,7 +46,7 @@ def create_parallel_context(n_cores=None):
         allow NEURON to use all available processors.
     """
 
-    global rank, nhosts, cvode, pc, last_network
+    global cvode, pc, last_network
 
     if pc is None:
         if n_cores is None:
@@ -56,8 +55,6 @@ def create_parallel_context(n_cores=None):
         else:
             pc = h.ParallelContext(n_cores)
 
-        nhosts = int(pc.nhost())  # Find number of hosts
-        rank = int(pc.id())     # rank or node number (0 will be the master)
         cvode = h.CVode()
 
         # be explicit about using fixed step integration
