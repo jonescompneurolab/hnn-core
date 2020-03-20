@@ -7,7 +7,8 @@ import numpy as np
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Network, Spikes, read_spikes
+from hnn_core import read_params, Network, Spikes, read_spikes, simulate_dipole
+from hnn_core.neuron import _neuron_network
 
 
 def test_network():
@@ -16,22 +17,22 @@ def test_network():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     net = Network(deepcopy(params))
-    net.build()  # needed to populate net.cells
+    neuron_network = _neuron_network(params)  # needed to populate net.cells
 
     # Assert that params are conserved across Network initialization
     for p in params:
-        assert params[p] == net.params[p]
-    assert len(params) == len(net.params)
-    print(net)
-    print(net.cells[:2])
+        assert params[p] == neuron_network.params[p]
+    assert len(params) == len(neuron_network.params)
+    print(neuron_network)
+    print(neuron_network.cells[:2])
 
     # Assert that proper number of gids are created for Network inputs
-    assert len(net.gid_dict['common']) == 2
-    assert len(net.gid_dict['extgauss']) == net.n_cells
-    assert len(net.gid_dict['extpois']) == net.n_cells
+    assert len(neuron_network.gid_dict['common']) == 2
+    assert len(neuron_network.gid_dict['extgauss']) == neuron_network.n_cells
+    assert len(neuron_network.gid_dict['extpois']) == neuron_network.n_cells
     for ev_input in params['t_ev*']:
         type_key = ev_input[2: -2] + ev_input[-1]
-        assert len(net.gid_dict[type_key]) == net.n_cells
+        assert len(neuron_network.gid_dict[type_key]) == neuron_network.n_cells
 
     # Assert that an empty Spikes object is created as an attribute
     assert net.spikes == Spikes()
@@ -74,3 +75,14 @@ def test_spikes():
         gid_dict = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
                     'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
         spikes = read_spikes('/tmp/spk_*.txt', gid_dict=gid_dict)
+    print(neuron_network.cells[:2])
+
+
+def test_plots():
+    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    net = Network(params)
+    simulate_dipole(net)
+    net.plot_input()
+    net.plot_spikes()
