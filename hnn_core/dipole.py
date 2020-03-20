@@ -25,11 +25,9 @@ def _clone_and_simulate(net, trial_idx):
     neuron_net = _neuron_network(net.params)
     dpl = _simulate_single_trial(neuron_net)
 
-    (spiketimes, spikegids, net.gid_dict) = neuron_net.get_data_from_neuron()
-    net.spiketimes.append(spiketimes)
-    net.spikegids.append(spikegids)
+    spikedata = neuron_net.get_data_from_neuron()
 
-    return dpl
+    return dpl, spikedata
 
 
 def _simulate_single_trial(neuron_net):
@@ -45,7 +43,8 @@ def _simulate_single_trial(neuron_net):
 
     pc.barrier()  # sync for output to screen
     if rank == 0:
-        print("running on %d cores" % nhosts)
+        print("running trial %d on %d cores" %
+              (neuron_net.trial_idx, nhosts))
 
     # create or reinitialize scalars in NEURON (hoc) context
     h("dp_total_L2 = 0.")
@@ -115,11 +114,12 @@ def _simulate_single_trial(neuron_net):
         dpl.scale(neuron_net.params['dipole_scalefctr'])
         dpl.smooth(neuron_net.params['dipole_smooth_win'] / h.dt)
 
+    neuron_net.trial_idx += 1
     return (dpl, neuron_net.spikes._times.to_python(),
             neuron_net.spikes._gids.to_python())
 
 
-def simulate_dipole(net, n_trials=1, n_jobs=1):
+def simulate_dipole(net, n_trials=None, n_jobs=1):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -127,38 +127,32 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     net : Network object
         The Network object specifying how cells are
         connected.
-    n_trials : int
-        The number of trials to simulate.
+    n_trials : int | None
+        The number of trials to simulate. If None the value in
+        net.params['N_trials'] will be used
     n_jobs : int
         The number of jobs to run in parallel.
 
     Returns
     -------
-    dpl: list | instance of Dipole
-        The dipole object or list of dipole objects if n_trials > 1
+    dpls: list
+        List of dipole objects for each trials
     """
 
-    from .parallel import create_parallel_context, get_nhosts
+    from .parallel import _backend, Joblib_backend
 
-    if n_jobs > 1:
-        # checking whether NEURON is using MPI parallelism requires
-        # instantiating ParallelContext and testing nhosts
-        create_parallel_context()
-        if get_nhosts() > 1:
-            from mpi4py import MPI
-            MPI.Finalize()
-            raise ValueError("Nested parallelism is not currently supported!\n"
-                             "Please choose embarassinly parallel jobs (n_jobs"
-                             " > 1)\n"
-                             "or multiple cores per simulation (with MPI)\n")
+    if n_trials is not None:
+        net.params['N_trials'] = n_trials
+    else:
+        n_trials = net.params['N_trials']
 
-    parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
-    out = parallel(myfunc(net, idx) for idx in range(n_trials))
-    dpl, spike_times, spike_gids = zip(*out)
-    net.spikes._times = list(spike_times)
-    net.spikes._gids = list(spike_gids)
-    net.spikes.update_types(net.gid_dict)
-    return dpl
+    if _backend is not None and _backend._type == 'mpi':
+        dpls = _backend.simulate(net)
+    else:
+        _backend = Joblib_backend(n_jobs=n_jobs)
+        dpls = _backend.simulate(net)
+
+    return dpls
 
 
 def read_dipole(fname, units='nAm'):
@@ -178,7 +172,6 @@ def read_dipole(fname, units='nAm'):
     dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:4])
     if units == 'nAm':
         dpl.units = units
-
     return dpl
 
 

@@ -12,6 +12,12 @@ from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import create_pext
 
+# We need to maintain a reference to the last
+# _neuron_network instance that ran pc.gid_clear(). Even if
+# pc is global, if pc.gid_clear() is called within a new
+# _neuron_network, it will seg fault.
+_last_network = None
+
 
 class _neuron_network(object):
     """The Neuron Network class.
@@ -107,20 +113,25 @@ class _neuron_network(object):
         for key in self.ext_list.keys():
             self.ext_list[key] = []
 
+        self.trial_idx = 0
         self.build()
 
     def build(self):
         """Building the network in NEURON."""
 
-        print('Building the NEURON model')
         from neuron import h
-        from .parallel import create_parallel_context
-        from .parallel import clear_last_network_objects
+        from .parallel import create_parallel_context, get_rank
+        from .utils import load_custom_mechanisms
 
-        # make sure ParallelContext has been created (needed for joblibs)
         create_parallel_context()
 
-        clear_last_network_objects(self)
+        # load mechanisms needs ParallelContext for get_rank
+        load_custom_mechanisms()
+
+        if get_rank() == 0:
+            print('Building the NEURON model')
+
+        self._clear_last_network_objects()
 
         self._gid_assign()
         # Create a h.Vector() with size 1xself.N_t, zero'd
@@ -138,7 +149,9 @@ class _neuron_network(object):
         self.spikegids = h.Vector()
         self._record_spikes()
         self.move_cells_to_pos()  # position cells in 2D grid
-        print('[Done]')
+
+        if get_rank() == 0:
+            print('[Done]')
 
     def __enter__(self):
         """Context manager to cleanly build Network objects"""
@@ -486,8 +499,20 @@ class _neuron_network(object):
         self.cells = []
 
     def get_data_from_neuron(self):
-        from copy import deepcopy
+        """Get copies of the data that are pickleable"""
 
+        from copy import deepcopy
         data = (self.spiketimes.to_python(), self.spikegids.to_python(),
                 deepcopy(self.gid_dict))
         return data
+
+    def _clear_last_network_objects(self):
+        """Clears NEURON objects and saves the current Network instance"""
+
+        global _last_network
+
+        if _last_network is not None:
+            _last_network._clear_neuron_objects()
+
+        self._clear_neuron_objects()
+        _last_network = self
