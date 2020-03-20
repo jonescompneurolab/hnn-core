@@ -16,6 +16,7 @@ import os.path as op
 
 import hnn_core
 from hnn_core import read_params, Network
+from hnn_core.neuron import _neuron_network
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
@@ -28,11 +29,11 @@ params = read_params(params_fname)
 # Now let's build the network
 import matplotlib.pyplot as plt
 
-with Network(params) as net:
-    net.build()
+with _neuron_network(params) as neuron_network:
+    neuron_network.cells[0].plot_voltage()
 
     # The cells are stored in the network object as a list
-    cells = net.cells
+    cells = neuron_network.cells
     print(cells[:5])
 
     # We have different kinds of cells with different cell IDs (gids)
@@ -41,15 +42,13 @@ with Network(params) as net:
         print(cells[gid].name)
 
     # We can plot the firing pattern of individual cells
-    net.cells[0].plot_voltage()
+    neuron_network.cells[0].plot_voltage()
     plt.title('%s (gid=%d)' % (cells[0].name, gid))
 
 ###############################################################################
 # Let's do this for the rest of the cell types with a new Network object
-with Network(params) as net:
-    net.build()
-
+with _neuron_network(params) as neuron_network:
     fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
     for gid, ax in zip([35, 170], axes):
-        net.cells[gid].plot_voltage(ax)
+        neuron_network.cells[gid].plot_voltage(ax)
         ax.set_title('%s (gid=%d)' % (cells[gid].name, gid))

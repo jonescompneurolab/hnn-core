@@ -6,117 +6,12 @@
 import numpy as np
 from numpy import convolve, hamming
 
-from .parallel import _parallel_func
-from .neuron import _neuron_network
-
 
 def _hammfilt(x, winsz):
     """Convolve with a hamming window."""
     win = hamming(winsz)
     win /= sum(win)
     return convolve(x, win, 'same')
-
-
-def _clone_and_simulate(net, trial_idx):
-
-    if trial_idx != 0:
-        net.params['prng_*'] = trial_idx
-
-    neuron_net = _neuron_network(net.params)
-    dpl = _simulate_single_trial(neuron_net)
-
-    spikedata = neuron_net.get_data_from_neuron()
-
-    return dpl, spikedata
-
-
-def _simulate_single_trial(neuron_net):
-    """Simulate one trial."""
-    from .parallel import pc, cvode, get_rank, get_nhosts
-    from neuron import h
-    h.load_file("stdrun.hoc")
-
-    rank = get_rank()
-    nhosts = get_nhosts()
-
-    # Now let's simulate the dipole
-
-    pc.barrier()  # sync for output to screen
-    if rank == 0:
-        print("running trial %d on %d cores" %
-              (neuron_net.trial_idx, nhosts))
-
-    # create or reinitialize scalars in NEURON (hoc) context
-    h("dp_total_L2 = 0.")
-    h("dp_total_L5 = 0.")
-
-    # Set tstop before instantiating any classes
-    h.tstop = neuron_net.params['tstop']
-    h.dt = neuron_net.params['dt']  # simulation duration and time-step
-    h.celsius = neuron_net.params['celsius']  # 37.0 - set temperature
-
-    # We define the arrays (Vector in numpy) for recording the signals
-    t_vec = h.Vector()
-    t_vec.record(h._ref_t)  # time recording
-    dp_rec_L2 = h.Vector()
-    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
-    dp_rec_L5 = h.Vector()
-    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
-
-    # sets the default max solver step in ms (purposefully large)
-    pc.set_maxstep(10)
-
-    # initialize cells to -65 mV, after all the NetCon
-    # delays have been specified
-    h.finitialize()
-
-    def simulation_time():
-        print('Simulation time: {0} ms...'.format(round(h.t, 2)))
-
-    if rank == 0:
-        for tt in range(0, int(h.tstop), 10):
-            cvode.event(tt, simulation_time)
-
-    h.fcurrent()
-
-    # initialization complete, but wait for all procs to start the solver
-    pc.barrier()
-
-    # actual simulation - run the solver
-    pc.psolve(h.tstop)
-
-    pc.barrier()
-
-    # these calls aggregate data across procs/nodes
-    pc.allreduce(dp_rec_L2, 1)
-    # combine dp_rec on every node, 1=add contributions together
-    pc.allreduce(dp_rec_L5, 1)
-    # aggregate the currents independently on each proc
-    neuron_net.aggregate_currents()
-    # combine net.current{} variables on each proc
-    pc.allreduce(neuron_net.current['L5Pyr_soma'], 1)
-    pc.allreduce(neuron_net.current['L2Pyr_soma'], 1)
-
-    pc.barrier()  # get all nodes to this place before continuing
-
-    dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
-                     np.array(dp_rec_L5.to_python()),
-                     np.array(dp_rec_L2.to_python()),
-                     np.array(dp_rec_L5.to_python())]
-
-    dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
-    if rank == 0:
-        if neuron_net.params['save_dpl']:
-            dpl.write('rawdpl.txt')
-
-        dpl.baseline_renormalize(neuron_net.params)
-        dpl.convert_fAm_to_nAm()
-        dpl.scale(neuron_net.params['dipole_scalefctr'])
-        dpl.smooth(neuron_net.params['dipole_smooth_win'] / h.dt)
-
-    neuron_net.trial_idx += 1
-    return (dpl, neuron_net.spikes._times.to_python(),
-            neuron_net.spikes._gids.to_python())
 
 
 def simulate_dipole(net, n_trials=None, n_jobs=1):
@@ -131,7 +26,7 @@ def simulate_dipole(net, n_trials=None, n_jobs=1):
         The number of trials to simulate. If None the value in
         net.params['N_trials'] will be used
     n_jobs : int
-        The number of jobs to run in parallel.
+        The number of jobs to run in parallel (joblib only).
 
     Returns
     -------
@@ -139,18 +34,19 @@ def simulate_dipole(net, n_trials=None, n_jobs=1):
         List of dipole objects for each trials
     """
 
-    from .parallel import _backend, Joblib_backend
+    from .parallel_backends import _backend, Joblib_backend
 
     if n_trials is not None:
         net.params['N_trials'] = n_trials
     else:
         n_trials = net.params['N_trials']
 
-    if _backend is not None and _backend._type == 'mpi':
-        dpls = _backend.simulate(net)
-    else:
+    # default is Joblib_backend
+    if _backend is None:
         _backend = Joblib_backend(n_jobs=n_jobs)
         dpls = _backend.simulate(net)
+
+    dpls = _backend.simulate(net)
 
     return dpls
 

@@ -24,8 +24,7 @@ def run_mpi_simulation():
     old_stderr = sys.stderr
     sys.stderr = sys.stdout
 
-    from hnn_core.neuron import _neuron_network
-    from hnn_core.dipole import _simulate_single_trial
+    from hnn_core.neuron import _neuron_network, _simulate_single_trial
 
     # using template for reading stdin from:
     # https://github.com/cloudpipe/cloudpickle/blob/master/tests/testutils.py
