@@ -275,5 +275,5 @@ class Dipole(object):
             Full path to the output file (.txt)
         """
         X = np.r_[[self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']]].T
-        np.savetxt('dpl2.txt', X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
+        np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
                    delimiter='\t')

@@ -547,3 +547,30 @@ class Network(object):
         if show:
             plt.show()
         return ax.get_figure()
+
+    def write_spikes(self, fname, trial_idx='all'):
+        """Write spike times to a file.
+
+        Parameters
+        ----------
+        fname : str
+            Full path to the output file (.txt)
+        trial_idx : list of int
+            Indices of selected trials. If 'all',
+            all trials are selected.
+        """
+        if trial_idx=='all':
+            spiketimes = sum(self.spiketimes,[])
+            spikegids = sum(self.spikegids,[])
+        else:
+            spiketimes = sum(self.spiketimes[trial_idx],[])
+            spikegids = sum(self.spikegids[trial_idx],[])
+
+        gidtypes = np.empty_like(spikegids,dtype='<U36')
+        for spike_type,gid_range in self.gid_dict.items():
+            gidtypes[np.in1d(spikegids,gid_range)] = spike_type
+
+        with open(fname,'w') as f:
+            for i in range(len(spiketimes)):
+                f.write('{:.3f}\t{}\t{}\n'.format(spiketimes[i],
+                    int(spikegids[i]),gidtypes[i]))
