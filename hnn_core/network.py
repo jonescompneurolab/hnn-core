@@ -560,11 +560,13 @@ class Network(object):
             all trials are selected.
         """
         if trial_idx=='all':
-            spiketimes = sum(self.spiketimes,[])
-            spikegids = sum(self.spikegids,[])
-        else:
-            spiketimes = sum(self.spiketimes[trial_idx],[])
-            spikegids = sum(self.spikegids[trial_idx],[])
+            trial_idx = range(len(self.spiketimes))
+
+        spiketimes = []
+        spikegids = []
+        for i in trial_idx:
+            spiketimes += self.spiketimes[i]
+            spikegids += self.spikegids[i]
 
         gidtypes = np.empty_like(spikegids,dtype='<U36')
         for spike_type,gid_range in self.gid_dict.items():
