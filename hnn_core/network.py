@@ -548,7 +548,7 @@ class Network(object):
             plt.show()
         return ax.get_figure()
 
-    def write_spikes(self, fname, trial_idx='all'):
+    def write_spikes(self, fname, trial_idx=None):
         """Write spike times to a file.
 
         Parameters
@@ -559,14 +559,14 @@ class Network(object):
             Indices of selected trials. If 'all',
             all trials are selected.
         """
-        if trial_idx=='all':
+        if trial_idx==None:
             trial_idx = range(len(self.spiketimes))
 
         spiketimes = []
         spikegids = []
-        for i in trial_idx:
-            spiketimes += self.spiketimes[i]
-            spikegids += self.spikegids[i]
+        for idx in trial_idx:
+            spiketimes += self.spiketimes[idx]
+            spikegids += self.spikegids[idx]
 
         gidtypes = np.empty_like(spikegids,dtype='<U36')
         for spike_type,gid_range in self.gid_dict.items():
