@@ -556,7 +556,7 @@ class Network(object):
         fname : str
             Full path to the output file (.txt)
         trial_idx : list of int
-            Indices of selected trials. If 'all',
+            Indices of selected trials. If None,
             all trials are selected.
         """
         if trial_idx==None:
@@ -573,6 +573,6 @@ class Network(object):
             gidtypes[np.in1d(spikegids,gid_range)] = spike_type
 
         with open(fname,'w') as f:
-            for i in range(len(spiketimes)):
-                f.write('{:.3f}\t{}\t{}\n'.format(spiketimes[i],
-                    int(spikegids[i]),gidtypes[i]))
+            for spk_idx in range(len(spiketimes)):
+                f.write('{:.3f}\t{}\t{}\n'.format(spiketimes[spk_idx],
+                    int(spikegids[spk_idx]),gidtypes[spk_idx]))
