@@ -558,6 +558,12 @@ class Network(object):
         trial_idx : list of int
             Indices of selected trials. If None,
             all trials are selected.
+
+        Outputs
+        -------
+        txt file at fname where rows correspond to spikes and columns, delimited
+            by '\\t', correspond to 1) spike time (s), 2) spike gid, and 3) gid
+            type
         """
         if trial_idx is None:
             trial_idx = range(len(self.spiketimes))
