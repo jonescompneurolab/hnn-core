@@ -559,7 +559,7 @@ class Network(object):
             Indices of selected trials. If None,
             all trials are selected.
         """
-        if trial_idx==None:
+        if trial_idx is None:
             trial_idx = range(len(self.spiketimes))
 
         spiketimes = []

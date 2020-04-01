@@ -11,11 +11,10 @@ matplotlib.use('agg')
 
 
 def test_dipole():
-    """Test params object."""
+    """Test dipole object."""
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-
     times = np.random.random(6000)
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
@@ -25,3 +24,4 @@ def test_dipole():
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
     dipole.plot(layer='agg')
     dipole.write('/tmp/dpl1.txt')
+    assert op.exists('/tmp/dpl1.txt')
