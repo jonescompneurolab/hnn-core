@@ -1,0 +1,104 @@
+# See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
+version: 2.1
+
+jobs:
+  docs-build:
+    docker:
+      - image: circleci/python:3.7.3-stretch
+    environment:
+      install_prefix: ~
+    steps:
+
+        - run:
+            name: Install miniconda
+            command: |
+              wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh;
+              chmod +x ~/miniconda.sh;
+              ~/miniconda.sh -b -p ~/miniconda;
+              echo "export PATH=~/miniconda/bin:$PATH" >> $BASH_ENV;
+
+        - run:
+            name: Setup Python environment
+            command: |
+              conda update --yes --quiet conda
+              conda create -n testenv --yes pip python=3.6
+              source activate testenv
+              conda install --yes scipy numpy matplotlib
+              pip install mpi4py mne
+
+        - run:
+            name: Setup doc building stuff
+            command: |
+              pip install sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow
+
+        - run:
+            name: Setup Neuron
+            command: |
+              git clone https://github.com/neuronsimulator/nrn
+              cd nrn
+              ./build.sh
+              ./configure --with-nrnpython=python3 --without-iv --prefix=${install_prefix}
+              make -j4
+              make install -j4
+              cd src/nrnpython/
+              python3 setup.py install
+
+        - checkout
+
+        - run:
+            name: Setup hnn-core
+            command: |
+            export PATH=$PATH:${install_prefix}/x86_64/bin
+            make
+            python setup.py develop
+
+        - run:
+            name: Build the documentation
+            command: |
+                source activate testenv
+                make build-doc
+
+        - persist_to_workspace:
+            root: doc/_build
+            paths: html
+
+        - store_artifacts:
+            path: doc/_build/html/
+            destination: html
+
+  docs-deploy:
+    # will only be run on master branch
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: doc/_build
+
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.2
+            git config --global user.email "circle@mne.com"
+            git config --global user.name "Circle Ci"
+
+      - add_ssh_keys:
+          fingerprints:
+            - "7f:74:00:17:2b:1a:7d:68:56:68:6b:64:b5:e0:7f:91"
+
+      - run:
+          # push built docs into the `dev` directory on the `gh-pages` branch
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "doc updates [skip ci]" --dist doc/_build/html --dest ./dev
+
+workflows:
+  build:
+    jobs:
+      - docs-build
+      - docs-deploy:
+          requires:
+            - docs-build
+          filters:
+            branches:
+              only: master
