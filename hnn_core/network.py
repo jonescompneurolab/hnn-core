@@ -582,3 +582,39 @@ class Network(object):
             for spk_idx in range(len(spiketimes)):
                 f.write('{:.3f}\t{}\t{}\n'.format(spiketimes[spk_idx],
                     int(spikegids[spk_idx]),gidtypes[spk_idx]))
+
+    def read_spikes(self, fname, append_trial=True):
+        """Read spike times from a file.
+
+        Parameters
+        ----------
+        fname : str
+            Full path to the output file (.txt)
+        append_trials : bool
+            If True, append the contents of fname (i.e., as a trial) to the
+            spike-related attributes of Network instance. If False, all spikes
+            of the Network instance will be overwritten.
+        """
+
+        spike_data = np.loadtxt(fname,dtype=str)
+        spiketimes = spike_data[:,0].astype(float)
+        spikegids = spike_data[:,1].astype(float)
+
+        # Note that legacy HNN 'spk.txt' files contain only 2 columns
+        # Handle 3-column version with gid validation
+        if spike_data.shape[0]==3:
+            gid_types = spike_data[:,2].astype(str)
+            for gid_type in np.unique(gid_types):
+                gid_type_max = np.max(spikegids[gid_types==gid_type])
+                gid_type_min = np.min(spikegids[gid_types==gid_type])
+                assert (gid_type_max in self.gid_dict.get(gid_type,False) and
+                    gid_type_min in self.gid_dict.get(gid_type,False)),\
+                    "Error: gids in %s are incompatible with the current \
+                    network" %(fname,)
+
+        if append_trial is True:
+            self.spiketimes = self.spiketimes + (list(spiketimes),)
+            self.spikegids = self.spikegids + (list(spikegids),)
+        else:
+            self.spiketimes = (list(spiketimes),)
+            self.spikegids = (list(spikegids),)
