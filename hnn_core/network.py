@@ -103,6 +103,10 @@ class Network(object):
         # global dictionary of gid and cell type
         self.gid_dict = {}
         self._create_gid_dict()
+        # create empty tuple of spiketime trials
+        self.spiketimes = ()
+        # create empty tuple of spikegids trials
+        self.spikegids = ()
         # assign gid to hosts, creates list of gids for this node in _gid_list
         # _gid_list length is number of cells assigned to this id()
         self._gid_list = []
