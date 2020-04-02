@@ -134,6 +134,26 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     return dpl
 
 
+def import_dipole(fname, units='nAm'):
+    """Read dipole values from a file and create a Dipole instance.
+
+    Parameters
+    ----------
+    fname : str
+        Full path to the input file (.txt)
+
+    Returns
+    -------
+    dpl : Dipole
+        The instance of Dipole class
+    """
+    dpl_data = np.loadtxt(fname, dtype=float)
+    dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:4])
+    if units == 'nAm':
+        dpl.units = units
+    return dpl
+
+
 class Dipole(object):
     """Dipole class.
 
@@ -277,7 +297,7 @@ class Dipole(object):
         Outputs
         -------
         txt file at fname where rows correspond to samples
-            and columns, delimited by \\t, correspond to 
+            and columns, delimited by \\t, correspond to
             1) time (s),
             2) aggregate current dipole (scaled nAm),
             3) L2/3 current dipole (scaled nAm), and

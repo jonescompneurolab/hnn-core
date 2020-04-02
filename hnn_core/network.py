@@ -586,7 +586,7 @@ class Network(object):
         with open(fname, 'w') as f:
             for spk_idx in range(len(spiketimes)):
                 f.write('{:.3f}\t{}\t{}\n'.format(spiketimes[spk_idx],
-                    int(spikegids[spk_idx]), gidtypes[spk_idx]))
+                        int(spikegids[spk_idx]), gidtypes[spk_idx]))
 
     def read_spikes(self, fname, append_trial=True):
         """Read spike times from a file.
@@ -594,7 +594,7 @@ class Network(object):
         Parameters
         ----------
         fname : str
-            Full path to the output file (.txt)
+            Full path to the input file (.txt)
         append_trials : bool
             If True, append the contents of fname
             (i.e., as a trial) to the spike-related
@@ -602,7 +602,6 @@ class Network(object):
             all spikes of the Network instance will
             be overwritten.
         """
-
         spike_data = np.loadtxt(fname, dtype=str)
         spiketimes = spike_data[:, 0].astype(float)
         spikegids = spike_data[:, 1].astype(float)
