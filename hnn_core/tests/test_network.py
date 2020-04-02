@@ -29,4 +29,4 @@ def test_network():
         type_key = ev_input[2: -2] + ev_input[-1]
         assert len(net.gid_dict[type_key]) == net.N_cells
     net.write_spikes('/tmp/spk1.txt', trial_idx=None)
-    assert op.exists('/tmp/spk1.txt', trial_idx=None)
+    assert op.exists('/tmp/spk1.txt')
