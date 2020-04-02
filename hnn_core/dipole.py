@@ -276,10 +276,12 @@ class Dipole(object):
 
         Outputs
         -------
-        txt file at fname where rows correspond to samples and columns,
-            delimited by \\t, correspond to 1) time (s), 2) aggregate current
-            dipole (scaled nAm), 3) L2/3 current dipole (scaled nAm), and 4) L5
-            current dipole (scaled nAm)
+        txt file at fname where rows correspond to samples
+            and columns, delimited by \\t, correspond to 
+            1) time (s),
+            2) aggregate current dipole (scaled nAm),
+            3) L2/3 current dipole (scaled nAm), and
+            4) L5 current dipole (scaled nAm)
         """
         X = np.r_[[self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']]].T
         np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
