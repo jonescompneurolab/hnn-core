@@ -613,8 +613,8 @@ class Network(object):
             for gid_type in np.unique(gid_types):
                 gid_type_max = np.max(spikegids[gid_types == gid_type])
                 gid_type_min = np.min(spikegids[gid_types == gid_type])
-                assert (gid_type_max in self.gid_dict.get(gid_type, False) and
-                        gid_type_min in self.gid_dict.get(gid_type, False)), \
+                assert (gid_type_max in self.gid_dict.get(gid_type, [None]) and
+                        gid_type_min in self.gid_dict.get(gid_type, [None])), \
                     "Error: gids in %s are incompatible with the current \
                     network" % (fname,)
 
