@@ -181,40 +181,57 @@ class Params(dict):
             json.dump(self, fp)
 
 
-def feed_validate(p_ext, d, tstop):
-    """Whips into shape ones that are not
-       could be properly made into a meaningful class.
+def _feed_validate(p_ext, p_ext_d, tstop):
+    """Validate external inputs that are fed to all
+    cells uniformly (i.e., rather than individually).
+    For now, this only includes rhythmic inputs.
+
+    Parameters
+    ----------
+    p_ext : list
+        Cumulative list of dicts where each dict contains
+        all parameters of an extinput.
+    p_ext_d : dict
+        The extinput to validate and append to p_ext.
+    tstop : float
+        Stop time of the simulation.
+
+    Returns
+    -------
+    p_ext : list
+        Cumulative list of dicts with newly appended
+        extinput.
     """
 
     # # reset tstop if the specified tstop exceeds the
     # # simulation runtime
-    # if d['tstop'] == 0:
-    #     d['tstop'] = tstop
+    # if p_ext_d['tstop'] == 0:
+    #     p_ext_d['tstop'] = tstop
 
-    if d['tstop'] > tstop:
-        d['tstop'] = tstop
+    if p_ext_d['tstop'] > tstop:
+        p_ext_d['tstop'] = tstop
 
     # if stdev is zero, increase synaptic weights 5 fold to make
     # single input equivalent to 5 simultaneous input to prevent spiking
     # <<---- SN: WHAT IS THIS RULE!?!?!?
-    if not d['stdev'] and d['distribution'] != 'uniform':
-        for key in d.keys():
+    if not p_ext_d['stdev'] and p_ext_d['distribution'] != 'uniform':
+        for key in p_ext_d.keys():
             if key.endswith('Pyr'):
-                d[key] = (d[key][0] * 5., d[key][1])
+                p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
             elif key.endswith('Basket'):
-                d[key] = (d[key][0] * 5., d[key][1])
+                p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
 
     # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in
     # which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
-    if d['L5Pyr_ampa'][1] == -1:
-        for key in d.keys():
+    if p_ext_d['L5Pyr_ampa'][1] == -1:
+        for key in p_ext_d.keys():
             if key.startswith('L5'):
-                if d['L2Pyr'][1] != 0.1:
-                    d[key] = (d[key][0], d['L2Pyr'][1])
+                if p_ext_d['L2Pyr'][1] != 0.1:
+                    p_ext_d[key] = (p_ext_d[key][0], p_ext_d['L2Pyr'][1])
                 else:
-                    d[key] = (d[key][0], 1.)
+                    p_ext_d[key] = (p_ext_d[key][0], 1.)
 
-    p_ext.append(d)
+    p_ext.append(p_ext_d)
     return p_ext
 
 
@@ -306,7 +323,7 @@ def create_pext(p, tstop):
     }
 
     # ensures time interval makes sense
-    p_ext = feed_validate(p_ext, feed_prox, tstop)
+    p_ext = _feed_validate(p_ext, feed_prox, tstop)
 
     # default params for distal rhythmic inputs
     feed_dist = {
@@ -336,7 +353,7 @@ def create_pext(p, tstop):
         'threshold': p['threshold']
     }
 
-    p_ext = feed_validate(p_ext, feed_dist, tstop)
+    p_ext = _feed_validate(p_ext, feed_dist, tstop)
 
     nprox, ndist = _count_evoked_inputs(p)
     # print('nprox,ndist evoked inputs:', nprox, ndist)
