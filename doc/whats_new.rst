@@ -26,7 +26,7 @@ Bug
 
 - Fix missing autapses in network construction, by `Mainak Jas`_ in `#50 <https://github.com/jonescompneurolab/hnn-core/pull/50>`_
 
-- Fix rhythmic input feed, by 'Ryan Thorpe'_ in '#98 <https://github.com/jonescompneurolab/hnn-core/pull/98>'_
+- Fix rhythmic input feed, by 'Ryan Thorpe'_ in `#98 <https://github.com/jonescompneurolab/hnn-core/pull/98>`_
 
 API
 ~~~
