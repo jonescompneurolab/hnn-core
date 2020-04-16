@@ -184,7 +184,7 @@ class ExtFeed(object):
             if key.startswith('L2Pyr') or \
                     key.startswith('L5Pyr') or \
                     key.startswith('L2Bask') or \
-                    key.startswith('L2Bask'):
+                    key.startswith('L5Bask'):
                 if self.p_ext[key][0] <= 0.0:
                     return False
         # store f_input as self variable for later use if it exists in p
