@@ -186,38 +186,35 @@ def feed_validate(p_ext, d, tstop):
        could be properly made into a meaningful class.
     """
 
-    # only append if t0 is less than simulation tstop
-    if tstop > d['t0']:
-        # # reset tstop if the specified tstop exceeds the
-        # # simulation runtime
-        # if d['tstop'] == 0:
-        #     d['tstop'] = tstop
+    # # reset tstop if the specified tstop exceeds the
+    # # simulation runtime
+    # if d['tstop'] == 0:
+    #     d['tstop'] = tstop
 
-        if d['tstop'] > tstop:
-            d['tstop'] = tstop
+    if d['tstop'] > tstop:
+        d['tstop'] = tstop
 
-        # if stdev is zero, increase synaptic weights 5 fold to make
-        # single input equivalent to 5 simultaneous input to prevent spiking
-        # <<---- SN: WHAT IS THIS RULE!?!?!?
-        if not d['stdev'] and d['distribution'] != 'uniform':
-            for key in d.keys():
-                if key.endswith('Pyr'):
-                    d[key] = (d[key][0] * 5., d[key][1])
-                elif key.endswith('Basket'):
-                    d[key] = (d[key][0] * 5., d[key][1])
+    # if stdev is zero, increase synaptic weights 5 fold to make
+    # single input equivalent to 5 simultaneous input to prevent spiking
+    # <<---- SN: WHAT IS THIS RULE!?!?!?
+    if not d['stdev'] and d['distribution'] != 'uniform':
+        for key in d.keys():
+            if key.endswith('Pyr'):
+                d[key] = (d[key][0] * 5., d[key][1])
+            elif key.endswith('Basket'):
+                d[key] = (d[key][0] * 5., d[key][1])
 
-        # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in
-        # which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
-        if d['L5Pyr_ampa'][1] == -1:
-            for key in d.keys():
-                if key.startswith('L5'):
-                    if d['L2Pyr'][1] != 0.1:
-                        d[key] = (d[key][0], d['L2Pyr'][1])
-                    else:
-                        d[key] = (d[key][0], 1.)
+    # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in
+    # which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
+    if d['L5Pyr_ampa'][1] == -1:
+        for key in d.keys():
+            if key.startswith('L5'):
+                if d['L2Pyr'][1] != 0.1:
+                    d[key] = (d[key][0], d['L2Pyr'][1])
+                else:
+                    d[key] = (d[key][0], 1.)
 
-        p_ext.append(d)
-
+    p_ext.append(d)
     return p_ext
 
 
