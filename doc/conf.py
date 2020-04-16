@@ -177,7 +177,7 @@ sphinx_gallery_conf = {
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'auto_examples',
-    'backreferences_dir': False,
+    'backreferences_dir': 'generated',
     'reference_url': {
         'hnn_core': 'https://jonescompneurolab.github.io/hnn-core/'
     },
