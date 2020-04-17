@@ -33,3 +33,23 @@ def test_hnn_core():
     dpl_pr = loadtxt(fname)
     assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
     assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
+
+    # Test spike type counts
+    spiketype_counts = {}
+    for spikegid in net.spikegids[0]:
+        if net.gid_to_type(spikegid) not in spiketype_counts:
+            spiketype_counts[net.gid_to_type(spikegid)] = 0
+        else:
+            spiketype_counts[net.gid_to_type(spikegid)] += 1
+    assert 'extinput' not in spiketype_counts
+    assert 'exgauss' not in spiketype_counts
+    assert 'extpois' not in spiketype_counts
+    assert spiketype_counts == {
+        'evprox1': 269,
+        'L2_basket': 55,
+        'L2_pyramidal': 88,
+        'L5_pyramidal': 390,
+        'L5_basket': 87,
+        'evdist1': 234,
+        'evprox2': 269
+    }
