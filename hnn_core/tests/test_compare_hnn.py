@@ -44,12 +44,10 @@ def test_hnn_core():
     assert 'extinput' not in spiketype_counts
     assert 'exgauss' not in spiketype_counts
     assert 'extpois' not in spiketype_counts
-    assert spiketype_counts == {
-        'evprox1': 269,
-        'L2_basket': 55,
-        'L2_pyramidal': 88,
-        'L5_pyramidal': 390,
-        'L5_basket': 87,
-        'evdist1': 234,
-        'evprox2': 269
-    }
+    assert spiketype_counts == {'evprox1': 269,
+                                'L2_basket': 54,
+                                'L2_pyramidal': 113,
+                                'L5_pyramidal': 395,
+                                'L5_basket': 85,
+                                'evdist1': 234,
+                                'evprox2': 269}
