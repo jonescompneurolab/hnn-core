@@ -7,6 +7,7 @@ jobs:
       - image: circleci/python:3.7.3-stretch
     environment:
       install_prefix: ~
+      PATH: "{PATH}:${install_prefix}/x86_64/bin"
     steps:
 
         - run:
@@ -48,9 +49,8 @@ jobs:
         - run:
             name: Setup hnn-core
             command: |
-            export PATH=$PATH:${install_prefix}/x86_64/bin
-            make
-            python setup.py develop
+              make
+              python setup.py develop
 
         - run:
             name: Build the documentation
