@@ -10,9 +10,12 @@ jobs:
       PATH: "{PATH}:${install_prefix}/x86_64/bin"
     steps:
 
+        - checkout
+
         - run:
             name: Install miniconda
             command: |
+              sudo apt-get wget
               wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh;
               chmod +x ~/miniconda.sh;
               ~/miniconda.sh -b -p ~/miniconda;
@@ -43,8 +46,6 @@ jobs:
               make install -j4
               cd src/nrnpython/
               python3 setup.py install
-
-        - checkout
 
         - run:
             name: Setup hnn-core
