@@ -80,7 +80,7 @@ jobs:
           name: Install and configure dependencies
           command: |
             npm install -g --silent gh-pages@2.2
-            git config --global user.email "circle@mne.com"
+            git config --global user.email "circle@jonescompneurolab.com"
             git config --global user.name "Circle Ci"
 
       - add_ssh_keys:

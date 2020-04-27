@@ -50,3 +50,9 @@ If you want to build the documentation locally without running all the examples,
 use the command::
 
     $ make html-noplot
+
+Continuous Integration
+======================
+
+The repository is tested via continuous integration with Travis and Circle. The automated
+tests run on Travis while the documentation is built on Circle.
