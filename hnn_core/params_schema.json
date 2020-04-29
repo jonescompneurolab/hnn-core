@@ -1,0 +1,2016 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "hnn-core Parameter Schema",
+    "description": "This is the json-schema for validating hnn-core param dictionaries. All input and trial-specific params must be explicitly defined. Evoked input params that go undefined will remain non-existent in the resulting simulation. Cell and network parameters will be assigned default values for missing key/value pairs consistent with the values in the 'default.json' param file.",
+    "default": {},
+    "additionalProperties": false,
+    "patternProperties": {
+        "^t_ev((prox)|(dist))_\\d+\\Z": {
+            "type": "number"
+        },
+        "^sigma_t_ev((prox)|(dist))_\\d+\\Z": {
+            "type": "number"
+        },
+        "^numspikes_ev((prox)|(dist))_\\d+\\Z": {
+            "type": "number"
+        },
+        "^gbar_ev((prox)|(dist))_\\d+_L(2|5)((Pyr)|(Basket))_((ampa)|(nmda))\\Z": {
+            "type": "number"
+        },
+        "^prng_seedcore_ev((prox)|(dist))_\\d+\\Z": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "tstop",
+        "N_trials",
+        "dipole_scalefctr",
+        "dipole_smooth_win",
+        "t0_input_prox",
+        "t0_input_stdev_prox",
+        "tstop_input_prox",
+        "f_input_prox",
+        "f_stdev_prox",
+        "events_per_cycle_prox",
+        "repeats_prox",
+        "input_prox_A_weight_L2Pyr_ampa",
+        "input_prox_A_weight_L2Pyr_nmda",
+        "input_prox_A_weight_L2Basket_ampa",
+        "input_prox_A_weight_L2Basket_nmda",
+        "input_prox_A_delay_L2",
+        "input_prox_A_weight_L5Pyr_ampa",
+        "input_prox_A_weight_L5Pyr_nmda",
+        "input_prox_A_weight_L5Basket_ampa",
+        "input_prox_A_weight_L5Basket_nmda",
+        "input_prox_A_delay_L5",
+        "t0_input_dist",
+        "t0_input_stdev_dist",
+        "tstop_input_dist",
+        "f_input_dist",
+        "f_stdev_dist",
+        "events_per_cycle_dist",
+        "repeats_dist",
+        "input_dist_A_weight_L2Pyr_ampa",
+        "input_dist_A_weight_L2Pyr_nmda",
+        "input_dist_A_weight_L2Basket_ampa",
+        "input_dist_A_weight_L2Basket_nmda",
+        "input_dist_A_delay_L2",
+        "input_dist_A_weight_L5Pyr_ampa",
+        "input_dist_A_weight_L5Pyr_nmda",
+        "input_dist_A_delay_L5",
+        "sync_evinput",
+        "inc_evinput",
+        "L2Pyr_Pois_A_weight_ampa",
+        "L2Pyr_Pois_A_weight_nmda",
+        "L2Pyr_Pois_lamtha",
+        "L2Basket_Pois_A_weight_ampa",
+        "L2Basket_Pois_A_weight_nmda",
+        "L2Basket_Pois_lamtha",
+        "L5Pyr_Pois_A_weight_ampa",
+        "L5Pyr_Pois_A_weight_nmda",
+        "L5Pyr_Pois_lamtha",
+        "L5Basket_Pois_A_weight_ampa",
+        "L5Basket_Pois_A_weight_nmda",
+        "L5Basket_Pois_lamtha",
+        "t0_pois",
+        "T_pois"
+    ],
+    "properties": {
+        "sim_prefix": {
+            "type": "string",
+            "description": "",
+            "default": "default"
+        },
+        "tstop": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                170.0
+            ]
+        },
+        "dt": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.025
+        },
+        "celsius": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 37.0
+        },
+        "N_trials": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                1.0
+            ]
+        },
+        "threshold": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "save_dpl": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "description": "[obsolete]",
+            "default": 0
+        },
+        "save_figs": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "title": "The Save_figs Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0
+        },
+        "save_spec_data": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0
+        },
+        "f_max_spec": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 100.0
+        },
+        "dipole_scalefctr": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                3000.0
+            ]
+        },
+        "dipole_smooth_win": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                30.0
+            ]
+        },
+        "save_vsoma": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0
+        },
+        "prng_seedcore_input_prox": {
+            "type": "integer",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 4
+        },
+        "prng_seedcore_input_dist": {
+            "type": "integer",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 4
+        },
+        "prng_seedcore_extpois": {
+            "type": "integer",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 4
+        },
+        "prng_seedcore_extgauss": {
+            "type": "integer",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 4
+        },
+        "L2Pyr_soma_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                22.1
+            ]
+        },
+        "L2Pyr_soma_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                23.4
+            ]
+        },
+        "L2Pyr_soma_cm": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.6195
+            ]
+        },
+        "L2Pyr_soma_Ra": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                200.0
+            ]
+        },
+        "L2Pyr_dend_cm": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.6195
+            ]
+        },
+        "L2Pyr_dend_Ra": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                200.0
+            ]
+        },
+        "L2Pyr_apicaltrunk_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                59.5
+            ]
+        },
+        "L2Pyr_apicaltrunk_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.25
+            ]
+        },
+        "L2Pyr_apical1_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                306.0
+            ]
+        },
+        "L2Pyr_apical1_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.08
+            ]
+        },
+        "L2Pyr_apicaltuft_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                238.0
+            ]
+        },
+        "L2Pyr_apicaltuft_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                3.4
+            ]
+        },
+        "L2Pyr_apicaloblique_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                340.0
+            ]
+        },
+        "L2Pyr_apicaloblique_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                3.91
+            ]
+        },
+        "L2Pyr_basal1_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                85.0
+            ]
+        },
+        "L2Pyr_basal1_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.25
+            ]
+        },
+        "L2Pyr_basal2_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                255.0
+            ]
+        },
+        "L2Pyr_basal2_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                2.72
+            ]
+        },
+        "L2Pyr_basal3_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                255.0
+            ]
+        },
+        "L2Pyr_basal3_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                2.72
+            ]
+        },
+        "L2Pyr_ampa_e": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "L2Pyr_ampa_tau1": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.5
+            ]
+        },
+        "L2Pyr_ampa_tau2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                5.0
+            ]
+        },
+        "L2Pyr_nmda_e": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "L2Pyr_nmda_tau1": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "L2Pyr_nmda_tau2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "L2Pyr_gabaa_e": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -80.0
+            ]
+        },
+        "L2Pyr_gabaa_tau1": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.5
+            ]
+        },
+        "L2Pyr_gabaa_tau2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                5.0
+            ]
+        },
+        "L2Pyr_gabab_e": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -80.0
+            ]
+        },
+        "L2Pyr_gabab_tau1": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "L2Pyr_gabab_tau2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "L2Pyr_soma_gkbar_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.01
+            ]
+        },
+        "L2Pyr_soma_gnabar_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.18
+            ]
+        },
+        "L2Pyr_soma_el_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -65.0
+            ]
+        },
+        "L2Pyr_soma_gl_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.26e-05
+            ]
+        },
+        "L2Pyr_soma_gbar_km": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                250.0
+            ]
+        },
+        "L2Pyr_dend_gkbar_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.01
+            ]
+        },
+        "L2Pyr_dend_gnabar_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.15
+            ]
+        },
+        "L2Pyr_dend_el_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -65.0
+            ]
+        },
+        "L2Pyr_dend_gl_hh2": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.26e-05
+            ]
+        },
+        "L2Pyr_dend_gbar_km": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                250.0
+            ]
+        },
+        "L5Pyr_soma_L": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                39.0
+            ]
+        },
+        "L5Pyr_soma_diam": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                28.9
+            ]
+        },
+        "L5Pyr_soma_cm": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.85
+            ]
+        },
+        "L5Pyr_soma_Ra": {
+            "$id": "#/properties/L5Pyr_soma_Ra",
+            "type": "number",
+            "title": "The L5pyr_soma_ra Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                200.0
+            ]
+        },
+        "L5Pyr_dend_cm": {
+            "$id": "#/properties/L5Pyr_dend_cm",
+            "type": "number",
+            "title": "The L5pyr_dend_cm Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.85
+            ]
+        },
+        "L5Pyr_dend_Ra": {
+            "$id": "#/properties/L5Pyr_dend_Ra",
+            "type": "number",
+            "title": "The L5pyr_dend_ra Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                200.0
+            ]
+        },
+        "L5Pyr_apicaltrunk_L": {
+            "$id": "#/properties/L5Pyr_apicaltrunk_L",
+            "type": "number",
+            "title": "The L5pyr_apicaltrunk_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                102.0
+            ]
+        },
+        "L5Pyr_apicaltrunk_diam": {
+            "$id": "#/properties/L5Pyr_apicaltrunk_diam",
+            "type": "number",
+            "title": "The L5pyr_apicaltrunk_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10.2
+            ]
+        },
+        "L5Pyr_apical1_L": {
+            "$id": "#/properties/L5Pyr_apical1_L",
+            "type": "number",
+            "title": "The L5pyr_apical1_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                680.0
+            ]
+        },
+        "L5Pyr_apical1_diam": {
+            "$id": "#/properties/L5Pyr_apical1_diam",
+            "type": "number",
+            "title": "The L5pyr_apical1_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                7.48
+            ]
+        },
+        "L5Pyr_apical2_L": {
+            "$id": "#/properties/L5Pyr_apical2_L",
+            "type": "number",
+            "title": "The L5pyr_apical2_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                680.0
+            ]
+        },
+        "L5Pyr_apical2_diam": {
+            "$id": "#/properties/L5Pyr_apical2_diam",
+            "type": "number",
+            "title": "The L5pyr_apical2_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.93
+            ]
+        },
+        "L5Pyr_apicaltuft_L": {
+            "$id": "#/properties/L5Pyr_apicaltuft_L",
+            "type": "number",
+            "title": "The L5pyr_apicaltuft_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                425.0
+            ]
+        },
+        "L5Pyr_apicaltuft_diam": {
+            "$id": "#/properties/L5Pyr_apicaltuft_diam",
+            "type": "number",
+            "title": "The L5pyr_apicaltuft_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                3.4
+            ]
+        },
+        "L5Pyr_apicaloblique_L": {
+            "$id": "#/properties/L5Pyr_apicaloblique_L",
+            "type": "number",
+            "title": "The L5pyr_apicaloblique_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                255.0
+            ]
+        },
+        "L5Pyr_apicaloblique_diam": {
+            "$id": "#/properties/L5Pyr_apicaloblique_diam",
+            "type": "number",
+            "title": "The L5pyr_apicaloblique_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                5.1
+            ]
+        },
+        "L5Pyr_basal1_L": {
+            "$id": "#/properties/L5Pyr_basal1_L",
+            "type": "number",
+            "title": "The L5pyr_basal1_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                85.0
+            ]
+        },
+        "L5Pyr_basal1_diam": {
+            "$id": "#/properties/L5Pyr_basal1_diam",
+            "type": "number",
+            "title": "The L5pyr_basal1_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                6.8
+            ]
+        },
+        "L5Pyr_basal2_L": {
+            "$id": "#/properties/L5Pyr_basal2_L",
+            "type": "number",
+            "title": "The L5pyr_basal2_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                255.0
+            ]
+        },
+        "L5Pyr_basal2_diam": {
+            "$id": "#/properties/L5Pyr_basal2_diam",
+            "type": "number",
+            "title": "The L5pyr_basal2_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                8.5
+            ]
+        },
+        "L5Pyr_basal3_L": {
+            "$id": "#/properties/L5Pyr_basal3_L",
+            "type": "number",
+            "title": "The L5pyr_basal3_l Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                255.0
+            ]
+        },
+        "L5Pyr_basal3_diam": {
+            "$id": "#/properties/L5Pyr_basal3_diam",
+            "type": "number",
+            "title": "The L5pyr_basal3_diam Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                8.5
+            ]
+        },
+        "L5Pyr_ampa_e": {
+            "$id": "#/properties/L5Pyr_ampa_e",
+            "type": "number",
+            "title": "The L5pyr_ampa_e Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "L5Pyr_ampa_tau1": {
+            "$id": "#/properties/L5Pyr_ampa_tau1",
+            "type": "number",
+            "title": "The L5pyr_ampa_tau1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.5
+            ]
+        },
+        "L5Pyr_ampa_tau2": {
+            "$id": "#/properties/L5Pyr_ampa_tau2",
+            "type": "number",
+            "title": "The L5pyr_ampa_tau2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                5.0
+            ]
+        },
+        "L5Pyr_nmda_e": {
+            "$id": "#/properties/L5Pyr_nmda_e",
+            "type": "number",
+            "title": "The L5pyr_nmda_e Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "L5Pyr_nmda_tau1": {
+            "$id": "#/properties/L5Pyr_nmda_tau1",
+            "type": "number",
+            "title": "The L5pyr_nmda_tau1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "L5Pyr_nmda_tau2": {
+            "$id": "#/properties/L5Pyr_nmda_tau2",
+            "type": "number",
+            "title": "The L5pyr_nmda_tau2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "L5Pyr_gabaa_e": {
+            "$id": "#/properties/L5Pyr_gabaa_e",
+            "type": "number",
+            "title": "The L5pyr_gabaa_e Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -80.0
+            ]
+        },
+        "L5Pyr_gabaa_tau1": {
+            "$id": "#/properties/L5Pyr_gabaa_tau1",
+            "type": "number",
+            "title": "The L5pyr_gabaa_tau1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.5
+            ]
+        },
+        "L5Pyr_gabaa_tau2": {
+            "$id": "#/properties/L5Pyr_gabaa_tau2",
+            "type": "number",
+            "title": "The L5pyr_gabaa_tau2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                5.0
+            ]
+        },
+        "L5Pyr_gabab_e": {
+            "$id": "#/properties/L5Pyr_gabab_e",
+            "type": "number",
+            "title": "The L5pyr_gabab_e Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -80.0
+            ]
+        },
+        "L5Pyr_gabab_tau1": {
+            "$id": "#/properties/L5Pyr_gabab_tau1",
+            "type": "number",
+            "title": "The L5pyr_gabab_tau1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "L5Pyr_gabab_tau2": {
+            "$id": "#/properties/L5Pyr_gabab_tau2",
+            "type": "number",
+            "title": "The L5pyr_gabab_tau2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "L5Pyr_soma_gkbar_hh2": {
+            "$id": "#/properties/L5Pyr_soma_gkbar_hh2",
+            "type": "number",
+            "title": "The L5pyr_soma_gkbar_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.01
+            ]
+        },
+        "L5Pyr_soma_gnabar_hh2": {
+            "$id": "#/properties/L5Pyr_soma_gnabar_hh2",
+            "type": "number",
+            "title": "The L5pyr_soma_gnabar_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.16
+            ]
+        },
+        "L5Pyr_soma_el_hh2": {
+            "$id": "#/properties/L5Pyr_soma_el_hh2",
+            "type": "number",
+            "title": "The L5pyr_soma_el_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -65.0
+            ]
+        },
+        "L5Pyr_soma_gl_hh2": {
+            "$id": "#/properties/L5Pyr_soma_gl_hh2",
+            "type": "number",
+            "title": "The L5pyr_soma_gl_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.26e-05
+            ]
+        },
+        "L5Pyr_soma_gbar_ca": {
+            "$id": "#/properties/L5Pyr_soma_gbar_ca",
+            "type": "number",
+            "title": "The L5pyr_soma_gbar_ca Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                60.0
+            ]
+        },
+        "L5Pyr_soma_taur_cad": {
+            "$id": "#/properties/L5Pyr_soma_taur_cad",
+            "type": "number",
+            "title": "The L5pyr_soma_taur_cad Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "L5Pyr_soma_gbar_kca": {
+            "$id": "#/properties/L5Pyr_soma_gbar_kca",
+            "type": "number",
+            "title": "The L5pyr_soma_gbar_kca Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0002
+            ]
+        },
+        "L5Pyr_soma_gbar_km": {
+            "$id": "#/properties/L5Pyr_soma_gbar_km",
+            "type": "number",
+            "title": "The L5pyr_soma_gbar_km Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                200.0
+            ]
+        },
+        "L5Pyr_soma_gbar_cat": {
+            "$id": "#/properties/L5Pyr_soma_gbar_cat",
+            "type": "number",
+            "title": "The L5pyr_soma_gbar_cat Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0002
+            ]
+        },
+        "L5Pyr_soma_gbar_ar": {
+            "$id": "#/properties/L5Pyr_soma_gbar_ar",
+            "type": "number",
+            "title": "The L5pyr_soma_gbar_ar Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1e-06
+            ]
+        },
+        "L5Pyr_dend_gkbar_hh2": {
+            "$id": "#/properties/L5Pyr_dend_gkbar_hh2",
+            "type": "number",
+            "title": "The L5pyr_dend_gkbar_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.01
+            ]
+        },
+        "L5Pyr_dend_gnabar_hh2": {
+            "$id": "#/properties/L5Pyr_dend_gnabar_hh2",
+            "type": "number",
+            "title": "The L5pyr_dend_gnabar_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.14
+            ]
+        },
+        "L5Pyr_dend_el_hh2": {
+            "$id": "#/properties/L5Pyr_dend_el_hh2",
+            "type": "number",
+            "title": "The L5pyr_dend_el_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                -71.0
+            ]
+        },
+        "L5Pyr_dend_gl_hh2": {
+            "$id": "#/properties/L5Pyr_dend_gl_hh2",
+            "type": "number",
+            "title": "The L5pyr_dend_gl_hh2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                4.26e-05
+            ]
+        },
+        "L5Pyr_dend_gbar_ca": {
+            "$id": "#/properties/L5Pyr_dend_gbar_ca",
+            "type": "number",
+            "title": "The L5pyr_dend_gbar_ca Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                60.0
+            ]
+        },
+        "L5Pyr_dend_taur_cad": {
+            "$id": "#/properties/L5Pyr_dend_taur_cad",
+            "type": "number",
+            "title": "The L5pyr_dend_taur_cad Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "L5Pyr_dend_gbar_kca": {
+            "$id": "#/properties/L5Pyr_dend_gbar_kca",
+            "type": "number",
+            "title": "The L5pyr_dend_gbar_kca Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0002
+            ]
+        },
+        "L5Pyr_dend_gbar_km": {
+            "$id": "#/properties/L5Pyr_dend_gbar_km",
+            "type": "number",
+            "title": "The L5pyr_dend_gbar_km Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                200.0
+            ]
+        },
+        "L5Pyr_dend_gbar_cat": {
+            "$id": "#/properties/L5Pyr_dend_gbar_cat",
+            "type": "number",
+            "title": "The L5pyr_dend_gbar_cat Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0002
+            ]
+        },
+        "L5Pyr_dend_gbar_ar": {
+            "$id": "#/properties/L5Pyr_dend_gbar_ar",
+            "type": "number",
+            "title": "The L5pyr_dend_gbar_ar Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1e-06
+            ]
+        },
+        "N_pyr_x": {
+            "$id": "#/properties/N_pyr_x",
+            "type": "integer",
+            "title": "The N_pyr_x Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10.0
+            ]
+        },
+        "N_pyr_y": {
+            "$id": "#/properties/N_pyr_y",
+            "type": "integer",
+            "title": "The N_pyr_y Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10.0
+            ]
+        },
+        "gbar_L2Pyr_L2Pyr_ampa": {
+            "$id": "#/properties/gbar_L2Pyr_L2Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_l2pyr_l2pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0005
+            ]
+        },
+        "gbar_L2Pyr_L2Pyr_nmda": {
+            "$id": "#/properties/gbar_L2Pyr_L2Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_l2pyr_l2pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0005
+            ]
+        },
+        "gbar_L2Basket_L2Pyr_gabaa": {
+            "$id": "#/properties/gbar_L2Basket_L2Pyr_gabaa",
+            "type": "number",
+            "title": "The Gbar_l2basket_l2pyr_gabaa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.05
+            ]
+        },
+        "gbar_L2Basket_L2Pyr_gabab": {
+            "$id": "#/properties/gbar_L2Basket_L2Pyr_gabab",
+            "type": "number",
+            "title": "The Gbar_l2basket_l2pyr_gabab Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.05
+            ]
+        },
+        "gbar_L2Pyr_L5Pyr": {
+            "$id": "#/properties/gbar_L2Pyr_L5Pyr",
+            "type": "number",
+            "title": "The Gbar_l2pyr_l5pyr Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.00025
+            ]
+        },
+        "gbar_L2Basket_L5Pyr": {
+            "$id": "#/properties/gbar_L2Basket_L5Pyr",
+            "type": "number",
+            "title": "The Gbar_l2basket_l5pyr Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.001
+            ]
+        },
+        "gbar_L5Pyr_L5Pyr_ampa": {
+            "$id": "#/properties/gbar_L5Pyr_L5Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_l5pyr_l5pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0005
+            ]
+        },
+        "gbar_L5Pyr_L5Pyr_nmda": {
+            "$id": "#/properties/gbar_L5Pyr_L5Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_l5pyr_l5pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0005
+            ]
+        },
+        "gbar_L5Basket_L5Pyr_gabaa": {
+            "$id": "#/properties/gbar_L5Basket_L5Pyr_gabaa",
+            "type": "number",
+            "title": "The Gbar_l5basket_l5pyr_gabaa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.025
+            ]
+        },
+        "gbar_L5Basket_L5Pyr_gabab": {
+            "$id": "#/properties/gbar_L5Basket_L5Pyr_gabab",
+            "type": "number",
+            "title": "The Gbar_l5basket_l5pyr_gabab Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.025
+            ]
+        },
+        "gbar_L2Pyr_L2Basket": {
+            "$id": "#/properties/gbar_L2Pyr_L2Basket",
+            "type": "number",
+            "title": "The Gbar_l2pyr_l2basket Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0005
+            ]
+        },
+        "gbar_L2Basket_L2Basket": {
+            "$id": "#/properties/gbar_L2Basket_L2Basket",
+            "type": "number",
+            "title": "The Gbar_l2basket_l2basket Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.02
+            ]
+        },
+        "gbar_L2Pyr_L5Basket": {
+            "$id": "#/properties/gbar_L2Pyr_L5Basket",
+            "type": "number",
+            "title": "The Gbar_l2pyr_l5basket Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.00025
+            ]
+        },
+        "gbar_L5Pyr_L5Basket": {
+            "$id": "#/properties/gbar_L5Pyr_L5Basket",
+            "type": "number",
+            "title": "The Gbar_l5pyr_l5basket Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0005
+            ]
+        },
+        "gbar_L5Basket_L5Basket": {
+            "$id": "#/properties/gbar_L5Basket_L5Basket",
+            "type": "number",
+            "title": "The Gbar_l5basket_l5basket Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.02
+            ]
+        },
+        "t0_input_prox": {
+            "$id": "#/properties/t0_input_prox",
+            "type": "number",
+            "title": "The T0_input_prox Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1000.0
+            ]
+        },
+        "t0_input_stdev_prox": {
+            "$id": "#/properties/t0_input_stdev_prox",
+            "type": "number",
+            "title": "The T0_input_stdev_prox Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "tstop_input_prox": {
+            "$id": "#/properties/tstop_input_prox",
+            "type": "integer",
+            "title": "The Tstop_input_prox Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1001.0
+            ]
+        },
+        "f_input_prox": {
+            "$id": "#/properties/f_input_prox",
+            "type": "number",
+            "title": "The F_input_prox Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10.0
+            ]
+        },
+        "f_stdev_prox": {
+            "$id": "#/properties/f_stdev_prox",
+            "type": "number",
+            "title": "The F_stdev_prox Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "events_per_cycle_prox": {
+            "$id": "#/properties/events_per_cycle_prox",
+            "type": "integer",
+            "title": "The Events_per_cycle_prox Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                2.0
+            ]
+        },
+        "repeats_prox": {
+            "$id": "#/properties/repeats_prox",
+            "type": "integer",
+            "title": "The Repeats_prox Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10.0
+            ]
+        },
+        "input_prox_A_weight_L2Pyr_ampa": {
+            "$id": "#/properties/input_prox_A_weight_L2Pyr_ampa",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l2pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_weight_L2Pyr_nmda": {
+            "$id": "#/properties/input_prox_A_weight_L2Pyr_nmda",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l2pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_weight_L2Basket_ampa": {
+            "$id": "#/properties/input_prox_A_weight_L2Basket_ampa",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l2basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_weight_L2Basket_nmda": {
+            "$id": "#/properties/input_prox_A_weight_L2Basket_nmda",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l2basket_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_delay_L2": {
+            "$id": "#/properties/input_prox_A_delay_L2",
+            "type": "number",
+            "title": "The Input_prox_a_delay_l2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.1
+            ]
+        },
+        "input_prox_A_weight_L5Pyr_ampa": {
+            "$id": "#/properties/input_prox_A_weight_L5Pyr_ampa",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l5pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_weight_L5Pyr_nmda": {
+            "$id": "#/properties/input_prox_A_weight_L5Pyr_nmda",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l5pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_weight_L5Basket_ampa": {
+            "$id": "#/properties/input_prox_A_weight_L5Basket_ampa",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l5basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_weight_L5Basket_nmda": {
+            "$id": "#/properties/input_prox_A_weight_L5Basket_nmda",
+            "type": "number",
+            "title": "The Input_prox_a_weight_l5basket_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_prox_A_delay_L5": {
+            "$id": "#/properties/input_prox_A_delay_L5",
+            "type": "number",
+            "title": "The Input_prox_a_delay_l5 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "t0_input_dist": {
+            "$id": "#/properties/t0_input_dist",
+            "type": "integer",
+            "title": "The T0_input_dist Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1000.0
+            ]
+        },
+        "t0_input_stdev_dist": {
+            "$id": "#/properties/t0_input_stdev_dist",
+            "type": "number",
+            "title": "The T0_input_stdev_dist Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "tstop_input_dist": {
+            "$id": "#/properties/tstop_input_dist",
+            "type": "integer",
+            "title": "The Tstop_input_dist Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1001.0
+            ]
+        },
+        "f_input_dist": {
+            "$id": "#/properties/f_input_dist",
+            "type": "number",
+            "title": "The F_input_dist Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10.0
+            ]
+        },
+        "f_stdev_dist": {
+            "$id": "#/properties/f_stdev_dist",
+            "type": "number",
+            "title": "The F_stdev_dist Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20.0
+            ]
+        },
+        "events_per_cycle_dist": {
+            "$id": "#/properties/events_per_cycle_dist",
+            "type": "integer",
+            "title": "The Events_per_cycle_dist Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                2.0
+            ]
+        },
+        "repeats_dist": {
+            "$id": "#/properties/repeats_dist",
+            "type": "integer",
+            "title": "The Repeats_dist Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10.0
+            ]
+        },
+        "input_dist_A_weight_L2Pyr_ampa": {
+            "$id": "#/properties/input_dist_A_weight_L2Pyr_ampa",
+            "type": "number",
+            "title": "The Input_dist_a_weight_l2pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_dist_A_weight_L2Pyr_nmda": {
+            "$id": "#/properties/input_dist_A_weight_L2Pyr_nmda",
+            "type": "number",
+            "title": "The Input_dist_a_weight_l2pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_dist_A_weight_L2Basket_ampa": {
+            "$id": "#/properties/input_dist_A_weight_L2Basket_ampa",
+            "type": "number",
+            "title": "The Input_dist_a_weight_l2basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_dist_A_weight_L2Basket_nmda": {
+            "$id": "#/properties/input_dist_A_weight_L2Basket_nmda",
+            "type": "number",
+            "title": "The Input_dist_a_weight_l2basket_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_dist_A_delay_L2": {
+            "$id": "#/properties/input_dist_A_delay_L2",
+            "type": "number",
+            "title": "The Input_dist_a_delay_l2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                5.0
+            ]
+        },
+        "input_dist_A_weight_L5Pyr_ampa": {
+            "$id": "#/properties/input_dist_A_weight_L5Pyr_ampa",
+            "type": "number",
+            "title": "The Input_dist_a_weight_l5pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_dist_A_weight_L5Pyr_nmda": {
+            "$id": "#/properties/input_dist_A_weight_L5Pyr_nmda",
+            "type": "number",
+            "title": "The Input_dist_a_weight_l5pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "input_dist_A_delay_L5": {
+            "$id": "#/properties/input_dist_A_delay_L5",
+            "type": "number",
+            "title": "The Input_dist_a_delay_l5 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                5.0
+            ]
+        },
+        "t_evprox_1": {
+            "$id": "#/properties/t_evprox_1",
+            "type": "number",
+            "title": "The T_evprox_1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                26.61
+            ]
+        },
+        "sigma_t_evprox_1": {
+            "$id": "#/properties/sigma_t_evprox_1",
+            "type": "number",
+            "title": "The Sigma_t_evprox_1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                2.47
+            ]
+        },
+        "numspikes_evprox_1": {
+            "$id": "#/properties/numspikes_evprox_1",
+            "type": "integer",
+            "title": "The Numspikes_evprox_1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "gbar_evprox_1_L2Pyr_ampa": {
+            "$id": "#/properties/gbar_evprox_1_L2Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l2pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.01525
+            ]
+        },
+        "gbar_evprox_1_L2Pyr_nmda": {
+            "$id": "#/properties/gbar_evprox_1_L2Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l2pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "gbar_evprox_1_L2Basket_ampa": {
+            "$id": "#/properties/gbar_evprox_1_L2Basket_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l2basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.08831
+            ]
+        },
+        "gbar_evprox_1_L2Basket_nmda": {
+            "$id": "#/properties/gbar_evprox_1_L2Basket_nmda",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l2basket_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "gbar_evprox_1_L5Pyr_ampa": {
+            "$id": "#/properties/gbar_evprox_1_L5Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l5pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.00865
+            ]
+        },
+        "gbar_evprox_1_L5Pyr_nmda": {
+            "$id": "#/properties/gbar_evprox_1_L5Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l5pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "gbar_evprox_1_L5Basket_ampa": {
+            "$id": "#/properties/gbar_evprox_1_L5Basket_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l5basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.19934
+            ]
+        },
+        "gbar_evprox_1_L5Basket_nmda": {
+            "$id": "#/properties/gbar_evprox_1_L5Basket_nmda",
+            "type": "number",
+            "title": "The Gbar_evprox_1_l5basket_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "t_evdist_1": {
+            "$id": "#/properties/t_evdist_1",
+            "type": "number",
+            "title": "The T_evdist_1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                63.53
+            ]
+        },
+        "sigma_t_evdist_1": {
+            "$id": "#/properties/sigma_t_evdist_1",
+            "type": "number",
+            "title": "The Sigma_t_evdist_1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                3.85
+            ]
+        },
+        "numspikes_evdist_1": {
+            "$id": "#/properties/numspikes_evdist_1",
+            "type": "integer",
+            "title": "The Numspikes_evdist_1 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "gbar_evdist_1_L2Pyr_ampa": {
+            "$id": "#/properties/gbar_evdist_1_L2Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_evdist_1_l2pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                7e-06
+            ]
+        },
+        "gbar_evdist_1_L2Pyr_nmda": {
+            "$id": "#/properties/gbar_evdist_1_L2Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_evdist_1_l2pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.004317
+            ]
+        },
+        "gbar_evdist_1_L2Basket_ampa": {
+            "$id": "#/properties/gbar_evdist_1_L2Basket_ampa",
+            "type": "number",
+            "title": "The Gbar_evdist_1_l2basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.006562
+            ]
+        },
+        "gbar_evdist_1_L2Basket_nmda": {
+            "$id": "#/properties/gbar_evdist_1_L2Basket_nmda",
+            "type": "number",
+            "title": "The Gbar_evdist_1_l2basket_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.019482
+            ]
+        },
+        "gbar_evdist_1_L5Pyr_ampa": {
+            "$id": "#/properties/gbar_evdist_1_L5Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_evdist_1_l5pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.1423
+            ]
+        },
+        "gbar_evdist_1_L5Pyr_nmda": {
+            "$id": "#/properties/gbar_evdist_1_L5Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_evdist_1_l5pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.080074
+            ]
+        },
+        "t_evprox_2": {
+            "$id": "#/properties/t_evprox_2",
+            "type": "number",
+            "title": "The T_evprox_2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                137.12
+            ]
+        },
+        "sigma_t_evprox_2": {
+            "$id": "#/properties/sigma_t_evprox_2",
+            "type": "number",
+            "title": "The Sigma_t_evprox_2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                8.33
+            ]
+        },
+        "numspikes_evprox_2": {
+            "$id": "#/properties/numspikes_evprox_2",
+            "type": "integer",
+            "title": "The Numspikes_evprox_2 Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.0
+            ]
+        },
+        "gbar_evprox_2_L2Pyr_ampa": {
+            "$id": "#/properties/gbar_evprox_2_L2Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_2_l2pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1.43884
+            ]
+        },
+        "gbar_evprox_2_L2Pyr_nmda": {
+            "$id": "#/properties/gbar_evprox_2_L2Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_evprox_2_l2pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "gbar_evprox_2_L2Basket_ampa": {
+            "$id": "#/properties/gbar_evprox_2_L2Basket_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_2_l2basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                3e-06
+            ]
+        },
+        "gbar_evprox_2_L2Basket_nmda": {
+            "$id": "#/properties/gbar_evprox_2_L2Basket_nmda",
+            "type": "number",
+            "title": "The Gbar_evprox_2_l2basket_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "gbar_evprox_2_L5Pyr_ampa": {
+            "$id": "#/properties/gbar_evprox_2_L5Pyr_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_2_l5pyr_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.684013
+            ]
+        },
+        "gbar_evprox_2_L5Pyr_nmda": {
+            "$id": "#/properties/gbar_evprox_2_L5Pyr_nmda",
+            "type": "number",
+            "title": "The Gbar_evprox_2_l5pyr_nmda Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.0
+            ]
+        },
+        "gbar_evprox_2_L5Basket_ampa": {
+            "$id": "#/properties/gbar_evprox_2_L5Basket_ampa",
+            "type": "number",
+            "title": "The Gbar_evprox_2_l5basket_ampa Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0.008958
+            ]
+        },
+        "gbar_evprox_2_L5Basket_nmda": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "sync_evinput": {
+            "type": "boolean",
+            "description": "An explanation about the purpose of this instance.",
+            "default": false
+        },
+        "inc_evinput": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L2Pyr_Pois_A_weight_ampa": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L2Pyr_Pois_A_weight_nmda": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L2Pyr_Pois_lamtha": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L2Basket_Pois_A_weight_ampa": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L2Basket_Pois_A_weight_nmda": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L2Basket_Pois_lamtha": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L5Pyr_Pois_A_weight_ampa": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L5Pyr_Pois_A_weight_nmda": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L5Pyr_Pois_lamtha": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L5Basket_Pois_A_weight_ampa": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L5Basket_Pois_A_weight_nmda": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "L5Basket_Pois_lamtha": {
+            "type": "number",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0
+        },
+        "t0_pois": {
+            "type": "number",
+            "description": "Start time of the Poisson input.",
+            "default": 0.0
+        },
+        "T_pois": {
+            "type": "number",
+            "description": "Period (i.e., time duration) of the Poisson input.",
+            "default": -1.0
+        },
+        "distribution_prox": {
+            "type": "string",
+            "description": "",
+            "default": "normal"
+        },
+        "distribution_dist": {
+            "type": "string",
+            "description": "",
+            "default": "normal"
+        },
+        "L2Basket_Gauss_A_weight": {
+            "type": "number",
+            "description": "",
+            "default": 0.0
+        },
+        "L2Basket_Gauss_mu": {
+            "type": "number",
+            "description": "",
+            "default": 2000.0
+        },
+        "L2Basket_Gauss_sigma": {
+            "type": "number",
+            "description": "",
+            "default": 3.6
+        },
+        "L2Pyr_Gauss_A_weight": {
+            "type": "number",
+            "description": "",
+            "default": 0.0
+        },
+        "L2Pyr_Gauss_mu": {
+            "type": "number",
+            "description": "",
+            "default": 2000.0
+        },
+        "L2Pyr_Gauss_sigma": {
+            "type": "number",
+            "description": "",
+            "default": 3.6
+        },
+        "L5Pyr_Gauss_A_weight": {
+            "type": "number",
+            "description": "",
+            "default": 0.0
+        },
+        "L5Pyr_Gauss_mu": {
+            "type": "number",
+            "description": "",
+            "default": 2000.0
+        },
+        "L5Pyr_Gauss_sigma": {
+            "type": "number",
+            "description": "",
+            "default": 4.8
+        },
+        "L5Basket_Gauss_A_weight": {
+            "type": "number",
+            "description": "",
+            "default": 0.0
+        },
+        "L5Basket_Gauss_mu": {
+            "type": "number",
+            "description": "",
+            "default": 2000.0
+        },
+        "L5Basket_Gauss_sigma": {
+            "type": "number",
+            "description": "",
+            "default": 2.0
+        },
+        "dt_evprox0_evdist": {
+            "type": "number",
+            "description": "",
+            "default": -1
+        },
+        "dt_evprox0_evprox1": {
+            "type": "number",
+            "description": "",
+            "default": -1
+        }
+    }
+}
