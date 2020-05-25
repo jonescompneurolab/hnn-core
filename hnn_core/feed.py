@@ -180,13 +180,17 @@ class ExtFeed(object):
         """Creates the ongoing external inputs (rhythmic)."""
         # print("__create_extinput")
         # Return if all synaptic weights are 0
+        all_syn_weights_zero = True  # fixes #101
         for key in self.p_ext.keys():
             if key.startswith('L2Pyr') or \
                     key.startswith('L5Pyr') or \
                     key.startswith('L2Bask') or \
                     key.startswith('L5Bask'):
-                if self.p_ext[key][0] <= 0.0:
-                    return False
+                if self.p_ext[key][0] > 0.0:
+                    all_syn_weights_zero = False
+        if all_syn_weights_zero:
+            return False
+
         # store f_input as self variable for later use if it exists in p
         # t0 is always defined
         t0 = self.p_ext['t0']
