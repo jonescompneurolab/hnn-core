@@ -28,6 +28,8 @@ Bug
 
 - Fix rhythmic input feed, by `Ryan Thorpe`_ in `#98 <https://github.com/jonescompneurolab/hnn-core/pull/98>`_
 
+- Fix bug introduced into rhythmic input feed and add test, by `Christopher Bailey`_ in `#102 <https://github.com/jonescompneurolab/hnn-core/pull/102>`_
+
 API
 ~~~
 
@@ -36,3 +38,4 @@ API
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Blake Caldwell: https://github.com/blakecaldwell
 .. _Ryan Thorpe: https://github.com/rythorpe
+.. _Christopher Bailey: https://github.com/cjayb
