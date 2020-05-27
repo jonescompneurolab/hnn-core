@@ -25,6 +25,9 @@ def test_external_rhythmic_feeds():
 
     # from Network.build: creates ExtFeeds in < 1 sec
     net._create_all_src()
+    # needed to close the ParallelContext, else next pc will segfault
+    from hnn_core.parallel import pc
+    pc.gid_clear()
 
     # annoyingly, net.extinput_list is always 2, whether populated
     # or not, so the first few assertions have no effect
