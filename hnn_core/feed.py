@@ -180,7 +180,7 @@ class ExtFeed(object):
         """Creates the ongoing external inputs (rhythmic)."""
         # print("__create_extinput")
         # Return if all synaptic weights are 0
-        all_syn_weights_zero = True  # fixes #101
+        all_syn_weights_zero = True
         for key in self.p_ext.keys():
             if key.startswith('L2Pyr') or \
                     key.startswith('L5Pyr') or \
