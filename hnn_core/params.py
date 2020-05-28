@@ -190,17 +190,16 @@ def _feed_validate(p_ext, p_ext_d, tstop):
     ----------
     p_ext : list
         Cumulative list of dicts where each dict contains
-        all parameters of an extinput.
+        all parameters of an ExtFeed input.
     p_ext_d : dict
-        The extinput to validate and append to p_ext.
+        The parameter set to validate and append to p_ext.
     tstop : float
         Stop time of the simulation.
 
     Returns
     -------
     p_ext : list
-        Cumulative list of dicts with newly appended
-        extinput.
+        Cumulative list of dicts with newly appended ExtFeed.
     """
 
     # # reset tstop if the specified tstop exceeds the
@@ -284,13 +283,13 @@ def create_pext(p, tstop):
     p : dict
         The parameters returned by ExpParams(f_psim).return_pdict()
     """
-    p_ext = []
+    p_common = []
 
     # p_unique is a dict of input param types that end up going to each cell
     # uniquely
     p_unique = {}
 
-    # default params for proximal rhythmic inputs
+    # default params for common proximal inputs
     feed_prox = {
         'f_input': p['f_input_prox'],
         't0': p['t0_input_prox'],
@@ -323,9 +322,9 @@ def create_pext(p, tstop):
     }
 
     # ensures time interval makes sense
-    p_ext = _feed_validate(p_ext, feed_prox, tstop)
+    p_common = _feed_validate(p_common, feed_prox, tstop)
 
-    # default params for distal rhythmic inputs
+    # default params for common distal inputs
     feed_dist = {
         'f_input': p['f_input_dist'],
         't0': p['t0_input_dist'],
@@ -353,7 +352,7 @@ def create_pext(p, tstop):
         'threshold': p['threshold']
     }
 
-    p_ext = _feed_validate(p_ext, feed_dist, tstop)
+    p_common = _feed_validate(p_common, feed_dist, tstop)
 
     nprox, ndist = _count_evoked_inputs(p)
     # print('nprox,ndist evoked inputs:', nprox, ndist)
@@ -463,7 +462,7 @@ def create_pext(p, tstop):
         'threshold': p['threshold']
     }
 
-    return p_ext, p_unique
+    return p_common, p_unique
 
 
 # Takes two dictionaries (d1 and d2) and compares the keys in d1 to those in d2
