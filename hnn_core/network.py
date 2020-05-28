@@ -144,7 +144,7 @@ class Network(object):
         """Context manager to cleanly build Network objects"""
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, cell_type, value, traceback):
         """Clear up NEURON internal gid information.
 
         Notes
@@ -315,44 +315,57 @@ class Network(object):
             if pc.gid_exists(gid):
                 # get type of cell and pos via gid
                 # now should be valid for ext inputs
-                type = self.gid_to_type(gid)
-                type_pos_ind = gid - self.gid_dict[type][0]
-                pos = self.pos_dict[type][type_pos_ind]
+                cell_type = self.gid_to_type(gid)
+                type_pos_ind = gid - self.gid_dict[cell_type][0]
+                pos = self.pos_dict[cell_type][type_pos_ind]
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 # creates a NetCon object internally to Neuron
                 type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
-                if type in ('L2_pyramidal', 'L5_pyramidal', 'L2_basket',
-                            'L5_basket'):
-                    Cell = type2class[type]
-                    if type in ('L2_pyramidal', 'L5_pyramidal'):
+                # first check for actual cell types
+                if cell_type in ('L2_pyramidal', 'L5_pyramidal', 'L2_basket',
+                                 'L5_basket'):
+                    Cell = type2class[cell_type]
+                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
                         self.cells.append(Cell(gid, pos, self.params))
                     else:
                         self.cells.append(Cell(gid, pos))
                     pc.cell(
                         gid, self.cells[-1].connect_to_target(
                             None, self.params['threshold']))
-                elif type == 'extinput':
-                    # print('type',type)
+                # external inputs are special types of pseudo-cells
+                elif cell_type == 'extinput':
+                    # print('cell_type',cell_type)
                     # to find param index, take difference between REAL gid
                     # here and gid start point of the items
                     p_ind = gid - self.gid_dict['extinput'][0]
+
+                    # new ExtFeed: cell type irrelevant (None) since input
+                    # timing is unaffected by it; cell_type == feed_type
+                    self.extinput_list.append(
+                        ExtFeed(cell_type, None, self.p_ext[p_ind], gid))
+
                     # now use the param index in the params and create
                     # the cell and artificial NetCon
-                    self.extinput_list.append(ExtFeed(
-                        type, None, self.p_ext[p_ind], gid))
                     pc.cell(
                         gid, self.extinput_list[-1].connect_to_target(
                             self.params['threshold']))
-                elif type in self.p_unique.keys():
-                    gid_post = gid - self.gid_dict[type][0]
+
+                # external inputs can also be Poisson- or Gaussian-
+                # distributed, or 'evoked' inputs (proximal or distal)
+                elif cell_type in self.p_unique.keys():
+                    gid_post = gid - self.gid_dict[cell_type][0]
+                    feed_type = cell_type  # purely for code clarity below
                     cell_type = self.gid_to_type(gid_post)
-                    # create dictionary entry, append to list
-                    self.ext_list[type].append(ExtFeed(
-                        type, cell_type, self.p_unique[type], gid))
+
+                    # new ExtFeed, where now both feed and cell type specified
+                    # because these feeds have cell-specific parameters
+                    self.ext_list[feed_type].append(
+                        ExtFeed(feed_type, cell_type,
+                                self.p_unique[feed_type], gid))
                     pc.cell(
-                        gid, self.ext_list[type][-1].connect_to_target(
+                        gid, self.ext_list[feed_type][-1].connect_to_target(
                             self.params['threshold']))
                 else:
                     print("None of these types in Net()")
@@ -386,10 +399,10 @@ class Network(object):
                 # now do the unique inputs specific to these cells
                 # parreceive_ext receives connections from UNIQUE
                 # external inputs
-                for type in self.p_unique.keys():
-                    p_type = self.p_unique[type]
+                for cell_type in self.p_unique.keys():
+                    p_type = self.p_unique[cell_type]
                     cell.parreceive_ext(
-                        type, gid, self.gid_dict, self.pos_dict, p_type)
+                        cell_type, gid, self.gid_dict, self.pos_dict, p_type)
 
     # setup spike recording for this node
     def _record_spikes(self):
