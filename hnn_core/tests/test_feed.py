@@ -5,7 +5,23 @@ from copy import deepcopy
 import os.path as op
 
 import hnn_core
-from hnn_core import read_params, Network
+from hnn_core import read_params, Network, Params
+from hnn_core.feed import ExtFeed
+from hnn_core.params import create_pext
+
+
+def test_ExtFeed_object():
+    """Test the different external feeds."""
+
+    params = Params()
+    p_common, p_unique = create_pext(params,
+                                     params['tstop'])
+    for feed_type in ['extpois', 'extgauss']:
+        ef = ExtFeed(feed_type, 'L2_basket', p_unique[feed_type], 0)
+        print(ef)  # test repr
+    for ii in range(2):  # distal and proximal
+        ef = ExtFeed('common', None, p_common[ii], 0) 
+        print(ef)  # test repr
 
 
 def test_external_rhythmic_feeds():
@@ -25,13 +41,16 @@ def test_external_rhythmic_feeds():
     with Network(deepcopy(params)) as net:
         net._create_all_src()
 
-        assert len(net.extinput_list) == 2  # (distal & proximal)
-        for ei in net.extinput_list:
-            # XXX: need to rename ei.ty to 'rhythmic'
-            assert ei.ty == 'extinput'
-            assert ei.eventvec.hname().startswith('Vector')
-            # not sure why this is 40 for both, just test > 0
-            assert len(ei.eventvec.as_numpy()) > 0
+        assert len(net.common_feed_list) == 2  # (distal & proximal)
+        for ei in net.common_feed_list:
+            assert ei.feed_type == 'common'
+            assert ei.cell_type is None  # artificial cell
+            assert hasattr(ei, 'nrn_EventVec')
+            assert hasattr(ei, 'nrn_VecStim')
+            assert ei.nrn_EventVec.hname().startswith('Vector')
+            assert hasattr(ei.nrn_VecStim, 'play')
+            # parameters should lead to > 0 input spikes
+            assert len(ei.nrn_EventVec.as_numpy()) > 0
 
             # check that ei.p_ext matches params
             loc = ei.p_ext['loc'][:4]  # loc=prox or dist

@@ -41,7 +41,7 @@ def test_hnn_core():
             spiketype_counts[net.gid_to_type(spikegid)] = 0
         else:
             spiketype_counts[net.gid_to_type(spikegid)] += 1
-    assert 'extinput' not in spiketype_counts
+    assert 'common' not in spiketype_counts
     assert 'exgauss' not in spiketype_counts
     assert 'extpois' not in spiketype_counts
     assert spiketype_counts == {'evprox1': 269,
