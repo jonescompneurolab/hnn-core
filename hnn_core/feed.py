@@ -2,65 +2,82 @@
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
+#          Christopher Bailey <bailey.cj@gmail.com>
 
 import numpy as np
 from neuron import h
 
 
 class ExtFeed(object):
-    """"The ExtFeed class.
+    """"The ExtFeed class of external spike input times.
+
+    An external input "feed" to the network, i.e., one that is independent of
+    the spiking output of cells in the network.
 
     Parameters
     ----------
-    ty : str
-        The feed type. Can be:
-        'extpois', 'evprox', 'evdist', 'extgauss', 'extinput'
-    celltype : str | None
-        The cell type.
-    p_ext : dict | list (XXX: check)
-        Parameters of external input.
-        p_ext has a different structure for the extinput
-        usually, p_ext is a dict of cell types
+    feed_type : str
+        The feed type, which is one of
+        'extpois' : Poisson-distributed input to proximal dendrites
+        'extgauss' : Gaussian-distributed input to proximal dendrites
+        'evprox' : Proximal input at specified time (or Gaussian spread)
+        'evdist' : Distal input at specified time (or Gaussian spread)
+        'common' : Common pulses to proximal and distal dendrites
+    cell_type : str | None
+        The cell type, e.g., 'L2_basket', 'L5_pyramidal', etc., or None for
+        common inputs (cell population-level weights for common inputs
+        are defined separately in the parameters)
+    p_ext : dict
+        Parameters of the external input feed, arranged into a dictionary.
     gid : int
         The cell ID.
 
     Attributes
     ----------
+    nrn_EventVec : NEURON hoc.HocObject
+        A vector (list) of event times
+    nrn_VecStim : NEURON hoc.HocObject
+        A VecStim is an artificial spiking cell that generates events at
+        times that are specified in a (NEURON) Vector (see vecevent.mod)
     seed : int
         The seed
     gid : int
         The cell ID
     """
 
-    def __init__(self, ty, celltype, p_ext, gid):
+    def __init__(self, feed_type, cell_type, p_ext, gid):
         # VecStim setup
-        self.eventvec = h.Vector()
-        self.vs = h.VecStim()
-        # self.p_unique = p_unique[type]
+        self.nrn_EventVec = h.Vector()
+        self.nrn_VecStim = h.VecStim()
         self.p_ext = p_ext
-        self.celltype = celltype
-        self.ty = ty  # feed type
+        # used to determine cell type-specific parameters for
+        # (not used for 'common', such as for rhythmic alpha/beta input)
+        self.cell_type = cell_type  # XXX rename for all cell types?
+        self.feed_type = feed_type
         self.gid = gid
         self.set_prng()  # sets seeds for random num generator
-        # sets event times into self.eventvec and plays into self.vs (VecStim)
+        # sets event times into self.nrn_EventVec (Vector)
+        # and plays into self.nrn_VecStim (VecStim)
         self.set_event_times()
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        s = 'seed %d, gid %d' % (self.seed, self.gid)
-        return '<%s | %s>' % (class_name, s)
+        repr_str = "<%s of type '%s' " % (class_name, self.feed_type)
+        repr_str += 'with %d events ' % len(self.nrn_EventVec)
+        repr_str += '| seed %d, gid %d>' % (self.seed, self.gid)
+        return repr_str
 
     def set_prng(self, seed=None):
         if seed is None:  # no seed specified then use p_ext to determine seed
             # random generator for this instance
             # qnd hack to make the seeds the same across all gids
             # for just evoked
-            if self.ty.startswith(('evprox', 'evdist')):
+            if self.feed_type.startswith(('evprox', 'evdist')):
                 if self.p_ext['sync_evinput']:
                     self.seed = self.p_ext['prng_seedcore']
                 else:
                     self.seed = self.p_ext['prng_seedcore'] + self.gid - 2
-            elif self.ty.startswith('extinput'):
+            elif self.feed_type.startswith('common'):
                 # seed for events assuming a given start time
                 self.seed = self.p_ext['prng_seedcore'] + self.gid
                 # separate seed for start times
@@ -74,21 +91,21 @@ class ExtFeed(object):
         self.prng = np.random.RandomState(self.seed)
         if hasattr(self, 'seed2'):
             self.prng2 = np.random.RandomState(self.seed2)
-        # print('ty,seed:',self.ty,self.seed)
+        # print('feed_type,seed:',self.feed_type,self.seed)
 
     def set_event_times(self, inc_evinput=0.0):
         # print('self.p_ext:',self.p_ext)
-        # each of these methods creates self.eventvec for playback
-        if self.ty == 'extpois':
+        # each of these methods creates self.nrn_EventVec for playback
+        if self.feed_type == 'extpois':
             self.__create_extpois()
-        elif self.ty.startswith(('evprox', 'evdist')):
+        elif self.feed_type.startswith(('evprox', 'evdist')):
             self.__create_evoked(inc_evinput)
-        elif self.ty == 'extgauss':
+        elif self.feed_type == 'extgauss':
             self.__create_extgauss()
-        elif self.ty == 'extinput':
-            self.__create_extinput()
+        elif self.feed_type == 'common':
+            self.__create_common_input()
         # load eventvec into VecStim object
-        self.vs.play(self.eventvec)
+        self.nrn_VecStim.play(self.nrn_EventVec)
 
     # based on cdf for exp wait time distribution from unif [0, 1)
     # returns in ms based on lamtha in Hz
@@ -98,13 +115,13 @@ class ExtFeed(object):
     # new external pois designation
     def __create_extpois(self):
         # print("__create_extpois")
-        if self.p_ext[self.celltype][0] <= 0.0 and \
-                self.p_ext[self.celltype][1] <= 0.0:
+        if self.p_ext[self.cell_type][0] <= 0.0 and \
+                self.p_ext[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
         # check the t interval
         t0 = self.p_ext['t_interval'][0]
         T = self.p_ext['t_interval'][1]
-        lamtha = self.p_ext[self.celltype][3]  # index 3 is frequency (lamtha)
+        lamtha = self.p_ext[self.cell_type][3]  # index 3 is frequency (lamtha)
         # values MUST be sorted for VecStim()!
         # start the initial value
         if lamtha > 0.:
@@ -127,15 +144,15 @@ class ExtFeed(object):
         #     print(lamtha, np.mean(xdiff), np.var(xdiff), 1/lamtha**2)
         # Convert array into nrn vector
         # if len(val_pois)>0: print('val_pois:',val_pois)
-        self.eventvec.from_python(val_pois)
-        return self.eventvec.size() > 0
+        self.nrn_EventVec.from_python(val_pois)
+        return self.nrn_EventVec.size() > 0
 
     # mu and sigma vals come from p
     def __create_evoked(self, inc=0.0):
-        if self.celltype in self.p_ext.keys():
+        if self.cell_type in self.p_ext.keys():
             # assign the params
             mu = self.p_ext['t0'] + inc
-            sigma = self.p_ext[self.celltype][3]  # index 3 is sigma_t_ (stdev)
+            sigma = self.p_ext[self.cell_type][3]  # index 3 is sigma_t (stdev)
             numspikes = int(self.p_ext['numspikes'])
             # print('mu:',mu,'sigma:',sigma,'inc:',inc)
             # if a non-zero sigma is specified
@@ -148,20 +165,20 @@ class ExtFeed(object):
             # vals must be sorted
             val_evoked.sort()
             # print('__create_evoked val_evoked:',val_evoked)
-            self.eventvec.from_python(val_evoked)
+            self.nrn_EventVec.from_python(val_evoked)
         else:
             # return an empty eventvec list
-            self.eventvec.from_python([])
-        return self.eventvec.size() > 0
+            self.nrn_EventVec.from_python([])
+        return self.nrn_EventVec.size() > 0
 
     def __create_extgauss(self):
         # assign the params
-        if self.p_ext[self.celltype][0] <= 0.0 and \
-                self.p_ext[self.celltype][1] <= 0.0:
+        if self.p_ext[self.cell_type][0] <= 0.0 and \
+                self.p_ext[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
-        # print('gauss params:',self.p_ext[self.celltype])
-        mu = self.p_ext[self.celltype][3]
-        sigma = self.p_ext[self.celltype][4]
+        # print('gauss params:',self.p_ext[self.cell_type])
+        mu = self.p_ext[self.cell_type][3]
+        sigma = self.p_ext[self.cell_type][4]
         # mu and sigma values come from p
         # one single value from Gaussian dist.
         # values MUST be sorted for VecStim()!
@@ -173,12 +190,15 @@ class ExtFeed(object):
         val_gauss.sort()
         # if len(val_gauss)>0: print('val_gauss:',val_gauss)
         # Convert array into nrn vector
-        self.eventvec.from_python(val_gauss)
-        return self.eventvec.size() > 0
+        self.nrn_EventVec.from_python(val_gauss)
+        return self.nrn_EventVec.size() > 0
 
-    def __create_extinput(self):
-        """Creates the ongoing external inputs (rhythmic)."""
-        # print("__create_extinput")
+    def __create_common_input(self):
+        """Creates the common ongoing external inputs.
+        
+        Used for, e.g., for rhythmic inputs in alpha/beta generation
+        """
+        # print("__create_common_input")
         # Return if all synaptic weights are 0
         all_syn_weights_zero = True
         for key in self.p_ext.keys():
@@ -254,15 +274,15 @@ class ExtFeed(object):
             t_input.sort()
         else:
             print("Indicated distribution not recognized. "
-                  "Not making any alpha feeds.")
+                  "Not making any common feeds.")
             t_input = []
         # Convert array into nrn vector
-        self.eventvec.from_python(t_input)
-        return self.eventvec.size() > 0
+        self.nrn_EventVec.from_python(t_input)
+        return self.nrn_EventVec.size() > 0
 
     # for parallel, maybe be that postsyn for this is just nil (None)
     def connect_to_target(self, threshold):
         # print("connect_to_target")
-        nc = h.NetCon(self.vs, None)  # why is target always nil??
+        nc = h.NetCon(self.nrn_VecStim, None)  # why is target always nil??
         nc.threshold = threshold
         return nc
