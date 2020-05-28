@@ -68,8 +68,8 @@ class L2Basket(BasketSingle):
     # par: receive from external inputs
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
         # for some gid relating to the input feed:
-        for gid_src, p_src, pos in zip(gid_dict['extinput'],
-                                       p_ext, pos_dict['extinput']):
+        for gid_src, p_src, pos in zip(gid_dict['common'],
+                                       p_ext, pos_dict['common']):
             # check if AMPA params are defined in the p_src
             if 'L2Basket_ampa' in p_src.keys():
                 # create an nc_dict
@@ -83,7 +83,7 @@ class L2Basket(BasketSingle):
                 }
 
                 # AMPA synapse
-                self.ncfrom_extinput.append(self.parconnect_from_src(
+                self.ncfrom_common.append(self.parconnect_from_src(
                     gid_src, nc_dict_ampa, self.soma_ampa))
 
             # Check if NMDA params are defined in p_src
@@ -98,7 +98,7 @@ class L2Basket(BasketSingle):
                 }
 
                 # NMDA synapse
-                self.ncfrom_extinput.append(self.parconnect_from_src(
+                self.ncfrom_common.append(self.parconnect_from_src(
                     gid_src, nc_dict_nmda, self.soma_nmda))
 
     # one parreceive function to handle all types of external parreceives
@@ -225,8 +225,8 @@ class L5Basket(BasketSingle):
     # parallel receive function parreceive()
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
         """Receive."""
-        for gid_src, p_src, pos in zip(gid_dict['extinput'], p_ext,
-                                       pos_dict['extinput']):
+        for gid_src, p_src, pos in zip(gid_dict['common'], p_ext,
+                                       pos_dict['common']):
             # Check if AMPA params are define in p_src
             if 'L5Basket_ampa' in p_src.keys():
                 nc_dict_ampa = {
@@ -239,7 +239,7 @@ class L5Basket(BasketSingle):
                 }
 
                 # AMPA synapse
-                self.ncfrom_extinput.append(self.parconnect_from_src(
+                self.ncfrom_common.append(self.parconnect_from_src(
                     gid_src, nc_dict_ampa, self.soma_ampa))
 
             # Check if nmda params are define in p_src
@@ -254,7 +254,7 @@ class L5Basket(BasketSingle):
                 }
 
                 # NMDA synapse
-                self.ncfrom_extinput.append(self.parconnect_from_src(
+                self.ncfrom_common.append(self.parconnect_from_src(
                     gid_src, nc_dict_nmda, self.soma_nmda))
 
     # one parreceive function to handle all types of external parreceives

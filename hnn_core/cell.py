@@ -45,7 +45,7 @@ class _Cell(object):
         self.ncfrom_L2Basket = []
         self.ncfrom_L5Pyr = []
         self.ncfrom_L5Basket = []
-        self.ncfrom_extinput = []
+        self.ncfrom_common = []
         self.ncfrom_extgauss = []
         self.ncfrom_extpois = []
         self.ncfrom_ev = []
