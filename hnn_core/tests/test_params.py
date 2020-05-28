@@ -12,16 +12,27 @@ from hnn_core import read_params, Params
 hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
 
-def test_params():
-    """Test params object."""
+def test_read_params():
+    """Test reading of params object."""
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     print(params)
     print(params['L2Pyr*'])
 
+    # unsupported extension
+    pytest.raises(ValueError, read_params, 'params.txt')
+    # empty file
+    empty_fname = op.join(hnn_core_root, 'param', 'empty.json')
+    with open(empty_fname, 'w') as json_data:
+        json.dump({}, json_data)
+    pytest.raises(ValueError, read_params, empty_fname)
+    # non dict type
+    pytest.raises(ValueError, Params, [])
+    pytest.raises(ValueError, Params, 'sdfdfdf')
 
-def test_legacy_params():
-    """Test reading legacy .param file."""
+
+def test_read_legacy_params():
+    """Test reading of legacy .param file."""
     param_url = ('https://raw.githubusercontent.com/hnnsolver/'
                  'hnn-core/test_data/default.param')
     params_legacy_fname = op.join(hnn_core_root, 'param', 'default.param')
@@ -36,7 +47,7 @@ def test_legacy_params():
 
 
 def test_base_params():
-    """Test params object with base params"""
+    """Test default params object matches base params"""
     param_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
                  'hnn-core/test_data/base.json')
     params_base_fname = op.join(hnn_core_root, 'param', 'base.json')
@@ -46,14 +57,3 @@ def test_base_params():
     params_base = read_params(params_base_fname)
     params = Params()
     assert params == params_base
-
-    # unsupported extension
-    pytest.raises(ValueError, read_params, 'params.txt')
-    # empty file
-    empty_fname = op.join(hnn_core_root, 'param', 'empty.json')
-    with open(empty_fname, 'w') as json_data:
-        json.dump({}, json_data)
-    pytest.raises(ValueError, read_params, empty_fname)
-    # non dict type
-    pytest.raises(ValueError, Params, [])
-    pytest.raises(ValueError, Params, 'sdfdfdf')
