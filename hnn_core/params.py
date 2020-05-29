@@ -16,7 +16,7 @@ from .params_default import get_params_default
 # filename d)
 def _count_evoked_inputs(d):
     nprox = ndist = 0
-    for k, v in d.items():
+    for k, _ in d.items():
         if k.startswith('t_'):
             if k.count('evprox') > 0:
                 nprox += 1

@@ -9,7 +9,7 @@ from neuron import h
 
 
 class ExtFeed(object):
-    """"The ExtFeed class of external spike input times.
+    """The ExtFeed class of external spike input times.
 
     An external input "feed" to the network, i.e., one that is independent of
     the spiking output of cells in the network.
@@ -22,7 +22,7 @@ class ExtFeed(object):
         'extgauss' : Gaussian-distributed input to proximal dendrites
         'evprox' : Proximal input at specified time (or Gaussian spread)
         'evdist' : Distal input at specified time (or Gaussian spread)
-        'common' : Common pulses to proximal and distal dendrites
+        'common' : Common inputs to all cells (locations parameter-dependent)
     cell_type : str | None
         The cell type, e.g., 'L2_basket', 'L5_pyramidal', etc., or None for
         common inputs (cell population-level weights for common inputs
@@ -34,9 +34,9 @@ class ExtFeed(object):
 
     Attributes
     ----------
-    nrn_EventVec : NEURON hoc.HocObject
-        A vector (list) of event times
-    nrn_VecStim : NEURON hoc.HocObject
+    nrn_eventvec : instance of NEURON Vector
+        A vector of event times
+    nrn_vecstim : instance of NEURON VecStim
         A VecStim is an artificial spiking cell that generates events at
         times that are specified in a (NEURON) Vector (see vecevent.mod)
     seed : int
@@ -47,8 +47,8 @@ class ExtFeed(object):
 
     def __init__(self, feed_type, cell_type, p_ext, gid):
         # VecStim setup
-        self.nrn_EventVec = h.Vector()
-        self.nrn_VecStim = h.VecStim()
+        self.nrn_eventvec = h.Vector()
+        self.nrn_vecstim = h.VecStim()
         self.p_ext = p_ext
         # used to determine cell type-specific parameters for
         # (not used for 'common', such as for rhythmic alpha/beta input)
@@ -56,14 +56,14 @@ class ExtFeed(object):
         self.feed_type = feed_type
         self.gid = gid
         self.set_prng()  # sets seeds for random num generator
-        # sets event times into self.nrn_EventVec (Vector)
-        # and plays into self.nrn_VecStim (VecStim)
+        # sets event times into self.nrn_eventvec (Vector)
+        # and plays into self.nrn_vecstim (VecStim)
         self.set_event_times()
 
     def __repr__(self):
         class_name = self.__class__.__name__
         repr_str = "<%s of type '%s' " % (class_name, self.feed_type)
-        repr_str += 'with %d events ' % len(self.nrn_EventVec)
+        repr_str += 'with %d events ' % len(self.nrn_eventvec)
         repr_str += '| seed %d, gid %d>' % (self.seed, self.gid)
         return repr_str
 
@@ -94,27 +94,39 @@ class ExtFeed(object):
         # print('feed_type,seed:',self.feed_type,self.seed)
 
     def set_event_times(self, inc_evinput=0.0):
-        # print('self.p_ext:',self.p_ext)
-        # each of these methods creates self.nrn_EventVec for playback
+
+        # check feed name validity, allowing substring matches ('evprox1' etc)
+        valid_feeds = ['extpois', 'extgauss', 'common', 'evprox', 'evdist']
+        # NB check if self.feed_type has a valid substring, not vice versa
+        matches = [f for f in valid_feeds if f in self.feed_type]
+        if len(matches) == 0:
+            raise ValueError('Invalid external feed: %s' % self.feed_type)
+        elif len(matches) > 1:
+            raise ValueError('Ambiguous external feed: %s' % self.feed_type)
+
+        # Each of these methods creates self.nrn_eventvec for playback
+        # Return values not checked: False if all weights for given feed type
+        # are zero. Designed to be silent so that zeroing input weights
+        # effectively disables each.
         if self.feed_type == 'extpois':
-            self.__create_extpois()
+            self._create_extpois()
         elif self.feed_type.startswith(('evprox', 'evdist')):
-            self.__create_evoked(inc_evinput)
+            self._create_evoked(inc_evinput)
         elif self.feed_type == 'extgauss':
-            self.__create_extgauss()
+            self._create_extgauss()
         elif self.feed_type == 'common':
-            self.__create_common_input()
+            self._create_common_input()
         # load eventvec into VecStim object
-        self.nrn_VecStim.play(self.nrn_EventVec)
+        self.nrn_vecstim.play(self.nrn_eventvec)
 
     # based on cdf for exp wait time distribution from unif [0, 1)
     # returns in ms based on lamtha in Hz
-    def __t_wait(self, lamtha):
+    def _t_wait(self, lamtha):
         return -1000. * np.log(1. - self.prng.rand()) / lamtha
 
     # new external pois designation
-    def __create_extpois(self):
-        # print("__create_extpois")
+    def _create_extpois(self):
+        # print("_create_extpois")
         if self.p_ext[self.cell_type][0] <= 0.0 and \
                 self.p_ext[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
@@ -125,7 +137,7 @@ class ExtFeed(object):
         # values MUST be sorted for VecStim()!
         # start the initial value
         if lamtha > 0.:
-            t_gen = t0 + self.__t_wait(lamtha)
+            t_gen = t0 + self._t_wait(lamtha)
             val_pois = np.array([])
             if t_gen < T:
                 np.append(val_pois, t_gen)
@@ -133,7 +145,7 @@ class ExtFeed(object):
             # sort
             while t_gen < T:
                 # so as to not clobber confusingly base off of t_gen ...
-                t_gen += self.__t_wait(lamtha)
+                t_gen += self._t_wait(lamtha)
                 if t_gen < T:
                     val_pois = np.append(val_pois, t_gen)
         else:
@@ -144,11 +156,11 @@ class ExtFeed(object):
         #     print(lamtha, np.mean(xdiff), np.var(xdiff), 1/lamtha**2)
         # Convert array into nrn vector
         # if len(val_pois)>0: print('val_pois:',val_pois)
-        self.nrn_EventVec.from_python(val_pois)
-        return self.nrn_EventVec.size() > 0
+        self.nrn_eventvec.from_python(val_pois)
+        return self.nrn_eventvec.size() > 0
 
     # mu and sigma vals come from p
-    def __create_evoked(self, inc=0.0):
+    def _create_evoked(self, inc=0.0):
         if self.cell_type in self.p_ext.keys():
             # assign the params
             mu = self.p_ext['t0'] + inc
@@ -164,14 +176,14 @@ class ExtFeed(object):
             val_evoked = val_evoked[val_evoked > 0]
             # vals must be sorted
             val_evoked.sort()
-            # print('__create_evoked val_evoked:',val_evoked)
-            self.nrn_EventVec.from_python(val_evoked)
+            # print('_create_evoked val_evoked:',val_evoked)
+            self.nrn_eventvec.from_python(val_evoked)
         else:
             # return an empty eventvec list
-            self.nrn_EventVec.from_python([])
-        return self.nrn_EventVec.size() > 0
+            self.nrn_eventvec.from_python([])
+        return self.nrn_eventvec.size() > 0
 
-    def __create_extgauss(self):
+    def _create_extgauss(self):
         # assign the params
         if self.p_ext[self.cell_type][0] <= 0.0 and \
                 self.p_ext[self.cell_type][1] <= 0.0:
@@ -190,15 +202,15 @@ class ExtFeed(object):
         val_gauss.sort()
         # if len(val_gauss)>0: print('val_gauss:',val_gauss)
         # Convert array into nrn vector
-        self.nrn_EventVec.from_python(val_gauss)
-        return self.nrn_EventVec.size() > 0
+        self.nrn_eventvec.from_python(val_gauss)
+        return self.nrn_eventvec.size() > 0
 
-    def __create_common_input(self):
+    def _create_common_input(self):
         """Creates the common ongoing external inputs.
-        
+
         Used for, e.g., for rhythmic inputs in alpha/beta generation
         """
-        # print("__create_common_input")
+        # print("_create_common_input")
         # Return if all synaptic weights are 0
         all_syn_weights_zero = True
         for key in self.p_ext.keys():
@@ -277,12 +289,11 @@ class ExtFeed(object):
                   "Not making any common feeds.")
             t_input = []
         # Convert array into nrn vector
-        self.nrn_EventVec.from_python(t_input)
-        return self.nrn_EventVec.size() > 0
+        self.nrn_eventvec.from_python(t_input)
+        return self.nrn_eventvec.size() > 0
 
-    # for parallel, maybe be that postsyn for this is just nil (None)
     def connect_to_target(self, threshold):
         # print("connect_to_target")
-        nc = h.NetCon(self.nrn_VecStim, None)  # why is target always nil??
+        nc = h.NetCon(self.nrn_vecstim, None)  # why is target always None??
         nc.threshold = threshold
         return nc
