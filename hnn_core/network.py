@@ -57,21 +57,21 @@ class Network(object):
         # ensuring that they exist on this node irrespective of whether
         # or not cells of relevant type actually do
 
-        self.N_t = np.arange(0., self.params['tstop'],
-                             self.params['dt']).size + 1
-        # Create a h.Vector() with size 1xself.N_t, zero'd
+        self.n_times = np.arange(0., self.params['tstop'],
+                                 self.params['dt']).size + 1
+        # Create a h.Vector() with size 1xself.n_times, zero'd
         self.current = {
-            'L5Pyr_soma': h.Vector(self.N_t, 0),
-            'L2Pyr_soma': h.Vector(self.N_t, 0),
+            'L5Pyr_soma': h.Vector(self.n_times, 0),
+            'L2Pyr_soma': h.Vector(self.n_times, 0),
         }
         # int variables for grid of pyramidal cells (for now in both L2 and L5)
         self.gridpyr = {
             'x': self.params['N_pyr_x'],
             'y': self.params['N_pyr_y'],
         }
-        self.N_src = 0
-        self.N = {}  # numbers of sources
-        self.N_cells = 0  # init self.N_cells
+        self.n_src = 0
+        self.n_of_type = {}  # numbers of sources
+        self.n_cells = 0  # init self.n_cells
         # zdiff is expressed as a positive DEPTH of L5 relative to L2
         # this is a deviation from the original, where L5 was defined at 0
         # this should not change interlaminar weight/delay calculations
@@ -82,7 +82,7 @@ class Network(object):
         # p_unique represent ext inputs that are going to go to each cell
         self.p_common, self.p_unique = create_pext(self.params,
                                                    self.params['tstop'])
-        self.N_common_feeds = len(self.p_common)
+        self.n_common_feeds = len(self.p_common)
         # Source list of names
         # in particular order (cells, common, names of unique inputs)
         self.src_list_new = self._create_src_list()
@@ -109,19 +109,19 @@ class Network(object):
         self._gid_assign()
         # create cells (and create self.origin in create_cells_pyr())
         self.cells = []
-        self.common_feed_list = []
+        self.common_feeds = []
         # external unique input list dictionary
-        self.unique_feed_dict = dict.fromkeys(self.p_unique)
+        self.unique_feeds = dict.fromkeys(self.p_unique)
         # initialize the lists in the dict
-        for key in self.unique_feed_dict.keys():
-            self.unique_feed_dict[key] = []
+        for key in self.unique_feeds.keys():
+            self.unique_feeds[key] = []
 
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
              % (self.gridpyr['x'], self.gridpyr['y']))
         s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (self.N['L2_basket'], self.N['L5_basket']))
+              % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
         return '<%s | %s>' % (class_name, s)
 
     def build(self):
@@ -224,19 +224,19 @@ class Network(object):
         origin_z = np.floor(self.zdiff / 2)
         self.origin = (origin_x, origin_y, origin_z)
         self.pos_dict['common'] = [self.origin for i in
-                                   range(self.N_common_feeds)]
+                                   range(self.n_common_feeds)]
         # at this time, each of the unique inputs is per cell
         for key in self.p_unique.keys():
             # create the pos_dict for all the sources
-            self.pos_dict[key] = [self.origin for i in range(self.N_cells)]
+            self.pos_dict[key] = [self.origin for i in range(self.n_cells)]
 
     def _count_cells(self):
         """Cell counting routine."""
         # cellname list is used *only* for this purpose for now
         for src in self.cellname_list:
             # if it's a cell, then add the number to total number of cells
-            self.N[src] = len(self.pos_dict[src])
-            self.N_cells += self.N[src]
+            self.n_of_type[src] = len(self.pos_dict[src])
+            self.n_cells += self.n_of_type[src]
 
     # general counting method requires pos_dict is correct for each source
     # and that all sources are represented
@@ -244,7 +244,7 @@ class Network(object):
         # all src numbers are based off of length of pos_dict entry
         # generally done here in lieu of upstream changes
         for src in self.extname_list:
-            self.N[src] = len(self.pos_dict[src])
+            self.n_of_type[src] = len(self.pos_dict[src])
 
     def _create_gid_dict(self):
         """Creates gid dicts and pos_lists."""
@@ -258,9 +258,9 @@ class Network(object):
             src = self.src_list_new[i]
             # query the N dict for that number and append here
             # to gid_ind, based on previous entry
-            gid_ind.append(gid_ind[i] + self.N[src])
+            gid_ind.append(gid_ind[i] + self.n_of_type[src])
             # accumulate total source count
-            self.N_src += self.N[src]
+            self.n_src += self.n_of_type[src]
         # now actually assign the ranges
         for i in range(len(self.src_list_new)):
             src = self.src_list_new[i]
@@ -272,7 +272,7 @@ class Network(object):
         from .parallel import nhosts, rank, pc
 
         # round robin assignment of gids
-        for gid in range(rank, self.N_cells, nhosts):
+        for gid in range(rank, self.n_cells, nhosts):
             # set the cell gid
             pc.set_gid2node(gid, rank)
             self._gid_list.append(gid)
@@ -283,9 +283,8 @@ class Network(object):
                 gid_input = gid + self.gid_dict[key][0]
                 pc.set_gid2node(gid_input, rank)
                 self._gid_list.append(gid_input)
-        # legacy handling of the external inputs
-        # NOT perfectly balanced for now  XXX wat?
-        for gid_base in range(rank, self.N_common_feeds, nhosts):
+
+        for gid_base in range(rank, self.n_common_feeds, nhosts):
             # shift the gid_base to the common gid
             gid = gid_base + self.gid_dict['common'][0]
             # set as usual
@@ -342,13 +341,13 @@ class Network(object):
 
                     # new ExtFeed: cell type irrelevant (None) since input
                     # timing is unaffected by it; cell_type == feed_type
-                    self.common_feed_list.append(
+                    self.common_feeds.append(
                         ExtFeed(cell_type, None, self.p_common[p_ind], gid))
 
                     # now use the param index in the params and create
                     # the cell and artificial NetCon
                     pc.cell(
-                        gid, self.common_feed_list[-1].connect_to_target(
+                        gid, self.common_feeds[-1].connect_to_target(
                             self.params['threshold']))
 
                 # external inputs can also be Poisson- or Gaussian-
@@ -360,12 +359,12 @@ class Network(object):
 
                     # new ExtFeed, where now both feed and cell type specified
                     # because these feeds have cell-specific parameters
-                    self.unique_feed_dict[feed_type].append(
+                    self.unique_feeds[feed_type].append(
                         ExtFeed(feed_type, cell_type,
                                 self.p_unique[feed_type], gid))
                     pc.cell(gid,
-                        self.unique_feed_dict[feed_type][-1].connect_to_target(
-                            self.params['threshold']))
+                            self.unique_feeds[feed_type][-1].connect_to_target(
+                                self.params['threshold']))
                 else:
                     print("None of these types in Net()")
                     exit()
@@ -383,8 +382,6 @@ class Network(object):
         from .parallel import pc
 
         # loop over target zipped gids and cells
-        # cells has NO common feeds anyway. also no extgausses
-        # XXX no comprendo commento
         for gid, cell in zip(self._gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
             if pc.gid_exists(gid) and self.gid_to_type(gid) != 'common':
@@ -392,11 +389,11 @@ class Network(object):
                 # based on gid
                 # this MUST be defined in EACH class of cell in self.cells
                 # parconnect receives connections from other cells
-                # parreceive receives connections from external inputs
+                # parreceive receives connections from common external inputs
                 cell.parconnect(gid, self.gid_dict, self.pos_dict, self.params)
                 cell.parreceive(gid, self.gid_dict,
                                 self.pos_dict, self.p_common)
-                # now do the unique inputs specific to these cells
+                # now do the unique external feeds specific to these cells
                 # parreceive_ext receives connections from UNIQUE
                 # external inputs
                 for cell_type in self.p_unique.keys():

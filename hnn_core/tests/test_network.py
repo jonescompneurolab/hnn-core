@@ -23,8 +23,8 @@ def test_network():
 
     # Assert that proper number of gids are created for Network inputs
     assert len(net.gid_dict['common']) == 2
-    assert len(net.gid_dict['extgauss']) == net.N_cells
-    assert len(net.gid_dict['extpois']) == net.N_cells
+    assert len(net.gid_dict['extgauss']) == net.n_cells
+    assert len(net.gid_dict['extpois']) == net.n_cells
     for ev_input in params['t_ev*']:
         type_key = ev_input[2: -2] + ev_input[-1]
-        assert len(net.gid_dict[type_key]) == net.N_cells
+        assert len(net.gid_dict[type_key]) == net.n_cells
