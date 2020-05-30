@@ -360,7 +360,10 @@ class Network(object):
                 # timing will be identical for all cells
                 # XXX common_feeds is a list of dict (comp. unique_feeds)
                 self.common_feeds.append(
-                    ExtFeed(src_type, None, self.p_common[p_ind], gid))
+                    ExtFeed(feed_type=src_type,
+                            target_cell_type=None,
+                            params=self.p_common[p_ind],
+                            gid=gid))
 
                 # now use the param index in the params and create
                 # the cell and artificial NetCon
@@ -378,8 +381,10 @@ class Network(object):
                 # specified because these feeds have cell-specific parameters
                 # XXX unique_feeds is a dict of dict (comp. common_feeds)
                 self.unique_feeds[src_type].append(
-                    ExtFeed(src_type, target_cell_type,
-                            self.p_unique[src_type], gid))
+                    ExtFeed(feed_type=src_type,
+                            target_cell_type=target_cell_type,
+                            params=self.p_unique[src_type],
+                            gid=gid))
                 pc.cell(gid,
                         self.unique_feeds[src_type][-1].connect_to_target(
                             self.params['threshold']))
