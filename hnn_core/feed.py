@@ -29,11 +29,10 @@ class ExtFeed(object):
         synchronous. Note that not all cells classes (types) are required to
         receive 'common' input---separate conductivity values can be assigned
         to basket vs. pyramidal cells and AMPA vs. NMDA synapses
-    cell_type : str | None
-        The cell type, e.g., 'L2_basket', 'L5_pyramidal', etc., or None for
-        common inputs (cell population-level weights for common inputs
-        are defined separately in the parameters)
-    p_ext : dict
+    target_cell_type : str | None
+        The target cell type of the feed, e.g., 'L2_basket', 'L5_pyramidal',
+        etc., or None for 'common' inputs
+    params : dict
         Parameters of the external input feed, arranged into a dictionary.
     gid : int
         The cell ID.
@@ -51,14 +50,14 @@ class ExtFeed(object):
         The cell ID
     """
 
-    def __init__(self, feed_type, cell_type, p_ext, gid):
+    def __init__(self, feed_type, target_cell_type, params, gid):
         # VecStim setup
         self.nrn_eventvec = h.Vector()
         self.nrn_vecstim = h.VecStim()
-        self.p_ext = p_ext
+        self.p_ext = params
         # used to determine cell type-specific parameters for
         # (not used for 'common', such as for rhythmic alpha/beta input)
-        self.cell_type = cell_type  # XXX rename for all cell types?
+        self.cell_type = target_cell_type
         self.feed_type = feed_type
         self.gid = gid
         self.set_prng()  # sets seeds for random num generator

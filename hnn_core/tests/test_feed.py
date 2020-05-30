@@ -26,10 +26,16 @@ def test_extfeed():
                   'ev', None, p_bogus, 0)  # ambiguous
 
     for feed_type in ['extpois', 'extgauss']:
-        feed = ExtFeed(feed_type, 'L2_basket', p_unique[feed_type], 0)
+        feed = ExtFeed(feed_type=feed_type,
+                       target_cell_type='L2_basket',
+                       params=p_unique[feed_type],
+                       gid=0)
         print(feed)  # test repr
     for ii in range(2):  # distal and proximal
-        feed = ExtFeed('common', None, p_common[ii], 0)
+        feed = ExtFeed(feed_type='common',
+                       target_cell_type=None,
+                       params=p_common[ii],
+                       gid=0)
         print(feed)  # test repr
 
 
