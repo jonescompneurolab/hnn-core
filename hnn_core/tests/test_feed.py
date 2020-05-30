@@ -48,7 +48,7 @@ def test_external_common_feeds():
                    't0_input_prox': 50})
 
     with Network(deepcopy(params)) as net:
-        net._create_all_src()
+        net._create_all_spike_sources()
 
         assert len(net.common_feeds) == 2  # (distal & proximal)
         for ei in net.common_feeds:
