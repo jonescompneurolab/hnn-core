@@ -129,7 +129,7 @@ class Network(object):
 
         print('Building the NEURON model')
         from neuron import h
-        self._create_all_src()
+        self._create_all_spike_sources()
         self.state_init()
         self._parnet_connect()
 
@@ -299,7 +299,20 @@ class Network(object):
             if gid in gids:
                 return gidtype
 
-    def _create_all_src(self):
+    def _get_src_type_and_pos(self, gid):
+        """Source type, position and whether it's a cell or artificial feed"""
+
+        # get type of cell and pos via gid
+        src_type = self.gid_to_type(gid)
+        type_pos_ind = gid - self.gid_dict[src_type][0]
+        src_pos = self.pos_dict[src_type][type_pos_ind]
+
+        real_cell_types = ['L2_pyramidal', 'L5_pyramidal',
+                           'L2_basket', 'L5_basket']
+
+        return src_type, src_pos, src_type in real_cell_types
+
+    def _create_all_spike_sources(self):
         """Parallel create cells AND external inputs (feeds)
            these are spike SOURCES but cells are also targets
            external inputs are not targets.
@@ -309,68 +322,70 @@ class Network(object):
 
         # loop through gids on this node
         for gid in self._gid_list:
+
+            src_type, src_pos, is_cell = self._get_src_type_and_pos(gid)
+
             # check existence of gid with Neuron
-            if pc.gid_exists(gid):
-                # get type of cell and pos via gid
-                # now should be valid for ext inputs
-                cell_type = self.gid_to_type(gid)
-                type_pos_ind = gid - self.gid_dict[cell_type][0]
-                pos = self.pos_dict[cell_type][type_pos_ind]
+            if not pc.gid_exists(gid):
+                msg = ('Source of type %s with ID %d does not exists in '
+                       'Network' % (src_type, gid))
+                raise RuntimeError(msg)
+
+            if is_cell:  # not a feed
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 # creates a NetCon object internally to Neuron
                 type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
-                # first check for actual cell types
-                if cell_type in ('L2_pyramidal', 'L5_pyramidal', 'L2_basket',
-                                 'L5_basket'):
-                    Cell = type2class[cell_type]
-                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                        self.cells.append(Cell(gid, pos, self.params))
-                    else:
-                        self.cells.append(Cell(gid, pos))
-                    pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.params['threshold']))
-                # external inputs are special types of pseudo-cells
-                elif cell_type == 'common':
-                    # print('cell_type',cell_type)
-                    # to find param index, take difference between REAL gid
-                    # here and gid start point of the items
-                    p_ind = gid - self.gid_dict['common'][0]
-
-                    # new ExtFeed: cell type irrelevant (None) since input
-                    # timing is unaffected by it; cell_type == feed_type
-                    self.common_feeds.append(
-                        ExtFeed(cell_type, None, self.p_common[p_ind], gid))
-
-                    # now use the param index in the params and create
-                    # the cell and artificial NetCon
-                    pc.cell(
-                        gid, self.common_feeds[-1].connect_to_target(
-                            self.params['threshold']))
-
-                # external inputs can also be Poisson- or Gaussian-
-                # distributed, or 'evoked' inputs (proximal or distal)
-                elif cell_type in self.p_unique.keys():
-                    gid_post = gid - self.gid_dict[cell_type][0]
-                    feed_type = cell_type  # purely for code clarity below
-                    cell_type = self.gid_to_type(gid_post)
-
-                    # new ExtFeed, where now both feed and cell type specified
-                    # because these feeds have cell-specific parameters
-                    self.unique_feeds[feed_type].append(
-                        ExtFeed(feed_type, cell_type,
-                                self.p_unique[feed_type], gid))
-                    pc.cell(gid,
-                            self.unique_feeds[feed_type][-1].connect_to_target(
-                                self.params['threshold']))
+                Cell = type2class[src_type]
+                if src_type in ('L2_pyramidal', 'L5_pyramidal'):
+                    self.cells.append(Cell(gid, src_pos, self.params))
                 else:
-                    print("None of these types in Net()")
-                    exit()
+                    self.cells.append(Cell(gid, src_pos))
+
+                pc.cell(gid, self.cells[-1].connect_to_target(
+                        None, self.params['threshold']))
+
+            # external inputs are special types of pseudo-cells
+            # 'common': all cells impacted with identical TIMING of spike
+            # events. NB: cell types can still have different weights for how
+            # such 'common' spikes influence them
+            elif src_type == 'common':
+                # print('cell_type',cell_type)
+                # to find param index, take difference between REAL gid
+                # here and gid start point of the items
+                p_ind = gid - self.gid_dict['common'][0]
+
+                # new ExtFeed: target cell type irrelevant (None) since input
+                # timing will be identical for all cells
+                # XXX common_feeds is a list of dict (comp. unique_feeds)
+                self.common_feeds.append(
+                    ExtFeed(src_type, None, self.p_common[p_ind], gid))
+
+                # now use the param index in the params and create
+                # the cell and artificial NetCon
+                pc.cell(gid, self.common_feeds[-1].connect_to_target(
+                        self.params['threshold']))
+
+            # external inputs can also be Poisson- or Gaussian-
+            # distributed, or 'evoked' inputs (proximal or distal)
+            # these are cell-specific ('unique')
+            elif src_type in self.p_unique.keys():
+                gid_target = gid - self.gid_dict[src_type][0]
+                target_cell_type = self.gid_to_type(gid_target)
+
+                # new ExtFeed, where now both feed type and target cell type
+                # specified because these feeds have cell-specific parameters
+                # XXX unique_feeds is a dict of dict (comp. common_feeds)
+                self.unique_feeds[src_type].append(
+                    ExtFeed(src_type, target_cell_type,
+                            self.p_unique[src_type], gid))
+                pc.cell(gid,
+                        self.unique_feeds[src_type][-1].connect_to_target(
+                            self.params['threshold']))
             else:
-                print("None of these types in Net()")
-                exit()
+                raise ValueError('No parameters specified for external feed '
+                                 'type: %s' % src_type)
 
     # connections:
     # this NODE is aware of its cells as targets

@@ -22,7 +22,13 @@ class ExtFeed(object):
         'extgauss' : Gaussian-distributed input to proximal dendrites
         'evprox' : Proximal input at specified time (or Gaussian spread)
         'evdist' : Distal input at specified time (or Gaussian spread)
-        'common' : Common inputs to all cells (locations parameter-dependent)
+
+        'common' : As opposed to other feed types, these have timing that is
+        identical (synchronous) for all real cells in the network. Proximal
+        and distal dendrites have separate parameter sets, and need not be
+        synchronous. Note that not all cells classes (types) are required to
+        receive 'common' input---separate conductivity values can be assigned
+        to basket vs. pyramidal cells and AMPA vs. NMDA synapses
     cell_type : str | None
         The cell type, e.g., 'L2_basket', 'L5_pyramidal', etc., or None for
         common inputs (cell population-level weights for common inputs
