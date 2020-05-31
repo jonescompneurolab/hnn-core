@@ -5,9 +5,6 @@ jobs:
     build_docs:
       docker:
           - image: circleci/python:3.8.1-buster
-      environment:
-          install_prefix: ~
-          PATH: "{PATH}:${install_prefix}/x86_64/bin"
       steps:
           - checkout
           - run:
@@ -44,6 +41,7 @@ jobs:
                 make install -j4
                 cd src/nrnpython/
                 python3 setup.py install
+                PATH="{PATH}:${install_prefix}/x86_64/bin"
 
           - run:
               name: Setup hnn-core
