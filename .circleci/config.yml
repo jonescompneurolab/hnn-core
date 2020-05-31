@@ -32,7 +32,7 @@ jobs:
           - run:
               name: Setup Neuron
               command: |
-                sudo apt-get install libopenmpi-dev
+                sudo apt-get install libopenmpi-dev bison flex libncurses-dev
                 git clone https://github.com/neuronsimulator/nrn
                 cd nrn
                 ./build.sh
