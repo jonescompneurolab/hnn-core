@@ -2,12 +2,12 @@
 version: 2.1
 
 jobs:
-  docs-build:
+  build_docs:
     docker:
       - image: circleci/python:3.8.1-buster
-    environment:
-      install_prefix: ~
-      PATH: "{PATH}:${install_prefix}/x86_64/bin"
+    # environment:
+    #  install_prefix: ~
+    #  PATH: "{PATH}:${install_prefix}/x86_64/bin"
     steps:
 
         - checkout
