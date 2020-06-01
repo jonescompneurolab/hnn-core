@@ -51,6 +51,7 @@ jobs:
               name: Build the documentation
               command: |
                   export PYTHONPATH="/usr/local/nrn/lib/python/:$PYTHONPATH"
+                  export LD_LIBRARY_PATH=~/miniconda/lib
                   source activate testenv
                   cd doc/ && make html
 
