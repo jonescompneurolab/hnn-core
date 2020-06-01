@@ -48,7 +48,7 @@ jobs:
               name: Build the documentation
               command: |
                   source activate testenv
-                  make build-doc
+                  cd doc/ && make html
 
           - persist_to_workspace:
               root: doc/_build
