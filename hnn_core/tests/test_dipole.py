@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 import hnn_core
-from hnn_core import read_params, import_dipole
+from hnn_core import read_params, read_dipole
 from hnn_core.dipole import Dipole
 
 matplotlib.use('agg')
@@ -26,7 +26,7 @@ def test_dipole():
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
     dipole.plot(layer='agg')
     dipole.write(dpl_out_fname)
-    dipole_read = import_dipole(dpl_out_fname)
+    dipole_read = read_dipole(dpl_out_fname)
     assert_array_equal(dipole_read.t, dipole.t.round(3))
     for dpl_key in dipole.dpl.keys():
         assert_array_equal(dipole_read.dpl[dpl_key],

@@ -134,7 +134,7 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     return dpl
 
 
-def import_dipole(fname, units='nAm'):
+def read_dipole(fname, units='nAm'):
     """Read dipole values from a file and create a Dipole instance.
 
     Parameters
