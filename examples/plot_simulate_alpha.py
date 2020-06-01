@@ -33,9 +33,9 @@ print(params)
 params.update({
     'dipole_scalefctr': 150000.0,
     'dipole_smooth_win': 0,
-    'tstop': 710.0,
+    'tstop': 310.0,
     't0_input_prox': 2000.0,
-    'tstop_input_prox': 710.0,
+    'tstop_input_prox': 310.0,
     't0_input_dist': 50.0,
     'tstop_input_dist': 1001.0,
     't_evprox_1': 1000,
