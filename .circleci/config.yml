@@ -1,4 +1,5 @@
 # See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
+# XXX: anaconda must be installed before Neuron. See: https://github.com/neuronsimulator/nrn/issues/410
 version: 2.1
 
 jobs:
@@ -7,6 +8,19 @@ jobs:
           - image: circleci/python:3.8.1-buster
       steps:
           - checkout
+
+          - run:
+              name: Setup Neuron
+              command: |
+                install_prefix=~
+                sudo apt-get install libopenmpi-dev bison flex libncurses-dev
+                git clone https://github.com/neuronsimulator/nrn
+                cd nrn
+                ./build.sh
+                ./configure --with-nrnpython=python3 --without-iv --prefix=${install_prefix}
+                make -j4
+                make install -j4
+
           - run:
               name: Install miniconda
               command: |
@@ -15,6 +29,7 @@ jobs:
                   chmod +x ~/miniconda.sh;
                   ~/miniconda.sh -b -p ~/miniconda;
                   echo "export PATH=~/miniconda/bin:$PATH" >> $BASH_ENV;
+
           - run:
               name: Setup Python environment
               command: |
@@ -29,16 +44,11 @@ jobs:
               command: |
                 pip install sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow
 
+
           - run:
-              name: Setup Neuron
+              name: Setup Neuron-Python
               command: |
-                sudo apt-get install libopenmpi-dev bison flex libncurses-dev
-                git clone https://github.com/neuronsimulator/nrn
-                cd nrn
-                ./build.sh
-                ./configure --with-nrnpython=python3 --without-iv --prefix=${install_prefix}
-                make -j4
-                make install -j4
+                install_prefix=~
                 cd src/nrnpython/
                 python3 setup.py install
                 PATH="{PATH}:${install_prefix}/x86_64/bin"
