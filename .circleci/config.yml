@@ -21,28 +21,31 @@ jobs:
           - run:
               name: Setup Python environment
               command: |
-                conda update --yes --quiet conda
-                conda create -n testenv --yes pip python=3.6
-                source activate testenv
-                conda install --yes scipy numpy matplotlib
-                pip install mne
+                  conda update --yes --quiet conda
+                  conda create -n testenv --yes pip python=3.6
+                  source activate testenv
+                  conda install --yes scipy numpy matplotlib
+                  pip install mne
 
           - run:
               name: Setup doc building stuff
               command: |
-                pip install sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow
+                  source activate testenv
+                  pip install sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow
 
           - run:
               name: Setup Neuron
               command: |
-                   wget https://neuron.yale.edu/ftp/neuron/versions/v7.7/nrn-7.7.x86_64-linux.deb
-                   sudo apt install ./nrn-7.7.x86_64-linux.deb
+                  source activate testenv
+                  wget https://neuron.yale.edu/ftp/neuron/versions/v7.7/nrn-7.7.x86_64-linux.deb
+                  sudo apt install ./nrn-7.7.x86_64-linux.deb
 
           - run:
               name: Setup hnn-core
               command: |
-                make
-                python setup.py develop
+                  source activate testenv
+                  make
+                  python setup.py develop
 
           - run:
               name: Build the documentation
