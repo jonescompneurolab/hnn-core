@@ -50,6 +50,7 @@ jobs:
           - run:
               name: Build the documentation
               command: |
+                  export PYTHONPATH="/usr/local/nrn/lib/python/:$PYTHONPATH"
                   source activate testenv
                   cd doc/ && make html
 
