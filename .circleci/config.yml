@@ -1,0 +1,65 @@
+# See: https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
+version: 2.1
+
+jobs:
+    build_docs:
+      docker:
+          - image: circleci/python:3.8.1-buster
+      steps:
+          - checkout
+
+          - run:
+              name: Install miniconda
+              command: |
+                  sudo apt-get install wget
+                  wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh;
+                  chmod +x ~/miniconda.sh;
+                  ~/miniconda.sh -b -p ~/miniconda;
+                  echo "export PATH=~/miniconda/bin:$PATH" >> $BASH_ENV;
+
+          - run:
+              name: Setup Python environment
+              command: |
+                  conda update --yes --quiet conda
+                  conda create -n testenv --yes pip python=3.6
+                  source activate testenv
+                  conda install --yes scipy numpy matplotlib
+                  pip install mne
+
+          - run:
+              name: Setup doc building stuff
+              command: |
+                  source activate testenv
+                  pip install sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow
+
+          - run:
+              name: Setup Neuron
+              command: |
+                  source activate testenv
+                  pip install NEURON
+
+          - run:
+              name: Setup hnn-core
+              command: |
+                  source activate testenv
+                  make
+                  python setup.py develop
+
+          - run:
+              name: Build the documentation
+              command: |
+                  source activate testenv
+                  cd doc/ && make html
+
+          - persist_to_workspace:
+              root: doc/_build
+              paths: html
+
+          - store_artifacts:
+              path: doc/_build/html/
+              destination: html
+
+workflows:
+  build:
+    jobs:
+      - build_docs
