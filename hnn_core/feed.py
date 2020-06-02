@@ -81,7 +81,7 @@ class ExtFeed(object):
                 if self.params['sync_evinput']:
                     self.seed = self.params['prng_seedcore']
                 else:
-                    self.seed = self.params['prng_seedcore'] + self.gid - 2
+                    self.seed = self.params['prng_seedcore'] + self.gid
             elif self.feed_type.startswith('common'):
                 # seed for events assuming a given start time
                 self.seed = self.params['prng_seedcore'] + self.gid
