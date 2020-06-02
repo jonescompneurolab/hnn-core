@@ -136,7 +136,7 @@ class ExtFeed(object):
         # check the t interval
         t0 = self.params['t_interval'][0]
         T = self.params['t_interval'][1]
-        lamtha = self.params[self.cell_type][3]  # index 3 is frequency (lamtha)
+        lamtha = self.params[self.cell_type][3]  # ind 3 is frequency (lamtha)
         # values MUST be sorted for VecStim()!
         # start the initial value
         if lamtha > 0.:
@@ -167,7 +167,7 @@ class ExtFeed(object):
         if self.cell_type in self.params.keys():
             # assign the params
             mu = self.params['t0'] + inc
-            sigma = self.params[self.cell_type][3]  # index 3 is sigma_t (stdev)
+            sigma = self.params[self.cell_type][3]  # ind 3 is sigma_t (stdev)
             numspikes = int(self.params['numspikes'])
             # if a non-zero sigma is specified
             if sigma:
