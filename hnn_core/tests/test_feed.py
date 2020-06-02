@@ -25,13 +25,15 @@ def test_extfeed():
     pytest.raises(ValueError, ExtFeed,
                   'ev', None, p_bogus, 0)  # ambiguous
 
+    # XXX 'unique' external feeds are always created; why?
     for feed_type in ['extpois', 'extgauss']:
         feed = ExtFeed(feed_type=feed_type,
                        target_cell_type='L2_basket',
                        params=p_unique[feed_type],
                        gid=0)
         print(feed)  # test repr
-    for ii in range(2):  # distal and proximal
+    # XXX but 'common' (rhythmic) feeds are not
+    for ii in range(len(p_common)):  # len == 0 for def. params
         feed = ExtFeed(feed_type='common',
                        target_cell_type=None,
                        params=p_common[ii],
@@ -68,7 +70,7 @@ def test_external_common_feeds():
             assert len(ei.nrn_eventvec.as_numpy()) > 0
 
             # check that ei.p_ext matches params
-            loc = ei.p_ext['loc'][:4]  # loc=prox or dist
+            loc = ei.params['loc'][:4]  # loc=prox or dist
             for layer in ['L2', 'L5']:
                 key = 'input_{}_A_weight_{}Pyr_ampa'.format(loc, layer)
-                assert ei.p_ext[layer + 'Pyr_ampa'][0] == params[key]
+                assert ei.params[layer + 'Pyr_ampa'][0] == params[key]

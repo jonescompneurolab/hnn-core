@@ -54,7 +54,7 @@ class ExtFeed(object):
         # VecStim setup
         self.nrn_eventvec = h.Vector()
         self.nrn_vecstim = h.VecStim()
-        self.p_ext = params
+        self.params = params
         # used to determine cell type-specific parameters for
         # (not used for 'common', such as for rhythmic alpha/beta input)
         self.cell_type = target_cell_type
@@ -73,22 +73,22 @@ class ExtFeed(object):
         return repr_str
 
     def set_prng(self, seed=None):
-        if seed is None:  # no seed specified then use p_ext to determine seed
+        if seed is None:  # no seed specified then use params to determine seed
             # random generator for this instance
             # qnd hack to make the seeds the same across all gids
             # for just evoked
             if self.feed_type.startswith(('evprox', 'evdist')):
-                if self.p_ext['sync_evinput']:
-                    self.seed = self.p_ext['prng_seedcore']
+                if self.params['sync_evinput']:
+                    self.seed = self.params['prng_seedcore']
                 else:
-                    self.seed = self.p_ext['prng_seedcore'] + self.gid - 2
+                    self.seed = self.params['prng_seedcore'] + self.gid - 2
             elif self.feed_type.startswith('common'):
                 # seed for events assuming a given start time
-                self.seed = self.p_ext['prng_seedcore'] + self.gid
+                self.seed = self.params['prng_seedcore'] + self.gid
                 # separate seed for start times
-                self.seed2 = self.p_ext['prng_seedcore']
+                self.seed2 = self.params['prng_seedcore']
             else:
-                self.seed = self.p_ext['prng_seedcore'] + self.gid
+                self.seed = self.params['prng_seedcore'] + self.gid
         else:  # if seed explicitly specified use it
             self.seed = seed
             if hasattr(self, 'seed2'):
@@ -96,7 +96,6 @@ class ExtFeed(object):
         self.prng = np.random.RandomState(self.seed)
         if hasattr(self, 'seed2'):
             self.prng2 = np.random.RandomState(self.seed2)
-        # print('feed_type,seed:',self.feed_type,self.seed)
 
     def set_event_times(self, inc_evinput=0.0):
 
@@ -131,14 +130,13 @@ class ExtFeed(object):
 
     # new external pois designation
     def _create_extpois(self):
-        # print("_create_extpois")
-        if self.p_ext[self.cell_type][0] <= 0.0 and \
-                self.p_ext[self.cell_type][1] <= 0.0:
+        if self.params[self.cell_type][0] <= 0.0 and \
+                self.params[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
         # check the t interval
-        t0 = self.p_ext['t_interval'][0]
-        T = self.p_ext['t_interval'][1]
-        lamtha = self.p_ext[self.cell_type][3]  # index 3 is frequency (lamtha)
+        t0 = self.params['t_interval'][0]
+        T = self.params['t_interval'][1]
+        lamtha = self.params[self.cell_type][3]  # index 3 is frequency (lamtha)
         # values MUST be sorted for VecStim()!
         # start the initial value
         if lamtha > 0.:
@@ -166,12 +164,11 @@ class ExtFeed(object):
 
     # mu and sigma vals come from p
     def _create_evoked(self, inc=0.0):
-        if self.cell_type in self.p_ext.keys():
+        if self.cell_type in self.params.keys():
             # assign the params
-            mu = self.p_ext['t0'] + inc
-            sigma = self.p_ext[self.cell_type][3]  # index 3 is sigma_t (stdev)
-            numspikes = int(self.p_ext['numspikes'])
-            # print('mu:',mu,'sigma:',sigma,'inc:',inc)
+            mu = self.params['t0'] + inc
+            sigma = self.params[self.cell_type][3]  # index 3 is sigma_t (stdev)
+            numspikes = int(self.params['numspikes'])
             # if a non-zero sigma is specified
             if sigma:
                 val_evoked = self.prng.normal(mu, sigma, numspikes)
@@ -181,7 +178,6 @@ class ExtFeed(object):
             val_evoked = val_evoked[val_evoked > 0]
             # vals must be sorted
             val_evoked.sort()
-            # print('_create_evoked val_evoked:',val_evoked)
             self.nrn_eventvec.from_python(val_evoked)
         else:
             # return an empty eventvec list
@@ -190,12 +186,11 @@ class ExtFeed(object):
 
     def _create_extgauss(self):
         # assign the params
-        if self.p_ext[self.cell_type][0] <= 0.0 and \
-                self.p_ext[self.cell_type][1] <= 0.0:
+        if self.params[self.cell_type][0] <= 0.0 and \
+                self.params[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
-        # print('gauss params:',self.p_ext[self.cell_type])
-        mu = self.p_ext[self.cell_type][3]
-        sigma = self.p_ext[self.cell_type][4]
+        mu = self.params[self.cell_type][3]
+        sigma = self.params[self.cell_type][4]
         # mu and sigma values come from p
         # one single value from Gaussian dist.
         # values MUST be sorted for VecStim()!
@@ -215,33 +210,32 @@ class ExtFeed(object):
 
         Used for, e.g., for rhythmic inputs in alpha/beta generation
         """
-        # print("_create_common_input")
         # Return if all synaptic weights are 0
         all_syn_weights_zero = True
-        for key in self.p_ext.keys():
+        for key in self.params.keys():
             if key.startswith('L2Pyr') or \
                     key.startswith('L5Pyr') or \
                     key.startswith('L2Bask') or \
                     key.startswith('L5Bask'):
-                if self.p_ext[key][0] > 0.0:
+                if self.params[key][0] > 0.0:
                     all_syn_weights_zero = False
         if all_syn_weights_zero:
             return False
 
         # store f_input as self variable for later use if it exists in p
         # t0 is always defined
-        t0 = self.p_ext['t0']
+        t0 = self.params['t0']
         # If t0 is -1, randomize start time of inputs
         if t0 == -1:
             t0 = self.prng.uniform(25., 125.)
         # randomize start time based on t0_stdev
-        elif self.p_ext['t0_stdev'] > 0.0:
+        elif self.params['t0_stdev'] > 0.0:
             # start time uses different prng
-            t0 = self.prng2.normal(t0, self.p_ext['t0_stdev'])
-        f_input = self.p_ext['f_input']
-        stdev = self.p_ext['stdev']
-        events_per_cycle = self.p_ext['events_per_cycle']
-        distribution = self.p_ext['distribution']
+            t0 = self.prng2.normal(t0, self.params['t0_stdev'])
+        f_input = self.params['f_input']
+        stdev = self.params['stdev']
+        events_per_cycle = self.params['events_per_cycle']
+        distribution = self.params['distribution']
         # events_per_cycle = 1
         if events_per_cycle > 2 or events_per_cycle <= 0:
             print("events_per_cycle should be either 1 or 2, trying 2")
@@ -251,11 +245,11 @@ class ExtFeed(object):
             t_input = []
         elif distribution == 'normal':
             # array of mean stimulus times, starts at t0
-            isi_array = np.arange(t0, self.p_ext['tstop'], 1000. / f_input)
+            isi_array = np.arange(t0, self.params['tstop'], 1000. / f_input)
             # array of single stimulus times -- no doublets
             if stdev:
                 t_array = self.prng.normal(
-                    np.repeat(isi_array, self.p_ext['repeats']), stdev)
+                    np.repeat(isi_array, self.params['repeats']), stdev)
             else:
                 t_array = isi_array
             if events_per_cycle == 2:  # spikes/burst in GUI
@@ -273,9 +267,9 @@ class ExtFeed(object):
             t_input.sort()
         # Uniform Distribution
         elif distribution == 'uniform':
-            n_inputs = self.p_ext['repeats'] * \
-                f_input * (self.p_ext['tstop'] - t0) / 1000.
-            t_array = self.prng.uniform(t0, self.p_ext['tstop'], n_inputs)
+            n_inputs = self.params['repeats'] * \
+                f_input * (self.params['tstop'] - t0) / 1000.
+            t_array = self.prng.uniform(t0, self.params['tstop'], n_inputs)
             if events_per_cycle == 2:
                 # Two arrays store doublet times
                 t_input_low = t_array - 5
@@ -298,7 +292,6 @@ class ExtFeed(object):
         return self.nrn_eventvec.size() > 0
 
     def connect_to_target(self, threshold):
-        # print("connect_to_target")
         nc = h.NetCon(self.nrn_vecstim, None)  # why is target always None??
         nc.threshold = threshold
         return nc
