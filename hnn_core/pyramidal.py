@@ -872,7 +872,8 @@ class L5Pyr(Pyr):
                       'L2_basket', 'L2Basket', lamtha=50.,
                       postsyns=[self.apicaltuft_gabaa])
 
-    # receive from external inputs
+    # receive from common inputs
+    # XXX check NetCon connections for proximal inputs with zero weights
     def parreceive(self, gid, gid_dict, pos_dict, p_ext):
         for gid_src, p_src, pos in zip(gid_dict['common'],
                                        p_ext, pos_dict['common']):
