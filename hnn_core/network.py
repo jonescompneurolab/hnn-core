@@ -346,7 +346,7 @@ class Network(object):
                 pc.cell(gid, self.cells[-1].connect_to_target(
                         None, self.params['threshold']))
 
-            # external inputs are special types of pseudo-cells
+            # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
             # events. NB: cell types can still have different weights for how
             # such 'common' spikes influence them
@@ -358,15 +358,14 @@ class Network(object):
 
                 # new ExtFeed: target cell type irrelevant (None) since input
                 # timing will be identical for all cells
-                # XXX common_feeds is a list of dict (comp. unique_feeds)
+                # XXX common_feeds is a list of dict
                 self.common_feeds.append(
                     ExtFeed(feed_type=src_type,
                             target_cell_type=None,
                             params=self.p_common[p_ind],
                             gid=gid))
 
-                # now use the param index in the params and create
-                # the cell and artificial NetCon
+                # create the cell and artificial NetCon
                 pc.cell(gid, self.common_feeds[-1].connect_to_target(
                         self.params['threshold']))
 
@@ -379,7 +378,7 @@ class Network(object):
 
                 # new ExtFeed, where now both feed type and target cell type
                 # specified because these feeds have cell-specific parameters
-                # XXX unique_feeds is a dict of dict (comp. common_feeds)
+                # XXX unique_feeds is a dict of dict
                 self.unique_feeds[src_type].append(
                     ExtFeed(feed_type=src_type,
                             target_cell_type=target_cell_type,
