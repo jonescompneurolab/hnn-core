@@ -13,6 +13,51 @@ from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import create_pext
 
+def read_spikes(self, fname, gid_dict=None):
+    """Read spike times from a file.
+
+    Parameters
+    ----------
+    fname : str
+        String format (e.g., '<pathname>/spk_*.txt') of the full
+        path to the spike file(s).
+    gid_dict : dict | None
+        Dictionary with keys 'evprox1', 'evdist1' etc.
+        containing the range of Cell or input IDs of different
+        cell or input types. If None, each spike file must contain
+        a 3rd column for spike type.
+
+    Returns
+    ----------
+    spikes : Spikes object
+        An instance of the Spikes object.
+    """
+    from glob import glob
+
+    spiketimes = ();
+    spikegids = ();
+    spiketypes = ();
+    for file in glob(fname):
+        spike_trial = np.loadtxt(file, dtype=str)
+        spiketimes = spiketimes + (list(spike_trial[:, 0].astype(float)),)
+        spikegids = spikegids + (list(spike_trial[:, 1].astype(float)),)
+
+        # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
+        # spike type. If reading a legacy version, validate that a gid_dict is
+        # provided.
+        if spike_data.shape[0] == 3:
+            spiketypes = spiketypes + (list(spike_trial[:, 2].astype(str)),)
+        else:
+            assert (gid_dict is not None, "Error: gid_dict must be provided \
+                if spike types are unspecified in 'spk.txt' file")
+            spiketypes_trial = np.empty((spike_data.shape[1], 1), dtype=str)
+            for gidtype, gids in self.gid_dict.items():
+                spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
+                spiketypes_trial[spikegids_mask] = gidtype
+            spiketypes = spiketypes + (spiketypes_trial,)
+
+    return Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
+
 
 class Network(object):
     """The Network class.
@@ -30,7 +75,8 @@ class Network(object):
         The list of cells
     gid_dict : dict
         Dictionary with keys 'evprox1', 'evdist1' etc.
-        containing the range of Cell IDs of different cell types.
+        containing the range of Cell IDs of different cell
+        (or input) types.
     extfeed_list : dictionary of list of ExtFeed.
         Keys are:
             'evprox1', 'evprox2', etc.
@@ -513,8 +559,62 @@ class Network(object):
             plt.show()
         return ax.get_figure()
 
-    def plot_spikes(self, ax=None, show=True):
-        """Plot the spiking activity for each cell type.
+
+# spikes.write()
+# fname = 'myexperiment_%d.txt'
+# net.spikes.write(fname)
+# from hnn_core import read_spikes
+# spikes = read_spikes(fname)
+# spikes.plot()
+
+class Spikes(object):
+    '''The Spikes class.
+
+    Parameters
+    ----------
+    times : tuple (n_trials, ) of list of float | None
+        Each element of the tuple is a trial.
+        The list contains the time stamps of spikes.
+    gids : tuple (n_trials, ) of list of float | None
+        Each element of the tuple is a trial.
+        The list contains the cell IDs of neurons that spiked.
+    types : tuple (n_trials, ) of list of float | None
+        Each element of the tuple is a trial.
+        The list contains the type of spike (e.g., evprox1 or
+        L2_pyramidal) that occured at the corresonding time stamp.
+        Each gid corresponds to a type via Network::gid_dict.
+
+    Attributes
+    ----------
+    times : tuple (n_trials, ) of list of float
+        Each element of the tuple is a trial.
+        The list contains the time stamps of spikes.
+    gids : tuple (n_trials, ) of list of float
+        Each element of the tuple is a trial.
+        The list contains the cell IDs of neurons that spiked.
+    types : tuple (n_trials, ) of list of float
+        Each element of the tuple is a trial.
+        The list contains the type of spike (e.g., evprox1 or
+        L2_pyramidal) that occured at the corresonding time stamp.
+        Each gid corresponds to a type via Network::gid_dict.
+
+    Methods
+    -------
+    plot : plot and return a matplotlib Figure object showing the
+        aggregate network spiking activity according to cell type
+    write : write spike times to a file
+    '''
+
+    def __init__(self, times=None, gids=None, types=None):
+        self.times = times
+        if times is None:
+            self.times = h.Vector()
+        self.gids = gids
+        self.types = types
+
+    def plot(self, ax=None, show=True):
+        """Plot the aggregate spiking activity according to cell
+        type.
 
         Parameters
         ----------
@@ -530,18 +630,15 @@ class Network(object):
             The matplotlib figure object
         """
         import matplotlib.pyplot as plt
-        spikes = np.array(sum(self.spiketimes, []))
-        gids = np.array(sum(self.spikegids, []))
-        spike_times = np.zeros((4, spikes.shape[0]))
+        spiketimes = np.array(sum(self.times, []))
+        spiketypes = np.array(sum(self.types, []))
         cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-        for idx, key in enumerate(cell_types):
-            mask = np.in1d(gids, self.gid_dict[key])
-            spike_times[idx, mask] = spikes[mask]
+        spiketimes_cell = [spiketimes[spiketypes==cell_type] for cell_type in cell_types]
 
         if ax is None:
             fig, ax = plt.subplots(1, 1)
 
-        ax.eventplot(spike_times, colors=['r', 'b', 'g', 'w'])
+        ax.eventplot(spiketimes_cell, colors=['r', 'b', 'g', 'w'])
         ax.legend(cell_types, ncol=2)
         ax.set_facecolor('k')
         ax.set_xlabel('Time (ms)')
@@ -552,75 +649,31 @@ class Network(object):
             plt.show()
         return ax.get_figure()
 
-    def write_spikes(self, fname, trial_idx=None):
+    def write(self, fname):
         """Write spike times to a file.
 
         Parameters
         ----------
         fname : str
-            Full path to the output file (.txt)
+            String format (e.g., '<pathname>/spk_%d.txt') of the full
+            path to the output spike file(s).
         trial_idx : list of int
             Indices of selected trials. If None,
             all trials are selected.
 
         Outputs
         -------
-        txt file at fname where rows correspond to
-            spikes and columns, delimited by '\\t',
-            correspond to 1) spike time (s),
-            2) spike gid, and 3) gid type
+        A numerically labelled txt file for each trial
+            where rows correspond to spikes, and columns,
+            delimited by '\\t', correspond to
+            1) spike time (s),
+            2) spike gid, and
+            3) gid type
         """
-        if trial_idx is None:
-            trial_idx = range(len(self.spiketimes))
-
-        spiketimes = []
-        spikegids = []
-        for idx in trial_idx:
-            spiketimes += self.spiketimes[idx]
-            spikegids += self.spikegids[idx]
-
-        gidtypes = np.empty_like(spikegids, dtype='<U36')
-        for spike_type, gid_range in self.gid_dict.items():
-            gidtypes[np.in1d(spikegids, gid_range)] = spike_type
-
-        with open(fname, 'w') as f:
-            for spk_idx in range(len(spiketimes)):
-                f.write('{:.3f}\t{}\t{}\n'.format(spiketimes[spk_idx],
-                        int(spikegids[spk_idx]), gidtypes[spk_idx]))
-
-    def read_spikes(self, fname, append_trial=True):
-        """Read spike times from a file.
-
-        Parameters
-        ----------
-        fname : str
-            Full path to the input file (.txt)
-        append_trials : bool
-            If True, append the contents of fname
-            (i.e., as a trial) to the spike-related
-            attributes of Network instance. If False,
-            all spikes of the Network instance will
-            be overwritten.
-        """
-        spike_data = np.loadtxt(fname, dtype=str)
-        spiketimes = spike_data[:, 0].astype(float)
-        spikegids = spike_data[:, 1].astype(float)
-
-        # Note that legacy HNN 'spk.txt' files contain only 2 columns
-        # Handle 3-column version with gid validation
-        if spike_data.shape[0] == 3:
-            gid_types = spike_data[:, 2].astype(str)
-            for gid_type in np.unique(gid_types):
-                gid_type_max = np.max(spikegids[gid_types == gid_type])
-                gid_type_min = np.min(spikegids[gid_types == gid_type])
-                assert (gid_type_max in self.gid_dict.get(gid_type, [None]) and
-                        gid_type_min in self.gid_dict.get(gid_type, [None])), \
-                    "Error: gids in %s are incompatible with the current \
-                    network" % (fname,)
-
-        if append_trial is True:
-            self.spiketimes = self.spiketimes + (list(spiketimes),)
-            self.spikegids = self.spikegids + (list(spikegids),)
-        else:
-            self.spiketimes = (list(spiketimes),)
-            self.spikegids = (list(spikegids),)
+        for trial_idx in range(len(self.spikes.times)):
+            with open(fname % (trial_idx,), 'w') as f:
+                for spk_idx in range(len(spiketimes)):
+                    f.write('{:.3f}\t{}\t{}\n'.format(
+                        self.times[trial_idx][spk_idx],
+                        int(self.gids[trial_idx][spk_idx]),
+                        self.types[trial_idx][spk_idx]))
