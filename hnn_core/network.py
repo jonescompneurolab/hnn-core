@@ -607,6 +607,18 @@ class Spikes(object):
         self.gids = gids
         self.types = types
 
+    def __eq__(self, other):
+        if not isinstance(other, Spikes):
+            return NotImplemented
+        # Round each element of each list within the tuple
+        times_self = [[round(time, 3) for time in trial]
+                      for trial in self.times]
+        times_other = [[round(time, 3) for time in trial]
+                       for trial in other.times]
+        return (times_self == times_other and
+                self.gids == other.gids and
+                self.types == other.types)
+
     def plot(self, ax=None, show=True):
         """Plot the aggregate spiking activity according to cell
         type.
