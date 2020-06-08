@@ -13,13 +13,15 @@ from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import create_pext
 
-def read_spikes(self, fname, gid_dict=None):
-    """Read spike times from a file.
+
+def read_spikes(fname, gid_dict=None):
+    """Read spiking activity from a collection of spike trial
+    files.
 
     Parameters
     ----------
     fname : str
-        String format (e.g., '<pathname>/spk_*.txt') of the full
+        Wildcard expression (e.g., '<pathname>/spk_*.txt') of the
         path to the spike file(s).
     gid_dict : dict | None
         Dictionary with keys 'evprox1', 'evdist1' etc.
@@ -34,10 +36,10 @@ def read_spikes(self, fname, gid_dict=None):
     """
     from glob import glob
 
-    spiketimes = ();
-    spikegids = ();
-    spiketypes = ();
-    for file in glob(fname):
+    spiketimes = ()
+    spikegids = ()
+    spiketypes = ()
+    for file in sorted(glob(fname)):
         spike_trial = np.loadtxt(file, dtype=str)
         spiketimes = spiketimes + (list(spike_trial[:, 0].astype(float)),)
         spikegids = spikegids + (list(spike_trial[:, 1].astype(float)),)
@@ -45,13 +47,13 @@ def read_spikes(self, fname, gid_dict=None):
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
         # spike type. If reading a legacy version, validate that a gid_dict is
         # provided.
-        if spike_data.shape[0] == 3:
+        if spike_trial.shape[1] == 3:
             spiketypes = spiketypes + (list(spike_trial[:, 2].astype(str)),)
         else:
-            assert (gid_dict is not None, "Error: gid_dict must be provided \
-                if spike types are unspecified in 'spk.txt' file")
-            spiketypes_trial = np.empty((spike_data.shape[1], 1), dtype=str)
-            for gidtype, gids in self.gid_dict.items():
+            assert gid_dict is not None, "Error: gid_dict must be provided \
+            if spike types are unspecified in 'spk.txt' file"
+            spiketypes_trial = np.empty((spike_trial.shape[1], 1), dtype=str)
+            for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
                 spiketypes_trial[spikegids_mask] = gidtype
             spiketypes = spiketypes + (spiketypes_trial,)
@@ -560,13 +562,6 @@ class Network(object):
         return ax.get_figure()
 
 
-# spikes.write()
-# fname = 'myexperiment_%d.txt'
-# net.spikes.write(fname)
-# from hnn_core import read_spikes
-# spikes = read_spikes(fname)
-# spikes.plot()
-
 class Spikes(object):
     '''The Spikes class.
 
@@ -633,7 +628,8 @@ class Spikes(object):
         spiketimes = np.array(sum(self.times, []))
         spiketypes = np.array(sum(self.types, []))
         cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-        spiketimes_cell = [spiketimes[spiketypes==cell_type] for cell_type in cell_types]
+        spiketimes_cell = [spiketimes[spiketypes == cell_type]
+                           for cell_type in cell_types]
 
         if ax is None:
             fig, ax = plt.subplots(1, 1)
@@ -644,18 +640,20 @@ class Spikes(object):
         ax.set_xlabel('Time (ms)')
         ax.get_yaxis().set_visible(False)
         ax.set_ylim((-1, 4.5))
+        ax.set_xlim(left=0)
 
         if show:
             plt.show()
         return ax.get_figure()
 
     def write(self, fname):
-        """Write spike times to a file.
+        """Write spiking activity to a collection of spike trial
+        files.
 
         Parameters
         ----------
         fname : str
-            String format (e.g., '<pathname>/spk_%d.txt') of the full
+            String format (e.g., '<pathname>/spk_%d.txt') of the
             path to the output spike file(s).
         trial_idx : list of int
             Indices of selected trials. If None,
@@ -670,9 +668,9 @@ class Spikes(object):
             2) spike gid, and
             3) gid type
         """
-        for trial_idx in range(len(self.spikes.times)):
+        for trial_idx in range(len(self.times)):
             with open(fname % (trial_idx,), 'w') as f:
-                for spk_idx in range(len(spiketimes)):
+                for spk_idx in range(len(self.times[trial_idx])):
                     f.write('{:.3f}\t{}\t{}\n'.format(
                         self.times[trial_idx][spk_idx],
                         int(self.gids[trial_idx][spk_idx]),
