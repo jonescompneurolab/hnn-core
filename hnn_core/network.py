@@ -23,7 +23,7 @@ def read_spikes(fname, gid_dict=None):
     fname : str
         Wildcard expression (e.g., '<pathname>/spk_*.txt') of the
         path to the spike file(s).
-    gid_dict : dict | None
+    gid_dict : dict of lists or range objects | None
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell or input IDs of different
         cell or input types. If None, each spike file must contain
@@ -42,7 +42,7 @@ def read_spikes(fname, gid_dict=None):
     for file in sorted(glob(fname)):
         spike_trial = np.loadtxt(file, dtype=str)
         spiketimes = spiketimes + (list(spike_trial[:, 0].astype(float)),)
-        spikegids = spikegids + (list(spike_trial[:, 1].astype(float)),)
+        spikegids = spikegids + (list(spike_trial[:, 1].astype(int)),)
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
         # spike type. If reading a legacy version, validate that a gid_dict is
@@ -50,13 +50,14 @@ def read_spikes(fname, gid_dict=None):
         if spike_trial.shape[1] == 3:
             spiketypes = spiketypes + (list(spike_trial[:, 2].astype(str)),)
         else:
-            assert gid_dict is not None, "Error: gid_dict must be provided \
-            if spike types are unspecified in 'spk.txt' file"
+            assert gid_dict is not None, ("Error: gid_dict must be provided "
+                                          "if spike types are unspecified in "
+                                          "'spk.txt' file")
             spiketypes_trial = np.empty((spike_trial.shape[1], 1), dtype=str)
             for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
                 spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes = spiketypes + (spiketypes_trial,)
+            spiketypes = spiketypes + (list(spiketypes_trial),)
 
     return Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
 
@@ -151,10 +152,8 @@ class Network(object):
         # global dictionary of gid and cell type
         self.gid_dict = {}
         self._create_gid_dict()
-        # create empty tuple of spiketime trials
-        self.spiketimes = ()
-        # create empty tuple of spikegids trials
-        self.spikegids = ()
+        # Create empty spikes object
+        self.spikes = Spikes()
         # assign gid to hosts, creates list of gids for this node in _gid_list
         # _gid_list length is number of cells assigned to this id()
         self._gid_list = []
@@ -180,14 +179,11 @@ class Network(object):
         """Building the network in NEURON."""
 
         print('Building the NEURON model')
-        from neuron import h
         self._create_all_spike_sources()
         self.state_init()
         self._parnet_connect()
 
         # set to record spikes
-        self.spiketimes = h.Vector()
-        self.spikegids = h.Vector()
         self._record_spikes()
         self.move_cells_to_pos()  # position cells in 2D grid
         print('[Done]')
@@ -481,7 +477,7 @@ class Network(object):
         # agnostic to type of source, will sort that out later
         for gid in self._gid_list:
             if pc.gid_exists(gid):
-                pc.spike_record(gid, self.spiketimes, self.spikegids)
+                pc.spike_record(gid, self.spikes.times, self.spikes.gids)
 
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
@@ -542,8 +538,8 @@ class Network(object):
             The matplotlib figure handle.
         """
         import matplotlib.pyplot as plt
-        spikes = np.array(sum(self.spiketimes, []))
-        gids = np.array(sum(self.spikegids, []))
+        spikes = np.array(sum(self.spikes.times, []))
+        gids = np.array(sum(self.spikes.gids, []))
         valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
                             if k.startswith('evprox')]]
         mask_evprox = np.in1d(gids, valid_gids)
@@ -601,10 +597,14 @@ class Spikes(object):
     '''
 
     def __init__(self, times=None, gids=None, types=None):
+        from neuron import h
+
         self.times = times
         if times is None:
             self.times = h.Vector()
         self.gids = gids
+        if gids is None:
+            self.gids = h.Vector()
         self.types = types
 
     def __eq__(self, other):
@@ -618,6 +618,26 @@ class Spikes(object):
         return (times_self == times_other and
                 self.gids == other.gids and
                 self.types == other.types)
+
+    def update_types(self, gid_dict):
+        """Update spike types in the current instance of Spikes.
+
+        Parameters
+        ----------
+        gid_dict : dict of lists or range objects
+            Dictionary with keys 'evprox1', 'evdist1' etc.
+            containing the range of Cell or input IDs of different
+            cell or input types.
+        """
+
+        spiketypes = ()
+        for trl_idx in range(len(self.times)):
+            spiketypes_trial = np.empty_like(self.times[trl_idx], dtype='<U36')
+            for gidtype, gids in gid_dict.items():
+                spikegids_mask = np.in1d(self.gids[trl_idx], gids)
+                spiketypes_trial[spikegids_mask] = gidtype
+            spiketypes = spiketypes + (list(spiketypes_trial),)
+        self.types = spiketypes
 
     def plot(self, ax=None, show=True):
         """Plot the aggregate spiking activity according to cell
@@ -636,6 +656,7 @@ class Spikes(object):
         fig : instance of matplotlib Figure
             The matplotlib figure object
         """
+
         import matplotlib.pyplot as plt
         spiketimes = np.array(sum(self.times, []))
         spiketypes = np.array(sum(self.types, []))
@@ -680,6 +701,7 @@ class Spikes(object):
             2) spike gid, and
             3) gid type
         """
+
         for trial_idx in range(len(self.times)):
             with open(fname % (trial_idx,), 'w') as f:
                 for spk_idx in range(len(self.times[trial_idx])):
