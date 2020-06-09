@@ -15,8 +15,7 @@ from .params import create_pext
 
 
 def read_spikes(fname, gid_dict=None):
-    """Read spiking activity from a collection of spike trial
-    files.
+    """Read spiking activity from a collection of spike trial files.
 
     Parameters
     ----------
@@ -591,12 +590,13 @@ class Spikes(object):
 
     Methods
     -------
-    update_types : update spike types in the current instance of
-        Spikes
-    plot : plot and return a matplotlib Figure object showing the
-        aggregate network spiking activity according to cell type
-    write : write spiking activity to a collection of spike trial
-        files
+    update_types(gid_dict)
+        Update spike types in the current instance of Spikes.
+    plot(ax=None, show=True)
+        Plot and return a matplotlib Figure object showing the
+        aggregate network spiking activity according to cell type.
+    write(fname)
+        Write spiking activity to a collection of spike trial files.
     '''
 
     def __init__(self, times=None, gids=None, types=None):
@@ -648,8 +648,7 @@ class Spikes(object):
         self.types = spiketypes
 
     def plot(self, ax=None, show=True):
-        """Plot the aggregate spiking activity according to cell
-        type.
+        """Plot the aggregate spiking activity according to cell type.
 
         Parameters
         ----------
@@ -662,7 +661,7 @@ class Spikes(object):
         Returns
         -------
         fig : instance of matplotlib Figure
-            The matplotlib figure object
+            The matplotlib figure object.
         """
 
         import matplotlib.pyplot as plt
@@ -688,8 +687,7 @@ class Spikes(object):
         return ax.get_figure()
 
     def write(self, fname):
-        """Write spiking activity to a collection of spike trial
-        files.
+        """Write spiking activity to a collection of spike trial files.
 
         Parameters
         ----------
