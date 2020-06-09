@@ -41,14 +41,14 @@ def read_spikes(fname, gid_dict=None):
     spiketypes = ()
     for file in sorted(glob(fname)):
         spike_trial = np.loadtxt(file, dtype=str)
-        spiketimes = spiketimes + (list(spike_trial[:, 0].astype(float)),)
-        spikegids = spikegids + (list(spike_trial[:, 1].astype(int)),)
+        spiketimes += (list(spike_trial[:, 0].astype(float)),)
+        spikegids += (list(spike_trial[:, 1].astype(int)),)
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
         # spike type. If reading a legacy version, validate that a gid_dict is
         # provided.
         if spike_trial.shape[1] == 3:
-            spiketypes = spiketypes + (list(spike_trial[:, 2].astype(str)),)
+            spiketypes += (list(spike_trial[:, 2].astype(str)),)
         else:
             assert gid_dict is not None, ("Error: gid_dict must be provided "
                                           "if spike types are unspecified in "
@@ -57,7 +57,7 @@ def read_spikes(fname, gid_dict=None):
             for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
                 spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes = spiketypes + (list(spiketypes_trial),)
+            spiketypes += (list(spiketypes_trial),)
 
     return Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
 
@@ -644,7 +644,7 @@ class Spikes(object):
             for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(self.gids[trl_idx], gids)
                 spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes = spiketypes + (list(spiketypes_trial),)
+            spiketypes += (list(spiketypes_trial),)
         self.types = spiketypes
 
     def plot(self, ax=None, show=True):
