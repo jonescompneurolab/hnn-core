@@ -31,23 +31,23 @@ def read_spikes(fname, gid_dict=None):
 
     Returns
     ----------
-    spikes : Spikes object
+    spikes : Spikes
         An instance of the Spikes object.
     """
 
-    spiketimes = ()
-    spikegids = ()
-    spiketypes = ()
+    spiketimes = []
+    spikegids = []
+    spiketypes = []
     for file in sorted(glob(fname)):
         spike_trial = np.loadtxt(file, dtype=str)
-        spiketimes += (list(spike_trial[:, 0].astype(float)),)
-        spikegids += (list(spike_trial[:, 1].astype(int)),)
+        spiketimes += [list(spike_trial[:, 0].astype(float)),]
+        spikegids += [list(spike_trial[:, 1].astype(int)),]
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
         # spike type. If reading a legacy version, validate that a gid_dict is
         # provided.
         if spike_trial.shape[1] == 3:
-            spiketypes += (list(spike_trial[:, 2].astype(str)),)
+            spiketypes += [list(spike_trial[:, 2].astype(str)),]
         else:
             assert gid_dict is not None, ("Error: gid_dict must be provided "
                                           "if spike types are unspecified in "
@@ -56,7 +56,7 @@ def read_spikes(fname, gid_dict=None):
             for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
                 spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes += (list(spiketypes_trial),)
+            spiketypes += [list(spiketypes_trial),]
 
     return Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
 
@@ -84,12 +84,8 @@ class Network(object):
             'evprox1', 'evprox2', etc.
             'evdist1', etc.
             'extgauss', 'extpois'
-    spiketimes : tuple (n_trials, ) of list of float
-        Each element of the tuple is a trial.
-        The list contains the time stamps of spikes.
-    spikegids : tuple (n_trials, ) of list of float
-        Each element of the tuple is a trial.
-        The list contains the cell IDs of neurons that spiked.
+    spikes : Spikes
+        An instance of the Spikes object.
     """
 
     def __init__(self, params, n_jobs=1):
@@ -183,6 +179,8 @@ class Network(object):
         self._parnet_connect()
 
         # set to record spikes
+        self.spikes._times = h.Vector()
+        self.spikes._gids = h.Vector()
         self._record_spikes()
         self.move_cells_to_pos()  # position cells in 2D grid
         print('[Done]')
@@ -476,7 +474,7 @@ class Network(object):
         # agnostic to type of source, will sort that out later
         for gid in self._gid_list:
             if pc.gid_exists(gid):
-                pc.spike_record(gid, self.spikes.times, self.spikes.gids)
+                pc.spike_record(gid, self.spikes._times, self.spikes._gids)
 
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
@@ -562,30 +560,32 @@ class Spikes(object):
 
     Parameters
     ----------
-    times : tuple (n_trials, ) of list of float | None
-        Each element of the tuple is a trial.
-        The list contains the time stamps of spikes.
-    gids : tuple (n_trials, ) of list of float | None
-        Each element of the tuple is a trial.
-        The list contains the cell IDs of neurons that spiked.
-    types : tuple (n_trials, ) of list of float | None
-        Each element of the tuple is a trial.
-        The list contains the type of spike (e.g., evprox1 or
-        L2_pyramidal) that occured at the corresonding time stamp.
+    times : list [n_trials, ] of list of float | None
+        Each element of the 1st-order list is a trial.
+        The 2nd-order list contains the time stamps of spikes.
+    gids : list [n_trials, ] of list of float | None
+        Each element of the 1st-order list is a trial.
+        The 2nd-order list contains the cell IDs of neurons that
+        spiked.
+    types : list [n_trials, ] of list of float | None
+        Each element of the 1st-order list is a trial.
+        The 2nd-order list contains the type of spike (e.g., evprox1
+        or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_dict.
 
     Attributes
     ----------
-    times : tuple (n_trials, ) of list of float
-        Each element of the tuple is a trial.
-        The list contains the time stamps of spikes.
-    gids : tuple (n_trials, ) of list of float
-        Each element of the tuple is a trial.
-        The list contains the cell IDs of neurons that spiked.
-    types : tuple (n_trials, ) of list of float
-        Each element of the tuple is a trial.
-        The list contains the type of spike (e.g., evprox1 or
-        L2_pyramidal) that occured at the corresonding time stamp.
+    times : list [n_trials, ] of list of float
+        Each element of the 1st-order list is a trial.
+        The 2nd-order list contains the time stamps of spikes.
+    gids : list [n_trials, ] of list of float
+        Each element of the 1st-order list is a trial.
+        The 2nd-order list contains the cell IDs of neurons that
+        spiked.
+    types : list [n_trials, ] of list of float
+        Each element of the 1st-order list is a trial.
+        The 2nd-order list contains the type of spike (e.g., evprox1
+        or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_dict.
 
     Methods
@@ -600,30 +600,38 @@ class Spikes(object):
     '''
 
     def __init__(self, times=None, gids=None, types=None):
-        self.times = times
-        if times is None:
-            self.times = h.Vector()
-        self.gids = gids
-        if gids is None:
-            self.gids = h.Vector()
-        self.types = types
+        self._times = times
+        self._gids = gids
+        self._types = types
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        num_trials = len(self.times)
-        return '<%s | %d trials>' % (class_name, num_trials)
+        n_trials = len(self._times)
+        return '<%s | %d trials>' % (class_name, n_trials)
 
     def __eq__(self, other):
         if not isinstance(other, Spikes):
             return NotImplemented
-        # Round each element of each list within the tuple
+        # Round each time element
         times_self = [[round(time, 3) for time in trial]
-                      for trial in self.times]
+                      for trial in self._times]
         times_other = [[round(time, 3) for time in trial]
-                       for trial in other.times]
+                       for trial in other._times]
         return (times_self == times_other and
-                self.gids == other.gids and
-                self.types == other.types)
+                self._gids == other._gids and
+                self._types == other._types)
+
+    @property
+    def times(self):
+        return self._times
+
+    @property
+    def gids(self):
+        return self._gids
+
+    @property
+    def types(self):
+        return self._types
 
     def update_types(self, gid_dict):
         """Update spike types in the current instance of Spikes.
@@ -636,14 +644,14 @@ class Spikes(object):
             cell or input types.
         """
 
-        spiketypes = ()
-        for trl_idx in range(len(self.times)):
-            spiketypes_trial = np.empty_like(self.times[trl_idx], dtype='<U36')
+        spiketypes = []
+        for trl_idx in range(len(self._times)):
+            spiketypes_trial = np.empty_like(self._times[trl_idx], dtype='<U36')
             for gidtype, gids in gid_dict.items():
-                spikegids_mask = np.in1d(self.gids[trl_idx], gids)
+                spikegids_mask = np.in1d(self._gids[trl_idx], gids)
                 spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes += (list(spiketypes_trial),)
-        self.types = spiketypes
+            spiketypes += [list(spiketypes_trial),]
+        self._types = spiketypes
 
     def plot(self, ax=None, show=True):
         """Plot the aggregate spiking activity according to cell type.
@@ -663,8 +671,8 @@ class Spikes(object):
         """
 
         import matplotlib.pyplot as plt
-        spiketimes = np.array(sum(self.times, []))
-        spiketypes = np.array(sum(self.types, []))
+        spiketimes = np.array(sum(self._times, []))
+        spiketypes = np.array(sum(self._types, []))
         cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
         spiketimes_cell = [spiketimes[spiketypes == cell_type]
                            for cell_type in cell_types]
@@ -703,10 +711,10 @@ class Spikes(object):
             3) gid type
         """
 
-        for trial_idx in range(len(self.times)):
+        for trial_idx in range(len(self._times)):
             with open(fname % (trial_idx,), 'w') as f:
-                for spk_idx in range(len(self.times[trial_idx])):
+                for spk_idx in range(len(self._times[trial_idx])):
                     f.write('{:.3f}\t{}\t{}\n'.format(
-                        self.times[trial_idx][spk_idx],
-                        int(self.gids[trial_idx][spk_idx]),
-                        self.types[trial_idx][spk_idx]))
+                        self._times[trial_idx][spk_idx],
+                        int(self._gids[trial_idx][spk_idx]),
+                        self._types[trial_idx][spk_idx]))
