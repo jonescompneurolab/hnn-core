@@ -591,9 +591,12 @@ class Spikes(object):
 
     Methods
     -------
+    update_types : update spike types in the current instance of
+        Spikes
     plot : plot and return a matplotlib Figure object showing the
         aggregate network spiking activity according to cell type
-    write : write spike times to a file
+    write : write spiking activity to a collection of spike trial
+        files
     '''
 
     def __init__(self, times=None, gids=None, types=None):
@@ -688,9 +691,6 @@ class Spikes(object):
         fname : str
             String format (e.g., '<pathname>/spk_%d.txt') of the
             path to the output spike file(s).
-        trial_idx : list of int
-            Indices of selected trials. If None,
-            all trials are selected.
 
         Outputs
         -------

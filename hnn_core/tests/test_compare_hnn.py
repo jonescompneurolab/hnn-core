@@ -36,7 +36,7 @@ def test_hnn_core():
 
     # Test spike type counts
     spiketype_counts = {}
-    for spikegid in net.spikegids[0]:
+    for spikegid in net.spikes.gids[0]:
         if net.gid_to_type(spikegid) not in spiketype_counts:
             spiketype_counts[net.gid_to_type(spikegid)] = 0
         else:

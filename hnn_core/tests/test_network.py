@@ -4,7 +4,7 @@ from copy import deepcopy
 import os.path as op
 
 import hnn_core
-from hnn_core import read_params, Network
+from hnn_core import read_params, Network, Spikes, read_spikes
 
 
 def test_network():
@@ -27,6 +27,12 @@ def test_network():
     assert len(net.gid_dict['extpois']) == net.n_cells
     for ev_input in params['t_ev*']:
         type_key = ev_input[2: -2] + ev_input[-1]
-        assert len(net.gid_dict[type_key]) == net.N_cells
-    net.write_spikes('/tmp/spk1.txt', trial_idx=None)
-    assert op.exists('/tmp/spk1.txt')
+        assert len(net.gid_dict[type_key]) == net.n_cells
+
+    # Test read/write spikes consistency
+    spiketimes = ([2.3456, 7.89], [4.2812, 93.2])
+    spikegids = ([1, 3], [5, 7])
+    spiketypes = (['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket'])
+    spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
+    spikes.write('/tmp/spk_%d.txt')
+    assert spikes == read_spikes('/tmp/spk_*.txt')
