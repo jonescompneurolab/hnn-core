@@ -105,7 +105,7 @@ def _simulate_single_trial(net):
         dpl.convert_fAm_to_nAm()
         dpl.scale(net.params['dipole_scalefctr'])
         dpl.smooth(net.params['dipole_smooth_win'] / h.dt)
-    return dpl, net.spiketimes.to_python(), net.spikegids.to_python()
+    return dpl, net.spikes.times.to_python(), net.spikes.gids.to_python()
 
 
 def simulate_dipole(net, n_trials=1, n_jobs=1):
@@ -129,8 +129,9 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
     out = parallel(myfunc(net.params, idx) for idx in range(n_trials))
     dpl, spiketimes, spikegids = zip(*out)
-    net.spiketimes = spiketimes
-    net.spikegids = spikegids
+    net.spikes.times = spiketimes
+    net.spikes.gids = spikegids
+    net.spikes.update_types(net.gid_dict)
     return dpl
 
 
