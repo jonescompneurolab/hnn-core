@@ -5,6 +5,7 @@
 
 import itertools as it
 import numpy as np
+from glob import glob
 
 from neuron import h
 
@@ -33,7 +34,6 @@ def read_spikes(fname, gid_dict=None):
     spikes : Spikes object
         An instance of the Spikes object.
     """
-    from glob import glob
 
     spiketimes = ()
     spikegids = ()
@@ -600,8 +600,6 @@ class Spikes(object):
     '''
 
     def __init__(self, times=None, gids=None, types=None):
-        from neuron import h
-
         self.times = times
         if times is None:
             self.times = h.Vector()
