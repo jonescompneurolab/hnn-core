@@ -610,6 +610,11 @@ class Spikes(object):
             self.gids = h.Vector()
         self.types = types
 
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        num_trials = len(self.times)
+        return '<%s | %d trials>' % (class_name, num_trials)
+
     def __eq__(self, other):
         if not isinstance(other, Spikes):
             return NotImplemented
