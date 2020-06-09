@@ -81,6 +81,6 @@ dpl = simulate_dipole(net)
 
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-dpl[0].plot(ax=axes[0])
+dpl[0].plot(ax=axes[0], show=False)
 net.plot_input(ax=axes[1])
-net.plot_spikes()
+net.spikes.plot()
