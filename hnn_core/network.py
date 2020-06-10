@@ -40,14 +40,14 @@ def read_spikes(fname, gid_dict=None):
     spiketypes = []
     for file in sorted(glob(fname)):
         spike_trial = np.loadtxt(file, dtype=str)
-        spiketimes += [list(spike_trial[:, 0].astype(float)),]
-        spikegids += [list(spike_trial[:, 1].astype(int)),]
+        spiketimes += [list(spike_trial[:, 0].astype(float))]
+        spikegids += [list(spike_trial[:, 1].astype(int))]
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
         # spike type. If reading a legacy version, validate that a gid_dict is
         # provided.
         if spike_trial.shape[1] == 3:
-            spiketypes += [list(spike_trial[:, 2].astype(str)),]
+            spiketypes += [list(spike_trial[:, 2].astype(str))]
         else:
             assert gid_dict is not None, ("Error: gid_dict must be provided "
                                           "if spike types are unspecified in "
@@ -56,7 +56,7 @@ def read_spikes(fname, gid_dict=None):
             for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
                 spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes += [list(spiketypes_trial),]
+            spiketypes += [list(spiketypes_trial)]
 
     return Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
 
@@ -600,6 +600,31 @@ class Spikes(object):
     '''
 
     def __init__(self, times=None, gids=None, types=None):
+        if times is None:
+            times = []
+        if gids is None:
+            gids = []
+        if types is None:
+            types = []
+
+        # Validate arguments
+        for arg in [times, gids, types]:
+            # Validate 1st-order list
+            if not isinstance(arg, list):
+                raise TypeError('the argument set to %s should be a list of '
+                                'lists' % (arg,))
+            # If arg is not an empty list, validate 2st-order list
+            for trial_list in arg:
+                if not isinstance(trial_list, list):
+                    raise TypeError('the argument set to %s should be a list '
+                                    'of lists' % (arg,))
+            # Set the length of 'times' as a references and validate
+            # uniform length
+            if arg == times:
+                n_trials = len(times)
+            if len(arg) != n_trials:
+                raise ValueError('times, gids, and types should be lists of '
+                                 'the same length')
         self._times = times
         self._gids = gids
         self._types = types
@@ -607,7 +632,7 @@ class Spikes(object):
     def __repr__(self):
         class_name = self.__class__.__name__
         n_trials = len(self._times)
-        return '<%s | %d trials>' % (class_name, n_trials)
+        return '<%s | %d simulation trials>' % (class_name, n_trials)
 
     def __eq__(self, other):
         if not isinstance(other, Spikes):
@@ -645,12 +670,13 @@ class Spikes(object):
         """
 
         spiketypes = []
-        for trl_idx in range(len(self._times)):
-            spiketypes_trial = np.empty_like(self._times[trl_idx], dtype='<U36')
+        for trial_idx in range(len(self._times)):
+            spiketypes_trial = np.empty_like(self._times[trial_idx],
+                                             dtype='<U36')
             for gidtype, gids in gid_dict.items():
-                spikegids_mask = np.in1d(self._gids[trl_idx], gids)
+                spikegids_mask = np.in1d(self._gids[trial_idx], gids)
                 spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes += [list(spiketypes_trial),]
+            spiketypes += [list(spiketypes_trial)]
         self._types = spiketypes
 
     def plot(self, ax=None, show=True):
