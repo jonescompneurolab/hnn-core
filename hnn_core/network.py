@@ -49,9 +49,9 @@ def read_spikes(fname, gid_dict=None):
         if spike_trial.shape[1] == 3:
             spiketypes += [list(spike_trial[:, 2].astype(str))]
         else:
-            assert gid_dict is not None, ("Error: gid_dict must be provided "
-                                          "if spike types are unspecified in "
-                                          "'spk.txt' file")
+            if gid_dict is None:
+                raise ValueError("gid_dict must be provided if spike types "
+                                 "are unspecified in 'spk.txt' file")
             spiketypes_trial = np.empty((spike_trial.shape[1], 1), dtype=str)
             for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
@@ -608,16 +608,17 @@ class Spikes(object):
             types = []
 
         # Validate arguments
-        for arg in [times, gids, types]:
+        arg_names = ['times', 'gids', 'types']
+        for arg_idx, arg in enumerate([times, gids, types]):
             # Validate 1st-order list
             if not isinstance(arg, list):
-                raise TypeError('the argument set to %s should be a list of '
-                                'lists' % (arg,))
+                raise TypeError('%s should be a list of lists'
+                                % (arg_names[arg_idx],))
             # If arg is not an empty list, validate 2st-order list
             for trial_list in arg:
                 if not isinstance(trial_list, list):
-                    raise TypeError('the argument set to %s should be a list '
-                                    'of lists' % (arg,))
+                    raise TypeError('%s should be a list of lists'
+                                    % (arg_names[arg_idx],))
             # Set the length of 'times' as a references and validate
             # uniform length
             if arg == times:
