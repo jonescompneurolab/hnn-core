@@ -50,7 +50,6 @@ net.plot_input(ax=axes[1])
 # Note that we can use formatting syntax to specify the filename pattern
 # with which each trial will be written. To read spikes back in, we can use
 # wildcard expressions.
-net.spikes.plot()
 net.spikes.write('spk_%d.txt')
 spikes = read_spikes('spk_*.txt')
 spikes.plot()
