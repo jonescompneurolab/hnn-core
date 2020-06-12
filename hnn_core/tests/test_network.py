@@ -37,7 +37,7 @@ def test_network():
 
 
 def test_spikes():
-    '''Test spikes object.'''
+    """Test spikes object."""
 
     # Round-trip test
     spiketimes = [[2.3456, 7.89], [4.2812, 93.2]]

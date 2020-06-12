@@ -51,7 +51,7 @@ def read_spikes(fname, gid_dict=None):
         else:
             if gid_dict is None:
                 raise ValueError("gid_dict must be provided if spike types "
-                                 "are unspecified in 'spk.txt' file")
+                                 "are unspecified in the file %s" % fname)
             spiketypes_trial = np.empty((spike_trial.shape[1], 1), dtype=str)
             for gidtype, gids in gid_dict.items():
                 spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
@@ -571,7 +571,7 @@ class Spikes(object):
         Each element of the 1st-order list is a trial.
         The 2nd-order list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
-        Each gid corresponds to a type via Network::gid_dict.
+        Each gid corresponds to a type via Network().gid_dict.
 
     Attributes
     ----------
@@ -720,7 +720,7 @@ class Spikes(object):
         return ax.get_figure()
 
     def write(self, fname):
-        """Write spiking activity to a collection of spike trial files.
+        """Write spiking activity per trial to a collection of files.
 
         Parameters
         ----------
