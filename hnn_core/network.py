@@ -52,12 +52,11 @@ def read_spikes(fname, gid_dict=None):
             if gid_dict is None:
                 raise ValueError("gid_dict must be provided if spike types "
                                  "are unspecified in the file %s" % (file,))
-            spike_types_trial = np.empty((spike_trial.shape[1], 1), dtype=str)
-            for gidtype, gids in gid_dict.items():
-                spike_gids_mask = np.in1d(spike_trial[:, 1].astype(float),
-                                          gids)
-                spike_types_trial[spike_gids_mask] = gidtype
-            spike_types += [list(spike_types_trial)]
+            spike_types += [[]]
+
+    spikes = Spikes(times=spike_times, gids=spike_gids, types=spike_types)
+    if gid_dict is not None:
+        spikes.update_types(gid_dict)
 
     return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
 
@@ -670,6 +669,16 @@ class Spikes(object):
             containing the range of Cell or input IDs of different
             cell or input types.
         """
+
+        # Validate gid_dict
+        gid_dict_ranges = list(gid_dict.values())
+        for item_idx_1 in range(len(gid_dict_ranges)):
+            for item_idx_2 in range(item_idx_1 + 1, len(gid_dict_ranges)):
+                gid_set_1 = set(gid_dict_ranges[item_idx_1])
+                gid_set_2 = set(gid_dict_ranges[item_idx_2])
+                if not gid_set_1.isdisjoint(gid_set_2):
+                    raise ValueError('gid_dict should contain only disjoint '
+                                     'sets of gid values')
 
         spike_types = list()
         for trial_idx in range(len(self._times)):
