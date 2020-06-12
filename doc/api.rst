@@ -19,7 +19,10 @@ Simulation (:py:mod:`hnn_core`):
    L5Basket
    ExtFeed
    simulate_dipole
+   read_dipole
    Network
+   Spikes
+   read_spikes
 
 .. currentmodule:: hnn_core.params
 

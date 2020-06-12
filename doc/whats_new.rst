@@ -35,7 +35,7 @@ API
 
 - Make a context manager for Network class, by `Mainak Jas`_ and `Blake Caldwell`_ in `#86 <https://github.com/jasmainak/hnn-core/pull/86>`_
 
-- Add read and write methods to Dipole and Network classes, by `Ryan Thorpe`_ in `#96 <https://github.com/jonescompneurolab/hnn-core/pull/96>`_
+- Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by `Ryan Thorpe`_ in `#96 <https://github.com/jonescompneurolab/hnn-core/pull/96>`_
 
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Blake Caldwell: https://github.com/blakecaldwell
