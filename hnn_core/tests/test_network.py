@@ -46,6 +46,7 @@ def test_spikes():
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
     spikes.write('/tmp/spk_%d.txt')
     assert spikes == read_spikes('/tmp/spk_*.txt')
+    assert ("Spikes | 2 simulation trials" in repr(spikes))
 
     with pytest.raises(TypeError, match="times should be a list of lists"):
         spikes = Spikes(times=([2.3456, 7.89], [4.2812, 93.2]), gids=spikegids,
