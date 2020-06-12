@@ -128,9 +128,9 @@ def simulate_dipole(net, n_trials=1, n_jobs=1):
     """
     parallel, myfunc = _parallel_func(_clone_and_simulate, n_jobs=n_jobs)
     out = parallel(myfunc(net.params, idx) for idx in range(n_trials))
-    dpl, spiketimes, spikegids = zip(*out)
-    net.spikes._times = list(spiketimes)
-    net.spikes._gids = list(spikegids)
+    dpl, spike_times, spike_gids = zip(*out)
+    net.spikes._times = list(spike_times)
+    net.spikes._gids = list(spike_gids)
     net.spikes.update_types(net.gid_dict)
     return dpl
 
@@ -297,8 +297,8 @@ class Dipole(object):
 
         Outputs
         -------
-        txt file at fname where rows correspond to samples
-            and columns, delimited by \\t, correspond to
+        A tab separatd txt file where rows correspond
+            to samples and columns correspond to
             1) time (s),
             2) aggregate current dipole (scaled nAm),
             3) L2/3 current dipole (scaled nAm), and

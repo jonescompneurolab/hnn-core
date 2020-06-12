@@ -47,35 +47,23 @@ def test_spikes():
     spikes.write('/tmp/spk_%d.txt')
     assert spikes == read_spikes('/tmp/spk_*.txt')
 
-    # TypeError should be raised when one of the args is entered as a non-list
-    # (e.g., when times is a tuple of lists)
-    with pytest.raises(TypeError) as excinfo:
-        spiketimes_tuple = ([2.3456, 7.89], [4.2812, 93.2])
-        spikes = Spikes(times=spiketimes_tuple, gids=spikegids,
+    with pytest.raises(TypeError, match="times should be a list of lists"):
+        spikes = Spikes(times=([2.3456, 7.89], [4.2812, 93.2]), gids=spikegids,
                         types=spiketypes)
-    assert "times should be a list of lists" in str(excinfo.value)
 
-    # TypeError should be raised when one of the args is entered as a list of
-    # non-lists (e.g., when times is a list of ints)
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(TypeError, match="times should be a list of lists"):
         spikes = Spikes(times=[1, 2], gids=spikegids, types=spiketypes)
-    assert "times should be a list of lists" in str(excinfo.value)
 
-    # ValueError should be raised when one of the args is entered as an
-    # incongruent number of trials (e.g., 1 trial when all other args have 2)
-    with pytest.raises(ValueError) as excinfo:
-        spiketimes_1_trial = [[2.3456, 7.89]]
-        spikes = Spikes(times=spiketimes_1_trial, gids=spikegids,
+    with pytest.raises(ValueError, match="times, gids, and types should be "
+                       "lists of the same length"):
+        spikes = Spikes(times=[[2.3456, 7.89]], gids=spikegids,
                         types=spiketypes)
-    assert ("times, gids, and types should be lists of the same length"
-            in str(excinfo.value))
 
     # Write spike file with no 'types' column
     # Check for error when read back in without providing gid_dict
     for fname in sorted(glob('/tmp/spk_*.txt')):
         times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match="gid_dict must be provided if spike "
+                       "types are unspecified in the file /tmp/spk_0.txt"):
         spikes = read_spikes('/tmp/spk_*.txt')
-    assert ("gid_dict must be provided if spike types are unspecified in "
-            "'spk.txt' file" in str(excinfo.value))
