@@ -35,30 +35,31 @@ def read_spikes(fname, gid_dict=None):
         An instance of the Spikes object.
     """
 
-    spiketimes = []
-    spikegids = []
-    spiketypes = []
+    spike_times = []
+    spike_gids = []
+    spike_types = []
     for file in sorted(glob(fname)):
         spike_trial = np.loadtxt(file, dtype=str)
-        spiketimes += [list(spike_trial[:, 0].astype(float))]
-        spikegids += [list(spike_trial[:, 1].astype(int))]
+        spike_times += [list(spike_trial[:, 0].astype(float))]
+        spike_gids += [list(spike_trial[:, 1].astype(int))]
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
         # spike type. If reading a legacy version, validate that a gid_dict is
         # provided.
         if spike_trial.shape[1] == 3:
-            spiketypes += [list(spike_trial[:, 2].astype(str))]
+            spike_types += [list(spike_trial[:, 2].astype(str))]
         else:
             if gid_dict is None:
                 raise ValueError("gid_dict must be provided if spike types "
-                                 "are unspecified in the file %s" % fname)
-            spiketypes_trial = np.empty((spike_trial.shape[1], 1), dtype=str)
+                                 "are unspecified in the file %s" % (file,))
+            spike_types_trial = np.empty((spike_trial.shape[1], 1), dtype=str)
             for gidtype, gids in gid_dict.items():
-                spikegids_mask = np.in1d(spike_trial[:, 1].astype(float), gids)
-                spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes += [list(spiketypes_trial)]
+                spike_gids_mask = np.in1d(spike_trial[:, 1].astype(float),
+                                          gids)
+                spike_types_trial[spike_gids_mask] = gidtype
+            spike_types += [list(spike_types_trial)]
 
-    return Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
+    return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
 
 
 class Network(object):
@@ -560,31 +561,31 @@ class Spikes(object):
 
     Parameters
     ----------
-    times : list [n_trials, ] of list of float | None
-        Each element of the 1st-order list is a trial.
-        The 2nd-order list contains the time stamps of spikes.
-    gids : list [n_trials, ] of list of float | None
-        Each element of the 1st-order list is a trial.
-        The 2nd-order list contains the cell IDs of neurons that
+    times : list (n_trials,) of list (n_spikes,) of float, shape | None
+        Each element of the outer list is a trial.
+        The inner list contains the time stamps of spikes.
+    gids : list (n_trials,) of list (n_spikes,) of float, shape | None
+        Each element of the outer list is a trial.
+        The inner list contains the cell IDs of neurons that
         spiked.
-    types : list [n_trials, ] of list of float | None
-        Each element of the 1st-order list is a trial.
-        The 2nd-order list contains the type of spike (e.g., evprox1
+    types : list (n_trials,) of list (n_spikes,) of float, shape | None
+        Each element of the outer list is a trial.
+        The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network().gid_dict.
 
     Attributes
     ----------
-    times : list [n_trials, ] of list of float
-        Each element of the 1st-order list is a trial.
-        The 2nd-order list contains the time stamps of spikes.
-    gids : list [n_trials, ] of list of float
-        Each element of the 1st-order list is a trial.
-        The 2nd-order list contains the cell IDs of neurons that
+    times : list (n_trials,) of list (n_spikes,) of float, shape
+        Each element of the outer list is a trial.
+        The inner list contains the time stamps of spikes.
+    gids : list (n_trials,) of list (n_spikes,) of float, shape
+        Each element of the outer list is a trial.
+        The inner list contains the cell IDs of neurons that
         spiked.
-    types : list [n_trials, ] of list of float
-        Each element of the 1st-order list is a trial.
-        The 2nd-order list contains the type of spike (e.g., evprox1
+    types : list (n_trials,) of list (n_spikes,) of float, shape
+        Each element of the outer list is a trial.
+        The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_dict.
 
@@ -601,20 +602,20 @@ class Spikes(object):
 
     def __init__(self, times=None, gids=None, types=None):
         if times is None:
-            times = []
+            times = list()
         if gids is None:
-            gids = []
+            gids = list()
         if types is None:
-            types = []
+            types = list()
 
         # Validate arguments
         arg_names = ['times', 'gids', 'types']
         for arg_idx, arg in enumerate([times, gids, types]):
-            # Validate 1st-order list
+            # Validate outer list
             if not isinstance(arg, list):
                 raise TypeError('%s should be a list of lists'
                                 % (arg_names[arg_idx],))
-            # If arg is not an empty list, validate 2st-order list
+            # If arg is not an empty list, validate inner list
             for trial_list in arg:
                 if not isinstance(trial_list, list):
                     raise TypeError('%s should be a list of lists'
@@ -670,15 +671,15 @@ class Spikes(object):
             cell or input types.
         """
 
-        spiketypes = []
+        spike_types = list()
         for trial_idx in range(len(self._times)):
-            spiketypes_trial = np.empty_like(self._times[trial_idx],
-                                             dtype='<U36')
+            spike_types_trial = np.empty_like(self._times[trial_idx],
+                                              dtype='<U36')
             for gidtype, gids in gid_dict.items():
-                spikegids_mask = np.in1d(self._gids[trial_idx], gids)
-                spiketypes_trial[spikegids_mask] = gidtype
-            spiketypes += [list(spiketypes_trial)]
-        self._types = spiketypes
+                spike_gids_mask = np.in1d(self._gids[trial_idx], gids)
+                spike_types_trial[spike_gids_mask] = gidtype
+            spike_types += [list(spike_types_trial)]
+        self._types = spike_types
 
     def plot(self, ax=None, show=True):
         """Plot the aggregate spiking activity according to cell type.
@@ -698,16 +699,16 @@ class Spikes(object):
         """
 
         import matplotlib.pyplot as plt
-        spiketimes = np.array(sum(self._times, []))
-        spiketypes = np.array(sum(self._types, []))
+        spike_times = np.array(sum(self._times, []))
+        spike_types = np.array(sum(self._types, []))
         cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-        spiketimes_cell = [spiketimes[spiketypes == cell_type]
-                           for cell_type in cell_types]
+        spike_times_cell = [spike_times[spike_types == cell_type]
+                            for cell_type in cell_types]
 
         if ax is None:
             fig, ax = plt.subplots(1, 1)
 
-        ax.eventplot(spiketimes_cell, colors=['r', 'b', 'g', 'w'])
+        ax.eventplot(spike_times_cell, colors=['r', 'b', 'g', 'w'])
         ax.legend(cell_types, ncol=2)
         ax.set_facecolor('k')
         ax.set_xlabel('Time (ms)')
@@ -730,9 +731,8 @@ class Spikes(object):
 
         Outputs
         -------
-        A numerically labelled txt file for each trial
-            where rows correspond to spikes, and columns,
-            delimited by '\\t', correspond to
+        A tab separated txt file for each trial where rows
+            correspond to spikes, and columns correspond to
             1) spike time (s),
             2) spike gid, and
             3) gid type
@@ -740,8 +740,8 @@ class Spikes(object):
 
         for trial_idx in range(len(self._times)):
             with open(fname % (trial_idx,), 'w') as f:
-                for spk_idx in range(len(self._times[trial_idx])):
+                for spike_idx in range(len(self._times[trial_idx])):
                     f.write('{:.3f}\t{}\t{}\n'.format(
-                        self._times[trial_idx][spk_idx],
-                        int(self._gids[trial_idx][spk_idx]),
-                        self._types[trial_idx][spk_idx]))
+                        self._times[trial_idx][spike_idx],
+                        int(self._gids[trial_idx][spike_idx]),
+                        self._types[trial_idx][spike_idx]))
