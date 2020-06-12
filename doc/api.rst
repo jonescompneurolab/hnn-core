@@ -19,10 +19,8 @@ Simulation (:py:mod:`hnn_core`):
    L5Basket
    ExtFeed
    simulate_dipole
-   read_dipole
    Network
    Spikes
-   read_spikes
 
 .. currentmodule:: hnn_core.params
 
@@ -31,3 +29,13 @@ Simulation (:py:mod:`hnn_core`):
 
    Params
    read_params
+
+Inputs and Outputs (:py:mod:`hnn_core`):
+
+.. currentmodule:: hnn_core
+
+.. autosummary::
+   :toctree: generated/
+
+   read_dipole
+   read_spikes
