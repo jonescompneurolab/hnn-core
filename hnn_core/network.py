@@ -556,7 +556,7 @@ class Network(object):
 
 
 class Spikes(object):
-    '''The Spikes class.
+    """The Spikes class.
 
     Parameters
     ----------
@@ -597,7 +597,7 @@ class Spikes(object):
         aggregate network spiking activity according to cell type.
     write(fname)
         Write spiking activity to a collection of spike trial files.
-    '''
+    """
 
     def __init__(self, times=None, gids=None, types=None):
         if times is None:
