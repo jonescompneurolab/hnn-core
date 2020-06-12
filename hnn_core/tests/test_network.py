@@ -61,10 +61,15 @@ def test_spikes():
                         types=spiketypes)
 
     # Write spike file with no 'types' column
-    # Check for error when read back in without providing gid_dict
+    # Check for gid_dict errors
     for fname in sorted(glob('/tmp/spk_*.txt')):
         times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
     with pytest.raises(ValueError, match="gid_dict must be provided if spike "
                        "types are unspecified in the file /tmp/spk_0.txt"):
         spikes = read_spikes('/tmp/spk_*.txt')
+    with pytest.raises(ValueError, match="gid_dict should contain only "
+                       "disjoint sets of gid values"):
+        gid_dict = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
+                    'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
+        spikes = read_spikes('/tmp/spk_*.txt', gid_dict=gid_dict)
