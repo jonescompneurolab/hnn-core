@@ -1,13 +1,9 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
-from copy import deepcopy
-import os.path as op
 import pytest
 
-import hnn_core
-from hnn_core import read_params, Network, Params
-from hnn_core.neuron import NeuronNetwork
+from hnn_core import Params
 from hnn_core.feed import ExtFeed
 from hnn_core.params import create_pext
 
@@ -33,6 +29,7 @@ def test_extfeed():
                        params=p_unique[feed_type],
                        gid=0)
         print(feed)  # test repr
+
     # XXX but 'common' (rhythmic) feeds are not
     for ii in range(len(p_common)):  # len == 0 for def. params
         feed = ExtFeed(feed_type='common',
@@ -40,37 +37,12 @@ def test_extfeed():
                        params=p_common[ii],
                        gid=0)
         print(feed)  # test repr
-
-
-def test_external_common_feeds():
-    """Test external common feeds to proximal and distal dendrites."""
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-    # default parameters have no common inputs (distal or proximal),
-    params.update({'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
-                   'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
-                   't0_input_dist': 50,
-                   'input_prox_A_weight_L2Pyr_ampa': 5.4e-5,
-                   'input_prox_A_weight_L5Pyr_ampa': 5.4e-5,
-                   't0_input_prox': 50})
-
-    net = Network(deepcopy(params))
-    neuron_network = NeuronNetwork(net)
-    assert len(neuron_network.common_feeds) == 2  # (distal & proximal)
-    for ei in neuron_network.common_feeds:
-        assert ei.feed_type == 'common'
-        assert ei.cell_type is None  # artificial cell
-        assert hasattr(ei, 'nrn_eventvec')
-        assert hasattr(ei, 'nrn_vecstim')
-        assert ei.nrn_eventvec.hname().startswith('Vector')
-        assert hasattr(ei.nrn_vecstim, 'play')
-        # parameters should lead to > 0 input spikes
-        assert len(ei.nrn_eventvec.as_numpy()) > 0
-
+        assert feed.feed_type == 'common'
+        assert feed.cell_type is None  # artificial cell
+        # parameters should lead to 0 input spikes for default params
+        assert len(feed.event_times) == 0
         # check that ei.p_ext matches params
-        loc = ei.params['loc'][:4]  # loc=prox or dist
+        loc = feed.params['loc'][:4]  # loc=prox or dist
         for layer in ['L2', 'L5']:
             key = 'input_{}_A_weight_{}Pyr_ampa'.format(loc, layer)
-            assert ei.params[layer + 'Pyr_ampa'][0] == params[key]
+            assert feed.params[layer + 'Pyr_ampa'][0] == params[key]

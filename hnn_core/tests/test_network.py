@@ -16,6 +16,13 @@ def test_network():
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
+    # add rhythmic inputs (i.e., a type of common input)
+    params.update({'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
+                   'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
+                   't0_input_dist': 50,
+                   'input_prox_A_weight_L2Pyr_ampa': 5.4e-5,
+                   'input_prox_A_weight_L5Pyr_ampa': 5.4e-5,
+                   't0_input_prox': 50})
     net = Network(deepcopy(params))
     neuron_network = NeuronNetwork(net)  # needed to populate net.cells
 
@@ -36,6 +43,17 @@ def test_network():
 
     # Assert that an empty Spikes object is created as an attribute
     assert net.spikes == Spikes()
+
+    # Assert that all external feeds are initialized
+    net._create_all_spike_sources()
+    n_evoked_sources = 270 * 3
+    n_pois_sources = 270
+    n_gaus_sources = 270
+    n_common_sources = 2
+    assert len(net._feed_cells) == (n_evoked_sources +
+                                    n_pois_sources +
+                                    n_gaus_sources +
+                                    n_common_sources)
 
 
 def test_spikes():

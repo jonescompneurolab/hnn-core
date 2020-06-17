@@ -135,7 +135,6 @@ class Network(object):
         # assign gid to hosts, creates list of gids for this node in _gid_list
         # _gid_list length is number of cells assigned to this id()
         self._gid_list = []
-
         self.trial_idx = 0
 
     def __repr__(self):
