@@ -181,16 +181,13 @@ class Params(dict):
             json.dump(self, fp)
 
 
-def _feed_validate(p_ext, p_ext_d, tstop):
+def _validate_feed(p_ext_d, tstop):
     """Validate external inputs that are fed to all
     cells uniformly (i.e., rather than individually).
     For now, this only includes rhythmic inputs.
 
     Parameters
     ----------
-    p_ext : list
-        Cumulative list of dicts where each dict contains
-        all parameters of an ExtFeed input.
     p_ext_d : dict
         The parameter set to validate and append to p_ext.
     tstop : float
@@ -228,8 +225,7 @@ def _feed_validate(p_ext, p_ext_d, tstop):
                 else:
                     p_ext_d[key] = (p_ext_d[key][0], 1.)
 
-    p_ext.append(p_ext_d)
-    return p_ext
+    return p_ext_d
 
 
 def check_evoked_synkeys(p, nprox, ndist):
@@ -320,7 +316,7 @@ def create_pext(p, tstop):
     }
 
     # ensures time interval makes sense
-    p_common = _feed_validate(p_common, feed_prox, tstop)
+    p_common.append(_validate_feed(feed_prox, tstop))
 
     # default params for common distal inputs
     feed_dist = {
@@ -350,7 +346,7 @@ def create_pext(p, tstop):
         'threshold': p['threshold']
     }
 
-    p_common = _feed_validate(p_common, feed_dist, tstop)
+    p_common.append(_validate_feed(feed_dist, tstop))
 
     nprox, ndist = _count_evoked_inputs(p)
     # print('nprox,ndist evoked inputs:', nprox, ndist)
