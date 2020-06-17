@@ -14,6 +14,42 @@ h("dp_total_L5 = 0.")  # put here since these variables used in cells
 # Units for gbar: S/cm^2
 
 
+class _ArtificialCell:
+    """The ArtificialCell class for initializing a NEURON feed source.
+
+    Parameters
+    ----------
+    event_times : list
+        Spike times associated with a single feed source (i.e.,
+        associated with a unique gid).
+    threshold : float
+        Membrane potential threshold that demarks a spike.
+
+    Attributes
+    ----------
+    nrn_eventvec : instance of h.Vector()
+        NEURON h.Vector() object of event times.
+    nrn_vecstim : instance of h.VecStim()
+        NEURON h.VecStim() object of spike sources created
+        from nrn_eventvec.
+    nrn_netcon : instance of h.NetCon()
+        NEURON h.NetCon() object that creates the spike
+        source-to-target references for nrn_vecstim.
+    """
+    def __init__(self, event_times, threshold):
+        # Convert event times into nrn vector
+        self.nrn_eventvec = h.Vector()
+        self.nrn_eventvec.from_python(event_times)
+
+        # load eventvec into VecStim object
+        self.nrn_vecstim = h.VecStim()
+        self.nrn_vecstim.play(self.nrn_eventvec)
+
+        # create the cell and artificial NetCon
+        self.nrn_netcon = h.NetCon(self.nrn_vecstim, None)
+        self.nrn_netcon.threshold = threshold
+
+
 class _Cell(object):
     """Create a cell object.
 
