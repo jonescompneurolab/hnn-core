@@ -47,11 +47,6 @@ params.update({
     'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
     'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
     'sync_evinput': 1,
-    "prng_seedcore_evdist_1": 3,
-    "prng_seedcore_evprox_1": 3,
-    "prng_seedcore_evprox_2": 3,
-    "prng_seedcore_extgauss": 3,
-    "prng_seedcore_extpois": 3,
     "prng_seedcore_input_dist": 3
 })
 

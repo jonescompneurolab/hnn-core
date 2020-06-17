@@ -25,7 +25,6 @@ hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 # Then we read the parameters file
 params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
 params = read_params(params_fname)
-params.update({'prng_seedcore_extpois': -3})
 print(params)
 
 ###############################################################################
