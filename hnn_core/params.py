@@ -202,37 +202,33 @@ def _feed_validate(p_ext, p_ext_d, tstop):
         Cumulative list of dicts with newly appended ExtFeed.
     """
 
-    # only append if t0 is less than simulation tstop
-    if tstop > p_ext_d['t0']:
-        # # reset tstop if the specified tstop exceeds the
-        # # simulation runtime
-        # if p_ext_d['tstop'] == 0:
-        #     p_ext_d['tstop'] = tstop
+    # # reset tstop if the specified tstop exceeds the
+    # # simulation runtime
 
-        if p_ext_d['tstop'] > tstop:
-            p_ext_d['tstop'] = tstop
+    if p_ext_d['tstop'] > tstop:
+        p_ext_d['tstop'] = tstop
 
-        # if stdev is zero, increase synaptic weights 5 fold to make
-        # single input equivalent to 5 simultaneous input to prevent spiking
-        # <<---- SN: WHAT IS THIS RULE!?!?!?
-        if not p_ext_d['stdev'] and p_ext_d['distribution'] != 'uniform':
-            for key in p_ext_d.keys():
-                if key.endswith('Pyr'):
-                    p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
-                elif key.endswith('Basket'):
-                    p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
+    # if stdev is zero, increase synaptic weights 5 fold to make
+    # single input equivalent to 5 simultaneous input to prevent spiking
+    # <<---- SN: WHAT IS THIS RULE!?!?!?
+    if not p_ext_d['stdev'] and p_ext_d['distribution'] != 'uniform':
+        for key in p_ext_d.keys():
+            if key.endswith('Pyr'):
+                p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
+            elif key.endswith('Basket'):
+                p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
 
-        # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in
-        # which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
-        if p_ext_d['L5Pyr_ampa'][1] == -1:
-            for key in p_ext_d.keys():
-                if key.startswith('L5'):
-                    if p_ext_d['L2Pyr'][1] != 0.1:
-                        p_ext_d[key] = (p_ext_d[key][0], p_ext_d['L2Pyr'][1])
-                    else:
-                        p_ext_d[key] = (p_ext_d[key][0], 1.)
+    # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in
+    # which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
+    if p_ext_d['L5Pyr_ampa'][1] == -1:
+        for key in p_ext_d.keys():
+            if key.startswith('L5'):
+                if p_ext_d['L2Pyr'][1] != 0.1:
+                    p_ext_d[key] = (p_ext_d[key][0], p_ext_d['L2Pyr'][1])
+                else:
+                    p_ext_d[key] = (p_ext_d[key][0], 1.)
 
-        p_ext.append(p_ext_d)
+    p_ext.append(p_ext_d)
     return p_ext
 
 

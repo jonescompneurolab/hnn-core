@@ -43,7 +43,12 @@ def test_read_legacy_params():
     params_legacy = read_params(params_legacy_fname)
     params_new = read_params(params_new_fname)
 
-    assert params_new == params_legacy
+    params_new_seedless = {key: val for key, val in params_new.items()
+                           if key not in params_new['prng_seedcore*'].keys()}
+    params_legacy_seedless = {key: val for key, val in params_legacy.items()
+                              if key not in
+                              params_legacy['prng_seedcore*'].keys()}
+    assert params_new_seedless == params_legacy_seedless
 
 
 def test_base_params():

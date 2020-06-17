@@ -53,7 +53,6 @@ net.plot_input(ax=axes[1])
 # wildcard expressions.
 net.spikes.plot()
 with tempfile.TemporaryDirectory() as tmp_dir_name:
-    print(tmp_dir_name)
     net.spikes.write(op.join(tmp_dir_name, 'spk_%d.txt'))
     spikes = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
 spikes.plot()

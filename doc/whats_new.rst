@@ -21,6 +21,8 @@ Changelog
 
 - Add plotting of voltage at soma to inspect firing pattern of cells, by `Mainak Jas`_ in `#86 <https://github.com/jasmainak/hnn-core/pull/86>`_
 
+- Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting their start times to exceed the simulation stop time, by `Ryan Thorpe`_ in `#105 <https://github.com/jonescompneurolab/hnn-core/pull/105>`_
+
 Bug
 ~~~
 
