@@ -14,6 +14,22 @@ h("dp_total_L5 = 0.")  # put here since these variables used in cells
 # Units for gbar: S/cm^2
 
 
+def artificial_cell(event_times, threshold):
+
+    # Convert event times into nrn vector
+    nrn_eventvec = h.Vector()
+    nrn_eventvec.from_python(event_times)
+
+    # load eventvec into VecStim object
+    nrn_vecstim = h.VecStim()
+    nrn_vecstim.play(nrn_eventvec)
+
+    # create the cell and artificial NetCon
+    nrn_netcon = h.NetCon(nrn_vecstim, None)
+    nrn_netcon.threshold = threshold
+    return nrn_netcon
+
+
 class _Cell(object):
     """Create a cell object.
 
