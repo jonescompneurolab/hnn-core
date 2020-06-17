@@ -25,6 +25,7 @@ hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 # Then we read the parameters file
 params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
 params = read_params(params_fname)
+params.update({'prng_seedcore_extpois': -3})
 print(params)
 
 ###############################################################################
@@ -41,7 +42,7 @@ import matplotlib.pyplot as plt
 from mne.time_frequency import tfr_array_multitaper
 
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-dpls[0].plot(ax=axes[0], layer='agg')
+dpls[0].plot(ax=axes[0], layer='agg', show=False)
 
 sfreq = 1000. / params['dt']
 time_bandwidth = 4.0
@@ -60,3 +61,4 @@ axes[1].pcolormesh(times, freqs, power[0, 0, ...], cmap='RdBu_r')
 axes[1].set_xlabel('Time (ms)')
 axes[1].set_ylabel('Frequency (Hz)')
 plt.xlim((0, params['tstop']))
+plt.show()
