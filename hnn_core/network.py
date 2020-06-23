@@ -9,7 +9,7 @@ from glob import glob
 
 from neuron import h
 
-from .feed import ExtFeed
+from .feed import ExtFeed, connect_to_target
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import create_pext
@@ -411,8 +411,9 @@ class Network(object):
                             gid=gid))
 
                 # create the cell and artificial NetCon
-                pc.cell(gid, self.common_feeds[-1].connect_to_target(
-                        self.params['threshold']))
+                nrn_eventvec = self.common_feeds[-1].nrn_eventvec
+                pc.cell(gid, connect_to_target(nrn_eventvec,
+                        threshold=self.params['threshold']))
 
             # external inputs can also be Poisson- or Gaussian-
             # distributed, or 'evoked' inputs (proximal or distal)
@@ -429,9 +430,8 @@ class Network(object):
                             target_cell_type=target_cell_type,
                             params=self.p_unique[src_type],
                             gid=gid))
-                pc.cell(gid,
-                        self.unique_feeds[src_type][-1].connect_to_target(
-                            self.params['threshold']))
+                pc.cell(gid, connect_to_target(self.unique_feeds[src_type][-1].nrn_eventvec,
+                                               self.params['threshold']))
             else:
                 raise ValueError('No parameters specified for external feed '
                                  'type: %s' % src_type)

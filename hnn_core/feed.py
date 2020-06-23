@@ -8,6 +8,14 @@ import numpy as np
 from neuron import h
 
 
+def connect_to_target(nrn_eventvec, threshold):
+    nrn_vecstim = h.Vector()
+    nrn_vecstim.play(nrn_eventvec)
+    nc = h.NetCon(nrn_vecstim, None)  # why is target always None??
+    nc.threshold = threshold
+    return nc
+
+
 class ExtFeed(object):
     """The ExtFeed class of external spike input times.
 
@@ -53,7 +61,6 @@ class ExtFeed(object):
     def __init__(self, feed_type, target_cell_type, params, gid):
         # VecStim setup
         self.nrn_eventvec = h.Vector()
-        self.nrn_vecstim = h.VecStim()
         self.params = params
         # used to determine cell type-specific parameters for
         # (not used for 'common', such as for rhythmic alpha/beta input)
@@ -121,7 +128,6 @@ class ExtFeed(object):
         elif self.feed_type == 'common':
             self._create_common_input()
         # load eventvec into VecStim object
-        self.nrn_vecstim.play(self.nrn_eventvec)
 
     # based on cdf for exp wait time distribution from unif [0, 1)
     # returns in ms based on lamtha in Hz
@@ -290,8 +296,3 @@ class ExtFeed(object):
         # Convert array into nrn vector
         self.nrn_eventvec.from_python(t_input)
         return self.nrn_eventvec.size() > 0
-
-    def connect_to_target(self, threshold):
-        nc = h.NetCon(self.nrn_vecstim, None)  # why is target always None??
-        nc.threshold = threshold
-        return nc
