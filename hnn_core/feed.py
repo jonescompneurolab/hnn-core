@@ -9,7 +9,7 @@ from neuron import h
 
 
 def connect_to_target(nrn_eventvec, threshold):
-    nrn_vecstim = h.Vector()
+    nrn_vecstim = h.VecStim()
     nrn_vecstim.play(nrn_eventvec)
     nc = h.NetCon(nrn_vecstim, None)  # why is target always None??
     nc.threshold = threshold
