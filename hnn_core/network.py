@@ -411,8 +411,8 @@ class Network(object):
                             gid=gid))
 
                 # create the cell and artificial NetCon
-                nrn_eventvec = self.common_feeds[-1].nrn_eventvec
-                pc.cell(gid, connect_to_target(nrn_eventvec,
+                nrn_vecstim = self.common_feeds[-1].nrn_vecstim
+                pc.cell(gid, connect_to_target(nrn_vecstim,
                         threshold=self.params['threshold']))
 
             # external inputs can also be Poisson- or Gaussian-
@@ -430,7 +430,7 @@ class Network(object):
                             target_cell_type=target_cell_type,
                             params=self.p_unique[src_type],
                             gid=gid))
-                pc.cell(gid, connect_to_target(self.unique_feeds[src_type][-1].nrn_eventvec,
+                pc.cell(gid, connect_to_target(self.unique_feeds[src_type][-1].nrn_vecstim,
                                                self.params['threshold']))
             else:
                 raise ValueError('No parameters specified for external feed '
