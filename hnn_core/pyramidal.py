@@ -596,6 +596,31 @@ class L2Pyr(Pyr):
             print("Warning, ext type def does not exist in L2Pyr")
 
 
+def _get_g_at_dist(x, gsoma, gdend, xkink):
+    """Compute distance-dependent ionic conductance.
+
+    Parameters
+    ----------
+    x : float
+        Distance from base of the soma.
+    gsoma : float
+        The ionic conductance at the soma.
+    gdend : float
+        The ionic conductance at the dendrite.
+    xkink : float
+        The distance at which the ionic conductance changes.
+
+    Returns
+    -------
+    g : float
+        The ionic conductance at x.
+    """
+    if x > xkink:
+        return gdend
+    g = gsoma + x * (gdend - gsoma) / xkink
+    return g
+
+
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
 # units for taur: ms
@@ -788,6 +813,25 @@ class L5Pyr(Pyr):
         self.soma.insert('ar')
         self.soma.gbar_ar = self.p_all['L5Pyr_soma_gbar_ar']
 
+    def _insert_almog(self, seg):
+        """Insert distance dependent ionic dynamics.
+        """
+        # XXX: what does almog stand for?
+        dist_soma = abs(h.distance(seg.x))
+        seg.gkbar_hh2 = self.p_all['L5Pyr_dend_gkbar_hh2'] + \
+            self.p_all['L5Pyr_soma_gkbar_hh2'] * np.exp(-0.006 * dist_soma)
+
+        seg.gnabar_hh2 = _get_g_at_dist(
+            x=dist_soma,
+            gsoma=self.p_all['L5Pyr_soma_gnabar_hh2'],
+            gdend=self.p_all['L5Pyr_dend_gnabar_hh2'],
+            xkink=962)
+        seg.gbar_ca = _get_g_at_dist(
+            x=dist_soma,
+            gsoma=self.p_all['L5Pyr_soma_gbar_ca'],
+            gdend=self.p_all['L5Pyr_dend_gbar_ca'],
+            xkink=1501)  # beginning of tuft
+
     def __biophys_dends(self):
         # set dend biophysics specified in Pyr()
         # self.pyr_biophys_dends()
@@ -839,7 +883,7 @@ class L5Pyr(Pyr):
             self.dends[key].push()
             for seg in self.dends[key]:
                 seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
-
+                self._insert_almog(seg)
             h.pop_section()
 
     # parallel connection function FROM all cell types TO here
