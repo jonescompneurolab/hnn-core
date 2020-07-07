@@ -141,7 +141,7 @@ class MPIBackend(object):
         self._type = 'mpi'
         self.n_jobs = n_jobs
 
-        physical_cores = psutil.cpu_count(logical=False)
+        n_physical_cores = psutil.cpu_count(logical=False)
         n_logical_cores = multiprocessing.cpu_count()
 
         oversubscribe = False
@@ -163,7 +163,7 @@ class MPIBackend(object):
             self.n_cores = min(self.n_cores, scheduler_cores)
 
         # detect if we need to use hwthread-cpus with mpiexec
-        if self.n_cores > physical_cores:
+        if self.n_cores > n_physical_cores:
             hyperthreading = True
         else:
             hyperthreading = False
