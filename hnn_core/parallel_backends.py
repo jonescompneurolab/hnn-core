@@ -62,7 +62,7 @@ class Joblib_backend(object):
         if trial_idx != 0:
             net.params['prng_*'] = trial_idx
 
-        neuron_net = _neuron_network(net.params)
+        neuron_net = _neuron_network(net)
         dpl = _simulate_single_trial(neuron_net)
 
         spikedata = neuron_net.get_data_from_neuron()
@@ -94,9 +94,10 @@ class Joblib_backend(object):
         for idx in range(n_trials):
             dpls.append(data[idx][0])
             spikedata = data[idx][1]
-            net.spiketimes.append(spikedata[0])
-            net.spikegids.append(spikedata[1])
+            net.spikes._times.append(spikedata[0])
+            net.spikes._gids.append(spikedata[1])
             net.gid_dict = spikedata[2]  # only have one gid_dict
+            net.spikes.update_types(net.gid_dict)
 
         return dpls
 
@@ -252,14 +253,29 @@ class MPI_backend(object):
         print(out)
 
         # if simulation failed, raise exception
-        if proc.returncode == 0:
-            raise RuntimeError
+        if proc.returncode != 0:
+            # data is padded with "==""
+            err_msg = err.split("==")
+            if len(err_msg) > 1:
+                print(err_msg[1])
+            raise RuntimeError("MPI simulation failed")
+
+        data_str = err.rstrip("=")
+        if len(data_str) == 0:
+            raise RuntimeError("MPI simulation didn't return any data")
+
+        # turn stderr (string) to bytes-like object
+        data_bytes = data_str.encode()
+
+        # decode base64 object
+        data_pickled = codecs.decode(data_bytes, "base64")
 
         # unpickle the data
-        dpl, spikedata = pickle.loads(codecs.decode(err.encode(), "base64"))
+        dpl, spikedata = pickle.loads(data_pickled)
 
         (spiketimes, spikegids, net.gid_dict) = spikedata
-        net.spiketimes.append(spiketimes)
-        net.spikegids.append(spikegids)
+        net.spikes._times.append(spiketimes)
+        net.spikes._gids.append(spikegids)
+        net.spikes.update_types(net.gid_dict)
 
         return dpl

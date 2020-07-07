@@ -38,4 +38,4 @@ with MPI_backend(n_procs=2, mpi_cmd='mpiexec'):
 # Plot the dipole and spiking results
 for dpl in dpls:
     dpl.plot(layer='agg')
-net.plot_spikes()
+net.spikes.plot()
