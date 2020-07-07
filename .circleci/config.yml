@@ -18,6 +18,11 @@ jobs:
                   echo "export PATH=~/miniconda/bin:$PATH" >> $BASH_ENV;
 
           - run:
+              name: Install openmpi
+              command: |
+                  sudo apt-get install libopenmpi-dev openmpi-bin
+
+          - run:
               name: Setup Python environment
               command: |
                   conda update --yes --quiet conda
