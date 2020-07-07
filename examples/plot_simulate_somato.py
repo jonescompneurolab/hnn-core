@@ -77,7 +77,7 @@ params_fname = op.join(hnn_core_root, 'param', 'N20.json')
 params = read_params(params_fname)
 
 net = Network(params)
-dpl = simulate_dipole(net)
+dpl = simulate_dipole(net, n_trials=1)
 
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
