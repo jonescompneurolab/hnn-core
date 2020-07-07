@@ -195,7 +195,8 @@ class MPIBackend(object):
         self.mpi_cmd_str += ' -np ' + str(self.n_cores)
 
         self.mpi_cmd_str += ' nrniv -python -mpi -nobanner ' + \
-            os.path.join(os.path.dirname(sys.modules[__name__].__file__), 'mpi_child.py')
+            os.path.join(os.path.dirname(sys.modules[__name__].__file__),
+                         'mpi_child.py')
 
     def __enter__(self):
         global BACKEND
