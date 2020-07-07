@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 from mne.utils import _fetch_file
 import hnn_core
 from hnn_core import simulate_dipole, Network, read_params
-from hnn_core import MPI_backend, Joblib_backend
+from hnn_core import MPIBackend, JoblibBackend
 
 
 def run_hnn_core(backend=None, n_jobs=1):
@@ -31,10 +31,10 @@ def run_hnn_core(backend=None, n_jobs=1):
     net = Network(params)
 
     if backend == 'mpi':
-        with MPI_backend(n_jobs=n_jobs, n_procs=2, mpi_cmd='mpiexec'):
+        with MPIBackend(n_jobs=n_jobs, n_procs=2, mpi_cmd='mpiexec'):
             dpl = simulate_dipole(net, n_trials=1)[0]
     elif backend == 'joblib':
-        with Joblib_backend(n_jobs=n_jobs):
+        with JoblibBackend(n_jobs=n_jobs):
             dpl = simulate_dipole(net, n_trials=2)[0]
     else:
         dpl = simulate_dipole(net, n_jobs=n_jobs)[0]

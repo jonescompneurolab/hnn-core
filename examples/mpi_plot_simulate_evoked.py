@@ -15,7 +15,7 @@ import os.path as op
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network, MPI_backend
+from hnn_core import simulate_dipole, read_params, Network, MPIBackend
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
@@ -29,9 +29,11 @@ params = read_params(params_fname)
 net = Network(params)
 
 ###############################################################################
-# Now let's simulate the dipole using the MPI backend.
-# This will run the mpiexec program on the system (for openmpi)
-with MPI_backend(n_procs=2, mpi_cmd='mpiexec'):
+# Now let's simulate the dipole using the MPI backend. This will
+# start the simulation across the number of processors (cores)
+# specified by n_procs using MPI. The 'mpiexec' launcher is for
+# openmpi, which must be installed on the system
+with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, n_trials=3)
 
 ###############################################################################

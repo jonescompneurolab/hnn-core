@@ -5,12 +5,11 @@
 
 from warnings import warn
 
-_backend = None
-_loaded_dll = None
+BACKEND = None
 
 
-class Joblib_backend(object):
-    """The Joblib_backend class.
+class JoblibBackend(object):
+    """The JoblibBackend class.
 
     Parameters
     ----------
@@ -45,24 +44,26 @@ class Joblib_backend(object):
         return parallel, my_func
 
     def __enter__(self):
-        global _backend
-        self._old_backend = _backend
-        _backend = self
+        global BACKEND
+
+        self._old_backend = BACKEND
+        BACKEND = self
 
         return self
 
     def __exit__(self, type, value, traceback):
-        global _backend
-        _backend = self._old_backend
+        global BACKEND
+
+        BACKEND = self._old_backend
 
     def _clone_and_simulate(self, net, trial_idx):
         # avoid relative lookups after being forked by joblib
-        from hnn_core.neuron import _neuron_network, _simulate_single_trial
+        from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
 
         if trial_idx != 0:
             net.params['prng_*'] = trial_idx
 
-        neuron_net = _neuron_network(net)
+        neuron_net = NeuronNetwork(net)
         dpl = _simulate_single_trial(neuron_net)
 
         spikedata = neuron_net.get_data_from_neuron()
@@ -102,8 +103,8 @@ class Joblib_backend(object):
         return dpls
 
 
-class MPI_backend(object):
-    """The MPI_backend class.
+class MPIBackend(object):
+    """The MPIBackend class.
 
     Parameters
     ----------
@@ -128,7 +129,7 @@ class MPI_backend(object):
         import psutil
         import multiprocessing
         import os
-        import hnn_core
+        import sys
 
         try:
             import mpi4py
@@ -141,30 +142,31 @@ class MPI_backend(object):
         self.n_jobs = n_jobs
 
         physical_cores = psutil.cpu_count(logical=False)
-        logical_cores = multiprocessing.cpu_count()
+        n_logical_cores = multiprocessing.cpu_count()
 
         oversubscribe = False
         # trying to run on more than available logical cores?
         if n_procs is None:
-            self.n_cores = logical_cores
+            self.n_cores = n_logical_cores
         else:
             self.n_cores = n_procs
-            if n_procs > logical_cores:
+            if n_procs > n_logical_cores:
                 oversubscribe = True
 
         # obey limits set by scheduler
-        try:
+        if hasattr(os, 'sched_getaffinity'):
             scheduler_cores = len(os.sched_getaffinity(0))
-        except AttributeError:
+        else:
             scheduler_cores = None
 
         if scheduler_cores is not None:
             self.n_cores = min(self.n_cores, scheduler_cores)
 
-        # use hwthread-cpus if necessary
-        hyperthreading = False
+        # detect if we need to use hwthread-cpus with mpiexec
         if self.n_cores > physical_cores:
             hyperthreading = True
+        else:
+            hyperthreading = False
 
         self.mpi_cmd_str = mpi_cmd
 
@@ -172,17 +174,17 @@ class MPI_backend(object):
             print("MPI will run over %d cores" % (self.n_cores))
         else:
             print("Only have 1 core available. Running simulation without MPI")
-            print("Consider using Joblib_backend with n_jobs > 1 "
+            print("Consider using JoblibBackend with n_jobs > 1 "
                   "for running multiple trials")
             return
 
         if self.n_jobs > 1:
             raise ValueError("Nested parallelism is not currently supported"
-                             " with MPI_backend!\n"
+                             " with MPIBackend!\n"
                              "Please use joblib for embarassinly parallel jobs"
                              " (n_jobs > 1)\n"
                              "or multiple cores per simulation with"
-                             " MPI_backend\n")
+                             " MPIBackend\n")
 
         if hyperthreading:
             self.mpi_cmd_str += ' --use-hwthread-cpus'
@@ -193,18 +195,20 @@ class MPI_backend(object):
         self.mpi_cmd_str += ' -np ' + str(self.n_cores)
 
         self.mpi_cmd_str += ' nrniv -python -mpi -nobanner ' + \
-            os.path.join(os.path.dirname(hnn_core.__file__), 'mpi_child.py')
+            os.path.join(os.path.dirname(sys.modules[__name__].__file__), 'mpi_child.py')
 
     def __enter__(self):
-        global _backend
-        self._old_backend = _backend
-        _backend = self
+        global BACKEND
+
+        self._old_backend = BACKEND
+        BACKEND = self
 
         return self
 
     def __exit__(self, type, value, traceback):
-        global _backend
-        _backend = self._old_backend
+        global BACKEND
+
+        BACKEND = self._old_backend
 
     def simulate(self, net):
         """Simulate the HNN model in parallel on all cores
@@ -229,7 +233,7 @@ class MPI_backend(object):
 
         # just use the joblib backend for a single core
         if self.n_cores == 1:
-            return Joblib_backend(n_jobs=1).simulate(net)
+            return JoblibBackend(n_jobs=1).simulate(net)
 
         print("Running %d trials..." % (net.params['N_trials']))
 
@@ -273,7 +277,7 @@ class MPI_backend(object):
         # unpickle the data
         dpl, spikedata = pickle.loads(data_pickled)
 
-        (spiketimes, spikegids, net.gid_dict) = spikedata
+        spiketimes, spikegids, net.gid_dict = spikedata
         net.spikes._times.append(spiketimes)
         net.spikes._gids.append(spikegids)
         net.spikes.update_types(net.gid_dict)

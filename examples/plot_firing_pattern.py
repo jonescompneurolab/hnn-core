@@ -16,7 +16,7 @@ import os.path as op
 
 import hnn_core
 from hnn_core import read_params, Network
-from hnn_core.neuron import _neuron_network
+from hnn_core.neuron import NeuronNetwork
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
 
@@ -30,7 +30,7 @@ params = read_params(params_fname)
 import matplotlib.pyplot as plt
 
 net = Network(params)
-with _neuron_network(net) as neuron_network:
+with NeuronNetwork(net) as neuron_network:
     neuron_network.cells[0].plot_voltage()
 
     # The cells are stored in the network object as a list
@@ -48,7 +48,7 @@ with _neuron_network(net) as neuron_network:
 
 ###############################################################################
 # Let's do this for the rest of the cell types with a new NeuronNetwork object
-with _neuron_network(net) as neuron_network:
+with NeuronNetwork(net) as neuron_network:
     fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
     for gid, ax in zip([35, 170], axes):
         neuron_network.cells[gid].plot_voltage(ax)

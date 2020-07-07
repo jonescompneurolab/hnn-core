@@ -1,4 +1,6 @@
-"""Script for running parallel simulations with MPI"""
+"""Script for running parallel simulations with MPI when called with mpiexec.
+This script is called directly from MPIBackend.simulate()
+"""
 
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 
@@ -30,7 +32,7 @@ def run_mpi_simulation():
     sys.stderr = str_err
 
     from hnn_core import Network
-    from hnn_core.neuron import _neuron_network, _simulate_single_trial
+    from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
 
     # using template for reading stdin from:
     # https://github.com/cloudpipe/cloudpickle/blob/master/tests/testutils.py
@@ -53,7 +55,7 @@ def run_mpi_simulation():
 
     params = comm.bcast(params, root=0)
     net = Network(params)
-    neuron_net = _neuron_network(net)
+    neuron_net = NeuronNetwork(net)
 
     dpls = []
     for trial in range(params['N_trials']):
