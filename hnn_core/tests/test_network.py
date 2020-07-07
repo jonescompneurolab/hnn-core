@@ -8,7 +8,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network, Spikes, read_spikes, simulate_dipole
-from hnn_core.neuron import _neuron_network
+from hnn_core.neuron import NeuronNetwork
 
 
 def test_network():
@@ -17,7 +17,7 @@ def test_network():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     net = Network(deepcopy(params))
-    neuron_network = _neuron_network(net)  # needed to populate net.cells
+    neuron_network = NeuronNetwork(net)  # needed to populate net.cells
 
     # Assert that params are conserved across Network initialization
     for p in params:
