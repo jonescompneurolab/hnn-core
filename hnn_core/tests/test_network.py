@@ -35,7 +35,7 @@ def test_network():
         assert len(neuron_network.gid_dict[type_key]) == neuron_network.n_cells
 
     # Assert that an empty Spikes object is created as an attribute
-    assert net.spikes == Spikes()
+    assert neuron_network.spikes == Spikes()
 
 
 def test_spikes():

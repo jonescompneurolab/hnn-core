@@ -44,7 +44,6 @@ def simulate_dipole(net, n_trials=None, n_jobs=1):
     # default is Joblib_backend
     if _backend is None:
         _backend = Joblib_backend(n_jobs=n_jobs)
-        dpls = _backend.simulate(net)
 
     dpls = _backend.simulate(net)
 

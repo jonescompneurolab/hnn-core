@@ -12,6 +12,7 @@ from .feed import ExtFeed
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import create_pext
+from .network import Spikes
 
 # a few globals
 _pc = None
@@ -116,8 +117,7 @@ def _simulate_single_trial(neuron_net):
 
     neuron_net.trial_idx += 1
 
-    return (dpl, neuron_net.spikes._times.to_python(),
-            neuron_net.spikes._gids.to_python())
+    return dpl
 
 
 def load_custom_mechanisms():
@@ -219,18 +219,15 @@ class _neuron_network(object):
         The list of cells
     gid_dict : dict
         Dictionary with keys 'evprox1', 'evdist1' etc.
-        containing the range of Cell IDs of different cell types.
-    ext_list : dictionary of list of ExtFeed.
+        containing the range of Cell IDs of different cell
+        (or input) types.
+    extfeed_list : dictionary of list of ExtFeed.
         Keys are:
             'evprox1', 'evprox2', etc.
             'evdist1', etc.
             'extgauss', 'extpois'
-    spiketimes : tuple (n_trials, ) of list of float
-        Each element of the tuple is a trial.
-        The list contains the time stamps of spikes.
-    spikegids : tuple (n_trials, ) of list of float
-        Each element of the tuple is a trial.
-        The list contains the cell IDs of neurons that spiked.
+    spikes : Spikes
+        An instance of the Spikes object.
     """
 
     def __init__(self, params):
@@ -243,34 +240,34 @@ class _neuron_network(object):
         # ensuring that they exist on this node irrespective of whether
         # or not cells of relevant type actually do
 
-        self.N_t = np.arange(0., self.params['tstop'],
-                             self.params['dt']).size + 1
+        self.n_times = np.arange(0., self.params['tstop'],
+                                 self.params['dt']).size + 1
 
         # int variables for grid of pyramidal cells (for now in both L2 and L5)
         self.gridpyr = {
             'x': self.params['N_pyr_x'],
             'y': self.params['N_pyr_y'],
         }
-        self.N_src = 0
-        self.N = {}  # numbers of sources
-        self.N_cells = 0  # init self.N_cells
+        self.n_src = 0
+        self.n_of_type = {}  # numbers of sources
+        self.n_cells = 0  # init self.n_cells
         # zdiff is expressed as a positive DEPTH of L5 relative to L2
         # this is a deviation from the original, where L5 was defined at 0
         # this should not change interlaminar weight/delay calculations
         self.zdiff = 1307.4
-        # params of external inputs in p_ext
+        # params of common external feeds inputs in p_common
         # Global number of external inputs ... automatic counting
         # makes more sense
         # p_unique represent ext inputs that are going to go to each cell
-        self.p_ext, self.p_unique = create_pext(self.params,
-                                                self.params['tstop'])
-        self.N_extinput = len(self.p_ext)
+        self.p_common, self.p_unique = create_pext(self.params,
+                                                   self.params['tstop'])
+        self.n_common_feeds = len(self.p_common)
         # Source list of names
-        # in particular order (cells, extinput, alpha names of unique inputs)
+        # in particular order (cells, common, names of unique inputs)
         self.src_list_new = self._create_src_list()
         # cell position lists, also will give counts: must be known
         # by ALL nodes
-        # extinput positions are all located at origin.
+        # common positions are all located at origin.
         # sort of a hack bc of redundancy
         self.pos_dict = dict.fromkeys(self.src_list_new)
         # create coords in pos_dict for all cells first
@@ -278,27 +275,37 @@ class _neuron_network(object):
         self._create_coords_basket()
         self._count_cells()
         # create coords for all other sources
-        self._create_coords_extinput()
+        self._create_coords_common_feeds()
         # count external sources
         self._count_extsrcs()
         # create dictionary of GIDs according to cell type
         # global dictionary of gid and cell type
         self.gid_dict = {}
         self._create_gid_dict()
+        # Create empty spikes object
+        self.spikes = Spikes()
         # assign gid to hosts, creates list of gids for this node in _gid_list
         # _gid_list length is number of cells assigned to this id()
         self._gid_list = []
         # create cells (and create self.origin in create_cells_pyr())
         self.cells = []
-        self.extinput_list = []
+        self.common_feeds = []
         # external unique input list dictionary
-        self.ext_list = dict.fromkeys(self.p_unique)
+        self.unique_feeds = dict.fromkeys(self.p_unique)
         # initialize the lists in the dict
-        for key in self.ext_list.keys():
-            self.ext_list[key] = []
+        for key in self.unique_feeds.keys():
+            self.unique_feeds[key] = []
 
         self.trial_idx = 0
         self._build()
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        s = ("%d x %d Pyramidal cells (L2, L5)"
+             % (self.gridpyr['x'], self.gridpyr['y']))
+        s += ("\n%d L2 basket cells\n%d L5 basket cells"
+              % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
+        return '<%s | %s>' % (class_name, s)
 
     def _build(self):
         """Building the network in NEURON."""
@@ -316,17 +323,17 @@ class _neuron_network(object):
         self._gid_assign()
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
-            'L5Pyr_soma': h.Vector(self.N_t, 0),
-            'L2Pyr_soma': h.Vector(self.N_t, 0),
+            'L5Pyr_soma': h.Vector(self.n_times, 0),
+            'L2Pyr_soma': h.Vector(self.n_times, 0),
         }
 
-        self._create_all_src()
+        self._create_all_spike_sources()
         self.state_init()
         self._parnet_connect()
 
         # set to record spikes
-        self.spiketimes = h.Vector()
-        self.spikegids = h.Vector()
+        self.spikes._times = h.Vector()
+        self.spikes._gids = h.Vector()
         self._record_spikes()
         self.move_cells_to_pos()  # position cells in 2D grid
 
@@ -337,7 +344,7 @@ class _neuron_network(object):
         """Context manager to cleanly build _neuron_network objects"""
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, cell_type, value, traceback):
         """Clear up NEURON internal gid information."""
 
         self._clear_neuron_objects()
@@ -354,9 +361,8 @@ class _neuron_network(object):
             'L5_basket',
             'L5_pyramidal',
         ]
-        # add the legacy extinput here
         self.extname_list = []
-        self.extname_list.append('extinput')
+        self.extname_list.append('common')
         # grab the keys for the unique set of inputs and sort the names
         # append them to the src list along with the number of cells
         unique_keys = sorted(self.p_unique.keys())
@@ -396,8 +402,8 @@ class _neuron_network(object):
         self.pos_dict['L5_basket'] = [
             pos_xy + (self.zdiff,) for pos_xy in coords_sorted]
 
-    # creates origin AND creates external input coords
-    def _create_coords_extinput(self):
+    # creates origin AND creates common feed input coords
+    def _create_coords_common_feeds(self):
         """ (same thing for now but won't fix because could change)
         """
         xrange = np.arange(self.gridpyr['x'])
@@ -409,20 +415,20 @@ class _neuron_network(object):
         origin_y = yrange[int((len(yrange) - 1) // 2)]
         origin_z = np.floor(self.zdiff / 2)
         self.origin = (origin_x, origin_y, origin_z)
-        self.pos_dict['extinput'] = [self.origin for i in
-                                     range(self.N_extinput)]
+        self.pos_dict['common'] = [self.origin for i in
+                                   range(self.n_common_feeds)]
         # at this time, each of the unique inputs is per cell
         for key in self.p_unique.keys():
             # create the pos_dict for all the sources
-            self.pos_dict[key] = [self.origin for i in range(self.N_cells)]
+            self.pos_dict[key] = [self.origin for i in range(self.n_cells)]
 
     def _count_cells(self):
         """Cell counting routine."""
         # cellname list is used *only* for this purpose for now
         for src in self.cellname_list:
             # if it's a cell, then add the number to total number of cells
-            self.N[src] = len(self.pos_dict[src])
-            self.N_cells += self.N[src]
+            self.n_of_type[src] = len(self.pos_dict[src])
+            self.n_cells += self.n_of_type[src]
 
     # general counting method requires pos_dict is correct for each source
     # and that all sources are represented
@@ -430,7 +436,7 @@ class _neuron_network(object):
         # all src numbers are based off of length of pos_dict entry
         # generally done here in lieu of upstream changes
         for src in self.extname_list:
-            self.N[src] = len(self.pos_dict[src])
+            self.n_of_type[src] = len(self.pos_dict[src])
 
     def _create_gid_dict(self):
         """Creates gid dicts and pos_lists."""
@@ -444,9 +450,9 @@ class _neuron_network(object):
             src = self.src_list_new[i]
             # query the N dict for that number and append here
             # to gid_ind, based on previous entry
-            gid_ind.append(gid_ind[i] + self.N[src])
+            gid_ind.append(gid_ind[i] + self.n_of_type[src])
             # accumulate total source count
-            self.N_src += self.N[src]
+            self.n_src += self.n_of_type[src]
         # now actually assign the ranges
         for i in range(len(self.src_list_new)):
             src = self.src_list_new[i]
@@ -460,7 +466,7 @@ class _neuron_network(object):
         nhosts = _get_nhosts()
 
         # round robin assignment of gids
-        for gid in range(rank, self.N_cells, nhosts):
+        for gid in range(rank, self.n_cells, nhosts):
             # set the cell gid
             _pc.set_gid2node(gid, rank)
             self._gid_list.append(gid)
@@ -471,11 +477,10 @@ class _neuron_network(object):
                 gid_input = gid + self.gid_dict[key][0]
                 _pc.set_gid2node(gid_input, rank)
                 self._gid_list.append(gid_input)
-        # legacy handling of the external inputs
-        # NOT perfectly balanced for now
-        for gid_base in range(rank, self.N_extinput, nhosts):
-            # shift the gid_base to the extinput gid
-            gid = gid_base + self.gid_dict['extinput'][0]
+
+        for gid_base in range(rank, self.n_common_feeds, nhosts):
+            # shift the gid_base to the common gid
+            gid = gid_base + self.gid_dict['common'][0]
             # set as usual
             _pc.set_gid2node(gid, rank)
             self._gid_list.append(gid)
@@ -488,7 +493,20 @@ class _neuron_network(object):
             if gid in gids:
                 return gidtype
 
-    def _create_all_src(self):
+    def _get_src_type_and_pos(self, gid):
+        """Source type, position and whether it's a cell or artificial feed"""
+
+        # get type of cell and pos via gid
+        src_type = self.gid_to_type(gid)
+        type_pos_ind = gid - self.gid_dict[src_type][0]
+        src_pos = self.pos_dict[src_type][type_pos_ind]
+
+        real_cell_types = ['L2_pyramidal', 'L5_pyramidal',
+                           'L2_basket', 'L5_basket']
+
+        return src_type, src_pos, src_type in real_cell_types
+
+    def _create_all_spike_sources(self):
         """Parallel create cells AND external inputs (feeds)
            these are spike SOURCES but cells are also targets
            external inputs are not targets.
@@ -496,55 +514,74 @@ class _neuron_network(object):
 
         # loop through gids on this node
         for gid in self._gid_list:
+
+            src_type, src_pos, is_cell = self._get_src_type_and_pos(gid)
+
             # check existence of gid with Neuron
-            if _pc.gid_exists(gid):
-                # get type of cell and pos via gid
-                # now should be valid for ext inputs
-                type = self.gid_to_type(gid)
-                type_pos_ind = gid - self.gid_dict[type][0]
-                pos = self.pos_dict[type][type_pos_ind]
+            if not _pc.gid_exists(gid):
+                msg = ('Source of type %s with ID %d does not exists in '
+                       'Network' % (src_type, gid))
+                raise RuntimeError(msg)
+
+            if is_cell:  # not a feed
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 # creates a NetCon object internally to Neuron
                 type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
-                if type in ('L2_pyramidal', 'L5_pyramidal', 'L2_basket',
-                            'L5_basket'):
-                    Cell = type2class[type]
-                    if type in ('L2_pyramidal', 'L5_pyramidal'):
-                        self.cells.append(Cell(gid, pos, self.params))
-                    else:
-                        self.cells.append(Cell(gid, pos))
-                    _pc.cell(
-                        gid, self.cells[-1].connect_to_target(
-                            None, self.params['threshold']))
-                elif type == 'extinput':
-                    # print('type',type)
-                    # to find param index, take difference between REAL gid
-                    # here and gid start point of the items
-                    p_ind = gid - self.gid_dict['extinput'][0]
-                    # now use the param index in the params and create
-                    # the cell and artificial NetCon
-                    self.extinput_list.append(ExtFeed(
-                        type, None, self.p_ext[p_ind], gid))
-                    _pc.cell(
-                        gid, self.extinput_list[-1].connect_to_target(
-                            self.params['threshold']))
-                elif type in self.p_unique.keys():
-                    gid_post = gid - self.gid_dict[type][0]
-                    cell_type = self.gid_to_type(gid_post)
-                    # create dictionary entry, append to list
-                    self.ext_list[type].append(ExtFeed(
-                        type, cell_type, self.p_unique[type], gid))
-                    _pc.cell(
-                        gid, self.ext_list[type][-1].connect_to_target(
-                            self.params['threshold']))
+                Cell = type2class[src_type]
+                if src_type in ('L2_pyramidal', 'L5_pyramidal'):
+                    self.cells.append(Cell(gid, src_pos, self.params))
                 else:
-                    print("None of these types in Net()")
-                    exit()
+                    self.cells.append(Cell(gid, src_pos))
+
+                _pc.cell(gid, self.cells[-1].connect_to_target(
+                         None, self.params['threshold']))
+
+            # external inputs are special types of artificial-cells
+            # 'common': all cells impacted with identical TIMING of spike
+            # events. NB: cell types can still have different weights for how
+            # such 'common' spikes influence them
+            elif src_type == 'common':
+                # print('cell_type',cell_type)
+                # to find param index, take difference between REAL gid
+                # here and gid start point of the items
+                p_ind = gid - self.gid_dict['common'][0]
+
+                # new ExtFeed: target cell type irrelevant (None) since input
+                # timing will be identical for all cells
+                # XXX common_feeds is a list of dict
+                self.common_feeds.append(
+                    ExtFeed(feed_type=src_type,
+                            target_cell_type=None,
+                            params=self.p_common[p_ind],
+                            gid=gid))
+
+                # create the cell and artificial NetCon
+                _pc.cell(gid, self.common_feeds[-1].connect_to_target(
+                         self.params['threshold']))
+
+            # external inputs can also be Poisson- or Gaussian-
+            # distributed, or 'evoked' inputs (proximal or distal)
+            # these are cell-specific ('unique')
+            elif src_type in self.p_unique.keys():
+                gid_target = gid - self.gid_dict[src_type][0]
+                target_cell_type = self.gid_to_type(gid_target)
+
+                # new ExtFeed, where now both feed type and target cell type
+                # specified because these feeds have cell-specific parameters
+                # XXX unique_feeds is a dict of dict
+                self.unique_feeds[src_type].append(
+                    ExtFeed(feed_type=src_type,
+                            target_cell_type=target_cell_type,
+                            params=self.p_unique[src_type],
+                            gid=gid))
+                _pc.cell(gid,
+                         self.unique_feeds[src_type][-1].connect_to_target(
+                             self.params['threshold']))
             else:
-                print("None of these types in Net()")
-                exit()
+                raise ValueError('No parameters specified for external feed '
+                                 'type: %s' % src_type)
 
     # connections:
     # this NODE is aware of its cells as targets
@@ -555,25 +592,24 @@ class _neuron_network(object):
     def _parnet_connect(self):
 
         # loop over target zipped gids and cells
-        # cells has NO extinputs anyway. also no extgausses
         for gid, cell in zip(self._gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
-            if _pc.gid_exists(gid) and self.gid_to_type(gid) \
-                    != 'extinput':
+            if _pc.gid_exists(gid) and self.gid_to_type(gid) != 'common':
                 # for each gid, find all the other cells connected to it,
                 # based on gid
                 # this MUST be defined in EACH class of cell in self.cells
                 # parconnect receives connections from other cells
-                # parreceive receives connections from external inputs
+                # parreceive receives connections from common external inputs
                 cell.parconnect(gid, self.gid_dict, self.pos_dict, self.params)
-                cell.parreceive(gid, self.gid_dict, self.pos_dict, self.p_ext)
-                # now do the unique inputs specific to these cells
+                cell.parreceive(gid, self.gid_dict,
+                                self.pos_dict, self.p_common)
+                # now do the unique external feeds specific to these cells
                 # parreceive_ext receives connections from UNIQUE
                 # external inputs
-                for type in self.p_unique.keys():
-                    p_type = self.p_unique[type]
+                for cell_type in self.p_unique.keys():
+                    p_type = self.p_unique[cell_type]
                     cell.parreceive_ext(
-                        type, gid, self.gid_dict, self.pos_dict, p_type)
+                        cell_type, gid, self.gid_dict, self.pos_dict, p_type)
 
     # setup spike recording for this node
     def _record_spikes(self):
@@ -583,7 +619,7 @@ class _neuron_network(object):
         # agnostic to type of source, will sort that out later
         for gid in self._gid_list:
             if _pc.gid_exists(gid):
-                _pc.spike_record(gid, self.spiketimes, self.spikegids)
+                _pc.spike_record(gid, self.spikes._times, self.spikes._gids)
 
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
@@ -666,7 +702,8 @@ class _neuron_network(object):
         """Get copies of the data that are pickleable"""
 
         from copy import deepcopy
-        data = (self.spiketimes.to_python(), self.spikegids.to_python(),
+        data = (self.spikes._times.to_python(),
+                self.spikes._gids.to_python(),
                 deepcopy(self.gid_dict))
         return data
 
