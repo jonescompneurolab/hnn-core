@@ -20,6 +20,7 @@ Simulation (:py:mod:`hnn_core`):
    ExtFeed
    simulate_dipole
    Network
+   NeuronNetwork
    Spikes
 
 .. currentmodule:: hnn_core.params
