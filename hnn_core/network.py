@@ -73,17 +73,13 @@ class Network(object):
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
         (or input) types.
-    extfeed_list : dictionary of list of ExtFeed.
-        Keys are:
-            'evprox1', 'evprox2', etc.
-            'evdist1', etc.
-            'extgauss', 'extpois'
     spikes : Spikes
         An instance of the Spikes object.
+    trial_idx : int
+        Current trial number (starting from 0)
     """
 
     def __init__(self, params):
-
         # set the params internally for this net
         # better than passing it around like ...
         self.params = params
@@ -150,9 +146,9 @@ class Network(object):
               % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
         return '<%s | %s>' % (class_name, s)
 
-    # creates the immutable source list along with corresponding numbers
-    # of cells
     def _create_src_list(self):
+        """ creates the immutable source list along with corresponding numbers of cells
+        """
         # base source list of tuples, name and number, in this order
         self.cellname_list = [
             'L2_basket',

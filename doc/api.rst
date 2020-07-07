@@ -20,7 +20,6 @@ Simulation (:py:mod:`hnn_core`):
    ExtFeed
    simulate_dipole
    Network
-   NeuronNetwork
    Spikes
 
 .. currentmodule:: hnn_core.params
@@ -30,6 +29,15 @@ Simulation (:py:mod:`hnn_core`):
 
    Params
    read_params
+
+.. currentmodule:: hnn_core.parallel_backends
+
+.. autosummary::
+   :toctree: generated/
+
+   MPIBackend
+   JoblibBackend
+
 
 Inputs and Outputs (:py:mod:`hnn_core`):
 
