@@ -4,8 +4,11 @@
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
+import itertools as it
 import numpy as np
 from glob import glob
+
+from .params import create_pext
 
 
 def read_spikes(fname, gid_dict=None):
@@ -80,10 +83,198 @@ class Network(object):
     """
 
     def __init__(self, params):
+
+        # set the params internally for this net
+        # better than passing it around like ...
         self.params = params
+        # Number of time points
+        # Originally used to create the empty vec for synaptic currents,
+        # ensuring that they exist on this node irrespective of whether
+        # or not cells of relevant type actually do
+
+        self.n_times = np.arange(0., self.params['tstop'],
+                                 self.params['dt']).size + 1
+
+        # int variables for grid of pyramidal cells (for now in both L2 and L5)
+        self.gridpyr = {
+            'x': self.params['N_pyr_x'],
+            'y': self.params['N_pyr_y'],
+        }
+        self.n_src = 0
+        self.n_of_type = {}  # numbers of sources
+        self.n_cells = 0  # init self.n_cells
+        # zdiff is expressed as a positive DEPTH of L5 relative to L2
+        # this is a deviation from the original, where L5 was defined at 0
+        # this should not change interlaminar weight/delay calculations
+        self.zdiff = 1307.4
+        # params of common external feeds inputs in p_common
+        # Global number of external inputs ... automatic counting
+        # makes more sense
+        # p_unique represent ext inputs that are going to go to each cell
+        self.p_common, self.p_unique = create_pext(self.params,
+                                                   self.params['tstop'])
+        self.n_common_feeds = len(self.p_common)
+        # Source list of names
+        # in particular order (cells, common, names of unique inputs)
+        self.src_list_new = self._create_src_list()
+        # cell position lists, also will give counts: must be known
+        # by ALL nodes
+        # common positions are all located at origin.
+        # sort of a hack bc of redundancy
+        self.pos_dict = dict.fromkeys(self.src_list_new)
+        # create coords in pos_dict for all cells first
+        self._create_coords_pyr()
+        self._create_coords_basket()
+        self._count_cells()
+        # create coords for all other sources
+        self._create_coords_common_feeds()
+        # count external sources
+        self._count_extsrcs()
+        # create dictionary of GIDs according to cell type
+        # global dictionary of gid and cell type
         self.gid_dict = {}
-        self.spiketimes = []
-        self.spikegids = []
+        self._create_gid_dict()
+        # Create empty spikes object
+        self.spikes = Spikes()
+        # assign gid to hosts, creates list of gids for this node in _gid_list
+        # _gid_list length is number of cells assigned to this id()
+        self._gid_list = []
+
+        self.trial_idx = 0
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        s = ("%d x %d Pyramidal cells (L2, L5)"
+             % (self.gridpyr['x'], self.gridpyr['y']))
+        s += ("\n%d L2 basket cells\n%d L5 basket cells"
+              % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
+        return '<%s | %s>' % (class_name, s)
+
+    # creates the immutable source list along with corresponding numbers
+    # of cells
+    def _create_src_list(self):
+        # base source list of tuples, name and number, in this order
+        self.cellname_list = [
+            'L2_basket',
+            'L2_pyramidal',
+            'L5_basket',
+            'L5_pyramidal',
+        ]
+        self.extname_list = []
+        self.extname_list.append('common')
+        # grab the keys for the unique set of inputs and sort the names
+        # append them to the src list along with the number of cells
+        unique_keys = sorted(self.p_unique.keys())
+        self.extname_list += unique_keys
+        # return one final source list
+        src_list = self.cellname_list + self.extname_list
+        return src_list
+
+    # Creates cells and grid
+    def _create_coords_pyr(self):
+        """ pyr grid is the immutable grid, origin now calculated in relation to feed
+        """
+        xrange = np.arange(self.gridpyr['x'])
+        yrange = np.arange(self.gridpyr['y'])
+        # create list of tuples/coords, (x, y, z)
+        self.pos_dict['L2_pyramidal'] = [
+            pos for pos in it.product(xrange, yrange, [0])]
+        self.pos_dict['L5_pyramidal'] = [
+            pos for pos in it.product(xrange, yrange, [self.zdiff])]
+
+    def _create_coords_basket(self):
+        """Create basket cell coords based on pyr grid."""
+        # define relevant x spacings for basket cells
+        xzero = np.arange(0, self.gridpyr['x'], 3)
+        xone = np.arange(1, self.gridpyr['x'], 3)
+        # split even and odd y vals
+        yeven = np.arange(0, self.gridpyr['y'], 2)
+        yodd = np.arange(1, self.gridpyr['y'], 2)
+        # create general list of x,y coords and sort it
+        coords = [pos for pos in it.product(
+            xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+        coords_sorted = sorted(coords, key=lambda pos: pos[1])
+        # append the z value for position for L2 and L5
+        # print(len(coords_sorted))
+        self.pos_dict['L2_basket'] = [pos_xy + (0,) for
+                                      pos_xy in coords_sorted]
+        self.pos_dict['L5_basket'] = [
+            pos_xy + (self.zdiff,) for pos_xy in coords_sorted]
+
+    # creates origin AND creates common feed input coords
+    def _create_coords_common_feeds(self):
+        """ (same thing for now but won't fix because could change)
+        """
+        xrange = np.arange(self.gridpyr['x'])
+        yrange = np.arange(self.gridpyr['y'])
+        # origin's z component isn't really used in
+        # calculating distance functions from origin
+        # these will be forced as ints!
+        origin_x = xrange[int((len(xrange) - 1) // 2)]
+        origin_y = yrange[int((len(yrange) - 1) // 2)]
+        origin_z = np.floor(self.zdiff / 2)
+        self.origin = (origin_x, origin_y, origin_z)
+        self.pos_dict['common'] = [self.origin for i in
+                                   range(self.n_common_feeds)]
+        # at this time, each of the unique inputs is per cell
+        for key in self.p_unique.keys():
+            # create the pos_dict for all the sources
+            self.pos_dict[key] = [self.origin for i in range(self.n_cells)]
+
+    def _count_cells(self):
+        """Cell counting routine."""
+        # cellname list is used *only* for this purpose for now
+        for src in self.cellname_list:
+            # if it's a cell, then add the number to total number of cells
+            self.n_of_type[src] = len(self.pos_dict[src])
+            self.n_cells += self.n_of_type[src]
+
+    # general counting method requires pos_dict is correct for each source
+    # and that all sources are represented
+    def _count_extsrcs(self):
+        # all src numbers are based off of length of pos_dict entry
+        # generally done here in lieu of upstream changes
+        for src in self.extname_list:
+            self.n_of_type[src] = len(self.pos_dict[src])
+
+    def _create_gid_dict(self):
+        """Creates gid dicts and pos_lists."""
+        # initialize gid index gid_ind to start at 0
+        gid_ind = [0]
+        # append a new gid_ind based on previous and next cell count
+        # order is guaranteed by self.src_list_new
+        for i in range(len(self.src_list_new)):
+            # N = self.src_list_new[i][1]
+            # grab the src name in ordered list src_list_new
+            src = self.src_list_new[i]
+            # query the N dict for that number and append here
+            # to gid_ind, based on previous entry
+            gid_ind.append(gid_ind[i] + self.n_of_type[src])
+            # accumulate total source count
+            self.n_src += self.n_of_type[src]
+        # now actually assign the ranges
+        for i in range(len(self.src_list_new)):
+            src = self.src_list_new[i]
+            self.gid_dict[src] = range(gid_ind[i], gid_ind[i + 1])
+
+    def gid_to_type(self, gid):
+        """Reverse lookup of gid to type."""
+        for gidtype, gids in self.gid_dict.items():
+            if gid in gids:
+                return gidtype
+
+    def _get_src_type_and_pos(self, gid):
+        """Source type, position and whether it's a cell or artificial feed"""
+
+        # get type of cell and pos via gid
+        src_type = self.gid_to_type(gid)
+        type_pos_ind = gid - self.gid_dict[src_type][0]
+        src_pos = self.pos_dict[src_type][type_pos_ind]
+
+        real_cell_types = ['L2_pyramidal', 'L5_pyramidal',
+                           'L2_basket', 'L5_basket']
+
+        return src_type, src_pos, src_type in real_cell_types
 
     def plot_input(self, ax=None, show=True):
         """Plot the histogram of input.

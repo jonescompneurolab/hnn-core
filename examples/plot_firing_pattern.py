@@ -29,7 +29,8 @@ params = read_params(params_fname)
 # Now let's build the network
 import matplotlib.pyplot as plt
 
-with _neuron_network(params) as neuron_network:
+net = Network(params)
+with _neuron_network(net) as neuron_network:
     neuron_network.cells[0].plot_voltage()
 
     # The cells are stored in the network object as a list
@@ -46,8 +47,8 @@ with _neuron_network(params) as neuron_network:
     plt.title('%s (gid=%d)' % (cells[0].name, gid))
 
 ###############################################################################
-# Let's do this for the rest of the cell types with a new Network object
-with _neuron_network(params) as neuron_network:
+# Let's do this for the rest of the cell types with a new NeuronNetwork object
+with _neuron_network(net) as neuron_network:
     fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
     for gid, ax in zip([35, 170], axes):
         neuron_network.cells[gid].plot_voltage(ax)
