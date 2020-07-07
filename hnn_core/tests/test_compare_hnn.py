@@ -82,4 +82,3 @@ def test_mpi():
 def test_joblib():
     """Test that running hnn-core with Joblib succeeds when n_jobs=2."""
     run_hnn_core('joblib', n_jobs=2)
->>>>>>> TST: add joblib and update MPI
