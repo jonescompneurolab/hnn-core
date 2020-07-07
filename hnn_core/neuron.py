@@ -200,11 +200,6 @@ def _create_parallel_context(n_cores=None):
         PC.done()
 
 
-def _shutdown():
-    PC.done()
-    h.quit()
-
-
 class NeuronNetwork(object):
     """The NeuronNetwork class.
 
