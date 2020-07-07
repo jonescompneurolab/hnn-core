@@ -218,11 +218,12 @@ class NeuronNetwork(object):
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
         (or input) types.
-    extfeed_list : dictionary of list of ExtFeed.
-        Keys are:
-            'evprox1', 'evprox2', etc.
-            'evdist1', etc.
-            'extgauss', 'extpois'
+    spiketimes : h.Vector
+        Contains list of times (ms) for each spike event recorded during the
+        simulation
+    spikegids : h.Vector
+        Contains list of cell gids corresponding to each spike during the
+        simulation
     """
 
     def __init__(self, net):
