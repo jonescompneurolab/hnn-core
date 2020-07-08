@@ -21,21 +21,21 @@ def test_network():
 
     # Assert that params are conserved across Network initialization
     for p in params:
-        assert params[p] == neuron_network.params[p]
-    assert len(params) == len(neuron_network.params)
+        assert params[p] == net.params[p]
+    assert len(params) == len(net.params)
     print(neuron_network)
     print(neuron_network.cells[:2])
 
     # Assert that proper number of gids are created for Network inputs
-    assert len(neuron_network.gid_dict['common']) == 2
-    assert len(neuron_network.gid_dict['extgauss']) == neuron_network.n_cells
-    assert len(neuron_network.gid_dict['extpois']) == neuron_network.n_cells
+    assert len(net.gid_dict['common']) == 2
+    assert len(net.gid_dict['extgauss']) == net.n_cells
+    assert len(net.gid_dict['extpois']) == net.n_cells
     for ev_input in params['t_ev*']:
         type_key = ev_input[2: -2] + ev_input[-1]
-        assert len(neuron_network.gid_dict[type_key]) == neuron_network.n_cells
+        assert len(net.gid_dict[type_key]) == net.n_cells
 
     # Assert that an empty Spikes object is created as an attribute
-    assert neuron_network.spikes == Spikes()
+    assert net.spikes == Spikes()
 
 
 def test_spikes():
@@ -86,4 +86,4 @@ def test_plots():
     net = Network(params)
     simulate_dipole(net)
     net.plot_input()
-    net.plot_spikes()
+    net.spikes.plot()

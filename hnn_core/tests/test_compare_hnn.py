@@ -32,10 +32,10 @@ def run_hnn_core(backend=None, n_jobs=1):
 
     if backend == 'mpi':
         with MPIBackend(n_jobs=n_jobs, n_procs=2, mpi_cmd='mpiexec'):
-            dpl = simulate_dipole(net, n_trials=1)[0]
+            dpl = simulate_dipole(net)[0]
     elif backend == 'joblib':
         with JoblibBackend(n_jobs=n_jobs):
-            dpl = simulate_dipole(net, n_trials=2)[0]
+            dpl = simulate_dipole(net)[0]
     else:
         dpl = simulate_dipole(net, n_jobs=n_jobs)[0]
 
@@ -72,13 +72,13 @@ def test_hnn_core():
 
 
 def test_mpi():
-    """Test that running hnn-core with MPI succeeds when n_jobs=1."""
-    run_hnn_core('mpi')
+    """Test that running hnn-core with MPI context manager when n_jobs=1."""
+    run_hnn_core(backend='mpi')
 
     # Test that running hnn-core with MPI fails when n_jobs=2.
     pytest.raises(ValueError, run_hnn_core, 'mpi', 2)
 
 
 def test_joblib():
-    """Test that running hnn-core with Joblib succeeds when n_jobs=2."""
-    run_hnn_core('joblib', n_jobs=2)
+    """Test that running hnn-core with Joblib context manager when n_jobs=2."""
+    run_hnn_core(backend='joblib', n_jobs=2)
