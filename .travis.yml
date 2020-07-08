@@ -45,26 +45,7 @@ install:
     - pip install flake8 pytest pytest-cov
     - pip install mne psutil joblib
     - pip install coverage coveralls
-    - travis_wait 60
-    - |
-      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        wget -q  https://neuron.yale.edu/ftp/neuron/versions/v7.7/nrn-7.7.x86_64-osx.pkg -O nrn.pkg
-        sudo installer -pkg nrn.pkg -allowUntrusted -target /
-      else
-        git clone https://github.com/neuronsimulator/nrn
-        cd nrn
-        ./build.sh
-        ./configure --with-nrnpython=python3 --without-iv --prefix=${install_prefix} \
-          --with-paranrn --disable-rx3d --without-nrnoc-x11 --with-mpi
-        make -j4
-        make install -j4
-        cd src/nrnpython/
-        python3 setup.py install
-        cd $TRAVIS_BUILD_DIR
-        export PATH=$PATH:${install_prefix}/x86_64/bin
-        make
-        python setup.py develop
-      fi
+    - pip install NEURON
 
 script:
     - flake8 --count hnn_core
