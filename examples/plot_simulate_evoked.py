@@ -9,6 +9,7 @@ waveforms using HNN-core.
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
+#          Blake Caldwell <blake_caldwell@brown.edu>
 
 import os.path as op
 import tempfile
@@ -63,6 +64,16 @@ spikes.plot()
 
 params.update({'sync_evinput': True})
 net_sync = Network(params)
-dpls_sync = simulate_dipole(net_sync, n_jobs=1, n_trials=1)
+
+###############################################################################
+# To simulate the dipole, we will use the MPI backend. This will
+# start the simulation across the number of processors (cores)
+# specified by n_procs using MPI. The 'mpiexec' launcher is for
+# openmpi, which must be installed on the system
+from hnn_core import MPIBackend
+
+with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
+    dpls_sync = simulate_dipole(net_sync, n_trials=1)
+
 dpls_sync[0].plot()
 net_sync.plot_input()
