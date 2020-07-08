@@ -26,8 +26,13 @@ def run_mpi_simulation():
     import os
     import io
 
+    # suppress output to stderr
+    stderr_fileno = sys.stderr.fileno()
+    null_fd = os.open(os.devnull, os.O_RDWR)
+    old_err_fd = os.dup(stderr_fileno)
+    os.dup2(null_fd, stderr_fileno)
+
     # temporarily use a StringIO object to capture stderr
-    old_err_fd = os.dup(sys.stderr.fileno())
     str_err = io.StringIO()
     sys.stderr = str_err
 
@@ -88,22 +93,24 @@ def run_mpi_simulation():
 
         data_iostream.write(repickled_bytes)
 
+    # flush anything in stderr (still points to str_err) to stdout
+    sys.stderr.flush()
+    sys.stdout.write(sys.stderr.getvalue())
+
+    # restore the old stderr
+    os.dup2(old_err_fd, stderr_fileno)
+    sys.stderr = open(old_err_fd, 'w')
+    os.close(null_fd)
+
     if rank == 0:
         try:
-            # flush anything in stderr (still points to str_err) to stdout
-            sys.stderr.flush()
-            sys.stdout.write(sys.stderr.getvalue())
-
-            # restore the old stderr and write data to it
-            sys.stderr = open(old_err_fd, 'w')
             data_str = data_iostream.getvalue().decode()
             sys.stderr.write(data_str)
         except Exception as e:
+            # if there are problems getting the data, this
+            # can be useful to indicate the problem to the
+            # caller (in parallel_backends.py)
             print("Exception: %s" % e)
-
-    else:
-        sys.stderr.flush()
-        sys.stdout.write(sys.stderr.getvalue())
 
     # close the StringIO object
     str_err.close()
