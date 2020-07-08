@@ -62,19 +62,17 @@ def run_mpi_simulation():
     net = Network(params)
     neuron_net = NeuronNetwork(net)
 
-    dpls = []
+    sim_data = []
     for trial in range(params['N_trials']):
-        dpls.append(_simulate_single_trial(neuron_net))
+        dpl = _simulate_single_trial(neuron_net)
+        if rank == 0:
+            spikedata = neuron_net.get_data_from_neuron()
+            sim_data.append((dpl, spikedata))
 
     # send results to stderr
     if rank == 0:
-        spikedata = neuron_net.get_data_from_neuron()
-
         # send back dpls and spikedata
-        return_data = (dpls, spikedata)
-
-        # pickle data
-        pickled_string = pickle.dumps(return_data)
+        pickled_string = pickle.dumps(sim_data)
 
         # pad data before encoding, always add at least 4 "=" to mark end
         padding = len(pickled_string) % 4
@@ -103,14 +101,8 @@ def run_mpi_simulation():
     os.close(null_fd)
 
     if rank == 0:
-        try:
-            data_str = data_iostream.getvalue().decode()
-            sys.stderr.write(data_str)
-        except Exception as e:
-            # if there are problems getting the data, this
-            # can be useful to indicate the problem to the
-            # caller (in parallel_backends.py)
-            print("Exception: %s" % e)
+        data_str = data_iostream.getvalue().decode()
+        sys.stderr.write(data_str)
 
     # close the StringIO object
     str_err.close()
@@ -120,5 +112,11 @@ def run_mpi_simulation():
 
 
 if __name__ == '__main__':
-    rc = run_mpi_simulation()
+    try:
+        rc = run_mpi_simulation()
+    except Exception as e:
+        # This can be useful to indicate the problem to the
+        # caller (in parallel_backends.py)
+        print("Exception: %s" % e)
+        rc = 2
     sys.exit(rc)
