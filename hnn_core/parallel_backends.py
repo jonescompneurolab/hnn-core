@@ -8,6 +8,23 @@ from warnings import warn
 BACKEND = None
 
 
+def _gather_trial_data(sim_data, net, n_trials):
+    """Utility function to arrange data returned from simulate() by trial and
+    save in the appropriate structure in Network instance
+    """
+    dpls = []
+
+    for idx in range(n_trials):
+        dpls.append(sim_data[idx][0])
+        spikedata = sim_data[idx][1]
+        net.spikes._times.append(spikedata[0])
+        net.spikes._gids.append(spikedata[1])
+        net.gid_dict = spikedata[2]  # only have one gid_dict
+        net.spikes.update_types(net.gid_dict)
+
+    return dpls
+
+
 class JoblibBackend(object):
     """The JoblibBackend class.
 
@@ -89,17 +106,9 @@ class JoblibBackend(object):
         dpls = []
 
         parallel, myfunc = self._parallel_func(self._clone_and_simulate)
-        data = parallel(myfunc(net, idx) for idx in range(n_trials))
+        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
 
-        # the assignments below need to be made after any forking
-        for idx in range(n_trials):
-            dpls.append(data[idx][0])
-            spikedata = data[idx][1]
-            net.spikes._times.append(spikedata[0])
-            net.spikes._gids.append(spikedata[1])
-            net.gid_dict = spikedata[2]  # only have one gid_dict
-            net.spikes.update_types(net.gid_dict)
-
+        dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
 
 
@@ -237,7 +246,9 @@ class MPIBackend(object):
         if self.n_cores == 1:
             return JoblibBackend(n_jobs=1).simulate(net)
 
-        print("Running %d trials..." % (net.params['N_trials']))
+        n_trials = net.params['N_trials']
+        print("Running %d trials..." % (n_trials))
+        dpls = []
 
         # Split the command into shell arguments for passing to Popen
         cmdargs = shlex.split(self.mpi_cmd_str, posix="win" not in platform)
@@ -255,12 +266,17 @@ class MPIBackend(object):
         # wait until process completes
         out, err = proc.communicate(pickled_params)
 
-        # print all messages (included error messages)
+        # print all messages (including error messages)
         print(out)
 
         # if simulation failed, raise exception
         if proc.returncode != 0:
-            # data is padded with "==""
+            # print the first 1000 bytes
+            print(err[0:1000])
+            if len(err) > 1000:
+                print("Stderr truncated to 1000 bytes")
+
+            # see if there are any error messages after data (padded with "==")
             err_msg = err.split("==")
             if len(err_msg) > 1:
                 print(err_msg[1])
@@ -277,11 +293,7 @@ class MPIBackend(object):
         data_pickled = codecs.decode(data_bytes, "base64")
 
         # unpickle the data
-        dpl, spikedata = pickle.loads(data_pickled)
+        sim_data = pickle.loads(data_pickled)
 
-        spiketimes, spikegids, net.gid_dict = spikedata
-        net.spikes._times.append(spiketimes)
-        net.spikes._gids.append(spikegids)
-        net.spikes.update_types(net.gid_dict)
-
-        return dpl
+        dpls = _gather_trial_data(sim_data, net, n_trials)
+        return dpls
