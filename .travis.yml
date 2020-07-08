@@ -46,6 +46,10 @@ install:
     - pip install mne psutil joblib
     - pip install coverage coveralls
     - pip install NEURON
+    - |
+      cd $TRAVIS_BUILD_DIR
+      make
+      python setup.py develop
 
 script:
     - flake8 --count hnn_core
