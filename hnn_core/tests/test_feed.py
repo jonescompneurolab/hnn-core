@@ -7,6 +7,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network, Params
+from hnn_core.neuron import NeuronNetwork
 from hnn_core.feed import ExtFeed
 from hnn_core.params import create_pext
 
@@ -55,22 +56,21 @@ def test_external_common_feeds():
                    'input_prox_A_weight_L5Pyr_ampa': 5.4e-5,
                    't0_input_prox': 50})
 
-    with Network(deepcopy(params)) as net:
-        net._create_all_spike_sources()
+    net = Network(deepcopy(params))
+    neuron_network = NeuronNetwork(net)
+    assert len(neuron_network.common_feeds) == 2  # (distal & proximal)
+    for ei in neuron_network.common_feeds:
+        assert ei.feed_type == 'common'
+        assert ei.cell_type is None  # artificial cell
+        assert hasattr(ei, 'nrn_eventvec')
+        assert hasattr(ei, 'nrn_vecstim')
+        assert ei.nrn_eventvec.hname().startswith('Vector')
+        assert hasattr(ei.nrn_vecstim, 'play')
+        # parameters should lead to > 0 input spikes
+        assert len(ei.nrn_eventvec.as_numpy()) > 0
 
-        assert len(net.common_feeds) == 2  # (distal & proximal)
-        for ei in net.common_feeds:
-            assert ei.feed_type == 'common'
-            assert ei.cell_type is None  # artificial cell
-            assert hasattr(ei, 'nrn_eventvec')
-            assert hasattr(ei, 'nrn_vecstim')
-            assert ei.nrn_eventvec.hname().startswith('Vector')
-            assert hasattr(ei.nrn_vecstim, 'play')
-            # parameters should lead to > 0 input spikes
-            assert len(ei.nrn_eventvec.as_numpy()) > 0
-
-            # check that ei.p_ext matches params
-            loc = ei.params['loc'][:4]  # loc=prox or dist
-            for layer in ['L2', 'L5']:
-                key = 'input_{}_A_weight_{}Pyr_ampa'.format(loc, layer)
-                assert ei.params[layer + 'Pyr_ampa'][0] == params[key]
+        # check that ei.p_ext matches params
+        loc = ei.params['loc'][:4]  # loc=prox or dist
+        for layer in ['L2', 'L5']:
+            key = 'input_{}_A_weight_{}Pyr_ampa'.format(loc, layer)
+            assert ei.params[layer + 'Pyr_ampa'][0] == params[key]
