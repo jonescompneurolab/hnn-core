@@ -195,6 +195,7 @@ class MPIBackend(object):
         self.mpi_cmd_str += ' -np ' + str(self.n_cores)
 
         self.mpi_cmd_str += ' nrniv -python -mpi -nobanner ' + \
+            sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
 
