@@ -9,8 +9,10 @@ BACKEND = None
 
 
 def _gather_trial_data(sim_data, net, n_trials):
-    """Utility function to arrange data returned from simulate() by trial and
-    save in the appropriate structure in Network instance
+    """Arrange data by trial
+
+    To be called after simulate(). Returns list of Dipoles, one for each trial,
+    and saves spiking info in net (instance of Network).
     """
     dpls = []
 
@@ -135,10 +137,11 @@ class MPIBackend(object):
 
     """
     def __init__(self, n_jobs=1, n_procs=None, mpi_cmd='mpiexec'):
-        import psutil
-        import multiprocessing
         import os
         import sys
+        import multiprocessing
+
+        import psutil
 
         try:
             import mpi4py
