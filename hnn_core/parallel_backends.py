@@ -120,7 +120,7 @@ class MPIBackend(object):
     Parameters
     ----------
     n_procs : int | None
-        The number of processors (cores) to start MPI job over
+        The number of processes processes MPI will use (spread over cores)
     mpi_cmd : str
         The name of the mpi launcher executable. Will use 'mpiexec'
         (openmpi) by default.
@@ -130,10 +130,10 @@ class MPIBackend(object):
 
     n_jobs : int
         The number of jobs to start in parallel (NOT SUPPORTED)
-    n_cores : int
-        The number of cores used by the backend
+    n_procs : int
+        The number of processes MPI will use (spread over cores)
     mpi_cmd_str : str
-        The string of the mpi command with number of cores and options
+        The string of the mpi command with number of procs and options
 
     """
     def __init__(self, n_jobs=1, n_procs=None, mpi_cmd='mpiexec'):
@@ -141,49 +141,51 @@ class MPIBackend(object):
         import sys
         import multiprocessing
 
-        import psutil
+        self.n_procs = n_procs
+        n_logical_cores = multiprocessing.cpu_count()
+
+        # obey limits set by scheduler
+        if hasattr(os, 'sched_getaffinity'):
+            scheduler_cores = len(os.sched_getaffinity(0))
+            self.n_procs = min(self.n_procs, scheduler_cores)
+        elif n_procs is None:
+            self.n_procs = n_logical_cores
+
+        # did user try to force running on more cores than available?
+        oversubscribe = False
+        if self.n_procs > n_logical_cores:
+            oversubscribe = True
+
+        hyperthreading = False
 
         try:
             import mpi4py
             mpi4py.__version__  # for flake8 test
+
+            try:
+                import psutil
+
+                n_physical_cores = psutil.cpu_count(logical=False)
+
+                # detect if we need to use hwthread-cpus with mpiexec
+                if self.n_procs > n_physical_cores:
+                    hyperthreading = True
+
+            except ImportError:
+                warn('psutil not installed, so cannot detect if hyperthreading'
+                     'is enabled, assuming yes.')
+                hyperthreading = True
+
         except ImportError:
             warn('mpi4py not installed. will run on single processor')
             self.n_procs = 1
 
         self._type = 'mpi'
         self.n_jobs = n_jobs
-
-        n_physical_cores = psutil.cpu_count(logical=False)
-        n_logical_cores = multiprocessing.cpu_count()
-
-        oversubscribe = False
-        # trying to run on more than available logical cores?
-        if n_procs is None:
-            self.n_cores = n_logical_cores
-        else:
-            self.n_cores = n_procs
-            if n_procs > n_logical_cores:
-                oversubscribe = True
-
-        # obey limits set by scheduler
-        if hasattr(os, 'sched_getaffinity'):
-            scheduler_cores = len(os.sched_getaffinity(0))
-        else:
-            scheduler_cores = None
-
-        if scheduler_cores is not None:
-            self.n_cores = min(self.n_cores, scheduler_cores)
-
-        # detect if we need to use hwthread-cpus with mpiexec
-        if self.n_cores > n_physical_cores:
-            hyperthreading = True
-        else:
-            hyperthreading = False
-
         self.mpi_cmd_str = mpi_cmd
 
-        if self.n_cores > 1:
-            print("MPI will run over %d cores" % (self.n_cores))
+        if self.n_procs > 1:
+            print("MPI will run over %d processes" % (self.n_procs))
         else:
             print("Only have 1 core available. Running simulation without MPI")
             print("Consider using JoblibBackend with n_jobs > 1 "
@@ -204,7 +206,7 @@ class MPIBackend(object):
         if oversubscribe:
             self.mpi_cmd_str += ' --oversubscribe'
 
-        self.mpi_cmd_str += ' -np ' + str(self.n_cores)
+        self.mpi_cmd_str += ' -np ' + str(self.n_procs)
 
         self.mpi_cmd_str += ' nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
@@ -246,7 +248,7 @@ class MPIBackend(object):
         from sys import platform
 
         # just use the joblib backend for a single core
-        if self.n_cores == 1:
+        if self.n_procs == 1:
             return JoblibBackend(n_jobs=1).simulate(net)
 
         n_trials = net.params['N_trials']
