@@ -13,6 +13,7 @@ from .params_default import get_params_default
 
 params_schema_fname = op.join(op.dirname(__file__), 'params_schema.json')
 
+
 # return number of evoked inputs (proximal, distal)
 # using dictionary d (or if d is a string, first load the dictionary from
 # filename d)
@@ -171,7 +172,7 @@ class Params(dict):
             matches = fnmatch.filter(keys, key)
             # or add new item
             if len(matches) == 0:
-                params_validated = self._validate_params({key : value})
+                self._validate_params({key: value})
                 return dict.__setitem__(self, key, value)
             # or update all wildcard matches
             for key in matches:
