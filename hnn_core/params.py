@@ -7,6 +7,7 @@ import json
 import fnmatch
 import os.path as op
 from copy import deepcopy
+import fastjsonschema
 
 from .params_default import get_params_default
 
@@ -120,6 +121,10 @@ class Params(dict):
         if params_input is None:
             params_input = {}
 
+        with open('/home/ryan/hnn-core/hnn_core/params_schema.json') as file:
+            params_schema = json.load(file)
+        self._validate_params = fastjsonschema.compile(params_schema)
+
         if isinstance(params_input, dict):
             nprox, ndist = _count_evoked_inputs(params_input)
             # create default params templated from params_input
@@ -156,12 +161,16 @@ class Params(dict):
     def __setitem__(self, key, value):
         """Set the value for a subset of parameters."""
         keys = self.keys()
+        # update existing value
         if key in keys:
             return dict.__setitem__(self, key, value)
         else:
             matches = fnmatch.filter(keys, key)
+            # or add new item
             if len(matches) == 0:
+                params_validated = self._validate_params({key : value})
                 return dict.__setitem__(self, key, value)
+            # or update all wildcard matches
             for key in keys:
                 if key in matches:
                     self.update({key: value})
