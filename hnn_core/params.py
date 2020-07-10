@@ -11,6 +11,7 @@ import fastjsonschema
 
 from .params_default import get_params_default
 
+params_schema_fname = op.join(op.dirname(__file__), 'params_schema.json')
 
 # return number of evoked inputs (proximal, distal)
 # using dictionary d (or if d is a string, first load the dictionary from
@@ -121,7 +122,7 @@ class Params(dict):
         if params_input is None:
             params_input = {}
 
-        with open('/home/ryan/hnn-core/hnn_core/params_schema.json') as file:
+        with open(params_schema_fname) as file:
             params_schema = json.load(file)
         self._validate_params = fastjsonschema.compile(params_schema)
 
