@@ -146,16 +146,18 @@ class Params(dict):
     def __getitem__(self, key):
         """Return a subset of parameters."""
         keys = self.keys()
+        # return existing value
         if key in keys:
             return dict.__getitem__(self, key)
         else:
             matches = fnmatch.filter(keys, key)
+            # or return no matches
             if len(matches) == 0:
                 return dict.__getitem__(self, key)
-            params = self.copy()
-            for key in keys:
-                if key not in matches:
-                    params.pop(key)
+            # or return all wildcard matches
+            params = dict()
+            for key in matches:
+                params[key] = self[key]
             return params
 
     def __setitem__(self, key, value):
@@ -171,9 +173,8 @@ class Params(dict):
                 params_validated = self._validate_params({key : value})
                 return dict.__setitem__(self, key, value)
             # or update all wildcard matches
-            for key in keys:
-                if key in matches:
-                    self.update({key: value})
+            for key in matches:
+                self.update({key: value})
 
     def copy(self):
         return deepcopy(self)
