@@ -3,7 +3,14 @@
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 #          Mainak Jas <mainakjas@gmail.com>
 
+import os
+import sys
+import multiprocessing
+import shlex
+import pickle
+import codecs
 from warnings import warn
+from subprocess import Popen, PIPE
 
 BACKEND = None
 
@@ -120,7 +127,7 @@ class MPIBackend(object):
     Parameters
     ----------
     n_procs : int | None
-        The number of processes processes MPI will use (spread over cores)
+        The number of MPI processes requested by the user
     mpi_cmd : str
         The name of the mpi launcher executable. Will use 'mpiexec'
         (openmpi) by default.
@@ -131,16 +138,15 @@ class MPIBackend(object):
     n_jobs : int
         The number of jobs to start in parallel (NOT SUPPORTED)
     n_procs : int
-        The number of processes MPI will use (spread over cores)
+        The number of processes MPI will actually use (spread over cores). This
+        can be less than the user specified value if limited by the cores on
+        the system, the number of cores allowed by the job scheduler, or
+        if mpi4py could not be loaded.
     mpi_cmd_str : str
         The string of the mpi command with number of procs and options
 
     """
     def __init__(self, n_jobs=1, n_procs=None, mpi_cmd='mpiexec'):
-        import os
-        import sys
-        import multiprocessing
-
         self.n_procs = n_procs
         n_logical_cores = multiprocessing.cpu_count()
 
@@ -240,12 +246,6 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-        from subprocess import Popen, PIPE
-        import shlex
-        import pickle
-        import codecs
-        import os
-        from sys import platform
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
@@ -256,7 +256,11 @@ class MPIBackend(object):
         dpls = []
 
         # Split the command into shell arguments for passing to Popen
-        cmdargs = shlex.split(self.mpi_cmd_str, posix="win" not in platform)
+        if 'win' in sys.platform:
+            use_posix = True
+        else:
+            use_posix = False
+        cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
 
         pickled_params = codecs.encode(pickle.dumps(net.params),
                                        "base64").decode()
