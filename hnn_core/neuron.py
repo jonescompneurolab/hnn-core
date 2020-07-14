@@ -354,7 +354,7 @@ class NeuronNetwork(object):
                     self.cells.append(Cell(gid, src_pos))
 
                 _PC.cell(gid, self.cells[-1].connect_to_target(
-                        None, self.net.params['threshold']))
+                         None, self.net.params['threshold']))
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
@@ -377,7 +377,7 @@ class NeuronNetwork(object):
 
                 # create the cell and artificial NetCon
                 _PC.cell(gid, self.common_feeds[-1].connect_to_target(
-                        self.net.params['threshold']))
+                         self.net.params['threshold']))
 
             # external inputs can also be Poisson- or Gaussian-
             # distributed, or 'evoked' inputs (proximal or distal)
@@ -395,8 +395,8 @@ class NeuronNetwork(object):
                             params=self.net.p_unique[src_type],
                             gid=gid))
                 _PC.cell(gid,
-                        self.unique_feeds[src_type][-1].connect_to_target(
-                            self.net.params['threshold']))
+                         self.unique_feeds[src_type][-1].connect_to_target(
+                             self.net.params['threshold']))
             else:
                 raise ValueError('No parameters specified for external feed '
                                  'type: %s' % src_type)
