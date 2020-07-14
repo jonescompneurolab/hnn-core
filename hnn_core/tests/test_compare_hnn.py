@@ -31,13 +31,13 @@ def run_hnn_core(backend=None, n_jobs=1):
     net = Network(params)
 
     if backend == 'mpi':
-        with MPIBackend(n_jobs=n_jobs, n_procs=2, mpi_cmd='mpiexec'):
+        with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
             dpl = simulate_dipole(net)[0]
     elif backend == 'joblib':
         with JoblibBackend(n_jobs=n_jobs):
             dpl = simulate_dipole(net)[0]
     else:
-        dpl = simulate_dipole(net, n_jobs=n_jobs)[0]
+        dpl = simulate_dipole(net)[0]
 
     # write the dipole to a file and compare
     fname = './dpl2.txt'
@@ -74,9 +74,6 @@ def test_hnn_core():
 def test_mpi():
     """Test that running hnn-core with MPI context manager when n_jobs=1."""
     run_hnn_core(backend='mpi')
-
-    # Test that running hnn-core with MPI fails when n_jobs=2.
-    pytest.raises(ValueError, run_hnn_core, 'mpi', 2)
 
 
 def test_joblib():

@@ -12,8 +12,6 @@ import codecs
 from warnings import warn
 from subprocess import Popen, PIPE
 
-BACKEND = None
-
 
 def _gather_trial_data(sim_data, net, n_trials):
     """Arrange data by trial
@@ -39,8 +37,9 @@ class JoblibBackend(object):
 
     Parameters
     ----------
-    n_jobs : int
-        The number of jobs to start in parallel
+    n_jobs : int | None
+        The number of jobs to start in parallel. If None, then 1 trial will be
+        started without parallelism
 
     Attributes
     ----------
@@ -70,17 +69,17 @@ class JoblibBackend(object):
         return parallel, my_func
 
     def __enter__(self):
-        global BACKEND
+        global _BACKEND
 
-        self._old_backend = BACKEND
-        BACKEND = self
+        self._old_backend = _BACKEND
+        _BACKEND = self
 
         return self
 
     def __exit__(self, type, value, traceback):
-        global BACKEND
+        global _BACKEND
 
-        BACKEND = self._old_backend
+        _BACKEND = self._old_backend
 
     def _clone_and_simulate(self, net, trial_idx):
         # avoid relative lookups after being forked by joblib
@@ -121,6 +120,10 @@ class JoblibBackend(object):
         return dpls
 
 
+# Set JoblibBackend as the global default
+_BACKEND = JoblibBackend
+
+
 class MPIBackend(object):
     """The MPIBackend class.
 
@@ -135,8 +138,6 @@ class MPIBackend(object):
     Attributes
     ----------
 
-    n_jobs : int
-        The number of jobs to start in parallel (NOT SUPPORTED)
     n_procs : int
         The number of processes MPI will actually use (spread over cores). This
         can be less than the user specified value if limited by the cores on
@@ -146,7 +147,7 @@ class MPIBackend(object):
         The string of the mpi command with number of procs and options
 
     """
-    def __init__(self, n_jobs=1, n_procs=None, mpi_cmd='mpiexec'):
+    def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
         self.n_procs = n_procs
         n_logical_cores = multiprocessing.cpu_count()
 
@@ -187,24 +188,13 @@ class MPIBackend(object):
             self.n_procs = 1
 
         self._type = 'mpi'
-        self.n_jobs = n_jobs
         self.mpi_cmd_str = mpi_cmd
 
-        if self.n_procs > 1:
-            print("MPI will run over %d processes" % (self.n_procs))
-        else:
-            print("Only have 1 core available. Running simulation without MPI")
-            print("Consider using JoblibBackend with n_jobs > 1 "
-                  "for running multiple trials")
+        if self.n_procs == 1:
+            print("Backend will use 1 core. Running simulation without MPI")
             return
-
-        if self.n_jobs > 1:
-            raise ValueError("Nested parallelism is not currently supported"
-                             " with MPIBackend!\n"
-                             "Please use joblib for embarassinly parallel jobs"
-                             " (n_jobs > 1)\n"
-                             "or multiple cores per simulation with"
-                             " MPIBackend\n")
+        else:
+            print("MPI will run over %d processes" % (self.n_procs))
 
         if hyperthreading:
             self.mpi_cmd_str += ' --use-hwthread-cpus'
@@ -220,17 +210,17 @@ class MPIBackend(object):
                          'mpi_child.py')
 
     def __enter__(self):
-        global BACKEND
+        global _BACKEND
 
-        self._old_backend = BACKEND
-        BACKEND = self
+        self._old_backend = _BACKEND
+        _BACKEND = self
 
         return self
 
     def __exit__(self, type, value, traceback):
-        global BACKEND
+        global _BACKEND
 
-        BACKEND = self._old_backend
+        _BACKEND = self._old_backend
 
     def simulate(self, net):
         """Simulate the HNN model in parallel on all cores

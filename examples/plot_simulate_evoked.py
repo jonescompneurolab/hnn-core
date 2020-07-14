@@ -34,10 +34,13 @@ print(params)
 print(params['L2Pyr_soma*'])
 
 ###############################################################################
-# Now let's simulate the dipole
-# You can simulate multiple trials in parallel by using n_jobs > 1
+# Now let's simulate the dipole, running multiple trials in parallel
+# with JoblibBackend. It will run each trial as a separate job by default
+from hnn_core import JoblibBackend
+
 net = Network(params)
-dpls = simulate_dipole(net, n_jobs=1, n_trials=2)
+with JoblibBackend():
+    dpls = simulate_dipole(net, n_trials=2)
 
 ###############################################################################
 # and then plot it
@@ -66,8 +69,8 @@ params.update({'sync_evinput': True})
 net_sync = Network(params)
 
 ###############################################################################
-# To simulate the dipole, we will use the MPI backend. This will
-# start the simulation across the number of processors (cores)
+# Next, let's simulate a single trial using the MPI backend. This will
+# start the simulation trial across the number of processors (cores)
 # specified by n_procs using MPI. The 'mpiexec' launcher is for
 # openmpi, which must be installed on the system
 from hnn_core import MPIBackend
