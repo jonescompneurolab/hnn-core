@@ -12,17 +12,17 @@ from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 
 # a few globals
-PC = None
-CVODE = None
+_PC = None
+_CVODE = None
 
 # We need to maintain a reference to the last
 # NeuronNetwork instance that ran pc.gid_clear(). Even if
 # pc is global, if pc.gid_clear() is called within a new
 # NeuronNetwork, it will seg fault.
-LAST_NETWORK = None
+_LAST_NETWORK = None
 
 # NEURON only allows mechanisms to be loaded once (per Python interpreter)
-LOADED_DLL = None
+_LOADED_DLL = None
 
 
 def _simulate_single_trial(neuron_net):
@@ -30,7 +30,7 @@ def _simulate_single_trial(neuron_net):
 
     from .dipole import Dipole
 
-    global PC, CVODE
+    global _PC, _CVODE
 
     h.load_file("stdrun.hoc")
 
@@ -39,7 +39,7 @@ def _simulate_single_trial(neuron_net):
 
     # Now let's simulate the dipole
 
-    PC.barrier()  # sync for output to screen
+    _PC.barrier()  # sync for output to screen
     if rank == 0:
         print("running trial %d on %d cores" %
               (neuron_net.net.trial_idx + 1, nhosts))
@@ -62,7 +62,7 @@ def _simulate_single_trial(neuron_net):
     dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 
     # sets the default max solver step in ms (purposefully large)
-    PC.set_maxstep(10)
+    _PC.set_maxstep(10)
 
     # initialize cells to -65 mV, after all the NetCon
     # delays have been specified
@@ -73,31 +73,31 @@ def _simulate_single_trial(neuron_net):
 
     if rank == 0:
         for tt in range(0, int(h.tstop), 10):
-            CVODE.event(tt, simulation_time)
+            _CVODE.event(tt, simulation_time)
 
     h.fcurrent()
 
     # initialization complete, but wait for all procs to start the solver
-    PC.barrier()
+    _PC.barrier()
 
     # actual simulation - run the solver
-    PC.psolve(h.tstop)
+    _PC.psolve(h.tstop)
 
-    PC.barrier()
+    _PC.barrier()
 
     # these calls aggregate data across procs/nodes
-    PC.allreduce(dp_rec_L2, 1)
+    _PC.allreduce(dp_rec_L2, 1)
     # combine dp_rec on every node, 1=add contributions together
-    PC.allreduce(dp_rec_L5, 1)
+    _PC.allreduce(dp_rec_L5, 1)
     # aggregate the currents independently on each proc
     neuron_net.aggregate_currents()
     # combine neuron_net.current{} variables from each proc
-    PC.allreduce(neuron_net.current['L5Pyr_soma'], 1)
-    PC.allreduce(neuron_net.current['L2Pyr_soma'], 1)
+    _PC.allreduce(neuron_net.current['L5Pyr_soma'], 1)
+    _PC.allreduce(neuron_net.current['L2Pyr_soma'], 1)
 
     # combine spiking data from each proc
-    spiketimes_list = PC.py_gather(neuron_net._spiketimes, 0)
-    spikegids_list = PC.py_gather(neuron_net._spikegids, 0)
+    spiketimes_list = _PC.py_gather(neuron_net._spiketimes, 0)
+    spikegids_list = _PC.py_gather(neuron_net._spikegids, 0)
     # only rank 0's lists are complete
 
     if rank == 0:
@@ -106,7 +106,7 @@ def _simulate_single_trial(neuron_net):
         for spike_vec in spikegids_list:
             neuron_net._all_spikegids.append(spike_vec)
 
-    PC.barrier()  # get all nodes to this place before continuing
+    _PC.barrier()  # get all nodes to this place before continuing
 
     dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
                      np.array(dp_rec_L5.to_python()),
@@ -132,9 +132,9 @@ def load_custom_mechanisms():
     import platform
     import os.path as op
 
-    global LOADED_DLL
+    global _LOADED_DLL
 
-    if LOADED_DLL is not None:
+    if _LOADED_DLL is not None:
         return
 
     if platform.system() == 'Windows':
@@ -143,7 +143,7 @@ def load_custom_mechanisms():
         mech_fname = op.join(op.dirname(__file__), '..', 'mod', 'x86_64',
                              '.libs', 'libnrnmech.so')
     h.nrn_load_dll(mech_fname)
-    LOADED_DLL = mech_fname
+    _LOADED_DLL = mech_fname
 
     if _get_rank() == 0:
         print('Loading custom mechanism files from %s' % mech_fname)
@@ -159,8 +159,8 @@ def _get_nhosts():
     nhosts: int
         Value from pc.nhost()
     """
-    if PC is not None:
-        return int(PC.nhost())
+    if _PC is not None:
+        return int(_PC.nhost())
 
     return 1
 
@@ -173,8 +173,8 @@ def _get_rank():
     rank: int
         Value from pc.id()
     """
-    if PC is not None:
-        return int(PC.id())
+    if _PC is not None:
+        return int(_PC.id())
 
     return 0
 
@@ -189,26 +189,26 @@ def _create_parallel_context(n_cores=None):
         allow NEURON to use all available processors.
     """
 
-    global CVODE, PC
+    global _CVODE, _PC
 
-    if PC is None:
+    if _PC is None:
         if n_cores is None:
             # MPI: Initialize the ParallelContext class
-            PC = h.ParallelContext()
+            _PC = h.ParallelContext()
         else:
-            PC = h.ParallelContext(n_cores)
+            _PC = h.ParallelContext(n_cores)
 
-        CVODE = h.CVode()
+        _CVODE = h.CVode()
 
         # be explicit about using fixed step integration
-        CVODE.active(0)
+        _CVODE.active(0)
 
         # use cache_efficient mode for allocating elements in contiguous order
         # cvode.cache_efficient(1)
     else:
         # ParallelContext() has already been called. Don't start more workers.
         # Just tell old nrniv workers to quit.
-        PC.done()
+        _PC.done()
 
 
 class NeuronNetwork(object):
@@ -292,8 +292,8 @@ class NeuronNetwork(object):
         """Clear up NEURON internal gid information."""
 
         self._clear_neuron_objects()
-        if LAST_NETWORK is not None:
-            LAST_NETWORK._clear_neuron_objects()
+        if _LAST_NETWORK is not None:
+            _LAST_NETWORK._clear_neuron_objects()
 
     # this happens on EACH node
     # creates self.net._gid_list for THIS node
@@ -305,21 +305,21 @@ class NeuronNetwork(object):
         # round robin assignment of gids
         for gid in range(rank, self.net.n_cells, nhosts):
             # set the cell gid
-            PC.set_gid2node(gid, rank)
+            _PC.set_gid2node(gid, rank)
             self.net._gid_list.append(gid)
             # now to do the cell-specific external input gids on the same proc
             # these are guaranteed to exist because all of
             # these inputs were created for each cell
             for key in self.net.p_unique.keys():
                 gid_input = gid + self.net.gid_dict[key][0]
-                PC.set_gid2node(gid_input, rank)
+                _PC.set_gid2node(gid_input, rank)
                 self.net._gid_list.append(gid_input)
 
         for gid_base in range(rank, self.net.n_common_feeds, nhosts):
             # shift the gid_base to the common gid
             gid = gid_base + self.net.gid_dict['common'][0]
             # set as usual
-            PC.set_gid2node(gid, rank)
+            _PC.set_gid2node(gid, rank)
             self.net._gid_list.append(gid)
         # extremely important to get the gids in the right order
         self.net._gid_list.sort()
@@ -336,7 +336,7 @@ class NeuronNetwork(object):
             src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
 
             # check existence of gid with Neuron
-            if not PC.gid_exists(gid):
+            if not _PC.gid_exists(gid):
                 msg = ('Source of type %s with ID %d does not exists in '
                        'Network' % (src_type, gid))
                 raise RuntimeError(msg)
@@ -353,7 +353,7 @@ class NeuronNetwork(object):
                 else:
                     self.cells.append(Cell(gid, src_pos))
 
-                PC.cell(gid, self.cells[-1].connect_to_target(
+                _PC.cell(gid, self.cells[-1].connect_to_target(
                         None, self.net.params['threshold']))
 
             # external inputs are special types of artificial-cells
@@ -376,7 +376,7 @@ class NeuronNetwork(object):
                             gid=gid))
 
                 # create the cell and artificial NetCon
-                PC.cell(gid, self.common_feeds[-1].connect_to_target(
+                _PC.cell(gid, self.common_feeds[-1].connect_to_target(
                         self.net.params['threshold']))
 
             # external inputs can also be Poisson- or Gaussian-
@@ -394,7 +394,7 @@ class NeuronNetwork(object):
                             target_cell_type=target_cell_type,
                             params=self.net.p_unique[src_type],
                             gid=gid))
-                PC.cell(gid,
+                _PC.cell(gid,
                         self.unique_feeds[src_type][-1].connect_to_target(
                             self.net.params['threshold']))
             else:
@@ -412,7 +412,7 @@ class NeuronNetwork(object):
         # loop over target zipped gids and cells
         for gid, cell in zip(self.net._gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
-            if PC.gid_exists(gid) and self.net.gid_to_type(gid) != 'common':
+            if _PC.gid_exists(gid) and self.net.gid_to_type(gid) != 'common':
                 # for each gid, find all the other cells connected to it,
                 # based on gid
                 # this MUST be defined in EACH class of cell in self.cells
@@ -438,8 +438,8 @@ class NeuronNetwork(object):
         # set to record spikes in spike time vec and id vec
         # agnostic to type of source, will sort that out later
         for gid in self.net._gid_list:
-            if PC.gid_exists(gid):
-                PC.spike_record(gid, self._spiketimes, self._spikegids)
+            if _PC.gid_exists(gid):
+                _PC.spike_record(gid, self._spiketimes, self._spikegids)
 
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
@@ -496,12 +496,12 @@ class NeuronNetwork(object):
         called from the right context, then those workers can exit.
         """
 
-        PC.gid_clear()
+        _PC.gid_clear()
 
         # dereference cell and NetConn objects
         for gid, cell in zip(self.net._gid_list, self.cells):
             # only work on cells on this node
-            if PC.gid_exists(gid):
+            if _PC.gid_exists(gid):
                 for name_src in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket',
                                  'extinput', 'extgauss', 'extpois', 'ev']:
                     for nc in getattr(cell, 'ncfrom_%s' % name_src):
@@ -530,10 +530,10 @@ class NeuronNetwork(object):
     def _clear_last_network_objects(self):
         """Clears NEURON objects and saves the current Network instance"""
 
-        global LAST_NETWORK
+        global _LAST_NETWORK
 
-        if LAST_NETWORK is not None:
-            LAST_NETWORK._clear_neuron_objects()
+        if _LAST_NETWORK is not None:
+            _LAST_NETWORK._clear_neuron_objects()
 
         self._clear_neuron_objects()
-        LAST_NETWORK = self
+        _LAST_NETWORK = self
