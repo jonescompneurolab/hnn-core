@@ -14,7 +14,7 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def simulate_dipole(net, n_trials=None, n_jobs=1):
+def simulate_dipole(net, n_trials=None):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -25,8 +25,6 @@ def simulate_dipole(net, n_trials=None, n_jobs=1):
     n_trials : int | None
         The number of trials to simulate. If None the value in
         net.params['N_trials'] will be used
-    n_jobs : int
-        The number of jobs to run in parallel (joblib only).
 
     Returns
     -------
@@ -34,18 +32,14 @@ def simulate_dipole(net, n_trials=None, n_jobs=1):
         List of dipole objects for each trials
     """
 
-    from .parallel_backends import BACKEND, JoblibBackend
+    from .parallel_backends import _BACKEND
 
     if n_trials is not None:
         net.params['N_trials'] = n_trials
     else:
         n_trials = net.params['N_trials']
 
-    # default is JoblibBackend
-    if BACKEND is None:
-        BACKEND = JoblibBackend(n_jobs=n_jobs)
-
-    dpls = BACKEND.simulate(net)
+    dpls = _BACKEND.simulate(net)
 
     return dpls
 

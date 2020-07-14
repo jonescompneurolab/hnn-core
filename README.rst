@@ -84,7 +84,11 @@ This is the default backend and will execute multiple trials at the same time, w
 
 **Usage**::
 
-	dpls = simulate_dipole(net, n_trials=2)
+	from hnn_core import JoblibBackend
+
+	# set n_jobs to the number of trials to run in parallel with Joblib (up to number of cores on system)
+	with JoblibBackend(n_jobs=2):
+		dpls = simulate_dipole(net, n_trials=2)
 
 MPI
 ------
