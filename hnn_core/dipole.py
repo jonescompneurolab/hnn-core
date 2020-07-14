@@ -32,7 +32,10 @@ def simulate_dipole(net, n_trials=None):
         List of dipole objects for each trials
     """
 
-    from .parallel_backends import _BACKEND
+    from .parallel_backends import _BACKEND, JoblibBackend
+
+    if _BACKEND is None:
+        _BACKEND = JoblibBackend(n_jobs=1)
 
     if n_trials is not None:
         net.params['N_trials'] = n_trials
