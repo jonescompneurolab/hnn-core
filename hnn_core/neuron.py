@@ -229,6 +229,18 @@ class NeuronNetwork(object):
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
         (or input) types.
+
+    Notes
+    -----
+    NeuronNetwork is not a pickleable class because it contains many NEURON
+    objects once it has been instantiated. This is important for the Joblib
+    backend that passes a pickled Network object to each forked process (job)
+    and only instantiates NeuronNetwork after the fork.
+
+    The `_build` routine can be called again to run more simulations without
+    creating new `nrniv` processes. Instead, the NERUON objects are recreated
+    and gids are reassigned according to the specifications in
+    `self.net.params` and the network is ready for another simulation.
     """
 
     def __init__(self, net):

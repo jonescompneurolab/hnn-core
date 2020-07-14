@@ -34,12 +34,12 @@ print(params)
 print(params['L2Pyr_soma*'])
 
 ###############################################################################
-# Now let's simulate the dipole, running multiple trials in parallel
-# with JoblibBackend. It will run each trial as a separate job by default
+# Now let's simulate the dipole, running 2 trials with the Joblib backend.
+# To run them in parallel we could set n_jobs to equal the number of trials.
 from hnn_core import JoblibBackend
 
 net = Network(params)
-with JoblibBackend():
+with JoblibBackend(n_jobs=1):
     dpls = simulate_dipole(net, n_trials=2)
 
 ###############################################################################
