@@ -1,5 +1,4 @@
 import os.path as op
-import pytest
 
 from numpy import loadtxt
 from numpy.testing import assert_array_equal

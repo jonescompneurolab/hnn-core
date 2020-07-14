@@ -49,8 +49,6 @@ class JoblibBackend(object):
         The number of jobs to start in parallel
     """
     def __init__(self, n_jobs=1):
-        self.type = 'joblib'
-
         self.n_jobs = n_jobs
         print("joblib will run over %d jobs" % (self.n_jobs))
 
@@ -128,7 +126,9 @@ class MPIBackend(object):
     Parameters
     ----------
     n_procs : int | None
-        The number of MPI processes requested by the user
+        The number of MPI processes requested by the user. If None, then will
+        attempt to detect number of cores (including hyperthreads) and start
+        parallel simulation over all of them.
     mpi_cmd : str
         The name of the mpi launcher executable. Will use 'mpiexec'
         (openmpi) by default.
@@ -185,7 +185,6 @@ class MPIBackend(object):
             warn('mpi4py not installed. will run on single processor')
             self.n_procs = 1
 
-        self._type = 'mpi'
         self.mpi_cmd_str = mpi_cmd
 
         if self.n_procs == 1:
