@@ -29,10 +29,9 @@ print(params)
 
 ###############################################################################
 # Now let's simulate the dipole
-# You can simulate multiple trials in parallel by using n_jobs > 1
 
 net = Network(params)
-dpls = simulate_dipole(net, n_jobs=1, n_trials=1)
+dpls = simulate_dipole(net, n_trials=1)
 
 ###############################################################################
 # We can plot the time-frequency response using MNE

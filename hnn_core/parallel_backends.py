@@ -12,6 +12,8 @@ import codecs
 from warnings import warn
 from subprocess import Popen, PIPE
 
+_BACKEND = None
+
 
 def _gather_trial_data(sim_data, net, n_trials):
     """Arrange data by trial
@@ -118,10 +120,6 @@ class JoblibBackend(object):
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
-
-
-# Set JoblibBackend as the global default
-_BACKEND = JoblibBackend
 
 
 class MPIBackend(object):
