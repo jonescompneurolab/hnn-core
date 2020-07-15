@@ -85,9 +85,9 @@ jobs:
                 - "46:05:f8:a5:da:f1:b2:f1:d1:d6:20:98:a4:75:4a:00"
 
           - run:
-              # push built docs into the `dev` directory on the `gh-pages` branch
+              # push built docs directory on the `gh-pages` branch
               name: Deploy docs to gh-pages branch
-              command: gh-pages --dotfiles --message "doc updates [skip ci]" --dist doc/_build/html --dest ./dev
+              command: gh-pages --dotfiles --message "doc updates [skip ci]" --dist doc/_build/html --dest .
 
 workflows:
   build:
