@@ -406,9 +406,11 @@ class NeuronNetwork(object):
                             target_cell_type=target_cell_type,
                             params=self.net.p_unique[src_type],
                             gid=gid))
-                _PC.cell(gid,
-                         self.unique_feeds[src_type][-1].connect_to_target(
-                         self.net.params['threshold']))
+                _PC.cell(
+                    gid,
+                    self.unique_feeds[src_type]
+                    [-1].connect_to_target(
+                        self.net.params['threshold']))
             else:
                 raise ValueError('No parameters specified for external feed '
                                  'type: %s' % src_type)
