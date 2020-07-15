@@ -24,10 +24,10 @@ It is early Work in Progress. Contributors are very welcome.
 Dependencies
 ------------
 
-* Neuron: installation instructions here: https://neuron.yale.edu/neuron/
-* scipy
 * numpy
+* scipy
 * matplotlib
+* Neuron: installation instructions here: https://neuron.yale.edu/neuron/
 
 Optional dependencies
 ---------------------
@@ -73,9 +73,11 @@ and it should not give any error messages.
 Parallel backends
 =================
 
-For further instructions on installation and usage of parallel backends for using more than one core, refer to :ref:`parallel_backends`
+For further instructions on installation and usage of parallel backends for using more than one core, refer to `parallel_backends`_
 
 Bug reports
 ===========
 
 Use the `github issue tracker <https://github.com/jonescompneurolab/hnn-core/issues>`_ to report bugs.
+
+.. _parallel_backends: https://jonescompneurolab.github.io/hnn-core/parallel.html
