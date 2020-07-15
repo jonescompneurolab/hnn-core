@@ -263,7 +263,7 @@ class NeuronNetwork(object):
         _create_parallel_context()
 
         # load mechanisms needs ParallelContext for get_rank
-        # load_custom_mechanisms()
+        load_custom_mechanisms()
 
         if _get_rank() == 0:
             print('Building the NEURON model')
