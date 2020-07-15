@@ -406,9 +406,11 @@ class NeuronNetwork(object):
                             target_cell_type=target_cell_type,
                             params=self.net.p_unique[src_type],
                             gid=gid))
-                _PC.cell(gid,
-                         self.unique_feeds[src_type][-1].connect_to_target(
-                             self.net.params['threshold']))
+                _PC.cell(
+                    gid,
+                    self.unique_feeds[src_type]
+                    [-1].connect_to_target(
+                        self.net.params['threshold']))
             else:
                 raise ValueError('No parameters specified for external feed '
                                  'type: %s' % src_type)
@@ -497,8 +499,7 @@ class NeuronNetwork(object):
             cell.move_to_pos()
 
     def _clear_neuron_objects(self):
-        """
-        Clear up NEURON internal gid information.
+        """Clear up NEURON internal gid information.
 
         Note: This function must be called from the context of the
         Network instance that ran build_in_neuron. This is a bug or

@@ -203,6 +203,8 @@ class L2Basket(BasketSingle):
 
 
 class L5Basket(BasketSingle):
+    """Class for layer 5 basket cells."""
+
     def __init__(self, gid=-1, pos=-1):
         # Note: Cell properties are set in BasketSingle()
         BasketSingle.__init__(self, gid, pos, 'L5Basket')

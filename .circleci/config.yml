@@ -64,7 +64,38 @@ jobs:
               path: doc/_build/html/
               destination: html
 
+    docs-deploy:
+        # will only be run on master branch
+        docker:
+          - image: node:8.10.0
+        steps:
+          - checkout
+
+          - attach_workspace:
+              at: doc/_build
+
+          - run:
+              name: Install and configure dependencies
+              command: |
+                npm install -g --silent gh-pages@2.2
+                git config --global user.email "circle@jonescompneurolab.com"
+                git config --global user.name "Circle Ci"
+          - add_ssh_keys:
+              fingerprints:
+                - "46:05:f8:a5:da:f1:b2:f1:d1:d6:20:98:a4:75:4a:00"
+
+          - run:
+              # push built docs directory on the `gh-pages` branch
+              name: Deploy docs to gh-pages branch
+              command: gh-pages --dotfiles --message "doc updates [skip ci]" --dist doc/_build/html --dest .
+
 workflows:
   build:
     jobs:
       - build_docs
+      - docs-deploy:
+          requires:
+            - build_docs
+          filters:
+            branches:
+              only: master

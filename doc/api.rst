@@ -7,6 +7,7 @@ API Documentation
 =================
 
 Simulation (:py:mod:`hnn_core`):
+----------
 
 .. currentmodule:: hnn_core
 
@@ -22,6 +23,9 @@ Simulation (:py:mod:`hnn_core`):
    Network
    Spikes
 
+Params (:py:mod:`hnn_core.params`):
+------
+
 .. currentmodule:: hnn_core.params
 
 .. autosummary::
@@ -30,6 +34,8 @@ Simulation (:py:mod:`hnn_core`):
    Params
    read_params
 
+Parallel backends (:py:mod:`hnn_core.parallel_backends`):
+-----------------
 .. currentmodule:: hnn_core.parallel_backends
 
 .. autosummary::
@@ -39,7 +45,8 @@ Simulation (:py:mod:`hnn_core`):
    JoblibBackend
 
 
-Inputs and Outputs (:py:mod:`hnn_core`):
+Input and Output:
+----------------
 
 .. currentmodule:: hnn_core
 
