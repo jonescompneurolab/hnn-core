@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hnn_core.ExtFeed &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -45,7 +48,7 @@
                 <li><a href="../auto_examples/index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
-                <li><a href="https://github.com/hnnsolver/hnn-core">GitHub</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -106,21 +109,31 @@
       
   <div class="section" id="hnn-core-extfeed">
 <h1>hnn_core.ExtFeed<a class="headerlink" href="#hnn-core-extfeed" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="hnn_core.ExtFeed">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">ExtFeed</code><span class="sig-paren">(</span><em class="sig-param">ty</em>, <em class="sig-param">celltype</em>, <em class="sig-param">p_ext</em>, <em class="sig-param">gid</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.ExtFeed" title="Permalink to this definition">¶</a></dt>
-<dd><p>“The ExtFeed class.</p>
-<dl class="field-list simple">
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">ExtFeed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feed_type</span></em>, <em class="sig-param"><span class="n">target_cell_type</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">gid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.ExtFeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ExtFeed class of external spike input times.</p>
+<p>An external input “feed” to the network, i.e., one that is independent of
+the spiking output of cells in the network.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ty</strong><span class="classifier">str</span></dt><dd><p>The feed type. Can be:
-‘extpois’, ‘evprox’, ‘evdist’, ‘extgauss’, ‘extinput’</p>
+<dd class="field-odd"><dl>
+<dt><strong>feed_type</strong><span class="classifier">str</span></dt><dd><p>The feed type, which is one of
+‘extpois’ : Poisson-distributed input to proximal dendrites
+‘extgauss’ : Gaussian-distributed input to proximal dendrites
+‘evprox’ : Proximal input at specified time (or Gaussian spread)
+‘evdist’ : Distal input at specified time (or Gaussian spread)</p>
+<p>‘common’ : As opposed to other feed types, these have timing that is
+identical (synchronous) for all real cells in the network. Proximal
+and distal dendrites have separate parameter sets, and need not be
+synchronous. Note that not all cells classes (types) are required to
+receive ‘common’ input—separate conductivity values can be assigned
+to basket vs. pyramidal cells and AMPA vs. NMDA synapses</p>
 </dd>
-<dt><strong>celltype</strong><span class="classifier">str | None</span></dt><dd><p>The cell type.</p>
+<dt><strong>target_cell_type</strong><span class="classifier">str | None</span></dt><dd><p>The target cell type of the feed, e.g., ‘L2_basket’, ‘L5_pyramidal’,
+etc., or None for ‘common’ inputs</p>
 </dd>
-<dt><strong>p_ext</strong><span class="classifier">dict | list (XXX: check)</span></dt><dd><p>Parameters of external input.
-p_ext has a different structure for the extinput
-usually, p_ext is a dict of cell types</p>
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameters of the external input feed, arranged into a dictionary.</p>
 </dd>
 <dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>The cell ID.</p>
 </dd>
@@ -128,6 +141,11 @@ usually, p_ext is a dict of cell types</p>
 </dd>
 <dt class="field-even">Attributes</dt>
 <dd class="field-even"><dl class="simple">
+<dt><strong>nrn_eventvec</strong><span class="classifier">instance of NEURON Vector</span></dt><dd><p>A vector of event times</p>
+</dd>
+<dt><strong>nrn_vecstim</strong><span class="classifier">instance of NEURON VecStim</span></dt><dd><p>A VecStim is an artificial spiking cell that generates events at
+times that are specified in a (NEURON) Vector (see vecevent.mod)</p>
+</dd>
 <dt><strong>seed</strong><span class="classifier">int</span></dt><dd><p>The seed</p>
 </dd>
 <dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>The cell ID</p>
@@ -136,34 +154,26 @@ usually, p_ext is a dict of cell types</p>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(self, threshold)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 66%" />
-<col style="width: 34%" />
+<col style="width: 68%" />
+<col style="width: 32%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><strong>set_event_times</strong></p></td>
+<tr class="row-odd"><td><p><strong>connect_to_target</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><strong>set_prng</strong></p></td>
+<tr class="row-even"><td><p><strong>set_event_times</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>set_prng</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.ExtFeed.__repr__">
-<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.ExtFeed.__repr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.ExtFeed.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
@@ -184,7 +194,7 @@ usually, p_ext is a dict of cell types</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>

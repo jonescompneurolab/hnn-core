@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_alpha.py>` to download the full example code or run this example in your browser via Binder
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_simulate_alpha.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_alpha.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_simulate_alpha.py:
 
 
 ====================
@@ -29,6 +31,7 @@ HNN-core.
 
 
 
+
 Let us import hnn_core
 
 
@@ -44,12 +47,14 @@ Let us import hnn_core
 
 
 
+
 Then we setup the directories and Neuron
 
 
 .. code-block:: default
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+
 
 
 
@@ -275,13 +280,13 @@ Then we read the default parameters file
         "numspikes_evdist_1": 1,
         "numspikes_evprox_1": 1,
         "numspikes_evprox_2": 1,
-        "prng_seedcore_evdist_1": 4,
-        "prng_seedcore_evprox_1": 4,
-        "prng_seedcore_evprox_2": 4,
-        "prng_seedcore_extgauss": 4,
-        "prng_seedcore_extpois": 4,
-        "prng_seedcore_input_dist": 4,
-        "prng_seedcore_input_prox": 4,
+        "prng_seedcore_evdist_1": 2,
+        "prng_seedcore_evprox_1": 2,
+        "prng_seedcore_evprox_2": 2,
+        "prng_seedcore_extgauss": 2,
+        "prng_seedcore_extpois": 2,
+        "prng_seedcore_input_dist": 2,
+        "prng_seedcore_input_prox": 2,
         "repeats_dist": 10,
         "repeats_prox": 10,
         "save_dpl": 0,
@@ -308,6 +313,7 @@ Then we read the default parameters file
 
 
 
+
 Now, we update a few parameters
 
 
@@ -316,9 +322,9 @@ Now, we update a few parameters
     params.update({
         'dipole_scalefctr': 150000.0,
         'dipole_smooth_win': 0,
-        'tstop': 710.0,
+        'tstop': 310.0,
         't0_input_prox': 2000.0,
-        'tstop_input_prox': 710.0,
+        'tstop_input_prox': 310.0,
         't0_input_dist': 50.0,
         'tstop_input_dist': 1001.0,
         't_evprox_1': 1000,
@@ -329,8 +335,10 @@ Now, we update a few parameters
         'sigma_t_evdist_1': 6.0,
         'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
         'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
-        'sync_evinput': 1
+        'sync_evinput': 1,
+        "prng_seedcore_input_dist": 3
     })
+
 
 
 
@@ -352,6 +360,7 @@ by using the pattern gbar_ev*
 
 
 
+
 Now let's simulate the dipole and plot it
 
 
@@ -365,6 +374,7 @@ Now let's simulate the dipole and plot it
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_alpha_001.png
+    :alt: agg
     :class: sphx-glr-single-img
 
 
@@ -374,9 +384,10 @@ Now let's simulate the dipole and plot it
 
  .. code-block:: none
 
+    joblib will run over 1 jobs
     Building the NEURON model
     [Done]
-    running on 1 cores
+    running trial 1 on 1 cores
     Simulation time: 0.03 ms...
     Simulation time: 10.0 ms...
     Simulation time: 20.0 ms...
@@ -408,48 +419,8 @@ Now let's simulate the dipole and plot it
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    Simulation time: 310.0 ms...
-    Simulation time: 320.0 ms...
-    Simulation time: 330.0 ms...
-    Simulation time: 340.0 ms...
-    Simulation time: 350.0 ms...
-    Simulation time: 360.0 ms...
-    Simulation time: 370.0 ms...
-    Simulation time: 380.0 ms...
-    Simulation time: 390.0 ms...
-    Simulation time: 400.0 ms...
-    Simulation time: 410.0 ms...
-    Simulation time: 420.0 ms...
-    Simulation time: 430.0 ms...
-    Simulation time: 440.0 ms...
-    Simulation time: 450.0 ms...
-    Simulation time: 460.0 ms...
-    Simulation time: 470.0 ms...
-    Simulation time: 480.0 ms...
-    Simulation time: 490.0 ms...
-    Simulation time: 500.0 ms...
-    Simulation time: 510.0 ms...
-    Simulation time: 520.0 ms...
-    Simulation time: 530.0 ms...
-    Simulation time: 540.0 ms...
-    Simulation time: 550.0 ms...
-    Simulation time: 560.0 ms...
-    Simulation time: 570.0 ms...
-    Simulation time: 580.0 ms...
-    Simulation time: 590.0 ms...
-    Simulation time: 600.0 ms...
-    Simulation time: 610.0 ms...
-    Simulation time: 620.0 ms...
-    Simulation time: 630.0 ms...
-    Simulation time: 640.0 ms...
-    Simulation time: 650.0 ms...
-    Simulation time: 660.0 ms...
-    Simulation time: 670.0 ms...
-    Simulation time: 680.0 ms...
-    Simulation time: 690.0 ms...
-    Simulation time: 700.0 ms...
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
+
+    <Figure size 640x480 with 1 Axes>
 
 
 
@@ -476,24 +447,17 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_alpha_002.png
+    :alt: plot simulate alpha
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_alpha.py:78: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 4 minutes  31.945 seconds)
+   **Total running time of the script:** ( 1 minutes  11.607 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:
@@ -508,17 +472,17 @@ We can confirm that what we simulate is indeed 10 Hz activity.
   .. container:: binder-badge
 
     .. image:: https://mybinder.org/badge_logo.svg
-      :target: https://mybinder.org/v2/gh/hnnsolver/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_alpha.ipynb
+      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_alpha.ipynb
       :width: 150 px
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_simulate_alpha.py <plot_simulate_alpha.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_simulate_alpha.ipynb <plot_simulate_alpha.ipynb>`
 

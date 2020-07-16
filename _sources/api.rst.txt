@@ -7,6 +7,7 @@ API Documentation
 =================
 
 Simulation (:py:mod:`hnn_core`):
+----------
 
 .. currentmodule:: hnn_core
 
@@ -20,6 +21,10 @@ Simulation (:py:mod:`hnn_core`):
    ExtFeed
    simulate_dipole
    Network
+   Spikes
+
+Params (:py:mod:`hnn_core.params`):
+------
 
 .. currentmodule:: hnn_core.params
 
@@ -28,3 +33,25 @@ Simulation (:py:mod:`hnn_core`):
 
    Params
    read_params
+
+Parallel backends (:py:mod:`hnn_core.parallel_backends`):
+-----------------
+.. currentmodule:: hnn_core.parallel_backends
+
+.. autosummary::
+   :toctree: generated/
+
+   MPIBackend
+   JoblibBackend
+
+
+Input and Output:
+----------------
+
+.. currentmodule:: hnn_core
+
+.. autosummary::
+   :toctree: generated/
+
+   read_dipole
+   read_spikes

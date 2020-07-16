@@ -1,0 +1,11 @@
+hnn_core.parallel_backends.JoblibBackend
+========================================
+
+.. currentmodule:: hnn_core.parallel_backends
+
+.. autoclass:: JoblibBackend
+   :members:
+   :special-members: __getitem__, __repr__
+
+   
+   

@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_gamma.py>` to download the full example code or run this example in your browser via Binder
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_simulate_gamma.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_gamma.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_simulate_gamma.py:
 
 
 ======================
@@ -30,6 +32,7 @@ Replicates: https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma
 
 
 
+
 Let us import hnn_core
 
 
@@ -45,13 +48,6 @@ Let us import hnn_core
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    Loading custom mechanism files from /Users/mainak/Documents/github_repos/hnn-core/hnn_core/../mod/x86_64/.libs/libnrnmech.so
 
 
 
@@ -277,7 +273,7 @@ Then we read the parameters file
         "prng_seedcore_evprox_1": 0,
         "prng_seedcore_evprox_2": 0,
         "prng_seedcore_extgauss": 0,
-        "prng_seedcore_extpois": -1,
+        "prng_seedcore_extpois": -3,
         "prng_seedcore_input_dist": 0,
         "prng_seedcore_input_prox": 0,
         "repeats_dist": 10,
@@ -306,15 +302,15 @@ Then we read the parameters file
 
 
 
+
 Now let's simulate the dipole
-You can simulate multiple trials in parallel by using n_jobs > 1
 
 
 .. code-block:: default
 
 
     net = Network(params)
-    dpls = simulate_dipole(net, n_jobs=1, n_trials=1)
+    dpls = simulate_dipole(net, n_trials=1)
 
 
 
@@ -326,9 +322,10 @@ You can simulate multiple trials in parallel by using n_jobs > 1
 
  .. code-block:: none
 
+    joblib will run over 1 jobs
     Building the NEURON model
     [Done]
-    running on 1 cores
+    running trial 1 on 1 cores
     Simulation time: 0.03 ms...
     Simulation time: 10.0 ms...
     Simulation time: 20.0 ms...
@@ -357,6 +354,7 @@ You can simulate multiple trials in parallel by using n_jobs > 1
 
 
 
+
 We can plot the time-frequency response using MNE
 
 
@@ -367,7 +365,7 @@ We can plot the time-frequency response using MNE
     from mne.time_frequency import tfr_array_multitaper
 
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-    dpls[0].plot(ax=axes[0], layer='agg')
+    dpls[0].plot(ax=axes[0], layer='agg', show=False)
 
     sfreq = 1000. / params['dt']
     time_bandwidth = 4.0
@@ -386,28 +384,22 @@ We can plot the time-frequency response using MNE
     axes[1].set_xlabel('Time (ms)')
     axes[1].set_ylabel('Frequency (Hz)')
     plt.xlim((0, params['tstop']))
+    plt.show()
 
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_gamma_001.png
+    :alt: agg
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:209: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  1.680 seconds)
+   **Total running time of the script:** ( 1 minutes  11.825 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_gamma.py:
@@ -422,17 +414,17 @@ We can plot the time-frequency response using MNE
   .. container:: binder-badge
 
     .. image:: https://mybinder.org/badge_logo.svg
-      :target: https://mybinder.org/v2/gh/hnnsolver/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_gamma.ipynb
+      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_gamma.ipynb
       :width: 150 px
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_simulate_gamma.py <plot_simulate_gamma.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_simulate_gamma.ipynb <plot_simulate_gamma.ipynb>`
 

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallel backends &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="auto_examples/index.html">Examples</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Parallel backends</a><ul>
+<li><a class="reference internal" href="#joblib">Joblib</a></li>
+<li><a class="reference internal" href="#mpi">MPI</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/parallel.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="parallel-backends">
+<h1>Parallel backends<a class="headerlink" href="#parallel-backends" title="Permalink to this headline">¶</a></h1>
+<p>Two options are available for making use of multiple CPU cores. The first runs multiple trials in parallel with joblib. Alternatively, you can run each trial across multiple cores to reduce the runtime.</p>
+<div class="section" id="joblib">
+<h2>Joblib<a class="headerlink" href="#joblib" title="Permalink to this headline">¶</a></h2>
+<p>This is the default backend and will execute multiple trials at the same time, with each trial running on a separate core in “embarrassingly parallel” execution. Note that with only 1 trial, there will be no parallelism.</p>
+<p><strong>Dependencies</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install joblib
+</pre></div>
+</div>
+<p><strong>Usage</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">JoblibBackend</span>
+
+<span class="c1"># set n_jobs to the number of trials to run in parallel with Joblib (up to number of cores on system)</span>
+<span class="k">with</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mpi">
+<h2>MPI<a class="headerlink" href="#mpi" title="Permalink to this headline">¶</a></h2>
+<p>This backend will use MPI (Message Passing Interface) on the system to split neurons across CPU cores (processors) and reduce the simulation time as more cores are used.</p>
+<p><strong>Linux Dependencies</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install libopenmpi-dev openmpi-bin
+$ pip install mpi4py psutil
+</pre></div>
+</div>
+<p><strong>MacOS Dependencies</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install yes openmpi mpi4py
+$ pip install psutil
+</pre></div>
+</div>
+<p><strong>MacOS Environment</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
+</pre></div>
+</div>
+<p>Alternatively, run the commands below will avoid needing to run the export command every time a new shell is opened:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ${CONDA_PREFIX}
+$ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
+$ echo &quot;export OLD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
+$ echo &quot;export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${CONDA_PREFIX}/lib&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
+$ echo &quot;export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
+$ echo &quot;unset OLD_LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
+</pre></div>
+</div>
+<p><strong>Test MPI</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpiexec -np 2 nrniv -mpi -python -c &#39;from neuron import h; from mpi4py import MPI; \
+                                       print(&quot;Hello from proc %d&quot; % MPI.COMM_WORLD.Get_rank()); \
+                                           h.quit()&#39;
+numprocs=2
+NEURON -- VERSION 7.7.2 7.7 (2b7985ba) 2019-06-20
+Duke, Yale, and the BlueBrain Project -- Copyright 1984-2018
+See http://neuron.yale.edu/neuron/credits
+
+Hello from proc 0
+Hello from proc 1
+</pre></div>
+</div>
+<p>Verifies that MPI, NEURON, and Python are all working together.</p>
+<p><strong>Usage</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">MPIBackend</span>
+
+<span class="c1"># set n_procs to the number of processors MPI can use (up to number of cores on system)</span>
+<span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Mainak Jas.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

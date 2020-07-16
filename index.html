@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hnn-core &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
@@ -45,7 +48,7 @@
                 <li><a href="auto_examples/index.html">Examples</a></li>
                 <li><a href="api.html">API</a></li>
                 <li><a href="whats_new.html">Whats new</a></li>
-                <li><a href="https://github.com/hnnsolver/hnn-core">GitHub</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -70,9 +73,11 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">hnn-core</a><ul>
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#optional-dependencies">Optional dependencies</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#parallel-backends">Parallel backends</a></li>
 <li><a class="reference internal" href="#bug-reports">Bug reports</a></li>
 </ul>
 </ul>
@@ -112,18 +117,30 @@
   <div class="section" id="hnn-core">
 <h1>hnn-core<a class="headerlink" href="#hnn-core" title="Permalink to this headline">¶</a></h1>
 <a class="reference external image-reference" href="https://gitter.im/hnn-core/hnn-core?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img alt="Gitter" src="https://badges.gitter.im/hnn-core/hnn-core.svg" /></a>
-<a class="reference external image-reference" href="https://travis-ci.org/hnnsolver/hnn-core"><img alt="Build Status" src="https://api.travis-ci.org/hnnsolver/hnn-core.svg?branch=master" /></a>
-<a class="reference external image-reference" href="https://codecov.io/gh/hnnsolver/hnn-core"><img alt="Test coverage" src="https://codecov.io/gh/hnnsolver/hnn-core/branch/master/graph/badge.svg" /></a>
+<a class="reference external image-reference" href="https://circleci.com/gh/jonescompneurolab/hnn-core"><img alt="CircleCi" src="https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg" /></a>
+<a class="reference external image-reference" href="https://travis-ci.org/jonescompneurolab/hnn-core"><img alt="Build Status" src="https://api.travis-ci.org/jonescompneurolab/hnn-core.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/jonescompneurolab/hnn-core"><img alt="Test coverage" src="https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg" /></a>
 <p>This is a leaner and cleaner version of the code based off the <a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN repository</a>. However, a Graphical User Interface is not supported at the moment in this repository.</p>
 <p>It is early Work in Progress. Contributors are very welcome.</p>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Neuron: installation instructions here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a></p></li>
-<li><p>scipy</p></li>
 <li><p>numpy</p></li>
+<li><p>scipy</p></li>
 <li><p>matplotlib</p></li>
-<li><p>joblib (optional for parallel processing)</p></li>
+<li><p>Neuron: installation instructions here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a></p></li>
+</ul>
+</div>
+<div class="section" id="optional-dependencies">
+<h2>Optional dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>joblib (for simulating trials simultaneously)</p></li>
+<li><p>mpi4py (for simulating the cells in parallel for a single trial). Also depends on:</p>
+<ul>
+<li><p>openmpi or other mpi platform installed on system</p></li>
+<li><p>psutil</p></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -133,14 +150,13 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install numpy matplotlib scipy
 </pre></div>
 </div>
-<p>For joblib, you can do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install joblib
+<p>Additionally, you would need Neuron which is available here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a>. It can also be installed via pip now:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install NEURON
 </pre></div>
 </div>
-<p>Additionally, you would need Neuron which is available here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a></p>
 <p>Since <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.</p>
 <p>To install the latest version of the code (nightly) do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/hnnsolver/hnn-core.git
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/jonescompneurolab/hnn-core.git
 $ cd hnn-core/
 $ python setup.py develop
 </pre></div>
@@ -157,9 +173,13 @@ mechanisms using <cite>nrnivmodl</cite> from Neuron. To do this, simple do:</p>
 </div>
 <p>and it should not give any error messages.</p>
 </div>
+<div class="section" id="parallel-backends">
+<h1>Parallel backends<a class="headerlink" href="#parallel-backends" title="Permalink to this headline">¶</a></h1>
+<p>For further instructions on installation and usage of parallel backends for using more than one core, refer to <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/parallel.html">parallel_backends</a></p>
+</div>
 <div class="section" id="bug-reports">
 <h1>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h1>
-<p>Use the <a class="reference external" href="https://github.com/hnnsolver/hnn-core/issues">github issue tracker</a> to report bugs.</p>
+<p>Use the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues">github issue tracker</a> to report bugs.</p>
 </div>
 
 
@@ -175,7 +195,7 @@ mechanisms using <cite>nrnivmodl</cite> from Neuron. To do this, simple do:</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>

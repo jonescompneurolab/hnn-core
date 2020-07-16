@@ -14,33 +14,14 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model. ">
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
+     :alt: Plot firing pattern
 
-        :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_simulate_evoked
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model.">
-
-.. only:: html
-
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
-
-        :ref:`sphx_glr_auto_examples_plot_firing_pattern.py`
+     :ref:`sphx_glr_auto_examples_plot_firing_pattern.py`
 
 .. raw:: html
 
@@ -54,13 +35,35 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using HNN-core.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core. ">
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+     :alt: Simulate dipole
 
-        :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`
+     :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_simulate_evoked
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using HNN-core. ">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
+     :alt: Simulate alpha waves
+
+     :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`
 
 .. raw:: html
 
@@ -78,9 +81,10 @@ Some introductory examples to get started with hnn-core
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
+     :alt: Simulate gamma rhythms
 
-        :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py`
+     :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py`
 
 .. raw:: html
 
@@ -98,9 +102,10 @@ Some introductory examples to get started with hnn-core
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
+     :alt: Simulate somato data
 
-        :ref:`sphx_glr_auto_examples_plot_simulate_somato.py`
+     :ref:`sphx_glr_auto_examples_plot_simulate_somato.py`
 
 .. raw:: html
 
@@ -113,7 +118,7 @@ Some introductory examples to get started with hnn-core
    /auto_examples/plot_simulate_somato
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
 
 
@@ -123,15 +128,15 @@ Some introductory examples to get started with hnn-core
     :class: sphx-glr-footer-gallery
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/mainak/Documents/github_repos/hnn-core/doc/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//home/circleci/project/doc/auto_examples/auto_examples_python.zip>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/mainak/Documents/github_repos/hnn-core/doc/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//home/circleci/project/doc/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html
