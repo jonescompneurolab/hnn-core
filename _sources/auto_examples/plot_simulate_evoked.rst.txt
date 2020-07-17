@@ -1,12 +1,10 @@
-.. only:: html
+.. note::
+    :class: sphx-glr-download-link-note
 
-    .. note::
-        :class: sphx-glr-download-link-note
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_evoked.py>` to download the full example code or run this example in your browser via Binder
+.. rst-class:: sphx-glr-example-title
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_evoked.py>`     to download the full example code or to run this example in your browser via Binder
-    .. rst-class:: sphx-glr-example-title
-
-    .. _sphx_glr_auto_examples_plot_simulate_evoked.py:
+.. _sphx_glr_auto_examples_plot_simulate_evoked.py:
 
 
 ===============
@@ -33,7 +31,6 @@ waveforms using HNN-core.
 
 
 
-
 Let us import hnn_core
 
 
@@ -44,7 +41,6 @@ Let us import hnn_core
     from hnn_core import simulate_dipole, read_params, Network, read_spikes
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
-
 
 
 
@@ -303,7 +299,6 @@ Then we read the parameters file
 
 
 
-
 This is a lot of parameters! We can also filter the
 parameters using unix-style wildcard characters
 
@@ -333,7 +328,6 @@ parameters using unix-style wildcard characters
         "L2Pyr_soma_gl_hh2": 4.26e-05,
         "L2Pyr_soma_gnabar_hh2": 0.18
     }
-
 
 
 
@@ -403,7 +397,6 @@ To run them in parallel we could set n_jobs to equal the number of trials.
 
 
 
-
 and then plot it
 
 
@@ -419,7 +412,6 @@ and then plot it
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
-    :alt: agg
     :class: sphx-glr-single-img
 
 
@@ -429,8 +421,8 @@ and then plot it
 
  .. code-block:: none
 
-
-    <Figure size 600x600 with 2 Axes>
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:308: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -457,14 +449,12 @@ wildcard expressions.
     *
 
       .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_002.png
-          :alt: plot simulate evoked
-          :class: sphx-glr-multi-img
+            :class: sphx-glr-multi-img
 
     *
 
       .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_003.png
-          :alt: plot simulate evoked
-          :class: sphx-glr-multi-img
+            :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -473,8 +463,8 @@ wildcard expressions.
 
  .. code-block:: none
 
-
-    <Figure size 640x480 with 1 Axes>
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:483: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -487,7 +477,6 @@ synchronous and see what happens
 
     params.update({'sync_evinput': True})
     net_sync = Network(params)
-
 
 
 
@@ -519,14 +508,12 @@ openmpi, which must be installed on the system
     *
 
       .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_004.png
-          :alt: agg
-          :class: sphx-glr-multi-img
+            :class: sphx-glr-multi-img
 
     *
 
       .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_005.png
-          :alt: plot simulate evoked
-          :class: sphx-glr-multi-img
+            :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -535,13 +522,13 @@ openmpi, which must be installed on the system
 
  .. code-block:: none
 
-    MPI will run over 2 processes
-    Running 1 trials...
-    numprocs=2
-    Loading custom mechanism files from /home/circleci/project/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/parallel_backends.py:185: UserWarning: mpi4py not installed. will run on single processor
+      warn('mpi4py not installed. will run on single processor')
+    Backend will use 1 core. Running simulation without MPI
+    joblib will run over 1 jobs
     Building the NEURON model
     [Done]
-    running trial 1 on 2 cores
+    running trial 1 on 1 cores
     Simulation time: 0.03 ms...
     Simulation time: 10.0 ms...
     Simulation time: 20.0 ms...
@@ -559,16 +546,15 @@ openmpi, which must be installed on the system
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
-
-
-    <Figure size 640x480 with 1 Axes>
+    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:142: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  36.915 seconds)
+   **Total running time of the script:** ( 4 minutes  58.078 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:
@@ -587,13 +573,13 @@ openmpi, which must be installed on the system
       :width: 150 px
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+  .. container:: sphx-glr-download
 
      :download:`Download Python source code: plot_simulate_evoked.py <plot_simulate_evoked.py>`
 
 
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
+  .. container:: sphx-glr-download
 
      :download:`Download Jupyter notebook: plot_simulate_evoked.ipynb <plot_simulate_evoked.ipynb>`
 

@@ -1,12 +1,10 @@
-.. only:: html
+.. note::
+    :class: sphx-glr-download-link-note
 
-    .. note::
-        :class: sphx-glr-download-link-note
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_gamma.py>` to download the full example code or run this example in your browser via Binder
+.. rst-class:: sphx-glr-example-title
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_gamma.py>`     to download the full example code or to run this example in your browser via Binder
-    .. rst-class:: sphx-glr-example-title
-
-    .. _sphx_glr_auto_examples_plot_simulate_gamma.py:
+.. _sphx_glr_auto_examples_plot_simulate_gamma.py:
 
 
 ======================
@@ -32,7 +30,6 @@ Replicates: https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma
 
 
 
-
 Let us import hnn_core
 
 
@@ -43,7 +40,6 @@ Let us import hnn_core
     from hnn_core import simulate_dipole, read_params, Network
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
-
 
 
 
@@ -302,7 +298,6 @@ Then we read the parameters file
 
 
 
-
 Now let's simulate the dipole
 
 
@@ -354,7 +349,6 @@ Now let's simulate the dipole
 
 
 
-
 We can plot the time-frequency response using MNE
 
 
@@ -389,17 +383,24 @@ We can plot the time-frequency response using MNE
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_gamma_001.png
-    :alt: agg
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_gamma.py:62: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  11.825 seconds)
+   **Total running time of the script:** ( 3 minutes  28.391 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_gamma.py:
@@ -418,13 +419,13 @@ We can plot the time-frequency response using MNE
       :width: 150 px
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+  .. container:: sphx-glr-download
 
      :download:`Download Python source code: plot_simulate_gamma.py <plot_simulate_gamma.py>`
 
 
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
+  .. container:: sphx-glr-download
 
      :download:`Download Jupyter notebook: plot_simulate_gamma.ipynb <plot_simulate_gamma.ipynb>`
 
