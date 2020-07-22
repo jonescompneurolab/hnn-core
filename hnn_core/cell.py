@@ -14,20 +14,48 @@ h("dp_total_L5 = 0.")  # put here since these variables used in cells
 # Units for gbar: S/cm^2
 
 
-def artificial_cell(event_times, threshold):
+class _ArtificialCell:
+    """An artificial spiking cell with a synapse.
 
-    # Convert event times into nrn vector
-    nrn_eventvec = h.Vector()
-    nrn_eventvec.from_python(event_times)
+    Parameters
+    ----------
+    event_times : list
+        Spike times associated with a single feed source (i.e.,
+        associated with a unique gid).
+    threshold : float
+        Membrane potential threshold that demarks a spike.
 
-    # load eventvec into VecStim object
-    nrn_vecstim = h.VecStim()
-    nrn_vecstim.play(nrn_eventvec)
+    Attributes
+    ----------
+    eventvec : instance of h.Vector
+        The event vector
+    vecstim : instance of h.VecStim (see vecm)
+        The event vector
+    netcon : instance of h.NetCon
+        The netcon object
 
-    # create the cell and artificial NetCon
-    nrn_netcon = h.NetCon(nrn_vecstim, None)
-    nrn_netcon.threshold = threshold
-    return nrn_netcon
+    Notes
+    -----
+    Due to the way Neuron is structured, netcon, nrn_eventvec,
+    nrn_vecstim should not be destroyed for the netcon to remain
+    active. It is why they are attributes to the class.
+    """
+
+    def __init__(self, event_times, threshold):
+        # Convert event times into nrn vector
+        eventvec = h.Vector()
+        eventvec.from_python(event_times)
+        self.eventvec = eventvec
+
+        # load eventvec into VecStim object
+        nrn_vecstim = h.VecStim()
+        nrn_vecstim.play(eventvec)
+        self.vecstim = nrn_vecstim
+
+        # create the cell and artificial NetCon
+        netcon = h.NetCon(nrn_vecstim, None)
+        netcon.threshold = threshold
+        self.netcon = netcon
 
 
 class _Cell(object):

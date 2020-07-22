@@ -8,6 +8,7 @@ import numpy as np
 from neuron import h
 
 from .feed import ExtFeed
+from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 
@@ -381,15 +382,16 @@ class NeuronNetwork(object):
                 # new ExtFeed: target cell type irrelevant (None) since input
                 # timing will be identical for all cells
                 # XXX common_feeds is a list of dict
-                self.common_feeds.append(
-                    ExtFeed(feed_type=src_type,
-                            target_cell_type=None,
-                            params=self.net.p_common[p_ind],
-                            gid=gid))
+                feed = ExtFeed(feed_type=src_type,
+                               target_cell_type=None,
+                               params=self.net.p_common[p_ind],
+                               gid=gid)
+                feed_cell = _ArtificialCell(feed.event_times,
+                                            self.net.params['threshold'])
+                self.common_feeds.append(feed_cell)
 
                 # create the cell and artificial NetCon
-                _PC.cell(gid, self.common_feeds[-1].connect_to_target(
-                         self.net.params['threshold']))
+                _PC.cell(gid, feed_cell.netcon)
 
             # external inputs can also be Poisson- or Gaussian-
             # distributed, or 'evoked' inputs (proximal or distal)
@@ -401,16 +403,14 @@ class NeuronNetwork(object):
                 # new ExtFeed, where now both feed type and target cell type
                 # specified because these feeds have cell-specific parameters
                 # XXX unique_feeds is a dict of dict
-                self.unique_feeds[src_type].append(
-                    ExtFeed(feed_type=src_type,
-                            target_cell_type=target_cell_type,
-                            params=self.net.p_unique[src_type],
-                            gid=gid))
-                _PC.cell(
-                    gid,
-                    self.unique_feeds[src_type]
-                    [-1].connect_to_target(
-                        self.net.params['threshold']))
+                feed = ExtFeed(feed_type=src_type,
+                               target_cell_type=target_cell_type,
+                               params=self.net.p_unique[src_type],
+                               gid=gid)
+                feed_cell = _ArtificialCell(feed.event_times,
+                                            self.net.params['threshold'])
+                self.unique_feeds[src_type].append(feed_cell)
+                _PC.cell(gid, feed_cell.netcon)
             else:
                 raise ValueError('No parameters specified for external feed '
                                  'type: %s' % src_type)

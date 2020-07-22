@@ -9,7 +9,6 @@ import numpy as np
 from glob import glob
 
 from .params import create_pext
-from .cell import artificial_cell
 
 
 def read_spikes(fname, gid_dict=None):

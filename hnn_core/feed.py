@@ -6,10 +6,6 @@
 
 import numpy as np
 
-from neuron import h
-
-from .utils import check_random_state
-
 
 class ExtFeed(object):
     """The ExtFeed class of external spike input times.
