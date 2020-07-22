@@ -95,7 +95,8 @@ html_theme_options = {
         ("Examples", "auto_examples/index"),
         ("API", "api"),
         ("Whats new", "whats_new"),
-        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
+        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True),
+        ("Roadmap", "roadmap")
     ],
     'bootswatch_theme': "united"
 }
