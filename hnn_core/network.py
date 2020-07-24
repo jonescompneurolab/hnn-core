@@ -70,7 +70,8 @@ def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
     n_common_feeds : int
         The number of common feeds.
     p_unique_keys : list of str
-        The keys of the dictionary p_unique.
+        The keys of the dictionary p_unique. Could be 'extpois',
+        'extgauss', or 'evdist_*', or 'evprox_*'
     zdiff : float
         Expressed as a positive DEPTH of L5 relative to L2
         This is a deviation from the original, where L5 was defined at 0
@@ -81,7 +82,7 @@ def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
     pos_dict : dict of list of tuple (x, y, z)
         Dictionary containing coordinate positions.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        'common', and p_unique_keys
+        'common', or any of the elements of the list p_unique_keys
 
     Notes
     -----
