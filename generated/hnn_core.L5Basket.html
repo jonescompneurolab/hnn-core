@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hnn_core.L5Basket &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -106,9 +109,9 @@
       
   <div class="section" id="hnn-core-l5basket">
 <h1>hnn_core.L5Basket<a class="headerlink" href="#hnn-core-l5basket" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="hnn_core.L5Basket">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L5Basket</code><span class="sig-paren">(</span><em class="sig-param">gid=-1</em>, <em class="sig-param">pos=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L5Basket</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">pos</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for layer 5 basket cells.</p>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
@@ -117,80 +120,80 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(self, target, threshold)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(target, threshold)</p></td>
 <td><p>Connect_to_target created for pc, used in Network()</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_soma</span></code>(self)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_soma</span></code>()</p></td>
 <td><p>Create soma and set geometry.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(self, yscale)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(yscale)</p></td>
 <td><p>Insert dipole into each section of this cell.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get3dinfo</span></code>(self)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get3dinfo</span></code>()</p></td>
 <td><p>Get 3d info.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sections</span></code>(self)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sections</span></code>()</p></td>
 <td><p>Get sections.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>(self)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>()</p></td>
 <td><p>Get cell’s bounding box.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code>(self)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code>()</p></td>
 <td><p>Move cell to position.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code>(self, gid, gid_dict, pos_dict, p)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code>(gid, gid_dict, pos_dict, p)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(self, gid_presyn, …)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(gid_presyn, nc_dict, postsyn)</p></td>
 <td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L5Basket.parreceive" title="hnn_core.L5Basket.parreceive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code></a>(self, gid, gid_dict, pos_dict, p_ext)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L5Basket.parreceive" title="hnn_core.L5Basket.parreceive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code></a>(gid, gid_dict, pos_dict, p_ext)</p></td>
 <td><p>Receive.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L5Basket.parreceive_ext" title="hnn_core.L5Basket.parreceive_ext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code></a>(self, type, gid, gid_dict, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L5Basket.parreceive_ext" title="hnn_core.L5Basket.parreceive_ext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code></a>(type, gid, gid_dict, …)</p></td>
 <td><p>Recieve external inputs.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_voltage</span></code>(self[, ax, delay, duration, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_voltage</span></code>([ax, delay, duration, dt, …])</p></td>
 <td><p>Plot voltage on soma for an injected current</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>(self)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>()</p></td>
 <td><p>Record current at soma.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>(self)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>()</p></td>
 <td><p>Define 3D shape of soma.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_ampa_create</span></code>(self, secloc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_ampa_create</span></code>(secloc)</p></td>
 <td><p>Create ampa receiving synapse.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(self, secloc, p)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(secloc, p)</p></td>
 <td><p>Create an h.Exp2Syn synapse.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabaa_create</span></code>(self, secloc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabaa_create</span></code>(secloc)</p></td>
 <td><p>Create gabaa receiving synapse.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabab_create</span></code>(self, secloc)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabab_create</span></code>(secloc)</p></td>
 <td><p>Create gabab receiving synapse.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_nmda_create</span></code>(self, secloc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_nmda_create</span></code>(secloc)</p></td>
 <td><p>Create nmda receiving synapse.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate3d</span></code>(self, dx, dy, dz)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate3d</span></code>(dx, dy, dz)</p></td>
 <td><p>Translate 3d.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_to</span></code>(self, x, y, z)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_to</span></code>(x, y, z)</p></td>
 <td><p>Translate to position.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.L5Basket.parreceive">
-<code class="sig-name descname">parreceive</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">gid</em>, <em class="sig-param">gid_dict</em>, <em class="sig-param">pos_dict</em>, <em class="sig-param">p_ext</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.parreceive" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parreceive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em>, <em class="sig-param"><span class="n">gid_dict</span></em>, <em class="sig-param"><span class="n">pos_dict</span></em>, <em class="sig-param"><span class="n">p_ext</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.parreceive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Receive.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.L5Basket.parreceive_ext">
-<code class="sig-name descname">parreceive_ext</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">type</em>, <em class="sig-param">gid</em>, <em class="sig-param">gid_dict</em>, <em class="sig-param">pos_dict</em>, <em class="sig-param">p_ext</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.parreceive_ext" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parreceive_ext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">gid</span></em>, <em class="sig-param"><span class="n">gid_dict</span></em>, <em class="sig-param"><span class="n">pos_dict</span></em>, <em class="sig-param"><span class="n">p_ext</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.parreceive_ext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recieve external inputs.</p>
 </dd></dl>
 
@@ -211,7 +214,7 @@
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>

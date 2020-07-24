@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hnn_core.Network &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -106,9 +109,9 @@
       
   <div class="section" id="hnn-core-network">
 <h1>hnn_core.Network<a class="headerlink" href="#hnn-core-network" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="hnn_core.Network">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">Network</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">Network</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Network class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -139,29 +142,29 @@ containing the range of Cell IDs of different cell
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(self, gid)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
 <td><p>Reverse lookup of gid to type.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_input" title="hnn_core.Network.plot_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_input</span></code></a>(self[, ax, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_input" title="hnn_core.Network.plot_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_input</span></code></a>([ax, show])</p></td>
 <td><p>Plot the histogram of input.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.Network.__repr__">
-<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.__repr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.Network.gid_to_type">
-<code class="sig-name descname">gid_to_type</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">gid</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.gid_to_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gid_to_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.gid_to_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reverse lookup of gid to type.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.Network.plot_input">
-<code class="sig-name descname">plot_input</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">show=True</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.plot_input" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.plot_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the histogram of input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -199,7 +202,7 @@ a new figure is created.</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>

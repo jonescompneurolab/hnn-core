@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hnn_core.Spikes &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -106,9 +109,9 @@
       
   <div class="section" id="hnn-core-spikes">
 <h1>hnn_core.Spikes<a class="headerlink" href="#hnn-core-spikes" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="hnn_core.Spikes">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">Spikes</code><span class="sig-paren">(</span><em class="sig-param">times=None</em>, <em class="sig-param">gids=None</em>, <em class="sig-param">types=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">Spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Spikes class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -162,15 +165,15 @@ Each gid corresponds to a type via Network::gid_dict.</p>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.Spikes.__repr__">
-<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.__repr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.Spikes.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">show=True</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the aggregate spiking activity according to cell type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -191,9 +194,9 @@ a new figure is created.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.Spikes.update_types">
-<code class="sig-name descname">update_types</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">gid_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.update_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update_types</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.update_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update spike types in the current instance of Spikes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -207,9 +210,9 @@ cell or input types.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.Spikes.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">fname</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write spiking activity per trial to a collection of files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -239,7 +242,7 @@ path to the output spike file(s).</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>

@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_alpha.py>` to download the full example code or run this example in your browser via Binder
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_simulate_alpha.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_simulate_alpha.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_simulate_alpha.py:
 
 
 ====================
@@ -29,6 +31,7 @@ HNN-core.
 
 
 
+
 Let us import hnn_core
 
 
@@ -44,12 +47,14 @@ Let us import hnn_core
 
 
 
+
 Then we setup the directories and Neuron
 
 
 .. code-block:: default
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+
 
 
 
@@ -308,6 +313,7 @@ Then we read the default parameters file
 
 
 
+
 Now, we update a few parameters
 
 
@@ -339,6 +345,7 @@ Now, we update a few parameters
 
 
 
+
 And we update all the conductances gbar related to the inputs
 by using the pattern gbar_ev*
 
@@ -346,6 +353,7 @@ by using the pattern gbar_ev*
 .. code-block:: default
 
     params['gbar_ev*'] = 0.0
+
 
 
 
@@ -366,6 +374,7 @@ Now let's simulate the dipole and plot it
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_alpha_001.png
+    :alt: agg
     :class: sphx-glr-single-img
 
 
@@ -410,8 +419,8 @@ Now let's simulate the dipole and plot it
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:142: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
+
+    <Figure size 640x480 with 1 Axes>
 
 
 
@@ -438,24 +447,17 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_alpha_002.png
+    :alt: plot simulate alpha
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_alpha.py:79: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  37.959 seconds)
+   **Total running time of the script:** ( 1 minutes  55.258 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:
@@ -474,13 +476,13 @@ We can confirm that what we simulate is indeed 10 Hz activity.
       :width: 150 px
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_simulate_alpha.py <plot_simulate_alpha.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_simulate_alpha.ipynb <plot_simulate_alpha.ipynb>`
 

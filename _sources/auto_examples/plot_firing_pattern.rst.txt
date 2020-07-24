@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_firing_pattern.py>` to download the full example code or run this example in your browser via Binder
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_firing_pattern.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_firing_pattern.py>`     to download the full example code or to run this example in your browser via Binder
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_firing_pattern.py:
 
 
 ===================
@@ -21,6 +23,7 @@ pattern of cells in the HNN model.
     # Authors: Mainak Jas <mjas@harvard.mgh.edu>
 
     import os.path as op
+
 
 
 
@@ -46,6 +49,7 @@ Let us import hnn_core
 
 
 
+
 Then we read the parameters file
 
 
@@ -53,6 +57,7 @@ Then we read the parameters file
 
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
+
 
 
 
@@ -93,12 +98,14 @@ Now let's build the network
     *
 
       .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_001.png
-            :class: sphx-glr-multi-img
+          :alt: plot firing pattern
+          :class: sphx-glr-multi-img
 
     *
 
       .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_002.png
-            :class: sphx-glr-multi-img
+          :alt: L2Basket (gid=170)
+          :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -107,7 +114,7 @@ Now let's build the network
 
  .. code-block:: none
 
-    Loading custom mechanism files from /Users/mainak/Documents/github_repos/hnn-core/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+    Loading custom mechanism files from /home/circleci/project/hnn_core/../mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     [Done]
     Simulating soma voltage
@@ -122,8 +129,6 @@ Now let's build the network
     Simulation time: 80.0 ms...
     Simulation time: 90.0 ms...
     [Done]
-    /Users/mainak/Documents/github_repos/hnn-core/hnn_core/cell.py:454: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
     [<L2Basket | soma: L 39.000000, diam 20.000000, Ra 200.000000, cm 0.850000>, <L2Basket | soma: L 39.000000, diam 20.000000, Ra 200.000000, cm 0.850000>, <L2Basket | soma: L 39.000000, diam 20.000000, Ra 200.000000, cm 0.850000>, <L2Basket | soma: L 39.000000, diam 20.000000, Ra 200.000000, cm 0.850000>, <L2Basket | soma: L 39.000000, diam 20.000000, Ra 200.000000, cm 0.850000>]
     L2Basket
     L2Pyr
@@ -144,6 +149,7 @@ Now let's build the network
 
 
 
+
 Let's do this for the rest of the cell types with a new NeuronNetwork object
 
 
@@ -158,6 +164,7 @@ Let's do this for the rest of the cell types with a new NeuronNetwork object
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_003.png
+    :alt: L2Pyr (gid=35), L5Pyr (gid=170)
     :class: sphx-glr-single-img
 
 
@@ -197,9 +204,10 @@ Let's do this for the rest of the cell types with a new NeuronNetwork object
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  22.592 seconds)
+   **Total running time of the script:** ( 0 minutes  42.049 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:
@@ -218,13 +226,13 @@ Let's do this for the rest of the cell types with a new NeuronNetwork object
       :width: 150 px
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_firing_pattern.py <plot_firing_pattern.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_firing_pattern.ipynb <plot_firing_pattern.ipynb>`
 
