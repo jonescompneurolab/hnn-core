@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hnn_core.L2Pyr &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -109,9 +106,9 @@
       
   <div class="section" id="hnn-core-l2pyr">
 <h1>hnn_core.L2Pyr<a class="headerlink" href="#hnn-core-l2pyr" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
+<dl class="class">
 <dt id="hnn_core.L2Pyr">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L2Pyr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">pos</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L2Pyr</code><span class="sig-paren">(</span><em class="sig-param">gid=-1</em>, <em class="sig-param">pos=-1</em>, <em class="sig-param">p={}</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Layer 2 pyramidal cell class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -141,125 +138,125 @@ and the value is an instance of h.Section.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.basic_shape" title="hnn_core.L2Pyr.basic_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">basic_shape</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.basic_shape" title="hnn_core.L2Pyr.basic_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">basic_shape</span></code></a>(self)</p></td>
 <td><p>Define shape of the neuron.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(target, threshold)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_to_target</span></code>(self, target, threshold)</p></td>
 <td><p>Connect_to_target created for pc, used in Network()</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dends</span></code>(p_dend_props)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dends</span></code>(self, p_dend_props)</p></td>
 <td><p>Create dendrites.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_soma</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_soma</span></code>(self)</p></td>
 <td><p>Create soma and set geometry.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(yscale)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(self, yscale)</p></td>
 <td><p>Insert dipole into each section of this cell.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.geom" title="hnn_core.L2Pyr.geom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geom</span></code></a>(p_dend)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.geom" title="hnn_core.L2Pyr.geom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geom</span></code></a>(self, p_dend)</p></td>
 <td><p>The geometry.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get3dinfo</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get3dinfo</span></code>(self)</p></td>
 <td><p>Get 3d info.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_section_names</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_section_names</span></code>(self)</p></td>
 <td><p>Get section names.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sections</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sections</span></code>(self)</p></td>
 <td><p>Get sections.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sectnames</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sectnames</span></code>(self)</p></td>
 <td><p>Create dictionary of section names with entries to scale section lengths to length along z-axis.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>(self)</p></td>
 <td><p>Get cell’s bounding box.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code>(self)</p></td>
 <td><p>Move cell to position.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.parconnect" title="hnn_core.L2Pyr.parconnect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code></a>(gid, gid_dict, pos_dict, p)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.parconnect" title="hnn_core.L2Pyr.parconnect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect</span></code></a>(self, gid, gid_dict, pos_dict, p)</p></td>
 <td><p>Collect receptor-type-based connections here.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(gid_presyn, nc_dict, postsyn)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(self, gid_presyn, …)</p></td>
 <td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.parreceive" title="hnn_core.L2Pyr.parreceive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code></a>(gid, gid_dict, pos_dict, p_ext)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.parreceive" title="hnn_core.L2Pyr.parreceive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive</span></code></a>(self, gid, gid_dict, pos_dict, p_ext)</p></td>
 <td><p>Connect cell.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.parreceive_ext" title="hnn_core.L2Pyr.parreceive_ext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code></a>(type, gid, gid_dict, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.parreceive_ext" title="hnn_core.L2Pyr.parreceive_ext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parreceive_ext</span></code></a>(self, type, gid, gid_dict, …)</p></td>
 <td><p>Connect cell to external input.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_voltage</span></code>([ax, delay, duration, dt, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_voltage</span></code>(self[, ax, delay, duration, …])</p></td>
 <td><p>Plot voltage on soma for an injected current</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>(self)</p></td>
 <td><p>Record current at soma.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_dend_props</span></code>(p_dend_props)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_dend_props</span></code>(self, p_dend_props)</p></td>
 <td><p>“Iterate over keys in p_dend_props.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>(self)</p></td>
 <td><p>Define 3D shape of soma.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_ampa_create</span></code>(secloc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_ampa_create</span></code>(self, secloc)</p></td>
 <td><p>Create ampa receiving synapse.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(secloc, p)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(self, secloc, p)</p></td>
 <td><p>Create an h.Exp2Syn synapse.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabaa_create</span></code>(secloc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabaa_create</span></code>(self, secloc)</p></td>
 <td><p>Create gabaa receiving synapse.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabab_create</span></code>(secloc)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_gabab_create</span></code>(self, secloc)</p></td>
 <td><p>Create gabab receiving synapse.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_nmda_create</span></code>(secloc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_nmda_create</span></code>(self, secloc)</p></td>
 <td><p>Create nmda receiving synapse.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.topol" title="hnn_core.L2Pyr.topol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topol</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.L2Pyr.topol" title="hnn_core.L2Pyr.topol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topol</span></code></a>(self)</p></td>
 <td><p>Connects sections of THIS cell together.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate3d</span></code>(dx, dy, dz)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate3d</span></code>(self, dx, dy, dz)</p></td>
 <td><p>Translate 3d.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_to</span></code>(x, y, z)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_to</span></code>(self, x, y, z)</p></td>
 <td><p>Translate to position.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="py method">
+<dl class="method">
 <dt id="hnn_core.L2Pyr.basic_shape">
-<code class="sig-name descname">basic_shape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.basic_shape" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">basic_shape</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.basic_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Define shape of the neuron.</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="method">
 <dt id="hnn_core.L2Pyr.geom">
-<code class="sig-name descname">geom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_dend</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.geom" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">geom</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">p_dend</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.geom" title="Permalink to this definition">¶</a></dt>
 <dd><p>The geometry.</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="method">
 <dt id="hnn_core.L2Pyr.parconnect">
-<code class="sig-name descname">parconnect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em>, <em class="sig-param"><span class="n">gid_dict</span></em>, <em class="sig-param"><span class="n">pos_dict</span></em>, <em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.parconnect" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parconnect</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">gid</em>, <em class="sig-param">gid_dict</em>, <em class="sig-param">pos_dict</em>, <em class="sig-param">p</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.parconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collect receptor-type-based connections here.</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="method">
 <dt id="hnn_core.L2Pyr.parreceive">
-<code class="sig-name descname">parreceive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em>, <em class="sig-param"><span class="n">gid_dict</span></em>, <em class="sig-param"><span class="n">pos_dict</span></em>, <em class="sig-param"><span class="n">p_ext</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.parreceive" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parreceive</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">gid</em>, <em class="sig-param">gid_dict</em>, <em class="sig-param">pos_dict</em>, <em class="sig-param">p_ext</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.parreceive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect cell.</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="method">
 <dt id="hnn_core.L2Pyr.parreceive_ext">
-<code class="sig-name descname">parreceive_ext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">gid</span></em>, <em class="sig-param"><span class="n">gid_dict</span></em>, <em class="sig-param"><span class="n">pos_dict</span></em>, <em class="sig-param"><span class="n">p_ext</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.parreceive_ext" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parreceive_ext</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">type</em>, <em class="sig-param">gid</em>, <em class="sig-param">gid_dict</em>, <em class="sig-param">pos_dict</em>, <em class="sig-param">p_ext</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.parreceive_ext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect cell to external input.</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="method">
 <dt id="hnn_core.L2Pyr.topol">
-<code class="sig-name descname">topol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.topol" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">topol</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.topol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connects sections of THIS cell together.</p>
 </dd></dl>
 
@@ -280,7 +277,7 @@ and the value is an instance of h.Section.</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
     </p>
   </div>
 </footer>

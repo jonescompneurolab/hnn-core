@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulate dipole &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -109,7 +106,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">here</span></a>     to download the full example code or to run this example in your browser via Binder</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">here</span></a> to download the full example code or run this example in your browser via Binder</p>
 </div>
 <div class="sphx-glr-example-title section" id="simulate-dipole">
 <span id="sphx-glr-auto-examples-plot-simulate-evoked-py"></span><h1>Simulate dipole<a class="headerlink" href="#simulate-dipole" title="Permalink to this headline">¶</a></h1>
@@ -125,7 +122,7 @@ waveforms using HNN-core.</p>
 </div>
 <p>Let us import hnn_core</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_spikes</span></a>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="View documentation for hnn_core.simulate_dipole"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="View documentation for hnn_core.Network"><span class="n">Network</span></a><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="View documentation for hnn_core.read_spikes"><span class="n">read_spikes</span></a>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
 </pre></div>
@@ -389,11 +386,11 @@ parameters using unix-style wildcard characters</p>
 </div>
 <p>Now let’s simulate the dipole, running 2 trials with the Joblib backend.
 To run them in parallel we could set n_jobs to equal the number of trials.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">JoblibBackend</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <span class="n">JoblibBackend</span>
 
-<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">net</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="View documentation for hnn_core.Network"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="n">dpls</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">dpls</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="View documentation for hnn_core.simulate_dipole"><span class="n">simulate_dipole</span></a><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -445,68 +442,70 @@ Simulation time: 160.0 ms...
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls</span><span class="p">:</span>
     <span class="n">dpl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.plot_input" title="hnn_core.Network.plot_input" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">plot_input</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">net</span><span class="o">.</span><span class="n">plot_input</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="agg" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
+<img alt="../_images/sphx_glr_plot_simulate_evoked_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:308: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+  plt.show()
 </pre></div>
 </div>
 <p>Also, we can plot the spikes and write them to txt files.
 Note that we can use formatting syntax to specify the filename pattern
 with which each trial will be written. To read spikes back in, we can use
 wildcard expressions.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.plot" title="hnn_core.Spikes.plot" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">plot</span></a><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir_name</span><span class="p">:</span>
-    <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.write" title="hnn_core.Spikes.write" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">write</span></a><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir_name</span><span class="p">,</span> <span class="s1">&#39;spk_</span><span class="si">%d</span><span class="s1">.txt&#39;</span><span class="p">))</span>
-    <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spikes</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_spikes</span></a><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir_name</span><span class="p">,</span> <span class="s1">&#39;spk_*.txt&#39;</span><span class="p">))</span>
-<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.plot" title="hnn_core.Spikes.plot" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">spikes</span><span class="o">.</span><span class="n">plot</span></a><span class="p">()</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir_name</span><span class="p">,</span> <span class="s1">&#39;spk_</span><span class="si">%d</span><span class="s1">.txt&#39;</span><span class="p">))</span>
+    <span class="n">spikes</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="View documentation for hnn_core.read_spikes"><span class="n">read_spikes</span></a><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_dir_name</span><span class="p">,</span> <span class="s1">&#39;spk_*.txt&#39;</span><span class="p">))</span>
+<span class="n">spikes</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
+<li><img alt="../_images/sphx_glr_plot_simulate_evoked_002.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
 </li>
-<li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_003.png" />
+<li><img alt="../_images/sphx_glr_plot_simulate_evoked_003.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_003.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 1 Axes&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/network.py:483: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+  plt.show()
 </pre></div>
 </div>
 <p>Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;sync_evinput&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
-<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sync</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">net_sync</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="View documentation for hnn_core.Network"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, let’s simulate a single trial using the MPI backend. This will
 start the simulation trial across the number of processors (cores)
 specified by n_procs using MPI. The ‘mpiexec’ launcher is for
 openmpi, which must be installed on the system</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">MPIBackend</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <span class="n">MPIBackend</span>
 
 <span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
-    <span class="n">dpls_sync</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sync</span></a><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dpls_sync</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="View documentation for hnn_core.simulate_dipole"><span class="n">simulate_dipole</span></a><span class="p">(</span><span class="n">net_sync</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">dpls_sync</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.plot_input" title="hnn_core.Network.plot_input" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_sync</span><span class="o">.</span><span class="n">plot_input</span></a><span class="p">()</span>
+<span class="n">net_sync</span><span class="o">.</span><span class="n">plot_input</span><span class="p">()</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="agg" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_004.png" />
+<li><img alt="../_images/sphx_glr_plot_simulate_evoked_004.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_004.png" />
 </li>
-<li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_005.png" />
+<li><img alt="../_images/sphx_glr_plot_simulate_evoked_005.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_005.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
-Running 1 trials...
-numprocs=2
-Loading custom mechanism files from /home/circleci/project/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/hnn_core/parallel_backends.py:185: UserWarning: mpi4py not installed. will run on single processor
+  warn(&#39;mpi4py not installed. will run on single processor&#39;)
+Backend will use 1 core. Running simulation without MPI
+joblib will run over 1 jobs
 Building the NEURON model
 [Done]
-running trial 1 on 2 cores
+running trial 1 on 1 cores
 Simulation time: 0.03 ms...
 Simulation time: 10.0 ms...
 Simulation time: 20.0 ms...
@@ -524,21 +523,20 @@ Simulation time: 130.0 ms...
 Simulation time: 140.0 ms...
 Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
-
-
-&lt;Figure size 640x480 with 1 Axes&gt;
+/Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:142: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+  plt.show()
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  30.666 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  58.078 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>
 </div>
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/56cda683b572bbf1db1981cd03238e43/plot_simulate_evoked.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_evoked.py</span></code></a></p>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8b09620ebbe11986172432adf199a9eb/plot_simulate_evoked.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_evoked.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/2200b8db8ea1fda3e92f59a421d58419/plot_simulate_evoked.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_evoked.ipynb</span></code></a></p>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/c7e8f5a9d2a99e40914605691db4ff07/plot_simulate_evoked.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_evoked.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -557,7 +555,7 @@ Simulation time: 160.0 ms...
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
     </p>
   </div>
 </footer>
