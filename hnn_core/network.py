@@ -293,6 +293,53 @@ class Network(object):
 
         return src_type, src_pos, src_type in real_cell_types
 
+    def plot_cells(self, ax=None, show=True):
+        """Plot the cells using Network.pos_dict.
+
+        Parameters
+        ----------
+        ax : instance of matplotlib Axes3D | None
+            An axis object from matplotlib. If None,
+            a new figure is created.
+        show : bool
+            If True, show the figure.
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+
+        if ax is None:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+
+        colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
+                  'L5_basket': 'r', 'L2_basket': 'm'}
+        markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
+                   'L5_basket': 'x', 'L2_basket': 'x'}
+
+        for cell_type in self.pos_dict:
+            x = [pos[0] for pos in self.pos_dict[cell_type]]
+            y = [pos[1] for pos in self.pos_dict[cell_type]]
+            z = [pos[2] for pos in self.pos_dict[cell_type]]
+            if cell_type in colors:
+                color = colors[cell_type]
+                marker = markers[cell_type]
+            else:
+                color = 'b'
+                marker = 'o'
+            ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
+
+        plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
+
+        if show:
+            plt.show()
+
+        return ax.get_figure()
+
     def plot_input(self, ax=None, show=True):
         """Plot the histogram of input.
 
