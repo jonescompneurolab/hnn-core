@@ -250,13 +250,6 @@ class NeuronNetwork(object):
         # create cells (and create self.origin in create_cells_pyr())
         self.cells = []
 
-        self.common_feeds = []
-        # external unique input list dictionary
-        self.unique_feeds = dict.fromkeys(self.net.p_unique)
-        # initialize the lists in the dict
-        for key in self.unique_feeds.keys():
-            self.unique_feeds[key] = []
-
         # artificial cells must be appended to a list in order to preserve
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
