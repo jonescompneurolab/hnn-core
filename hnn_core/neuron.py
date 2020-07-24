@@ -11,7 +11,7 @@ from .feed import ExtFeed
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
-from .cell import _ArtificialCell
+
 # a few globals
 _PC = None
 _CVODE = None
