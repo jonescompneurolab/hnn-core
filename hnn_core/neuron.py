@@ -388,7 +388,7 @@ class NeuronNetwork(object):
                 # timing will be identical for all cells
                 common_feed = ExtFeed(feed_type=src_type,
                                       target_cell_type=None,
-                                      params=self.p_common[p_ind],
+                                      params=self.net.p_common[p_ind],
                                       gid=gid)
                 self._feed_cells.append(
                     _ArtificialCell(common_feed.event_times,
@@ -406,11 +406,11 @@ class NeuronNetwork(object):
                 # specified because these feeds have cell-specific parameters
                 unique_feed = ExtFeed(feed_type=src_type,
                                       target_cell_type=target_cell_type,
-                                      params=self.p_unique[src_type],
+                                      params=self.net.p_unique[src_type],
                                       gid=gid)
                 self._feed_cells.append(
                     _ArtificialCell(unique_feed.event_times,
-                                    self.params['threshold']))
+                                    self.net.params['threshold']))
                 _PC.cell(gid, self._feed_cells[-1].nrn_netcon)
             else:
                 raise ValueError('No parameters specified for external feed '

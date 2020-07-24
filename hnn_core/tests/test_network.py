@@ -45,15 +45,14 @@ def test_network():
     assert net.spikes == Spikes()
 
     # Assert that all external feeds are initialized
-    net._create_all_spike_sources()
     n_evoked_sources = 270 * 3
     n_pois_sources = 270
     n_gaus_sources = 270
     n_common_sources = 2
-    assert len(net._feed_cells) == (n_evoked_sources +
-                                    n_pois_sources +
-                                    n_gaus_sources +
-                                    n_common_sources)
+    assert len(neuron_network._feed_cells) == (n_evoked_sources +
+                                               n_pois_sources +
+                                               n_gaus_sources +
+                                               n_common_sources)
 
 
 def test_spikes():
