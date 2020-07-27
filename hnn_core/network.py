@@ -328,10 +328,7 @@ class Network(object):
             if cell_type in colors:
                 color = colors[cell_type]
                 marker = markers[cell_type]
-            else:
-                color = 'b'
-                marker = 'o'
-            ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
+                ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
 
         plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
 
