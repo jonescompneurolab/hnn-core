@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hnn_core.parallel_backends.JoblibBackend &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -106,9 +109,9 @@
       
   <div class="section" id="hnn-core-parallel-backends-joblibbackend">
 <h1>hnn_core.parallel_backends.JoblibBackend<a class="headerlink" href="#hnn-core-parallel-backends-joblibbackend" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="hnn_core.parallel_backends.JoblibBackend">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.parallel_backends.</code><code class="sig-name descname">JoblibBackend</code><span class="sig-paren">(</span><em class="sig-param">n_jobs=1</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.JoblibBackend" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.parallel_backends.</code><code class="sig-name descname">JoblibBackend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.JoblibBackend" title="Permalink to this definition">¶</a></dt>
 <dd><p>The JoblibBackend class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -132,14 +135,14 @@ started without parallelism</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.parallel_backends.JoblibBackend.simulate" title="hnn_core.parallel_backends.JoblibBackend.simulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate</span></code></a>(self, net)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.parallel_backends.JoblibBackend.simulate" title="hnn_core.parallel_backends.JoblibBackend.simulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate</span></code></a>(net)</p></td>
 <td><p>Simulate the HNN model</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="hnn_core.parallel_backends.JoblibBackend.simulate">
-<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">net</em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.JoblibBackend.simulate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.JoblibBackend.simulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simulate the HNN model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -175,7 +178,7 @@ connected.</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>

@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulate alpha waves &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -106,7 +109,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">here</span></a> to download the full example code or run this example in your browser via Binder</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">here</span></a>     to download the full example code or to run this example in your browser via Binder</p>
 </div>
 <div class="sphx-glr-example-title section" id="simulate-alpha-waves">
 <span id="sphx-glr-auto-examples-plot-simulate-alpha-py"></span><h1>Simulate alpha waves<a class="headerlink" href="#simulate-alpha-waves" title="Permalink to this headline">¶</a></h1>
@@ -120,7 +123,7 @@ HNN-core.</p>
 </div>
 <p>Let us import hnn_core</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="k">import</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="View documentation for hnn_core.simulate_dipole"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="View documentation for hnn_core.Network"><span class="n">Network</span></a>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a>
 </pre></div>
 </div>
 <p>Then we setup the directories and Neuron</p>
@@ -393,12 +396,12 @@ by using the pattern gbar_ev*</p>
 </pre></div>
 </div>
 <p>Now let’s simulate the dipole and plot it</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="View documentation for hnn_core.Network"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<span class="n">dpl</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="View documentation for hnn_core.simulate_dipole"><span class="n">simulate_dipole</span></a><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">dpl</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span>
 <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/sphx_glr_plot_simulate_alpha_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_001.png" />
+<img alt="agg" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
 Building the NEURON model
@@ -435,13 +438,13 @@ Simulation time: 270.0 ms...
 Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
-/Users/mainak/Documents/github_repos/hnn-core/hnn_core/dipole.py:142: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
+
+&lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
 <p>We can confirm that what we simulate is indeed 10 Hz activity.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="k">import</span> <span class="n">spectrogram</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">spectrogram</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
 <span class="n">n_fft</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span>
@@ -456,22 +459,17 @@ Simulation time: 300.0 ms...
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/sphx_glr_plot_simulate_alpha_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_002.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/mainak/Documents/github_repos/hnn-core/examples/plot_simulate_alpha.py:79: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  37.959 seconds)</p>
+<img alt="plot simulate alpha" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_002.png" />
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  24.352 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-alpha-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_alpha.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>
 </div>
-<div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/0a3e739cecbfa1855627385292d29a84/plot_simulate_alpha.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_alpha.py</span></code></a></p>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6f89751d1b14c681021ccb65242cbaf2/plot_simulate_alpha.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_alpha.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/4e089a948e990b5375107ac7ee73a396/plot_simulate_alpha.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_alpha.ipynb</span></code></a></p>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/87a2c43c5e565625949aa0580a1a4619/plot_simulate_alpha.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_alpha.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -490,7 +488,7 @@ Simulation time: 300.0 ms...
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
     </p>
   </div>
 </footer>
