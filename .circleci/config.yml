@@ -87,7 +87,9 @@ jobs:
           - run:
               # push built docs directory on the `gh-pages` branch
               name: Deploy docs to gh-pages branch
-              command: gh-pages --dotfiles --message "doc updates [skip ci]" --dist doc/_build/html --dest .
+              command: |
+                touch doc/_build/.nojekyll
+                gh-pages --dotfiles --message "doc updates [skip ci]" --dist doc/_build/html --dest .
 
 workflows:
   build:
@@ -96,6 +98,6 @@ workflows:
       - docs-deploy:
           requires:
             - build_docs
-          filters:
-            branches:
-              only: master
+          # filters:
+          #  branches:
+          #    only: master
