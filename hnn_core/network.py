@@ -57,6 +57,88 @@ def read_spikes(fname, gid_dict=None):
     return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
 
 
+def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
+                   zdiff=1307.4):
+    """Creates coordinate grid.
+
+    Parameters
+    ----------
+    n_pyr_x : int
+        The number of Pyramidal cells in x direction.
+    n_pyr_y : int
+        The number of Pyramidal cells in y direction.
+    n_common_feeds : int
+        The number of common feeds.
+    p_unique_keys : list of str
+        The keys of the dictionary p_unique. Could be 'extpois',
+        'extgauss', or 'evdist_*', or 'evprox_*'
+    zdiff : float
+        Expressed as a positive DEPTH of L5 relative to L2
+        This is a deviation from the original, where L5 was defined at 0
+        This should not change interlaminar weight/delay calculations.
+
+    Returns
+    -------
+    pos_dict : dict of list of tuple (x, y, z)
+        Dictionary containing coordinate positions.
+        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
+        'common', or any of the elements of the list p_unique_keys
+
+    Notes
+    -----
+    Common positions are all located at origin.
+    Sort of a hack bc of redundancy
+    """
+    pos_dict = dict()
+
+    # PYRAMIDAL CELLS
+    xxrange = np.arange(n_pyr_x)
+    yyrange = np.arange(n_pyr_y)
+
+    pos_dict['L2_pyramidal'] = [
+        pos for pos in it.product(xxrange, yyrange, [0])]
+    pos_dict['L5_pyramidal'] = [
+        pos for pos in it.product(xxrange, yyrange, [zdiff])]
+
+    # BASKET CELLS
+    xzero = np.arange(0, n_pyr_x, 3)
+    xone = np.arange(1, n_pyr_x, 3)
+    # split even and odd y vals
+    yeven = np.arange(0, n_pyr_y, 2)
+    yodd = np.arange(1, n_pyr_y, 2)
+    # create general list of x,y coords and sort it
+    coords = [pos for pos in it.product(
+        xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+    coords_sorted = sorted(coords, key=lambda pos: pos[1])
+    # append the z value for position for L2 and L5
+    # print(len(coords_sorted))
+
+    pos_dict['L2_basket'] = [pos_xy + (0,) for
+                             pos_xy in coords_sorted]
+    pos_dict['L5_basket'] = [
+        pos_xy + (zdiff,) for pos_xy in coords_sorted]
+
+    n_cells = sum([len(pos_dict[key]) for key in pos_dict])
+    # ORIGIN
+    # origin's z component isn't really used in
+    # calculating distance functions from origin
+    # these will be forced as ints!
+    origin_x = xxrange[int((len(xxrange) - 1) // 2)]
+    origin_y = yyrange[int((len(yyrange) - 1) // 2)]
+    origin_z = np.floor(zdiff / 2)
+    origin = (origin_x, origin_y, origin_z)
+
+    # COMMON FEEDS
+    pos_dict['common'] = [origin for i in range(n_common_feeds)]
+
+    # UNIQUE FEEDS
+    for key in p_unique_keys:
+        # create the pos_dict for all the sources
+        pos_dict[key] = [origin for i in range(n_cells)]
+
+    return pos_dict
+
+
 class Network(object):
     """The Network class.
 
@@ -91,18 +173,10 @@ class Network(object):
         self.n_times = np.arange(0., self.params['tstop'],
                                  self.params['dt']).size + 1
 
-        # int variables for grid of pyramidal cells (for now in both L2 and L5)
-        self.gridpyr = {
-            'x': self.params['N_pyr_x'],
-            'y': self.params['N_pyr_y'],
-        }
         self.n_src = 0
         self.n_of_type = {}  # numbers of sources
         self.n_cells = 0  # init self.n_cells
-        # zdiff is expressed as a positive DEPTH of L5 relative to L2
-        # this is a deviation from the original, where L5 was defined at 0
-        # this should not change interlaminar weight/delay calculations
-        self.zdiff = 1307.4
+
         # params of common external feeds inputs in p_common
         # Global number of external inputs ... automatic counting
         # makes more sense
@@ -115,15 +189,14 @@ class Network(object):
         self.src_list_new = self._create_src_list()
         # cell position lists, also will give counts: must be known
         # by ALL nodes
-        # common positions are all located at origin.
-        # sort of a hack bc of redundancy
         self.pos_dict = dict.fromkeys(self.src_list_new)
-        # create coords in pos_dict for all cells first
-        self._create_coords_pyr()
-        self._create_coords_basket()
+        self.pos_dict = _create_coords(n_pyr_x=self.params['N_pyr_x'],
+                                       n_pyr_y=self.params['N_pyr_y'],
+                                       n_common_feeds=self.n_common_feeds,
+                                       p_unique_keys=self.p_unique.keys(),
+                                       zdiff=1307.4)
         self._count_cells()
-        # create coords for all other sources
-        self._create_coords_common_feeds()
+
         # count external sources
         self._count_extsrcs()
         # create dictionary of GIDs according to cell type
@@ -140,7 +213,7 @@ class Network(object):
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self.gridpyr['x'], self.gridpyr['y']))
+             % (self.params['N_pyr_x'], self.params['N_pyr_y']))
         s += ("\n%d L2 basket cells\n%d L5 basket cells"
               % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
         return '<%s | %s>' % (class_name, s)
@@ -164,57 +237,6 @@ class Network(object):
         # return one final source list
         src_list = self.cellname_list + self.extname_list
         return src_list
-
-    # Creates cells and grid
-    def _create_coords_pyr(self):
-        """ pyr grid is the immutable grid, origin now calculated in relation to feed
-        """
-        xrange = np.arange(self.gridpyr['x'])
-        yrange = np.arange(self.gridpyr['y'])
-        # create list of tuples/coords, (x, y, z)
-        self.pos_dict['L2_pyramidal'] = [
-            pos for pos in it.product(xrange, yrange, [0])]
-        self.pos_dict['L5_pyramidal'] = [
-            pos for pos in it.product(xrange, yrange, [self.zdiff])]
-
-    def _create_coords_basket(self):
-        """Create basket cell coords based on pyr grid."""
-        # define relevant x spacings for basket cells
-        xzero = np.arange(0, self.gridpyr['x'], 3)
-        xone = np.arange(1, self.gridpyr['x'], 3)
-        # split even and odd y vals
-        yeven = np.arange(0, self.gridpyr['y'], 2)
-        yodd = np.arange(1, self.gridpyr['y'], 2)
-        # create general list of x,y coords and sort it
-        coords = [pos for pos in it.product(
-            xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
-        coords_sorted = sorted(coords, key=lambda pos: pos[1])
-        # append the z value for position for L2 and L5
-        # print(len(coords_sorted))
-        self.pos_dict['L2_basket'] = [pos_xy + (0,) for
-                                      pos_xy in coords_sorted]
-        self.pos_dict['L5_basket'] = [
-            pos_xy + (self.zdiff,) for pos_xy in coords_sorted]
-
-    # creates origin AND creates common feed input coords
-    def _create_coords_common_feeds(self):
-        """ (same thing for now but won't fix because could change)
-        """
-        xrange = np.arange(self.gridpyr['x'])
-        yrange = np.arange(self.gridpyr['y'])
-        # origin's z component isn't really used in
-        # calculating distance functions from origin
-        # these will be forced as ints!
-        origin_x = xrange[int((len(xrange) - 1) // 2)]
-        origin_y = yrange[int((len(yrange) - 1) // 2)]
-        origin_z = np.floor(self.zdiff / 2)
-        self.origin = (origin_x, origin_y, origin_z)
-        self.pos_dict['common'] = [self.origin for i in
-                                   range(self.n_common_feeds)]
-        # at this time, each of the unique inputs is per cell
-        for key in self.p_unique.keys():
-            # create the pos_dict for all the sources
-            self.pos_dict[key] = [self.origin for i in range(self.n_cells)]
 
     def _count_cells(self):
         """Cell counting routine."""
@@ -270,6 +292,50 @@ class Network(object):
                            'L2_basket', 'L5_basket']
 
         return src_type, src_pos, src_type in real_cell_types
+
+    def plot_cells(self, ax=None, show=True):
+        """Plot the cells using Network.pos_dict.
+
+        Parameters
+        ----------
+        ax : instance of matplotlib Axes3D | None
+            An axis object from matplotlib. If None,
+            a new figure is created.
+        show : bool
+            If True, show the figure.
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+
+        if ax is None:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+
+        colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
+                  'L5_basket': 'r', 'L2_basket': 'm'}
+        markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
+                   'L5_basket': 'x', 'L2_basket': 'x'}
+
+        for cell_type in self.pos_dict:
+            x = [pos[0] for pos in self.pos_dict[cell_type]]
+            y = [pos[1] for pos in self.pos_dict[cell_type]]
+            z = [pos[2] for pos in self.pos_dict[cell_type]]
+            if cell_type in colors:
+                color = colors[cell_type]
+                marker = markers[cell_type]
+                ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
+
+        plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
+
+        if show:
+            plt.show()
+
+        return ax.get_figure()
 
     def plot_input(self, ax=None, show=True):
         """Plot the histogram of input.

@@ -34,11 +34,16 @@ print(params)
 print(params['L2Pyr_soma*'])
 
 ###############################################################################
+# Let us first create our network from the params file and visualize the cells
+# inside it.
+net = Network(params)
+net.plot_cells()
+
+###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
 # To run them in parallel we could set n_jobs to equal the number of trials.
 from hnn_core import JoblibBackend
 
-net = Network(params)
 with JoblibBackend(n_jobs=1):
     dpls = simulate_dipole(net, n_trials=2)
 
