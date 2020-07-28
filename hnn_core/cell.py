@@ -363,18 +363,15 @@ class _Cell(object):
         syn_nmda.tau2 = 20.
         return syn_nmda
 
-    def connect_to_target(self, target, threshold):
-        """Connect_to_target created for pc, used in Network()
-           these are SOURCES of spikes.
+    def setup_netcon(self, threshold):
+        """Created for _PC.cell and specifies SOURCES of spikes.
 
         Parameters
         ----------
-        target : POINT_PROCESS | ARTIFICIAL_CELL | None
-            The target passed to connect to using h.NetCon
         threshold : float
             The voltage threshold for action potential.
         """
-        nc = h.NetCon(self.soma(0.5)._ref_v, target, sec=self.soma)
+        nc = h.NetCon(self.soma(0.5)._ref_v, None, sec=self.soma)
         nc.threshold = threshold
         return nc
 
