@@ -36,6 +36,24 @@ class BasketSingle(_Cell):
             'name': cell_name,
         }
 
+    # For all synapses, section location 'secloc' is being explicitly supplied
+    # for clarity, even though they are (right now) always 0.5.
+    # Might change in future
+    # creates a RECEIVING inhibitory synapse at secloc
+    def syn_gabaa_create(self, secloc):
+        """Create gabaa receiving synapse."""
+        return self.syn_create(secloc, e=-80, tau1=0.5, tau2=5.)
+
+    def syn_ampa_create(self, secloc):
+        """Create ampa receiving synapse at secloc."""
+        return self.syn_create(secloc, e=0., tau1=0.5, tau2=5.)
+
+    # creates a RECEIVING nmda synapse at secloc
+    # this is a pretty fast NMDA, no?
+    def syn_nmda_create(self, secloc):
+        """Create nmda receiving synapse."""
+        return self.syn_create(secloc, e=0., tau1=1., tau2=20.)
+
     # creation of synapses
     def _synapse_create(self):
         # creates synapses onto this cell

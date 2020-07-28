@@ -273,18 +273,19 @@ class _Cell(object):
                 " but no self.synapses dict was found")
             pass
 
-    # General fn that creates any Exp2Syn synapse type
-    # requires dictionary of synapse properties
-    def syn_create(self, secloc, p):
+    def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
 
         Parameters
         ----------
-        p : dict
-            Should contain keys
-                - 'e' (reverse potential)
-                - 'tau1' (rise time)
-                - 'tau2' (decay time)
+        secloc : float (0. to 1.0)
+            The section location
+        e: float
+            Reverse potential
+        tau1: float
+            Rise time
+        tau2: float
+            Decay time
 
         Returns
         -------
@@ -292,76 +293,10 @@ class _Cell(object):
             A two state kinetic scheme synapse.
         """
         syn = h.Exp2Syn(secloc)
-        syn.e = p['e']
-        syn.tau1 = p['tau1']
-        syn.tau2 = p['tau2']
+        syn.e = e
+        syn.tau1 = tau1
+        syn.tau2 = tau2
         return syn
-
-    # For all synapses, section location 'secloc' is being explicitly supplied
-    # for clarity, even though they are (right now) always 0.5.
-    # Might change in future
-    # creates a RECEIVING inhibitory synapse at secloc
-    def syn_gabaa_create(self, secloc):
-        """Create gabaa receiving synapse.
-
-        Parameters
-        ----------
-        secloc : float (0 to 1.0)
-            The section location
-        """
-        syn_gabaa = h.Exp2Syn(secloc)
-        syn_gabaa.e = -80
-        syn_gabaa.tau1 = 0.5
-        syn_gabaa.tau2 = 5.
-        return syn_gabaa
-
-    # creates a RECEIVING slow inhibitory synapse at secloc
-    # called: self.soma_gabab = syn_gabab_create(self.soma(0.5))
-    def syn_gabab_create(self, secloc):
-        """Create gabab receiving synapse.
-
-        Parameters
-        ----------
-        secloc : float (0 to 1.0)
-            The section location.
-        """
-        syn_gabab = h.Exp2Syn(secloc)
-        syn_gabab.e = -80
-        syn_gabab.tau1 = 1
-        syn_gabab.tau2 = 20.
-        return syn_gabab
-
-    # creates a RECEIVING excitatory synapse at secloc
-    # def syn_ampa_create(self, secloc, tau_decay, prng_obj):
-    def syn_ampa_create(self, secloc):
-        """Create ampa receiving synapse.
-
-        Parameters
-        ----------
-        secloc : float (0 to 1.0)
-            The section location.
-        """
-        syn_ampa = h.Exp2Syn(secloc)
-        syn_ampa.e = 0.
-        syn_ampa.tau1 = 0.5
-        syn_ampa.tau2 = 5.
-        return syn_ampa
-
-    # creates a RECEIVING nmda synapse at secloc
-    # this is a pretty fast NMDA, no?
-    def syn_nmda_create(self, secloc):
-        """Create nmda receiving synapse.
-
-        Parameters
-        ----------
-        secloc : float (0 to 1.0)
-            The section location.
-        """
-        syn_nmda = h.Exp2Syn(secloc)
-        syn_nmda.e = 0.
-        syn_nmda.tau1 = 1.
-        syn_nmda.tau2 = 20.
-        return syn_nmda
 
     def setup_netcon(self, threshold):
         """Created for _PC.cell and specifies SOURCES of spikes.
