@@ -189,34 +189,34 @@ class Pyr(_Cell):
         """Creates synapses onto this cell."""
         # Somatic synapses
         self.synapses = {
-            'soma_gabaa': self.syn_create(self.soma(0.5), p_syn['gabaa']),
-            'soma_gabab': self.syn_create(self.soma(0.5), p_syn['gabab']),
+            'soma_gabaa': self.syn_create(self.soma(0.5), **p_syn['gabaa']),
+            'soma_gabab': self.syn_create(self.soma(0.5), **p_syn['gabab']),
         }
 
         # Dendritic synapses
         self.apicaloblique_ampa = self.syn_create(
-            self.dends['apical_oblique'](0.5), p_syn['ampa'])
+            self.dends['apical_oblique'](0.5), **p_syn['ampa'])
         self.apicaloblique_nmda = self.syn_create(
-            self.dends['apical_oblique'](0.5), p_syn['nmda'])
+            self.dends['apical_oblique'](0.5), **p_syn['nmda'])
 
         self.basal2_ampa = self.syn_create(
-            self.dends['basal_2'](0.5), p_syn['ampa'])
+            self.dends['basal_2'](0.5), **p_syn['ampa'])
         self.basal2_nmda = self.syn_create(
-            self.dends['basal_2'](0.5), p_syn['nmda'])
+            self.dends['basal_2'](0.5), **p_syn['nmda'])
 
         self.basal3_ampa = self.syn_create(
-            self.dends['basal_3'](0.5), p_syn['ampa'])
+            self.dends['basal_3'](0.5), **p_syn['ampa'])
         self.basal3_nmda = self.syn_create(
-            self.dends['basal_3'](0.5), p_syn['nmda'])
+            self.dends['basal_3'](0.5), **p_syn['nmda'])
 
         self.apicaltuft_ampa = self.syn_create(
-            self.dends['apical_tuft'](0.5), p_syn['ampa'])
+            self.dends['apical_tuft'](0.5), **p_syn['ampa'])
         self.apicaltuft_nmda = self.syn_create(
-            self.dends['apical_tuft'](0.5), p_syn['nmda'])
+            self.dends['apical_tuft'](0.5), **p_syn['nmda'])
 
         if self.name == 'L5Pyr':
             self.apicaltuft_gabaa = self.syn_create(
-                self.dends['apical_tuft'](0.5), p_syn['gabaa'])
+                self.dends['apical_tuft'](0.5), **p_syn['gabaa'])
 
 
 class L2Pyr(Pyr):
