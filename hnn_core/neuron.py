@@ -277,7 +277,7 @@ class NeuronNetwork(object):
             'L2Pyr_soma': h.Vector(self.net.n_times, 0),
         }
 
-        self._create_all_spike_sources()
+        self._create_cells_and_feeds()
         self.state_init()
         self._parnet_connect()
 
@@ -335,11 +335,13 @@ class NeuronNetwork(object):
         # extremely important to get the gids in the right order
         self.net._gid_list.sort()
 
-    def _create_all_spike_sources(self):
+    def _create_cells_and_feeds(self):
         """Parallel create cells AND external inputs (feeds)
-           these are spike SOURCES but cells are also targets
-           external inputs are not targets.
+
+        These feeds are spike SOURCES but cells are also targets.
+        External inputs are not targets.
         """
+        params = self.net.params
 
         # loop through gids on this node
         for gid in self.net._gid_list:
@@ -360,12 +362,9 @@ class NeuronNetwork(object):
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
                 Cell = type2class[src_type]
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    self.cells.append(Cell(gid, src_pos, self.net.params))
+                    self.cells.append(Cell(gid, src_pos, params))
                 else:
                     self.cells.append(Cell(gid, src_pos))
-
-                _PC.cell(gid, self.cells[-1].connect_to_target(
-                         None, self.net.params['threshold']))
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
@@ -379,14 +378,13 @@ class NeuronNetwork(object):
 
                 # new ExtFeed: target cell type irrelevant (None) since input
                 # timing will be identical for all cells
-                common_feed = ExtFeed(feed_type=src_type,
-                                      target_cell_type=None,
-                                      params=self.net.p_common[p_ind],
-                                      gid=gid)
-                self._feed_cells.append(
-                    _ArtificialCell(common_feed.event_times,
-                                    self.net.params['threshold']))
-                _PC.cell(gid, self._feed_cells[-1].nrn_netcon)
+                feed = ExtFeed(feed_type=src_type,
+                               target_cell_type=None,
+                               params=self.net.p_common[p_ind],
+                               gid=gid)
+                feed_cell = _ArtificialCell(feed.event_times,
+                                            params['threshold'])
+                self._feed_cells.append(feed_cell)
 
             # external inputs can also be Poisson- or Gaussian-
             # distributed, or 'evoked' inputs (proximal or distal)
@@ -397,17 +395,23 @@ class NeuronNetwork(object):
 
                 # new ExtFeed, where now both feed type and target cell type
                 # specified because these feeds have cell-specific parameters
-                unique_feed = ExtFeed(feed_type=src_type,
-                                      target_cell_type=target_cell_type,
-                                      params=self.net.p_unique[src_type],
-                                      gid=gid)
-                self._feed_cells.append(
-                    _ArtificialCell(unique_feed.event_times,
-                                    self.net.params['threshold']))
-                _PC.cell(gid, self._feed_cells[-1].nrn_netcon)
+                feed = ExtFeed(feed_type=src_type,
+                               target_cell_type=target_cell_type,
+                               params=self.net.p_unique[src_type],
+                               gid=gid)
+                feed_cell = _ArtificialCell(feed.event_times,
+                                            params['threshold'])
+                self._feed_cells.append(feed_cell)
             else:
                 raise ValueError('No parameters specified for external feed '
                                  'type: %s' % src_type)
+
+            # Now let's associate the cell objects with a netcon
+            if is_cell:
+                nrn_netcon = self.cells[-1].setup_netcon(params['threshold'])
+                _PC.cell(gid, nrn_netcon)
+            else:
+                _PC.cell(gid, feed_cell.nrn_netcon)
 
     # connections:
     # this NODE is aware of its cells as targets
