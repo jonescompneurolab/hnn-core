@@ -298,7 +298,7 @@ class _Cell(object):
         syn.tau2 = tau2
         return syn
 
-    def setup_netcon(self, threshold):
+    def setup_source_netcon(self, threshold):
         """Created for _PC.cell and specifies SOURCES of spikes.
 
         Parameters

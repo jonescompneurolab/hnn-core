@@ -362,9 +362,10 @@ class NeuronNetwork(object):
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
                 Cell = type2class[src_type]
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    self.cells.append(Cell(gid, src_pos, params))
+                    cell = Cell(gid, src_pos, params)
                 else:
-                    self.cells.append(Cell(gid, src_pos))
+                    cell = Cell(gid, src_pos)
+                self.cells.append(cell)
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
@@ -408,7 +409,7 @@ class NeuronNetwork(object):
 
             # Now let's associate the cell objects with a netcon
             if is_cell:
-                nrn_netcon = self.cells[-1].setup_netcon(params['threshold'])
+                nrn_netcon = cell.setup_source_netcon(params['threshold'])
                 _PC.cell(gid, nrn_netcon)
             else:
                 _PC.cell(gid, feed_cell.nrn_netcon)
