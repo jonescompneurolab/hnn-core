@@ -9,7 +9,7 @@ from mne.utils import _fetch_file
 
 import hnn_core
 from hnn_core import read_params, Params
-hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 
 def test_read_params():

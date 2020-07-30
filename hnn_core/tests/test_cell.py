@@ -11,7 +11,7 @@ matplotlib.use('agg')
 
 def test_cell():
     """Test cells object."""
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
