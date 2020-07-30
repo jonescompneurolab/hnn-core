@@ -1,0 +1,15 @@
+include *.rst
+include hnn_core/__init__.py
+recursive-include hnn_core/mod/x86_64/ *
+recursive-include hnn_core/param/ *
+
+recursive-include examples *.py
+recursive-include examples *.txt
+
+recursive-include hnn_core *.py
+
+### Exclude
+
+exclude Makefile
+exclude CONTRIBUTING.rst
+recursive-exclude hnn_core *.pyc
