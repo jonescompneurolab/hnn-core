@@ -13,7 +13,7 @@ from hnn_core.neuron import NeuronNetwork
 
 def test_network():
     """Test network object."""
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     # add rhythmic inputs (i.e., a type of common input)

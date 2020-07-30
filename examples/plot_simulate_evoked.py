@@ -20,7 +20,7 @@ import tempfile
 import hnn_core
 from hnn_core import simulate_dipole, read_params, Network, read_spikes
 
-hnn_core_root = op.join(op.dirname(hnn_core.__file__), 'param', '..')
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 ###############################################################################
 # Then we read the parameters file

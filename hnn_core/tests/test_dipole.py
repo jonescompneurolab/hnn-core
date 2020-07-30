@@ -13,7 +13,7 @@ matplotlib.use('agg')
 
 def test_dipole():
     """Test dipole object."""
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     dpl_out_fname = '/tmp/dpl1.txt'
     params = read_params(params_fname)

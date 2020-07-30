@@ -20,7 +20,7 @@ from hnn_core import simulate_dipole, read_params, Network
 
 ###############################################################################
 # Then we setup the directories and Neuron
-hnn_core_root = op.join(op.dirname(hnn_core.__file__), 'param', '..')
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 ###############################################################################
 # Then we read the default parameters file
