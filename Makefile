@@ -10,4 +10,4 @@ modl:
 # clean
 .PHONY: clean
 clean :
-	rm -f x86_64/*
+	rm -f hnn_core/mod/x86_64/*
