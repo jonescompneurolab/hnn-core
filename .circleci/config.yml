@@ -47,8 +47,7 @@ jobs:
               name: Setup hnn-core
               command: |
                   source ~/miniconda/bin/activate testenv
-                  make
-                  python setup.py develop
+                  python setup.py install
 
           - run:
               name: Build the documentation
