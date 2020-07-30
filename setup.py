@@ -75,7 +75,11 @@ if __name__ == "__main__":
           ],
           platforms='any',
           packages=find_packages(),
-          package_data={'hnn_core': ['param/*.json', 'mod/*', 'mod/x86_64/*']},
+          package_data={'hnn_core':
+            ['param/*.json',
+             'mod/*',
+             'mod/x86_64/*',
+             'mod/x86_64/.libs/*']},
           include_package_data=True,
           cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod}
           )
