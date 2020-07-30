@@ -53,16 +53,7 @@ Since ``hnn-core`` does not yet have a stable release, we recommend installing t
 
 To install the latest version of the code (nightly) do::
 
-	$ git clone https://github.com/jonescompneurolab/hnn-core.git
-	$ cd hnn-core/
-	$ python setup.py develop
-
-A final step to the installation process is to compile custom ionic channel
-mechanisms using `nrnivmodl` from Neuron. To do this, simple do::
-
-	$ cd mod/ && nrnivmodl
-
-inside the ``hnn-core`` directory. It should create the compiled custom mechanism files.
+	$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 
 To check if everything worked fine, you can do::
 
