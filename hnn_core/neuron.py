@@ -22,10 +22,6 @@ _CVODE = None
 # NeuronNetwork, it will seg fault.
 _LAST_NETWORK = None
 
-# NEURON only allows mechanisms to be loaded once (per Python interpreter)
-_LOADED_DLL = None
-
-
 def _simulate_single_trial(neuron_net):
     """Simulate one trial."""
 
@@ -128,14 +124,25 @@ def _simulate_single_trial(neuron_net):
 
     return dpl
 
+def _is_loaded_mechanisms():
+    # copied from: https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
+    mt = h.MechanismType(0)
+    mname = h.ref('')
+    mnames = list()
+    for i in range(mt.count()):
+        mt.select(i)
+        mt.selected(mname)
+        mnames.append(mname[0])
+    if 'hh2' not in mnames:
+        return False
+    else:
+        return True
 
 def load_custom_mechanisms():
     import platform
     import os.path as op
 
-    global _LOADED_DLL
-
-    if _LOADED_DLL is not None:
+    if _is_loaded_mechanisms():
         return
 
     if platform.system() == 'Windows':
@@ -143,13 +150,13 @@ def load_custom_mechanisms():
     else:
         mech_fname = op.join(op.dirname(__file__), 'mod', 'x86_64',
                              '.libs', 'libnrnmech.so')
-    h.nrn_load_dll(mech_fname)
-    _LOADED_DLL = mech_fname
+    if not op.exists(mech_fname):
+        raise FileNotFoundError(f'The file {mech_fname} could not be found')
 
-    if _get_rank() == 0:
-        print('Loading custom mechanism files from %s' % mech_fname)
-
-    return
+    exit_status = h.nrn_load_dll(mech_fname)
+    print('Loading custom mechanism files from %s' % mech_fname)
+    if not _is_loaded_mechanisms():
+        raise ValueError('The custom mechanisms could not be loaded')
 
 
 def _get_nhosts():
