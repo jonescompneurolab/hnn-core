@@ -5,7 +5,7 @@ import subprocess
 
 from setuptools import setup, find_packages
 
-from distutils.command.build import build
+from distutils.command.build_py import build_py
 from distutils.cmd import Command
 
 descr = """Experimental code for simulating evoked using Neuron"""
@@ -19,16 +19,20 @@ LICENSE = 'BSD (3-clause)'
 DOWNLOAD_URL = 'http://github.com/jonescompneurolab/hnn-core'
 VERSION = '0.1.dev0'
 
-
+# test install with:
+# $ python setup.py clean --all install
+#
+# to make sure there are no residual mod files
+#
+# also see following link to understand why build_py must be overriden:
+# https://stackoverflow.com/questions/51243633/python-setuptools-setup-py-install-does-not-automatically-call-build
 class BuildMod(Command):
     user_options = []
 
     def initialize_options(self):
-        """Abstract method that is required to be overwritten"""
         pass
 
     def finalize_options(self):
-        """Abstract method that is required to be overwritten"""
         pass
 
     def run(self):
@@ -41,10 +45,10 @@ class BuildMod(Command):
         print(outs)
 
 
-class my_build(build):
+class build_py_mod(build_py):
     def run(self):
+        build_py.run(self)
         self.run_command("build_mod")
-        build.run(self)
 
 
 if __name__ == "__main__":
@@ -71,6 +75,7 @@ if __name__ == "__main__":
           ],
           platforms='any',
           packages=find_packages(),
+          package_data={'hnn_core': ['param/*.json', 'mod/*', 'mod/x86_64/*']},
           include_package_data=True,
-          cmdclass={'build': my_build, 'build_mod': BuildMod}
+          cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod}
           )
