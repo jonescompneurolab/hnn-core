@@ -139,9 +139,9 @@ def load_custom_mechanisms():
         return
 
     if platform.system() == 'Windows':
-        mech_fname = op.join(op.dirname(__file__), '..', 'mod', 'nrnmech.dll')
+        mech_fname = op.join(op.dirname(__file__), 'mod', 'nrnmech.dll')
     else:
-        mech_fname = op.join(op.dirname(__file__), '..', 'mod', 'x86_64',
+        mech_fname = op.join(op.dirname(__file__), 'mod', 'x86_64',
                              '.libs', 'libnrnmech.so')
     h.nrn_load_dll(mech_fname)
     _LOADED_DLL = mech_fname
