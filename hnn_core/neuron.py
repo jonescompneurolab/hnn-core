@@ -22,6 +22,7 @@ _CVODE = None
 # NeuronNetwork, it will seg fault.
 _LAST_NETWORK = None
 
+
 def _simulate_single_trial(neuron_net):
     """Simulate one trial."""
 
@@ -126,7 +127,8 @@ def _simulate_single_trial(neuron_net):
 
 
 def _is_loaded_mechanisms():
-    # copied from: https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
+    # copied from:
+    # https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
     mt = h.MechanismType(0)
     mname = h.ref('')
     mnames = list()
@@ -155,7 +157,7 @@ def load_custom_mechanisms():
     if not op.exists(mech_fname):
         raise FileNotFoundError(f'The file {mech_fname} could not be found')
 
-    exit_status = h.nrn_load_dll(mech_fname)
+    h.nrn_load_dll(mech_fname)
     print('Loading custom mechanism files from %s' % mech_fname)
     if not _is_loaded_mechanisms():
         raise ValueError('The custom mechanisms could not be loaded')

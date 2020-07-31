@@ -20,7 +20,7 @@ def run_hnn_core(backend=None, n_jobs=1):
         _fetch_file(data_url, 'dpl.txt')
     dpl_master = loadtxt('dpl.txt')
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.dirname(hnn_core.__file__)
 
     # default params
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
