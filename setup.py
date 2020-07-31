@@ -47,8 +47,10 @@ class BuildMod(Command):
 
 class build_py_mod(build_py):
     def run(self):
-        build_py.run(self)
         self.run_command("build_mod")
+        build_py.build_package_data(self)
+        build_py.run(self)
+
 
 
 if __name__ == "__main__":

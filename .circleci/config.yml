@@ -47,6 +47,7 @@ jobs:
               name: Setup hnn-core
               command: |
                   source ~/miniconda/bin/activate testenv
+                  pip install --upgrade pip
                   python setup.py install
 
           - run:
