@@ -2,6 +2,7 @@
 import os.path as op
 import os
 import subprocess
+import shutil
 
 from setuptools import setup, find_packages
 
@@ -20,6 +21,7 @@ DOWNLOAD_URL = 'http://github.com/jonescompneurolab/hnn-core'
 VERSION = '0.1.dev0'
 
 # test install with:
+# $ rm -rf hnn_core/mod/x86_64/
 # $ python setup.py clean --all install
 #
 # to make sure there are no residual mod files
@@ -48,6 +50,11 @@ class BuildMod(Command):
 class build_py_mod(build_py):
     def run(self):
         self.run_command("build_mod")
+
+        build_dir = op.join(self.build_lib, 'hnn_core', 'mod')
+        mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
+        shutil.copytree(mod_path, build_dir)
+
         build_py.run(self)
 
 
@@ -79,7 +86,6 @@ if __name__ == "__main__":
             ['param/*.json',
              'mod/*', 
              'mod/x86_64/*',
-             'mod/x86_64/.lib/*'],
-             '': ['*.mod', '*.so', '*.o', '*.c']},
+             'mod/x86_64/.lib/*']},
           cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod}
           )
