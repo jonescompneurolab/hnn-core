@@ -97,7 +97,7 @@ def test_spikes():
 def test_plots():
     """Tests plots."""
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     net = Network(params)
