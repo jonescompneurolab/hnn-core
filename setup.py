@@ -48,9 +48,7 @@ class BuildMod(Command):
 class build_py_mod(build_py):
     def run(self):
         self.run_command("build_mod")
-        build_py.build_package_data(self)
         build_py.run(self)
-
 
 
 if __name__ == "__main__":
@@ -77,11 +75,11 @@ if __name__ == "__main__":
           ],
           platforms='any',
           packages=find_packages(),
-          package_data={'hnn_core':
+          package_data={'hnn_core': 
             ['param/*.json',
-             'mod/*',
+             'mod/*', 
              'mod/x86_64/*',
-             'mod/x86_64/.libs/*']},
-          include_package_data=True,
+             'mod/x86_64/.lib/*'],
+             '': ['*.mod', '*.so', '*.o', '*.c']},
           cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod}
           )
