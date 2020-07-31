@@ -124,6 +124,7 @@ def _simulate_single_trial(neuron_net):
 
     return dpl
 
+
 def _is_loaded_mechanisms():
     # copied from: https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
     mt = h.MechanismType(0)
@@ -137,6 +138,7 @@ def _is_loaded_mechanisms():
         return False
     else:
         return True
+
 
 def load_custom_mechanisms():
     import platform
