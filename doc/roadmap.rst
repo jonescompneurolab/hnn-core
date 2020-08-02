@@ -67,17 +67,21 @@ following steps:
     analysis functions will be moved from the HNN repository into the ``hnn_core.analysis``.
     module.
 -   Parallelization of the simulation in the ``hnn_core.simulation`` module via a
-    combination of MPI and Joblib.
+    combination of MPI and Joblib. xx reference github issue and milestone here XX
 -   Removal of all simulation code from the HNN repository, which will be replaced 
     with by importing from hnn_core.simulator module. HNN repository will then be 
     renamed HNN-GUI.
+    Milestone here: new HNN release 
 -   Reorganization of the Network class within the ``hnn_core.simulator`` module 
     to separate cortical column model from exogenous drive, and optimization routines.
 -   Reorganization of Param.py file within ``hnn_core.simulator`` module to multiple files that 
     contain smaller dictionaries of parameters related to different modules of the code.
 -   Extending ``hnn_core.simulator`` module to run batch simulations that enable parameter
     sweeps.
--   Development of functions in HNN-GUI to enable parameter sweeps via the GUI.
+-   Development of functions in HNN-GUI to enable parameter sweeps via the GUI. 
+    xx reference github issue and milestone here XX -
+    Milestone here: new HNN release 
+
 
 LFP/CSD Simulation, Visualization and Data Comparison
 -----------------------------------------------------
@@ -92,11 +96,14 @@ be developed in HNN-core, and imported into the HNN-GUI repository, along with e
 tutorials, in the following steps:
 
 - Develop code in ``hnn_core.analysis`` to simulate and visualize LFP/CSD from cellular 
-  membrane potentials
+  membrane potentials.
+  xx reference github issue and milestone here XX
 - Develop code in ``hnn_core.analysis`` to statistically compare and visualize model 
   LFP/CSD to invasive animal data.
 - Develop functions in HNN-GUI to enable simulation, visualization and data comparison 
   in the GUI.
+
+Milestone here: new HNN release 
 
 Parameter Estimation Expansion
 ------------------------------
@@ -113,6 +120,8 @@ example tutorials for the following tasks:
 - Develop code for SNPE parameter estimation and visualization in ``hnn_core.analysis``.
 - Develop functions in HNN-GUI to enable SNPE estimation in the GUI.
 
+Milestone here: new HNN release 
+
 Different Cortical Model Template Choices
 -----------------------------------------
 HNN is distributed with a cortical column model template that represents 
@@ -126,6 +135,8 @@ in other platforms (e.g. NetPyNE), see 5-year plan.
 - Develop a new cortical column template model with improved pyramidal neuron 
   calcium dynamics as part of the  ``hnn_core.simulator`` module.
 - Develop function in HNN-GUI to choose among different template models in the GUI
+
+Milestone here: new HNN release 
 
 API and Tutorial development
 ----------------------------
