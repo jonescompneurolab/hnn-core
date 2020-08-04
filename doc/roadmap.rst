@@ -165,8 +165,9 @@ include,
 Five-Year Plan to 2025
 ----------------------
 
-Develop a framework to import cortical column models developed in NetPyNE or 
-other modeling platforms into HNN  The core of HNN is a cortical column model 
+**Develop a framework to import cortical column models developed in NetPyNE or 
+other modeling platforms into HNN:**  
+The core of HNN is a cortical column model 
 that simulates macroscale current dipoles. Currently, HNN is distributed with 
 a template cortical column model based on generalizable features of cortical 
 circuitry and as applied in `prior studies`_.
