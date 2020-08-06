@@ -18,7 +18,7 @@ import hnn_core
 from hnn_core import read_params, Network
 from hnn_core.neuron import NeuronNetwork
 
-hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 ###############################################################################
 # Then we read the parameters file

@@ -80,6 +80,7 @@
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#parallel-backends">Parallel backends</a></li>
 <li><a class="reference internal" href="#bug-reports">Bug reports</a></li>
+<li><a class="reference internal" href="#interested-in-contributing">Interested in Contributing?</a></li>
 </ul>
 </ul>
 </li>
@@ -157,17 +158,9 @@
 </div>
 <p>Since <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.</p>
 <p>To install the latest version of the code (nightly) do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/jonescompneurolab/hnn-core.git
-$ cd hnn-core/
-$ python setup.py develop
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 </pre></div>
 </div>
-<p>A final step to the installation process is to compile custom ionic channel
-mechanisms using <cite>nrnivmodl</cite> from Neuron. To do this, simple do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd mod/ &amp;&amp; nrnivmodl
-</pre></div>
-</div>
-<p>inside the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> directory. It should create the compiled custom mechanism files.</p>
 <p>To check if everything worked fine, you can do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -c &#39;import hnn_core&#39;
 </pre></div>
@@ -181,6 +174,10 @@ mechanisms using <cite>nrnivmodl</cite> from Neuron. To do this, simple do:</p>
 <div class="section" id="bug-reports">
 <h1>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h1>
 <p>Use the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues">github issue tracker</a> to report bugs.</p>
+</div>
+<div class="section" id="interested-in-contributing">
+<h1>Interested in Contributing?<a class="headerlink" href="#interested-in-contributing" title="Permalink to this headline">¶</a></h1>
+<p>Read our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/CONTRIBUTING.rst">contributing guide</a>.</p>
 </div>
 
 

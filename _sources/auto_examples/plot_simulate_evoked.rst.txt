@@ -43,7 +43,7 @@ Let us import hnn_core
     import hnn_core
     from hnn_core import simulate_dipole, read_params, Network, read_spikes
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.dirname(hnn_core.__file__)
 
 
 
@@ -565,8 +565,9 @@ openmpi, which must be installed on the system
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
-    Loading custom mechanism files from /home/circleci/project/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     [Done]
     running trial 1 on 2 cores
     Simulation time: 0.03 ms...
@@ -595,7 +596,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  9.438 seconds)
+   **Total running time of the script:** ( 2 minutes  23.687 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

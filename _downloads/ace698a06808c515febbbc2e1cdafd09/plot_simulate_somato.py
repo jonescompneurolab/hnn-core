@@ -71,7 +71,7 @@ import os.path as op
 import hnn_core
 from hnn_core import simulate_dipole, read_params, Network
 
-hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 params_fname = op.join(hnn_core_root, 'param', 'N20.json')
 params = read_params(params_fname)

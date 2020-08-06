@@ -41,7 +41,7 @@ Let us import hnn_core
     from hnn_core import read_params, Network
     from hnn_core.neuron import NeuronNetwork
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.dirname(hnn_core.__file__)
 
 
 
@@ -114,7 +114,7 @@ Now let's build the network
 
  .. code-block:: none
 
-    Loading custom mechanism files from /home/circleci/project/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     [Done]
     Simulating soma voltage
@@ -207,7 +207,7 @@ Let's do this for the rest of the cell types with a new NeuronNetwork object
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  35.288 seconds)
+   **Total running time of the script:** ( 0 minutes  39.649 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

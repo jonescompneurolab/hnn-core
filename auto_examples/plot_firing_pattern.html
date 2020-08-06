@@ -126,7 +126,7 @@ pattern of cells in the HNN model.</p>
 <span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">read_params</span><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a>
 <span class="kn">from</span> <span class="nn">hnn_core.neuron</span> <span class="kn">import</span> <span class="n">NeuronNetwork</span>
 
-<span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
+<span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then we read the parameters file</p>
@@ -162,7 +162,7 @@ pattern of cells in the HNN model.</p>
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loading custom mechanism files from /home/circleci/project/hnn_core/../mod/x86_64/.libs/libnrnmech.so
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 [Done]
 Simulating soma voltage
@@ -234,7 +234,7 @@ Simulation time: 90.0 ms...
 [Done]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  35.288 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  39.649 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-firing-pattern-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_firing_pattern.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>
