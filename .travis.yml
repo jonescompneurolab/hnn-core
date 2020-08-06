@@ -45,7 +45,12 @@ install:
     - pip install flake8 pytest pytest-cov
     - pip install mne psutil joblib
     - pip install coverage coveralls
-    - pip install NEURON
+    - |
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        pip install NEURON-nightly
+      else
+        pip install NEURON
+      fi
     - |
       cd $TRAVIS_BUILD_DIR
       make
