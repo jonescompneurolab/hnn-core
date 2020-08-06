@@ -25,7 +25,7 @@ Then, install the following python packages::
 
     $ pip install flake8 pytest pytest-cov
 
-If you update a mod file, you will have to rebuild them using the command:
+If you update a mod file, you will have to rebuild them using the command::
 
     $ python setup.py build_mod
 

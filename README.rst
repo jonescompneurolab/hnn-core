@@ -71,4 +71,9 @@ Bug reports
 
 Use the `github issue tracker <https://github.com/jonescompneurolab/hnn-core/issues>`_ to report bugs.
 
+Interested in Contributing?
+===========================
+
+Read our `contributing guide <https://github.com/jonescompneurolab/hnn-core/blob/master/CONTRIBUTING.rst>`_.
+
 .. _parallel_backends: https://jonescompneurolab.github.io/hnn-core/parallel.html
