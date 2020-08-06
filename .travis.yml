@@ -47,7 +47,7 @@ install:
     - pip install coverage coveralls
     - |
       if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        pip install NEURON-nightly
+        pip install NEURON
       else
         pip install NEURON
       fi
