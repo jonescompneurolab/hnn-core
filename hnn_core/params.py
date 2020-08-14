@@ -106,6 +106,30 @@ def read_params(params_fname):
     return params
 
 
+def _validate_type(key, value, dtype):
+    if not isinstance(value, dtype):
+        raise TypeError(f'params key {key} must be of type {dtype}'
+                         'Got {type(value)}')
+
+
+def _validate_param(key, value):
+    import re
+
+    float_params = ['tstop', 'dt', 'celcius', 'N_trials', 'threshold',
+                    'dipole_smooth_win']
+    if key in float_params:
+        _validate_type(key, value, float)
+    elif re.match(key, 'sigma_t_ev((prox)|(dist))_\\d+\\Z') is not None:
+        _validate_type(key, value, float)
+    elif re.match(key, 'numspikes_ev((prox)|(dist))_\\d+\\Z') is not None:
+        _validate_type(key, value, float)
+    elif re.match(key, 'gbar_ev((prox)|(dist))_\\d+_L(2|5)((Pyr)|(Basket))_((ampa)|(nmda))\\Z'):
+        _validate_type(key, value, float)
+    elif key.startswith('prng'):
+        _validate_type(key, value, int)
+
+
+
 class Params(dict):
     """Params object.
 
@@ -161,9 +185,11 @@ class Params(dict):
         else:
             matches = fnmatch.filter(keys, key)
             if len(matches) == 0:
+                _validate_param(key, value)
                 return dict.__setitem__(self, key, value)
             for key in keys:
                 if key in matches:
+                    _validate_param(key, value)
                     self.update({key: value})
 
     def copy(self):
