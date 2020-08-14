@@ -94,7 +94,7 @@ class ExtFeed(object):
         if hasattr(self, 'seed2'):
             self.prng2 = np.random.RandomState(self.seed2)
 
-    def set_event_times(self, inc_evinput=0.0):
+    def set_event_times(self):
 
         # check feed name validity, allowing substring matches ('evprox1' etc)
         valid_feeds = ['extpois', 'extgauss', 'common', 'evprox', 'evdist']
@@ -112,7 +112,7 @@ class ExtFeed(object):
         if self.feed_type == 'extpois':
             self._create_extpois()
         elif self.feed_type.startswith(('evprox', 'evdist')):
-            self._create_evoked(inc_evinput)
+            self._create_evoked()
         elif self.feed_type == 'extgauss':
             self._create_extgauss()
         elif self.feed_type == 'common':
@@ -155,11 +155,11 @@ class ExtFeed(object):
         self.event_times = val_pois.tolist()
 
     # mu and sigma vals come from p
-    def _create_evoked(self, inc=0.0):
+    def _create_evoked(self):
         val_evoked = np.array([])
         if self.cell_type in self.params.keys():
             # assign the params
-            mu = self.params['t0'] + inc
+            mu = self.params['t0']
             sigma = self.params[self.cell_type][3]  # ind 3 is sigma_t (stdev)
             numspikes = int(self.params['numspikes'])
             # if a non-zero sigma is specified
