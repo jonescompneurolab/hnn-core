@@ -28,7 +28,7 @@ def test_dipole():
     viz.plot_dipole([dipole, dipole], show=False)
     dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
-    assert_allclose(dipole_read.t, dipole.t, rtol=0, atol=0.00051)
-    for dpl_key in dipole.dpl.keys():
-        assert_allclose(dipole_read.dpl[dpl_key],
-                        dipole.dpl[dpl_key], rtol=0, atol=0.000051)
+    assert_allclose(dipole_read.times, dipole.times, rtol=0, atol=0.00051)
+    for dpl_key in dipole.data.keys():
+        assert_allclose(dipole_read.data[dpl_key],
+                        dipole.data[dpl_key], rtol=0, atol=0.000051)

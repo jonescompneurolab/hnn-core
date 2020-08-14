@@ -82,37 +82,37 @@ class Dipole(object):
 
     Attributes
     ----------
-    t : array
+    times : array
         The time vector
-    dpl : dict of array
+    data : dict of array
         The dipole with keys 'agg', 'L2' and 'L5'
     """
 
     def __init__(self, times, data):  # noqa: D102
         self.units = 'fAm'
         self.N = data.shape[0]
-        self.t = times
-        self.dpl = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
+        self.times = times
+        self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
 
     def convert_fAm_to_nAm(self):
         """ must be run after baseline_renormalization()
         """
-        for key in self.dpl.keys():
-            self.dpl[key] *= 1e-6
+        for key in self.data.keys():
+            self.data[key] *= 1e-6
         self.units = 'nAm'
 
     def scale(self, fctr):
-        for key in self.dpl.keys():
-            self.dpl[key] *= fctr
+        for key in self.data.keys():
+            self.data[key] *= fctr
         return fctr
 
     def smooth(self, winsz):
-        # XXX: add check to make sure self.t is
+        # XXX: add check to make sure self.times is
         # not smaller than winsz
         if winsz <= 1:
             return
-        for key in self.dpl.keys():
-            self.dpl[key] = _hammfilt(self.dpl[key], winsz)
+        for key in self.data.keys():
+            self.data[key] = _hammfilt(self.data[key], winsz)
 
     def plot(self, ax=None, layer='agg', show=True):
         """Simple layer-specific plot function.
@@ -169,7 +169,7 @@ class Dipole(object):
         }
         # L2 dipole offset can be roughly baseline shifted over
         # the entire range of t
-        self.dpl['L2'] -= dpl_offset['L2']
+        self.data['L2'] -= dpl_offset['L2']
         # L5 dipole offset should be different for interval [50., 500.]
         # and then it can be offset
         # slope (m) and intercept (b) params for L5 dipole offset
@@ -182,14 +182,14 @@ class Dipole(object):
         m1 = 1.01e-4
         b1 = -48.412078
         # piecewise normalization
-        self.dpl['L5'][self.t <= 37.] -= dpl_offset['L5']
-        self.dpl['L5'][(self.t > 37.) & (self.t < t1)] -= N_pyr * \
-            (m * self.t[(self.t > 37.) & (self.t < t1)] + b)
-        self.dpl['L5'][self.t >= t1] -= N_pyr * \
-            (m1 * self.t[self.t >= t1] + b1)
+        self.data['L5'][self.times <= 37.] -= dpl_offset['L5']
+        self.data['L5'][(self.times > 37.) & (self.times < t1)] -= N_pyr * \
+            (m * self.times[(self.times > 37.) & (self.times < t1)] + b)
+        self.data['L5'][self.times >= t1] -= N_pyr * \
+            (m1 * self.times[self.times >= t1] + b1)
         # recalculate the aggregate dipole based on the baseline
         # normalized ones
-        self.dpl['agg'] = self.dpl['L2'] + self.dpl['L5']
+        self.data['agg'] = self.data['L2'] + self.data['L5']
 
     def write(self, fname):
         """Write dipole values to a file.
@@ -208,6 +208,6 @@ class Dipole(object):
             3) L2/3 current dipole (scaled nAm), and
             4) L5 current dipole (scaled nAm)
         """
-        X = np.r_[[self.t, self.dpl['agg'], self.dpl['L2'], self.dpl['L5']]].T
+        X = np.r_[[self.times, self.data['agg'], self.data['L2'], self.data['L5']]].T
         np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
                    delimiter='\t')
