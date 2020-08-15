@@ -70,7 +70,7 @@ class CustomL5Pyr(L5Pyr):
             gdend=self.p_all['L5Pyr_dend_gbar_ca'],
             xkink=1501)  # beginning of tuft
 
-    def __biophys_dends(self):
+    def _biophys_dends(self):
         """Override setting dendrites."""
         L5Pyr._biophys_dends(self)
         for key in self.dends:
@@ -80,13 +80,12 @@ class CustomL5Pyr(L5Pyr):
                 self.insert_almog(seg)
             h.pop_section()
 
-
 ###############################################################################
 # Now let's set the cell morphology of the NeuronNetwork object
-from hnn_core.neuron import NeuronNetwork
+from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
 
 net = Network(params)
-with NeuronNetwork(net) as neuron_network:
-    neuron_network.set_cell_morphology({'L5Pyr': L5Pyr})
-
-dpls = simulate_dipole(net, n_trials=1)
+neuron_network = NeuronNetwork(net)
+neuron_network.set_cell_morphology({'L5Pyr': CustomL5Pyr})
+neuron_network._build()
+dpl = _simulate_single_trial(neuron_network)
