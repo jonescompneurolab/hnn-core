@@ -56,15 +56,15 @@ def plot_hist_input(net, ax=None, show=True):
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    spikes = np.array(sum(self.spikes.times, []))
-    gids = np.array(sum(self.spikes.gids, []))
-    valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
+    spikes = np.array(sum(net.spikes.times, []))
+    gids = np.array(sum(net.spikes.gids, []))
+    valid_gids = np.r_[[v for (k, v) in net.gid_dict.items()
                         if k.startswith('evprox')]]
     mask_evprox = np.in1d(gids, valid_gids)
-    valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
+    valid_gids = np.r_[[v for (k, v) in net.gid_dict.items()
                         if k.startswith('evdist')]]
     mask_evdist = np.in1d(gids, valid_gids)
-    bins = np.linspace(0, self.params['tstop'], 50)
+    bins = np.linspace(0, net.params['tstop'], 50)
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
