@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Network, Spikes, read_spikes, simulate_dipole
+from hnn_core import read_params, Network, Spikes, read_spikes
 from hnn_core.neuron import NeuronNetwork
 
 

@@ -8,6 +8,7 @@ from numpy import convolve, hamming
 
 from .viz import plot_dipole
 
+
 def _hammfilt(x, winsz):
     """Convolve with a hamming window."""
     win = hamming(winsz)

@@ -144,9 +144,9 @@ def plot_cells(net, ax=None, show=True):
         ax = fig.add_subplot(111, projection='3d')
 
     colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
-                'L5_basket': 'r', 'L2_basket': 'm'}
+              'L5_basket': 'r', 'L2_basket': 'm'}
     markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
-                'L5_basket': 'x', 'L2_basket': 'x'}
+               'L5_basket': 'x', 'L2_basket': 'x'}
 
     for cell_type in net.pos_dict:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
