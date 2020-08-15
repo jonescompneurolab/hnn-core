@@ -92,15 +92,3 @@ def test_spikes():
         gid_dict = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
                     'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
         spikes = read_spikes('/tmp/spk_*.txt', gid_dict=gid_dict)
-
-
-def test_plots():
-    """Tests plots."""
-
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-    net = Network(params)
-    simulate_dipole(net)
-    net.plot_input()
-    net.spikes.plot()
