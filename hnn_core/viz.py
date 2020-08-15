@@ -36,8 +36,8 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
         dpl = [dpl]
 
     for dpl_trial in dpl:
-        if layer in dpl_trial.dpl.keys():
-            ax.plot(dpl_trial.t, dpl_trial.dpl[layer])
+        if layer in dpl_trial.data.keys():
+            ax.plot(dpl_trial.times, dpl_trial.data[layer])
 
     ax.set_xlabel('Time (ms)')
     ax.set_title(layer)
