@@ -9,8 +9,6 @@ from neuron import h
 
 from .feed import ExtFeed
 from .cell import _ArtificialCell
-from .pyramidal import L2Pyr, L5Pyr
-from .basket import L2Basket, L5Basket
 
 # a few globals
 _PC = None
@@ -265,6 +263,7 @@ class NeuronNetwork(object):
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
         self._feed_cells = []
+        self.set_cell_morphology()
         self._build()
 
     def _build(self):
@@ -316,6 +315,35 @@ class NeuronNetwork(object):
         self._clear_neuron_objects()
         if _LAST_NETWORK is not None:
             _LAST_NETWORK._clear_neuron_objects()
+
+    def set_cell_morphology(self, cell_morphology=None):
+        """Set the cell object for a particular cell type.
+
+        Parameters
+        ----------
+        cell_morphology : dict
+            A mapping from cell type to cell object. It can have
+            keys 'L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket'. If None,
+            all the default objects in HNN are used. Only cell objects
+            whose keys are provided will be updated.
+        """
+        from .pyramidal import L2Pyr, L5Pyr
+        from .basket import L2Basket, L5Basket
+
+        type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
+                      'L2_basket': L2Basket, 'L5_basket': L5Basket}
+        camel2snake = {'L2Pyr': 'L2_pyramidal', 'L5Pyr': 'L5_pyramidal',
+                       'L2Basket': 'L2_basket', 'L5Basket': 'L5_basket'}
+
+        for key in cell_morphology:
+            if key in cell_morphology:
+                HNNCell = type2class[camel2snake[key]]
+                if not issubclass(cell_morphology[key], HNNCell):
+                    raise TypeError(f'cell_morphology[{key}] must be a'
+                                    '  subclass of {HNNCell.__name__}')
+                type2class[camel2snake[key]] = cell_morphology[key]
+        self._type2class = type2class
+
 
     # this happens on EACH node
     # creates self.net._gid_list for THIS node
@@ -369,9 +397,7 @@ class NeuronNetwork(object):
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 # creates a NetCon object internally to Neuron
-                type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
-                              'L2_basket': L2Basket, 'L5_basket': L5Basket}
-                Cell = type2class[src_type]
+                Cell = self._type2class[src_type]
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
                     cell = Cell(gid, src_pos, params)
                 else:
