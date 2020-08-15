@@ -208,6 +208,7 @@ class Dipole(object):
             3) L2/3 current dipole (scaled nAm), and
             4) L5 current dipole (scaled nAm)
         """
-        X = np.r_[[self.times, self.data['agg'], self.data['L2'], self.data['L5']]].T
+        X = np.r_[[self.times, self.data['agg'], self.data['L2'],
+                   self.data['L5']]].T
         np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
                    delimiter='\t')

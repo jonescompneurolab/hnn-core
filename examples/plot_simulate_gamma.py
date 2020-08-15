@@ -48,7 +48,7 @@ freqs = np.arange(20., 100., 1.)
 n_cycles = freqs / 4.
 
 # MNE expects an array of shape (n_trials, n_channels, n_times)
-data = dpls[0].dpl['agg'][None, None, :]
+data = dpls[0].data['agg'][None, None, :]
 power = tfr_array_multitaper(data, sfreq=sfreq, freqs=freqs,
                              n_cycles=n_cycles,
                              time_bandwidth=time_bandwidth,
