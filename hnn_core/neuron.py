@@ -335,6 +335,10 @@ class NeuronNetwork(object):
         camel2snake = {'L2Pyr': 'L2_pyramidal', 'L5Pyr': 'L5_pyramidal',
                        'L2Basket': 'L2_basket', 'L5Basket': 'L5_basket'}
 
+        if cell_morphology is None:
+            self._type2class = type2class
+            return
+
         for key in cell_morphology:
             if key in cell_morphology:
                 HNNCell = type2class[camel2snake[key]]
