@@ -9,7 +9,7 @@ import numpy as np
 from glob import glob
 
 from .params import create_pext
-from .viz import plot_hist_input, plot_spikes, plot_cells
+from .viz import plot_hist_input, plot_spikes_raster, plot_cells
 
 
 def read_spikes(fname, gid_dict=None):
@@ -482,7 +482,7 @@ class Spikes(object):
         fig : instance of matplotlib Figure
             The matplotlib figure object.
         """
-        return plot_spikes(spikes=self, ax=ax, show=show)
+        return plot_spikes_raster(spikes=self, ax=ax, show=show)
 
     def write(self, fname):
         """Write spiking activity per trial to a collection of files.

@@ -76,7 +76,7 @@ def plot_hist_input(net, ax=None, show=True):
     return ax.get_figure()
 
 
-def plot_spikes(spikes, ax=None, show=True):
+def plot_spikes_raster(spikes, ax=None, show=True):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters

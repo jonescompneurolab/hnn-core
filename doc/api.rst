@@ -44,7 +44,7 @@ Visualization (:py:mod:`hnn_core.viz`):
 
    plot_dipole
    plot_hist_input
-   plot_spikes
+   plot_spikes_raster
    plot_cells
 
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):
