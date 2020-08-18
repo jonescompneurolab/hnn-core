@@ -1,4 +1,4 @@
-hnn_core.Network
+﻿hnn_core.Network
 ================
 
 .. currentmodule:: hnn_core

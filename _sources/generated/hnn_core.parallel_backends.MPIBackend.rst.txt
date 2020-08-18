@@ -1,4 +1,4 @@
-hnn_core.parallel_backends.MPIBackend
+﻿hnn_core.parallel_backends.MPIBackend
 =====================================
 
 .. currentmodule:: hnn_core.parallel_backends

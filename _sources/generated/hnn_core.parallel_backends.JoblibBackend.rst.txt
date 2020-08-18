@@ -1,4 +1,4 @@
-hnn_core.parallel_backends.JoblibBackend
+﻿hnn_core.parallel_backends.JoblibBackend
 ========================================
 
 .. currentmodule:: hnn_core.parallel_backends

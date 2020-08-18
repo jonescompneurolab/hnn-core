@@ -1,4 +1,4 @@
-hnn\_core.simulate\_dipole
+﻿hnn\_core.simulate\_dipole
 ==========================
 
 .. currentmodule:: hnn_core

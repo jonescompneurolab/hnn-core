@@ -1,4 +1,4 @@
-hnn_core.Spikes
+﻿hnn_core.Spikes
 ===============
 
 .. currentmodule:: hnn_core

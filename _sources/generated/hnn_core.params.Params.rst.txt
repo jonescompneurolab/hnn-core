@@ -1,4 +1,4 @@
-hnn_core.params.Params
+﻿hnn_core.params.Params
 ======================
 
 .. currentmodule:: hnn_core.params

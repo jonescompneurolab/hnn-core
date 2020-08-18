@@ -1,4 +1,4 @@
-hnn_core.L5Pyr
+﻿hnn_core.L5Pyr
 ==============
 
 .. currentmodule:: hnn_core

@@ -1,4 +1,4 @@
-hnn\_core.read\_spikes
+﻿hnn\_core.read\_spikes
 ======================
 
 .. currentmodule:: hnn_core

@@ -1,4 +1,4 @@
-hnn\_core.read\_dipole
+﻿hnn\_core.read\_dipole
 ======================
 
 .. currentmodule:: hnn_core

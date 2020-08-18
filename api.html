@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API Documentation &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -75,6 +75,7 @@
 <li><a class="reference internal" href="#">API Documentation</a><ul>
 <li><a class="reference internal" href="#simulation-hnn-core">Simulation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
 <li><a class="reference internal" href="#params-hnn-core-params">Params (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.params</span></code>):</a></li>
+<li><a class="reference internal" href="#visualization-hnn-core-viz">Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):</a></li>
 <li><a class="reference internal" href="#parallel-backends-hnn-core-parallel-backends">Parallel backends (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.parallel_backends</span></code>):</a></li>
 <li><a class="reference internal" href="#input-and-output">Input and Output:</a></li>
 </ul>
@@ -168,6 +169,29 @@
 </tbody>
 </table>
 </div>
+<div class="section" id="visualization-hnn-core-viz">
+<h2>Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):<a class="headerlink" href="#visualization-hnn-core-viz" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_dipole</span></code></a>(dpl[, ax, layer, show])</p></td>
+<td><p>Simple layer-specific plot function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_hist_input.html#hnn_core.viz.plot_hist_input" title="hnn_core.viz.plot_hist_input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hist_input</span></code></a>(net[, ax, show])</p></td>
+<td><p>Plot the histogram of input.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster" title="hnn_core.viz.plot_spikes_raster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes_raster</span></code></a>(spikes[, ax, show])</p></td>
+<td><p>Plot the aggregate spiking activity according to cell type.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_cells.html#hnn_core.viz.plot_cells" title="hnn_core.viz.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>(net[, ax, show])</p></td>
+<td><p>Plot the cells using Network.pos_dict.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="section" id="parallel-backends-hnn-core-parallel-backends">
 <h2>Parallel backends (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.parallel_backends</span></code>):<a class="headerlink" href="#parallel-backends-hnn-core-parallel-backends" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
@@ -217,7 +241,7 @@
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

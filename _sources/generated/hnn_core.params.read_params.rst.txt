@@ -1,4 +1,4 @@
-hnn\_core.params.read\_params
+﻿hnn\_core.params.read\_params
 =============================
 
 .. currentmodule:: hnn_core.params

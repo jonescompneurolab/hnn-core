@@ -1,4 +1,4 @@
-hnn_core.ExtFeed
+﻿hnn_core.ExtFeed
 ================
 
 .. currentmodule:: hnn_core
