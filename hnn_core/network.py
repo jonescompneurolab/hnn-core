@@ -9,6 +9,7 @@ import numpy as np
 from glob import glob
 
 from .params import create_pext
+from .viz import plot_hist_input, plot_spikes_raster, plot_cells
 
 
 def read_spikes(fname, gid_dict=None):
@@ -309,33 +310,7 @@ class Network(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-
-        if ax is None:
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-
-        colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
-                  'L5_basket': 'r', 'L2_basket': 'm'}
-        markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
-                   'L5_basket': 'x', 'L2_basket': 'x'}
-
-        for cell_type in self.pos_dict:
-            x = [pos[0] for pos in self.pos_dict[cell_type]]
-            y = [pos[1] for pos in self.pos_dict[cell_type]]
-            z = [pos[2] for pos in self.pos_dict[cell_type]]
-            if cell_type in colors:
-                color = colors[cell_type]
-                marker = markers[cell_type]
-                ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
-
-        plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
-
-        if show:
-            plt.show()
-
-        return ax.get_figure()
+        return plot_cells(net=self, ax=ax, show=show)
 
     def plot_input(self, ax=None, show=True):
         """Plot the histogram of input.
@@ -353,25 +328,7 @@ class Network(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        import matplotlib.pyplot as plt
-        spikes = np.array(sum(self.spikes.times, []))
-        gids = np.array(sum(self.spikes.gids, []))
-        valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
-                            if k.startswith('evprox')]]
-        mask_evprox = np.in1d(gids, valid_gids)
-        valid_gids = np.r_[[v for (k, v) in self.gid_dict.items()
-                            if k.startswith('evdist')]]
-        mask_evdist = np.in1d(gids, valid_gids)
-        bins = np.linspace(0, self.params['tstop'], 50)
-
-        if ax is None:
-            fig, ax = plt.subplots(1, 1)
-        ax.hist(spikes[mask_evprox], bins, color='r', label='Proximal')
-        ax.hist(spikes[mask_evdist], bins, color='g', label='Distal')
-        plt.legend()
-        if show:
-            plt.show()
-        return ax.get_figure()
+        return plot_hist_input(net=self, ax=ax, show=show)
 
 
 class Spikes(object):
@@ -525,28 +482,7 @@ class Spikes(object):
         fig : instance of matplotlib Figure
             The matplotlib figure object.
         """
-
-        import matplotlib.pyplot as plt
-        spike_times = np.array(sum(self._times, []))
-        spike_types = np.array(sum(self._types, []))
-        cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-        spike_times_cell = [spike_times[spike_types == cell_type]
-                            for cell_type in cell_types]
-
-        if ax is None:
-            fig, ax = plt.subplots(1, 1)
-
-        ax.eventplot(spike_times_cell, colors=['r', 'b', 'g', 'w'])
-        ax.legend(cell_types, ncol=2)
-        ax.set_facecolor('k')
-        ax.set_xlabel('Time (ms)')
-        ax.get_yaxis().set_visible(False)
-        ax.set_ylim((-1, 4.5))
-        ax.set_xlim(left=0)
-
-        if show:
-            plt.show()
-        return ax.get_figure()
+        return plot_spikes_raster(spikes=self, ax=ax, show=show)
 
     def write(self, fname):
         """Write spiking activity per trial to a collection of files.

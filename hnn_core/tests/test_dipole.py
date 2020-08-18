@@ -24,7 +24,6 @@ def test_dipole():
     dipole.convert_fAm_to_nAm()
     dipole.scale(params['dipole_scalefctr'])
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
-    dipole.plot(layer='agg')
     dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.t, dipole.t, rtol=0, atol=0.00051)

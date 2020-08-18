@@ -6,6 +6,8 @@
 import numpy as np
 from numpy import convolve, hamming
 
+from .viz import plot_dipole
+
 
 def _hammfilt(x, winsz):
     """Convolve with a hamming window."""
@@ -130,17 +132,7 @@ class Dipole(object):
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        import matplotlib.pyplot as plt
-
-        if ax is None:
-            fig, ax = plt.subplots(1, 1)
-        if layer in self.dpl.keys():
-            ax.plot(self.t, self.dpl[layer])
-            ax.set_xlabel('Time (ms)')
-            ax.set_title(layer)
-        if show:
-            plt.show()
-        return ax.get_figure()
+        return plot_dipole(dpl=self, ax=ax, layer=layer, show=show)
 
     def baseline_renormalize(self, params):
         """Only baseline renormalize if the units are fAm.

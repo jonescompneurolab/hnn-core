@@ -34,6 +34,19 @@ Params (:py:mod:`hnn_core.params`):
    Params
    read_params
 
+Visualization (:py:mod:`hnn_core.viz`):
+-------------
+
+.. currentmodule:: hnn_core.viz
+
+.. autosummary::
+   :toctree: generated/
+
+   plot_dipole
+   plot_hist_input
+   plot_spikes_raster
+   plot_cells
+
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):
 -----------------
 .. currentmodule:: hnn_core.parallel_backends
