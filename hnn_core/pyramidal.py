@@ -267,7 +267,7 @@ class L2Pyr(Pyr):
 
         # biophysics
         self._biophys_soma()
-        self._biophys_dends()
+        self.set_dends_biophys()
 
         # dipole_insert() comes from Cell()
         self.yscale = self.get_sectnames()
@@ -382,7 +382,7 @@ class L2Pyr(Pyr):
         self.soma.insert('km')
         self.soma.gbar_km = self.p_all['L2Pyr_soma_gbar_km']
 
-    def _biophys_dends(self):
+    def set_dends_biophys(self):
         """Defining biophysics for dendrites."""
         # set dend biophysics
         # iterate over keys in self.dends and set biophysics for each dend
@@ -639,7 +639,7 @@ class L5Pyr(Pyr):
 
         # biophysics
         self.__biophys_soma()
-        self._biophys_dends()
+        self.set_dends_biophys()
 
         # Dictionary of length scales to calculate dipole without
         # 3d shape. Comes from Pyr().
@@ -788,7 +788,7 @@ class L5Pyr(Pyr):
         self.soma.insert('ar')
         self.soma.gbar_ar = self.p_all['L5Pyr_soma_gbar_ar']
 
-    def _biophys_dends(self):
+    def set_dends_biophys(self):
         # set dend biophysics specified in Pyr()
         # self.pyr_biophys_dends()
 
