@@ -61,6 +61,7 @@ def run_mpi_simulation():
     params = comm.bcast(params, root=0)
     net = Network(params)
     neuron_net = NeuronNetwork(net)
+    neuron_net._build()
 
     sim_data = []
     for trial in range(params['N_trials']):

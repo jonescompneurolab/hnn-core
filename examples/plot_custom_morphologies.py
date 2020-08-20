@@ -127,4 +127,4 @@ neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
 from hnn_core import JoblibBackend
 
 with JoblibBackend(n_jobs=1) as parallel:
-    parallel.simulate(net, neuron_net=neuron_net)
+    dpls = parallel.simulate(net, neuron_net=neuron_net)
