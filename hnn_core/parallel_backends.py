@@ -115,6 +115,8 @@ class JoblibBackend(object):
 
         parallel, myfunc = self._parallel_func(self._clone_and_simulate)
         sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
+        # XXX: why don't we do:
+        # dpls, spike_data = parallel(...)
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls

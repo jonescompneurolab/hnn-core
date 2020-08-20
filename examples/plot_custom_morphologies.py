@@ -7,7 +7,7 @@ This example demonstrates how to make your custom cell objects using
 HNN-core.
 """
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mjas@mgh.harvard.edu>
 
 import os.path as op
 import tempfile
@@ -33,9 +33,10 @@ net = Network(params)
 ###############################################################################
 # The custom cell object we want to create is one with distance-dependent
 # ionic dynamics. To do so, first let's create a function for computing
-# distance-dependent ionic conductance g. It computes a piecewise linear
-# function where the conductance at distance x from soma is linear from gsoma
-# at x=0 to gdend at xkink and constant at gdend thereafter.
+# distance-dependent ionic conductance *g*. It computes a piecewise linear
+# function where the conductance at distance ``x`` from soma is linear from
+# ``gsoma``` at x=0 (base of soma) to ``gdend`` at distance ``xkink``
+# from base of soma and constant thereafter.
 def get_g_at_dist(x, gsoma, gdend, xkink):
     """Compute distance-dependent ionic conductance."""
     if x > xkink:
@@ -68,10 +69,11 @@ plt.ylabel('Conductance (pS/um^2)')
 # Next, we need to create a subclass of the original HNN class and override
 # any methods that we would like to override. The new cell class contains
 # two new methods:
-#   * ``set_conductance``: sets the conductance of a particular 
-#     dendritic segment of the neuron, and
-#   * ``set_dends_biophys``: which loops over the segments in a cell and sets
-#     their conductance.
+#
+# * ``set_conductance``: sets the conductance of a particular 
+#   dendritic segment of the neuron, and
+# * ``set_dends_biophys``: which loops over the segments in a cell and sets
+#   their conductance.
 import numpy as np
 
 from neuron import h
@@ -114,14 +116,50 @@ class CustomL5Pyr(L5Pyr):
             h.pop_section()
 
 ###############################################################################
-# Now let's set the custom cell object in the NeuronNetwork object
-from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
+# Now let's set the custom cell object in the NeuronNetwork object. The
+# NeuronNetwork object is responsible for creating the cells in Neuron and
+# connecting them according to the specification provided by Network object.
+from hnn_core.neuron import NeuronNetwork
 
 net = Network(params)
-neuron_network = NeuronNetwork(net)
-neuron_network.set_cell_morphology({'L5Pyr': CustomL5Pyr})
 
 ###############################################################################
-# Now let's run the simulation
-neuron_network._build()
-dpl = _simulate_single_trial(neuron_network)
+# Now let's run the simulation in parallel for 2 trials.
+
+# desired API?
+"""
+@parallel_simulate(n_jobs=2)
+def simulate():
+    neuron_net = NeuronNetwork(net)
+    neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
+    return simulate_dipole(neuron_net)
+ 
+dpl = simulate()
+"""
+
+def _clone_and_simulate(net, trial_idx):
+    # avoid relative lookups after being forked by joblib
+    from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
+
+    if trial_idx != 0:
+        net.params['prng_*'] = trial_idx
+
+    neuron_net = NeuronNetwork(net)
+    # neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
+
+    dpl = _simulate_single_trial(neuron_net)
+    spikedata = neuron_net.get_data_from_neuron()
+
+    return dpl, spikedata
+
+
+from hnn_core.parallel_backends import _gather_trial_data
+from joblib import Parallel, delayed
+
+n_trials = net.params['N_trials']
+dpls = []
+
+parallel, myfunc = Parallel(n_jobs=2), delayed(_clone_and_simulate)
+sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
+
+dpls = _gather_trial_data(sim_data, net, n_trials)
