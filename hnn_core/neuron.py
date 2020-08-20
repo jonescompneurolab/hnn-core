@@ -263,11 +263,13 @@ class NeuronNetwork(object):
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
         self._feed_cells = []
-        self.set_cell_morphology()
-        self._build()
+
+
 
     def _build(self):
         """Building the network in NEURON."""
+
+        self.set_cell_morphology()
 
         _create_parallel_context()
 
@@ -307,6 +309,7 @@ class NeuronNetwork(object):
 
     def __enter__(self):
         """Context manager to cleanly build NeuronNetwork objects"""
+        self._build()  # XXX: should _build be public and called explicitly?
         return self
 
     def __exit__(self, cell_type, value, traceback):

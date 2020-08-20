@@ -81,21 +81,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def _clone_and_simulate(self, net, trial_idx):
-        # avoid relative lookups after being forked by joblib
-        from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
-
-        if trial_idx != 0:
-            net.params['prng_*'] = trial_idx
-
-        neuron_net = NeuronNetwork(net)
-        dpl = _simulate_single_trial(neuron_net)
-
-        spikedata = neuron_net.get_data_from_neuron()
-
-        return dpl, spikedata
-
-    def simulate(self, net):
+    def simulate(self, net, neuron_net=None):
         """Simulate the HNN model
 
         Parameters
@@ -103,6 +89,8 @@ class JoblibBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
+        neuron_net : NeuronNetwork object
+            The NeuronNetwork object.
 
         Returns
         -------
@@ -110,10 +98,30 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
 
+        # XXX: not good. We should not use params inside
+        # our API as much as possible. Pass n_trials if needed
         n_trials = net.params['N_trials']
         dpls = []
 
-        parallel, myfunc = self._parallel_func(self._clone_and_simulate)
+        def _clone_and_simulate(net, trial_idx):
+            # avoid relative lookups after being forked by joblib
+            from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
+
+            if trial_idx != 0:
+                net.params['prng_*'] = trial_idx
+
+            nonlocal neuron_net
+            if neuron_net is None:
+                neuron_net = NeuronNetwork(net)
+            
+            neuron_net._build()
+            dpl = _simulate_single_trial(neuron_net)
+
+            spikedata = neuron_net.get_data_from_neuron()
+
+            return dpl, spikedata
+
+        parallel, myfunc = self._parallel_func(_clone_and_simulate)
         sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
         # XXX: why don't we do:
         # dpls, spike_data = parallel(...)

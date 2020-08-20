@@ -3,7 +3,7 @@
 Setting custom cell objects
 ===========================
 
-This example demonstrates how to make your custom cell objects using
+This is an advanced tutorial that demonstrates how to make your custom cell objects using
 HNN-core.
 """
 
@@ -70,7 +70,7 @@ plt.ylabel('Conductance (pS/um^2)')
 # any methods that we would like to override. The new cell class contains
 # two new methods:
 #
-# * ``set_conductance``: sets the conductance of a particular 
+# * ``set_conductance``: sets the conductance of a particular
 #   dendritic segment of the neuron, and
 # * ``set_dends_biophys``: which loops over the segments in a cell and sets
 #   their conductance.
@@ -82,31 +82,27 @@ class CustomL5Pyr(L5Pyr):
 
     def set_conductance(self, seg):
         """Insert distance dependent ionic dynamics."""
-        dist_soma = abs(h.distance(seg.x))
+        from neuron import h
 
+        dist_soma = abs(h.distance(seg.x))
         # set the Potassium (gkbar_hh2), Sodium (gnabar_hh2),
         # and Calcium (gbar_ca) dynamics
         seg.gkbar_hh2 = params['L5Pyr_dend_gkbar_hh2'] + \
             params['L5Pyr_soma_gkbar_hh2'] * np.exp(-0.006 * dist_soma)
 
         seg.gnabar_hh2 = get_g_at_dist(
-            x=dist_soma,
-            gsoma=params['L5Pyr_soma_gnabar_hh2'],
-            gdend=params['L5Pyr_dend_gnabar_hh2'],
-            xkink=962)
+            x=dist_soma, gsoma=params['L5Pyr_soma_gnabar_hh2'],
+            gdend=params['L5Pyr_dend_gnabar_hh2'], xkink=962)
 
         seg.gbar_ca = get_g_at_dist(
-            x=dist_soma,
-            gsoma=params['L5Pyr_soma_gbar_ca'],
-            gdend=params['L5Pyr_dend_gbar_ca'],
-            xkink=1501)  # beginning of tuft
+            x=dist_soma, gsoma=params['L5Pyr_soma_gbar_ca'],
+            gdend=params['L5Pyr_dend_gbar_ca'], xkink=1501)  # beginning of tuft
 
     def set_dends_biophys(self):
         """Set custom dendritic biophysics"""
         from neuron import h
 
         L5Pyr.set_dends_biophys(self)
-
         # iterate over dendritic segments, compute
         # conductance and set it
         for key in self.dends:
@@ -123,43 +119,12 @@ class CustomL5Pyr(L5Pyr):
 from hnn_core.neuron import NeuronNetwork
 
 net = Network(params)
+neuron_net = NeuronNetwork(net)
+neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
 
 ###############################################################################
-# Now let's run the simulation in parallel for 2 trials.
+# Finally, we will run the simulation in parallel for 2 trials.
+from hnn_core import JoblibBackend
 
-# desired API?
-"""
-@parallel_simulate(n_jobs=2)
-def simulate():
-    neuron_net = NeuronNetwork(net)
-    neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
-    return simulate_dipole(neuron_net)
- 
-dpl = simulate()
-"""
-
-def _clone_and_simulate(net, trial_idx):
-    from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
-
-    if trial_idx != 0:
-        net.params['prng_*'] = trial_idx
-
-    neuron_net = NeuronNetwork(net)
-    neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
-
-    dpl = _simulate_single_trial(neuron_net)
-    spikedata = neuron_net.get_data_from_neuron()
-
-    return dpl, spikedata
-
-
-from hnn_core.parallel_backends import _gather_trial_data
-from joblib import Parallel, delayed
-
-n_trials = net.params['N_trials']
-dpls = []
-
-parallel, myfunc = Parallel(n_jobs=2), delayed(_clone_and_simulate)
-sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
-
-dpls = _gather_trial_data(sim_data, net, n_trials)
+with JoblibBackend(n_jobs=1) as parallel:
+    parallel.simulate(net, neuron_net=neuron_net)
