@@ -75,8 +75,6 @@ plt.ylabel('Conductance (pS/um^2)')
 # * ``set_dends_biophys``: which loops over the segments in a cell and sets
 #   their conductance.
 import numpy as np
-
-from neuron import h
 from hnn_core.pyramidal import L5Pyr
 
 
@@ -105,6 +103,8 @@ class CustomL5Pyr(L5Pyr):
 
     def set_dends_biophys(self):
         """Set custom dendritic biophysics"""
+        from neuron import h
+
         L5Pyr.set_dends_biophys(self)
 
         # iterate over dendritic segments, compute
@@ -114,6 +114,7 @@ class CustomL5Pyr(L5Pyr):
             for seg in self.dends[key]:
                 self.set_conductance(seg)
             h.pop_section()
+
 
 ###############################################################################
 # Now let's set the custom cell object in the NeuronNetwork object. The
@@ -138,14 +139,13 @@ dpl = simulate()
 """
 
 def _clone_and_simulate(net, trial_idx):
-    # avoid relative lookups after being forked by joblib
     from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
 
     if trial_idx != 0:
         net.params['prng_*'] = trial_idx
 
     neuron_net = NeuronNetwork(net)
-    # neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
+    neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
 
     dpl = _simulate_single_trial(neuron_net)
     spikedata = neuron_net.get_data_from_neuron()
