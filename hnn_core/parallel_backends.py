@@ -113,7 +113,7 @@ class JoblibBackend(object):
             nonlocal neuron_net
             if neuron_net is None:
                 neuron_net = NeuronNetwork(net)
-            
+
             neuron_net._build()
             dpl = _simulate_single_trial(neuron_net)
 

@@ -349,7 +349,6 @@ class NeuronNetwork(object):
                 type2class[camel2snake[key]] = cell_objects[key]
         self._type2class = type2class
 
-
     # this happens on EACH node
     # creates self.net._gid_list for THIS node
     def _gid_assign(self):
