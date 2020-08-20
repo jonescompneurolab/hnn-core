@@ -85,18 +85,11 @@ class CustomL5Pyr(L5Pyr):
         from neuron import h
 
         dist_soma = abs(h.distance(seg.x))
-        # set the Potassium (gkbar_hh2), Sodium (gnabar_hh2),
-        # and Calcium (gbar_ca) dynamics
-        seg.gkbar_hh2 = params['L5Pyr_dend_gkbar_hh2'] + \
-            params['L5Pyr_soma_gkbar_hh2'] * np.exp(-0.006 * dist_soma)
-
-        seg.gnabar_hh2 = get_g_at_dist(
-            x=dist_soma, gsoma=params['L5Pyr_soma_gnabar_hh2'],
-            gdend=params['L5Pyr_dend_gnabar_hh2'], xkink=962)
-
         seg.gbar_ca = get_g_at_dist(
-            x=dist_soma, gsoma=params['L5Pyr_soma_gbar_ca'],
-            gdend=params['L5Pyr_dend_gbar_ca'], xkink=1501)  # beginning of tuft
+            x=dist_soma,
+            gsoma=params['L5Pyr_soma_gbar_ca'],
+            gdend=params['L5Pyr_dend_gbar_ca'],
+            xkink=1501)  # beginning of tuft
 
     def set_dends_biophys(self):
         """Set custom dendritic biophysics"""
