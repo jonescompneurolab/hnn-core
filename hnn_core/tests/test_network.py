@@ -25,6 +25,7 @@ def test_network():
                    't0_input_prox': 50})
     net = Network(deepcopy(params))
     neuron_network = NeuronNetwork(net)  # needed to populate net.cells
+    neuron_network._build()
 
     # Assert that params are conserved across Network initialization
     for p in params:

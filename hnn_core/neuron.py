@@ -264,12 +264,10 @@ class NeuronNetwork(object):
         # initialized by _ArtificialCell()
         self._feed_cells = []
 
-
-
     def _build(self):
         """Building the network in NEURON."""
 
-        self.set_cell_morphology()
+        self.set_cell_objects()
 
         _create_parallel_context()
 
@@ -319,12 +317,12 @@ class NeuronNetwork(object):
         if _LAST_NETWORK is not None:
             _LAST_NETWORK._clear_neuron_objects()
 
-    def set_cell_morphology(self, cell_morphology=None):
+    def set_cell_objects(self, cell_objects=None):
         """Set the cell object for a particular cell type.
 
         Parameters
         ----------
-        cell_morphology : dict
+        cell_objects : dict
             A mapping from cell type to cell object. It can have
             keys 'L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket'. If None,
             all the default objects in HNN are used. Only cell objects
@@ -338,17 +336,17 @@ class NeuronNetwork(object):
         camel2snake = {'L2Pyr': 'L2_pyramidal', 'L5Pyr': 'L5_pyramidal',
                        'L2Basket': 'L2_basket', 'L5Basket': 'L5_basket'}
 
-        if cell_morphology is None:
+        if cell_objects is None:
             self._type2class = type2class
             return
 
-        for key in cell_morphology:
-            if key in cell_morphology:
+        for key in cell_objects:
+            if key in cell_objects:
                 HNNCell = type2class[camel2snake[key]]
-                if not issubclass(cell_morphology[key], HNNCell):
-                    raise TypeError(f'cell_morphology[{key}] must be a'
+                if not issubclass(cell_objects[key], HNNCell):
+                    raise TypeError(f'cell_objects[{key}] must be a'
                                     '  subclass of {HNNCell.__name__}')
-                type2class[camel2snake[key]] = cell_morphology[key]
+                type2class[camel2snake[key]] = cell_objects[key]
         self._type2class = type2class
 
 

@@ -35,7 +35,7 @@ net = Network(params)
 # ionic dynamics. To do so, first let's create a function for computing
 # distance-dependent ionic conductance *g*. It computes a piecewise linear
 # function where the conductance at distance ``x`` from soma is linear from
-# ``gsoma``` at x=0 (base of soma) to ``gdend`` at distance ``xkink``
+# ``gsoma`` at x=0 (base of soma) to ``gdend`` at distance ``xkink``
 # from base of soma and constant thereafter.
 def get_g_at_dist(x, gsoma, gdend, xkink):
     """Compute distance-dependent ionic conductance."""
@@ -113,7 +113,7 @@ from hnn_core.neuron import NeuronNetwork
 
 net = Network(params)
 neuron_net = NeuronNetwork(net)
-neuron_net.set_cell_morphology({'L5Pyr': CustomL5Pyr})
+neuron_net.set_cell_objects({'L5Pyr': CustomL5Pyr})
 
 ###############################################################################
 # Finally, we will run the simulation in parallel for 2 trials.
