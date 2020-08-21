@@ -90,6 +90,7 @@ class JoblibBackend(object):
             net.params['prng_*'] = trial_idx
 
         neuron_net = NetworkBuilder(net)
+        neuron_net.net.trial_idx = trial_idx
         dpl = _simulate_single_trial(neuron_net)
 
         spikedata = neuron_net.get_data_from_neuron()

@@ -11,6 +11,7 @@ from .feed import ExtFeed
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
+from .params import create_pext
 
 # a few globals
 _PC = None
@@ -120,8 +121,6 @@ def _simulate_single_trial(neuron_net):
         dpl.convert_fAm_to_nAm()
         dpl.scale(neuron_net.net.params['dipole_scalefctr'])
         dpl.smooth(neuron_net.net.params['dipole_smooth_win'] / h.dt)
-
-    neuron_net.net.trial_idx += 1
 
     return dpl
 
@@ -353,6 +352,11 @@ class NetworkBuilder(object):
         External inputs are not targets.
         """
         params = self.net.params
+        # Re-create external feed param dictionaries
+        # Note that the only thing being updated here are the param['prng_*']
+        # values
+        self.net.p_common, self.net.p_unique = create_pext(params,
+                                                           params['tstop'])
 
         # loop through gids on this node
         for gid in self.net._gid_list:
