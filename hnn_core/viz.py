@@ -5,6 +5,7 @@
 
 import numpy as np
 
+
 def plot_dipole(dpl, ax=None, layer='agg', show=True):
     """Simple layer-specific plot function.
 
