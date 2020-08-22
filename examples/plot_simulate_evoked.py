@@ -19,6 +19,7 @@ import tempfile
 
 import hnn_core
 from hnn_core import simulate_dipole, read_params, Network, read_spikes
+from viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -51,8 +52,7 @@ with JoblibBackend(n_jobs=1):
 # and then plot it
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-for dpl in dpls:
-    dpl.plot(ax=axes[0], layer='agg', show=False)
+plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
 net.plot_input(ax=axes[1])
 
 ###############################################################################
