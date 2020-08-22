@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 import hnn_core
-from hnn_core import read_params, read_dipole
+from hnn_core import read_params, read_dipole, viz
 from hnn_core.dipole import Dipole
 
 matplotlib.use('agg')
@@ -24,6 +24,8 @@ def test_dipole():
     dipole.convert_fAm_to_nAm()
     dipole.scale(params['dipole_scalefctr'])
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
+    dipole.plot(show=True)
+    viz.plot_dipole([dipole, dipole],show=True)
     dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.t, dipole.t, rtol=0, atol=0.00051)
