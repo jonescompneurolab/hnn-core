@@ -19,7 +19,7 @@ import tempfile
 
 import hnn_core
 from hnn_core import simulate_dipole, read_params, Network, read_spikes
-from viz import plot_dipole
+from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
