@@ -11,7 +11,7 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
 
     Parameters
     ----------
-    dpl : instance of Dipole
+    dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
     ax : instance of matplotlib figure | None
         The matplotlib axis
@@ -28,12 +28,22 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
     """
     import matplotlib.pyplot as plt
 
+    def plot_dpl_trial(dpl):
+        if layer in dpl.dpl.keys():
+            ax.plot(dpl.t, dpl.dpl[layer])
+
     if ax is None:
         fig, ax = plt.subplots(1, 1)
-    if layer in dpl.dpl.keys():
-        ax.plot(dpl.t, dpl.dpl[layer])
-        ax.set_xlabel('Time (ms)')
-        ax.set_title(layer)
+
+    if type(dpl) is list:
+        for dpl_trial in dpl:
+            plot_dpl_trial(dpl_trial)
+    else:
+        plot_dpl_trial(dpl)
+
+    ax.set_xlabel('Time (ms)')
+    ax.set_title(layer)
+
     if show:
         plt.show()
     return ax.get_figure()
