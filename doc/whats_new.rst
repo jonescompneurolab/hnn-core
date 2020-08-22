@@ -25,6 +25,8 @@ Changelog
 
 - Add ability to simulate a single trial in parallel across cores using MPI, by `Blake Caldwell`_ in `#79 <https://github.com/jonescompneurolab/hnn-core/pull/79>`_
 
+- Modify plot_dipole() to accept both lists and individual instances of Dipole object, by `Nick Tolley`_ in `#145 <https://github.com/jonescompneurolab/hnn-core/pull/145>`_
+
 Bug
 ~~~
 
@@ -49,3 +51,4 @@ API
 .. _Blake Caldwell: https://github.com/blakecaldwell
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Christopher Bailey: https://github.com/cjayb
+.. _Nick Tolley: https://github.com/ntolley
