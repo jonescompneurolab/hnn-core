@@ -5,7 +5,6 @@
 
 import numpy as np
 
-
 def plot_dipole(dpl, ax=None, layer='agg', show=True):
     """Simple layer-specific plot function.
 
@@ -27,7 +26,7 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    from hnn_core.dipole import Dipole
+    from .dipole import Dipole
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
