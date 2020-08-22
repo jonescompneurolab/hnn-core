@@ -27,19 +27,17 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-
-    def plot_dpl_trial(dpl):
-        if layer in dpl.dpl.keys():
-            ax.plot(dpl.t, dpl.dpl[layer])
+    from hnn_core.dipole import Dipole
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    if type(dpl) is list:
-        for dpl_trial in dpl:
-            plot_dpl_trial(dpl_trial)
-    else:
-        plot_dpl_trial(dpl)
+    if isinstance(dpl, Dipole):
+        dpl = [dpl]
+
+    for dpl_trial in dpl:
+        if layer in dpl_trial.dpl.keys():
+            ax.plot(dpl_trial.t, dpl_trial.dpl[layer])
 
     ax.set_xlabel('Time (ms)')
     ax.set_title(layer)
