@@ -42,6 +42,7 @@ Let us import hnn_core
 
     import hnn_core
     from hnn_core import simulate_dipole, read_params, Network, read_spikes
+    from hnn_core.viz import plot_dipole
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -438,8 +439,7 @@ and then plot it
 
     import matplotlib.pyplot as plt
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-    for dpl in dpls:
-        dpl.plot(ax=axes[0], layer='agg', show=False)
+    plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
     net.plot_input(ax=axes[1])
 
 
@@ -596,7 +596,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  46.160 seconds)
+   **Total running time of the script:** ( 2 minutes  18.517 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:
