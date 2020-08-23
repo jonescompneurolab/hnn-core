@@ -588,12 +588,11 @@ class L2Pyr(Pyr):
                 if p_ext[self.celltype][1] > 0.0:
                     # index 1 for nmda weight
                     nc_dict['A_weight'] = p_ext[self.celltype][1]
-                    self.ncfrom_extpois.append(self.parconnect_from_src(
-                        gid_extpois, nc_dict, self.basal2_nmda))
-                    self.ncfrom_extpois.append(self.parconnect_from_src(
-                        gid_extpois, nc_dict, self.basal3_nmda))
-                    self.ncfrom_extpois.append(self.parconnect_from_src(
-                        gid_extpois, nc_dict, self.apicaloblique_nmda))
+
+                    self._connect_at_loc(
+                        loc='proximal', receptor='nmda',
+                        gid_src=gid_extpois, nc_dict=nc_dict,
+                        nc_list=self.ncfrom_extpois)
 
         else:
             print("Warning, ext type def does not exist in L2Pyr")
