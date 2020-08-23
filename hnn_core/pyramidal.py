@@ -925,6 +925,7 @@ class L5Pyr(Pyr):
                 }
 
                 nc_dict['nmda'] = {
+                    'pos_src': pos_dict[type][gid],
                     'A_weight': p_ext[self.celltype][1],
                     'A_delay': p_ext[self.celltype][2],  # index 2 for delay
                     'lamtha': p_ext['lamtha_space'],
