@@ -842,15 +842,40 @@ class L5Pyr(Pyr):
 
             h.pop_section()
 
-    def _get_postsyns(self, dends, receptor):
-        if dends == 'proximal':
+    def _connect_at_loc(self, loc, receptor, gid_src, nc_dict, nc_list):
+        """Get list of proximal/distal postsynaptic junctions.
+
+        Parameters
+        ----------
+        loc : str
+            Either 'proximal' or 'distal'
+        receptor : str
+            'nmda', 'ampa' etc.
+        gid_src : int
+            The Cell ID of the source.
+        nc_dict : dict.
+            The connection parameters. Usually contains the keys
+            pos_src, A_weight, A_delay, lamtha.
+        nc_list : list of NetCon
+            Different intput types are appended to different lists
+            of NetCon objects. The created network connections will
+            be appended to this list.
+        """
+        if loc == 'proximal':
             dends = ['apicaloblique', 'basal2', 'basal3']
-        elif dends == 'distal':
+        elif loc == 'distal':
             dends = ['apicaltuft']
+        else:
+            raise ValueError('loc must be one of proximal or distal')
 
         postsyns = list()
         for dend in dends:
             postsyns.append(getattr(self, f'{dend}_{receptor}'))
+
+        for postsyn in postsyns:
+            nc = self.parconnect_from_src(gid_src, nc_dict, postsyn)
+            nc_list.append(nc)
+
         return postsyns
 
     # parallel connection function FROM all cell types TO here
@@ -900,11 +925,9 @@ class L5Pyr(Pyr):
                         'type_src': 'ext'
                     }
 
-                postsyns = self._get_postsyns(dends=p_src['loc'],
-                                              receptor=receptor)
-                for postsyn in postsyns:
-                    nc = self.parconnect_from_src(gid_src, nc_dict, postsyn)
-                    self.ncfrom_common.append(nc)
+                self._connect_at_loc(loc=p_src['loc'], receptor=receptor,
+                                     gid_src=gid_src, nc_dict=nc_dict,
+                                     nc_list=self.ncfrom_common)
 
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
@@ -934,13 +957,10 @@ class L5Pyr(Pyr):
                 }
 
                 for receptor in ['ampa', 'nmda']:
-                    postsyns = self._get_postsyns(dends=p_ext['loc'],
-                                                  receptor=receptor)
-                    for postsyn in postsyns:
-                        nc = self.parconnect_from_src(gid_ev,
-                                                      nc_dict[receptor],
-                                                      postsyn)
-                        self.ncfrom_ev.append(nc)
+                    self._connect_at_loc(loc=p_ext['loc'], receptor=receptor,
+                                         gid_src=gid_ev,
+                                         nc_dict=nc_dict[receptor],
+                                         nc_list=self.ncfrom_ev)
 
         elif type == 'extgauss':
             # gid is this cell's gid
@@ -967,15 +987,11 @@ class L5Pyr(Pyr):
                     'type_src': type
                 }
 
-                self.ncfrom_extgauss.append(
-                    self.parconnect_from_src(
-                        gid_extgauss, nc_dict, self.basal2_ampa))
-                self.ncfrom_extgauss.append(
-                    self.parconnect_from_src(
-                        gid_extgauss, nc_dict, self.basal3_ampa))
-                self.ncfrom_extgauss.append(
-                    self.parconnect_from_src(
-                        gid_extgauss, nc_dict, self.apicaloblique_ampa))
+                self._connect_at_loc(
+                    loc='proximal', receptor='ampa',
+                    gid_src=gid_extgauss,
+                    nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extgauss)
 
         elif type == 'extpois':
             if self.celltype in p_ext.keys():
@@ -992,15 +1008,11 @@ class L5Pyr(Pyr):
                     'type_src': type
                 }
 
-                self.ncfrom_extpois.append(
-                    self.parconnect_from_src(
-                        gid_extpois, nc_dict, self.basal2_ampa))
-                self.ncfrom_extpois.append(
-                    self.parconnect_from_src(
-                        gid_extpois, nc_dict, self.basal3_ampa))
-                self.ncfrom_extpois.append(
-                    self.parconnect_from_src(
-                        gid_extpois, nc_dict, self.apicaloblique_ampa))
+                self._connect_at_loc(
+                    loc='proximal', receptor='ampa',
+                    gid_src=gid_extpois,
+                    nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extpois)
 
                 if p_ext[self.celltype][1] > 0.0:
                     # index 1 for nmda weight
