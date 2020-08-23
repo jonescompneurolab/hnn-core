@@ -25,7 +25,7 @@ def test_dipole():
     dipole.scale(params['dipole_scalefctr'])
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
     dipole.plot(show=False)
-    viz.plot_dipole([dipole, dipole],show=False)
+    viz.plot_dipole([dipole, dipole], show=False)
     dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.t, dipole.t, rtol=0, atol=0.00051)
