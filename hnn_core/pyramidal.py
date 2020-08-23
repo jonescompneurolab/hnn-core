@@ -3,6 +3,8 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+from abc import abstractmethod
+
 import numpy as np
 
 from neuron import h
@@ -218,6 +220,18 @@ class Pyr(_Cell):
             self.apicaltuft_gabaa = self.syn_create(
                 self.dends['apical_tuft'](0.5), **p_syn['gabaa'])
 
+    @abstractmethod
+    def geom(self, p_dend):
+        pass
+
+    @abstractmethod
+    def topol(self):
+        pass
+
+    @abstractmethod
+    def basic_shape(self):
+        pass
+
 
 class L2Pyr(Pyr):
     """Layer 2 pyramidal cell class.
@@ -275,7 +289,6 @@ class L2Pyr(Pyr):
 
         # create synapses
         self._synapse_create(p_syn)
-        # self.__synapse_create()
 
         # run record_current_soma(), defined in Cell()
         self.record_current_soma()
@@ -638,8 +651,8 @@ class L5Pyr(Pyr):
         self.geom(p_dend)
 
         # biophysics
-        self.__biophys_soma()
-        self.__biophys_dends()
+        self._biophys_soma()
+        self._biophys_dends()
 
         # Dictionary of length scales to calculate dipole without
         # 3d shape. Comes from Pyr().
@@ -749,7 +762,7 @@ class L5Pyr(Pyr):
         self.basic_shape()  # translated from original hoc (2009 model)
 
     # adds biophysics to soma
-    def __biophys_soma(self):
+    def _biophys_soma(self):
         # set soma biophysics specified in Pyr
         # self.pyr_biophys_soma()
 
@@ -788,7 +801,7 @@ class L5Pyr(Pyr):
         self.soma.insert('ar')
         self.soma.gbar_ar = self.p_all['L5Pyr_soma_gbar_ar']
 
-    def __biophys_dends(self):
+    def _biophys_dends(self):
         # set dend biophysics specified in Pyr()
         # self.pyr_biophys_dends()
 

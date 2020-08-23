@@ -3,6 +3,8 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 from neuron import h
 
@@ -50,7 +52,7 @@ class _ArtificialCell:
         self.nrn_netcon.threshold = threshold
 
 
-class _Cell(object):
+class _Cell(ABC):
     """Create a cell object.
 
     Parameters
@@ -93,6 +95,14 @@ class _Cell(object):
              (soma_props['L'], soma_props['diam'],
               soma_props['Ra'], soma_props['cm']))
         return '<%s | %s>' % (class_name, s)
+
+    @abstractmethod
+    def _biophys_soma(self):
+        pass
+
+    @abstractmethod
+    def _synapse_create(self):
+        pass
 
     def create_soma(self):
         """Create soma and set geometry."""
@@ -342,6 +352,18 @@ class _Cell(object):
             (np.exp(-(d**2) / (nc_dict['lamtha']**2)))
 
         return nc
+
+    @abstractmethod
+    def parconnect(self, gid, gid_dict, pos_dict, p):
+        pass
+
+    @abstractmethod
+    def parreceive(self, gid, gid_dict, pos_dict, p_ext):
+        pass
+
+    @abstractmethod
+    def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
+        pass
 
     # pardistance function requires pre position, since it is
     # calculated on POST cell
