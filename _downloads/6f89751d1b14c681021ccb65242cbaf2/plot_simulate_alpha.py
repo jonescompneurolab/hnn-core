@@ -69,7 +69,7 @@ import numpy as np
 sfreq = 1000. / params['dt']
 n_fft = 1024 * 8
 freqs, _, psds = spectrogram(
-    dpl[0].dpl['agg'], sfreq, window='hamming', nfft=n_fft,
+    dpl[0].data['agg'], sfreq, window='hamming', nfft=n_fft,
     nperseg=n_fft, noverlap=0)
 plt.figure()
 plt.plot(freqs, np.mean(psds, axis=-1))

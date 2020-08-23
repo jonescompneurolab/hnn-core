@@ -418,7 +418,7 @@ Simulation time: 240.0 ms...
 <span class="n">n_cycles</span> <span class="o">=</span> <span class="n">freqs</span> <span class="o">/</span> <span class="mf">4.</span>
 
 <span class="c1"># MNE expects an array of shape (n_trials, n_channels, n_times)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dpl</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
 <span class="n">power</span> <span class="o">=</span> <span class="n">tfr_array_multitaper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
                              <span class="n">n_cycles</span><span class="o">=</span><span class="n">n_cycles</span><span class="p">,</span>
                              <span class="n">time_bandwidth</span><span class="o">=</span><span class="n">time_bandwidth</span><span class="p">,</span>
@@ -438,7 +438,7 @@ Simulation time: 240.0 ms...
   axes[1].pcolormesh(times, freqs, power[0, 0, ...], cmap=&#39;RdBu_r&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  14.627 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  0.407 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-gamma-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_gamma.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>
