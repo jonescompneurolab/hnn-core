@@ -219,6 +219,43 @@ class Pyr(_Cell):
                 self.dends['apical_tuft'](0.5), **p_syn['gabaa'])
 
 
+    def _connect_at_loc(self, loc, receptor, gid_src, nc_dict, nc_list):
+        """Get list of proximal/distal postsynaptic junctions.
+
+        Parameters
+        ----------
+        loc : str
+            Either 'proximal' or 'distal'
+        receptor : str
+            'nmda', 'ampa' etc.
+        gid_src : int
+            The Cell ID of the source.
+        nc_dict : dict.
+            The connection parameters. Usually contains the keys
+            pos_src, A_weight, A_delay, lamtha.
+        nc_list : list of NetCon
+            Different intput types are appended to different lists
+            of NetCon objects. The created network connections will
+            be appended to this list.
+        """
+        if loc == 'proximal':
+            dends = ['apicaloblique', 'basal2', 'basal3']
+        elif loc == 'distal':
+            dends = ['apicaltuft']
+        else:
+            raise ValueError('loc must be one of proximal or distal')
+
+        postsyns = list()
+        for dend in dends:
+            postsyns.append(getattr(self, f'{dend}_{receptor}'))
+
+        for postsyn in postsyns:
+            nc = self.parconnect_from_src(gid_src, nc_dict, postsyn)
+            nc_list.append(nc)
+
+        return postsyns
+
+
 class L2Pyr(Pyr):
     """Layer 2 pyramidal cell class.
 
@@ -441,18 +478,10 @@ class L2Pyr(Pyr):
                     'type_src': 'ext'
                 }
 
-                # Proximal feed AMPA synapses
-                if p_src['loc'] == 'proximal':
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_ampa, self.basal2_ampa))
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_ampa, self.basal3_ampa))
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_ampa, self.apicaloblique_ampa))
-                # Distal feed AMPA synapses
-                elif p_src['loc'] == 'distal':
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_ampa, self.apicaltuft_ampa))
+                self._connect_at_loc(
+                    loc=p_src['loc'], receptor='ampa',
+                    gid_src=gid_src, nc_dict=nc_dict_ampa,
+                    nc_list=self.ncfrom_common)
 
             # Check is NMDA params defined in p_src
             if 'L2Pyr_nmda' in p_src.keys():
@@ -465,18 +494,10 @@ class L2Pyr(Pyr):
                     'type_src': 'ext'
                 }
 
-                # Proximal feed NMDA synapses
-                if p_src['loc'] == 'proximal':
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_nmda, self.basal2_nmda))
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_nmda, self.basal3_nmda))
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_nmda, self.apicaloblique_nmda))
-                # Distal feed NMDA synapses
-                elif p_src['loc'] == 'distal':
-                    self.ncfrom_common.append(self.parconnect_from_src(
-                        gid_src, nc_dict_nmda, self.apicaltuft_nmda))
+                self._connect_at_loc(
+                    loc=p_src['loc'], receptor='nmda',
+                    gid_src=gid_src, nc_dict=nc_dict_nmda,
+                    nc_list=self.ncfrom_common)
 
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
@@ -487,8 +508,9 @@ class L2Pyr(Pyr):
             if self.celltype in p_ext.keys():
                 gid_ev = gid + gid_dict[type][0]
 
+                nc_dict = dict()
                 # separate dictionaries for ampa and nmda evoked inputs
-                nc_dict_ampa = {
+                nc_dict['ampa'] = {
                     'pos_src': pos_dict[type][gid],
                     # index 0 for ampa weight
                     'A_weight': p_ext[self.celltype][0],
@@ -498,7 +520,7 @@ class L2Pyr(Pyr):
                     'type_src': type
                 }
 
-                nc_dict_nmda = {
+                nc_dict['nmda'] = {
                     'pos_src': pos_dict[type][gid],
                     # index 1 for nmda weight
                     'A_weight': p_ext[self.celltype][1],
@@ -508,28 +530,13 @@ class L2Pyr(Pyr):
                     'type_src': type
                 }
 
-                if p_ext['loc'] == 'proximal':
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_ampa, self.basal2_ampa))
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_ampa, self.basal3_ampa))
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_ampa, self.apicaloblique_ampa))
-
-                    # NEW: note that default/original is 0 nmda weight
-                    # for these proximal dends
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_nmda, self.basal2_nmda))
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_nmda, self.basal3_nmda))
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_nmda, self.apicaloblique_nmda))
-
-                elif p_ext['loc'] == 'distal':
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_ampa, self.apicaltuft_ampa))
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_nmda, self.apicaltuft_nmda))
+                # NEW: note that default/original is 0 nmda weight
+                # for the proximal dends
+                for receptor in ['ampa', 'nmda']:
+                    self._connect_at_loc(
+                        loc=p_ext['loc'], receptor=receptor,
+                        gid_src=gid_ev, nc_dict=nc_dict[receptor],
+                        nc_list=self.ncfrom_common)
 
         elif type == 'extgauss':
             # gid is this cell's gid
@@ -554,12 +561,10 @@ class L2Pyr(Pyr):
                     'type_src': type
                 }
 
-                self.ncfrom_extgauss.append(self.parconnect_from_src(
-                    gid_extgauss, nc_dict, self.basal2_ampa))
-                self.ncfrom_extgauss.append(self.parconnect_from_src(
-                    gid_extgauss, nc_dict, self.basal3_ampa))
-                self.ncfrom_extgauss.append(self.parconnect_from_src(
-                    gid_extgauss, nc_dict, self.apicaloblique_ampa))
+                self._connect_at_loc(
+                    loc='proximal', receptor='ampa',
+                    gid_src=gid_extgauss, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extgauss)
 
         elif type == 'extpois':
             if self.celltype in p_ext.keys():
@@ -575,12 +580,10 @@ class L2Pyr(Pyr):
                     'type_src': type
                 }
 
-                self.ncfrom_extpois.append(self.parconnect_from_src(
-                    gid_extpois, nc_dict, self.basal2_ampa))
-                self.ncfrom_extpois.append(self.parconnect_from_src(
-                    gid_extpois, nc_dict, self.basal3_ampa))
-                self.ncfrom_extpois.append(self.parconnect_from_src(
-                    gid_extpois, nc_dict, self.apicaloblique_ampa))
+                self._connect_at_loc(
+                    loc='proximal', receptor='ampa',
+                    gid_src=gid_extpois, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extpois)
 
                 if p_ext[self.celltype][1] > 0.0:
                     # index 1 for nmda weight
@@ -842,42 +845,6 @@ class L5Pyr(Pyr):
 
             h.pop_section()
 
-    def _connect_at_loc(self, loc, receptor, gid_src, nc_dict, nc_list):
-        """Get list of proximal/distal postsynaptic junctions.
-
-        Parameters
-        ----------
-        loc : str
-            Either 'proximal' or 'distal'
-        receptor : str
-            'nmda', 'ampa' etc.
-        gid_src : int
-            The Cell ID of the source.
-        nc_dict : dict.
-            The connection parameters. Usually contains the keys
-            pos_src, A_weight, A_delay, lamtha.
-        nc_list : list of NetCon
-            Different intput types are appended to different lists
-            of NetCon objects. The created network connections will
-            be appended to this list.
-        """
-        if loc == 'proximal':
-            dends = ['apicaloblique', 'basal2', 'basal3']
-        elif loc == 'distal':
-            dends = ['apicaltuft']
-        else:
-            raise ValueError('loc must be one of proximal or distal')
-
-        postsyns = list()
-        for dend in dends:
-            postsyns.append(getattr(self, f'{dend}_{receptor}'))
-
-        for postsyn in postsyns:
-            nc = self.parconnect_from_src(gid_src, nc_dict, postsyn)
-            nc_list.append(nc)
-
-        return postsyns
-
     # parallel connection function FROM all cell types TO here
     def parconnect(self, gid, gid_dict, pos_dict, p):
 
@@ -1017,12 +984,9 @@ class L5Pyr(Pyr):
                 if p_ext[self.celltype][1] > 0.0:
                     # index 1 for nmda weight
                     nc_dict['A_weight'] = p_ext[self.celltype][1]
-                    self.ncfrom_extpois.append(
-                        self.parconnect_from_src(
-                            gid_extpois, nc_dict, self.basal2_nmda))
-                    self.ncfrom_extpois.append(
-                        self.parconnect_from_src(
-                            gid_extpois, nc_dict, self.basal3_nmda))
-                    self.ncfrom_extpois.append(
-                        self.parconnect_from_src(
-                            gid_extpois, nc_dict, self.apicaloblique_nmda))
+
+                    self._connect_at_loc(
+                        loc='proximal', receptor='nmda',
+                        gid_src=gid_extpois,
+                        nc_dict=nc_dict,
+                        nc_list=self.ncfrom_extpois)
