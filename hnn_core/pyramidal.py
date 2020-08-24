@@ -229,7 +229,8 @@ class Pyr(_Cell):
         receptor : str
             'nmda', 'ampa' etc.
         gid_src : int
-            The Cell ID of the source.
+            The Cell ID of the feed source (i.e., artificial presynaptic 
+            neuron).
         nc_dict : dict.
             The connection parameters. Usually contains the keys
             pos_src, A_weight, A_delay, lamtha.
