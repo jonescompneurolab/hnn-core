@@ -218,9 +218,8 @@ class Pyr(_Cell):
             self.apicaltuft_gabaa = self.syn_create(
                 self.dends['apical_tuft'](0.5), **p_syn['gabaa'])
 
-
-    def _connect_at_loc(self, loc, receptor, gid_src, nc_dict, nc_list):
-        """Get list of proximal/distal postsynaptic junctions.
+    def _connect_feed_at_loc(self, loc, receptor, gid_src, nc_dict, nc_list):
+        """Connect a feed at a certain location for a particular receptor.
 
         Parameters
         ----------
@@ -229,7 +228,7 @@ class Pyr(_Cell):
         receptor : str
             'nmda', 'ampa' etc.
         gid_src : int
-            The Cell ID of the feed source (i.e., artificial presynaptic 
+            The Cell ID of the feed source (i.e., artificial presynaptic
             neuron).
         nc_dict : dict.
             The connection parameters. Usually contains the keys
@@ -479,7 +478,7 @@ class L2Pyr(Pyr):
                     'type_src': 'ext'
                 }
 
-                self._connect_at_loc(
+                self._connect_feed_at_loc(
                     loc=p_src['loc'], receptor='ampa',
                     gid_src=gid_src, nc_dict=nc_dict_ampa,
                     nc_list=self.ncfrom_common)
@@ -495,7 +494,7 @@ class L2Pyr(Pyr):
                     'type_src': 'ext'
                 }
 
-                self._connect_at_loc(
+                self._connect_feed_at_loc(
                     loc=p_src['loc'], receptor='nmda',
                     gid_src=gid_src, nc_dict=nc_dict_nmda,
                     nc_list=self.ncfrom_common)
@@ -534,7 +533,7 @@ class L2Pyr(Pyr):
                 # NEW: note that default/original is 0 nmda weight
                 # for the proximal dends
                 for receptor in ['ampa', 'nmda']:
-                    self._connect_at_loc(
+                    self._connect_feed_at_loc(
                         loc=p_ext['loc'], receptor=receptor,
                         gid_src=gid_ev, nc_dict=nc_dict[receptor],
                         nc_list=self.ncfrom_common)
@@ -562,7 +561,7 @@ class L2Pyr(Pyr):
                     'type_src': type
                 }
 
-                self._connect_at_loc(
+                self._connect_feed_at_loc(
                     loc='proximal', receptor='ampa',
                     gid_src=gid_extgauss, nc_dict=nc_dict,
                     nc_list=self.ncfrom_extgauss)
@@ -581,7 +580,7 @@ class L2Pyr(Pyr):
                     'type_src': type
                 }
 
-                self._connect_at_loc(
+                self._connect_feed_at_loc(
                     loc='proximal', receptor='ampa',
                     gid_src=gid_extpois, nc_dict=nc_dict,
                     nc_list=self.ncfrom_extpois)
@@ -590,7 +589,7 @@ class L2Pyr(Pyr):
                     # index 1 for nmda weight
                     nc_dict['A_weight'] = p_ext[self.celltype][1]
 
-                    self._connect_at_loc(
+                    self._connect_feed_at_loc(
                         loc='proximal', receptor='nmda',
                         gid_src=gid_extpois, nc_dict=nc_dict,
                         nc_list=self.ncfrom_extpois)
@@ -892,7 +891,7 @@ class L5Pyr(Pyr):
                         'type_src': 'ext'
                     }
 
-                self._connect_at_loc(loc=p_src['loc'], receptor=receptor,
+                self._connect_feed_at_loc(loc=p_src['loc'], receptor=receptor,
                                      gid_src=gid_src, nc_dict=nc_dict,
                                      nc_list=self.ncfrom_common)
 
@@ -924,7 +923,7 @@ class L5Pyr(Pyr):
                 }
 
                 for receptor in ['ampa', 'nmda']:
-                    self._connect_at_loc(loc=p_ext['loc'], receptor=receptor,
+                    self._connect_feed_at_loc(loc=p_ext['loc'], receptor=receptor,
                                          gid_src=gid_ev,
                                          nc_dict=nc_dict[receptor],
                                          nc_list=self.ncfrom_ev)
@@ -954,7 +953,7 @@ class L5Pyr(Pyr):
                     'type_src': type
                 }
 
-                self._connect_at_loc(
+                self._connect_feed_at_loc(
                     loc='proximal', receptor='ampa',
                     gid_src=gid_extgauss,
                     nc_dict=nc_dict,
@@ -975,7 +974,7 @@ class L5Pyr(Pyr):
                     'type_src': type
                 }
 
-                self._connect_at_loc(
+                self._connect_feed_at_loc(
                     loc='proximal', receptor='ampa',
                     gid_src=gid_extpois,
                     nc_dict=nc_dict,
@@ -985,7 +984,7 @@ class L5Pyr(Pyr):
                     # index 1 for nmda weight
                     nc_dict['A_weight'] = p_ext[self.celltype][1]
 
-                    self._connect_at_loc(
+                    self._connect_feed_at_loc(
                         loc='proximal', receptor='nmda',
                         gid_src=gid_extpois,
                         nc_dict=nc_dict,
