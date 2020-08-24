@@ -149,17 +149,11 @@ class L2Basket(BasketSingle):
 
                 # connections depend on location of input - why only
                 # for L2 basket and not L5 basket?
-                if p_ext['loc'] == 'proximal':
+                if p_ext['loc'] in ['proximal', 'distal']:
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_ampa, self.soma_ampa))
                     # NEW: note that default/original is 0 nmda weight for
                     # the soma (for prox evoked)
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_nmda, self.soma_nmda))
-
-                elif p_ext['loc'] == 'distal':
-                    self.ncfrom_ev.append(self.parconnect_from_src(
-                        gid_ev, nc_dict_ampa, self.soma_ampa))
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_nmda, self.soma_nmda))
 
