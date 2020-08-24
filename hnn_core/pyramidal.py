@@ -891,9 +891,10 @@ class L5Pyr(Pyr):
                         'type_src': 'ext'
                     }
 
-                self._connect_feed_at_loc(loc=p_src['loc'], receptor=receptor,
-                                     gid_src=gid_src, nc_dict=nc_dict,
-                                     nc_list=self.ncfrom_common)
+                self._connect_feed_at_loc(
+                    loc=p_src['loc'], receptor=receptor,
+                    gid_src=gid_src, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_common)
 
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
@@ -923,10 +924,10 @@ class L5Pyr(Pyr):
                 }
 
                 for receptor in ['ampa', 'nmda']:
-                    self._connect_feed_at_loc(loc=p_ext['loc'], receptor=receptor,
-                                         gid_src=gid_ev,
-                                         nc_dict=nc_dict[receptor],
-                                         nc_list=self.ncfrom_ev)
+                    self._connect_feed_at_loc(
+                        loc=p_ext['loc'], receptor=receptor,
+                        gid_src=gid_ev, nc_dict=nc_dict[receptor],
+                        nc_list=self.ncfrom_ev)
 
         elif type == 'extgauss':
             # gid is this cell's gid
