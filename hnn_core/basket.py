@@ -10,7 +10,16 @@ from .cell import _Cell
 
 
 class BasketSingle(_Cell):
-    """Inhibitory cell class."""
+    """Inhibitory cell class.
+
+    Attributes
+    ----------
+    synapses : dict
+        The synapses that the cell can use for connections.
+    sect_loc : dict of list
+        Can have keys 'proximal' or 'distal' each containing
+        names of section locations that are proximal or distal.
+    """
 
     def __init__(self, gid, pos, cell_name='Basket'):
         self.props = self.__set_props(cell_name, pos)
@@ -22,6 +31,8 @@ class BasketSingle(_Cell):
         # for height and xz plane for depth. This is opposite for model as a
         # whole, but convention is followed in this function ease use of gui.
         self.shape_soma()
+        self.synapses = dict()
+        self.sect_loc = dict(proximal=['soma'], distal=[])
 
     def _biophysics(self):
         self.soma.insert('hh2')
@@ -36,30 +47,16 @@ class BasketSingle(_Cell):
             'name': cell_name,
         }
 
-    # For all synapses, section location 'secloc' is being explicitly supplied
-    # for clarity, even though they are (right now) always 0.5.
-    # Might change in future
-    # creates a RECEIVING inhibitory synapse at secloc
-    def syn_gabaa_create(self, secloc):
-        """Create gabaa receiving synapse."""
-        return self.syn_create(secloc, e=-80, tau1=0.5, tau2=5.)
-
-    def syn_ampa_create(self, secloc):
-        """Create ampa receiving synapse at secloc."""
-        return self.syn_create(secloc, e=0., tau1=0.5, tau2=5.)
-
-    # creates a RECEIVING nmda synapse at secloc
-    # this is a pretty fast NMDA, no?
-    def syn_nmda_create(self, secloc):
-        """Create nmda receiving synapse."""
-        return self.syn_create(secloc, e=0., tau1=1., tau2=20.)
-
     # creation of synapses
     def _synapse_create(self):
         # creates synapses onto this cell
-        self.soma_ampa = self.syn_ampa_create(self.soma(0.5))
-        self.soma_gabaa = self.syn_gabaa_create(self.soma(0.5))
-        self.soma_nmda = self.syn_nmda_create(self.soma(0.5))
+        self.synapses['soma_ampa'] = self.syn_create(0.5, e=0., tau1=0.5,
+                                                     tau2=5.)
+        self.synapses['soma_gabaa'] = self.syn_create(0.5, e=-80, tau1=0.5,
+                                                      tau2=5.)
+        # this is a pretty fast NMDA, no?
+        self.synapses['soma_nmda'] = self.syn_create(0.5, e=0., tau1=1.,
+                                                     tau2=20.)
 
     # this function might make more sense as a method of net?
     # par: receive from external inputs
@@ -70,7 +67,7 @@ class BasketSingle(_Cell):
             # check if AMPA params are defined in the p_src
             if f'{self.name}_ampa' in p_src.keys():
                 # create an nc_dict
-                nc_dict_ampa = {
+                nc_dict = {
                     'pos_src': pos,
                     'A_weight': p_src[f'{self.name}_ampa'][0],
                     'A_delay': p_src[f'{self.name}_ampa'][1],
@@ -79,13 +76,14 @@ class BasketSingle(_Cell):
                     'type_src': 'ext'
                 }
 
-                # AMPA synapse
-                self.ncfrom_common.append(self.parconnect_from_src(
-                    gid_src, nc_dict_ampa, self.soma_ampa))
+                self._connect_feed_at_loc(
+                    feed_loc='proximal', receptor='ampa',
+                    gid_src=gid_src, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_common)
 
             # Check if NMDA params are defined in p_src
             if f'{self.name}_nmda' in p_src.keys():
-                nc_dict_nmda = {
+                nc_dict = {
                     'pos_src': pos,
                     'A_weight': p_src[f'{self.name}_nmda'][0],
                     'A_delay': p_src[f'{self.name}_nmda'][1],
@@ -94,9 +92,10 @@ class BasketSingle(_Cell):
                     'type_src': 'ext'
                 }
 
-                # NMDA synapse
-                self.ncfrom_common.append(self.parconnect_from_src(
-                    gid_src, nc_dict_nmda, self.soma_nmda))
+                self._connect_feed_at_loc(
+                    feed_loc='proximal', receptor='nmda',
+                    gid_src=gid_src, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_common)
 
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
@@ -107,7 +106,8 @@ class BasketSingle(_Cell):
             if self.celltype in p_ext.keys():
                 gid_ev = gid + gid_dict[type][0]
 
-                nc_dict_ampa = {
+                nc_dict = dict()
+                nc_dict['ampa'] = {
                     'pos_src': pos_dict[type][gid],
                     # index 0 is ampa weight
                     'A_weight': p_ext[self.celltype][0],
@@ -117,7 +117,7 @@ class BasketSingle(_Cell):
                     'type_src': type
                 }
 
-                nc_dict_nmda = {
+                nc_dict['nmda'] = {
                     'pos_src': pos_dict[type][gid],
                     # index 1 is nmda weight
                     'A_weight': p_ext[self.celltype][1],
@@ -127,13 +127,13 @@ class BasketSingle(_Cell):
                     'type_src': type
                 }
 
-                self.ncfrom_ev.append(self.parconnect_from_src(
-                    gid_ev, nc_dict_ampa, self.soma_ampa))
-
                 # NEW: note that default/original is 0 nmda weight
                 # for the soma (both prox and distal evoked)
-                self.ncfrom_ev.append(self.parconnect_from_src(
-                    gid_ev, nc_dict_nmda, self.soma_nmda))
+                for receptor in ['ampa', 'nmda']:
+                    self._connect_feed_at_loc(
+                        feed_loc='proximal', receptor=receptor,
+                        gid_src=gid_ev, nc_dict=nc_dict[receptor],
+                        nc_list=self.ncfrom_ev)
 
         elif type == 'extgauss':
             # gid is this cell's gid
@@ -154,8 +154,10 @@ class BasketSingle(_Cell):
                     'type_src': type
                 }
 
-                self.ncfrom_extgauss.append(self.parconnect_from_src(
-                    gid_extgauss, nc_dict, self.soma_ampa))
+                self._connect_feed_at_loc(
+                    feed_loc='proximal', receptor='ampa',
+                    gid_src=gid_extgauss, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extgauss)
 
         elif type == 'extpois':
             if self.celltype in p_ext.keys():
@@ -171,14 +173,18 @@ class BasketSingle(_Cell):
                     'type_src': type
                 }
 
-                self.ncfrom_extpois.append(self.parconnect_from_src(
-                    gid_extpois, nc_dict, self.soma_ampa))
+                self._connect_feed_at_loc(
+                    feed_loc='proximal', receptor='ampa',
+                    gid_src=gid_extpois, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extpois)
 
                 if p_ext[self.celltype][1] > 0.0:
                     # index 1 for nmda weight
                     nc_dict['A_weight'] = p_ext[self.celltype][1]
-                    self.ncfrom_extpois.append(self.parconnect_from_src(
-                        gid_extpois, nc_dict, self.soma_nmda))
+                    self._connect_feed_at_loc(
+                        feed_loc='proximal', receptor='nmda',
+                        gid_src=gid_extpois, nc_dict=nc_dict,
+                        nc_list=self.ncfrom_extpois)
 
         else:
             print("Warning, type def not specified in L2Basket")
@@ -200,9 +206,9 @@ class L2Basket(BasketSingle):
     # no connections from L5Pyr or L5Basket to L2Baskets
     def parconnect(self, gid, gid_dict, pos_dict, p):
         self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr',
-                      postsyns=[self.soma_ampa])
+                      postsyns=[self.synapses['soma_ampa']])
         self._connect(gid, gid_dict, pos_dict, p, 'L2_basket', 'L2Basket',
-                      lamtha=20., postsyns=[self.soma_gabaa])
+                      lamtha=20., postsyns=[self.synapses['soma_gabaa']])
 
 
 class L5Basket(BasketSingle):
@@ -221,8 +227,8 @@ class L5Basket(BasketSingle):
     def parconnect(self, gid, gid_dict, pos_dict, p):
         self._connect(gid, gid_dict, pos_dict, p, 'L5_basket', 'L5Basket',
                       lamtha=20., autapses=False,
-                      postsyns=[self.soma_gabaa])
+                      postsyns=[self.synapses['soma_gabaa']])
         self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr',
-                      postsyns=[self.soma_ampa])
+                      postsyns=[self.synapses['soma_ampa']])
         self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr',
-                      postsyns=[self.soma_ampa])
+                      postsyns=[self.synapses['soma_ampa']])

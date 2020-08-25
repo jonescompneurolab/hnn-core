@@ -162,6 +162,38 @@ class _Cell(object):
         """Move cell to position."""
         self.translate_to(self.pos[0] * 100, self.pos[2], self.pos[1] * 100)
 
+    def _connect_feed_at_loc(self, feed_loc, receptor, gid_src, nc_dict,
+                             nc_list):
+        """Connect a feed at a certain location for a particular receptor.
+
+        Parameters
+        ----------
+        feed_loc : str
+            Either 'proximal' or 'distal'
+        receptor : str
+            'nmda', 'ampa' etc.
+        gid_src : int
+            The Cell ID of the feed source (i.e., artificial presynaptic
+            neuron).
+        nc_dict : dict.
+            The connection parameters. Usually contains the keys
+            pos_src, A_weight, A_delay, lamtha.
+        nc_list : list of NetCon
+            Different intput types are appended to different lists
+            of NetCon objects. The created network connections will
+            be appended to this list.
+        """
+        sects = self.sect_loc[feed_loc]
+        if isinstance(sects, str):
+            sects = [sects]
+        if not isinstance(sects, list):
+            raise TypeError('sect_loc must be a list of dict')
+
+        for sect in sects:
+            syn_key = f'{sect}_{receptor}'
+            nc = self.parconnect_from_src(gid_src, nc_dict, self.synapses[syn_key])
+            nc_list.append(nc)
+
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
                  lamtha=3., receptor=None, postsyns=None, autapses=True):
         for gid_src, pos in zip(gid_dict[type_src],

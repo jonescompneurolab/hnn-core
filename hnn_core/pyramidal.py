@@ -27,8 +27,13 @@ class Pyr(_Cell):
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.
-    list_dend : list of h.Section
+    synapses : dict
+        The synapses that the cell can use for connections.
+    list_dend : list of str
         List of dendrites.
+    sect_loc : dict of list
+        Can have keys 'proximal' or 'distal' each containing
+        names of section locations that are proximal or distal.
     celltype : str
         The cell type, 'L5_Pyramidal' or 'L2_Pyramidal'
     """
@@ -40,6 +45,8 @@ class Pyr(_Cell):
         self.name = soma_props['name']
         # preallocate dict to store dends
         self.dends = {}
+        self.synapses = dict()
+        self.sect_loc = dict()
         # for legacy use with L5Pyr
         self.list_dend = []
         self.celltype = 'Pyramidal'
@@ -74,6 +81,8 @@ class Pyr(_Cell):
                           ['apical_trunk', 'apical_oblique', 'apical_1',
                            'apical_2', 'apical_tuft', 'basal_1', 'basal_2',
                            'basal_3'] if key in self.dends]
+        self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
+        self.sect_loc['distal'] = ['apicaltuft']
 
     def set_dend_props(self, p_dend_props):
         """"Iterate over keys in p_dend_props. Create dend for each key."""
@@ -191,72 +200,35 @@ class Pyr(_Cell):
     def _synapse_create(self, p_syn):
         """Creates synapses onto this cell."""
         # Somatic synapses
-        self.synapses = {
-            'soma_gabaa': self.syn_create(self.soma(0.5), **p_syn['gabaa']),
-            'soma_gabab': self.syn_create(self.soma(0.5), **p_syn['gabab']),
-        }
+        self.synapses['soma_gabaa'] = self.syn_create(self.soma(0.5),
+                                                      **p_syn['gabaa'])
+        self.synapses['soma_gabab'] = self.syn_create(self.soma(0.5),
+                                                      **p_syn['gabab'])
 
         # Dendritic synapses
-        self.apicaloblique_ampa = self.syn_create(
+        self.synapses['apicaloblique_ampa'] = self.syn_create(
             self.dends['apical_oblique'](0.5), **p_syn['ampa'])
-        self.apicaloblique_nmda = self.syn_create(
+        self.synapses['apicaloblique_nmda'] = self.syn_create(
             self.dends['apical_oblique'](0.5), **p_syn['nmda'])
 
-        self.basal2_ampa = self.syn_create(
+        self.synapses['basal2_ampa'] = self.syn_create(
             self.dends['basal_2'](0.5), **p_syn['ampa'])
-        self.basal2_nmda = self.syn_create(
+        self.synapses['basal2_nmda'] = self.syn_create(
             self.dends['basal_2'](0.5), **p_syn['nmda'])
 
-        self.basal3_ampa = self.syn_create(
+        self.synapses['basal3_ampa'] = self.syn_create(
             self.dends['basal_3'](0.5), **p_syn['ampa'])
-        self.basal3_nmda = self.syn_create(
+        self.synapses['basal3_nmda'] = self.syn_create(
             self.dends['basal_3'](0.5), **p_syn['nmda'])
 
-        self.apicaltuft_ampa = self.syn_create(
+        self.synapses['apicaltuft_ampa'] = self.syn_create(
             self.dends['apical_tuft'](0.5), **p_syn['ampa'])
-        self.apicaltuft_nmda = self.syn_create(
+        self.synapses['apicaltuft_nmda'] = self.syn_create(
             self.dends['apical_tuft'](0.5), **p_syn['nmda'])
 
         if self.name == 'L5Pyr':
-            self.apicaltuft_gabaa = self.syn_create(
+            self.synapses['apicaltuft_gabaa'] = self.syn_create(
                 self.dends['apical_tuft'](0.5), **p_syn['gabaa'])
-
-    def _connect_feed_at_loc(self, loc, receptor, gid_src, nc_dict, nc_list):
-        """Connect a feed at a certain location for a particular receptor.
-
-        Parameters
-        ----------
-        loc : str
-            Either 'proximal' or 'distal'
-        receptor : str
-            'nmda', 'ampa' etc.
-        gid_src : int
-            The Cell ID of the feed source (i.e., artificial presynaptic
-            neuron).
-        nc_dict : dict.
-            The connection parameters. Usually contains the keys
-            pos_src, A_weight, A_delay, lamtha.
-        nc_list : list of NetCon
-            Different intput types are appended to different lists
-            of NetCon objects. The created network connections will
-            be appended to this list.
-        """
-        if loc == 'proximal':
-            dends = ['apicaloblique', 'basal2', 'basal3']
-        elif loc == 'distal':
-            dends = ['apicaltuft']
-        else:
-            raise ValueError('loc must be one of proximal or distal')
-
-        postsyns = list()
-        for dend in dends:
-            postsyns.append(getattr(self, f'{dend}_{receptor}'))
-
-        for postsyn in postsyns:
-            nc = self.parconnect_from_src(gid_src, nc_dict, postsyn)
-            nc_list.append(nc)
-
-        return postsyns
 
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
@@ -293,7 +265,7 @@ class Pyr(_Cell):
                 # for the proximal dends
                 for receptor in ['ampa', 'nmda']:
                     self._connect_feed_at_loc(
-                        loc=p_ext['loc'], receptor=receptor,
+                        feed_loc=p_ext['loc'], receptor=receptor,
                         gid_src=gid_ev, nc_dict=nc_dict[receptor],
                         nc_list=self.ncfrom_common)
 
@@ -321,7 +293,7 @@ class Pyr(_Cell):
                 }
 
                 self._connect_feed_at_loc(
-                    loc='proximal', receptor='ampa',
+                    feed_loc='proximal', receptor='ampa',
                     gid_src=gid_extgauss, nc_dict=nc_dict,
                     nc_list=self.ncfrom_extgauss)
 
@@ -340,7 +312,7 @@ class Pyr(_Cell):
                 }
 
                 self._connect_feed_at_loc(
-                    loc='proximal', receptor='ampa',
+                    feed_loc='proximal', receptor='ampa',
                     gid_src=gid_extpois, nc_dict=nc_dict,
                     nc_list=self.ncfrom_extpois)
 
@@ -349,7 +321,7 @@ class Pyr(_Cell):
                     nc_dict['A_weight'] = p_ext[self.celltype][1]
 
                     self._connect_feed_at_loc(
-                        loc='proximal', receptor='nmda',
+                        feed_loc='proximal', receptor='nmda',
                         gid_src=gid_extpois, nc_dict=nc_dict,
                         nc_list=self.ncfrom_extpois)
 
@@ -374,7 +346,7 @@ class Pyr(_Cell):
                     }
 
                 self._connect_feed_at_loc(
-                    loc=p_src['loc'], receptor=receptor,
+                    feed_loc=p_src['loc'], receptor=receptor,
                     gid_src=gid_src, nc_dict=nc_dict,
                     nc_list=self.ncfrom_common)
 
@@ -567,13 +539,16 @@ class L2Pyr(Pyr):
     def parconnect(self, gid, gid_dict, pos_dict, p):
         """Collect receptor-type-based connections here."""
 
-        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
-                    self.basal3_ampa]
+        postsyns = [self.synapses['apicaloblique_ampa'],
+                    self.synapses['basal2_ampa'],
+                    self.synapses['basal3_ampa']]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='ampa',
                       postsyns=postsyns, autapses=False)
-        postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
-                    self.basal3_nmda]
+
+        postsyns = [self.synapses['apicaloblique_nmda'],
+                    self.synapses['basal2_nmda'],
+                    self.synapses['basal3_nmda']]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='nmda',
                       postsyns=postsyns, autapses=False)
@@ -835,13 +810,15 @@ class L5Pyr(Pyr):
     # parallel connection function FROM all cell types TO here
     def parconnect(self, gid, gid_dict, pos_dict, p):
 
-        postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
-                    self.basal3_ampa]
+        postsyns = [self.synapses['apicaloblique_ampa'],
+                    self.synapses['basal2_ampa'],
+                    self.synapses['basal3_ampa']]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='ampa',
                       postsyns=postsyns, autapses=False)
-        postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
-                    self.basal3_nmda]
+        postsyns = [self.synapses['apicaloblique_nmda'], 
+                    self.synapses['basal2_nmda'],
+                    self.synapses['basal3_nmda']]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='nmda',
                       postsyns=postsyns, autapses=False)
@@ -853,11 +830,13 @@ class L5Pyr(Pyr):
                       'L5_basket', 'L5Basket', lamtha=70., receptor='gabab',
                       postsyns=[self.synapses['soma_gabab']])
 
-        postsyns = [self.basal2_ampa, self.basal3_ampa, self.apicaltuft_ampa,
-                    self.apicaloblique_ampa]
+        postsyns = [self.synapses['basal2_ampa'],
+                    self.synapses['basal3_ampa'],
+                    self.synapses['apicaltuft_ampa'],
+                    self.synapses['apicaloblique_ampa']]
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_pyramidal', 'L2Pyr', lamtha=3., postsyns=postsyns)
 
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50.,
-                      postsyns=[self.apicaltuft_gabaa])
+                      postsyns=[self.synapses['apicaltuft_gabaa']])
