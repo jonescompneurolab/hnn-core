@@ -23,12 +23,14 @@ class Pyr(_Cell):
     Attributes
     ----------
     name : str
-        The name of the cell
+        The name of the cell, 'L5Pyr' or 'L2Pyr'
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.
     list_dend : list of h.Section
         List of dendrites.
+    celltype : str
+        The cell type, 'L5_Pyramidal' or 'L2_Pyramidal'
     """
 
     def __init__(self, gid, soma_props):
@@ -40,6 +42,7 @@ class Pyr(_Cell):
         self.dends = {}
         # for legacy use with L5Pyr
         self.list_dend = []
+        self.celltype = 'Pyramidal'
 
     def get_sectnames(self):
         """Create dictionary of section names with entries
@@ -255,6 +258,126 @@ class Pyr(_Cell):
 
         return postsyns
 
+    # one parreceive function to handle all types of external parreceives
+    # types must be defined explicitly here
+    # this function handles evoked, gaussian, and poisson inputs
+    def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
+        """Connect cell to external input."""
+        if type.startswith(('evprox', 'evdist')):
+            if self.celltype in p_ext.keys():
+                gid_ev = gid + gid_dict[type][0]
+
+                nc_dict = dict()
+                # separate dictionaries for ampa and nmda evoked inputs
+                nc_dict['ampa'] = {
+                    'pos_src': pos_dict[type][gid],
+                    # index 0 for ampa weight
+                    'A_weight': p_ext[self.celltype][0],
+                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
+                    'lamtha': p_ext['lamtha_space'],
+                    'threshold': p_ext['threshold'],
+                    'type_src': type
+                }
+
+                nc_dict['nmda'] = {
+                    'pos_src': pos_dict[type][gid],
+                    # index 1 for nmda weight
+                    'A_weight': p_ext[self.celltype][1],
+                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
+                    'lamtha': p_ext['lamtha_space'],
+                    'threshold': p_ext['threshold'],
+                    'type_src': type
+                }
+
+                # NEW: note that default/original is 0 nmda weight
+                # for the proximal dends
+                for receptor in ['ampa', 'nmda']:
+                    self._connect_feed_at_loc(
+                        loc=p_ext['loc'], receptor=receptor,
+                        gid_src=gid_ev, nc_dict=nc_dict[receptor],
+                        nc_list=self.ncfrom_common)
+
+        elif type == 'extgauss':
+            # gid is this cell's gid
+            # gid_dict is the whole dictionary, including the gids of
+            # the extgauss
+            # pos_list is also the pos of the extgauss (net origin)
+            # p_ext_gauss are the params (strength, etc.)
+
+            # gid shift is based on L2_pyramidal cells NOT L5
+            # I recognize this is ugly (hack)
+            # gid_shift = gid_dict['extgauss'][0] - gid_dict['L2_pyramidal'][0]
+            if self.celltype in p_ext.keys():
+                gid_extgauss = gid + gid_dict['extgauss'][0]
+
+                nc_dict = {
+                    'pos_src': pos_dict['extgauss'][gid],
+                    # index 0 for ampa weight (nmda not yet used in Gauss)
+                    'A_weight': p_ext[self.celltype][0],
+                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
+                    'lamtha': p_ext['lamtha'],
+                    'threshold': p_ext['threshold'],
+                    'type_src': type
+                }
+
+                self._connect_feed_at_loc(
+                    loc='proximal', receptor='ampa',
+                    gid_src=gid_extgauss, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extgauss)
+
+        elif type == 'extpois':
+            if self.celltype in p_ext.keys():
+                gid_extpois = gid + gid_dict['extpois'][0]
+
+                nc_dict = {
+                    'pos_src': pos_dict['extpois'][gid],
+                    # index 0 for ampa weight
+                    'A_weight': p_ext[self.celltype][0],
+                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
+                    'lamtha': p_ext['lamtha_space'],
+                    'threshold': p_ext['threshold'],
+                    'type_src': type
+                }
+
+                self._connect_feed_at_loc(
+                    loc='proximal', receptor='ampa',
+                    gid_src=gid_extpois, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_extpois)
+
+                if p_ext[self.celltype][1] > 0.0:
+                    # index 1 for nmda weight
+                    nc_dict['A_weight'] = p_ext[self.celltype][1]
+
+                    self._connect_feed_at_loc(
+                        loc='proximal', receptor='nmda',
+                        gid_src=gid_extpois, nc_dict=nc_dict,
+                        nc_list=self.ncfrom_extpois)
+
+        else:
+            print("Warning, ext type def does not exist in L2Pyr")
+
+    # receive from common inputs
+    # XXX check NetCon connections for proximal inputs with zero weights
+    def parreceive(self, gid, gid_dict, pos_dict, p_ext):
+        for gid_src, p_src, pos in zip(gid_dict['common'],
+                                       p_ext, pos_dict['common']):
+            for receptor in ['ampa', 'nmda']:
+                # Check if AMPA params defined in p_src
+                if f'{self.name}_{receptor}' in p_src.keys():
+                    nc_dict = {
+                        'pos_src': pos,
+                        'A_weight': p_src[f'{self.name}_{receptor}'][0],
+                        'A_delay': p_src[f'{self.name}_{receptor}'][1],
+                        'lamtha': p_src['lamtha'],
+                        'threshold': p_src['threshold'],
+                        'type_src': 'ext'
+                    }
+
+                self._connect_feed_at_loc(
+                    loc=p_src['loc'], receptor=receptor,
+                    gid_src=gid_src, nc_dict=nc_dict,
+                    nc_list=self.ncfrom_common)
+
 
 class L2Pyr(Pyr):
     """Layer 2 pyramidal cell class.
@@ -461,141 +584,6 @@ class L2Pyr(Pyr):
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50., receptor='gabab',
                       postsyns=[self.synapses['soma_gabab']])
-
-    # may be reorganizable
-    def parreceive(self, gid, gid_dict, pos_dict, p_ext):
-        """Connect cell."""
-        for gid_src, p_src, pos in zip(gid_dict['common'], p_ext,
-                                       pos_dict['common']):
-            # Check if AMPA params defined in p_src
-            if 'L2Pyr_ampa' in p_src.keys():
-                nc_dict_ampa = {
-                    'pos_src': pos,
-                    'A_weight': p_src['L2Pyr_ampa'][0],
-                    'A_delay': p_src['L2Pyr_ampa'][1],
-                    'lamtha': p_src['lamtha'],
-                    'threshold': p_src['threshold'],
-                    'type_src': 'ext'
-                }
-
-                self._connect_feed_at_loc(
-                    loc=p_src['loc'], receptor='ampa',
-                    gid_src=gid_src, nc_dict=nc_dict_ampa,
-                    nc_list=self.ncfrom_common)
-
-            # Check is NMDA params defined in p_src
-            if 'L2Pyr_nmda' in p_src.keys():
-                nc_dict_nmda = {
-                    'pos_src': pos,
-                    'A_weight': p_src['L2Pyr_nmda'][0],
-                    'A_delay': p_src['L2Pyr_nmda'][1],
-                    'lamtha': p_src['lamtha'],
-                    'threshold': p_src['threshold'],
-                    'type_src': 'ext'
-                }
-
-                self._connect_feed_at_loc(
-                    loc=p_src['loc'], receptor='nmda',
-                    gid_src=gid_src, nc_dict=nc_dict_nmda,
-                    nc_list=self.ncfrom_common)
-
-    # one parreceive function to handle all types of external parreceives
-    # types must be defined explicitly here
-    # this function handles evoked, gaussian, and poisson inputs
-    def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
-        """Connect cell to external input."""
-        if type.startswith(('evprox', 'evdist')):
-            if self.celltype in p_ext.keys():
-                gid_ev = gid + gid_dict[type][0]
-
-                nc_dict = dict()
-                # separate dictionaries for ampa and nmda evoked inputs
-                nc_dict['ampa'] = {
-                    'pos_src': pos_dict[type][gid],
-                    # index 0 for ampa weight
-                    'A_weight': p_ext[self.celltype][0],
-                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
-                    'lamtha': p_ext['lamtha_space'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                nc_dict['nmda'] = {
-                    'pos_src': pos_dict[type][gid],
-                    # index 1 for nmda weight
-                    'A_weight': p_ext[self.celltype][1],
-                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
-                    'lamtha': p_ext['lamtha_space'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                # NEW: note that default/original is 0 nmda weight
-                # for the proximal dends
-                for receptor in ['ampa', 'nmda']:
-                    self._connect_feed_at_loc(
-                        loc=p_ext['loc'], receptor=receptor,
-                        gid_src=gid_ev, nc_dict=nc_dict[receptor],
-                        nc_list=self.ncfrom_common)
-
-        elif type == 'extgauss':
-            # gid is this cell's gid
-            # gid_dict is the whole dictionary, including the gids of
-            # the extgauss
-            # pos_list is also the pos of the extgauss (net origin)
-            # p_ext_gauss are the params (strength, etc.)
-
-            # gid shift is based on L2_pyramidal cells NOT L5
-            # I recognize this is ugly (hack)
-            # gid_shift = gid_dict['extgauss'][0] - gid_dict['L2_pyramidal'][0]
-            if 'L2_pyramidal' in p_ext.keys():
-                gid_extgauss = gid + gid_dict['extgauss'][0]
-
-                nc_dict = {
-                    'pos_src': pos_dict['extgauss'][gid],
-                    # index 0 for ampa weight (nmda not yet used in Gauss)
-                    'A_weight': p_ext['L2_pyramidal'][0],
-                    'A_delay': p_ext['L2_pyramidal'][2],  # index 2 for delay
-                    'lamtha': p_ext['lamtha'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                self._connect_feed_at_loc(
-                    loc='proximal', receptor='ampa',
-                    gid_src=gid_extgauss, nc_dict=nc_dict,
-                    nc_list=self.ncfrom_extgauss)
-
-        elif type == 'extpois':
-            if self.celltype in p_ext.keys():
-                gid_extpois = gid + gid_dict['extpois'][0]
-
-                nc_dict = {
-                    'pos_src': pos_dict['extpois'][gid],
-                    # index 0 for ampa weight
-                    'A_weight': p_ext[self.celltype][0],
-                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
-                    'lamtha': p_ext['lamtha_space'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                self._connect_feed_at_loc(
-                    loc='proximal', receptor='ampa',
-                    gid_src=gid_extpois, nc_dict=nc_dict,
-                    nc_list=self.ncfrom_extpois)
-
-                if p_ext[self.celltype][1] > 0.0:
-                    # index 1 for nmda weight
-                    nc_dict['A_weight'] = p_ext[self.celltype][1]
-
-                    self._connect_feed_at_loc(
-                        loc='proximal', receptor='nmda',
-                        gid_src=gid_extpois, nc_dict=nc_dict,
-                        nc_list=self.ncfrom_extpois)
-
-        else:
-            print("Warning, ext type def does not exist in L2Pyr")
 
 
 # Units for e: mV
@@ -873,120 +861,3 @@ class L5Pyr(Pyr):
         self._connect(gid, gid_dict, pos_dict, p,
                       'L2_basket', 'L2Basket', lamtha=50.,
                       postsyns=[self.apicaltuft_gabaa])
-
-    # receive from common inputs
-    # XXX check NetCon connections for proximal inputs with zero weights
-    def parreceive(self, gid, gid_dict, pos_dict, p_ext):
-        for gid_src, p_src, pos in zip(gid_dict['common'],
-                                       p_ext, pos_dict['common']):
-            for receptor in ['ampa', 'nmda']:
-                # Check if AMPA params defined in p_src
-                if f'L5Pyr_{receptor}' in p_src.keys():
-                    nc_dict = {
-                        'pos_src': pos,
-                        'A_weight': p_src[f'L5Pyr_{receptor}'][0],
-                        'A_delay': p_src[f'L5Pyr_{receptor}'][1],
-                        'lamtha': p_src['lamtha'],
-                        'threshold': p_src['threshold'],
-                        'type_src': 'ext'
-                    }
-
-                self._connect_feed_at_loc(
-                    loc=p_src['loc'], receptor=receptor,
-                    gid_src=gid_src, nc_dict=nc_dict,
-                    nc_list=self.ncfrom_common)
-
-    # one parreceive function to handle all types of external parreceives
-    # types must be defined explicitly here
-    def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
-        if type.startswith(('evprox', 'evdist')):
-            if self.celltype in p_ext.keys():
-                gid_ev = gid + gid_dict[type][0]
-
-                nc_dict = dict()
-                nc_dict['ampa'] = {
-                    'pos_src': pos_dict[type][gid],
-                    # index 0 for ampa weight
-                    'A_weight': p_ext[self.celltype][0],
-                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
-                    'lamtha': p_ext['lamtha_space'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                nc_dict['nmda'] = {
-                    'pos_src': pos_dict[type][gid],
-                    'A_weight': p_ext[self.celltype][1],
-                    'A_delay': p_ext[self.celltype][2],  # index 2 for delay
-                    'lamtha': p_ext['lamtha_space'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                for receptor in ['ampa', 'nmda']:
-                    self._connect_feed_at_loc(
-                        loc=p_ext['loc'], receptor=receptor,
-                        gid_src=gid_ev, nc_dict=nc_dict[receptor],
-                        nc_list=self.ncfrom_ev)
-
-        elif type == 'extgauss':
-            # gid is this cell's gid
-            # gid_dict is the whole dictionary, including the
-            # gids of the extgauss
-            # pos_dict is also the pos of the extgauss (net origin)
-            # p_ext_gauss are the params (strength, etc.)
-            # doesn't matter if this doesn't do anything
-
-            # gid shift is based on L2_pyramidal cells NOT L5
-            # I recognize this is ugly (hack)
-            # gid_shift = gid_dict['extgauss'][0] - gid_dict['L2_pyramidal'][0]
-            if 'L5_pyramidal' in p_ext.keys():
-                gid_extgauss = gid + gid_dict['extgauss'][0]
-
-                nc_dict = {
-                    'pos_src': pos_dict['extgauss'][gid],
-                    # index 0 for ampa weight
-                    'A_weight': p_ext['L5_pyramidal'][0],
-                    # index 2 for delay
-                    'A_delay': p_ext['L5_pyramidal'][2],
-                    'lamtha': p_ext['lamtha'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                self._connect_feed_at_loc(
-                    loc='proximal', receptor='ampa',
-                    gid_src=gid_extgauss,
-                    nc_dict=nc_dict,
-                    nc_list=self.ncfrom_extgauss)
-
-        elif type == 'extpois':
-            if self.celltype in p_ext.keys():
-                gid_extpois = gid + gid_dict['extpois'][0]
-
-                nc_dict = {
-                    'pos_src': pos_dict['extpois'][gid],
-                    # index 0 for ampa weight
-                    'A_weight': p_ext[self.celltype][0],
-                    # index 2 for delay
-                    'A_delay': p_ext[self.celltype][2],
-                    'lamtha': p_ext['lamtha_space'],
-                    'threshold': p_ext['threshold'],
-                    'type_src': type
-                }
-
-                self._connect_feed_at_loc(
-                    loc='proximal', receptor='ampa',
-                    gid_src=gid_extpois,
-                    nc_dict=nc_dict,
-                    nc_list=self.ncfrom_extpois)
-
-                if p_ext[self.celltype][1] > 0.0:
-                    # index 1 for nmda weight
-                    nc_dict['A_weight'] = p_ext[self.celltype][1]
-
-                    self._connect_feed_at_loc(
-                        loc='proximal', receptor='nmda',
-                        gid_src=gid_extpois,
-                        nc_dict=nc_dict,
-                        nc_list=self.ncfrom_extpois)
