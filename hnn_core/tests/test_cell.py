@@ -1,10 +1,12 @@
+import pytest
+
 import matplotlib
 import os.path as op
 
 import hnn_core
 from hnn_core import read_params, Network
 from hnn_core.neuron import NeuronNetwork
-from hnn_core.cell import _ArtificialCell
+from hnn_core.cell import _ArtificialCell, _Cell
 
 matplotlib.use('agg')
 
@@ -18,6 +20,12 @@ def test_cell():
     net = Network(params)
     with NeuronNetwork(net) as neuron_net:
         neuron_net.cells[0].plot_voltage()
+
+    soma_props = {"L": 22.1, "diam": 23.4, "cm": 0.6195, "Ra": 200.0,
+                  "pos": (0., 0., 0.), 'name': 'test_cell'}
+    cell = _Cell(gid=1, soma_props=soma_props)
+    with pytest.raises(TypeError, match='secloc must be instance of'):
+        cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
 
 def test_artificial_cell():
