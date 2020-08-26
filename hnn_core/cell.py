@@ -4,7 +4,7 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
-from neuron import h
+from neuron import h, nrn
 
 # global variables, should be node-independent
 h("dp_total_L2 = 0.")
@@ -324,6 +324,9 @@ class _Cell(object):
         syn : instance of h.Exp2Syn
             A two state kinetic scheme synapse.
         """
+        if not isinstance(secloc, nrn.Segment):
+            raise TypeError(f'secloc must be instance of'
+                            f'nrn.Segment. Got {type(secloc)}')
         syn = h.Exp2Syn(secloc)
         syn.e = e
         syn.tau1 = tau1
