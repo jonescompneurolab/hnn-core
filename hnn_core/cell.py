@@ -191,7 +191,8 @@ class _Cell(object):
 
         for sect in sects:
             syn_key = f'{sect}_{receptor}'
-            nc = self.parconnect_from_src(gid_src, nc_dict, self.synapses[syn_key])
+            nc = self.parconnect_from_src(gid_src, nc_dict,
+                                          self.synapses[syn_key])
             nc_list.append(nc)
 
     def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
