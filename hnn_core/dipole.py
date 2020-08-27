@@ -69,6 +69,40 @@ def read_dipole(fname, units='nAm'):
     return dpl
 
 
+def average_dipoles(dpls):
+    """Compute dipole averages over a list of Dipole objects. 'L2', 'L5' and 'agg'
+    components are averaged separately.
+
+    Parameters
+    ----------
+    dpls: list of Dipole objects
+        Contains list of dipole objects, each with a `data` member containing
+        'L2', 'L5' and 'agg' components
+
+    Returns
+    -------
+    dpl: instance of Dipole
+        A new dipole object with each component of `dpl.data` representing the
+        average over the same components in the input list
+    """
+    # need at least one Dipole to get times
+    if (len(dpls) < 2):
+        raise ValueError("Need at least two dipole object to compute an"
+                         " average")
+
+    agg_avg = np.mean(np.array([dpl.data['agg'] for dpl in dpls]), axis=0)
+    L2_avg = np.mean(np.array([dpl.data['L2'] for dpl in dpls]), axis=0)
+    L5_avg = np.mean(np.array([dpl.data['L5'] for dpl in dpls]), axis=0)
+
+    avg_dpl_data = np.c_[agg_avg,
+                         L2_avg,
+                         L5_avg]
+
+    avg_dpl = Dipole(dpls[0].times, avg_dpl_data)
+
+    return avg_dpl
+
+
 class Dipole(object):
     """Dipole class.
 

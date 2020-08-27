@@ -1,4 +1,4 @@
-from .dipole import simulate_dipole, read_dipole
+from .dipole import simulate_dipole, read_dipole, average_dipoles
 from .feed import ExtFeed
 from .params import Params, read_params
 from .network import Network, Spikes, read_spikes
