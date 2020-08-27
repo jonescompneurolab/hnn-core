@@ -38,4 +38,3 @@ def test_dipole():
     for dpl_key in dipole_avg.data.keys():
         assert_allclose(dipole_read.data[dpl_key],
                         dipole_avg.data[dpl_key], rtol=0, atol=0.000051)
-
