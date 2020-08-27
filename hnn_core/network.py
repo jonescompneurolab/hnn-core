@@ -494,7 +494,7 @@ class Spikes(object):
             The matplotlib figure handle.
         """
         return plot_hist_input(
-            self, ax=None, spike_types=spike_types, show=True)
+            self, ax=ax, spike_types=spike_types, show=show)
 
     def write(self, fname):
         """Write spiking activity per trial to a collection of files.
