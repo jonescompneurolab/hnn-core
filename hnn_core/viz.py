@@ -47,14 +47,24 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
     return ax.get_figure()
 
 
-def plot_hist_input(net, ax=None, show=True):
+def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     """Plot the histogram of input.
 
     Parameters
     ----------
+    spikes : instance of Spikes
+        The spikes object from net.spikes
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None,
         a new figure is created.
+    spike_types: string | list | dictionary | None
+        String input of a valid spike type is plotted individually. 
+            String Input: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
+        List of valid spike types will plot each type individually.
+            List Input: ['common', 'evdist']
+        Dictionary of valid lists will plot list elements as a group.
+            Dictionary Input: {'Evoked': ['evdist', 'evprox']}
+        If None, all spike types are plotted individually.
     show : bool
         If True, show the figure.
 
@@ -64,20 +74,28 @@ def plot_hist_input(net, ax=None, show=True):
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    spikes = np.array(sum(net.spikes.times, []))
-    gids = np.array(sum(net.spikes.gids, []))
-    valid_gids = np.r_[[v for (k, v) in net.gid_dict.items()
-                        if k.startswith('evprox')]]
-    mask_evprox = np.in1d(gids, valid_gids)
-    valid_gids = np.r_[[v for (k, v) in net.gid_dict.items()
-                        if k.startswith('evdist')]]
-    mask_evdist = np.in1d(gids, valid_gids)
-    bins = np.linspace(0, net.params['tstop'], 50)
+    spike_times = np.array(sum(spikes._times, []))
+    spike_types_array = np.array(sum(spikes._types, []))
+    spike_types_unique = np.unique(spike_types_array)
+    
+    labels = {
+        'common': 'Common', 'evdist': 'Distal',
+        'evprox': 'Proximal', 'extgauss': 'External Gaussian',
+        'extpois': 'External Poisson'}
+    if type(spike_types) is str:
+        spike_types = {labels[spike_types]: spike_types_unique[np.in1d(spike_types_unqiue, spike_types)] }
+    elif type(spike_types) is list:
+        spike_types = {labels[spike_types]: spike_types_unique[np.in1d(spike_types_unqiue, spike_types)] } #incomplete
+    elif spike_types is None:
+        spike_types = {s_label: [s_type] for s_type, s_label in labels.items()}
+
+    #**Check how to grab this from spikes**
+    bins = np.linspace(0, spike_times[0], 50)
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
-    ax.hist(spikes[mask_evprox], bins, color='r', label='Proximal')
-    ax.hist(spikes[mask_evdist], bins, color='g', label='Distal')
+
+
     plt.legend()
     if show:
         plt.show()
