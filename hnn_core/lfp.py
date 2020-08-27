@@ -168,16 +168,6 @@ class LFPElectrode ():
         self.lfp_t = h.Vector()
         self.lfp_v = h.Vector()
 
-        # for i, cellinfo in enumerate(gidinfo.values()):
-        #  seg = cellinfo.cell.soma(0.5)
-        #  imem_ptrvec.pset(i, seg._ref_i_membrane_)
-        #rx = h.Matrix(nelectrode, n)
-        #vx = h.Vector(nelectrode)
-        # for i in range(nelectrode):
-        #  for j, cellinfo in enumerate(gidinfo.values()):
-        #    rx.setval(i, j, transfer_resistance(cellinfo.cell, e_coord[i]))
-        #  #rx.setval(i,1,1.0)
-
     def callback(self):
         # print('In lfp callback - pc.id = ',self.pc.id(),' t=',self.pc.t(0))
         self.imem_ptrvec.gather(self.imem_vec)
