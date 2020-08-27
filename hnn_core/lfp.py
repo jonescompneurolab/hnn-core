@@ -17,8 +17,8 @@ based on mhines code
 
 from neuron import h
 from math import sqrt, log, pi, exp
-from seg3d import *
-from pylab import *
+# from seg3d import *
+# from pylab import *
 
 # get all Sections
 
@@ -55,64 +55,6 @@ def getcoordinf(s):
             lend.append([x1, y1, z1])
             lsegloc.append()
     return lcoord, ldist, lend, lsegloc
-
-# this function not used ... yet
-
-
-def transfer_resistance2(exyz):
-    vres = h.Vector()
-    lsec = getallSections()
-    sigma = 3.0  # extracellular conductivity in mS/cm
-    # see http://jn.physiology.org/content/104/6/3388.long shows table of values with conductivity
-    for s in lsec:
-        lcoord, ldist, lend = getcoordinf(s)
-        for i in range(len(lcoord)):
-            x, y, z = lcoord[i]
-            dis = sqrt((exyz[0] - x)**2 + (exyz[1] - y)**2 + (exyz[2] - z)**2)
-            # setting radius limit
-            if(dis < (s.diam / 2.0)):
-                dis = (s.diam / 2.0) + 0.1
-
-            dist_comp = ldist[i]  # length of the compartment
-            sum_dist_comp = sqrt(
-                dist_comp[0]**2 + dist_comp[0]**2 + dist_comp[0]**2)
-
-            # print "sum_dist_comp=",sum_dist_comp, secname()
-
-            #  setting radius limit
-            if sum_dist_comp < s.diam / 2.0:
-                sum_dist_comp = s.diam / 2.0 + 0.1
-
-            long_dist_x = exyz[0] - lend[i][0]
-            long_dist_y = exyz[1] - lend[i][1]
-            long_dist_z = exyz[2] - lend[i][2]
-
-            sum_HH = long_dist_x * dist_comp_x + long_dist_y * \
-                dist_comp_y + long_dist_z * dist_comp_z
-
-            final_sum_HH = sum_HH / sum_dist_comp
-
-            sum_temp1 = long_dist_x**2 + long_dist_y**2 + long_dist_z**2
-            r_sq = sum_temp1 - (final_sum_HH * final_sum_HH)
-
-            Length_vector = final_sum_HH + sum_dist_comp
-
-            if final_sum_HH < 0 and Length_vector <= 0:
-                phi = log((sqrt(final_sum_HH**2 + r_sq) - final_sum_HH) /
-                          (sqrt(Length_vector**2 + r_sq) - Length_vector))
-            elif final_sum_HH > 0 and Length_vector > 0:
-                phi = log((sqrt(Length_vector**2 + r_sq) + Length_vector) /
-                          (sqrt(final_sum_HH**2 + r_sq) + final_sum_HH))
-            else:
-                phi = log(((sqrt(Length_vector**2 + r_sq) + Length_vector) *
-                           (sqrt(final_sum_HH**2 + r_sq) - final_sum_HH)) / r_sq)
-
-            line_part1 = 1.0 / (4.0 * pi * sum_dist_comp * sigma) * phi
-            vres.append(line_part1)
-
-    return vres
-
-# represents a simple LFP electrode
 
 
 class LFPElectrode ():
