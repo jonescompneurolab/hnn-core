@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 import hnn_core
-from hnn_core import read_params, read_dipole, viz
+from hnn_core import read_params, read_dipole, average_dipoles, viz
 from hnn_core.dipole import Dipole
 
 matplotlib.use('agg')
@@ -32,3 +32,10 @@ def test_dipole():
     for dpl_key in dipole.data.keys():
         assert_allclose(dipole_read.data[dpl_key],
                         dipole.data[dpl_key], rtol=0, atol=0.000051)
+
+    # average two identical dipole objects
+    dipole_avg = average_dipoles([dipole, dipole_read])
+    for dpl_key in dipole_avg.data.keys():
+        assert_allclose(dipole_read.data[dpl_key],
+                        dipole_avg.data[dpl_key], rtol=0, atol=0.000051)
+
