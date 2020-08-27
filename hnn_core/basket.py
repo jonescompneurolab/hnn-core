@@ -163,7 +163,7 @@ class L2Basket(BasketSingle):
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_nmda, self.soma_nmda))
 
-        elif type == 'extgauss':
+        elif feed_type== 'extgauss':
             # gid is this cell's gid
             # gid_dict is the whole dictionary, including the gids
             # of the extgauss
@@ -193,7 +193,7 @@ class L2Basket(BasketSingle):
                 self.ncfrom_extgauss.append(self.parconnect_from_src(
                     gid_extgauss, nc_dict, self.soma_ampa))
 
-        elif type == 'extpois':
+        elif feed_type== 'extpois':
             if self.celltype in p_ext.keys():
                 gid_extpois = gid + gid_dict['extpois'][0]
 
@@ -217,7 +217,7 @@ class L2Basket(BasketSingle):
                         gid_extpois, nc_dict, self.soma_nmda))
 
         else:
-            print("Warning, type def not specified in L2Basket")
+            print("Warning,typedef not specified in L2Basket")
 
 
 class L5Basket(BasketSingle):
@@ -314,7 +314,7 @@ class L5Basket(BasketSingle):
                 self.ncfrom_ev.append(self.parconnect_from_src(
                     gid_ev, nc_dict_nmda, self.soma_nmda))
 
-        elif type == 'extgauss':
+        elif feed_type== 'extgauss':
             # gid is this cell's gid
             # gid_dict is the whole dictionary, including the gids
             # of the extgauss
@@ -336,7 +336,7 @@ class L5Basket(BasketSingle):
                 self.ncfrom_extgauss.append(self.parconnect_from_src(
                     gid_extgauss, nc_dict, self.soma_ampa))
 
-        elif type == 'extpois':
+        elif feed_type== 'extpois':
             if self.celltype in p_ext.keys():
                 gid_extpois = gid + gid_dict['extpois'][0]
 
@@ -360,4 +360,4 @@ class L5Basket(BasketSingle):
                         gid_extpois, nc_dict, self.soma_nmda))
 
         else:
-            print("Warning, type def not specified in L2Basket")
+            print("Warning, typedef not specified in L2Basket")

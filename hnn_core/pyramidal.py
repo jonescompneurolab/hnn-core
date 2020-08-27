@@ -531,7 +531,7 @@ class L2Pyr(Pyr):
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_nmda, self.apicaltuft_nmda))
 
-        elif type == 'extgauss':
+        elif feed_type== 'extgauss':
             # gid is this cell's gid
             # gid_dict is the whole dictionary, including the gids of
             # the extgauss
@@ -561,7 +561,7 @@ class L2Pyr(Pyr):
                 self.ncfrom_extgauss.append(self.parconnect_from_src(
                     gid_extgauss, nc_dict, self.apicaloblique_ampa))
 
-        elif type == 'extpois':
+        elif feed_type== 'extpois':
             if self.celltype in p_ext.keys():
                 gid_extpois = gid + gid_dict['extpois'][0]
 
@@ -593,7 +593,7 @@ class L2Pyr(Pyr):
                         gid_extpois, nc_dict, self.apicaloblique_nmda))
 
         else:
-            print("Warning, ext type def does not exist in L2Pyr")
+            print("Warning, ext typedef does not exist in L2Pyr")
 
 
 # Units for e: mV
@@ -996,7 +996,7 @@ class L5Pyr(Pyr):
                         self.parconnect_from_src(
                             gid_ev, nc_dict_nmda, self.apicaltuft_nmda))
 
-        elif type == 'extgauss':
+        elif feed_type== 'extgauss':
             # gid is this cell's gid
             # gid_dict is the whole dictionary, including the
             # gids of the extgauss
@@ -1031,7 +1031,7 @@ class L5Pyr(Pyr):
                     self.parconnect_from_src(
                         gid_extgauss, nc_dict, self.apicaloblique_ampa))
 
-        elif type == 'extpois':
+        elif feed_type== 'extpois':
             if self.celltype in p_ext.keys():
                 gid_extpois = gid + gid_dict['extpois'][0]
 
