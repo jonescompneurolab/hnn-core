@@ -37,7 +37,7 @@ def run_mpi_simulation():
     sys.stderr = str_err
 
     from hnn_core import Network
-    from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
+    from hnn_core.network_builder import NetworkBuilder, _simulate_single_trial
 
     # using template for reading stdin from:
     # https://github.com/cloudpipe/cloudpickle/blob/master/tests/testutils.py
@@ -60,7 +60,7 @@ def run_mpi_simulation():
 
     params = comm.bcast(params, root=0)
     net = Network(params)
-    neuron_net = NeuronNetwork(net)
+    neuron_net = NetworkBuilder(net)
 
     sim_data = []
     for trial in range(params['N_trials']):

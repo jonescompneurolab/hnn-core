@@ -8,7 +8,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network, Spikes, read_spikes
-from hnn_core.neuron import NeuronNetwork
+from hnn_core.network_builder import NetworkBuilder
 
 
 def test_network():
@@ -24,14 +24,14 @@ def test_network():
                    'input_prox_A_weight_L5Pyr_ampa': 5.4e-5,
                    't0_input_prox': 50})
     net = Network(deepcopy(params))
-    neuron_network = NeuronNetwork(net)  # needed to populate net.cells
+    network_builder = NetworkBuilder(net)  # needed to populate net.cells
 
     # Assert that params are conserved across Network initialization
     for p in params:
         assert params[p] == net.params[p]
     assert len(params) == len(net.params)
-    print(neuron_network)
-    print(neuron_network.cells[:2])
+    print(network_builder)
+    print(network_builder.cells[:2])
 
     # Assert that proper number of gids are created for Network inputs
     assert len(net.gid_dict['common']) == 2
@@ -49,10 +49,10 @@ def test_network():
     n_pois_sources = 270
     n_gaus_sources = 270
     n_common_sources = 2
-    assert len(neuron_network._feed_cells) == (n_evoked_sources +
-                                               n_pois_sources +
-                                               n_gaus_sources +
-                                               n_common_sources)
+    assert len(network_builder._feed_cells) == (n_evoked_sources +
+                                                n_pois_sources +
+                                                n_gaus_sources +
+                                                n_common_sources)
 
 
 def test_spikes():

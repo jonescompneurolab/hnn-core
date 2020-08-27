@@ -83,12 +83,13 @@ class JoblibBackend(object):
 
     def _clone_and_simulate(self, net, trial_idx):
         # avoid relative lookups after being forked by joblib
-        from hnn_core.neuron import NeuronNetwork, _simulate_single_trial
+        from hnn_core.network_builder import NetworkBuilder
+        from hnn_core.network_builder import _simulate_single_trial
 
         if trial_idx != 0:
             net.params['prng_*'] = trial_idx
 
-        neuron_net = NeuronNetwork(net)
+        neuron_net = NetworkBuilder(net)
         dpl = _simulate_single_trial(neuron_net)
 
         spikedata = neuron_net.get_data_from_neuron()
