@@ -63,6 +63,7 @@ def test_spikes():
     spikegids = [[1, 3], [5, 7]]
     spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
+    spikes.plot_input(show=False)
     spikes.write('/tmp/spk_%d.txt')
     assert spikes == read_spikes('/tmp/spk_*.txt')
     assert ("Spikes | 2 simulation trials" in repr(spikes))
