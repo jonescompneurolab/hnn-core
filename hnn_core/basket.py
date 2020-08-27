@@ -121,30 +121,30 @@ class L2Basket(BasketSingle):
 
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
-    def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
+    def parreceive_ext(self,feed_type, gid, gid_dict, pos_dict, p_ext):
         """Receive external inputs."""
-        if type.startswith(('evprox', 'evdist')):
+        if feed_type.startswith(('evprox', 'evdist')):
             if self.celltype in p_ext.keys():
-                gid_ev = gid + gid_dict[type][0]
+                gid_ev = gid + gid_dict[feed_type][0]
 
                 nc_dict_ampa = {
-                    'pos_src': pos_dict[type][gid],
+                    'pos_src': pos_dict[feed_type][gid],
                     # index 0 is ampa weight
                     'A_weight': p_ext[self.celltype][0],
                     'A_delay': p_ext[self.celltype][2],  # index 2 is delay
                     'lamtha': p_ext['lamtha_space'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 nc_dict_nmda = {
-                    'pos_src': pos_dict[type][gid],
+                    'pos_src': pos_dict[feed_type][gid],
                     # index 1 is nmda weight
                     'A_weight': p_ext[self.celltype][1],
                     'A_delay': p_ext[self.celltype][2],  # index 2 is delay
                     'lamtha': p_ext['lamtha_space'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 # connections depend on location of input - why only
@@ -163,7 +163,7 @@ class L2Basket(BasketSingle):
                     self.ncfrom_ev.append(self.parconnect_from_src(
                         gid_ev, nc_dict_nmda, self.soma_nmda))
 
-        elif type == 'extgauss':
+        elif feed_type == 'extgauss':
             # gid is this cell's gid
             # gid_dict is the whole dictionary, including the gids
             # of the extgauss
@@ -187,13 +187,13 @@ class L2Basket(BasketSingle):
                     'A_delay': p_ext[self.celltype][1],  # index 2 is delay
                     'lamtha': p_ext['lamtha'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 self.ncfrom_extgauss.append(self.parconnect_from_src(
                     gid_extgauss, nc_dict, self.soma_ampa))
 
-        elif type == 'extpois':
+        elif feed_type == 'extpois':
             if self.celltype in p_ext.keys():
                 gid_extpois = gid + gid_dict['extpois'][0]
 
@@ -204,7 +204,7 @@ class L2Basket(BasketSingle):
                     'A_delay': p_ext[self.celltype][2],  # index 2 is delay
                     'lamtha': p_ext['lamtha_space'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 self.ncfrom_extpois.append(self.parconnect_from_src(
@@ -279,31 +279,31 @@ class L5Basket(BasketSingle):
 
     # one parreceive function to handle all types of external parreceives
     # types must be defined explicitly here
-    def parreceive_ext(self, type, gid, gid_dict, pos_dict, p_ext):
+    def parreceive_ext(self, feed_type, gid, gid_dict, pos_dict, p_ext):
         """Recieve external inputs."""
         # shouldn't this just check for evprox?
-        if type.startswith(('evprox', 'evdist')):
+        if feed_type.startswith(('evprox', 'evdist')):
             if self.celltype in p_ext.keys():
-                gid_ev = gid + gid_dict[type][0]
+                gid_ev = gid + gid_dict[feed_type][0]
 
                 nc_dict_ampa = {
-                    'pos_src': pos_dict[type][gid],
+                    'pos_src': pos_dict[feed_type][gid],
                     # index 0 is ampa weight
                     'A_weight': p_ext[self.celltype][0],
                     'A_delay': p_ext[self.celltype][2],  # index 2 is delay
                     'lamtha': p_ext['lamtha_space'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 nc_dict_nmda = {
-                    'pos_src': pos_dict[type][gid],
+                    'pos_src': pos_dict[feed_type][gid],
                     # index 1 is nmda weight
                     'A_weight': p_ext[self.celltype][1],
                     'A_delay': p_ext[self.celltype][2],  # index 2 is delay
                     'lamtha': p_ext['lamtha_space'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 self.ncfrom_ev.append(self.parconnect_from_src(
@@ -314,7 +314,7 @@ class L5Basket(BasketSingle):
                 self.ncfrom_ev.append(self.parconnect_from_src(
                     gid_ev, nc_dict_nmda, self.soma_nmda))
 
-        elif type == 'extgauss':
+        elif feed_type == 'extgauss':
             # gid is this cell's gid
             # gid_dict is the whole dictionary, including the gids
             # of the extgauss
@@ -330,13 +330,13 @@ class L5Basket(BasketSingle):
                     'A_delay': p_ext['L5_basket'][2],  # index 2 is delay
                     'lamtha': p_ext['lamtha'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 self.ncfrom_extgauss.append(self.parconnect_from_src(
                     gid_extgauss, nc_dict, self.soma_ampa))
 
-        elif type == 'extpois':
+        elif feed_type == 'extpois':
             if self.celltype in p_ext.keys():
                 gid_extpois = gid + gid_dict['extpois'][0]
 
@@ -347,7 +347,7 @@ class L5Basket(BasketSingle):
                     'A_delay': p_ext[self.celltype][2],  # index 2 is delay
                     'lamtha': p_ext['lamtha_space'],
                     'threshold': p_ext['threshold'],
-                    'type_src': type
+                    'type_src': feed_type
                 }
 
                 self.ncfrom_extpois.append(self.parconnect_from_src(
