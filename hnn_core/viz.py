@@ -58,13 +58,16 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
         An axis object from matplotlib. If None,
         a new figure is created.
     spike_types: string | list | dictionary | None
-        String input of a valid spike type is plotted individually. 
-            String Input: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
-        List of valid spike types will plot each type individually.
-            List Input: ['common', 'evdist']
+        String input of a valid spike type is plotted individually.
+            Ex: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
+        List of valid string inputs will plot each spike type individually.
+            Ex: ['common', 'evdist']
         Dictionary of valid lists will plot list elements as a group.
-            Dictionary Input: {'Evoked': ['evdist', 'evprox']}
-        If None, all spike types are plotted individually.
+            Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
+        If None, all default spike types are plotted individually.
+            Default: ['common', 'evdist', 'evprox', 'extgauss', 'extpois']
+        Valid strings also include leading characters of spike types
+                Example: 'ext' is equivalent to ['extgauss', 'extpois']
     show : bool
         If True, show the figure.
 
@@ -76,33 +79,25 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     import matplotlib.pyplot as plt
     spike_times = np.array(sum(spikes._times, []))
     spike_types_data = np.array(sum(spikes._types, []))
-    default_types = ['evprox', 'evdist', 'common']
+    default_types = ['evprox', 'evdist', 'common', 'extgauss', 'extpois']
     cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     input_types = np.setdiff1d(np.unique(spike_types_data), cell_types)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
                         for s_type in input_types}
 
     if type(spike_types) is str:
-        spike_mask = {spike_types: np.logical_or.reduce(
-            [s_mask for (s_key, s_mask) in spike_types_mask.items()
-                if s_key.startswith(spike_types)])}
+        spike_types = {spike_types: [spike_types]}
     elif type(spike_types) is list:
-        spike_mask = {s_type: np.logical_or.reduce(
-            [s_mask for (s_key, s_mask) in spike_types_mask.items()
-                if s_key.startswith(s_type)])
-            for s_type in spike_types}
-    elif type(spike_types) is dict:
-        spike_mask = {s_label: np.logical_or.reduce(
-            np.logical_or.reduce([
-                [s_mask for (s_key, s_mask) in spike_types_mask.items() 
-                    if s_key.startswith(s_type)]
-                for s_type in s_list]))
-            for (s_label, s_list) in spike_types.items()}
+        spike_types = {s_type: [s_type] for s_type in spike_types}
     elif spike_types is None:
-        spike_mask = {s_type: np.logical_or.reduce(
-            [s_mask for (s_key, s_mask) in spike_types_mask.items() 
-                if s_key.startswith(s_type)])
-            for s_type in default_types}
+        spike_types = {s_type: [s_type] for s_type in default_types}
+
+    spike_mask = {s_label: np.logical_or.reduce(
+        np.logical_or.reduce([
+            [s_mask for (s_key, s_mask) in spike_types_mask.items()
+                if s_key.startswith(s_type)]
+            for s_type in s_list]))
+        for (s_label, s_list) in spike_types.items()}
 
     bins = np.linspace(0, spike_times[-1], 50)
 
