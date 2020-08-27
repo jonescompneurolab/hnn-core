@@ -1,13 +1,17 @@
 """
-LFPsim - Simulation scripts to compute Local Field Potentials (LFP) from cable compartmental
-models of neurons and networks implemented in NEURON simulation environment.
+LFPsim - Simulation scripts to compute Local Field Potentials (LFP) from cable
+compartmental models of neurons and networks implemented in NEURON simulation
+environment.
 
-LFPsim works reliably on biophysically detailed multi-compartmental neurons with ion channels in
-some or all compartments.
+LFPsim works reliably on biophysically detailed multi-compartmental neurons with
+ion channels in some or all compartments.
 
 Last updated 12-March-2016
-Developed by : Harilal Parasuram & Shyam Diwakar
-Computational Neuroscience & Neurophysiology Lab, School of Biotechnology, Amrita University, India.
+Developed by : 
+Harilal Parasuram & Shyam Diwakar
+Computational Neuroscience & Neurophysiology Lab, School of Biotechnology, 
+Amrita University, India.
+
 Email: harilalp@am.amrita.edu; shyam@amrita.edu
 www.amrita.edu/compneuro 
 
@@ -17,12 +21,11 @@ based on mhines code
 
 from neuron import h
 from math import sqrt, log, pi, exp
-# from seg3d import *
-# from pylab import *
+
+import matplotlib.pyplot as plt
+
 
 # get all Sections
-
-
 def getallSections(ty='Pyr'):
     ls = h.allsec()
     ls = [s for s in ls if s.name().count(ty) > 0 or len(ty) == 0]
@@ -49,7 +52,7 @@ def getcoordinf(s):
             x0, y0, z0 = s.x3d(i - 1, sec=s), s.y3d(i - 1,
                                                     sec=s), s.z3d(i - 1, sec=s)
             x1, y1, z1 = s.x3d(i, sec=s), s.y3d(i, sec=s), s.z3d(i, sec=s)
-            lcoord.append([(x0 + x1) / 2., (y0 + y1) / 2.(z0 + z1) / 2.])
+            lcoord.append([(x0 + x1) / 2., (y0 + y1) / 2., (z0 + z1) / 2.])
             dist = sqrt((x1 - x0)**2 + (y1 - y0)**2 + (z1 - z0)**2)
             ldist.append(dist)
             lend.append([x1, y1, z1])
@@ -63,7 +66,8 @@ class LFPElectrode ():
 
         # extracellular conductivity in mS/cm (uniform for simplicity)
         self.sigma = sigma
-        # see http://jn.physiology.org/content/104/6/3388.long shows table of values with conductivity
+        # see http://jn.physiology.org/content/104/6/3388.long shows table of 
+        # values with conductivity
         self.coord = coord
         self.vres = None
         self.vx = None
@@ -106,9 +110,6 @@ class LFPElectrode ():
                 vres.append(point_part1)
             else:
                 # calculate length of the compartment
-                dist_comp = sqrt((h.x3d(1, sec=s) - h.x3d(0, sec=s))**2 + (
-                    h.y3d(1, sec=s) - h.y3d(0, sec=s))**2 + (h.z3d(1, sec=s) - h.z3d(0, sec=s))**2)
-
                 dist_comp_x = (h.x3d(1, sec=s) - h.x3d(0, sec=s))
                 dist_comp_y = (h.y3d(1, sec=s) - h.y3d(0, sec=s))
                 dist_comp_z = (h.z3d(1, sec=s) - h.z3d(0, sec=s))
@@ -161,7 +162,8 @@ class LFPElectrode ():
         self.imem_vec = h.Vector(n)
         for i, s in enumerate(lsec):
             seg = s(0.5)
-            # for seg in s # so do not need to use segments...? more accurate to use segments and their neighbors
+            # for seg in s # so do not need to use segments...?
+            # more accurate to use segments and their neighbors
             self.imem_ptrvec.pset(i, seg._ref_i_membrane_)
 
         self.vres = self.transfer_resistance(self.coord)
@@ -208,7 +210,10 @@ class LFPElectrode ():
 
 
 def test():
-    from L5_pyramidal import L5Pyr
+    from hnn_core.pyramidal import L5Pyr
+    from hnn_core.neuron import load_custom_mechanisms
+
+    load_custom_mechanisms()
     cell = L5Pyr()
 
     h.load_file("stdgui.hoc")
@@ -229,12 +234,13 @@ def test():
     elec.LFPinit()
     h.run()
     elec.lfp_final()
-    ion()
-    plot(elec.lfp_t, elec.lfp_v)
+    plt.ion()
+    plt.plot(elec.lfp_t, elec.lfp_v)
 
 
 if __name__ == '__main__':
     test()
+
     """
   for i in range(len(lfp_t)):
     print(lfp_t.x[i],)
