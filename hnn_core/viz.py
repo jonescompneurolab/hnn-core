@@ -75,26 +75,43 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     """
     import matplotlib.pyplot as plt
     spike_times = np.array(sum(spikes._times, []))
-    spike_types_array = np.array(sum(spikes._types, []))
-    spike_types_unique = np.unique(spike_types_array)
-    
-    labels = {
-        'common': 'Common', 'evdist': 'Distal',
-        'evprox': 'Proximal', 'extgauss': 'External Gaussian',
-        'extpois': 'External Poisson'}
-    if type(spike_types) is str:
-        spike_types = {labels[spike_types]: spike_types_unique[np.in1d(spike_types_unqiue, spike_types)] }
-    elif type(spike_types) is list:
-        spike_types = {labels[spike_types]: spike_types_unique[np.in1d(spike_types_unqiue, spike_types)] } #incomplete
-    elif spike_types is None:
-        spike_types = {s_label: [s_type] for s_type, s_label in labels.items()}
+    spike_types_data = np.array(sum(spikes._types, []))
+    default_types = ['evprox', 'evdist', 'common']
+    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+    input_types = np.setdiff1d(np.unique(spike_types_data), cell_types)
+    spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
+                        for s_type in input_types}
 
-    #**Check how to grab this from spikes**
-    bins = np.linspace(0, spike_times[0], 50)
+    if type(spike_types) is str:
+        spike_mask = {spike_types: np.logical_or.reduce(
+            [s_mask for (s_key, s_mask) in spike_types_mask.items()
+                if s_key.startswith(spike_types)])}
+    elif type(spike_types) is list:
+        spike_mask = {s_type: np.logical_or.reduce(
+            [s_mask for (s_key, s_mask) in spike_types_mask.items()
+                if s_key.startswith(s_type)])
+            for s_type in spike_types}
+    elif type(spike_types) is dict:
+        spike_mask = {s_label: np.logical_or.reduce(
+            np.logical_or.reduce([
+                [s_mask for (s_key, s_mask) in spike_types_mask.items() 
+                    if s_key.startswith(s_type)]
+                for s_type in s_list]))
+            for (s_label, s_list) in spike_types.items()}
+    elif spike_types is None:
+        spike_mask = {s_type: np.logical_or.reduce(
+            [s_mask for (s_key, s_mask) in spike_types_mask.items() 
+                if s_key.startswith(s_type)])
+            for s_type in default_types}
+
+    bins = np.linspace(0, spike_times[-1], 50)
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
+    for (s_key, s_mask) in spike_mask.items():
+        if np.any(s_mask):
+            ax.hist(spike_times[s_mask], bins, label=s_key)
 
     plt.legend()
     if show:
