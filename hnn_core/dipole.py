@@ -3,6 +3,7 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import warnings
 import numpy as np
 from numpy import convolve, hamming
 
@@ -70,8 +71,7 @@ def read_dipole(fname, units='nAm'):
 
 
 def average_dipoles(dpls):
-    """Compute dipole averages over a list of Dipole objects. 'L2', 'L5' and 'agg'
-    components are averaged separately.
+    """Compute dipole averages over a list of Dipole objects.
 
     Parameters
     ----------
@@ -86,9 +86,15 @@ def average_dipoles(dpls):
         average over the same components in the input list
     """
     # need at least one Dipole to get times
-    if (len(dpls) < 2):
+    if len(dpls) < 2:
         raise ValueError("Need at least two dipole object to compute an"
                          " average")
+
+    for dpl_idx, dpl in enumerate(dpls):
+        if dpl.nave > 1:
+            raise ValueError("Dipole at index %d was already an average of %d"
+                             " trials. Cannot reaverage" %
+                             (dpl_idx, dpl.nave))
 
     agg_avg = np.mean(np.array([dpl.data['agg'] for dpl in dpls]), axis=0)
     L2_avg = np.mean(np.array([dpl.data['L2'] for dpl in dpls]), axis=0)
@@ -99,6 +105,9 @@ def average_dipoles(dpls):
                          L5_avg]
 
     avg_dpl = Dipole(dpls[0].times, avg_dpl_data)
+
+    # set nave to the number of trials averaged in this dipole
+    avg_dpl.nave = len(dpls)
 
     return avg_dpl
 
@@ -113,6 +122,9 @@ class Dipole(object):
     data : array (n_times x 3)
         The data. The first column represents 'agg',
         the second 'L2' and the last one 'L5'
+    nave : int
+        Number of trials that were averaged to produce this Dipole. Defaults
+        to 1
 
     Attributes
     ----------
@@ -120,13 +132,16 @@ class Dipole(object):
         The time vector
     data : dict of array
         The dipole with keys 'agg', 'L2' and 'L5'
+    nave : int
+        Number of trials that were averaged to produce this Dipole
     """
 
-    def __init__(self, times, data):  # noqa: D102
+    def __init__(self, times, data, nave=1):  # noqa: D102
         self.units = 'fAm'
         self.N = data.shape[0]
         self.times = times
         self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
+        self.nave = nave
 
     def convert_fAm_to_nAm(self):
         """ must be run after baseline_renormalization()
@@ -242,6 +257,11 @@ class Dipole(object):
             3) L2/3 current dipole (scaled nAm), and
             4) L5 current dipole (scaled nAm)
         """
+
+        if self.nave > 1:
+            warnings.warn("Saving Dipole to file that is an average of %d"
+                          " trials" % self.nave)
+
         X = np.r_[[self.times, self.data['agg'], self.data['L2'],
                    self.data['L5']]].T
         np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
