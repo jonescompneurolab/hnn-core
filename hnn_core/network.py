@@ -431,6 +431,24 @@ class Spikes(object):
             spike_types += [list(spike_types_trial)]
         self._types = spike_types
 
+    def get_spike_rates(self):
+        """Spike rates by cell type.
+
+        Returns
+        -------
+        spike_rate : dict
+            Dictionary with keys 'L5_pyramidal', 'L5_basket', etc.
+        """
+        cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+        spike_times = np.array(sum(spikes._times, []))
+        spike_types = np.array(sum(spikes._types, []))
+        spike_rates = dict()
+        tstart, tstop = min(spike_times), max(spike_times)
+        for cell_type in cell_types:
+            spike_times_cells = spike_times[spike_types == cell_type]
+            spike_rates[cell_type] = len(spike_times_cells) / (tstop - tstart)
+        return spike_rates
+
     def plot(self, ax=None, show=True):
         """Plot the aggregate spiking activity according to cell type.
 
