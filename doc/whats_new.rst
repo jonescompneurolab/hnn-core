@@ -36,6 +36,8 @@ Bug
 
 - Fix bug introduced into rhythmic input feed and add test, by `Christopher Bailey`_ in `#102 <https://github.com/jonescompneurolab/hnn-core/pull/102>`_
 
+- Fix bug in amplitude of delay (for connection between L2 Basket and Gaussian feed) being passed incorrectly, by `Mainak Jas`_ in `#102 <https://github.com/jonescompneurolab/hnn-core/pull/146>`_
+
 API
 ~~~
 
