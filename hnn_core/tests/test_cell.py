@@ -5,7 +5,7 @@ import os.path as op
 
 import hnn_core
 from hnn_core import read_params, Network
-from hnn_core.neuron import NeuronNetwork
+from hnn_core.network_builder import NetworkBuilder
 from hnn_core.cell import _ArtificialCell, _Cell
 from hnn_core.pyramidal import L5Pyr
 from hnn_core.params_default import get_L5Pyr_params_default
@@ -20,7 +20,7 @@ def test_cell():
     params = read_params(params_fname)
 
     net = Network(params)
-    with NeuronNetwork(net) as neuron_net:
+    with NetworkBuilder(net) as neuron_net:
         neuron_net.cells[0].plot_voltage()
 
     # test that ExpSyn always takes nrn.Segment, not float

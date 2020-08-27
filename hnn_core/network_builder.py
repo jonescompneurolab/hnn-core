@@ -1,4 +1,4 @@
-"""Neuron simulation functions and NeuronNetwork class."""
+"""Neuron simulation functions and NetworkBuilder class."""
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
@@ -17,9 +17,9 @@ _PC = None
 _CVODE = None
 
 # We need to maintain a reference to the last
-# NeuronNetwork instance that ran pc.gid_clear(). Even if
+# NetworkBuilder instance that ran pc.gid_clear(). Even if
 # pc is global, if pc.gid_clear() is called within a new
-# NeuronNetwork, it will seg fault.
+# NetworkBuilder, it will seg fault.
 _LAST_NETWORK = None
 
 
@@ -223,8 +223,8 @@ def _create_parallel_context(n_cores=None):
         _PC.done()
 
 
-class NeuronNetwork(object):
-    """The NeuronNetwork class.
+class NetworkBuilder(object):
+    """The NetworkBuilder class.
 
     Parameters
     ----------
@@ -244,10 +244,10 @@ class NeuronNetwork(object):
 
     Notes
     -----
-    NeuronNetwork is not a pickleable class because it contains many NEURON
+    NetworkBuilder is not a pickleable class because it contains many NEURON
     objects once it has been instantiated. This is important for the Joblib
     backend that passes a pickled Network object to each forked process (job)
-    and only instantiates NeuronNetwork after the fork.
+    and only instantiates NetworkBuilder after the fork.
 
     The `_build` routine can be called again to run more simulations without
     creating new `nrniv` processes. Instead, the NERUON objects are recreated
@@ -307,7 +307,7 @@ class NeuronNetwork(object):
             print('[Done]')
 
     def __enter__(self):
-        """Context manager to cleanly build NeuronNetwork objects"""
+        """Context manager to cleanly build NetworkBuilder objects"""
         return self
 
     def __exit__(self, cell_type, value, traceback):

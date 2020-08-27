@@ -365,7 +365,7 @@ class _Cell(object):
         nc : instance of h.NetCon
             A network connection object.
         """
-        from .neuron import _PC
+        from .network_builder import _PC
 
         nc = _PC.gid_connect(gid_presyn, postsyn)
         # calculate distance between cell positions with pardistance()
