@@ -328,7 +328,7 @@ class Network(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_hist_input(spikes=self.spikes, ax=ax, show=show)
+        return self.spikes.plot_input()
 
 
 class Spikes(object):
@@ -484,7 +484,7 @@ class Spikes(object):
         """
         return plot_spikes_raster(spikes=self, ax=ax, show=show)
 
-    def plot_input(self, ax=None, show=True):
+    def plot_input(self, ax=None, spike_types=None, show=True):
         """Plot the histogram of input.
 
         Parameters
@@ -500,7 +500,8 @@ class Spikes(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_hist_input(spikes=self, ax=ax, show=show)
+        return plot_hist_input(
+            self, ax=None, spike_types=spike_types, show=True)
 
     def write(self, fname):
         """Write spiking activity per trial to a collection of files.
