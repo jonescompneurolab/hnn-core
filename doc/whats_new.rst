@@ -47,6 +47,8 @@ API
 
 - Make a context manager for parallel backends (JoblibBackend, MPIBackend), by `Blake Caldwell`_ in `#79 <https://github.com/jonescompneurolab/hnn-core/pull/79>`_
 
+- Add average_dipoles function to `hnn_core.dipole`, by `Blake Caldwell`_ in `#156 <https://github.com/jonescompneurolab/hnn-core/pull/156>`_
+
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Blake Caldwell: https://github.com/blakecaldwell
 .. _Ryan Thorpe: https://github.com/rythorpe
