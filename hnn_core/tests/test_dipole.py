@@ -1,8 +1,9 @@
-import matplotlib
 import os.path as op
 
+import matplotlib
 import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 
 import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles, viz
@@ -38,3 +39,7 @@ def test_dipole():
     for dpl_key in dipole_avg.data.keys():
         assert_allclose(dipole_read.data[dpl_key],
                         dipole_avg.data[dpl_key], rtol=0, atol=0.000051)
+
+    with pytest.raises(ValueError, match="Dipole at index 0 was already an "
+                       "average of 2 trials"):
+        dipole_avg = average_dipoles([dipole_avg, dipole_read])
