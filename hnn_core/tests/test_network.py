@@ -16,7 +16,7 @@ def test_network():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    # add rhythmic inputs (i.e., a type of common input)
+    # add rhythmic inputs (i.e., a  feed_type  of common input)
     params.update({'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
                    'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
                    't0_input_dist': 50,
@@ -38,8 +38,8 @@ def test_network():
     assert len(net.gid_dict['extgauss']) == net.n_cells
     assert len(net.gid_dict['extpois']) == net.n_cells
     for ev_input in params['t_ev*']:
-        type_key = ev_input[2: -2] + ev_input[-1]
-        assert len(net.gid_dict[type_key]) == net.n_cells
+         feed_type _key = ev_input[2: -2] + ev_input[-1]
+        assert len(net.gid_dict[ feed_type _key]) == net.n_cells
 
     # Assert that an empty Spikes object is created as an attribute
     assert net.spikes == Spikes()
@@ -61,31 +61,31 @@ def test_spikes():
     # Round-trip test
     spiketimes = [[2.3456, 7.89], [4.2812, 93.2]]
     spikegids = [[1, 3], [5, 7]]
-    spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
-    spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
+    spike feed_type s = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
+    spikes = Spikes(times=spiketimes, gids=spikegids,  feed_type s=spike feed_type s)
     spikes.write('/tmp/spk_%d.txt')
     assert spikes == read_spikes('/tmp/spk_*.txt')
     assert ("Spikes | 2 simulation trials" in repr(spikes))
 
-    with pytest.raises(TypeError, match="times should be a list of lists"):
+    with pytest.raises( feed_type Error, match="times should be a list of lists"):
         spikes = Spikes(times=([2.3456, 7.89], [4.2812, 93.2]), gids=spikegids,
-                        types=spiketypes)
+                         feed_type s=spike feed_type s)
 
-    with pytest.raises(TypeError, match="times should be a list of lists"):
-        spikes = Spikes(times=[1, 2], gids=spikegids, types=spiketypes)
+    with pytest.raises( feed_type Error, match="times should be a list of lists"):
+        spikes = Spikes(times=[1, 2], gids=spikegids,  feed_type s=spike feed_type s)
 
-    with pytest.raises(ValueError, match="times, gids, and types should be "
+    with pytest.raises(ValueError, match="times, gids, and  feed_type s should be "
                        "lists of the same length"):
         spikes = Spikes(times=[[2.3456, 7.89]], gids=spikegids,
-                        types=spiketypes)
+                         feed_type s=spike feed_type s)
 
-    # Write spike file with no 'types' column
+    # Write spike file with no ' feed_type s' column
     # Check for gid_dict errors
     for fname in sorted(glob('/tmp/spk_*.txt')):
-        times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
+        times_gids_only = np.loadtxt(fname, d feed_type =str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
     with pytest.raises(ValueError, match="gid_dict must be provided if spike "
-                       "types are unspecified in the file /tmp/spk_0.txt"):
+                       " feed_type s are unspecified in the file /tmp/spk_0.txt"):
         spikes = read_spikes('/tmp/spk_*.txt')
     with pytest.raises(ValueError, match="gid_dict should contain only "
                        "disjoint sets of gid values"):

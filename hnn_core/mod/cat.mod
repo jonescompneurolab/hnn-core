@@ -1,4 +1,4 @@
-TITLE Calcium low threshold T type current for RD Traub, J Neurophysiol 89:909-921, 2003
+TITLE Calcium low threshold T  feed_type  current for RD Traub, J Neurophysiol 89:909-921, 2003
 
 COMMENT
     Implemented by Maciej Lazarewicz 2003 (mlazarew@seas.upenn.edu)

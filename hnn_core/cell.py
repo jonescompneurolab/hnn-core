@@ -162,10 +162,10 @@ class _Cell(object):
         """Move cell to position."""
         self.translate_to(self.pos[0] * 100, self.pos[2], self.pos[1] * 100)
 
-    def _connect(self, gid, gid_dict, pos_dict, p, type_src, name_src,
+    def _connect(self, gid, gid_dict, pos_dict, p,  feed_type _src, name_src,
                  lamtha=3., receptor=None, postsyns=None, autapses=True):
-        for gid_src, pos in zip(gid_dict[type_src],
-                                pos_dict[type_src]):
+        for gid_src, pos in zip(gid_dict[ feed_type _src],
+                                pos_dict[ feed_type _src]):
             if not autapses and gid_src == gid:
                 continue
             if receptor is not None:
@@ -179,7 +179,7 @@ class _Cell(object):
                 'A_delay': 1.,
                 'lamtha': lamtha,
                 'threshold': p['threshold'],
-                'type_src': type_src
+                ' feed_type _src':  feed_type _src
             }
 
             for postsyn in postsyns:
@@ -211,9 +211,9 @@ class _Cell(object):
             # sets pointers in dipole mod file to the correct locations
             # h.setpointer(ref, ptr, obj)
             h.setpointer(sect(0.99)._ref_v, 'pv', dpp)
-            if self.celltype.startswith('L2'):
+            if self.cell feed_type .startswith('L2'):
                 h.setpointer(h._ref_dp_total_L2, 'Qtotal', dpp)
-            elif self.celltype.startswith('L5'):
+            elif self.cell feed_type .startswith('L5'):
                 h.setpointer(h._ref_dp_total_L5, 'Qtotal', dpp)
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
@@ -242,10 +242,10 @@ class _Cell(object):
                     h.setpointer(sect(0)._ref_v, 'pv', sect(loc[i]).dipole)
                 # set aggregate pointers
                 h.setpointer(dpp._ref_Qsum, 'Qsum', sect(loc[i]).dipole)
-                if self.celltype.startswith('L2'):
+                if self.cell feed_type .startswith('L2'):
                     h.setpointer(h._ref_dp_total_L2, 'Qtotal',
                                  sect(loc[i]).dipole)
-                elif self.celltype.startswith('L5'):
+                elif self.cell feed_type .startswith('L5'):
                     h.setpointer(h._ref_dp_total_L5, 'Qtotal',
                                  sect(loc[i]).dipole)
                 # add ztan values

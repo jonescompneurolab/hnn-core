@@ -62,7 +62,7 @@ def read_dipole(fname, units='nAm'):
     dpl : Dipole
         The instance of Dipole class
     """
-    dpl_data = np.loadtxt(fname, dtype=float)
+    dpl_data = np.loadtxt(fname, d feed_type =float)
     dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:4])
     if units == 'nAm':
         dpl.units = units

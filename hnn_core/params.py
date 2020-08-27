@@ -132,7 +132,7 @@ class Params(dict):
                     self[key] = params_default[key]
         else:
             raise ValueError('params_input must be dict or None. Got %s'
-                             % type(params_input))
+                             %  feed_type (params_input))
 
     def __repr__(self):
         """Display the params nicely."""
@@ -231,11 +231,11 @@ def _validate_feed(p_ext_d, tstop):
 def check_evoked_synkeys(p, nprox, ndist):
     # make sure ampa,nmda gbar values are in the param dict for evoked
     # inputs(for backwards compatibility)
-    # evoked distal target cell types
+    # evoked distal target cell  feed_type s
     lctprox = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']
-    # evoked proximal target cell types
+    # evoked proximal target cell  feed_type s
     lctdist = ['L2Pyr', 'L5Pyr', 'L2Basket']
-    lsy = ['ampa', 'nmda']  # synapse types used in evoked inputs
+    lsy = ['ampa', 'nmda']  # synapse  feed_type s used in evoked inputs
     for nev, pref, lct in zip([nprox, ndist], ['evprox_', 'evdist_'],
                               [lctprox, lctdist]):
         for i in range(nev):
@@ -254,8 +254,8 @@ def check_evoked_synkeys(p, nprox, ndist):
 def check_pois_synkeys(p):
     # make sure ampa,nmda gbar values are in the param dict for Poisson inputs
     # (for backwards compatibility)
-    lct = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']  # target cell types
-    lsy = ['ampa', 'nmda']  # synapse types used in Poisson inputs
+    lct = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']  # target cell  feed_type s
+    lsy = ['ampa', 'nmda']  # synapse  feed_type s used in Poisson inputs
     for ct in lct:
         for sy in lsy:
             k = ct + '_Pois_A_weight_' + sy
@@ -279,7 +279,7 @@ def create_pext(p, tstop):
     """
     p_common = []
 
-    # p_unique is a dict of input param types that end up going to each cell
+    # p_unique is a dict of input param  feed_type s that end up going to each cell
     # uniquely
     p_unique = {}
 

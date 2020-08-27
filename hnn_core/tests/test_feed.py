@@ -23,22 +23,22 @@ def test_extfeed():
                   'ev', None, p_bogus, 0)  # ambiguous
 
     # XXX 'unique' external feeds are always created; why?
-    for feed_type in ['extpois', 'extgauss']:
-        feed = ExtFeed(feed_type=feed_type,
-                       target_cell_type='L2_basket',
-                       params=p_unique[feed_type],
+    for feed_ feed_type  in ['extpois', 'extgauss']:
+        feed = ExtFeed(feed_ feed_type =feed_ feed_type ,
+                       target_cell_ feed_type ='L2_basket',
+                       params=p_unique[feed_ feed_type ],
                        gid=0)
         print(feed)  # test repr
 
     # XXX but 'common' (rhythmic) feeds are not
     for ii in range(len(p_common)):  # len == 0 for def. params
-        feed = ExtFeed(feed_type='common',
-                       target_cell_type=None,
+        feed = ExtFeed(feed_ feed_type ='common',
+                       target_cell_ feed_type =None,
                        params=p_common[ii],
                        gid=0)
         print(feed)  # test repr
-        assert feed.feed_type == 'common'
-        assert feed.cell_type is None  # artificial cell
+        assert feed.feed_ feed_type  == 'common'
+        assert feed.cell_ feed_type  is None  # artificial cell
         # parameters should lead to 0 input spikes for default params
         assert len(feed.event_times) == 0
         # check that ei.p_ext matches params

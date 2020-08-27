@@ -85,7 +85,7 @@ def plot_hist_input(net, ax=None, show=True):
 
 
 def plot_spikes_raster(spikes, ax=None, show=True):
-    """Plot the aggregate spiking activity according to cell type.
+    """Plot the aggregate spiking activity according to cell  feed_type .
 
     Parameters
     ----------
@@ -105,16 +105,16 @@ def plot_spikes_raster(spikes, ax=None, show=True):
 
     import matplotlib.pyplot as plt
     spike_times = np.array(sum(spikes._times, []))
-    spike_types = np.array(sum(spikes._types, []))
-    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-    spike_times_cell = [spike_times[spike_types == cell_type]
-                        for cell_type in cell_types]
+    spike_ feed_type s = np.array(sum(spikes._ feed_type s, []))
+    cell_ feed_type s = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+    spike_times_cell = [spike_times[spike_ feed_type s == cell_ feed_type ]
+                        for cell_ feed_type  in cell_ feed_type s]
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
     ax.eventplot(spike_times_cell, colors=['r', 'b', 'g', 'w'])
-    ax.legend(cell_types, ncol=2)
+    ax.legend(cell_ feed_type s, ncol=2)
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
@@ -156,14 +156,14 @@ def plot_cells(net, ax=None, show=True):
     markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
                'L5_basket': 'x', 'L2_basket': 'x'}
 
-    for cell_type in net.pos_dict:
-        x = [pos[0] for pos in net.pos_dict[cell_type]]
-        y = [pos[1] for pos in net.pos_dict[cell_type]]
-        z = [pos[2] for pos in net.pos_dict[cell_type]]
-        if cell_type in colors:
-            color = colors[cell_type]
-            marker = markers[cell_type]
-            ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
+    for cell_ feed_type  in net.pos_dict:
+        x = [pos[0] for pos in net.pos_dict[cell_ feed_type ]]
+        y = [pos[1] for pos in net.pos_dict[cell_ feed_type ]]
+        z = [pos[2] for pos in net.pos_dict[cell_ feed_type ]]
+        if cell_ feed_type  in colors:
+            color = colors[cell_ feed_type ]
+            marker = markers[cell_ feed_type ]
+            ax.scatter(x, y, z, c=color, marker=marker, label=cell_ feed_type )
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
 

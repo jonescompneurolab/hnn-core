@@ -29,7 +29,7 @@ def _gather_trial_data(sim_data, net, n_trials):
         net.spikes._times.append(spikedata[0])
         net.spikes._gids.append(spikedata[1])
         net.gid_dict = spikedata[2]  # only have one gid_dict
-        net.spikes.update_types(net.gid_dict)
+        net.spikes.update_ feed_type s(net.gid_dict)
 
     return dpls
 
@@ -76,7 +76,7 @@ class JoblibBackend(object):
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self,  feed_type , value, traceback):
         global _BACKEND
 
         _BACKEND = self._old_backend
@@ -214,7 +214,7 @@ class MPIBackend(object):
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self,  feed_type , value, traceback):
         global _BACKEND
 
         _BACKEND = self._old_backend

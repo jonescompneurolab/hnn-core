@@ -128,8 +128,8 @@ def _simulate_single_trial(neuron_net):
 
 def _is_loaded_mechanisms():
     # copied from:
-    # https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
-    mt = h.MechanismType(0)
+    # https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mech feed_type .html
+    mt = h.Mechanism feed_type (0)
     mname = h.ref('')
     mnames = list()
     for i in range(mt.count()):
@@ -240,7 +240,7 @@ class NeuronNetwork(object):
     gid_dict : dict
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
-        (or input) types.
+        (or input)  feed_type s.
 
     Notes
     -----
@@ -310,7 +310,7 @@ class NeuronNetwork(object):
         """Context manager to cleanly build NeuronNetwork objects"""
         return self
 
-    def __exit__(self, cell_type, value, traceback):
+    def __exit__(self, cell_ feed_type , value, traceback):
         """Clear up NEURON internal gid information."""
 
         self._clear_neuron_objects()
@@ -357,41 +357,41 @@ class NeuronNetwork(object):
         # loop through gids on this node
         for gid in self.net._gid_list:
 
-            src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
+            src_ feed_type , src_pos, is_cell = self.net._get_src_ feed_type _and_pos(gid)
 
             # check existence of gid with Neuron
             if not _PC.gid_exists(gid):
-                msg = ('Source of type %s with ID %d does not exists in '
-                       'Network' % (src_type, gid))
+                msg = ('Source of  feed_type  %s with ID %d does not exists in '
+                       'Network' % (src_ feed_type , gid))
                 raise RuntimeError(msg)
 
             if is_cell:  # not a feed
-                # figure out which cell type is assoc with the gid
+                # figure out which cell  feed_type  is assoc with the gid
                 # create cells based on loc property
                 # creates a NetCon object internally to Neuron
-                type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
+                 feed_type 2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
-                Cell = type2class[src_type]
-                if src_type in ('L2_pyramidal', 'L5_pyramidal'):
+                Cell =  feed_type 2class[src_ feed_type ]
+                if src_ feed_type  in ('L2_pyramidal', 'L5_pyramidal'):
                     cell = Cell(gid, src_pos, params)
                 else:
                     cell = Cell(gid, src_pos)
                 self.cells.append(cell)
 
-            # external inputs are special types of artificial-cells
+            # external inputs are special  feed_type s of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
-            # events. NB: cell types can still have different weights for how
+            # events. NB: cell  feed_type s can still have different weights for how
             # such 'common' spikes influence them
-            elif src_type == 'common':
-                # print('cell_type',cell_type)
+            elif src_ feed_type  == 'common':
+                # print('cell_ feed_type ',cell_ feed_type )
                 # to find param index, take difference between REAL gid
                 # here and gid start point of the items
                 p_ind = gid - self.net.gid_dict['common'][0]
 
-                # new ExtFeed: target cell type irrelevant (None) since input
+                # new ExtFeed: target cell  feed_type  irrelevant (None) since input
                 # timing will be identical for all cells
-                feed = ExtFeed(feed_type=src_type,
-                               target_cell_type=None,
+                feed = ExtFeed(feed_ feed_type =src_ feed_type ,
+                               target_cell_ feed_type =None,
                                params=self.net.p_common[p_ind],
                                gid=gid)
                 feed_cell = _ArtificialCell(feed.event_times,
@@ -401,22 +401,22 @@ class NeuronNetwork(object):
             # external inputs can also be Poisson- or Gaussian-
             # distributed, or 'evoked' inputs (proximal or distal)
             # these are cell-specific ('unique')
-            elif src_type in self.net.p_unique.keys():
-                gid_target = gid - self.net.gid_dict[src_type][0]
-                target_cell_type = self.net.gid_to_type(gid_target)
+            elif src_ feed_type  in self.net.p_unique.keys():
+                gid_target = gid - self.net.gid_dict[src_ feed_type ][0]
+                target_cell_ feed_type  = self.net.gid_to_ feed_type (gid_target)
 
-                # new ExtFeed, where now both feed type and target cell type
+                # new ExtFeed, where now both feed  feed_type  and target cell  feed_type 
                 # specified because these feeds have cell-specific parameters
-                feed = ExtFeed(feed_type=src_type,
-                               target_cell_type=target_cell_type,
-                               params=self.net.p_unique[src_type],
+                feed = ExtFeed(feed_ feed_type =src_ feed_type ,
+                               target_cell_ feed_type =target_cell_ feed_type ,
+                               params=self.net.p_unique[src_ feed_type ],
                                gid=gid)
                 feed_cell = _ArtificialCell(feed.event_times,
                                             params['threshold'])
                 self._feed_cells.append(feed_cell)
             else:
                 raise ValueError('No parameters specified for external feed '
-                                 'type: %s' % src_type)
+                                 ' feed_type : %s' % src_ feed_type )
 
             # Now let's associate the cell objects with a netcon
             if is_cell:
@@ -436,7 +436,7 @@ class NeuronNetwork(object):
         # loop over target zipped gids and cells
         for gid, cell in zip(self.net._gid_list, self.cells):
             # ignore iteration over inputs, since they are NOT targets
-            if _PC.gid_exists(gid) and self.net.gid_to_type(gid) != 'common':
+            if _PC.gid_exists(gid) and self.net.gid_to_ feed_type (gid) != 'common':
                 # for each gid, find all the other cells connected to it,
                 # based on gid
                 # this MUST be defined in EACH class of cell in self.cells
@@ -449,18 +449,18 @@ class NeuronNetwork(object):
                 # now do the unique external feeds specific to these cells
                 # parreceive_ext receives connections from UNIQUE
                 # external inputs
-                for cell_type in self.net.p_unique.keys():
-                    p_type = self.net.p_unique[cell_type]
+                for cell_ feed_type  in self.net.p_unique.keys():
+                    p_ feed_type  = self.net.p_unique[cell_ feed_type ]
                     cell.parreceive_ext(
-                        cell_type, gid, self.net.gid_dict, self.net.pos_dict,
-                        p_type)
+                        cell_ feed_type , gid, self.net.gid_dict, self.net.pos_dict,
+                        p_ feed_type )
 
     # setup spike recording for this node
     def _record_spikes(self):
 
         # iterate through gids on this node and
         # set to record spikes in spike time vec and id vec
-        # agnostic to type of source, will sort that out later
+        # agnostic to  feed_type  of source, will sort that out later
         for gid in self.net._gid_list:
             if _PC.gid_exists(gid):
                 _PC.spike_record(gid, self._spiketimes, self._spikegids)
@@ -470,8 +470,8 @@ class NeuronNetwork(object):
         """This method must be run post-integration."""
         # this is quite ugly
         for cell in self.cells:
-            # check for celltype
-            if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
+            # check for cell feed_type 
+            if cell.cell feed_type  in ('L5_pyramidal', 'L2_pyramidal'):
                 # iterate over somatic currents, assumes this list exists
                 # is guaranteed in L5Pyr()
                 for key, I_soma in cell.dict_currents.items():
@@ -487,9 +487,9 @@ class NeuronNetwork(object):
             seclist.wholetree(sec=cell.soma)
             for sect in seclist:
                 for seg in sect:
-                    if cell.celltype == 'L2_pyramidal':
+                    if cell.cell feed_type  == 'L2_pyramidal':
                         seg.v = -71.46
-                    elif cell.celltype == 'L5_pyramidal':
+                    elif cell.cell feed_type  == 'L5_pyramidal':
                         if sect.name() == 'L5Pyr_apical_1':
                             seg.v = -71.32
                         elif sect.name() == 'L5Pyr_apical_2':
@@ -498,9 +498,9 @@ class NeuronNetwork(object):
                             seg.v = -67.30
                         else:
                             seg.v = -72.
-                    elif cell.celltype == 'L2_basket':
+                    elif cell.cell feed_type  == 'L2_basket':
                         seg.v = -64.9737
-                    elif cell.celltype == 'L5_basket':
+                    elif cell.cell feed_type  == 'L5_basket':
                         seg.v = -64.9737
 
     def move_cells_to_pos(self):

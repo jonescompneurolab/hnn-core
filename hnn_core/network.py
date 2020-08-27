@@ -23,8 +23,8 @@ def read_spikes(fname, gid_dict=None):
     gid_dict : dict of lists or range objects | None
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell or input IDs of different
-        cell or input types. If None, each spike file must contain
-        a 3rd column for spike type.
+        cell or input  feed_type s. If None, each spike file must contain
+        a 3rd column for spike  feed_type .
 
     Returns
     ----------
@@ -34,28 +34,28 @@ def read_spikes(fname, gid_dict=None):
 
     spike_times = []
     spike_gids = []
-    spike_types = []
+    spike_ feed_type s = []
     for file in sorted(glob(fname)):
-        spike_trial = np.loadtxt(file, dtype=str)
-        spike_times += [list(spike_trial[:, 0].astype(float))]
-        spike_gids += [list(spike_trial[:, 1].astype(int))]
+        spike_trial = np.loadtxt(file, d feed_type =str)
+        spike_times += [list(spike_trial[:, 0].as feed_type (float))]
+        spike_gids += [list(spike_trial[:, 1].as feed_type (int))]
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
-        # spike type. If reading a legacy version, validate that a gid_dict is
+        # spike  feed_type . If reading a legacy version, validate that a gid_dict is
         # provided.
         if spike_trial.shape[1] == 3:
-            spike_types += [list(spike_trial[:, 2].astype(str))]
+            spike_ feed_type s += [list(spike_trial[:, 2].as feed_type (str))]
         else:
             if gid_dict is None:
-                raise ValueError("gid_dict must be provided if spike types "
+                raise ValueError("gid_dict must be provided if spike  feed_type s "
                                  "are unspecified in the file %s" % (file,))
-            spike_types += [[]]
+            spike_ feed_type s += [[]]
 
-    spikes = Spikes(times=spike_times, gids=spike_gids, types=spike_types)
+    spikes = Spikes(times=spike_times, gids=spike_gids,  feed_type s=spike_ feed_type s)
     if gid_dict is not None:
-        spikes.update_types(gid_dict)
+        spikes.update_ feed_type s(gid_dict)
 
-    return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
+    return Spikes(times=spike_times, gids=spike_gids,  feed_type s=spike_ feed_type s)
 
 
 def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
@@ -155,7 +155,7 @@ class Network(object):
     gid_dict : dict
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
-        (or input) types.
+        (or input)  feed_type s.
     spikes : Spikes
         An instance of the Spikes object.
     trial_idx : int
@@ -169,13 +169,13 @@ class Network(object):
         # Number of time points
         # Originally used to create the empty vec for synaptic currents,
         # ensuring that they exist on this node irrespective of whether
-        # or not cells of relevant type actually do
+        # or not cells of relevant  feed_type  actually do
 
         self.n_times = np.arange(0., self.params['tstop'],
                                  self.params['dt']).size + 1
 
         self.n_src = 0
-        self.n_of_type = {}  # numbers of sources
+        self.n_of_ feed_type  = {}  # numbers of sources
         self.n_cells = 0  # init self.n_cells
 
         # params of common external feeds inputs in p_common
@@ -200,8 +200,8 @@ class Network(object):
 
         # count external sources
         self._count_extsrcs()
-        # create dictionary of GIDs according to cell type
-        # global dictionary of gid and cell type
+        # create dictionary of GIDs according to cell  feed_type 
+        # global dictionary of gid and cell  feed_type 
         self.gid_dict = {}
         self._create_gid_dict()
         # Create empty spikes object
@@ -216,7 +216,7 @@ class Network(object):
         s = ("%d x %d Pyramidal cells (L2, L5)"
              % (self.params['N_pyr_x'], self.params['N_pyr_y']))
         s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
+              % (self.n_of_ feed_type ['L2_basket'], self.n_of_ feed_type ['L5_basket']))
         return '<%s | %s>' % (class_name, s)
 
     def _create_src_list(self):
@@ -244,8 +244,8 @@ class Network(object):
         # cellname list is used *only* for this purpose for now
         for src in self.cellname_list:
             # if it's a cell, then add the number to total number of cells
-            self.n_of_type[src] = len(self.pos_dict[src])
-            self.n_cells += self.n_of_type[src]
+            self.n_of_ feed_type [src] = len(self.pos_dict[src])
+            self.n_cells += self.n_of_ feed_type [src]
 
     # general counting method requires pos_dict is correct for each source
     # and that all sources are represented
@@ -253,7 +253,7 @@ class Network(object):
         # all src numbers are based off of length of pos_dict entry
         # generally done here in lieu of upstream changes
         for src in self.extname_list:
-            self.n_of_type[src] = len(self.pos_dict[src])
+            self.n_of_ feed_type [src] = len(self.pos_dict[src])
 
     def _create_gid_dict(self):
         """Creates gid dicts and pos_lists."""
@@ -267,32 +267,32 @@ class Network(object):
             src = self.src_list_new[i]
             # query the N dict for that number and append here
             # to gid_ind, based on previous entry
-            gid_ind.append(gid_ind[i] + self.n_of_type[src])
+            gid_ind.append(gid_ind[i] + self.n_of_ feed_type [src])
             # accumulate total source count
-            self.n_src += self.n_of_type[src]
+            self.n_src += self.n_of_ feed_type [src]
         # now actually assign the ranges
         for i in range(len(self.src_list_new)):
             src = self.src_list_new[i]
             self.gid_dict[src] = range(gid_ind[i], gid_ind[i + 1])
 
-    def gid_to_type(self, gid):
-        """Reverse lookup of gid to type."""
-        for gidtype, gids in self.gid_dict.items():
+    def gid_to_ feed_type (self, gid):
+        """Reverse lookup of gid to  feed_type ."""
+        for gid feed_type , gids in self.gid_dict.items():
             if gid in gids:
-                return gidtype
+                return gid feed_type 
 
-    def _get_src_type_and_pos(self, gid):
-        """Source type, position and whether it's a cell or artificial feed"""
+    def _get_src_ feed_type _and_pos(self, gid):
+        """Source  feed_type , position and whether it's a cell or artificial feed"""
 
-        # get type of cell and pos via gid
-        src_type = self.gid_to_type(gid)
-        type_pos_ind = gid - self.gid_dict[src_type][0]
-        src_pos = self.pos_dict[src_type][type_pos_ind]
+        # get  feed_type  of cell and pos via gid
+        src_ feed_type  = self.gid_to_ feed_type (gid)
+         feed_type _pos_ind = gid - self.gid_dict[src_ feed_type ][0]
+        src_pos = self.pos_dict[src_ feed_type ][ feed_type _pos_ind]
 
-        real_cell_types = ['L2_pyramidal', 'L5_pyramidal',
+        real_cell_ feed_type s = ['L2_pyramidal', 'L5_pyramidal',
                            'L2_basket', 'L5_basket']
 
-        return src_type, src_pos, src_type in real_cell_types
+        return src_ feed_type , src_pos, src_ feed_type  in real_cell_ feed_type s
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
@@ -343,11 +343,11 @@ class Spikes(object):
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    types : list (n_trials,) of list (n_spikes,) of float, shape | None
+     feed_type s : list (n_trials,) of list (n_spikes,) of float, shape | None
         Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
+        The inner list contains the  feed_type  of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
-        Each gid corresponds to a type via Network().gid_dict.
+        Each gid corresponds to a  feed_type  via Network().gid_dict.
 
     Attributes
     ----------
@@ -358,53 +358,53 @@ class Spikes(object):
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    types : list (n_trials,) of list (n_spikes,) of float, shape
+     feed_type s : list (n_trials,) of list (n_spikes,) of float, shape
         Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
+        The inner list contains the  feed_type  of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
-        Each gid corresponds to a type via Network::gid_dict.
+        Each gid corresponds to a  feed_type  via Network::gid_dict.
 
     Methods
     -------
-    update_types(gid_dict)
-        Update spike types in the current instance of Spikes.
+    update_ feed_type s(gid_dict)
+        Update spike  feed_type s in the current instance of Spikes.
     plot(ax=None, show=True)
         Plot and return a matplotlib Figure object showing the
-        aggregate network spiking activity according to cell type.
+        aggregate network spiking activity according to cell  feed_type .
     write(fname)
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, times=None, gids=None, types=None):
+    def __init__(self, times=None, gids=None,  feed_type s=None):
         if times is None:
             times = list()
         if gids is None:
             gids = list()
-        if types is None:
-            types = list()
+        if  feed_type s is None:
+             feed_type s = list()
 
         # Validate arguments
-        arg_names = ['times', 'gids', 'types']
-        for arg_idx, arg in enumerate([times, gids, types]):
+        arg_names = ['times', 'gids', ' feed_type s']
+        for arg_idx, arg in enumerate([times, gids,  feed_type s]):
             # Validate outer list
             if not isinstance(arg, list):
-                raise TypeError('%s should be a list of lists'
+                raise  feed_type Error('%s should be a list of lists'
                                 % (arg_names[arg_idx],))
             # If arg is not an empty list, validate inner list
             for trial_list in arg:
                 if not isinstance(trial_list, list):
-                    raise TypeError('%s should be a list of lists'
+                    raise  feed_type Error('%s should be a list of lists'
                                     % (arg_names[arg_idx],))
             # Set the length of 'times' as a references and validate
             # uniform length
             if arg == times:
                 n_trials = len(times)
             if len(arg) != n_trials:
-                raise ValueError('times, gids, and types should be lists of '
+                raise ValueError('times, gids, and  feed_type s should be lists of '
                                  'the same length')
         self._times = times
         self._gids = gids
-        self._types = types
+        self._ feed_type s =  feed_type s
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -421,7 +421,7 @@ class Spikes(object):
                        for trial in other._times]
         return (times_self == times_other and
                 self._gids == other._gids and
-                self._types == other._types)
+                self._ feed_type s == other._ feed_type s)
 
     @property
     def times(self):
@@ -432,18 +432,18 @@ class Spikes(object):
         return self._gids
 
     @property
-    def types(self):
-        return self._types
+    def  feed_type s(self):
+        return self._ feed_type s
 
-    def update_types(self, gid_dict):
-        """Update spike types in the current instance of Spikes.
+    def update_ feed_type s(self, gid_dict):
+        """Update spike  feed_type s in the current instance of Spikes.
 
         Parameters
         ----------
         gid_dict : dict of lists or range objects
             Dictionary with keys 'evprox1', 'evdist1' etc.
             containing the range of Cell or input IDs of different
-            cell or input types.
+            cell or input  feed_type s.
         """
 
         # Validate gid_dict
@@ -456,18 +456,18 @@ class Spikes(object):
                     raise ValueError('gid_dict should contain only disjoint '
                                      'sets of gid values')
 
-        spike_types = list()
+        spike_ feed_type s = list()
         for trial_idx in range(len(self._times)):
-            spike_types_trial = np.empty_like(self._times[trial_idx],
-                                              dtype='<U36')
-            for gidtype, gids in gid_dict.items():
+            spike_ feed_type s_trial = np.empty_like(self._times[trial_idx],
+                                              d feed_type ='<U36')
+            for gid feed_type , gids in gid_dict.items():
                 spike_gids_mask = np.in1d(self._gids[trial_idx], gids)
-                spike_types_trial[spike_gids_mask] = gidtype
-            spike_types += [list(spike_types_trial)]
-        self._types = spike_types
+                spike_ feed_type s_trial[spike_gids_mask] = gid feed_type 
+            spike_ feed_type s += [list(spike_ feed_type s_trial)]
+        self._ feed_type s = spike_ feed_type s
 
     def plot(self, ax=None, show=True):
-        """Plot the aggregate spiking activity according to cell type.
+        """Plot the aggregate spiking activity according to cell  feed_type .
 
         Parameters
         ----------
@@ -499,7 +499,7 @@ class Spikes(object):
             correspond to spikes, and columns correspond to
             1) spike time (s),
             2) spike gid, and
-            3) gid type
+            3) gid  feed_type 
         """
 
         for trial_idx in range(len(self._times)):
@@ -508,4 +508,4 @@ class Spikes(object):
                     f.write('{:.3f}\t{}\t{}\n'.format(
                         self._times[trial_idx][spike_idx],
                         int(self._gids[trial_idx][spike_idx]),
-                        self._types[trial_idx][spike_idx]))
+                        self._ feed_type s[trial_idx][spike_idx]))

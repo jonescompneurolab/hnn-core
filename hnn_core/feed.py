@@ -15,21 +15,21 @@ class ExtFeed(object):
 
     Parameters
     ----------
-    feed_type : str
-        The feed type, which is one of
+    feed_ feed_type  : str
+        The feed  feed_type , which is one of
         'extpois' : Poisson-distributed input to proximal dendrites
         'extgauss' : Gaussian-distributed input to proximal dendrites
         'evprox' : Proximal input at specified time (or Gaussian spread)
         'evdist' : Distal input at specified time (or Gaussian spread)
 
-        'common' : As opposed to other feed types, these have timing that is
+        'common' : As opposed to other feed  feed_type s, these have timing that is
         identical (synchronous) for all real cells in the network. Proximal
         and distal dendrites have separate parameter sets, and need not be
-        synchronous. Note that not all cells classes (types) are required to
+        synchronous. Note that not all cells classes ( feed_type s) are required to
         receive 'common' input---separate conductivity values can be assigned
         to basket vs. pyramidal cells and AMPA vs. NMDA synapses
-    target_cell_type : str | None
-        The target cell type of the feed, e.g., 'L2_basket', 'L5_pyramidal',
+    target_cell_ feed_type  : str | None
+        The target cell  feed_type  of the feed, e.g., 'L2_basket', 'L5_pyramidal',
         etc., or None for 'common' inputs
     params : dict
         Parameters of the external input feed, arranged into a dictionary.
@@ -40,23 +40,23 @@ class ExtFeed(object):
     ----------
     event_times : list
         A list of event times
-    feed_type : str
-        The feed type corresponding to the given gid (e.g., 'extpois',
+    feed_ feed_type  : str
+        The feed  feed_type  corresponding to the given gid (e.g., 'extpois',
         'extgauss', 'common', 'evprox', 'evdist')
     params : dict
-        Parameters of the given feed type
+        Parameters of the given feed  feed_type 
     seed : int
         The seed
     gid : int
         The cell ID
     """
 
-    def __init__(self, feed_type, target_cell_type, params, gid):
+    def __init__(self, feed_ feed_type , target_cell_ feed_type , params, gid):
         self.params = params
-        # used to determine cell type-specific parameters for
+        # used to determine cell  feed_type -specific parameters for
         # (not used for 'common', such as for rhythmic alpha/beta input)
-        self.cell_type = target_cell_type
-        self.feed_type = feed_type
+        self.cell_ feed_type  = target_cell_ feed_type 
+        self.feed_ feed_type  = feed_ feed_type 
         self.gid = gid
         self.set_prng()  # sets seeds for random num generator
         self.event_times = list()
@@ -64,7 +64,7 @@ class ExtFeed(object):
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        repr_str = "<%s of type '%s' " % (class_name, self.feed_type)
+        repr_str = "<%s of  feed_type  '%s' " % (class_name, self.feed_ feed_type )
         repr_str += 'with %d events ' % len(self.event_times)
         repr_str += '| seed %d, gid %d>' % (self.seed, self.gid)
         return repr_str
@@ -74,12 +74,12 @@ class ExtFeed(object):
             # random generator for this instance
             # qnd hack to make the seeds the same across all gids
             # for just evoked
-            if self.feed_type.startswith(('evprox', 'evdist')):
+            if self.feed_ feed_type .startswith(('evprox', 'evdist')):
                 if self.params['sync_evinput']:
                     self.seed = self.params['prng_seedcore']
                 else:
                     self.seed = self.params['prng_seedcore'] + self.gid
-            elif self.feed_type.startswith('common'):
+            elif self.feed_ feed_type .startswith('common'):
                 # seed for events assuming a given start time
                 self.seed = self.params['prng_seedcore'] + self.gid
                 # separate seed for start times
@@ -98,24 +98,24 @@ class ExtFeed(object):
 
         # check feed name validity, allowing substring matches ('evprox1' etc)
         valid_feeds = ['extpois', 'extgauss', 'common', 'evprox', 'evdist']
-        # NB check if self.feed_type has a valid substring, not vice versa
-        matches = [f for f in valid_feeds if f in self.feed_type]
+        # NB check if self.feed_ feed_type  has a valid substring, not vice versa
+        matches = [f for f in valid_feeds if f in self.feed_ feed_type ]
         if len(matches) == 0:
-            raise ValueError('Invalid external feed: %s' % self.feed_type)
+            raise ValueError('Invalid external feed: %s' % self.feed_ feed_type )
         elif len(matches) > 1:
-            raise ValueError('Ambiguous external feed: %s' % self.feed_type)
+            raise ValueError('Ambiguous external feed: %s' % self.feed_ feed_type )
 
         # Each of these methods creates self.event_times
-        # Return values not checked: False if all weights for given feed type
+        # Return values not checked: False if all weights for given feed  feed_type 
         # are zero. Designed to be silent so that zeroing input weights
         # effectively disables each.
-        if self.feed_type == 'extpois':
+        if self.feed_ feed_type  == 'extpois':
             self._create_extpois()
-        elif self.feed_type.startswith(('evprox', 'evdist')):
+        elif self.feed_ feed_type .startswith(('evprox', 'evdist')):
             self._create_evoked()
-        elif self.feed_type == 'extgauss':
+        elif self.feed_ feed_type  == 'extgauss':
             self._create_extgauss()
-        elif self.feed_type == 'common':
+        elif self.feed_ feed_type  == 'common':
             self._create_common_input()
 
     # based on cdf for exp wait time distribution from unif [0, 1)
@@ -125,13 +125,13 @@ class ExtFeed(object):
 
     # new external pois designation
     def _create_extpois(self):
-        if self.params[self.cell_type][0] <= 0.0 and \
-                self.params[self.cell_type][1] <= 0.0:
+        if self.params[self.cell_ feed_type ][0] <= 0.0 and \
+                self.params[self.cell_ feed_type ][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
         # check the t interval
         t0 = self.params['t_interval'][0]
         T = self.params['t_interval'][1]
-        lamtha = self.params[self.cell_type][3]  # ind 3 is frequency (lamtha)
+        lamtha = self.params[self.cell_ feed_type ][3]  # ind 3 is frequency (lamtha)
         # values MUST be sorted for VecStim()!
         # start the initial value
         val_pois = np.array([])
@@ -157,10 +157,10 @@ class ExtFeed(object):
     # mu and sigma vals come from p
     def _create_evoked(self):
         val_evoked = np.array([])
-        if self.cell_type in self.params.keys():
+        if self.cell_ feed_type  in self.params.keys():
             # assign the params
             mu = self.params['t0']
-            sigma = self.params[self.cell_type][3]  # ind 3 is sigma_t (stdev)
+            sigma = self.params[self.cell_ feed_type ][3]  # ind 3 is sigma_t (stdev)
             numspikes = int(self.params['numspikes'])
             # if a non-zero sigma is specified
             if sigma:
@@ -175,11 +175,11 @@ class ExtFeed(object):
 
     def _create_extgauss(self):
         # assign the params
-        if self.params[self.cell_type][0] <= 0.0 and \
-                self.params[self.cell_type][1] <= 0.0:
+        if self.params[self.cell_ feed_type ][0] <= 0.0 and \
+                self.params[self.cell_ feed_type ][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
-        mu = self.params[self.cell_type][3]
-        sigma = self.params[self.cell_type][4]
+        mu = self.params[self.cell_ feed_type ][3]
+        sigma = self.params[self.cell_ feed_type ][4]
         # mu and sigma values come from p
         # one single value from Gaussian dist.
         # values MUST be sorted for VecStim()!

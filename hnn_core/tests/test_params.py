@@ -26,7 +26,7 @@ def test_read_params():
     with open(empty_fname, 'w') as json_data:
         json.dump({}, json_data)
     pytest.raises(ValueError, read_params, empty_fname)
-    # non dict type
+    # non dict  feed_type 
     pytest.raises(ValueError, Params, [])
     pytest.raises(ValueError, Params, 'sdfdfdf')
 

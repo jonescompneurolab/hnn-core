@@ -172,7 +172,7 @@ that simulates macroscale current dipoles. Currently, HNN is distributed with
 a template cortical column model based on generalizable features of cortical 
 circuitry and as applied in `prior studies`_.
 Essential to future expansion of HNN is the ability to use other cortical column 
-models that include different cell types and or different network features. 
+models that include different cell  feed_type s and or different network features. 
 We have begun creation of a framework where models built in NetPyNE can be adapted 
 to the HNN workflows of use. As a test bed, this currently entails integration of 
 the HNN cortical column model and exogenous drives into the full NetPyNE 

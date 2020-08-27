@@ -46,17 +46,17 @@ def run_hnn_core(backend=None, n_jobs=1):
     assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
     assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
 
-    # Test spike type counts
-    spiketype_counts = {}
+    # Test spike  feed_type  counts
+    spike feed_type _counts = {}
     for spikegid in net.spikes.gids[0]:
-        if net.gid_to_type(spikegid) not in spiketype_counts:
-            spiketype_counts[net.gid_to_type(spikegid)] = 0
+        if net.gid_to_ feed_type (spikegid) not in spike feed_type _counts:
+            spike feed_type _counts[net.gid_to_ feed_type (spikegid)] = 0
         else:
-            spiketype_counts[net.gid_to_type(spikegid)] += 1
-    assert 'common' not in spiketype_counts
-    assert 'exgauss' not in spiketype_counts
-    assert 'extpois' not in spiketype_counts
-    assert spiketype_counts == {'evprox1': 269,
+            spike feed_type _counts[net.gid_to_ feed_type (spikegid)] += 1
+    assert 'common' not in spike feed_type _counts
+    assert 'exgauss' not in spike feed_type _counts
+    assert 'extpois' not in spike feed_type _counts
+    assert spike feed_type _counts == {'evprox1': 269,
                                 'L2_basket': 54,
                                 'L2_pyramidal': 113,
                                 'L5_pyramidal': 395,

@@ -47,7 +47,7 @@ with NeuronNetwork(net) as neuron_network:
     plt.title('%s (gid=%d)' % (cells[0].name, gid))
 
 ###############################################################################
-# Let's do this for the rest of the cell types with a new NeuronNetwork object
+# Let's do this for the rest of the cell  feed_type s with a new NeuronNetwork object
 with NeuronNetwork(net) as neuron_network:
     fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
     for gid, ax in zip([35, 170], axes):
