@@ -54,7 +54,6 @@ class BasketSingle(_Cell):
             self.soma(0.5), e=0., tau1=0.5, tau2=5.)
         self.synapses['soma_gabaa'] = self.syn_create(
             self.soma(0.5), e=-80, tau1=0.5, tau2=5.)
-        # this is a pretty fast NMDA, no?
         self.synapses['soma_nmda'] = self.syn_create(
             self.soma(0.5), e=0., tau1=1., tau2=20.)
 
