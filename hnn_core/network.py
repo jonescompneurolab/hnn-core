@@ -440,13 +440,16 @@ class Spikes(object):
             Dictionary with keys 'L5_pyramidal', 'L5_basket', etc.
         """
         cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-        spike_times = np.array(sum(spikes._times, []))
-        spike_types = np.array(sum(spikes._types, []))
         spike_rates = dict()
-        tstart, tstop = min(spike_times), max(spike_times)
+        all_spike_times = np.array(sum(self._times, []))
+        tstart, tstop = min(all_spike_times), max(all_spike_times)
         for cell_type in cell_types:
-            spike_times_cells = spike_times[spike_types == cell_type]
-            spike_rates[cell_type] = len(spike_times_cells) / (tstop - tstart)
+            trial_spike_rate = list()
+            for spike_times, spike_types in zip(self._times, self._types):
+                spike_times_cells = spike_times[spike_types == cell_type]
+                trial_spike_rate.append(
+                    len(spike_times_cells) / (tstop - tstart))
+            spike_rates[cell_type] = np.mean(trial_spike_rate)
         return spike_rates
 
     def plot(self, ax=None, show=True):
