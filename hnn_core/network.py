@@ -312,24 +312,6 @@ class Network(object):
         """
         return plot_cells(net=self, ax=ax, show=show)
 
-    def plot_input(self, ax=None, show=True):
-        """Plot the histogram of input.
-
-        Parameters
-        ----------
-        ax : instance of matplotlib axis | None
-            An axis object from matplotlib. If None,
-            a new figure is created.
-        show : bool
-            If True, show the figure.
-
-        Returns
-        -------
-        fig : instance of matplotlib Figure
-            The matplotlib figure handle.
-        """
-        return self.spikes.plot_input()
-
 
 class Spikes(object):
     """The Spikes class.
@@ -492,6 +474,17 @@ class Spikes(object):
         ax : instance of matplotlib axis | None
             An axis object from matplotlib. If None,
             a new figure is created.
+        spike_types: string | list | dictionary | None
+            String input of a valid spike type is plotted individually.
+                Ex: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
+            List of valid string inputs will plot each spike type individually.
+                Ex: ['common', 'evdist']
+            Dictionary of valid lists will plot list elements as a group.
+                Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
+            If None, all default spike types are plotted individually.
+                Default: ['common', 'evdist', 'evprox', 'extgauss', 'extpois']
+            Valid strings also include leading characters of spike types
+                    Example: 'ext' is equivalent to ['extgauss', 'extpois']
         show : bool
             If True, show the figure.
 
