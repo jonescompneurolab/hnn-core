@@ -23,6 +23,18 @@ Simulation (:py:mod:`hnn_core`):
    Network
    Spikes
 
+Dipole (:py:mod:`hnn_core.dipole`):
+------
+
+.. currentmodule:: hnn_core.dipole
+
+.. autosummary::
+   :toctree: generated/
+
+   simulate_dipole
+   read_dipole
+   average_dipoles
+
 Params (:py:mod:`hnn_core.params`):
 ------
 
