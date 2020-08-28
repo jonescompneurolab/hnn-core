@@ -32,7 +32,6 @@ class BasketSingle(_Cell):
         # whole, but convention is followed in this function ease use of gui.
         self.shape_soma()
         self.synapses = dict()
-        self.sect_loc = dict(proximal=['soma'], distal=[])
 
     def _biophysics(self):
         self.soma.insert('hh2')
@@ -76,7 +75,7 @@ class BasketSingle(_Cell):
                 }
 
                 self._connect_feed_at_loc(
-                    feed_loc='proximal', receptor='ampa',
+                    feed_loc=p_src['loc'], receptor='ampa',
                     gid_src=gid_src, nc_dict=nc_dict,
                     nc_list=self.ncfrom_common)
 
@@ -92,7 +91,7 @@ class BasketSingle(_Cell):
                 }
 
                 self._connect_feed_at_loc(
-                    feed_loc='proximal', receptor='nmda',
+                    feed_loc=p_src['loc'], receptor='nmda',
                     gid_src=gid_src, nc_dict=nc_dict,
                     nc_list=self.ncfrom_common)
 
@@ -130,7 +129,7 @@ class BasketSingle(_Cell):
                 # for the soma (both prox and distal evoked)
                 for receptor in ['ampa', 'nmda']:
                     self._connect_feed_at_loc(
-                        feed_loc='proximal', receptor=receptor,
+                        feed_loc=p_ext['loc'], receptor=receptor,
                         gid_src=gid_ev, nc_dict=nc_dict[receptor],
                         nc_list=self.ncfrom_ev)
 
@@ -200,6 +199,7 @@ class L2Basket(BasketSingle):
 
         self._synapse_create()
         self._biophysics()
+        self.sect_loc = dict(proximal=['soma'], distal=['soma'])
 
     # par connect between all presynaptic cells
     # no connections from L5Pyr or L5Basket to L2Baskets
@@ -220,6 +220,7 @@ class L5Basket(BasketSingle):
 
         self._synapse_create()
         self._biophysics()
+        self.sect_loc = dict(proximal=['soma'], distal=[])
 
     # connections FROM other cells TO this cell
     # there are no connections from the L2Basket cells. congrats!
