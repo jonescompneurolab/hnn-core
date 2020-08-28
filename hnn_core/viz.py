@@ -4,7 +4,7 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
-from cycler import cycler
+from itertools import cycle
 
 
 def plot_dipole(dpl, ax=None, layer='agg', show=True):
@@ -80,7 +80,7 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     import matplotlib.pyplot as plt
     spike_times = np.array(sum(spikes._times, []))
     spike_types_data = np.array(sum(spikes._types, []))
-    default_types = ['evprox', 'evdist', 'common', 'extgauss', 'extpois']
+
     cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     input_types = np.setdiff1d(np.unique(spike_types_data), cell_types)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
@@ -88,38 +88,54 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
 
     if isinstance(spike_types, str):
         spike_types = {spike_types: [spike_types]}
-    elif isinstance(spike_types, list):
+
+    if spike_types is None:
+        spike_types = input_types.tolist()
+    if isinstance(spike_types, list):
         spike_types = {s_type: [s_type] for s_type in spike_types}
-    elif spike_types is None:
-        spike_types = {s_type: [s_type] for s_type in default_types}
-    elif not isinstance(spike_types, dict):
+    if isinstance(spike_types, dict):
+        for spike_label in spike_types:
+            if not isinstance(spike_types[spike_label], list):
+                raise TypeError(f'spike_types[{spike_label}] must be a list'
+                                f'Got {type(spike_types[spike_label])}')
+
+    if not isinstance(spike_types, dict):
         raise TypeError('spike_types should be str, list, dict, or None')
 
-    spike_mask = {}
-    for (s_label, s_list) in spike_types.items():
-        s_label_mask = []
-        for s_type in s_list:
-            s_mask_list = []
-            for (s_key, s_mask) in spike_types_mask.items():
-                if s_key.startswith(s_type):
-                    s_mask_list.append(s_mask)
-            s_mask_list = np.logical_or.reduce(s_mask_list)
-            s_label_mask.append(s_mask_list)
-        spike_mask[s_label] = np.logical_or.reduce(s_label_mask)
-
-    bins = np.linspace(0, spike_times[-1], 50)
+    spike_labels = dict()
+    for spike_label, spike_type_list in spike_types.items():
+        for spike_type in spike_type_list:
+            n_found = 0
+            for input_type in input_types:
+                if input_type.startswith(spike_type):
+                    if input_type in spike_labels:
+                        raise ValueError(f'Elements of spike_types must map to'
+                                         f' mutually exclusive input types.'
+                                         f' {input_type} is found more than'
+                                         f' once')
+                    spike_labels[input_type] = spike_label
+                    n_found += 1
+            if n_found == 0:
+                raise ValueError(f'No input types found for {spike_type}')
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    color_cycle = cycler('color', ['r', 'g', 'b', 'y', 'm', 'c'])
-    plt.rcParams["axes.prop_cycle"] = color_cycle
+    color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
 
-    for (s_key, s_mask) in spike_mask.items():
-        if np.any(s_mask):
-            ax.hist(spike_times[s_mask], bins, label=s_key)
+    bins = np.linspace(0, spike_times[-1], 50)
+    spike_color = dict()
+    for input_type, spike_label in spike_labels.items():
+        label = "_nolegend_"
+        if spike_label not in spike_color:
+            spike_color[spike_label] = next(color_cycle)
+            label = spike_label
 
+        color = spike_color[spike_label]
+        ax.hist(spike_times[spike_types_mask[input_type]], bins,
+                label=label, color=color)
     plt.legend()
+
     if show:
         plt.show()
     return ax.get_figure()

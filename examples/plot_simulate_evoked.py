@@ -53,7 +53,7 @@ with JoblibBackend(n_jobs=1):
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
-net.spikes.plot_input(ax=axes[1])
+net.spikes.plot_input(ax=axes[1], spike_types=['evprox', 'evdist'])
 
 ###############################################################################
 # Also, we can plot the spikes and write them to txt files.
