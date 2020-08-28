@@ -76,7 +76,7 @@ class JoblibBackend(object):
 
         return self
 
-    def __exit__(self, feed_type, value, traceback):
+    def __exit__(self):
         global _BACKEND
 
         _BACKEND = self._old_backend
