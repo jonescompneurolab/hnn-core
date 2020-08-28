@@ -92,15 +92,20 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
         spike_types = {s_type: [s_type] for s_type in spike_types}
     elif spike_types is None:
         spike_types = {s_type: [s_type] for s_type in default_types}
-    else:
+    elif not isinstance(spike_types, dict):
         raise ValueError('Invalid spike_types input.')
 
-    spike_mask = {s_label: np.logical_or.reduce(
-        np.logical_or.reduce([
-            [s_mask for (s_key, s_mask) in spike_types_mask.items()
-                if s_key.startswith(s_type)]
-            for s_type in s_list]))
-        for (s_label, s_list) in spike_types.items()}
+    spike_mask = {}
+    for (s_label, s_list) in spike_types.items():
+        s_label_mask = []
+        for s_type in s_list:
+            s_mask_list = []
+            for (s_key, s_mask) in spike_types_mask.items():
+                if s_key.startswith(s_type):
+                    s_mask_list.append(s_mask)
+            s_mask_list = np.logical_or.reduce(s_mask_list)
+            s_label_mask.append(s_mask_list)
+        spike_mask[s_label] = np.logical_or.reduce(s_label_mask)
 
     bins = np.linspace(0, spike_times[-1], 50)
 
