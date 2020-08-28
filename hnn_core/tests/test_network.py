@@ -79,6 +79,9 @@ def test_spikes():
                        "lists of the same length"):
         spikes = Spikes(times=[[2.3456, 7.89]], gids=spikegids,
                         types=spiketypes)
+    with pytest.raises(TypeError, match="spike_types should be str, "
+                                        "list, dict, or None"):
+        spikes.plot_input(spike_types=1)
 
     # Write spike file with no 'types' column
     # Check for gid_dict errors
