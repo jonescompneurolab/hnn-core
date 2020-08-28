@@ -484,7 +484,7 @@ class Spikes(object):
             If None, all default spike types are plotted individually.
                 Default: ['common', 'evdist', 'evprox', 'extgauss', 'extpois']
             Valid strings also include leading characters of spike types
-                    Example: 'ext' is equivalent to ['extgauss', 'extpois']
+                Example: 'ext' is equivalent to ['extgauss', 'extpois']
         show : bool
             If True, show the figure.
 
