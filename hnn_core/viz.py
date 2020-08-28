@@ -4,6 +4,7 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
+from cycler import cycler
 
 
 def plot_dipole(dpl, ax=None, layer='agg', show=True):
@@ -103,6 +104,9 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
+
+    color_cycle = cycler('color', ['r', 'g', 'b', 'y', 'm', 'c'])
+    plt.rcParams["axes.prop_cycle"] = color_cycle
 
     for (s_key, s_mask) in spike_mask.items():
         if np.any(s_mask):
