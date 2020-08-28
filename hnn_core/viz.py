@@ -93,7 +93,7 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     elif spike_types is None:
         spike_types = {s_type: [s_type] for s_type in default_types}
     elif not isinstance(spike_types, dict):
-        raise ValueError('Invalid spike_types input.')
+        raise TypeError('spike_types should be str, list, dict, or None')
 
     spike_mask = {}
     for (s_label, s_list) in spike_types.items():
