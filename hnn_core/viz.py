@@ -86,12 +86,14 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
                         for s_type in input_types}
 
-    if type(spike_types) is str:
+    if isinstance(spike_types, str):
         spike_types = {spike_types: [spike_types]}
-    elif type(spike_types) is list:
+    elif isinstance(spike_types, list):
         spike_types = {s_type: [s_type] for s_type in spike_types}
     elif spike_types is None:
         spike_types = {s_type: [s_type] for s_type in default_types}
+    else:
+        raise ValueError('Invalid spike_types input.')
 
     spike_mask = {s_label: np.logical_or.reduce(
         np.logical_or.reduce([
