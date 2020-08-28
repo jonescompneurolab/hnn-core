@@ -59,7 +59,7 @@ def run_hnn_core(backend=None, n_jobs=1):
     assert spiketype_counts == {'evprox1': 269,
                                 'L2_basket': 54,
                                 'L2_pyramidal': 113,
-                                'L5_pyramidal': 395,
+                                'L5Pyr': 395,
                                 'L5_basket': 85,
                                 'evdist1': 234,
                                 'evprox2': 269}

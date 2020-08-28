@@ -369,10 +369,10 @@ class NeuronNetwork(object):
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 # creates a NetCon object internally to Neuron
-                type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
+                type2class = {'L2_pyramidal': L2Pyr, 'L5Pyr': L5Pyr,
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
                 Cell = type2class[src_type]
-                if src_type in ('L2_pyramidal', 'L5_pyramidal'):
+                if src_type in ('L2_pyramidal', 'L5Pyr'):
                     cell = Cell(gid, src_pos, params)
                 else:
                     cell = Cell(gid, src_pos)
@@ -471,7 +471,7 @@ class NeuronNetwork(object):
         # this is quite ugly
         for cell in self.cells:
             # check for celltype
-            if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
+            if cell.celltype in ('L5Pyr', 'L2_pyramidal'):
                 # iterate over somatic currents, assumes this list exists
                 # is guaranteed in L5Pyr()
                 for key, I_soma in cell.dict_currents.items():
@@ -489,7 +489,7 @@ class NeuronNetwork(object):
                 for seg in sect:
                     if cell.celltype == 'L2_pyramidal':
                         seg.v = -71.46
-                    elif cell.celltype == 'L5_pyramidal':
+                    elif cell.celltype == 'L5Pyr':
                         if sect.name() == 'L5Pyr_apical_1':
                             seg.v = -71.32
                         elif sect.name() == 'L5Pyr_apical_2':

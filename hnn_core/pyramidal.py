@@ -627,7 +627,7 @@ class L5Pyr(Pyr):
         p_dend = self._get_dend_props()
         p_syn = self._get_syn_props()
 
-        self.celltype = 'L5_pyramidal'
+        self.celltype = 'L5Pyr'
 
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
@@ -848,12 +848,12 @@ class L5Pyr(Pyr):
         postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
                     self.basal3_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='ampa',
+                      'L5Pyr', 'L5Pyr', lamtha=3., receptor='ampa',
                       postsyns=postsyns, autapses=False)
         postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
                     self.basal3_nmda]
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='nmda',
+                      'L5Pyr', 'L5Pyr', lamtha=3., receptor='nmda',
                       postsyns=postsyns, autapses=False)
 
         self._connect(gid, gid_dict, pos_dict, p,
@@ -1007,15 +1007,15 @@ class L5Pyr(Pyr):
             # gid shift is based on L2_pyramidal cells NOT L5
             # I recognize this is ugly (hack)
             # gid_shift = gid_dict['extgauss'][0] - gid_dict['L2_pyramidal'][0]
-            if 'L5_pyramidal' in p_ext.keys():
+            if 'L5Pyr' in p_ext.keys():
                 gid_extgauss = gid + gid_dict['extgauss'][0]
 
                 nc_dict = {
                     'pos_src': pos_dict['extgauss'][gid],
                     # index 0 for ampa weight
-                    'A_weight': p_ext['L5_pyramidal'][0],
+                    'A_weight': p_ext['L5Pyr'][0],
                     # index 2 for delay
-                    'A_delay': p_ext['L5_pyramidal'][2],
+                    'A_delay': p_ext['L5Pyr'][2],
                     'lamtha': p_ext['lamtha'],
                     'threshold': p_ext['threshold'],
                     'type_src': type

@@ -29,7 +29,7 @@ class ExtFeed(object):
         receive 'common' input---separate conductivity values can be assigned
         to basket vs. pyramidal cells and AMPA vs. NMDA synapses
     target_cell_type : str | None
-        The target cell type of the feed, e.g., 'L2_basket', 'L5_pyramidal',
+        The target cell type of the feed, e.g., 'L2_basket', 'L5Pyr',
         etc., or None for 'common' inputs
     params : dict
         Parameters of the external input feed, arranged into a dictionary.
