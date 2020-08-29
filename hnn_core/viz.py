@@ -48,8 +48,8 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
     return ax.get_figure()
 
 
-def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
-    """Plot the histogram of input.
+def plot_hist(spikes, ax=None, spike_types=None, show=True):
+    """Plot the histogram of spiking activity.
 
     Parameters
     ----------
@@ -65,8 +65,7 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
             Ex: ['common', 'evdist']
         Dictionary of valid lists will plot list elements as a group.
             Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
-        If None, all default spike types are plotted individually.
-            Default: ['common', 'evdist', 'evprox', 'extgauss', 'extpois']
+        If None, all input spike types are plotted individually. 
         Valid strings also include leading characters of spike types
             Example: 'ext' is equivalent to ['extgauss', 'extpois']
     show : bool
@@ -81,16 +80,20 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     spike_times = np.array(sum(spikes._times, []))
     spike_types_data = np.array(sum(spikes._types, []))
 
-    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-    input_types = np.setdiff1d(np.unique(spike_types_data), cell_types)
+    unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
-                        for s_type in input_types}
+                        for s_type in unique_types}
+    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+    input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
         spike_types = {spike_types: [spike_types]}
 
     if spike_types is None:
-        spike_types = input_types.tolist()
+        if any(input_types):
+            spike_types = input_types.tolist()
+        else:
+            spike_types = unique_types.tolist()
     if isinstance(spike_types, list):
         spike_types = {s_type: [s_type] for s_type in spike_types}
     if isinstance(spike_types, dict):
@@ -107,14 +110,14 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     for spike_label, spike_type_list in spike_types.items():
         for spike_type in spike_type_list:
             n_found = 0
-            for input_type in input_types:
-                if input_type.startswith(spike_type):
-                    if input_type in spike_labels:
+            for unique_type in unique_types:
+                if unique_type.startswith(spike_type):
+                    if unique_type in spike_labels:
                         raise ValueError(f'Elements of spike_types must map to'
                                          f' mutually exclusive input types.'
-                                         f' {input_type} is found more than'
+                                         f' {unique_type} is found more than'
                                          f' once')
-                    spike_labels[input_type] = spike_label
+                    spike_labels[unique_type] = spike_label
                     n_found += 1
             if n_found == 0:
                 raise ValueError(f'No input types found for {spike_type}')
