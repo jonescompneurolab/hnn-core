@@ -35,7 +35,7 @@ class Pyr(_Cell):
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.
     celltype : str
-        The cell type, 'L5_Pyramidal' or 'L2_Pyramidal'
+        The cell type, 'L5Pyr' or 'L2_Pyramidal'
     """
 
     def __init__(self, gid, soma_props):
@@ -592,7 +592,7 @@ class L5Pyr(Pyr):
         p_dend = self._get_dend_props()
         p_syn = self._get_syn_props()
 
-        self.celltype = 'L5_pyramidal'
+        self.celltype = 'L5Pyr'
 
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
@@ -814,13 +814,13 @@ class L5Pyr(Pyr):
                     self.synapses['basal2_ampa'],
                     self.synapses['basal3_ampa']]
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='ampa',
+                      'L5Pyr', 'L5Pyr', lamtha=3., receptor='ampa',
                       postsyns=postsyns, autapses=False)
         postsyns = [self.synapses['apicaloblique_nmda'],
                     self.synapses['basal2_nmda'],
                     self.synapses['basal3_nmda']]
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='nmda',
+                      'L5Pyr', 'L5Pyr', lamtha=3., receptor='nmda',
                       postsyns=postsyns, autapses=False)
 
         self._connect(gid, gid_dict, pos_dict, p,

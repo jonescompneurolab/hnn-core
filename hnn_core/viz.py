@@ -106,7 +106,7 @@ def plot_spikes_raster(spikes, ax=None, show=True):
     import matplotlib.pyplot as plt
     spike_times = np.array(sum(spikes._times, []))
     spike_types = np.array(sum(spikes._types, []))
-    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+    cell_types = ['L5Pyr', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     spike_times_cell = [spike_times[spike_types == cell_type]
                         for cell_type in cell_types]
 
@@ -151,9 +151,9 @@ def plot_cells(net, ax=None, show=True):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
-    colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
+    colors = {'L5Pyr': 'b', 'L2_pyramidal': 'c',
               'L5_basket': 'r', 'L2_basket': 'm'}
-    markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
+    markers = {'L5Pyr': '^', 'L2_pyramidal': '^',
                'L5_basket': 'x', 'L2_basket': 'x'}
 
     for cell_type in net.pos_dict:

@@ -228,7 +228,7 @@ class L5Basket(BasketSingle):
         self._connect(gid, gid_dict, pos_dict, p, 'L5_basket', 'L5Basket',
                       lamtha=20., autapses=False,
                       postsyns=[self.synapses['soma_gabaa']])
-        self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr',
+        self._connect(gid, gid_dict, pos_dict, p, 'L5Pyr',
                       postsyns=[self.synapses['soma_ampa']])
         self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr',
                       postsyns=[self.synapses['soma_ampa']])

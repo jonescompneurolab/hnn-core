@@ -61,7 +61,7 @@ def test_spikes():
     # Round-trip test
     spiketimes = [[2.3456, 7.89], [4.2812, 93.2]]
     spikegids = [[1, 3], [5, 7]]
-    spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
+    spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5Pyr', 'L5_basket']]
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
     spikes.write('/tmp/spk_%d.txt')
     assert spikes == read_spikes('/tmp/spk_*.txt')
@@ -90,5 +90,5 @@ def test_spikes():
     with pytest.raises(ValueError, match="gid_dict should contain only "
                        "disjoint sets of gid values"):
         gid_dict = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
-                    'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
+                    'L5Pyr': range(4, 6), 'L5_basket': range(6, 8)}
         spikes = read_spikes('/tmp/spk_*.txt', gid_dict=gid_dict)

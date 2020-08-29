@@ -82,7 +82,7 @@ def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
     -------
     pos_dict : dict of list of tuple (x, y, z)
         Dictionary containing coordinate positions.
-        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
+        Keys are 'L2_pyramidal', 'L5Pyr', 'L2_basket', 'L5_basket',
         'common', or any of the elements of the list p_unique_keys
 
     Notes
@@ -98,7 +98,7 @@ def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
 
     pos_dict['L2_pyramidal'] = [
         pos for pos in it.product(xxrange, yyrange, [0])]
-    pos_dict['L5_pyramidal'] = [
+    pos_dict['L5Pyr'] = [
         pos for pos in it.product(xxrange, yyrange, [zdiff])]
 
     # BASKET CELLS
@@ -227,7 +227,7 @@ class Network(object):
             'L2_basket',
             'L2_pyramidal',
             'L5_basket',
-            'L5_pyramidal',
+            'L5Pyr',
         ]
         self.extname_list = []
         self.extname_list.append('common')
@@ -289,7 +289,7 @@ class Network(object):
         type_pos_ind = gid - self.gid_dict[src_type][0]
         src_pos = self.pos_dict[src_type][type_pos_ind]
 
-        real_cell_types = ['L2_pyramidal', 'L5_pyramidal',
+        real_cell_types = ['L2_pyramidal', 'L5Pyr',
                            'L2_basket', 'L5_basket']
 
         return src_type, src_pos, src_type in real_cell_types
