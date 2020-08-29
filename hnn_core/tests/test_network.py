@@ -63,7 +63,7 @@ def test_spikes():
     spikegids = [[1, 3], [5, 7]]
     spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
-    spikes.plot_input(show=False)
+    spikes.plot_hist(show=False)
     spikes.write('/tmp/spk_%d.txt')
     assert spikes == read_spikes('/tmp/spk_*.txt')
     assert ("Spikes | 2 simulation trials" in repr(spikes))
@@ -79,9 +79,22 @@ def test_spikes():
                        "lists of the same length"):
         spikes = Spikes(times=[[2.3456, 7.89]], gids=spikegids,
                         types=spiketypes)
+
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
-        spikes.plot_input(spike_types=1)
+        spikes.plot_hist(spike_types=1, show=False)
+
+    with pytest.raises(TypeError, match=r"spike_types\[ev\] must be a list\. "
+                                        r"Got int\."):
+        spikes.plot_hist(spike_types={'ev': 1}, show=False)
+
+    with pytest.raises(ValueError, match=r"Elements of spike_types must map to"
+                       r" mutually exclusive input types\. L2_basket is found"
+                       r" more than once\."):
+        spikes.plot_hist(spike_types={'ev': ['L2_basket', 'L2_b']}, show=False)
+
+    with pytest.raises(ValueError, match="No input types found for ABC"):
+        spikes.plot_hist(spike_types='ABC', show=False)
 
     # Write spike file with no 'types' column
     # Check for gid_dict errors

@@ -116,7 +116,7 @@ def plot_hist(spikes, ax=None, spike_types=None, show=True):
                         raise ValueError(f'Elements of spike_types must map to'
                                          f' mutually exclusive input types.'
                                          f' {unique_type} is found more than'
-                                         f' once')
+                                         f' once.')
                     spike_labels[unique_type] = spike_label
                     n_found += 1
             if n_found == 0:
