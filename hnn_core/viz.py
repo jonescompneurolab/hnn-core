@@ -96,8 +96,9 @@ def plot_hist_input(spikes, ax=None, spike_types=None, show=True):
     if isinstance(spike_types, dict):
         for spike_label in spike_types:
             if not isinstance(spike_types[spike_label], list):
-                raise TypeError(f'spike_types[{spike_label}] must be a list'
-                                f'Got {type(spike_types[spike_label])}')
+                raise TypeError(f'spike_types[{spike_label}] must be a list. '
+                                f'Got '
+                                f'{type(spike_types[spike_label]).__name__}.')
 
     if not isinstance(spike_types, dict):
         raise TypeError('spike_types should be str, list, dict, or None')
