@@ -848,7 +848,7 @@ class L5Pyr(Pyr):
         postsyns = [self.apicaloblique_ampa, self.basal2_ampa,
                     self.basal3_ampa]
         self._connect(gid, gid_dict, pos_dict, p,
-                      'L5Pyr', 'L5Pyr', lamtha=3., receptor='ampa',
+                      'L5Pyr', lamtha=3., receptor='ampa',
                       postsyns=postsyns, autapses=False)
         postsyns = [self.apicaloblique_nmda, self.basal2_nmda,
                     self.basal3_nmda]
