@@ -124,7 +124,7 @@ pattern of cells in the HNN model.</p>
 <p>Let us import hnn_core</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
 <span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">read_params</span><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a>
-<span class="kn">from</span> <span class="nn">hnn_core.neuron</span> <span class="kn">import</span> <span class="n">NeuronNetwork</span>
+<span class="kn">from</span> <span class="nn">hnn_core.network_builder</span> <span class="kn">import</span> <span class="n">NetworkBuilder</span>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
@@ -138,11 +138,11 @@ pattern of cells in the HNN model.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<span class="k">with</span> <span class="n">NeuronNetwork</span><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span> <span class="k">as</span> <span class="n">neuron_network</span><span class="p">:</span>
-    <span class="n">neuron_network</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_voltage</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">NetworkBuilder</span><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span> <span class="k">as</span> <span class="n">network_builder</span><span class="p">:</span>
+    <span class="n">network_builder</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_voltage</span><span class="p">()</span>
 
     <span class="c1"># The cells are stored in the network object as a list</span>
-    <span class="n">cells</span> <span class="o">=</span> <span class="n">neuron_network</span><span class="o">.</span><span class="n">cells</span>
+    <span class="n">cells</span> <span class="o">=</span> <span class="n">network_builder</span><span class="o">.</span><span class="n">cells</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">cells</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
 
     <span class="c1"># We have different kinds of cells with different cell IDs (gids)</span>
@@ -151,7 +151,7 @@ pattern of cells in the HNN model.</p>
         <span class="nb">print</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="n">gid</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="c1"># We can plot the firing pattern of individual cells</span>
-    <span class="n">neuron_network</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_voltage</span><span class="p">()</span>
+    <span class="n">network_builder</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_voltage</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (gid=</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">gid</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -196,11 +196,11 @@ Simulation time: 90.0 ms...
 [Done]
 </pre></div>
 </div>
-<p>Let’s do this for the rest of the cell types with a new NeuronNetwork object</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">NeuronNetwork</span><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span> <span class="k">as</span> <span class="n">neuron_network</span><span class="p">:</span>
+<p>Let’s do this for the rest of the cell types with a new NetworkBuilder object</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">NetworkBuilder</span><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span> <span class="k">as</span> <span class="n">network_builder</span><span class="p">:</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">gid</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">35</span><span class="p">,</span> <span class="mi">170</span><span class="p">],</span> <span class="n">axes</span><span class="p">):</span>
-        <span class="n">neuron_network</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">gid</span><span class="p">]</span><span class="o">.</span><span class="n">plot_voltage</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">network_builder</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">gid</span><span class="p">]</span><span class="o">.</span><span class="n">plot_voltage</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (gid=</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="n">gid</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">gid</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -234,7 +234,7 @@ Simulation time: 90.0 ms...
 [Done]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.163 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  49.685 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-firing-pattern-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_firing_pattern.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="150px" /></a>
