@@ -425,6 +425,31 @@ class NetworkBuilder(object):
             else:
                 _PC.cell(gid, feed_cell.nrn_netcon)
 
+    def _connect_celltypes(self, src_type, target_type, loc,
+                           receptor, nc_dict):
+        """Connect two cell types for a particular receptor."""
+        self.ncs = list()
+        for gid_target in self.net.gid_dict[target_type]:
+            if _PC.gid_exists(gid_target):
+                for gid_src in self.net.gid_dict[src_type]:
+
+                    target_cell = self.cells[gid_target]
+                    nc_dict['pos_src'] = self.net.pos_dict[gid_src]
+
+                    # get synapse locations
+                    for syn_key in syn_keys:
+                        syn_keys = list()
+                        if loc in ['proximal', 'distal']:
+                            for sect in target_cell.sect_loc[loc]:
+                                syn_keys.append(f'{sect}_{receptor}')
+                        else:
+                            syn_keys = [f'{loc}_{receptor}']
+                            
+                        nc = target_cell.parconnect_from_src(
+                            gid_src, nc_dict,
+                            target_cell.synapses[syn_key])
+                        self.ncs.append(nc)
+
     # connections:
     # this NODE is aware of its cells as targets
     # for each syn, return list of source GIDs.
@@ -432,28 +457,61 @@ class NetworkBuilder(object):
     # nc = pc.gid_connect(source_gid, target_syn), weight,delay
     # Both for synapses AND for external inputs
     def _parnet_connect(self):
+        params = self.net.params
+        nc_dict = {
+            'A_delay': 1.,
+            'threshold': params['threshold'],
+        }
 
-        # loop over target zipped gids and cells
-        for gid, cell in zip(self.net._gid_list, self.cells):
-            # ignore iteration over inputs, since they are NOT targets
-            if _PC.gid_exists(gid) and self.net.gid_to_type(gid) != 'common':
-                # for each gid, find all the other cells connected to it,
-                # based on gid
-                # this MUST be defined in EACH class of cell in self.cells
-                # parconnect receives connections from other cells
-                # parreceive receives connections from common external inputs
-                cell.parconnect(gid, self.net.gid_dict, self.net.pos_dict,
-                                self.net.params)
-                cell.parreceive(gid, self.net.gid_dict,
-                                self.net.pos_dict, self.net.p_common)
-                # now do the unique external feeds specific to these cells
-                # parreceive_ext receives connections from UNIQUE
-                # external inputs
-                for cell_type in self.net.p_unique.keys():
-                    p_type = self.net.p_unique[cell_type]
-                    cell.parreceive_ext(
-                        cell_type, gid, self.net.gid_dict, self.net.pos_dict,
-                        p_type)
+        # target = L2 Pyramidal cells
+        nc_dict['lamtha'] = 3.
+        nc_dict['A_weight'] = params[f'gbar_L2Pyr_L2Pyr_nmda']
+        self._connect_celltypes('L2Pyr', 'L2Pyr', 'proximal', 'nmda',
+                                nc_dict)
+        
+        nc_dict['A_weight'] = params[f'gbar_L2Pyr_L2Pyr_ampa']
+        self._connect_celltypes('L2Pyr', 'L2Pyr', 'proximal', 'ampa',
+                                nc_dict)
+
+        nc_dict['lamtha'] = 50.
+        nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_gabaa']
+        self._connect_celltypes('L2Basket', 'L2Pyr', 'soma', 'gabaa', nc_dict)
+        nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_gabab']
+        self._connect_celltypes('L2Basket', 'L2Pyr', 'soma', 'gabab', nc_dict)
+
+        # target = L5 Pyramidal cells
+        nc_dict['lamtha'] = 3.
+        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Pyr_nmda']
+        self._connect_celltypes('L5Pyr', 'L5Pyr', 'proximal', 'nmda',
+                                nc_dict)
+        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Pyr_ampa']
+        self._connect_celltypes('L5Pyr', 'L5Pyr', 'proximal', 'ampa',
+                                nc_dict)
+    
+        nc_dict['lamtha'] = 70.
+        self._connect_celltypes('L5Basket', 'L5Pyr', 'soma', 'gabaa',
+                                nc_dict)
+        self._connect_celltypes('L5Basket', 'L5Pyr', 'soma', 'gabab',
+                                nc_dict)
+        self._connect_celltypes('L2Pyr', 'L5Pyr', 'soma', 'gabab',
+                                nc_dict)
+
+        # target = L2 Basket cells
+        # target = L5 Basket cells
+
+        # source = common feed
+        self._connect_celltypes('common', 'L2Basket', 'proximal', 'ampa',
+                                nc_dict)
+        self._connect_celltypes('common', 'L5Basket', 'proximal', 'ampa',
+                                nc_dict)
+        self._connect_celltypes('common', 'L5Basket', 'distal', 'ampa',
+                                nc_dict)
+
+        for src_cell_type in self.net.p_unique.keys():
+            for target_cell_type in ['L2Basket', 'L5Basket', 'L5Pyr', 'L2Pyr']:
+                for receptor in ['ampa', 'nmda']:
+                    self._connect_celltypes(src_cell_type, 'L5Basket', 'distal', 'ampa',
+                                            nc_dict)
 
     # setup spike recording for this node
     def _record_spikes(self):

@@ -416,30 +416,6 @@ class L2Pyr(Pyr):
             self.dends[key].insert('km')
             self.dends[key].gbar_km = self.p_all['L2Pyr_dend_gbar_km']
 
-    def parconnect(self, gid, gid_dict, pos_dict, p):
-        """Collect receptor-type-based connections here."""
-
-        postsyns = [self.synapses['apicaloblique_ampa'],
-                    self.synapses['basal2_ampa'],
-                    self.synapses['basal3_ampa']]
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='ampa',
-                      postsyns=postsyns, autapses=False)
-
-        postsyns = [self.synapses['apicaloblique_nmda'],
-                    self.synapses['basal2_nmda'],
-                    self.synapses['basal3_nmda']]
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_pyramidal', 'L2Pyr', lamtha=3., receptor='nmda',
-                      postsyns=postsyns, autapses=False)
-
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_basket', 'L2Basket', lamtha=50., receptor='gabaa',
-                      postsyns=[self.synapses['soma_gabaa']])
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_basket', 'L2Basket', lamtha=50., receptor='gabab',
-                      postsyns=[self.synapses['soma_gabab']])
-
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
@@ -689,20 +665,6 @@ class L5Pyr(Pyr):
 
     # parallel connection function FROM all cell types TO here
     def parconnect(self, gid, gid_dict, pos_dict, p):
-
-        postsyns = [self.synapses['apicaloblique_ampa'],
-                    self.synapses['basal2_ampa'],
-                    self.synapses['basal3_ampa']]
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='ampa',
-                      postsyns=postsyns, autapses=False)
-        postsyns = [self.synapses['apicaloblique_nmda'],
-                    self.synapses['basal2_nmda'],
-                    self.synapses['basal3_nmda']]
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_pyramidal', 'L5Pyr', lamtha=3., receptor='nmda',
-                      postsyns=postsyns, autapses=False)
-
         self._connect(gid, gid_dict, pos_dict, p,
                       'L5_basket', 'L5Basket', lamtha=70., receptor='gabaa',
                       postsyns=[self.synapses['soma_gabaa']])
