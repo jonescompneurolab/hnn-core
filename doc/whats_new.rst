@@ -27,6 +27,8 @@ Changelog
 
 - Modify plot_dipole() to accept both lists and individual instances of Dipole object, by `Nick Tolley`_ in `#145 <https://github.com/jonescompneurolab/hnn-core/pull/145>`_
 
+- Update plot_hist_input() to plot_hist() with a flexibly defined spike_types argument, by `Nick Tolley`_ in `#157 <https://github.com/jonescompneurolab/hnn-core/pull/157>`_
+
 Bug
 ~~~
 
