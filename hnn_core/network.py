@@ -9,7 +9,7 @@ import numpy as np
 from glob import glob
 
 from .params import create_pext
-from .viz import plot_hist, plot_spikes_raster, plot_cells
+from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
 def read_spikes(fname, gid_dict=None):
@@ -481,7 +481,8 @@ class Spikes(object):
                 Ex: ['common', 'evdist']
             Dictionary of valid lists will plot list elements as a group.
                 Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
-            If None, all input spike types are plotted individually.
+            If None, all input spike types are plotted individually if any
+            are present. Otherwise spikes from all cells are plotted.
             Valid strings also include leading characters of spike types
                 Example: 'ext' is equivalent to ['extgauss', 'extpois']
         show : bool
@@ -492,7 +493,7 @@ class Spikes(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_hist(
+        return plot_spikes_hist(
             self, ax=ax, spike_types=spike_types, show=show)
 
     def write(self, fname):

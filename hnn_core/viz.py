@@ -48,7 +48,7 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
     return ax.get_figure()
 
 
-def plot_hist(spikes, ax=None, spike_types=None, show=True):
+def plot_spikes_hist(spikes, ax=None, spike_types=None, show=True):
     """Plot the histogram of spiking activity.
 
     Parameters
@@ -65,7 +65,8 @@ def plot_hist(spikes, ax=None, spike_types=None, show=True):
             Ex: ['common', 'evdist']
         Dictionary of valid lists will plot list elements as a group.
             Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
-        If None, all input spike types are plotted individually.
+        If None, all input spike types are plotted individually if any
+        are present. Otherwise spikes from all cells are plotted.
         Valid strings also include leading characters of spike types
             Example: 'ext' is equivalent to ['extgauss', 'extpois']
     show : bool
