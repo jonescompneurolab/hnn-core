@@ -467,7 +467,7 @@ class Spikes(object):
         return plot_spikes_raster(spikes=self, ax=ax, show=show)
 
     def plot_hist(self, ax=None, spike_types=None, show=True):
-        """Plot the histogram of spiking activity.
+        """Plot the histogram of spiking activity across trials.
 
         Parameters
         ----------

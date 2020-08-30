@@ -55,7 +55,7 @@ Visualization (:py:mod:`hnn_core.viz`):
    :toctree: generated/
 
    plot_dipole
-   plot_hist_input
+   plot_spikes_hist
    plot_spikes_raster
    plot_cells
 
