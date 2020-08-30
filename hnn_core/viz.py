@@ -49,7 +49,7 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
 
 
 def plot_spikes_hist(spikes, ax=None, spike_types=None, show=True):
-    """Plot the histogram of spiking activity.
+    """Plot the histogram of spiking activity across trials.
 
     Parameters
     ----------
@@ -130,14 +130,14 @@ def plot_spikes_hist(spikes, ax=None, spike_types=None, show=True):
 
     bins = np.linspace(0, spike_times[-1], 50)
     spike_color = dict()
-    for input_type, spike_label in spike_labels.items():
+    for spike_type, spike_label in spike_labels.items():
         label = "_nolegend_"
         if spike_label not in spike_color:
             spike_color[spike_label] = next(color_cycle)
             label = spike_label
 
         color = spike_color[spike_label]
-        ax.hist(spike_times[spike_types_mask[input_type]], bins,
+        ax.hist(spike_times[spike_types_mask[spike_type]], bins,
                 label=label, color=color)
     plt.legend()
 
