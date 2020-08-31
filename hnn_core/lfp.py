@@ -211,7 +211,7 @@ class LFPElectrode ():
 
 def test():
     from hnn_core.pyramidal import L5Pyr
-    from hnn_core.neuron import load_custom_mechanisms
+    from hnn_core.network_builder import load_custom_mechanisms
 
     load_custom_mechanisms()
     cell = L5Pyr()
@@ -224,7 +224,7 @@ def test():
     ns.start = 100
     ns.interval = 50.0
 
-    nc = h.NetCon(ns, cell.apicaltuft_ampa)
+    nc = h.NetCon(ns, cell.synapses['apicaltuft_ampa'])
     nc.weight[0] = 0.001
 
     h.tstop = 2000.0
