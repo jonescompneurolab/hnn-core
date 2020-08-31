@@ -60,20 +60,29 @@ def getcoordinf(s):
     return lcoord, ldist, lend, lsegloc
 
 
-class LFPElectrode ():
+class LFPElectrode:
+    """LFP electrode class.
+
+    Parameters
+    ----------
+    sigma : float
+        Extracellular conductivity in mS/cm (uniform for simplicity)
+    """
 
     def __init__(self, coord, sigma=3.0, pc=None, usePoint=True):
 
-        # extracellular conductivity in mS/cm (uniform for simplicity)
-        self.sigma = sigma
         # see http://jn.physiology.org/content/104/6/3388.long shows table of 
         # values with conductivity
+        self.sigma = sigma
         self.coord = coord
         self.vres = None
         self.vx = None
 
-        self.imem_ptrvec = self.imem_vec = self.rx = self.vx = self.vres = None
-        self.bscallback = self.fih = None
+        self.imem_ptrvec = None
+        self.imem_vec = None
+        self.rx = None
+        self.bscallback = None
+        self.fih = None
 
         if pc is None:
             self.pc = h.ParallelContext()
