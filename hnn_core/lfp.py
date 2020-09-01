@@ -3,8 +3,8 @@ LFPsim - Simulation scripts to compute Local Field Potentials (LFP) from cable
 compartmental models of neurons and networks implemented in NEURON simulation
 environment.
 
-LFPsim works reliably on biophysically detailed multi-compartmental neurons with
-ion channels in some or all compartments.
+LFPsim works reliably on biophysically detailed multi-compartmental neurons
+with ion channels in some or all compartments.
 
 Last updated 12-March-2016
 Developed by : 
@@ -44,8 +44,15 @@ class LFPElectrode:
 
     Parameters
     ----------
+    coord : tuple
+        The (x, y, z) coordinates of the LFP electrode.
     sigma : float
         Extracellular conductivity in mS/cm (uniform for simplicity)
+    pc : instance of h.ParallelContext()
+        ParallelContext instance for running in parallel
+    method : str
+        'psa' (default), i.e., point source approximation or line source
+        approximation, i.e., 'lsa'
 
     Attributes
     ----------
@@ -53,9 +60,11 @@ class LFPElectrode:
         The LFP time instances.
     lfp_v : instance of h.Vector
         The LFP voltage.
+    imem_vec : instance of h.Vector
+        The transmembrane ionic current.
     """
 
-    def __init__(self, coord, sigma=3.0, pc=None, usePoint=True):
+    def __init__(self, coord, sigma=3.0, pc=None, method='psa'):
 
         # see http://jn.physiology.org/content/104/6/3388.long shows table of 
         # values with conductivity
@@ -69,6 +78,7 @@ class LFPElectrode:
         self.rx = None
         self.bscallback = None
         self.fih = None
+        self.method = method
 
         if pc is None:
             self.pc = h.ParallelContext()
@@ -82,42 +92,48 @@ class LFPElectrode:
         self.bscallback = h.cvode.extra_scatter_gather(0, self.callback)
         fih = h.FInitializeHandler(1, self.LFPinit)
 
-    def transfer_resistance(self, exyz, usePoint=True):
+    def transfer_resistance(self, exyz, method):
         """Transfer resistance.
 
         Parameters
         ----------
         exyz : list (x, y, z)
             The x, y, z coordinates of the electrode.
-        usePoint : bool
-            ???
+        use_point : bool
+            Whether to do a point source approximation
+            for extracellular currents.
 
         Returns
         -------
         vres : instance of h.Vector
-            The transfer resistance.
+            The resistance.
         """
+        import numpy as np
+
         vres = h.Vector()
+
         lsec = getallSections()
         for s in lsec:
 
+            # get midpoint of compartment
             x = (h.x3d(0, sec=s) + h.x3d(1, sec=s)) / 2.0
             y = (h.y3d(0, sec=s) + h.y3d(1, sec=s)) / 2.0
             z = (h.z3d(0, sec=s) + h.z3d(1, sec=s)) / 2.0
 
             sigma = self.sigma
 
+            # distance from compartment to electrode
             dis = sqrt((exyz[0] - x) ** 2 + (exyz[1] - y) ** 2 + (exyz[2] - z) ** 2)
 
             # setting radius limit
             if dis < s.diam / 2.0:
                 dis = s.diam / 2.0 + 0.1
 
-            if usePoint:
+            if method == 'psa':
                 # x10000 for units of microV : nA/(microm*(mS/cm)) -> microV
                 point_part1 = 10000.0 * (1.0 / (4.0 * pi * dis * sigma))
                 vres.append(point_part1)
-            else:
+            elif method == 'lsa':
                 # calculate length of the compartment
                 dist_comp_x = (h.x3d(1, sec=s) - h.x3d(0, sec=s))
                 dist_comp_y = (h.y3d(1, sec=s) - h.y3d(0, sec=s))
@@ -126,24 +142,27 @@ class LFPElectrode:
                 sum_dist_comp = sqrt(
                     dist_comp_x**2 + dist_comp_y**2 + dist_comp_z**2)
 
-                # print "sum_dist_comp=",sum_dist_comp, secname()
-
-                #  setting radius limit
+                # setting radius limit
                 if sum_dist_comp < s.diam / 2.0:
                     sum_dist_comp = s.diam / 2.0 + 0.1
 
+                # longitudinal distance "h" from end of line
+                # if a = distance from electrode to end of compartment
+                # h = a.cos(theta) = a.dot(h) / |a|
                 long_dist_x = exyz[0] - h.x3d(1, sec=s)
                 long_dist_y = exyz[1] - h.y3d(1, sec=s)
                 long_dist_z = exyz[2] - h.z3d(1, sec=s)
 
+                # a.dot(b) / |a|
                 sum_HH = long_dist_x * dist_comp_x + long_dist_y * \
                     dist_comp_y + long_dist_z * dist_comp_z
-
                 final_sum_HH = sum_HH / sum_dist_comp
 
+                # pythagoras theorem, r^2 = a^2 - h^2
                 sum_temp1 = long_dist_x**2 + long_dist_y**2 + long_dist_z**2
-                r_sq = sum_temp1 - (final_sum_HH * final_sum_HH)
+                r_sq = sum_temp1 - final_sum_HH ** 2
 
+                # h + a ??
                 Length_vector = final_sum_HH + sum_dist_comp
 
                 if final_sum_HH < 0 and Length_vector <= 0:
@@ -165,17 +184,17 @@ class LFPElectrode:
 
     def LFPinit(self):
         lsec = getallSections()
-        n = len(lsec)
-        # print('In LFPinit - pc.id = ',self.pc.id(),'len(lsec)=',n)
-        self.imem_ptrvec = h.PtrVector(n)
-        self.imem_vec = h.Vector(n)
+        n_sections = len(lsec)
+
+        self.imem_ptrvec = h.PtrVector(n_sections)
+        self.imem_vec = h.Vector(n_sections)
         for i, s in enumerate(lsec):
             seg = s(0.5)
             # for seg in s # so do not need to use segments...?
             # more accurate to use segments and their neighbors
             self.imem_ptrvec.pset(i, seg._ref_i_membrane_)
 
-        self.vres = self.transfer_resistance(self.coord)
+        self.vres = self.transfer_resistance(self.coord, method=self.method)
         self.lfp_t = h.Vector()
         self.lfp_v = h.Vector()
 
@@ -195,9 +214,6 @@ class LFPElectrode:
         # append to Vector
         self.lfp_t.append(self.pc.t(0))
         self.lfp_v.append(val)
-
-    def lfp_final(self):
-        self.pc.allreduce(self.lfp_v, 1)
 
 
 if __name__ == '__main__':
@@ -224,6 +240,6 @@ if __name__ == '__main__':
     elec.setup()
     elec.LFPinit()
     h.run()
-    elec.lfp_final()
-    plt.ion()
+    elec.pc.allreduce(elec.lfp_v, 1)
+
     plt.plot(elec.lfp_t.to_python(), elec.lfp_v.to_python())
