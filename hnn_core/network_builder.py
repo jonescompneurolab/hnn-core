@@ -465,62 +465,69 @@ class NetworkBuilder(object):
 
         # source of synapse is always at soma
         # target = L2 Pyramidal cells
+        target_cell = 'L2Pyr'
         nc_dict['lamtha'] = 3.
         nc_dict['A_weight'] = params[f'gbar_L2Pyr_L2Pyr_nmda']
-        self._connect_celltypes('L2Pyr', 'L2Pyr', 'proximal', 'nmda',
+        self._connect_celltypes('L2Pyr', target_cell, 'proximal', 'nmda',
                                 nc_dict)
         
         nc_dict['A_weight'] = params[f'gbar_L2Pyr_L2Pyr_ampa']
-        self._connect_celltypes('L2Pyr', 'L2Pyr', 'proximal', 'ampa',
+        self._connect_celltypes('L2Pyr', target_cell, 'proximal', 'ampa',
                                 nc_dict)
 
         nc_dict['lamtha'] = 50.
         nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_gabaa']
-        self._connect_celltypes('L2Basket', 'L2Pyr', 'soma', 'gabaa', nc_dict)
+        self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabaa',
+                                nc_dict)
         nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_gabab']
-        self._connect_celltypes('L2Basket', 'L2Pyr', 'soma', 'gabab', nc_dict)
+        self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabab',
+                                nc_dict)
 
         # target = L5 Pyramidal cells
+        target_cell = 'L5Pyr'
         nc_dict['lamtha'] = 3.
         nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Pyr_nmda']
-        self._connect_celltypes('L5Pyr', 'L5Pyr', 'proximal', 'nmda',
+        self._connect_celltypes('L5Pyr', target_cell, 'proximal', 'nmda',
                                 nc_dict)
         nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Pyr_ampa']
-        self._connect_celltypes('L5Pyr', 'L5Pyr', 'proximal', 'ampa',
+        self._connect_celltypes('L5Pyr', target_cell, 'proximal', 'ampa',
                                 nc_dict)
     
         nc_dict['lamtha'] = 70.
-        self._connect_celltypes('L5Basket', 'L5Pyr', 'soma', 'gabaa',
+        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Basket_gabaa']
+        self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabaa',
                                 nc_dict)
-        self._connect_celltypes('L5Basket', 'L5Pyr', 'soma', 'gabab',
+        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Basket_gabab']
+        self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabab',
                                 nc_dict)
 
         nc_dict['lamtha'] = 3.
-        self._connect_celltypes('L2Pyr', 'L5Pyr', 'proximal', 'ampa',
+        self._connect_celltypes('L2Pyr', target_cell, 'proximal', 'ampa',
                                 nc_dict)
-        self._connect_celltypes('L2Pyr', 'L5Pyr', 'distal', 'ampa',
+        self._connect_celltypes('L2Pyr', target_cell, 'distal', 'ampa',
                                 nc_dict)
         nc_dict['lamtha'] = 50.
-        self._connect_celltypes('L2Basket', 'L5Pyr', 'proximal', 'ampa',
+        self._connect_celltypes('L2Basket', target_cell, 'proximal', 'ampa',
                                 nc_dict)
-        self._connect_celltypes('L2Basket', 'L5Pyr', 'distal', 'ampa',
+        self._connect_celltypes('L2Basket', target_cell, 'distal', 'ampa',
                                 nc_dict)
 
         # target = L2 Basket cells
+        target_cell = 'L2Basket'
         nc_dict['lamtha'] = 3.
-        self._connect_celltypes('L2Pyr', 'L2Pyr', 'soma', 'ampa',
+        self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
-        self._connect_celltypes('L2Basket', 'L2Basket', 'soma', 'gabaa',
+        self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabaa',
                                 nc_dict)
 
         # target = L5 Basket cells
         nc_dict['lamtha'] = 20.
-        self._connect_celltypes('L5Basket', 'L5Basket', 'soma', 'gabaa',
+        self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabaa',
                                 nc_dict)
         nc_dict['lamtha'] = 3.
-        self._connect_celltypes('L5Pyr', 'L5Pyr', 'soma', 'ampa',
+        self._connect_celltypes('L5Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
-        self._connect_celltypes('L2Pyr', 'L2Pyr', 'soma', 'ampa',
+        self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
     
         # source = common feed
