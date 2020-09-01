@@ -217,18 +217,22 @@ if __name__ == '__main__':
     ns.number = 10
     ns.start = 100
     ns.interval = 50.0
+    ns.noise = 0.  # deterministic
 
     nc = h.NetCon(ns, cell.synapses['apicaltuft_ampa'])
     nc.weight[0] = 0.001
 
     h.tstop = 2000.0
 
-    elec = LFPElectrode([0, 100.0, 100.0], pc=h.ParallelContext(),
-                        method='lsa')
-    elec.setup()
-    elec.LFPinit()
-    h.run()
-    elec.pc.allreduce(elec.lfp_v, 1)
+    for method in ['lsa', 'psa']:
+        elec = LFPElectrode([0, 100.0, 100.0], pc=h.ParallelContext(),
+                            method='psa')
+        elec.setup()
+        elec.LFPinit()
+        h.run()
+        elec.pc.allreduce(elec.lfp_v, 1)
 
-    plt.plot(elec.lfp_t.to_python(), elec.lfp_v.to_python())
+        plt.plot(elec.lfp_t.to_python(), elec.lfp_v.to_python(),
+                 label=method)
+    plt.legend()
     plt.show()
