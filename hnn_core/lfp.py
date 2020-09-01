@@ -27,7 +27,6 @@ and Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65
 """
 
 from neuron import h
-from math import sqrt, log, pi, exp
 
 import matplotlib.pyplot as plt
 
@@ -109,77 +108,68 @@ class LFPElectrode:
             The resistance.
         """
         import numpy as np
+        from numpy.linalg import norm
 
         vres = h.Vector()
-
         lsec = getallSections()
+        sigma = self.sigma
+
+        exyz = np.array(exyz)  # electrode position
+
         for s in lsec:
 
-            # get midpoint of compartment
-            x = (h.x3d(0, sec=s) + h.x3d(1, sec=s)) / 2.0
-            y = (h.y3d(0, sec=s) + h.y3d(1, sec=s)) / 2.0
-            z = (h.z3d(0, sec=s) + h.z3d(1, sec=s)) / 2.0
-
-            sigma = self.sigma
-
-            # distance from compartment to electrode
-            dis = sqrt((exyz[0] - x) ** 2 + (exyz[1] - y) ** 2 + (exyz[2] - z) ** 2)
-
-            # setting radius limit
-            if dis < s.diam / 2.0:
-                dis = s.diam / 2.0 + 0.1
+            start = np.array([s.x3d(0), s.y3d(0), s.z3d(0)])
+            end = np.array([s.x3d(1), s.y3d(1), s.z3d(1)])
+            mid = (start + end) / 2.
 
             if method == 'psa':
-                # x10000 for units of microV : nA/(microm*(mS/cm)) -> microV
-                point_part1 = 10000.0 * (1.0 / (4.0 * pi * dis * sigma))
-                vres.append(point_part1)
-            elif method == 'lsa':
-                # calculate length of the compartment
-                dist_comp_x = (h.x3d(1, sec=s) - h.x3d(0, sec=s))
-                dist_comp_y = (h.y3d(1, sec=s) - h.y3d(0, sec=s))
-                dist_comp_z = (h.z3d(1, sec=s) - h.z3d(0, sec=s))
 
-                sum_dist_comp = sqrt(
-                    dist_comp_x**2 + dist_comp_y**2 + dist_comp_z**2)
+                # distance from compartment to electrode
+                dis = norm(exyz - mid)
 
                 # setting radius limit
-                if sum_dist_comp < s.diam / 2.0:
-                    sum_dist_comp = s.diam / 2.0 + 0.1
+                if dis < s.diam / 2.0:
+                    dis = s.diam / 2.0 + 0.1
+                
+                phi = 1. / dis
 
-                # longitudinal distance "h" from end of line
-                # if a = distance from electrode to end of compartment
-                # h = a.cos(theta) = a.dot(h) / |a|
-                long_dist_x = exyz[0] - h.x3d(1, sec=s)
-                long_dist_y = exyz[1] - h.y3d(1, sec=s)
-                long_dist_z = exyz[2] - h.z3d(1, sec=s)
+            elif method == 'lsa':
+                # calculate length of the compartment
+                a = end - start
+                dis = norm(a)
 
-                # a.dot(b) / |a|
-                sum_HH = long_dist_x * dist_comp_x + long_dist_y * \
-                    dist_comp_y + long_dist_z * dist_comp_z
-                final_sum_HH = sum_HH / sum_dist_comp
+                # setting radius limit
+                if dis < s.diam / 2.0:
+                    dis = s.diam / 2.0 + 0.1
 
-                # pythagoras theorem, r^2 = a^2 - h^2
-                sum_temp1 = long_dist_x**2 + long_dist_y**2 + long_dist_z**2
-                r_sq = sum_temp1 - final_sum_HH ** 2
+                # if a = position vector of end with respect to start
+                #    b = position vector of electrode with respect to end
+                #
+                # we want to compute the length of projection of "a"
+                # "b".
+                # H = a.cos(theta) = a.dot(b) / |a|
+                a = end - start
+                b = exyz - end
+                H = a.dot(b) / dis
 
-                # h + a ??
-                Length_vector = final_sum_HH + sum_dist_comp
+                # total longitudinal distance from start of compartment
+                L = H + dis
 
-                if final_sum_HH < 0 and Length_vector <= 0:
-                    phi = log((sqrt(final_sum_HH**2 + r_sq) - final_sum_HH) /
-                              (sqrt(Length_vector**2 + r_sq) - Length_vector))
-                elif final_sum_HH > 0 and Length_vector > 0:
-                    phi = log((sqrt(Length_vector**2 + r_sq) + Length_vector) /
-                              (sqrt(final_sum_HH**2 + r_sq) + final_sum_HH))
-                else:
-                    phi = log(((sqrt(Length_vector**2 + r_sq) + Length_vector) *
-                               (sqrt(final_sum_HH**2 + r_sq) - final_sum_HH)) / r_sq)
+                # if a.dot(b) < 0, projection will fall on the
+                # compartment.
+                if H < 0:
+                    H = -H
 
-                # x10000 for units of microV
-                line_part1 = 10000.0 * \
-                    (1.0 / (4.0 * pi * sum_dist_comp * sigma) * phi)
-                vres.append(line_part1)
+                # distance ^ 2 of electrode to end
+                r_sq = np.linalg.norm(exyz - end) ** 2
 
+                # phi
+                num = np.sqrt(H ** 2 + r_sq) - H
+                denom = np.sqrt(H ** 2 + r_sq) - L
+                phi = 1. / dis * np.log(num / denom)
+
+            # x10000 for units of microV : nA/(microm*(mS/cm)) -> microV
+            vres.append(10000.0 * phi / (4.0 * np.pi * sigma))
         return vres
 
     def LFPinit(self):
@@ -236,10 +226,12 @@ if __name__ == '__main__':
 
     h.tstop = 2000.0
 
-    elec = LFPElectrode([0, 100.0, 100.0], pc=h.ParallelContext())
+    elec = LFPElectrode([0, 100.0, 100.0], pc=h.ParallelContext(),
+                        method='psa')
     elec.setup()
     elec.LFPinit()
     h.run()
     elec.pc.allreduce(elec.lfp_v, 1)
 
     plt.plot(elec.lfp_t.to_python(), elec.lfp_v.to_python())
+    plt.show()
