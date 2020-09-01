@@ -248,11 +248,10 @@ class _Cell(object):
         # NEW: note that default/original is 0 nmda weight
         # for the proximal dends
         for receptor in receptors:
-            if nc_dict[receptor]['A_weight'] > 0.:
-                self._connect_feed_at_loc(
-                    feed_loc=p_ext['loc'], receptor=receptor,
-                    gid_src=gid_src, nc_dict=nc_dict[receptor],
-                    nc_list=self.ncfrom_unique)
+            self._connect_feed_at_loc(
+                feed_loc=p_ext['loc'], receptor=receptor,
+                gid_src=gid_src, nc_dict=nc_dict[receptor],
+                nc_list=self.ncfrom_unique)
 
     # receive from common inputs
     # XXX check NetCon connections for proximal inputs with zero weights
