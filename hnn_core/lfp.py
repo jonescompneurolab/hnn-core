@@ -46,6 +46,13 @@ class LFPElectrode:
     ----------
     sigma : float
         Extracellular conductivity in mS/cm (uniform for simplicity)
+
+    Attributes
+    ----------
+    lfp_t : instance of h.Vector
+        The LFP time instances.
+    lfp_v : instance of h.Vector
+        The LFP voltage.
     """
 
     def __init__(self, coord, sigma=3.0, pc=None, usePoint=True):
@@ -192,26 +199,8 @@ class LFPElectrode:
     def lfp_final(self):
         self.pc.allreduce(self.lfp_v, 1)
 
-    def lfpout(self, fn='LFP.txt', append=False, tvec=None):
-        fmode = 'w'
-        if append:
-            fmode = 'a'
-        if int(self.pc.id()) == 0:
-            print('len(lfp_t) is %d' % len(self.lfp_t))
-            f = open(fn, fmode)
-            if tvec is None:
-                for i in range(1, len(self.lfp_t), 1):
-                    line = '%g' % self.lfp_v.x[i]
-                    f.write(line + '\n')
-            else:
-                for i in range(1, len(self.lfp_t), 1):
-                    line = '%g' % self.lfp_t.x[i]
-                    line += ' %g' % self.lfp_v.x[i]
-                    f.write(line + '\n')
-            f.close()
 
-
-def test():
+if __name__ == '__main__':
     from hnn_core.pyramidal import L5Pyr
     from hnn_core.network_builder import load_custom_mechanisms
 
@@ -237,8 +226,4 @@ def test():
     h.run()
     elec.lfp_final()
     plt.ion()
-    plt.plot(elec.lfp_t, elec.lfp_v)
-
-
-if __name__ == '__main__':
-    test()
+    plt.plot(elec.lfp_t.to_python(), elec.lfp_v.to_python())
