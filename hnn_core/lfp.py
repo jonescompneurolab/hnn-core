@@ -17,6 +17,13 @@ www.amrita.edu/compneuro
 
 translated to Python and modified to use use_fast_imem by Sam Neymotin
 based on mhines code
+
+References
+----------
+1 . Parasuram H, Nair B, D'Angelo E, Hines M, Naldi G, Diwakar S (2016)
+Computational Modeling of Single Neuron Extracellular Electric Potentials
+and Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65
+[PubMed].
 """
 
 from neuron import h
@@ -30,34 +37,6 @@ def getallSections(ty='Pyr'):
     ls = h.allsec()
     ls = [s for s in ls if s.name().count(ty) > 0 or len(ty) == 0]
     return ls
-
-
-def getcoordinf(s):
-    lcoord = []
-    ldist = []
-    lend = []
-    lsegloc = []
-    if s.nseg == 1:
-        i = 1
-        x0, y0, z0 = s.x3d(i - 1, sec=s), s.y3d(i - 1,
-                                                sec=s), s.z3d(i - 1, sec=s)
-        x1, y1, z1 = s.x3d(i, sec=s), s.y3d(i, sec=s), s.z3d(i, sec=s)
-        lcoord.append([(x0 + x1) / 2.0, (y0 + y1) / 2.0, (z0 + z1) / 2.0])
-        dist = sqrt((x1 - x0)**2 + (y1 - y0)**2 + (z1 - z0)**2)
-        ldist.append(dist)
-        lend.append([x1, y1, z1])
-        lsegloc.append(0.5)
-    else:
-        for i in range(1, s.n3d(), 1):
-            x0, y0, z0 = s.x3d(i - 1, sec=s), s.y3d(i - 1,
-                                                    sec=s), s.z3d(i - 1, sec=s)
-            x1, y1, z1 = s.x3d(i, sec=s), s.y3d(i, sec=s), s.z3d(i, sec=s)
-            lcoord.append([(x0 + x1) / 2., (y0 + y1) / 2., (z0 + z1) / 2.])
-            dist = sqrt((x1 - x0)**2 + (y1 - y0)**2 + (z1 - z0)**2)
-            ldist.append(dist)
-            lend.append([x1, y1, z1])
-            lsegloc.append()
-    return lcoord, ldist, lend, lsegloc
 
 
 class LFPElectrode:
@@ -90,13 +69,27 @@ class LFPElectrode:
             self.pc = pc
 
     def setup(self):
-        # enables fast calculation of transmembrane current (nA) at each segment
+        """Enables fast calculation of transmembrane current (nA) at
+           each segment."""
         h.cvode.use_fast_imem(1)
-        self.bscallback = h.beforestep_callback(h.cas()(.5))
-        self.bscallback.set_callback(self.callback)
+        self.bscallback = h.cvode.extra_scatter_gather(0, self.callback)
         fih = h.FInitializeHandler(1, self.LFPinit)
 
     def transfer_resistance(self, exyz, usePoint=True):
+        """Transfer resistance.
+
+        Parameters
+        ----------
+        exyz : list (x, y, z)
+            The x, y, z coordinates of the electrode.
+        usePoint : bool
+            ???
+
+        Returns
+        -------
+        vres : instance of h.Vector
+            The transfer resistance.
+        """
         vres = h.Vector()
         lsec = getallSections()
         for s in lsec:
@@ -107,11 +100,11 @@ class LFPElectrode:
 
             sigma = self.sigma
 
-            dis = sqrt((exyz[0] - x)**2 + (exyz[1] - y)**2 + (exyz[2] - z)**2)
+            dis = sqrt((exyz[0] - x) ** 2 + (exyz[1] - y) ** 2 + (exyz[2] - z) ** 2)
 
             # setting radius limit
-            if(dis < (s.diam / 2.0)):
-                dis = (s.diam / 2.0) + 0.1
+            if dis < s.diam / 2.0:
+                dis = s.diam / 2.0 + 0.1
 
             if usePoint:
                 # x10000 for units of microV : nA/(microm*(mS/cm)) -> microV
@@ -249,11 +242,3 @@ def test():
 
 if __name__ == '__main__':
     test()
-
-    """
-  for i in range(len(lfp_t)):
-    print(lfp_t.x[i],)
-    for j in range(nelectrode):
-      print(lfp_v[j].x[i],)
-    print("")
-  """
