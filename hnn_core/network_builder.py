@@ -463,6 +463,7 @@ class NetworkBuilder(object):
             'threshold': params['threshold'],
         }
 
+        # source of synapse is always at soma
         # target = L2 Pyramidal cells
         nc_dict['lamtha'] = 3.
         nc_dict['A_weight'] = params[f'gbar_L2Pyr_L2Pyr_nmda']
@@ -493,12 +494,35 @@ class NetworkBuilder(object):
                                 nc_dict)
         self._connect_celltypes('L5Basket', 'L5Pyr', 'soma', 'gabab',
                                 nc_dict)
-        self._connect_celltypes('L2Pyr', 'L5Pyr', 'soma', 'gabab',
+
+        nc_dict['lamtha'] = 3.
+        self._connect_celltypes('L2Pyr', 'L5Pyr', 'proximal', 'ampa',
+                                nc_dict)
+        self._connect_celltypes('L2Pyr', 'L5Pyr', 'distal', 'ampa',
+                                nc_dict)
+        nc_dict['lamtha'] = 50.
+        self._connect_celltypes('L2Basket', 'L5Pyr', 'proximal', 'ampa',
+                                nc_dict)
+        self._connect_celltypes('L2Basket', 'L5Pyr', 'distal', 'ampa',
                                 nc_dict)
 
         # target = L2 Basket cells
-        # target = L5 Basket cells
+        nc_dict['lamtha'] = 3.
+        self._connect_celltypes('L2Pyr', 'L2Pyr', 'soma', 'ampa',
+                                nc_dict)
+        self._connect_celltypes('L2Basket', 'L2Basket', 'soma', 'gabaa',
+                                nc_dict)
 
+        # target = L5 Basket cells
+        nc_dict['lamtha'] = 20.
+        self._connect_celltypes('L5Basket', 'L5Basket', 'soma', 'gabaa',
+                                nc_dict)
+        nc_dict['lamtha'] = 3.
+        self._connect_celltypes('L5Pyr', 'L5Pyr', 'soma', 'ampa',
+                                nc_dict)
+        self._connect_celltypes('L2Pyr', 'L2Pyr', 'soma', 'ampa',
+                                nc_dict)
+    
         # source = common feed
         self._connect_celltypes('common', 'L2Basket', 'proximal', 'ampa',
                                 nc_dict)
