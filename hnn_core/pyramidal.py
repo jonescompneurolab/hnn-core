@@ -662,23 +662,3 @@ class L5Pyr(Pyr):
                 seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
 
             h.pop_section()
-
-    # parallel connection function FROM all cell types TO here
-    def parconnect(self, gid, gid_dict, pos_dict, p):
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_basket', 'L5Basket', lamtha=70., receptor='gabaa',
-                      postsyns=[self.synapses['soma_gabaa']])
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L5_basket', 'L5Basket', lamtha=70., receptor='gabab',
-                      postsyns=[self.synapses['soma_gabab']])
-
-        postsyns = [self.synapses['basal2_ampa'],
-                    self.synapses['basal3_ampa'],
-                    self.synapses['apicaltuft_ampa'],
-                    self.synapses['apicaloblique_ampa']]
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_pyramidal', 'L2Pyr', lamtha=3., postsyns=postsyns)
-
-        self._connect(gid, gid_dict, pos_dict, p,
-                      'L2_basket', 'L2Basket', lamtha=50.,
-                      postsyns=[self.synapses['apicaltuft_gabaa']])

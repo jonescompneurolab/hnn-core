@@ -70,14 +70,6 @@ class L2Basket(BasketSingle):
         self._biophysics()
         self.sect_loc = dict(proximal=['soma'], distal=['soma'])
 
-    # par connect between all presynaptic cells
-    # no connections from L5Pyr or L5Basket to L2Baskets
-    def parconnect(self, gid, gid_dict, pos_dict, p):
-        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr',
-                      postsyns=[self.synapses['soma_ampa']])
-        self._connect(gid, gid_dict, pos_dict, p, 'L2_basket', 'L2Basket',
-                      lamtha=20., postsyns=[self.synapses['soma_gabaa']])
-
 
 class L5Basket(BasketSingle):
     """Class for layer 5 basket cells."""
@@ -90,14 +82,3 @@ class L5Basket(BasketSingle):
         self._synapse_create()
         self._biophysics()
         self.sect_loc = dict(proximal=['soma'], distal=[])
-
-    # connections FROM other cells TO this cell
-    # there are no connections from the L2Basket cells. congrats!
-    def parconnect(self, gid, gid_dict, pos_dict, p):
-        self._connect(gid, gid_dict, pos_dict, p, 'L5_basket', 'L5Basket',
-                      lamtha=20., autapses=False,
-                      postsyns=[self.synapses['soma_gabaa']])
-        self._connect(gid, gid_dict, pos_dict, p, 'L5_pyramidal', 'L5Pyr',
-                      postsyns=[self.synapses['soma_ampa']])
-        self._connect(gid, gid_dict, pos_dict, p, 'L2_pyramidal', 'L2Pyr',
-                      postsyns=[self.synapses['soma_ampa']])
