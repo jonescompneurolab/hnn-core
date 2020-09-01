@@ -464,42 +464,28 @@ class NetworkBuilder(object):
         }
 
         # source of synapse is always at soma
-        # target = L2 Pyramidal cells
-        target_cell = 'L2Pyr'
+        # First, all to all connectivity between
+        # layer 2 and layer 5 Pyramidal cells
         nc_dict['lamtha'] = 3.
-        nc_dict['A_weight'] = params[f'gbar_L2Pyr_L2Pyr_nmda']
-        self._connect_celltypes('L2Pyr', target_cell, 'proximal', 'nmda',
-                                nc_dict)
-        
-        nc_dict['A_weight'] = params[f'gbar_L2Pyr_L2Pyr_ampa']
-        self._connect_celltypes('L2Pyr', target_cell, 'proximal', 'ampa',
-                                nc_dict)
+        for target_cell in ['L2Pyr', 'L5Pyr']:
+            for receptor in ['nmda', 'ampa']:
+                nc_dict['A_weight'] = params[f'gbar_{target_cell}_{target_cell}_{receptor}']
+                self._connect_celltypes({target_cell}, target_cell, 'proximal',
+                                        receptor, nc_dict)
 
+        # target = L2 Pyramidal cells
         nc_dict['lamtha'] = 50.
-        nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_gabaa']
-        self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabaa',
-                                nc_dict)
-        nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_gabab']
-        self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabab',
-                                nc_dict)
+        for receptor in ['gabaa', 'gabab']:
+            nc_dict['A_weight'] = params[f'gbar_L2Basket_{target_cell}_{receptor}']
+            self._connect_celltypes('L2Basket', target_cell, 'soma', receptor,
+                                    nc_dict)
 
         # target = L5 Pyramidal cells
-        target_cell = 'L5Pyr'
-        nc_dict['lamtha'] = 3.
-        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Pyr_nmda']
-        self._connect_celltypes('L5Pyr', target_cell, 'proximal', 'nmda',
-                                nc_dict)
-        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Pyr_ampa']
-        self._connect_celltypes('L5Pyr', target_cell, 'proximal', 'ampa',
-                                nc_dict)
-    
         nc_dict['lamtha'] = 70.
-        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Basket_gabaa']
-        self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabaa',
-                                nc_dict)
-        nc_dict['A_weight'] = params[f'gbar_L5Pyr_L5Basket_gabab']
-        self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabab',
-                                nc_dict)
+        for receptor in ['gabaa', 'gabab']:
+            nc_dict['A_weight'] = params[f'gbar_L5Basket_{target_cell}_{receptor}']
+            self._connect_celltypes('L5Basket', target_cell, 'soma', receptor,
+                                    nc_dict)
 
         nc_dict['lamtha'] = 3.
         self._connect_celltypes('L2Pyr', target_cell, 'proximal', 'ampa',
