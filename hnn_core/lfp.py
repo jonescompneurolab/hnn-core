@@ -31,10 +31,9 @@ from neuron import h
 import matplotlib.pyplot as plt
 
 
-# get all Sections
-def getallSections(ty='Pyr'):
+def get_all_sections(sec_type='Pyr'):
     ls = h.allsec()
-    ls = [s for s in ls if s.name().count(ty) > 0 or len(ty) == 0]
+    ls = [s for s in ls if sec_type in s.name()]
     return ls
 
 
@@ -70,11 +69,9 @@ class LFPElectrode:
         self.sigma = sigma
         self.coord = coord
         self.vres = None
-        self.vx = None
 
         self.imem_ptrvec = None
         self.imem_vec = None
-        self.rx = None
         self.bscallback = None
         self.fih = None
         self.method = method
@@ -111,7 +108,7 @@ class LFPElectrode:
         from numpy.linalg import norm
 
         vres = h.Vector()
-        lsec = getallSections()
+        lsec = get_all_sections()
         sigma = self.sigma
 
         exyz = np.array(exyz)  # electrode position
@@ -130,7 +127,7 @@ class LFPElectrode:
                 # setting radius limit
                 if dis < s.diam / 2.0:
                     dis = s.diam / 2.0 + 0.1
-                
+
                 phi = 1. / dis
 
             elif method == 'lsa':
@@ -173,7 +170,7 @@ class LFPElectrode:
         return vres
 
     def LFPinit(self):
-        lsec = getallSections()
+        lsec = get_all_sections()
         n_sections = len(lsec)
 
         self.imem_ptrvec = h.PtrVector(n_sections)
@@ -227,7 +224,7 @@ if __name__ == '__main__':
     h.tstop = 2000.0
 
     elec = LFPElectrode([0, 100.0, 100.0], pc=h.ParallelContext(),
-                        method='psa')
+                        method='lsa')
     elec.setup()
     elec.LFPinit()
     h.run()
