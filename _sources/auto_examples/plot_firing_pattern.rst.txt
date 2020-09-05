@@ -207,7 +207,7 @@ Let's do this for the rest of the cell types with a new NetworkBuilder object
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  36.366 seconds)
+   **Total running time of the script:** ( 0 minutes  49.647 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:
@@ -221,7 +221,7 @@ Let's do this for the rest of the cell types with a new NetworkBuilder object
 
   .. container:: binder-badge
 
-    .. image:: https://mybinder.org/badge_logo.svg
+    .. image:: /../../miniconda/envs/testenv/lib/python3.6/site-packages/sphinx_gallery/_static/binder_badge_logo.svg
       :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_firing_pattern.ipynb
       :width: 150 px
 
