@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+import platform
 import os.path as op
 import os
 import subprocess
@@ -20,6 +21,7 @@ LICENSE = 'BSD (3-clause)'
 DOWNLOAD_URL = 'http://github.com/jonescompneurolab/hnn-core'
 VERSION = '0.1.dev0'
 
+
 # test install with:
 # $ rm -rf hnn_core/mod/x86_64/
 # $ python setup.py clean --all install
@@ -40,9 +42,15 @@ class BuildMod(Command):
     def run(self):
         print("=> Building mod files ...")
         mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
+
+        if platform.system() == 'Windows':
+            shell = True
+        else:
+            shell = False
+
         process = subprocess.Popen(['nrnivmodl'], cwd=mod_path,
                                    stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+                                   stderr=subprocess.PIPE, shell=shell)
         outs, errs = process.communicate()
         print(outs)
 
