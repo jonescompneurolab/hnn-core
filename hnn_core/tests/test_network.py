@@ -88,7 +88,8 @@ def test_spikes(tmpdir):
     spiketimes = [[2.3456, 7.89], [4.2812, 93.2]]
     spikegids = [[1, 3], [5, 7]]
     spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
-    spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
+    spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes,
+                    tstart=0.1, tstop=98.4)
     spikes.plot_hist(show=False)
     spikes.write(tmpdir.join('spk_%d.txt'))
     assert spikes == read_spikes(tmpdir.join('spk_*.txt'))
@@ -97,15 +98,28 @@ def test_spikes(tmpdir):
 
     with pytest.raises(TypeError, match="times should be a list of lists"):
         spikes = Spikes(times=([2.3456, 7.89], [4.2812, 93.2]), gids=spikegids,
-                        types=spiketypes)
+                        types=spiketypes, tstart=0.1, tstop=98.4)
 
     with pytest.raises(TypeError, match="times should be a list of lists"):
-        spikes = Spikes(times=[1, 2], gids=spikegids, types=spiketypes)
+        spikes = Spikes(times=[1, 2], gids=spikegids, types=spiketypes,
+                        tstart=0.1, tstop=98.4)
 
     with pytest.raises(ValueError, match="times, gids, and types should be "
                        "lists of the same length"):
         spikes = Spikes(times=[[2.3456, 7.89]], gids=spikegids,
-                        types=spiketypes)
+                        types=spiketypes, tstart=0.1, tstop=98.4)
+
+    with pytest.raises(ValueError, match="tstart and tstop must be of type "
+                       "int or float"):
+        spikes = Spikes()
+        spikes.update_trial_bounds(tstart=0.1, tstop='ABC')
+
+    with pytest.raises(ValueError, match="tstop must be greater than tstart"):
+        spikes = Spikes()
+        spikes.update_trial_bounds(tstart=0.1, tstop=-1.0)
+
+    spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes,
+                    tstart=0.1, tstop=98.4)
 
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
