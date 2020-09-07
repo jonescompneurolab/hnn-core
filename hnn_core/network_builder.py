@@ -223,6 +223,14 @@ def _create_parallel_context(n_cores=None):
         _PC.done()
 
 
+def _long_name(short_name):
+    long_name = dict(L2Basket='L2_basket', L5Basket='L5_basket',
+                     L2Pyr='L2_pyramidal', L5Pyr='L5_pyramidal')
+    if short_name in long_name:
+        return long_name[short_name]
+    return short_name
+
+
 class NetworkBuilder(object):
     """The NetworkBuilder class.
 
@@ -446,25 +454,25 @@ class NetworkBuilder(object):
             A_delay, A_weight, lamtha, and threshold
         """
         self.ncs = list()
-        for gid_target in self.net.gid_dict[target_type]:
+        for gid_target in self.net.gid_dict[_long_name(target_type)]:
             if _PC.gid_exists(gid_target):
-                for gid_src in self.net.gid_dict[src_type]:
+                for gid_src in self.net.gid_dict[_long_name(src_type)]:
 
                     target_cell = self.cells[gid_target]
-                    nc_dict['pos_src'] = self.net.pos_dict[gid_src]
+                    pos_idx = gid_src - self.net.gid_dict[_long_name(src_type)][0]
+                    nc_dict['pos_src'] = self.net.pos_dict[_long_name(src_type)][pos_idx]
 
                     # get synapse locations
+                    syn_keys = list()
+                    if loc in ['proximal', 'distal']:
+                        for sect in target_cell.sect_loc[loc]:
+                            syn_keys.append(f'{sect}_{receptor}')
+                    else:
+                        syn_keys = [f'{loc}_{receptor}']
+
                     for syn_key in syn_keys:
-                        syn_keys = list()
-                        if loc in ['proximal', 'distal']:
-                            for sect in target_cell.sect_loc[loc]:
-                                syn_keys.append(f'{sect}_{receptor}')
-                        else:
-                            syn_keys = [f'{loc}_{receptor}']
-                            
                         nc = target_cell.parconnect_from_src(
-                            gid_src, nc_dict,
-                            target_cell.synapses[syn_key])
+                            gid_src, nc_dict, target_cell.synapses[syn_key])
                         self.ncs.append(nc)
 
     # connections:
@@ -526,6 +534,7 @@ class NetworkBuilder(object):
                                 nc_dict)
 
         # xx -> layer5 Basket
+        target_cell = 'L2Basket'
         nc_dict['lamtha'] = 20.
         self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabaa',
                                 nc_dict)
@@ -542,31 +551,35 @@ class NetworkBuilder(object):
                     if f'{target_cell_type}_{receptor}' in p_common.keys():
                         nc_dict['lamtha'] = p_common['lamtha']
                         nc_dict['A_weight'] = \
-                            p_common[f'gbar_{target_cell_type}_{receptor}'][0]
+                            p_common[f'{target_cell_type}_{receptor}'][0]
                         nc_dict['A_delay'] = \
-                            p_common[f'gbar_{target_cell_type}_{receptor}'][1]
+                            p_common[f'{target_cell_type}_{receptor}'][1]
                         self._connect_celltypes('common', target_cell_type,
-                                                p_common['loc'], receptor, nc_dict)
+                                                p_common['loc'], receptor,
+                                                nc_dict)
 
         # unique feed -> xx
         p_unique = self.net.p_unique
         for src_cell_type in p_unique:
 
             p_src = p_unique[src_cell_type]
-            if type.startswith(('evprox', 'evdist')) or type == 'extpois':
+            if src_cell_type.startswith(('evprox', 'evdist')) or src_cell_type == 'extpois':
                 receptors = ['ampa', 'nmda']
-            if type == 'extgauss':
+            if src_cell_type == 'extgauss':
                 receptors = ['ampa']
 
             for target_cell_type in ['L2Basket', 'L5Basket', 'L5Pyr', 'L2Pyr']:
+                # XXX: hack for distal connection
+                if target_cell_type == 'L5Basket' and p_src['loc'] == 'distal':
+                    continue
                 for receptor in receptors:
-                    nc_dict['A_delay'] = p_src[target_cell_type][2]
+                    nc_dict['A_delay'] = p_src[_long_name(target_cell_type)][2]
                     if receptor == 'ampa':
-                        nc_dict['A_weight'] = p_src[target_cell_type][0]
+                        nc_dict['A_weight'] = p_src[_long_name(target_cell_type)][0]
                     elif receptor == 'nmda':
-                        nc_dict['A_weight'] = p_src[target_cell_type][1]
+                        nc_dict['A_weight'] = p_src[_long_name(target_cell_type)][1]
                     self._connect_celltypes(src_cell_type, target_cell_type,
-                                            p_src, receptor, nc_dict)
+                                            p_src['loc'], receptor, nc_dict)
 
     # setup spike recording for this node
     def _record_spikes(self):

@@ -30,6 +30,7 @@ def test_cell():
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
+    """
     # test connecting feed at a location
     cell_params = get_L5Pyr_params_default()
     cell = L5Pyr(gid=0, pos=(0., 0., 0.), p=cell_params)
@@ -45,11 +46,12 @@ def test_cell():
     n_connections = dict(proximal=3, distal=1)
     for feed_type in n_connections:
         nc_list = []
-        cell._connect_feed_at_loc(feed_type, receptor='ampa', gid_src=gid_src,
-                                  nc_dict=nc_dict, nc_list=nc_list)
+        cell._connect_celltypes(feed_type, receptor='ampa', gid_src=gid_src,
+                                nc_dict=nc_dict, nc_list=nc_list)
         assert len(nc_list) == n_connections[feed_type]
         # XXX: poor man's type check since couldn't do isinstance(nc, h.NetCon)
         assert all(isinstance(nc, type(nc_list[0])) for nc in nc_list)
+    """
 
 
 def test_artificial_cell():
