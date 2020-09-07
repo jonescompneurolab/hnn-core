@@ -456,6 +456,10 @@ class Spikes(object):
         all_spike_gids = np.array(sum(self._gids, []))
         tstart, tstop = min(all_spike_times), max(all_spike_times)
 
+        if mean_type not in ['all', 'trial', 'cell']:
+            raise ValueError("Invalid mean_type. Valid arguments include "
+                             "'all', 'trial', or 'cell'.")
+
         for cell_type in cell_types:
             type_mask = np.in1d(all_spike_types, cell_type)
             cell_type_gids = np.unique(all_spike_gids[type_mask])

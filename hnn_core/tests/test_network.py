@@ -123,6 +123,10 @@ def test_spikes(tmpdir):
     with pytest.raises(ValueError, match="No input types found for ABC"):
         spikes.plot_hist(spike_types='ABC', show=False)
 
+    with pytest.raises(ValueError, match="Invalid mean_type. Valid "
+                       "arguments include 'all', 'trial', or 'cell'."):
+        spikes.mean_rates(mean_type='ABC')
+
     # Write spike file with no 'types' column
     # Check for gid_dict errors
     for fname in sorted(glob(str(tmpdir.join('spk_*.txt')))):
