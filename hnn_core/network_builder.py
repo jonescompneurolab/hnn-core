@@ -434,7 +434,7 @@ class NetworkBuilder(object):
                 _PC.cell(gid, feed_cell.nrn_netcon)
 
     def _connect_celltypes(self, src_type, target_type, loc,
-                           receptor, nc_dict):
+                           receptor, nc_dict, allow_autapses=True):
         """Connect two cell types for a particular receptor.
 
         Parameters
@@ -452,11 +452,16 @@ class NetworkBuilder(object):
         nc_dict : dict
             The connection dictionary containing keys
             A_delay, A_weight, lamtha, and threshold
+        allow_autapses : bool
+            If True, allow connecting neuron to itself.
         """
         self.ncs = list()
         for gid_target in self.net.gid_dict[_long_name(target_type)]:
             if _PC.gid_exists(gid_target):
                 for gid_src in self.net.gid_dict[_long_name(src_type)]:
+
+                    if not allow_autapses and gid_src == gid_target:
+                        continue
 
                     target_cell = self.cells[gid_target]
                     pos_idx = gid_src - self.net.gid_dict[_long_name(src_type)][0]
@@ -498,9 +503,11 @@ class NetworkBuilder(object):
                 key = f'gbar_{target_cell}_{target_cell}_{receptor}'
                 nc_dict['A_weight'] = params[key]
                 self._connect_celltypes(target_cell, target_cell, 'proximal',
-                                        receptor, nc_dict)
+                                        receptor, nc_dict,
+                                        allow_autapses=False)
 
-        # layer2 Pyr -> layer2 Basket
+        # layer2 Basket -> layer2 Pyr
+        target_cell = 'L2Pyr'
         nc_dict['lamtha'] = 50.
         for receptor in ['gabaa', 'gabab']:
             nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_{receptor}']
@@ -530,14 +537,15 @@ class NetworkBuilder(object):
         nc_dict['lamtha'] = 3.
         self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
+        nc_dict['lamtha'] = 20.
         self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabaa',
                                 nc_dict)
 
         # xx -> layer5 Basket
-        target_cell = 'L2Basket'
+        target_cell = 'L5Basket'
         nc_dict['lamtha'] = 20.
         self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabaa',
-                                nc_dict)
+                                nc_dict, allow_autapses=False)
         nc_dict['lamtha'] = 3.
         self._connect_celltypes('L5Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
