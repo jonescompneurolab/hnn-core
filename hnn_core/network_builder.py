@@ -455,7 +455,6 @@ class NetworkBuilder(object):
         allow_autapses : bool
             If True, allow connecting neuron to itself.
         """
-        self.ncs = list()
         for gid_target in self.net.gid_dict[_long_name(target_type)]:
             if _PC.gid_exists(gid_target):
                 for gid_src in self.net.gid_dict[_long_name(src_type)]:
@@ -487,6 +486,7 @@ class NetworkBuilder(object):
     # nc = pc.gid_connect(source_gid, target_syn), weight,delay
     # Both for synapses AND for external inputs
     def _parnet_connect(self):
+        self.ncs = list()
         params = self.net.params
         nc_dict = {
             'A_delay': 1.,
@@ -562,6 +562,8 @@ class NetworkBuilder(object):
         # common feed -> xx
         for p_common in self.net.p_common:
             for target_cell_type in ['L2Basket', 'L5Basket', 'L5Pyr', 'L2Pyr']:
+                if target_cell_type == 'L5Basket' and p_common['loc'] == 'distal':
+                    continue
                 for receptor in ['ampa', 'nmda']:
                     if f'{target_cell_type}_{receptor}' in p_common.keys():
                         nc_dict['lamtha'] = p_common['lamtha']
@@ -588,6 +590,7 @@ class NetworkBuilder(object):
                 if target_cell_type == 'L5Basket' and p_src['loc'] == 'distal':
                     continue
                 for receptor in receptors:
+                    nc_dict['lamtha'] = p_src['lamtha']
                     nc_dict['A_delay'] = p_src[_long_name(target_cell_type)][2]
                     if receptor == 'ampa':
                         nc_dict['A_weight'] = p_src[_long_name(target_cell_type)][0]
