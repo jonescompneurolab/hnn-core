@@ -514,7 +514,7 @@ class NetworkBuilder(object):
             self._connect_celltypes('L2Basket', target_cell, 'soma', receptor,
                                     nc_dict)
 
-        # layer5 Pyr -> layer5 Basket
+        # layer5 Basket -> layer5 Pyr
         target_cell = 'L5Pyr'
         nc_dict['lamtha'] = 70.
         for receptor in ['gabaa', 'gabab']:
@@ -525,30 +525,37 @@ class NetworkBuilder(object):
         # layer2 Pyr -> layer5 Pyr
         nc_dict['lamtha'] = 3.
         for loc in ['proximal', 'distal']:
+            nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
             self._connect_celltypes('L2Pyr', target_cell, loc, 'ampa',
                                     nc_dict)
         # layer2 Basket -> layer5 Pyr
         nc_dict['lamtha'] = 50.
+        nc_dict['A_weight'] = params[f'gbar_L2Basket_{target_cell}']
         self._connect_celltypes('L2Basket', target_cell, 'distal', 'gabaa',
                                 nc_dict)
 
         # xx -> layer2 Basket
         target_cell = 'L2Basket'
         nc_dict['lamtha'] = 3.
+        nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
         self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
         nc_dict['lamtha'] = 20.
+        nc_dict['A_weight'] = params[f'gbar_L2Basket_{target_cell}']
         self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabaa',
                                 nc_dict)
 
         # xx -> layer5 Basket
         target_cell = 'L5Basket'
         nc_dict['lamtha'] = 20.
+        nc_dict['A_weight'] = params[f'gbar_L5Basket_{target_cell}']
         self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabaa',
                                 nc_dict, allow_autapses=False)
         nc_dict['lamtha'] = 3.
+        nc_dict['A_weight'] = params[f'gbar_L5Pyr_{target_cell}']
         self._connect_celltypes('L5Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
+        nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
         self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
 
