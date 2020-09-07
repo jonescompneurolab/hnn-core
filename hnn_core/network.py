@@ -12,7 +12,7 @@ from .params import create_pext
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
-def read_spikes(fname, gid_dict=None):
+def read_spikes(fname, gid_dict=None, tstart=None, tstop=None):
     """Read spiking activity from a collection of spike trial files.
 
     Parameters
@@ -25,6 +25,8 @@ def read_spikes(fname, gid_dict=None):
         containing the range of Cell or input IDs of different
         cell or input types. If None, each spike file must contain
         a 3rd column for spike type.
+    tstart, tstop : float | None
+        Values defining the start and stop times of all trials.
 
     Returns
     ----------
@@ -35,27 +37,58 @@ def read_spikes(fname, gid_dict=None):
     spike_times = []
     spike_gids = []
     spike_types = []
+<<<<<<< HEAD
     for file in sorted(glob(str(fname))):
+=======
+    spike_tstart = []
+    spike_tstop = []
+    for file in sorted(glob(fname)):
+>>>>>>> Add tstart and tstop attributes to Spikes class, update Network/Spikes functions and tests accordingly
         spike_trial = np.loadtxt(file, dtype=str)
         spike_times += [list(spike_trial[:, 0].astype(float))]
         spike_gids += [list(spike_trial[:, 1].astype(int))]
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
-        # spike type. If reading a legacy version, validate that a gid_dict is
-        # provided.
-        if spike_trial.shape[1] == 3:
+        # spike type, or a 4th and 5th column for tstart and tstop. If reading
+        # a legacy version, validate that gid_dict, tstart, and tstop provided.
+        if spike_trial.shape[1] >= 3:
             spike_types += [list(spike_trial[:, 2].astype(str))]
-        else:
+        elif spike_trial.shape[1] == 2:
             if gid_dict is None:
                 raise ValueError("gid_dict must be provided if spike types "
                                  "are unspecified in the file %s" % (file,))
             spike_types += [[]]
 
-    spikes = Spikes(times=spike_times, gids=spike_gids, types=spike_types)
+        if spike_trial.shape[1] == 5:
+            spike_tstart += np.unique(spike_trial[:, 3].astype(float)).tolist()
+            spike_tstop += np.unique(spike_trial[:, 4].astype(float)).tolist()
+        else:
+            if tstart is None or tstop is None:
+                raise ValueError("tstart and tstop must be provided if values "
+                                 "are unspecified in the file %s" % (file,))
+
+    if len(np.unique(spike_tstart)) > 1 or len(np.unique(spike_tstop)) > 1:
+        raise ValueError("tstart and tstop must match across files.")
+
+    elif len(np.unique(spike_tstart)) == 1 and len(
+            np.unique(spike_tstop)) == 1:
+        spike_tstart = spike_tstart[0]
+        spike_tstop = spike_tstop[0]
+    else:
+        spike_tstart = np.min(sum(spike_times, []))
+        spike_tstop = np.max(sum(spike_times, []))
+
+    spikes = Spikes(times=spike_times, gids=spike_gids, types=spike_types,
+                    tstart=spike_tstart, tstop=spike_tstop)
+
     if gid_dict is not None:
         spikes.update_types(gid_dict)
 
-    return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
+    if tstart is not None and tstop is not None:
+        spikes.update_trial_bounds(spike_tstart, spike_tstop)
+
+    return Spikes(times=spike_times, gids=spike_gids, types=spike_types,
+                  tstart=spike_tstart, tstop=spike_tstop)
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
@@ -313,6 +346,8 @@ class Spikes(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network().gid_dict.
+    tstart, tstop : int | float | None
+        Values defining the start and stop times of all trials.
 
     Attributes
     ----------
@@ -328,6 +363,8 @@ class Spikes(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_dict.
+    tstart, tstop : int | float | None
+        Values defining the start and stop times of all trials.
 
     Methods
     -------
@@ -336,11 +373,15 @@ class Spikes(object):
     plot(ax=None, show=True)
         Plot and return a matplotlib Figure object showing the
         aggregate network spiking activity according to cell type.
+    mean_rates(mean_type='all')
+        Calculate mean firing rate for each cell type. Specify
+        averaging method with mean_type argument.
     write(fname)
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, times=None, gids=None, types=None):
+    def __init__(self, times=None, gids=None, types=None,
+                 tstart=None, tstop=None):
         if times is None:
             times = list()
         if gids is None:
@@ -370,6 +411,8 @@ class Spikes(object):
         self._times = times
         self._gids = gids
         self._types = types
+        self._tstart = tstart
+        self._tstop = tstop
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -386,7 +429,9 @@ class Spikes(object):
                        for trial in other._times]
         return (times_self == times_other and
                 self._gids == other._gids and
-                self._types == other._types)
+                self._types == other._types and
+                self._tstart == other._tstart and
+                self._tstop == other._tstop)
 
     @property
     def times(self):
@@ -399,6 +444,14 @@ class Spikes(object):
     @property
     def types(self):
         return self._types
+
+    @property
+    def tstart(self):
+        return self._tstart
+
+    @property
+    def tstop(self):
+        return self._tstop
 
     def update_types(self, gid_dict):
         """Update spike types in the current instance of Spikes.
@@ -431,6 +484,25 @@ class Spikes(object):
             spike_types += [list(spike_types_trial)]
         self._types = spike_types
 
+    def update_trial_bounds(self, tstart, tstop):
+        """Update tstart and tstop in the current instance of Spikes.
+
+        Parameters
+        ----------
+        tstart, tstop : float | None
+            Values defining the start and stop times of all trials.
+
+        """
+
+        # Validate tstart, tstop
+        if not isinstance(tstart, (int, float)) or not isinstance(
+                tstop, (int, float)):
+            raise ValueError('tstart and tstop must be of type int or float')
+        elif tstop <= tstart:
+            raise ValueError('tstop must be greater than tstart')
+        self._tstart = tstart
+        self._tstop = tstop
+
     def mean_rates(self, mean_type='all'):
         """Mean spike rates (Hz) by cell type.
 
@@ -451,10 +523,8 @@ class Spikes(object):
         """
         cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
         spike_rates = dict()
-        all_spike_times = np.array(sum(self._times, []))
         all_spike_types = np.array(sum(self._types, []))
         all_spike_gids = np.array(sum(self._gids, []))
-        tstart, tstop = min(all_spike_times), max(all_spike_times)
 
         if mean_type not in ['all', 'trial', 'cell']:
             raise ValueError("Invalid mean_type. Valid arguments include "
@@ -472,7 +542,7 @@ class Spikes(object):
                     spike_gids)[trial_type_mask], return_counts=True)
 
                 gid_spike_rate[trial, cell_type_gids == gid] = (gid_counts / (
-                    tstop - tstart)) * 1000
+                    self._tstop - self._tstart)) * 1000
 
             if mean_type == 'all':
                 spike_rates[cell_type] = np.mean(
@@ -550,12 +620,15 @@ class Spikes(object):
             1) spike time (s),
             2) spike gid, and
             3) gid type
+            4) tstart
+            5) tstop
         """
 
         for trial_idx in range(len(self._times)):
             with open(str(fname) % (trial_idx,), 'w') as f:
                 for spike_idx in range(len(self._times[trial_idx])):
-                    f.write('{:.3f}\t{}\t{}\n'.format(
+                    f.write('{:.3f}\t{}\t{}\t{:.3f}\t{:.3f}\n'.format(
                         self._times[trial_idx][spike_idx],
                         int(self._gids[trial_idx][spike_idx]),
-                        self._types[trial_idx][spike_idx]))
+                        self._types[trial_idx][spike_idx],
+                        float(self._tstart), float(self._tstop)))

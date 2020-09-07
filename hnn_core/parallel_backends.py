@@ -24,6 +24,8 @@ def _gather_trial_data(sim_data, net, n_trials):
     """
     dpls = []
 
+    net.spikes.update_trial_bounds(0.0, net.params['tstop'])
+
     for idx in range(n_trials):
         dpls.append(sim_data[idx][0])
         spikedata = sim_data[idx][1]
