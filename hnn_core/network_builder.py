@@ -249,6 +249,8 @@ class NetworkBuilder(object):
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
         (or input) types.
+    ncs : list
+        A list containing all the NetCon objects.
 
     Notes
     -----
@@ -273,7 +275,9 @@ class NetworkBuilder(object):
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
         self._feed_cells = []
+        self.ncs = list()
         self._build()
+
 
     def _build(self):
         """Building the network in NEURON."""
@@ -494,7 +498,6 @@ class NetworkBuilder(object):
     # nc = pc.gid_connect(source_gid, target_syn), weight,delay
     # Both for synapses AND for external inputs
     def _parnet_connect(self):
-        self.ncs = list()
         params = self.net.params
         nc_dict = {
             'A_delay': 1.,
