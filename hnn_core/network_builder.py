@@ -434,7 +434,8 @@ class NetworkBuilder(object):
                 _PC.cell(gid, feed_cell.nrn_netcon)
 
     def _connect_celltypes(self, src_type, target_type, loc,
-                           receptor, nc_dict, allow_autapses=True):
+                           receptor, nc_dict, unique=False,
+                           allow_autapses=True):
         """Connect two cell types for a particular receptor.
 
         Parameters
@@ -451,13 +452,18 @@ class NetworkBuilder(object):
             The receptor.
         nc_dict : dict
             The connection dictionary containing keys
-            A_delay, A_weight, lamtha, and threshold
+            A_delay, A_weight, lamtha, and threshold.
+        unique : bool
+            Is unique?
         allow_autapses : bool
             If True, allow connecting neuron to itself.
         """
         for gid_target in self.net.gid_dict[_long_name(target_type)]:
             if _PC.gid_exists(gid_target):
-                for gid_src in self.net.gid_dict[_long_name(src_type)]:
+                gid_srcs = self.net.gid_dict[_long_name(src_type)]
+                if unique:
+                    gid_srcs = [gid_target + self.net.gid_dict[src_type][0]]
+                for gid_src in gid_srcs:
 
                     if not allow_autapses and gid_src == gid_target:
                         continue
@@ -597,7 +603,8 @@ class NetworkBuilder(object):
                     elif receptor == 'nmda':
                         nc_dict['A_weight'] = p_src[_long_name(target_cell_type)][1]
                     self._connect_celltypes(src_cell_type, target_cell_type,
-                                            p_src['loc'], receptor, nc_dict)
+                                            p_src['loc'], receptor, nc_dict,
+                                            unique=True)
 
     # setup spike recording for this node
     def _record_spikes(self):
