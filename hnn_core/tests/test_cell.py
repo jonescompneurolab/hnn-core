@@ -7,8 +7,8 @@ import hnn_core
 from hnn_core import read_params, Network
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.cell import _ArtificialCell, _Cell
-from hnn_core.pyramidal import L5Pyr
-from hnn_core.params_default import get_L5Pyr_params_default
+# from hnn_core.pyramidal import L5Pyr
+# from hnn_core.params_default import get_L5Pyr_params_default
 
 matplotlib.use('agg')
 
