@@ -73,16 +73,6 @@ class _Cell(object):
         self.list_IClamp = None
         self.soma_props = soma_props
         self.create_soma()
-        # par: create arbitrary lists of connections FROM other cells
-        # TO this cell instantiation
-        # these lists are allowed to be empty
-        # this should be a dict
-        self.ncfrom_L2Pyr = []
-        self.ncfrom_L2Basket = []
-        self.ncfrom_L5Pyr = []
-        self.ncfrom_L5Basket = []
-        self.ncfrom_common = []
-        self.ncfrom_unique = []
 
     def __repr__(self):
         class_name = self.__class__.__name__
