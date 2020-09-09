@@ -458,19 +458,21 @@ class NetworkBuilder(object):
         allow_autapses : bool
             If True, allow connecting neuron to itself.
         """
-        for gid_target in self.net.gid_dict[_long_name(target_type)]:
+        net = self.net
+        for gid_target in net.gid_dict[_long_name(target_type)]:
             if _PC.gid_exists(gid_target):
-                gid_srcs = self.net.gid_dict[_long_name(src_type)]
+                gid_srcs = net.gid_dict[_long_name(src_type)]
                 if unique:
-                    gid_srcs = [gid_target + self.net.gid_dict[src_type][0]]
+                    gid_srcs = [gid_target + net.gid_dict[src_type][0]]
                 for gid_src in gid_srcs:
 
                     if not allow_autapses and gid_src == gid_target:
                         continue
 
                     target_cell = self.cells[gid_target]
-                    pos_idx = gid_src - self.net.gid_dict[_long_name(src_type)][0]
-                    nc_dict['pos_src'] = self.net.pos_dict[_long_name(src_type)][pos_idx]
+                    pos_idx = gid_src - net.gid_dict[_long_name(src_type)][0]
+                    nc_dict['pos_src'] = net.pos_dict[
+                        _long_name(src_type)][pos_idx]
 
                     # get synapse locations
                     syn_keys = list()
@@ -524,7 +526,8 @@ class NetworkBuilder(object):
         target_cell = 'L5Pyr'
         nc_dict['lamtha'] = 70.
         for receptor in ['gabaa', 'gabab']:
-            nc_dict['A_weight'] = params[f'gbar_L5Basket_{target_cell}_{receptor}']
+            key = f'gbar_L5Basket_{target_cell}_{receptor}'
+            nc_dict['A_weight'] = params[key]
             self._connect_celltypes('L5Basket', target_cell, 'soma', receptor,
                                     nc_dict)
 
@@ -568,7 +571,8 @@ class NetworkBuilder(object):
         # common feed -> xx
         for p_common in self.net.p_common:
             for target_cell_type in ['L2Basket', 'L5Basket', 'L5Pyr', 'L2Pyr']:
-                if target_cell_type == 'L5Basket' and p_common['loc'] == 'distal':
+                if (target_cell_type == 'L5Basket' and
+                        p_common['loc'] == 'distal'):
                     continue
                 for receptor in ['ampa', 'nmda']:
                     if f'{target_cell_type}_{receptor}' in p_common.keys():
@@ -586,7 +590,8 @@ class NetworkBuilder(object):
         for src_cell_type in p_unique:
 
             p_src = p_unique[src_cell_type]
-            if src_cell_type.startswith(('evprox', 'evdist')) or src_cell_type == 'extpois':
+            if (src_cell_type.startswith(('evprox', 'evdist')) or
+                    src_cell_type == 'extpois'):
                 receptors = ['ampa', 'nmda']
             if src_cell_type == 'extgauss':
                 receptors = ['ampa']
@@ -596,12 +601,13 @@ class NetworkBuilder(object):
                 if target_cell_type == 'L5Basket' and p_src['loc'] == 'distal':
                     continue
                 for receptor in receptors:
+                    target_cell_long = _long_name(target_cell_type)
                     nc_dict['lamtha'] = p_src['lamtha']
-                    nc_dict['A_delay'] = p_src[_long_name(target_cell_type)][2]
+                    nc_dict['A_delay'] = p_src[target_cell_long][2]
                     if receptor == 'ampa':
-                        nc_dict['A_weight'] = p_src[_long_name(target_cell_type)][0]
+                        nc_dict['A_weight'] = p_src[target_cell_long][0]
                     elif receptor == 'nmda':
-                        nc_dict['A_weight'] = p_src[_long_name(target_cell_type)][1]
+                        nc_dict['A_weight'] = p_src[target_cell_long][1]
                     self._connect_celltypes(src_cell_type, target_cell_type,
                                             p_src['loc'], receptor, nc_dict,
                                             unique=True)
