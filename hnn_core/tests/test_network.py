@@ -54,6 +54,25 @@ def test_network():
                                                 n_gaus_sources +
                                                 n_common_sources)
 
+    # Assert that netcons are created properly
+    # proximal
+    assert 'L2Pyr_L2Pyr_nmda' in network_builder.ncs
+    n_pyr = len(net.gid_dict['L2_pyramidal'])
+    n_connections = 3 * (n_pyr ** 2 - n_pyr)
+    assert len(network_builder.ncs['L2Pyr_L2Pyr_nmda']) == n_connections
+    nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
+    assert nc.threshold == params['threshold']
+
+    # create a new connection between cell types
+    nc_dict = {'A_delay': 1, 'A_weight': 1e-5, 'lamtha': 20,
+               'threshold': 0.5}
+    network_builder._connect_celltypes(
+        'common', 'L5Basket', 'soma', 'gabaa', nc_dict,
+        unique=False)
+    assert 'common_L5Basket_gabaa' in network_builder.ncs
+    n_conn = len(net.gid_dict['common']) * len(net.gid_dict['L5_basket'])
+    assert len(network_builder.ncs['common_L5Basket_gabaa']) == n_conn
+
 
 def test_spikes():
     """Test spikes object."""
