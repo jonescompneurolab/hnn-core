@@ -249,8 +249,9 @@ class NetworkBuilder(object):
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
         (or input) types.
-    ncs : list
-        A list containing all the NetCon objects.
+    ncs : dict of list
+        A dictionary with key describing the types of cell objects connected
+        and contains a list of NetCon objects.
 
     Notes
     -----
@@ -275,9 +276,8 @@ class NetworkBuilder(object):
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
         self._feed_cells = []
-        self.ncs = list()
+        self.ncs = dict()
         self._build()
-
 
     def _build(self):
         """Building the network in NEURON."""
@@ -463,6 +463,9 @@ class NetworkBuilder(object):
             If True, allow connecting neuron to itself.
         """
         net = self.net
+        connection_name = f'{src_type}_{target_type}_{receptor}'
+        if connection_name not in self.ncs:
+            self.ncs[connection_name] = list()
         for gid_target in net.gid_dict[_long_name(target_type)]:
             if _PC.gid_exists(gid_target):
                 gid_srcs = net.gid_dict[_long_name(src_type)]
@@ -489,7 +492,7 @@ class NetworkBuilder(object):
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
                             gid_src, nc_dict, target_cell.synapses[syn_key])
-                        self.ncs.append(nc)
+                        self.ncs[connection_name].append(nc)
 
     # connections:
     # this NODE is aware of its cells as targets
@@ -593,9 +596,7 @@ class NetworkBuilder(object):
         for src_cell_type in p_unique:
 
             p_src = p_unique[src_cell_type]
-            if (src_cell_type.startswith(('evprox', 'evdist')) or
-                    src_cell_type == 'extpois'):
-                receptors = ['ampa', 'nmda']
+            receptors = ['ampa', 'nmda']
             if src_cell_type == 'extgauss':
                 receptors = ['ampa']
 
@@ -685,9 +686,8 @@ class NetworkBuilder(object):
         for gid, cell in zip(self.net._gid_list, self.cells):
             # only work on cells on this node
             if _PC.gid_exists(gid):
-                for name_src in ['L2Pyr', 'L2Basket', 'L5Pyr', 'L5Basket',
-                                 'extinput', 'extgauss', 'extpois', 'ev']:
-                    for nc in getattr(cell, 'ncfrom_%s' % name_src):
+                for nc_key in self.ncs:
+                    for nc in self.ncs[nc_key]:
                         if nc.valid():
                             # delete NEURON cell object
                             cell_obj1 = nc.precell(gid)
