@@ -74,9 +74,6 @@ def read_spikes(fname, gid_dict=None, tstart=None, tstop=None):
             np.unique(spike_tstop)) == 1:
         spike_tstart = spike_tstart[0]
         spike_tstop = spike_tstop[0]
-    else:
-        spike_tstart = np.min(sum(spike_times, []))
-        spike_tstop = np.max(sum(spike_times, []))
 
     spikes = Spikes(times=spike_times, gids=spike_gids, types=spike_types,
                     tstart=spike_tstart, tstop=spike_tstop)
