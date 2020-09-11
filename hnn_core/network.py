@@ -536,13 +536,13 @@ class Spikes(object):
             gid_spike_rate = np.zeros((len(self._times), len(cell_type_gids)))
 
             trial_data = zip(self._types, self._gids)
-            for trial, (spike_types, spike_gids) in enumerate(trial_data):
+            for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
                 trial_type_mask = np.in1d(spike_types, cell_type)
                 gid, gid_counts = np.unique(np.array(
                     spike_gids)[trial_type_mask], return_counts=True)
 
-                gid_spike_rate[trial, cell_type_gids == gid] = (gid_counts / (
-                    self._tstop - self._tstart)) * 1000
+                gid_spike_rate[trial_idx, cell_type_gids == gid] = (
+                    gid_counts / (self._tstop - self._tstart)) * 1000
 
             if mean_type == 'all':
                 spike_rates[cell_type] = np.mean(
