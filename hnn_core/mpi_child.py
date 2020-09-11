@@ -66,6 +66,7 @@ def run_mpi_simulation():
     for trial in range(params['N_trials']):
         dpl = _simulate_single_trial(neuron_net)
         if rank == 0:
+            net.trial_idx += 1
             spikedata = neuron_net.get_data_from_neuron()
             sim_data.append((dpl, spikedata))
 
