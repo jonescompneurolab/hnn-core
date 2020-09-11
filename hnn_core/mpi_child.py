@@ -60,13 +60,17 @@ def run_mpi_simulation():
 
     params = comm.bcast(params, root=0)
     net = Network(params)
-    neuron_net = NetworkBuilder(net)
 
     sim_data = []
-    for trial in range(params['N_trials']):
+    for trial_idx in range(params['N_trials']):
+        # update rng seed state with new trial
+        #if rank == 0:
+        net.trial_idx = trial_idx
+        for param_key in net.params['prng_*'].keys():
+            net.params[param_key] += trial_idx
+        neuron_net = NetworkBuilder(net)
         dpl = _simulate_single_trial(neuron_net)
         if rank == 0:
-            net.trial_idx += 1
             spikedata = neuron_net.get_data_from_neuron()
             sim_data.append((dpl, spikedata))
 
