@@ -346,8 +346,10 @@ class Spikes(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network().gid_dict.
-    tstart, tstop : int | float | None
-        Values defining the start and stop times of all trials.
+    tstart : int | float | None
+        Value defining the start time of all trials.
+    tstop : int | float | None
+        Value defining the stop time of all trials.
 
     Attributes
     ----------
@@ -363,8 +365,10 @@ class Spikes(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_dict.
-    tstart, tstop : int | float | None
-        Values defining the start and stop times of all trials.
+    tstart : int | float | None
+        Value defining the start time of all trials.
+    tstop : int | float | None
+        Value defining the stop time of all trials.
 
     Methods
     -------
@@ -489,8 +493,10 @@ class Spikes(object):
 
         Parameters
         ----------
-        tstart, tstop : float | None
-            Values defining the start and stop times of all trials.
+        tstart : int | float | None
+            Value defining the start time of all trials.
+        tstop : int | float | None
+            Value defining the stop time of all trials.
 
         """
 
