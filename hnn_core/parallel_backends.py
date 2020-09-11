@@ -86,8 +86,8 @@ class JoblibBackend(object):
         from hnn_core.network_builder import NetworkBuilder
         from hnn_core.network_builder import _simulate_single_trial
 
-        if trial_idx != 0:
-            net.params['prng_*'] = trial_idx
+        for param_key in net.params['prng_*'].keys():
+            net.params[param_key] += trial_idx
 
         neuron_net = NetworkBuilder(net)
         neuron_net.net.trial_idx = trial_idx
