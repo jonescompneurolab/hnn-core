@@ -25,8 +25,12 @@ def read_spikes(fname, gid_dict=None, tstart=None, tstop=None):
         containing the range of Cell or input IDs of different
         cell or input types. If None, each spike file must contain
         a 3rd column for spike type.
-    tstart, tstop : float | None
-        Values defining the start and stop times of all trials.
+    tstart : int | float | None
+        Value defining the start time of all trials.
+        Only relevant for legacy files.
+    tstop : int | float | None
+        Value defining the stop time of all trials.
+        Only relevant for legacy files.
 
     Returns
     ----------
@@ -345,8 +349,10 @@ class Spikes(object):
         Each gid corresponds to a type via Network().gid_dict.
     tstart : int | float | None
         Value defining the start time of all trials.
+        Only relevant for legacy files.
     tstop : int | float | None
         Value defining the stop time of all trials.
+        Only relevant for legacy files.
 
     Attributes
     ----------
@@ -364,8 +370,10 @@ class Spikes(object):
         Each gid corresponds to a type via Network::gid_dict.
     tstart : int | float | None
         Value defining the start time of all trials.
+        Only relevant for legacy files.
     tstop : int | float | None
         Value defining the stop time of all trials.
+        Only relevant for legacy files.
 
     Methods
     -------
@@ -492,8 +500,10 @@ class Spikes(object):
         ----------
         tstart : int | float | None
             Value defining the start time of all trials.
+            Only relevant for legacy files.
         tstop : int | float | None
             Value defining the stop time of all trials.
+            Only relevant for legacy files.
 
         """
 
