@@ -64,12 +64,14 @@ def read_spikes(fname, gid_dict=None, tstart=None, tstop=None):
             spike_types += [[]]
 
         if spike_trial.shape[1] == 5:
+            if tstart is not None or tstop is not None:
+                raise ValueError("tstart and tstop are specified in both the "
+                                 "file %s and function call. " % (file,))
             spike_tstart += np.unique(spike_trial[:, 3].astype(float)).tolist()
             spike_tstop += np.unique(spike_trial[:, 4].astype(float)).tolist()
-        else:
-            if tstart is None or tstop is None:
-                raise ValueError("tstart and tstop must be provided if values "
-                                 "are unspecified in the file %s" % (file,))
+        elif tstart is None or tstop is None:
+            raise ValueError("tstart and tstop must be provided if values "
+                             "are unspecified in the file %s" % (file,))
 
     if len(np.unique(spike_tstart)) > 1 or len(np.unique(spike_tstop)) > 1:
         raise ValueError("tstart and tstop must match across files.")

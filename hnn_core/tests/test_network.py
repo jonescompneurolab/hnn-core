@@ -95,6 +95,9 @@ def test_spikes(tmpdir):
     assert spikes == read_spikes(tmpdir.join('spk_*.txt'))
 
     assert ("Spikes | 2 simulation trials" in repr(spikes))
+    with pytest.raises(ValueError, match="tstart and tstop are specified in "
+                       "both the file /tmp/spk_0.txt and function call."):
+        read_spikes('/tmp/spk_*.txt', tstart=0.1, tstop=98.4)
 
     with pytest.raises(TypeError, match="times should be a list of lists"):
         spikes = Spikes(times=([2.3456, 7.89], [4.2812, 93.2]), gids=spikegids,
