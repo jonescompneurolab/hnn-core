@@ -95,6 +95,21 @@ def test_spikes(tmpdir):
     assert spikes == read_spikes(tmpdir.join('spk_*.txt'))
 
     assert ("Spikes | 2 simulation trials" in repr(spikes))
+    assert spikes.mean_rates() == {
+        'L5_pyramidal': 5.08646998982706,
+        'L5_basket': 5.08646998982706,
+        'L2_pyramidal': 5.08646998982706,
+        'L2_basket': 5.08646998982706}
+    assert spikes.mean_rates(mean_type='trial') == {
+        'L5_pyramidal': [0.0, 10.17293997965412],
+        'L5_basket': [0.0, 10.17293997965412],
+        'L2_pyramidal': [10.17293997965412, 0.0],
+        'L2_basket': [10.17293997965412, 0.0]}
+    assert spikes.mean_rates(mean_type='cell') == {
+        'L5_pyramidal': [[0.0], [10.17293997965412]],
+        'L5_basket': [[0.0], [10.17293997965412]],
+        'L2_pyramidal': [[10.17293997965412], [0.0]],
+        'L2_basket': [[10.17293997965412], [0.0]]}
     with pytest.raises(ValueError, match="tstart and tstop are specified in "
                        "both the file /tmp/spk_0.txt and function call."):
         read_spikes('/tmp/spk_*.txt', tstart=0.1, tstop=98.4)
