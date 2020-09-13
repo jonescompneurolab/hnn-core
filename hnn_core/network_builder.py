@@ -458,7 +458,9 @@ class NetworkBuilder(object):
             The connection dictionary containing keys
             A_delay, A_weight, lamtha, and threshold.
         unique : bool
-            Is unique?
+            If True, each target cell gets one "unique" feed.
+            If False, all src_type cells are connected to
+            all target_type cells.
         allow_autapses : bool
             If True, allow connecting neuron to itself.
         """
@@ -469,9 +471,9 @@ class NetworkBuilder(object):
         # XXX: self.cells and net._gid_list are not same length
         # ideally self.cells should be a dict of list
         for gid_target, target_cell in zip(self.net._gid_list, self.cells):
-            is_gid_type = (gid_target in
-                           self.net.gid_dict[_long_name(target_type)])
-            if _PC.gid_exists(gid_target) and is_gid_type:
+            is_target_gid = (gid_target in
+                             self.net.gid_dict[_long_name(target_type)])
+            if _PC.gid_exists(gid_target) and is_target_gid:
                 gid_srcs = net.gid_dict[_long_name(src_type)]
                 if unique:
                     gid_srcs = [gid_target + net.gid_dict[src_type][0]]
