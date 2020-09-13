@@ -42,6 +42,10 @@ install the following::
 
     $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
 
+If you are using a newer version of pip, you may be prompted to use the flag --use-feature=2020-resolver. If this happens, please add it as recommended::
+
+    $ pip install --use-feature=2020-resolver matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
+
 You can build the documentation locally using the command::
 
     $ cd doc/
