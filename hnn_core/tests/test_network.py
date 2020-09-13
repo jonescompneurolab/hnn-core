@@ -58,7 +58,7 @@ def test_network():
     # proximal
     assert 'L2Pyr_L2Pyr_nmda' in network_builder.ncs
     n_pyr = len(net.gid_dict['L2_pyramidal'])
-    n_connections = 3 * (n_pyr ** 2 - n_pyr)
+    n_connections = 3 * (n_pyr ** 2 - n_pyr)  # 3 synapses / cell
     assert len(network_builder.ncs['L2Pyr_L2Pyr_nmda']) == n_connections
     nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
     assert nc.threshold == params['threshold']
@@ -72,6 +72,13 @@ def test_network():
     assert 'common_L5Basket_gabaa' in network_builder.ncs
     n_conn = len(net.gid_dict['common']) * len(net.gid_dict['L5_basket'])
     assert len(network_builder.ncs['common_L5Basket_gabaa']) == n_conn
+
+    # try unique=True
+    network_builder._connect_celltypes(
+        'extgauss', 'L5Basket', 'soma', 'gabaa', nc_dict,
+        unique=True)
+    n_conn = len(net.gid_dict['L5_basket'])
+    assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
 
 def test_spikes():
