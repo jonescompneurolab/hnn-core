@@ -466,8 +466,12 @@ class NetworkBuilder(object):
         connection_name = f'{src_type}_{target_type}_{receptor}'
         if connection_name not in self.ncs:
             self.ncs[connection_name] = list()
-        for gid_target in net.gid_dict[_long_name(target_type)]:
-            if _PC.gid_exists(gid_target):
+        # XXX: self.cells and net._gid_list are not same length
+        # ideally self.cells should be a dict of list
+        for gid_target, target_cell in zip(self.net._gid_list, self.cells):
+            is_gid_type = (gid_target in
+                           self.net.gid_dict[_long_name(target_type)])
+            if _PC.gid_exists(gid_target) and is_gid_type:
                 gid_srcs = net.gid_dict[_long_name(src_type)]
                 if unique:
                     gid_srcs = [gid_target + net.gid_dict[src_type][0]]
@@ -476,7 +480,6 @@ class NetworkBuilder(object):
                     if not allow_autapses and gid_src == gid_target:
                         continue
 
-                    target_cell = self.cells[gid_target]
                     pos_idx = gid_src - net.gid_dict[_long_name(src_type)][0]
                     nc_dict['pos_src'] = net.pos_dict[
                         _long_name(src_type)][pos_idx]
