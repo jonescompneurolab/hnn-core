@@ -29,7 +29,6 @@ def test_cell():
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
 
-
 def test_artificial_cell():
     """Test artificial cell object."""
     event_times = [1, 2, 3]
