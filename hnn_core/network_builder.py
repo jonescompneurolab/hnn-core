@@ -24,7 +24,7 @@ _CVODE = None
 _LAST_NETWORK = None
 
 
-def _simulate_single_trial(neuron_net):
+def _simulate_single_trial(neuron_net, trial_idx):
     """Simulate one trial."""
 
     from .dipole import Dipole
@@ -41,7 +41,7 @@ def _simulate_single_trial(neuron_net):
     _PC.barrier()  # sync for output to screen
     if rank == 0:
         print("running trial %d on %d cores" %
-              (neuron_net.net.trial_idx + 1, nhosts))
+              (trial_idx + 1, nhosts))
 
     # create or reinitialize scalars in NEURON (hoc) context
     h("dp_total_L2 = 0.")

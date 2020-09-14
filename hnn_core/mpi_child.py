@@ -60,16 +60,18 @@ def run_mpi_simulation():
 
     params = comm.bcast(params, root=0)
     net = Network(params)
+    # XXX store the initial prng_seedcore params to be referenced in each trial
+    prng_seedcore_initial = net.params['prng_*'].copy()
 
     sim_data = []
     for trial_idx in range(params['N_trials']):
-        # update rng seed state with new trial
-        #if rank == 0:
-        net.trial_idx = trial_idx
-        for param_key in net.params['prng_*'].keys():
-            net.params[param_key] += trial_idx
+        # XXX this should be built into NetworkBuilder
+        # update prng_seedcore params to provide jitter between trials
+        for param_key in prng_seedcore_initial.keys():
+            net.params[param_key] = (prng_seedcore_initial[param_key] +
+                                     trial_idx)
         neuron_net = NetworkBuilder(net)
-        dpl = _simulate_single_trial(neuron_net)
+        dpl = _simulate_single_trial(neuron_net, trial_idx)
         if rank == 0:
             spikedata = neuron_net.get_data_from_neuron()
             sim_data.append((dpl, spikedata))
