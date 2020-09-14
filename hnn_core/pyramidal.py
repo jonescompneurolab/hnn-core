@@ -516,25 +516,17 @@ class L5Pyr(Pyr):
         soma = self.soma
         dend = self.list_dend
         # soma.L = 13 # BUSH 1999 spike amp smaller
+        sec_lens = [102, 255, 680, 680, 425, 85, 255, 255]
+        sec_diams = [10.2, 5.1, 7.48, 4.93, 3.4, 6.8, 8.5, 8.5]
+
         soma.L = 39  # Bush 1993
-        dend[0].L = 102
-        dend[1].L = 255
-        dend[2].L = 680  # default 400
-        dend[3].L = 680  # default 400
-        dend[4].L = 425
-        dend[5].L = 85
-        dend[6].L = 255  # default 150
-        dend[7].L = 255  # default 150
         # soma.diam = 18.95 # Bush 1999
         soma.diam = 28.9  # Bush 1993
-        dend[0].diam = 10.2
-        dend[1].diam = 5.1
-        dend[2].diam = 7.48  # default 4.4
-        dend[3].diam = 4.93  # default 2.9
-        dend[4].diam = 3.4
-        dend[5].diam = 6.8
-        dend[6].diam = 8.5
-        dend[7].diam = 8.5
+
+        for idx, dend in enumerate(self.list_dends):
+            dend.L = sec_lens[idx]
+            dend.diam = sec_diams[idx]
+
         # resets length,diam,etc. based on param specification
         self.set_dend_props(p_dend)
 
