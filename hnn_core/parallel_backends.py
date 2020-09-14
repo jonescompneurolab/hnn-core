@@ -86,12 +86,13 @@ class JoblibBackend(object):
         from hnn_core.network_builder import NetworkBuilder
         from hnn_core.network_builder import _simulate_single_trial
 
+        # XXX this should be built into NetworkBuilder
+        # update prng_seedcore params to provide jitter between trials
         for param_key in net.params['prng_*'].keys():
             net.params[param_key] += trial_idx
 
         neuron_net = NetworkBuilder(net)
-        neuron_net.net.trial_idx = trial_idx
-        dpl = _simulate_single_trial(neuron_net)
+        dpl = _simulate_single_trial(neuron_net, trial_idx)
 
         spikedata = neuron_net.get_data_from_neuron()
 
