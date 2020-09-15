@@ -1,7 +1,7 @@
 import os.path as op
 
 from numpy import loadtxt
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
 from mne.utils import _fetch_file
 import hnn_core
@@ -25,18 +25,30 @@ def run_hnn_core(backend=None, n_jobs=1):
     # default params
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
+    params_reduced = params.copy()
+    params_reduced.update({'N_pyr_x': 3,
+                           'N_pyr_y': 3,
+                           'tstop': 25,
+                           't_evprox_1': 5,
+                           't_evdist_1': 10,
+                           't_evprox_2': 20,
+                           'N_trials': 2})
 
-    # run the simulation
+    # run the simulation on full model (1 trial) and a reduced model (2 trials)
     net = Network(params)
+    net_reduced = Network(params_reduced)
 
     if backend == 'mpi':
         with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
             dpl = simulate_dipole(net)[0]
+            dpls_reduced = simulate_dipole(net_reduced)
     elif backend == 'joblib':
         with JoblibBackend(n_jobs=n_jobs):
             dpl = simulate_dipole(net)[0]
+            dpls_reduced = simulate_dipole(net_reduced)
     else:
         dpl = simulate_dipole(net)[0]
+        dpls_reduced = simulate_dipole(net_reduced)
 
     # write the dipole to a file and compare
     fname = './dpl2.txt'
@@ -63,18 +75,30 @@ def run_hnn_core(backend=None, n_jobs=1):
                                 'L5_basket': 85,
                                 'evdist1': 234,
                                 'evprox2': 269}
+    return dpls_reduced
 
 
-def test_hnn_core():
-    """Test that running hnn-core succeeds (implicit n_jobs=1)."""
-    run_hnn_core(None)
+def test_compare_across_backends():
+    """Test that trials are generated consistently across parallel backends."""
 
+    # test consistency between default backend simulation and master
+    dpls_reduced_default = run_hnn_core(None)
 
-def test_mpi():
-    """Test that running hnn-core with MPI context manager when n_jobs=1."""
-    run_hnn_core(backend='mpi')
+    # test consistency between mpi backend simulation (n_procs=2) and master
+    dpls_reduced_mpi = run_hnn_core(backend='mpi')
 
+    # test consistency between joblib backend simulation (n_jobs=2) with master
+    dpls_reduced_joblib = run_hnn_core(backend='joblib', n_jobs=2)
 
-def test_joblib():
-    """Test that running hnn-core with Joblib context manager when n_jobs=2."""
-    run_hnn_core(backend='joblib', n_jobs=2)
+    # test consistency across all parallel backends for multiple trials
+    assert_raises(AssertionError, assert_array_equal,
+                  dpls_reduced_default[0].data['agg'],
+                  dpls_reduced_default[1].data['agg'])
+
+    for trial_idx in range(len(dpls_reduced_default)):
+        # account for rounding error incured during MPI parallelization
+        assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
+                        dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
+                        atol=1e-14)
+        assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
+                           dpls_reduced_joblib[trial_idx].data['agg'])
