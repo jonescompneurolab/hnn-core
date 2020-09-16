@@ -22,7 +22,7 @@ _CVODE = None
 _LAST_NETWORK = None
 
 
-def _simulate_single_trial(neuron_net, trial_idx):
+def _simulate_single_trial(neuron_net, trial_idx, postproc=True):
     """Simulate one trial."""
 
     from .dipole import Dipole
@@ -109,10 +109,12 @@ def _simulate_single_trial(neuron_net, trial_idx):
         if neuron_net.net.params['save_dpl']:
             dpl.write('rawdpl.txt')
 
-        dpl.baseline_renormalize(neuron_net.net.params)
+
+        dpl.baseline_renormalize(neuron_net.net.params)   
         dpl.convert_fAm_to_nAm()
-        dpl.scale(neuron_net.net.params['dipole_scalefctr'])
-        dpl.smooth(neuron_net.net.params['dipole_smooth_win'] / h.dt)
+        if postproc:
+            dpl.scale(neuron_net.net.params['dipole_scalefctr'])
+            dpl.smooth(neuron_net.net.params['dipole_smooth_win'] / h.dt)
 
     return dpl
 

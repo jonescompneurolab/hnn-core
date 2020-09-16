@@ -117,7 +117,24 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net):
+    def _clone_and_simulate(self, net, trial_idx, postproc=True):
+        # avoid relative lookups after being forked by joblib
+        from hnn_core.network_builder import NetworkBuilder
+        from hnn_core.network_builder import _simulate_single_trial
+
+        # XXX this should be built into NetworkBuilder
+        # update prng_seedcore params to provide jitter between trials
+        for param_key in net.params['prng_*'].keys():
+            net.params[param_key] += trial_idx
+
+        neuron_net = NetworkBuilder(net)
+        dpl = _simulate_single_trial(neuron_net, trial_idx, postproc)
+
+        spikedata = neuron_net.get_data_from_neuron()
+
+        return dpl, spikedata
+
+    def simulate(self, net, postproc=True):
         """Simulate the HNN model
 
         Parameters
@@ -135,8 +152,9 @@ class JoblibBackend(object):
         n_trials = net.params['N_trials']
         dpls = []
 
-        parallel, myfunc = self._parallel_func(_clone_and_simulate)
-        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
+        parallel, myfunc = self._parallel_func(self._clone_and_simulate)
+        sim_data = parallel(myfunc(net, idx, postproc) for idx in
+                            range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
@@ -323,7 +341,7 @@ class MPIBackend(object):
         # unpickle the data
         return pickle.loads(data_pickled)
 
-    def simulate(self, net):
+    def simulate(self, net, postproc=True):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -340,7 +358,7 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            return JoblibBackend(n_jobs=1).simulate(net)
+            return JoblibBackend(n_jobs=1).simulate(net, postproc)
 
         n_trials = net.params['N_trials']
         print("Running %d trials..." % (n_trials))

@@ -18,7 +18,7 @@ def _hammfilt(x, winsz):
 
 
 def simulate_dipole(net, n_trials=None, record_vsoma=False,
-                    record_isoma=False):
+                    record_isoma=False, postproc=True):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -33,6 +33,8 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         Option to record somatic voltages from cells
     record_isoma : bool
         Option to record somatic currents from cells
+    postproc : bool
+        Option to apply postprocessing 
 
     Returns
     -------
@@ -67,7 +69,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         raise TypeError("record_isoma must be bool, got %s"
                         % type(record_isoma).__name__)
 
-    dpls = _BACKEND.simulate(net)
+    dpls = _BACKEND.simulate(net, postproc)
 
     return dpls
 

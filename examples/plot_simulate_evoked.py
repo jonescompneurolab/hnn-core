@@ -27,18 +27,19 @@ hnn_core_root = op.dirname(hnn_core.__file__)
 # Then we read the parameters file
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
-print(params)
+params['tstop']=10
+#print(params)
 
 ###############################################################################
 # This is a lot of parameters! We can also filter the
 # parameters using unix-style wildcard characters
-print(params['L2Pyr_soma*'])
+#print(params['L2Pyr_soma*'])
 
 ###############################################################################
 # Let us first create our network from the params file and visualize the cells
 # inside it.
 net = Network(params)
-net.plot_cells()
+#net.plot_cells()
 
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
@@ -46,8 +47,8 @@ net.plot_cells()
 from hnn_core import JoblibBackend
 
 with JoblibBackend(n_jobs=1):
-    dpls = simulate_dipole(net, n_trials=2)
-
+    dpls = simulate_dipole(net, n_trials=1,postproc=True)
+sdfd
 ###############################################################################
 # and then plot it
 import matplotlib.pyplot as plt
