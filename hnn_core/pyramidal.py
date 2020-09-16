@@ -294,7 +294,6 @@ class Pyr(_Cell):
 
 class L2Pyr(Pyr):
     """Layer 2 pyramidal cell class.
-
     Parameters
     ----------
     pos : tuple
