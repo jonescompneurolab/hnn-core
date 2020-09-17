@@ -417,12 +417,14 @@ class NetworkBuilder(object):
             # external inputs can also be Poisson- or Gaussian-
             # distributed, or 'evoked' inputs (proximal or distal)
             # these are cell-specific ('unique')
+            # XXX src_type is 'common', 'evprox1', 'evdist1', 'evgauss', etc.
             elif src_type in self.net.p_unique.keys():
                 gid_target = gid - self.net.gid_dict[src_type][0]
                 target_cell_type = self.net.gid_to_type(gid_target)
 
                 # new ExtFeed, where now both feed type and target cell type
-                # specified because these feeds have cell-specific parameters
+                # specified because these feeds have cell-specific
+                # CONNECTION parameters, i.e., AMPA and NMDA weights
                 feed = ExtFeed(feed_type=src_type,
                                target_cell_type=target_cell_type,
                                params=self.net.p_unique[src_type],
