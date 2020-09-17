@@ -58,8 +58,7 @@ def read_spikes(fname, gid_dict=None):
     return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
 
 
-def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
-                   zdiff=1307.4):
+def _create_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     """Creates coordinate grid.
 
     Parameters
@@ -119,7 +118,7 @@ def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
     pos_dict['L5_basket'] = [
         pos_xy + (zdiff,) for pos_xy in coords_sorted]
 
-    n_cells = sum([len(pos_dict[key]) for key in pos_dict])
+    # n_cells = sum([len(pos_dict[key]) for key in pos_dict])
     # ORIGIN
     # origin's z component isn't really used in
     # calculating distance functions from origin
@@ -129,13 +128,8 @@ def _create_coords(n_pyr_x, n_pyr_y, n_common_feeds, p_unique_keys,
     origin_z = np.floor(zdiff / 2)
     origin = (origin_x, origin_y, origin_z)
 
-    # COMMON FEEDS
-    pos_dict['common'] = [origin for i in range(n_common_feeds)]
-
-    # UNIQUE FEEDS
-    for key in p_unique_keys:
-        # create the pos_dict for all the sources
-        pos_dict[key] = [origin for i in range(n_cells)]
+    # save the origin for adding external feeds later
+    pos_dict['origin'] = origin
 
     return pos_dict
 
@@ -177,39 +171,37 @@ class Network(object):
         self.n_src = 0
         self.n_of_type = {}  # numbers of sources
         self.n_cells = 0  # init self.n_cells
-
-        # params of common external feeds inputs in p_common
-        # Global number of external inputs ... automatic counting
-        # makes more sense
-        # p_unique represent ext inputs that are going to go to each cell
-        self.p_common, self.p_unique = create_pext(self.params,
-                                                   self.params['tstop'])
-        self.n_common_feeds = len(self.p_common)
-        # Source list of names
-        # in particular order (cells, common, names of unique inputs)
-        self.src_list_new = self._create_src_list()
+        # Source list of names, first real ones only!
+        self.cellname_list = [
+            'L2_basket',
+            'L2_pyramidal',
+            'L5_basket',
+            'L5_pyramidal',
+        ]
         # cell position lists, also will give counts: must be known
         # by ALL nodes
-        self.pos_dict = dict.fromkeys(self.src_list_new)
+        # XXX structure of pos_dict determines all downstream inferences of
+        # cell counts, real and artificial
+        self.pos_dict = dict.fromkeys(self.cellname_list)
         self.pos_dict = _create_coords(n_pyr_x=self.params['N_pyr_x'],
                                        n_pyr_y=self.params['N_pyr_y'],
-                                       n_common_feeds=self.n_common_feeds,
-                                       p_unique_keys=self.p_unique.keys(),
                                        zdiff=1307.4)
+
+        # set n_cells, EXCLUDING Artificial ones
         self._count_cells()
 
-        # count external sources
-        self._count_extsrcs()
         # create dictionary of GIDs according to cell type
         # global dictionary of gid and cell type
         self.gid_dict = {}
-        self._create_gid_dict()
         # Create empty spikes object
         self.spikes = Spikes()
         # assign gid to hosts, creates list of gids for this node in _gid_list
         # _gid_list length is number of cells assigned to this id()
         self._gid_list = []
         self.trial_idx = 0
+
+        # test adding external feeds would work here
+        self._add_external_feeds()
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -219,16 +211,43 @@ class Network(object):
               % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
         return '<%s | %s>' % (class_name, s)
 
+    def _assign_external_feeds_coords(self, n_common_feeds, p_unique_keys):
+        origin = self.pos_dict['origin']
+
+        # COMMON FEEDS
+        self.pos_dict['common'] = [origin for i in range(n_common_feeds)]
+
+        # UNIQUE FEEDS
+        for key in p_unique_keys:
+            # create the pos_dict for all the sources
+            self.pos_dict[key] = [origin for i in range(self.n_cells)]
+
+    def _add_external_feeds(self):
+        # params of common external feeds inputs in p_common
+        # Global number of external inputs ... automatic counting
+        # makes more sense
+        # p_unique represent ext inputs that are going to go to each cell
+        self.p_common, self.p_unique = create_pext(self.params,
+                                                   self.params['tstop'])
+        self.n_common_feeds = len(self.p_common)
+
+        self._assign_external_feeds_coords(self.n_common_feeds,
+                                           self.p_unique.keys())
+
+        # in particular order (cells, common, names of unique inputs)
+        self.src_list_new = self._create_src_list()
+
+        # self._count_cells()  # sets n_cells, includes Artificial ones too!
+
+        # count external sources
+        self._count_extsrcs()
+
+        self._create_gid_dict()
+
     def _create_src_list(self):
         """ creates the immutable source list along with corresponding numbers of cells
         """
         # base source list of tuples, name and number, in this order
-        self.cellname_list = [
-            'L2_basket',
-            'L2_pyramidal',
-            'L5_basket',
-            'L5_pyramidal',
-        ]
         self.extname_list = []
         self.extname_list.append('common')
         # grab the keys for the unique set of inputs and sort the names
