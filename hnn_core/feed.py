@@ -125,6 +125,8 @@ class ExtFeed(object):
 
     # new external pois designation
     def _create_extpois(self):
+        # XXX Check whether both AMPA and NMDA connections are zero
+        # If so, return without updating self.event_times (from empty list)
         if self.params[self.cell_type][0] <= 0.0 and \
                 self.params[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
