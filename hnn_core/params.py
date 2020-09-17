@@ -355,6 +355,10 @@ def create_pext(p, tstop):
     # (for backwards compatibility)
     # could cause differences between output of param files
     # since some nmda weights should be 0 while others > 0
+
+    # XXX dangerzone: params are modified in-place, values are imputed if
+    # deemed missing (e.g. if 'gbar_evprox_1_L2Pyr_nmda' is not defined, the
+    # code adds it to the p-dict with value: p['gbar_evprox_1_L2Pyr'])
     check_evoked_synkeys(p, nprox, ndist)
 
     # Create proximal evoked response parameters
