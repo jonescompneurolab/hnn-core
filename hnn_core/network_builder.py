@@ -276,6 +276,9 @@ class NetworkBuilder(object):
         # initialized by _ArtificialCell()
         self._feed_cells = []
         self.ncs = dict()
+
+        self.net._create_gid_dict()
+
         self._build()
 
     def _build(self):
