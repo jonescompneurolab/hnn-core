@@ -63,17 +63,6 @@ def test_base_params():
     params = Params()
     assert params == params_base
 
-
-def test_param_set():
-    """Test that a parameter value can be changed"""
-    param_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
-                 'hnn-core/test_data/base.json')
-    params_base_fname = op.join(hnn_core_root, 'param', 'base.json')
-    if not op.exists(params_base_fname):
-        _fetch_file(param_url, params_base_fname)
-
-    params_base = read_params(params_base_fname)
     params_base['spec_cmap'] = 'viridis'
-
     params = Params(params_base)
     assert params == params_base
