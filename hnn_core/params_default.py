@@ -135,6 +135,7 @@ def get_params_default(nprox=2, ndist=1):
         # analysis
         'save_spec_data': 0,
         'f_max_spec': 40.,
+        'spec_cmap': 'jet',  # only used in GUI
         'dipole_scalefctr': 30e3,  # scale factor for dipole - default at 30e3
         # based on scaling needed to match model ongoing rhythms from
         # jones 2009 - for ERPs can use 300

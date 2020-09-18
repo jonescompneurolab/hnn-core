@@ -62,3 +62,7 @@ def test_base_params():
     params_base = read_params(params_base_fname)
     params = Params()
     assert params == params_base
+
+    params_base['spec_cmap'] = 'viridis'
+    params = Params(params_base)
+    assert params == params_base
