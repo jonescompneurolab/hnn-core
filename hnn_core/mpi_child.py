@@ -78,25 +78,21 @@ def run_mpi_simulation():
 
     # send results to stderr
     if rank == 0:
-        # send back dpls and spikedata
-        pickled_string = pickle.dumps(sim_data)
-
-        # pad data before encoding, always add at least 4 "=" to mark end
-        padding = len(pickled_string) % 4
-        pickled_string += b"=" * padding
-        pickled_string += b"=" * 4
-
-        # encode as base64 before sending to stderr
-        repickled_bytes = codecs.encode(pickled_string,
-                                        'base64')
-
         data_iostream = io.BytesIO()
 
         # Force the use of bytes streams under Python 3
         if hasattr(data_iostream, 'buffer'):
             data_iostream = data_iostream.buffer
 
-        data_iostream.write(repickled_bytes)
+        if len(sim_data) > 0:
+            # send back dpls and spikedata
+            pickled_string = pickle.dumps(sim_data)
+
+            # encode as base64 before sending to stderr
+            repickled_bytes = codecs.encode(pickled_string,
+                                            'base64')
+
+            data_iostream.write(repickled_bytes + b"===")
 
     # flush anything in stderr (still points to str_err) to stdout
     sys.stderr.flush()
