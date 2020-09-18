@@ -296,6 +296,7 @@ Then we read the default parameters file
         "sigma_t_evprox_1": 2.47,
         "sigma_t_evprox_2": 8.33,
         "sim_prefix": "default",
+        "spec_cmap": "jet",
         "sync_evinput": false,
         "t0_input_dist": 1000,
         "t0_input_prox": 1000.0,
@@ -457,7 +458,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  18.320 seconds)
+   **Total running time of the script:** ( 1 minutes  15.024 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

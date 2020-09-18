@@ -285,6 +285,7 @@ Then we read the parameters file
         "sigma_t_evprox_1": 2.5,
         "sigma_t_evprox_2": 7.0,
         "sim_prefix": "default",
+        "spec_cmap": "jet",
         "sync_evinput": 1,
         "t0_input_dist": 1000.0,
         "t0_input_prox": 1000.0,
@@ -408,7 +409,7 @@ We can plot the time-frequency response using MNE
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  24.421 seconds)
+   **Total running time of the script:** ( 1 minutes  10.967 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_gamma.py:
