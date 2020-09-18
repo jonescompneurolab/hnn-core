@@ -6,8 +6,8 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, read_dipole, average_dipoles, viz
-from hnn_core.dipole import Dipole
+from hnn_core import read_params, read_dipole, average_dipoles, viz, Network
+from hnn_core.dipole import Dipole, simulate_dipole
 
 matplotlib.use('agg')
 
@@ -43,3 +43,13 @@ def test_dipole():
     with pytest.raises(ValueError, match="Dipole at index 0 was already an "
                        "average of 2 trials"):
         dipole_avg = average_dipoles([dipole_avg, dipole_read])
+
+
+def test_num_trials():
+    """Test that running 0 trials retuns an exception."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    net = Network(params)
+    with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
+        simulate_dipole(net, n_trials=0)
