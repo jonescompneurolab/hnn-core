@@ -218,7 +218,7 @@ def plot_cells(net, ax=None, show=True):
     markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
                'L5_basket': 'x', 'L2_basket': 'x'}
 
-    for cell_type in net.pos_dict:
+    for cell_type in net.cellname_list:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
