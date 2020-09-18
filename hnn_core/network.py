@@ -67,11 +67,7 @@ def _create_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
         The number of Pyramidal cells in x direction.
     n_pyr_y : int
         The number of Pyramidal cells in y direction.
-    n_common_feeds : int
-        The number of common feeds.
-    p_unique_keys : list of str
-        The keys of the dictionary p_unique. Could be 'extpois',
-        'extgauss', or 'evdist_*', or 'evprox_*'
+
     zdiff : float
         Expressed as a positive DEPTH of L5 relative to L2
         This is a deviation from the original, where L5 was defined at 0
@@ -212,6 +208,13 @@ class Network(object):
         return '<%s | %s>' % (class_name, s)
 
     def _assign_external_feeds_coords(self, n_common_feeds, p_unique_keys):
+        """
+        n_common_feeds : int
+            The number of common feeds.
+        p_unique_keys : list of str
+            The keys of the dictionary p_unique. Could be 'extpois',
+            'extgauss', or 'evdist_*', or 'evprox_*'
+        """
         origin = self.pos_dict['origin']
 
         # COMMON FEEDS
@@ -234,18 +237,16 @@ class Network(object):
         self._assign_external_feeds_coords(self.n_common_feeds,
                                            self.p_unique.keys())
 
-        # in particular order (cells, common, names of unique inputs)
-        self.src_list_new = self._create_src_list()
-
         # self._count_cells()  # sets n_cells, includes Artificial ones too!
+
+        # in particular order (cells, common, names of unique inputs)
+        self.src_list_new = self._update_list_of_all_cells()
 
         # count external sources
         self._count_extsrcs()
 
-        self._create_gid_dict()
-
-    def _create_src_list(self):
-        """ creates the immutable source list along with corresponding numbers of cells
+    def _update_list_of_all_cells(self):
+        """creates the immutable list of cell names (real ones and feeds)
         """
         # base source list of tuples, name and number, in this order
         self.extname_list = []
