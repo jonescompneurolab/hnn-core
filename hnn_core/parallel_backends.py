@@ -10,9 +10,21 @@ import shlex
 import pickle
 import codecs
 from warnings import warn
-from subprocess import Popen, PIPE
+from subprocess import Popen
+import select
 
 _BACKEND = None
+
+
+def _read_all_bytes(stream_in, chunk_size=4096):
+    all_data = b""
+    while True:
+        data = stream_in.read(chunk_size)
+        all_data += data
+        if len(data) < chunk_size:
+            break
+
+    return all_data
 
 
 def _gather_trial_data(sim_data, net, n_trials):
@@ -253,43 +265,90 @@ class MPIBackend(object):
         cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
 
         pickled_params = codecs.encode(pickle.dumps(net.params),
-                                       "base64").decode()
+                                       "base64")
 
         # set some MPI environment variables
         my_env = os.environ.copy()
-        my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
+        if 'win' not in sys.platform:
+            my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
+
+        if 'darwin' in sys.platform:
+            my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
+            my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
+
+        # set up pairs of pipes to communicate with subprocess
+        (pipe_stdin_r, pipe_stdin_w) = os.pipe()
+        (pipe_stdout_r, pipe_stdout_w) = os.pipe()
+        (pipe_stderr_r, pipe_stderr_w) = os.pipe()
+
         # Start the simulation in parallel!
-        proc = Popen(cmdargs, stdin=PIPE, stdout=PIPE, stderr=PIPE, env=my_env,
-                     cwd=os.getcwd(), universal_newlines=True)
+        proc = Popen(cmdargs, stdin=pipe_stdin_r, stdout=pipe_stdout_w,
+                     stderr=pipe_stderr_w, env=my_env, cwd=os.getcwd(),
+                     universal_newlines=True)
 
-        # wait until process completes
-        out, err = proc.communicate(pickled_params)
+        # process will read stdin on startup for params
+        os.write(pipe_stdin_w, pickled_params)
 
-        # print all messages (including error messages)
-        print(out)
+        # signal that we are done writing params
+        os.close(pipe_stdin_w)
+        os.close(pipe_stdin_r)
+
+        proc_stderr_bytes = b''
+        # capture stdout while waiting for process to complete
+        while proc.poll() is None:
+            ready = select.select([pipe_stdout_r, pipe_stderr_r], [], [], 0)[0]
+            if not ready:
+                continue
+            for stream in ready:
+                if stream == pipe_stdout_r:
+                    buf = os.read(pipe_stdout_r, 1024)
+                    # write processes stdout to our stdout (fd 0)
+                    os.write(sys.stdout.fileno(), buf)
+                else:
+                    proc_stderr_bytes += os.read(pipe_stderr_r, 1024)
+
+        # done with stdout and stderr
+        os.close(pipe_stdout_r)
+        os.close(pipe_stdout_w)
+        os.close(pipe_stderr_r)
+        os.close(pipe_stderr_w)
+
+        # covert to string to be able to look for padding
+        proc_stderr = proc_stderr_bytes.decode()
+
+        sim_failed = False
+        mpi_error_msg = ''
+
+        # data will always be padded with '===' at the end.
+        if "=" in proc_stderr:
+            # see if there are any error messages after data (padded with "==")
+            stderr_list = proc_stderr.split("=")
+            if len(stderr_list[-1]) > 0:
+                mpi_error_msg = stderr_list[-1]
+                data_str = stderr_list[0]  # padding removed
+                data_str_bytes = data_str.encode() + b"==="
+            else:
+                data_str = proc_stderr
+                data_str_bytes = data_str.encode()
+        else:
+            sim_failed = True
+            if len(proc_stderr) > 0:
+                mpi_error_msg = proc_stderr
+
+        if sim_failed or len(mpi_error_msg) > 0:
+            sys.stderr.write("MPI simulation returned extra messages:\n")
+            sys.stderr.write(mpi_error_msg)
+            sys.stderr.write("\n*** End MPI messages ***\n\n")
 
         # if simulation failed, raise exception
         if proc.returncode != 0:
-            # print the first 1000 bytes
-            print(err[0:1000])
-            if len(err) > 1000:
-                print("Stderr truncated to 1000 bytes")
-
-            # see if there are any error messages after data (padded with "==")
-            err_msg = err.split("==")
-            if len(err_msg) > 1:
-                print(err_msg[1])
             raise RuntimeError("MPI simulation failed")
 
-        data_str = err.rstrip("=")
-        if len(data_str) == 0:
+        if sim_failed:
             raise RuntimeError("MPI simulation didn't return any data")
 
-        # turn stderr (string) to bytes-like object
-        data_bytes = data_str.encode()
-
         # decode base64 object
-        data_pickled = codecs.decode(data_bytes, "base64")
+        data_pickled = codecs.decode(data_str_bytes, "base64")
 
         # unpickle the data
         sim_data = pickle.loads(data_pickled)
