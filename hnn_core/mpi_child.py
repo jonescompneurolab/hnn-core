@@ -84,15 +84,14 @@ def run_mpi_simulation():
         if hasattr(data_iostream, 'buffer'):
             data_iostream = data_iostream.buffer
 
-        if len(sim_data) > 0:
-            # send back dpls and spikedata
-            pickled_string = pickle.dumps(sim_data)
+        # send back dpls and spikedata
+        pickled_string = pickle.dumps(sim_data)
 
-            # encode as base64 before sending to stderr
-            repickled_bytes = codecs.encode(pickled_string,
-                                            'base64')
+        # encode as base64 before sending to stderr
+        repickled_bytes = codecs.encode(pickled_string,
+                                        'base64')
 
-            data_iostream.write(repickled_bytes + b"===")
+        data_iostream.write(repickled_bytes + b"===")
 
     # flush anything in stderr (still points to str_err) to stdout
     sys.stderr.flush()
