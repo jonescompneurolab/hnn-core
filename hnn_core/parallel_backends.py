@@ -303,7 +303,12 @@ class MPIBackend(object):
                 if stream == pipe_stdout_r:
                     buf = os.read(pipe_stdout_r, 1024)
                     # write processes stdout to our stdout (fd 0)
-                    os.write(sys.stdout.fileno(), buf)
+                    try:
+                        stdout_fd = sys.stdout.fileno()
+                    except AttributeError:
+                        # for sphinx-gallery that replaces sys.stdout
+                        stdout_fd = 0
+                    os.write(stdout_fd, buf)
                 else:
                     proc_stderr_bytes += os.read(pipe_stderr_r, 1024)
 
