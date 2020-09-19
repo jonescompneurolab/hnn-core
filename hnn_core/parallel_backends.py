@@ -16,17 +16,6 @@ import select
 _BACKEND = None
 
 
-def _read_all_bytes(stream_in, chunk_size=4096):
-    all_data = b""
-    while True:
-        data = stream_in.read(chunk_size)
-        all_data += data
-        if len(data) < chunk_size:
-            break
-
-    return all_data
-
-
 def _gather_trial_data(sim_data, net, n_trials):
     """Arrange data by trial
 
