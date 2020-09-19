@@ -32,10 +32,8 @@ This backend will use MPI (Message Passing Interface) on the system to split neu
 
 **MacOS Dependencies**::
 
-    $ conda install --yes openmpi
-    $ pip install psutil mpi4py
-
-If you encounter difficulties installing mpi4py with pip (1st choice), then try with conda
+    $ conda install yes openmpi mpi4py
+    $ pip install psutil
 
 **MacOS Environment**::
 
