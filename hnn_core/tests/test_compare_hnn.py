@@ -89,14 +89,15 @@ def test_compare_across_backends():
     # test consistency between default backend simulation and master
     dpls_reduced_default = run_hnn_core(None)
 
-    # test consistency between mpi backend simulation (n_procs=2) and master
-    dpls_reduced_mpi = run_hnn_core(backend='mpi')
-
     try:
         import mpi4py
         mpi4py.__file__
+        # test consistency between mpi backend simulation (n_procs=2) & master
+        dpls_reduced_mpi = run_hnn_core(backend='mpi')
     except ImportError:
-        pytest.skip("mpi4py not available")
+        print("Skipping MPIBackend test and dipole comparison because mpi4py "
+              "could not be imported...")
+        dpls_reduced_mpi = None
 
     # test consistency between joblib backend simulation (n_jobs=2) with master
     dpls_reduced_joblib = run_hnn_core(backend='joblib', n_jobs=2)
@@ -108,9 +109,10 @@ def test_compare_across_backends():
 
     for trial_idx in range(len(dpls_reduced_default)):
         # account for rounding error incured during MPI parallelization
-        assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
-                        dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
-                        atol=1e-14)
+        if dpls_reduced_mpi:
+            assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
+                            dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
+                            atol=1e-14)
         assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
                            dpls_reduced_joblib[trial_idx].data['agg'])
 
