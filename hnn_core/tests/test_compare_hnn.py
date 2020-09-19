@@ -1,4 +1,8 @@
 import os.path as op
+from os import environ
+import pytest
+import io
+from contextlib import redirect_stderr
 
 from numpy import loadtxt
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
@@ -102,3 +106,17 @@ def test_compare_across_backends():
                         atol=1e-14)
         assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
                            dpls_reduced_joblib[trial_idx].data['agg'])
+
+
+def test_mpi_failure():
+    """Test that an MPI failure is handled and error messages pass through"""
+    # this MPI paramter will cause a MPI job with more than one process to fail
+    environ["OMPI_MCA_btl"] = "self"
+
+    with io.StringIO() as buf, redirect_stderr(buf):
+        with pytest.raises(RuntimeError, match="MPI simulation failed"):
+            run_hnn_core(backend='mpi')
+        str_err = buf.getvalue()
+    del environ["OMPI_MCA_btl"]
+
+    assert "MPI processes are unable to reach each other" in str_err
