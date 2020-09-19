@@ -2,6 +2,7 @@ import os.path as op
 from os import environ
 import pytest
 import io
+import sys
 from contextlib import redirect_stderr
 
 from numpy import loadtxt
@@ -113,10 +114,15 @@ def test_mpi_failure():
     # this MPI paramter will cause a MPI job with more than one process to fail
     environ["OMPI_MCA_btl"] = "self"
 
-    with io.StringIO() as buf, redirect_stderr(buf):
+    # this is a bummer, but pytest on linux does something w/ file descriptors
+    if 'linux' in sys.platform:
         with pytest.raises(RuntimeError, match="MPI simulation failed"):
             run_hnn_core(backend='mpi')
-        str_err = buf.getvalue()
-    del environ["OMPI_MCA_btl"]
+    elif 'darwin' in sys.platform:
+        with io.StringIO() as buf, redirect_stderr(buf):
+            with pytest.raises(RuntimeError, match="MPI simulation failed"):
+                run_hnn_core(backend='mpi')
+            str_err = buf.getvalue()
+        assert "MPI processes are unable to reach each other" in str_err
 
-    assert "MPI processes are unable to reach each other" in str_err
+    del environ["OMPI_MCA_btl"]
