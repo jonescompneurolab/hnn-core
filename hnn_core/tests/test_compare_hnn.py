@@ -92,6 +92,12 @@ def test_compare_across_backends():
     # test consistency between mpi backend simulation (n_procs=2) and master
     dpls_reduced_mpi = run_hnn_core(backend='mpi')
 
+    try:
+        import mpi4py
+        mpi4py.__file__
+    except ImportError:
+        pytest.skip("mpi4py not available")
+
     # test consistency between joblib backend simulation (n_jobs=2) with master
     dpls_reduced_joblib = run_hnn_core(backend='joblib', n_jobs=2)
 
@@ -111,6 +117,8 @@ def test_compare_across_backends():
 
 def test_mpi_failure():
     """Test that an MPI failure is handled and error messages pass through"""
+    pytest.importorskip("mpi4py", reason="mpi4py not available")
+
     # this MPI paramter will cause a MPI job with more than one process to fail
     environ["OMPI_MCA_btl"] = "self"
 
