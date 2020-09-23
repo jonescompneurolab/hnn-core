@@ -1,5 +1,4 @@
 import os.path as op
-
 import matplotlib
 import numpy as np
 from numpy.testing import assert_allclose
@@ -12,11 +11,11 @@ from hnn_core.dipole import Dipole, simulate_dipole
 matplotlib.use('agg')
 
 
-def test_dipole():
+def test_dipole(tmpdir):
     """Test dipole object."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    dpl_out_fname = '/tmp/dpl1.txt'
+    dpl_out_fname=tmpdir.join('dpl1.txt')
     params = read_params(params_fname)
     times = np.random.random(6000)
     data = np.random.random((6000, 3))

@@ -81,7 +81,7 @@ def test_network():
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
 
-def test_spikes():
+def test_spikes(tmpdir):
     """Test spikes object."""
 
     # Round-trip test
@@ -90,8 +90,9 @@ def test_spikes():
     spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
     spikes.plot_hist(show=False)
-    spikes.write('/tmp/spk_%d.txt')
-    assert spikes == read_spikes('/tmp/spk_*.txt')
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    spikes.write(op.join(tmpdir.join('spk_%d.txt')))
+    assert spikes == read_spikes(op.join(tmpdir.join('spk_*.txt')))
     assert ("Spikes | 2 simulation trials" in repr(spikes))
 
     with pytest.raises(TypeError, match="times should be a list of lists"):
@@ -124,14 +125,14 @@ def test_spikes():
 
     # Write spike file with no 'types' column
     # Check for gid_dict errors
-    for fname in sorted(glob('/tmp/spk_*.txt')):
+    for fname in sorted(glob(op.join(tmpdir,'spk_*.txt'))):
         times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
     with pytest.raises(ValueError, match="gid_dict must be provided if spike "
-                       "types are unspecified in the file /tmp/spk_0.txt"):
-        spikes = read_spikes('/tmp/spk_*.txt')
+                       "types are unspecified in the file %s" % (fname[0])):
+        spikes = read_spikes(op.join(tmpdir,'spk_*.txt'))
     with pytest.raises(ValueError, match="gid_dict should contain only "
                        "disjoint sets of gid values"):
         gid_dict = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
                     'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
-        spikes = read_spikes('/tmp/spk_*.txt', gid_dict=gid_dict)
+        spikes = read_spikes(op.join(tmpdir,'spk_*.txt'), gid_dict=gid_dict)
