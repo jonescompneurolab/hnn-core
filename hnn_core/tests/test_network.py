@@ -129,7 +129,7 @@ def test_spikes(tmpdir):
         times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
     with pytest.raises(ValueError, match="gid_dict must be provided if spike "
-                       "types are unspecified in the file %s" % (fname[0])):
+                       "types are unspecified in the file "):
         spikes = read_spikes(op.join(tmpdir,'spk_*.txt'))
     with pytest.raises(ValueError, match="gid_dict should contain only "
                        "disjoint sets of gid values"):
