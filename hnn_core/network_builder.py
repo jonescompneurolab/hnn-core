@@ -106,11 +106,8 @@ def _simulate_single_trial(neuron_net, trial_idx, postproc=True):
 
     dpl = Dipole(times, dpl_data)
     if rank == 0:
-        if neuron_net.net.params['save_dpl']:
-            dpl.write('rawdpl.txt')
 
-
-        dpl.baseline_renormalize(neuron_net.net.params)   
+        dpl.baseline_renormalize(neuron_net.net.params)
         dpl.convert_fAm_to_nAm()
         if postproc:
             dpl.scale(neuron_net.net.params['dipole_scalefctr'])
