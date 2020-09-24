@@ -142,6 +142,8 @@ class JoblibBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
+        postproc: bool
+            If False, no scaling or smoothing applied to the dipole
 
         Returns
         -------
