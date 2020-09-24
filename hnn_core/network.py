@@ -35,7 +35,7 @@ def read_spikes(fname, gid_dict=None):
     spike_times = []
     spike_gids = []
     spike_types = []
-    for file in sorted(glob(fname)):
+    for file in sorted(glob(str(fname))):
         spike_trial = np.loadtxt(file, dtype=str)
         spike_times += [list(spike_trial[:, 0].astype(float))]
         spike_gids += [list(spike_trial[:, 1].astype(int))]
@@ -515,7 +515,7 @@ class Spikes(object):
         """
 
         for trial_idx in range(len(self._times)):
-            with open(fname % (trial_idx,), 'w') as f:
+            with open(str(fname) % (trial_idx,), 'w') as f:
                 for spike_idx in range(len(self._times[trial_idx])):
                     f.write('{:.3f}\t{}\t{}\n'.format(
                         self._times[trial_idx][spike_idx],

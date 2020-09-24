@@ -1,4 +1,5 @@
 import os.path as op
+
 import matplotlib
 import numpy as np
 from numpy.testing import assert_allclose
