@@ -174,6 +174,10 @@ class Network(object):
             'L5_basket',
             'L5_pyramidal',
         ]
+        self.feedname_list = []  # no feeds defined yet
+        # this will contain a list of all cell names, real and artificial
+        self._all_cell_names = []
+
         # cell position lists, also will give counts: must be known
         # by ALL nodes
         # XXX structure of pos_dict determines all downstream inferences of
@@ -188,16 +192,32 @@ class Network(object):
 
         # create dictionary of GIDs according to cell type
         # global dictionary of gid and cell type
-        self.gid_dict = {}
+        # Initialise a dictionary of cell ID's, which get assigned when the
+        # network is constructed ('built') in NetworkBuilder
+        # We want it to remain in each Network object, so that the user can
+        # interrogate a built and simulated net. In addition, Spikes are
+        # attached to a Network during simulation---Network is the natural
+        # place to keep this information
+        # XXX rename gid_dict in future
+        self.gid_dict = dict()
+
+        # When computing the network dynamics in parallel, the nodes of the
+        # network (real and artificial cells) potentially get distributed
+        # on different host machines/threads. NetworkBuilder._gid_assign
+        # assigns each node, identified by its unique GID, to one of the
+        # possible hosts/threads for computations. _gid_list here contains
+        # the GIDs of all the nodes assigned to the current host/thread.
+        self._gid_list = []
+
         # Create empty spikes object
         self.spikes = Spikes()
-        # assign gid to hosts, creates list of gids for this node in _gid_list
-        # _gid_list length is number of cells assigned to this id()
-        self._gid_list = []
-        self.trial_idx = 0
 
         # test adding external feeds would work here
         self._add_external_feeds()
+
+        # in particular order (cells, common, names of unique inputs)
+        self._update_all_cell_names()
+
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -239,25 +259,22 @@ class Network(object):
 
         # self._count_cells()  # sets n_cells, includes Artificial ones too!
 
-        # in particular order (cells, common, names of unique inputs)
-        self.src_list_new = self._update_list_of_all_cells()
-
-        # count external sources
-        self._count_extsrcs()
-
-    def _update_list_of_all_cells(self):
-        """creates the immutable list of cell names (real ones and feeds)
-        """
-        # base source list of tuples, name and number, in this order
-        self.extname_list = []
-        self.extname_list.append('common')
+        # XXX hard-coded here until attaching feeds can be done smarter
+        self.feedname_list = []
+        self.feedname_list.append('common')
         # grab the keys for the unique set of inputs and sort the names
         # append them to the src list along with the number of cells
         unique_keys = sorted(self.p_unique.keys())
-        self.extname_list += unique_keys
+        self.feedname_list += unique_keys
+        # count external sources
+
+        self._count_extsrcs()
+
+    def _update_all_cell_names(self):
+        """updatest the list of cell names (real ones and feeds)
+        """
         # return one final source list
-        src_list = self.cellname_list + self.extname_list
-        return src_list
+        self._all_cell_names = self.cellname_list + self.feedname_list
 
     def _count_cells(self):
         """Cell counting routine."""
@@ -272,7 +289,7 @@ class Network(object):
     def _count_extsrcs(self):
         # all src numbers are based off of length of pos_dict entry
         # generally done here in lieu of upstream changes
-        for src in self.extname_list:
+        for src in self.feedname_list:
             self.n_of_type[src] = len(self.pos_dict[src])
 
     def _create_gid_dict(self):
@@ -281,18 +298,18 @@ class Network(object):
         gid_ind = [0]
         # append a new gid_ind based on previous and next cell count
         # order is guaranteed by self.src_list_new
-        for i in range(len(self.src_list_new)):
+        for i in range(len(self._all_cell_names)):
             # N = self.src_list_new[i][1]
             # grab the src name in ordered list src_list_new
-            src = self.src_list_new[i]
+            src = self._all_cell_names[i]
             # query the N dict for that number and append here
             # to gid_ind, based on previous entry
             gid_ind.append(gid_ind[i] + self.n_of_type[src])
             # accumulate total source count
             self.n_src += self.n_of_type[src]
         # now actually assign the ranges
-        for i in range(len(self.src_list_new)):
-            src = self.src_list_new[i]
+        for i in range(len(self._all_cell_names)):
+            src = self._all_cell_names[i]
             self.gid_dict[src] = range(gid_ind[i], gid_ind[i + 1])
 
     def gid_to_type(self, gid):
