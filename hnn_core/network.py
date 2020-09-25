@@ -151,8 +151,6 @@ class Network(object):
         (or input) types.
     spikes : Spikes
         An instance of the Spikes object.
-    trial_idx : int
-        Current trial number (starting from 0)
     """
 
     def __init__(self, params):
@@ -166,9 +164,6 @@ class Network(object):
         self.n_times = np.arange(0., self.params['tstop'],
                                  self.params['dt']).size + 1
 
-        self.n_src = 0
-        self.n_of_type = {}  # numbers of sources
-        self.n_cells = 0  # init self.n_cells
         # Source list of names, first real ones only!
         self.cellname_list = [
             'L2_basket',
@@ -177,8 +172,6 @@ class Network(object):
             'L5_pyramidal',
         ]
         self.feedname_list = []  # no feeds defined yet
-        # this will contain a list of all cell names, real and artificial
-        self._all_cell_names = []
 
         # cell position lists, also will give counts: must be known
         # by ALL nodes
@@ -189,7 +182,8 @@ class Network(object):
                                             zdiff=1307.4)
 
         # set n_cells, EXCLUDING Artificial ones
-        self._count_cells()
+        self.n_cells = sum(len(self.pos_dict[src]) for src in
+                           self.cellname_list)
 
         # Initialise a dictionary of cell ID's, which get assigned when the
         # network is constructed ('built') in NetworkBuilder
@@ -216,15 +210,13 @@ class Network(object):
         # until a new handling of external NetworkDrives's is completed.
         self._add_external_feeds()
 
-        # in particular order (cells, common, names of unique inputs)
-        self._update_all_cell_names()
-
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
              % (self.params['N_pyr_x'], self.params['N_pyr_y']))
         s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
+              % (len(self.pos_dict['L2_basket']),
+                 len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
 
     def _add_external_feeds(self):
@@ -259,44 +251,15 @@ class Network(object):
         unique_keys = sorted(self.p_unique.keys())
         self.feedname_list += unique_keys
 
-        # update external feed/source/drive count
-        # all src numbers are based off of length of pos_dict entry
-        # generally done here in lieu of upstream changes
-        for src in self.feedname_list:
-            self.n_of_type[src] = len(self.pos_dict[src])
-
-    def _update_all_cell_names(self):
-        """Updates the list of cell names (real ones and feeds)"""
-        # return one final source list
-        self._all_cell_names = self.cellname_list + self.feedname_list
-
-    def _count_cells(self):
-        """Cell counting routine."""
-        # cellname list is used *only* for this purpose for now
-        for src in self.cellname_list:
-            # if it's a cell, then add the number to total number of cells
-            self.n_of_type[src] = len(self.pos_dict[src])
-            self.n_cells += self.n_of_type[src]
-
     def _create_gid_dict(self):
-        """Creates gid dicts and pos_lists."""
-        # initialize gid index gid_ind to start at 0
-        gid_ind = [0]
-        # append a new gid_ind based on previous and next cell count
-        # order is guaranteed by self.src_list_new
-        for i in range(len(self._all_cell_names)):
-            # N = self.src_list_new[i][1]
-            # grab the src name in ordered list src_list_new
-            src = self._all_cell_names[i]
-            # query the N dict for that number and append here
-            # to gid_ind, based on previous entry
-            gid_ind.append(gid_ind[i] + self.n_of_type[src])
-            # accumulate total source count
-            self.n_src += self.n_of_type[src]
-        # now actually assign the ranges
-        for i in range(len(self._all_cell_names)):
-            src = self._all_cell_names[i]
-            self.gid_dict[src] = range(gid_ind[i], gid_ind[i + 1])
+        """Creates gid dicts."""
+        gid_lims = [0]  # start and end gids per cell type
+        src_types = self.cellname_list + self.feedname_list
+        for idx, src_type in enumerate(src_types):
+            n_srcs = len(self.pos_dict[src_type])
+            gid_lims.append(gid_lims[idx] + n_srcs)
+            self.gid_dict[src_type] = range(gid_lims[idx],
+                                            gid_lims[idx + 1])
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
