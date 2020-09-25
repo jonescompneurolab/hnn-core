@@ -58,8 +58,8 @@ def read_spikes(fname, gid_dict=None):
     return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
 
 
-def _create_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
-    """Creates coordinate grid.
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
+    """Creates coordinate grid and place cells in it.
 
     Parameters
     ----------
@@ -185,9 +185,9 @@ class Network(object):
         # XXX structure of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self.pos_dict = dict.fromkeys(self.cellname_list)
-        self.pos_dict = _create_coords(n_pyr_x=self.params['N_pyr_x'],
-                                       n_pyr_y=self.params['N_pyr_y'],
-                                       zdiff=1307.4)
+        self.pos_dict = _create_cell_coords(n_pyr_x=self.params['N_pyr_x'],
+                                            n_pyr_y=self.params['N_pyr_y'],
+                                            zdiff=1307.4)
 
         # set n_cells, EXCLUDING Artificial ones
         self._count_cells()
@@ -213,7 +213,7 @@ class Network(object):
         self.spikes = Spikes()
 
         # XXX The legacy code in HNN-GUI _always_ defines 2 'common' and 5
-        # 'unique' feeds. The are added here for backwards compatibility
+        # 'unique' feeds. They are added here for backwards compatibility
         # until a new handling of external NetworkDrives's is completed.
         self._add_external_feeds()
 
@@ -228,25 +228,11 @@ class Network(object):
               % (self.n_of_type['L2_basket'], self.n_of_type['L5_basket']))
         return '<%s | %s>' % (class_name, s)
 
-    def _assign_external_feeds_coords(self, n_common_feeds, p_unique_keys):
-        """
-        n_common_feeds : int
-            The number of common feeds.
-        p_unique_keys : list of str
-            The keys of the dictionary p_unique. Could be 'extpois',
-            'extgauss', or 'evdist_*', or 'evprox_*'
-        """
-        origin = self.pos_dict['origin']
-
-        # COMMON FEEDS
-        self.pos_dict['common'] = [origin for i in range(n_common_feeds)]
-
-        # UNIQUE FEEDS
-        for key in p_unique_keys:
-            # create the pos_dict for all the sources
-            self.pos_dict[key] = [origin for i in range(self.n_cells)]
-
     def _add_external_feeds(self):
+        """Legacy function, for backward compatibility with original HNN-GUI
+
+        This function is called exactly once during initialisation
+        """
         # params of common external feeds inputs in p_common
         # Global number of external inputs ... automatic counting
         # makes more sense
@@ -255,23 +241,33 @@ class Network(object):
                                                    self.params['tstop'])
         self.n_common_feeds = len(self.p_common)
 
-        self._assign_external_feeds_coords(self.n_common_feeds,
-                                           self.p_unique.keys())
+        # 'position' the artificial cells arbitrarily in the origin of the
+        # network grid. Non-biophysical cell placement is irrelevant
+        origin = self.pos_dict['origin']
 
-        # XXX hard-coded here until attaching feeds can be done smarter
-        self.feedname_list = []
+        # COMMON FEEDS
+        self.pos_dict['common'] = [origin for i in range(self.n_common_feeds)]
+
+        # UNIQUE FEEDS
+        for key in self.p_unique.keys():
+            # create the pos_dict for all the sources
+            self.pos_dict[key] = [origin for i in range(self.n_cells)]
+
+        # Now add the names of the feeds to a list
         self.feedname_list.append('common')
         # grab the keys for the unique set of inputs and sort the names
         # append them to the src list along with the number of cells
         unique_keys = sorted(self.p_unique.keys())
         self.feedname_list += unique_keys
-        # count external sources
 
-        self._count_extsrcs()
+        # update external feed/source/drive count
+        # all src numbers are based off of length of pos_dict entry
+        # generally done here in lieu of upstream changes
+        for src in self.feedname_list:
+            self.n_of_type[src] = len(self.pos_dict[src])
 
     def _update_all_cell_names(self):
-        """updatest the list of cell names (real ones and feeds)
-        """
+        """Updates the list of cell names (real ones and feeds)"""
         # return one final source list
         self._all_cell_names = self.cellname_list + self.feedname_list
 
@@ -282,14 +278,6 @@ class Network(object):
             # if it's a cell, then add the number to total number of cells
             self.n_of_type[src] = len(self.pos_dict[src])
             self.n_cells += self.n_of_type[src]
-
-    # general counting method requires pos_dict is correct for each source
-    # and that all sources are represented
-    def _count_extsrcs(self):
-        # all src numbers are based off of length of pos_dict entry
-        # generally done here in lieu of upstream changes
-        for src in self.feedname_list:
-            self.n_of_type[src] = len(self.pos_dict[src])
 
     def _create_gid_dict(self):
         """Creates gid dicts and pos_lists."""
