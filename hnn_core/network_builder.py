@@ -277,6 +277,10 @@ class NetworkBuilder(object):
         self._feed_cells = []
         self.ncs = dict()
 
+        # To allow incremental building up of cells and drives in the
+        # network, hold off on initialising the GID dict of the Network
+        # until user calls NetworkBuilder. This method may be dropped later
+        # if GIDs can safely also be created on-the-fly, incrementally.
         self.net._create_gid_dict()
 
         self._build()
