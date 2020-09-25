@@ -114,7 +114,6 @@ def _create_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     pos_dict['L5_basket'] = [
         pos_xy + (zdiff,) for pos_xy in coords_sorted]
 
-    # n_cells = sum([len(pos_dict[key]) for key in pos_dict])
     # ORIGIN
     # origin's z component isn't really used in
     # calculating distance functions from origin
@@ -142,6 +141,10 @@ class Network(object):
     ----------
     params : dict
         The parameters
+    cellname_list : list
+        The names of real cell types in the network (e.g. 'L2_basket')
+    feedname_list : list
+        The names of external drivers ('feeds') to the network (e.g. 'evdist1')
     gid_dict : dict
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell IDs of different cell
@@ -153,14 +156,13 @@ class Network(object):
     """
 
     def __init__(self, params):
-        # set the params internally for this net
-        # better than passing it around like ...
+        # Save the parameters used to create the Network
         self.params = params
+
         # Number of time points
         # Originally used to create the empty vec for synaptic currents,
         # ensuring that they exist on this node irrespective of whether
         # or not cells of relevant type actually do
-
         self.n_times = np.arange(0., self.params['tstop'],
                                  self.params['dt']).size + 1
 
@@ -190,8 +192,6 @@ class Network(object):
         # set n_cells, EXCLUDING Artificial ones
         self._count_cells()
 
-        # create dictionary of GIDs according to cell type
-        # global dictionary of gid and cell type
         # Initialise a dictionary of cell ID's, which get assigned when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
@@ -212,12 +212,13 @@ class Network(object):
         # Create empty spikes object
         self.spikes = Spikes()
 
-        # test adding external feeds would work here
+        # XXX The legacy code in HNN-GUI _always_ defines 2 'common' and 5
+        # 'unique' feeds. The are added here for backwards compatibility
+        # until a new handling of external NetworkDrives's is completed.
         self._add_external_feeds()
 
         # in particular order (cells, common, names of unique inputs)
         self._update_all_cell_names()
-
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -256,8 +257,6 @@ class Network(object):
 
         self._assign_external_feeds_coords(self.n_common_feeds,
                                            self.p_unique.keys())
-
-        # self._count_cells()  # sets n_cells, includes Artificial ones too!
 
         # XXX hard-coded here until attaching feeds can be done smarter
         self.feedname_list = []
@@ -326,10 +325,7 @@ class Network(object):
         type_pos_ind = gid - self.gid_dict[src_type][0]
         src_pos = self.pos_dict[src_type][type_pos_ind]
 
-        real_cell_types = ['L2_pyramidal', 'L5_pyramidal',
-                           'L2_basket', 'L5_basket']
-
-        return src_type, src_pos, src_type in real_cell_types
+        return src_type, src_pos, src_type in self.cellname_list
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
