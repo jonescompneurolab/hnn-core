@@ -151,6 +151,10 @@ class Network(object):
         (or input) types.
     spikes : Spikes
         An instance of the Spikes object.
+    vsoma : dict
+        Dictionary indexed by gids containing somatic voltages
+    trial_idx : int
+        Current trial number (starting from 0)
     """
 
     def __init__(self, params):
@@ -193,6 +197,7 @@ class Network(object):
         # place to keep this information
         # XXX rename gid_dict in future
         self.gid_dict = dict()
+        self.vsoma = {}
 
         # When computing the network dynamics in parallel, the nodes of the
         # network (real and artificial cells) potentially get distributed
