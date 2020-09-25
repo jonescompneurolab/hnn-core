@@ -184,7 +184,6 @@ class Network(object):
         # by ALL nodes
         # XXX structure of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
-        self.pos_dict = dict.fromkeys(self.cellname_list)
         self.pos_dict = _create_cell_coords(n_pyr_x=self.params['N_pyr_x'],
                                             n_pyr_y=self.params['N_pyr_y'],
                                             zdiff=1307.4)
