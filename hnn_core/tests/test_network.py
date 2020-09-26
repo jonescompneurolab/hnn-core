@@ -122,14 +122,14 @@ def test_spikes(tmpdir):
         spikes = Spikes(times=[[2.3456, 7.89]], gids=spikegids,
                         types=spiketypes)
 
-    # with pytest.raises(ValueError, match="tstart and tstop must be of type "
-    #                    "int or float"):
-    #     spikes = Spikes()
-    #     spikes.update_trial_bounds(tstart=0.1, tstop='ABC')
+    with pytest.raises(ValueError, match="tstart and tstop must be of type "
+                       "int or float"):
+        spikes = Spikes()
+        spikes.mean_rates(tstart=0.1, tstop='ABC', gid_dict={})
 
-    # with pytest.raises(ValueError, match="tstop must be greater than tstart"):
-    #     spikes = Spikes()
-    #     spikes.update_trial_bounds(tstart=0.1, tstop=-1.0)
+    with pytest.raises(ValueError, match="tstop must be greater than tstart"):
+        spikes = Spikes()
+        spikes.mean_rates(tstart=0.1, tstop=-1.0, gid_dict={})
 
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
 
@@ -151,7 +151,7 @@ def test_spikes(tmpdir):
 
     with pytest.raises(ValueError, match="Invalid mean_type. Valid "
                        "arguments include 'all', 'trial', or 'cell'."):
-        spikes.mean_rates(mean_type='ABC')
+        spikes.mean_rates(tstart=0.1, tstop=98.4, gid_dict={}, mean_type='ABC')
 
     # Write spike file with no 'types' column
     # Check for gid_dict errors
