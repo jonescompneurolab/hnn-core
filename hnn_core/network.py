@@ -12,7 +12,7 @@ from .params import create_pext
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
-def read_spikes(fname, gid_dict=None, tstart=None, tstop=None):
+def read_spikes(fname, gid_dict=None):
     """Read spiking activity from a collection of spike trial files.
 
     Parameters
@@ -490,7 +490,7 @@ class Spikes(object):
 
             if mean_type == 'all':
                 spike_rates[cell_type] = np.mean(
-                    np.mean(gid_spike_rate, axis=1))
+                    gid_spike_rate.mean(axis=1))
             if mean_type == 'trial':
                 spike_rates[cell_type] = np.mean(
                     gid_spike_rate, axis=1).tolist()
@@ -569,7 +569,7 @@ class Spikes(object):
         for trial_idx in range(len(self._times)):
             with open(str(fname) % (trial_idx,), 'w') as f:
                 for spike_idx in range(len(self._times[trial_idx])):
-                    f.write('{:.3f}\t{}\t{}\t\n'.format(
+                    f.write('{:.3f}\t{}\t{}\n'.format(
                         self._times[trial_idx][spike_idx],
                         int(self._gids[trial_idx][spike_idx]),
                         self._types[trial_idx][spike_idx]))
