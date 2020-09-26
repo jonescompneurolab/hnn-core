@@ -137,20 +137,26 @@ class Network(object):
     Parameters
     ----------
     params : dict
-        The parameters
+        The parameters to use for constructing the network.
 
     Attributes
     ----------
     params : dict
-        The parameters
+        The parameters of the network
     cellname_list : list
         The names of real cell types in the network (e.g. 'L2_basket')
     feedname_list : list
         The names of external drivers ('feeds') to the network (e.g. 'evdist1')
     gid_dict : dict
-        Dictionary with keys 'evprox1', 'evdist1' etc.
-        containing the range of Cell IDs of different cell
-        (or input) types.
+        A dictionary of unique identifiers of each real and artificial cell
+        in the network. Every cell type is represented by a key read from
+        cellname_list, followed by entries read from feedname_list. The value
+        of each key is a range of ints, one for each cell in given category.
+        Examples: 'L2_basal': range(0, 270), 'evdist1': range(272, 542), etc
+    pos_dict : dict
+        Dictionary containing the coordinate positions of all cells.
+        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
+        'common', or any of the elements of the cellname or feedname lists.
     spikes : Spikes
         An instance of the Spikes object.
     """
@@ -158,35 +164,6 @@ class Network(object):
     def __init__(self, params):
         # Save the parameters used to create the Network
         self.params = params
-
-        # Number of time points
-        # Originally used to create the empty vec for synaptic currents,
-        # ensuring that they exist on this node irrespective of whether
-        # or not cells of relevant type actually
-        self.times = np.arange(0., params['tstop'] + params['dt'],
-                               params['dt'])
-
-        # Source list of names, first real ones only!
-        self.cellname_list = [
-            'L2_basket',
-            'L2_pyramidal',
-            'L5_basket',
-            'L5_pyramidal',
-        ]
-        self.feedname_list = []  # no feeds defined yet
-
-        # cell position lists, also will give counts: must be known
-        # by ALL nodes
-        # XXX structure of pos_dict determines all downstream inferences of
-        # cell counts, real and artificial
-        self.pos_dict = _create_cell_coords(n_pyr_x=self.params['N_pyr_x'],
-                                            n_pyr_y=self.params['N_pyr_y'],
-                                            zdiff=1307.4)
-
-        # set n_cells, EXCLUDING Artificial ones
-        self.n_cells = sum(len(self.pos_dict[src]) for src in
-                           self.cellname_list)
-
         # Initialise a dictionary of cell ID's, which get assigned when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
@@ -204,8 +181,38 @@ class Network(object):
         # the GIDs of all the nodes assigned to the current host/thread.
         self._gid_list = []
 
+        # Number of time points
+        # Originally used to create the empty vec for synaptic currents,
+        # ensuring that they exist on this node irrespective of whether
+        # or not cells of relevant type actually
+        self.times = np.arange(0., params['tstop'] + params['dt'],
+                               params['dt'])
         # Create empty spikes object
         self.spikes = Spikes()
+
+        # Source list of names, first real ones only!
+        self.cellname_list = [
+            'L2_basket',
+            'L2_pyramidal',
+            'L5_basket',
+            'L5_pyramidal',
+        ]
+        self.feedname_list = []  # no feeds defined yet
+
+        # cell position lists, also will give counts: must be known
+        # by ALL nodes
+        # XXX structure of pos_dict determines all downstream inferences of
+        # cell counts, real and artificial
+        self.pos_dict = _create_cell_coords(n_pyr_x=self.params['N_pyr_x'],
+                                            n_pyr_y=self.params['N_pyr_y'],
+                                            zdiff=1307.4)
+        # XXX not strictly necessary here (_add_external_feeds calls it blw.)
+        # but perhaps should be encouraged on adding new cells?
+        self._update_gid_dict()
+
+        # set n_cells, EXCLUDING Artificial ones
+        self.n_cells = sum(len(self.pos_dict[src]) for src in
+                           self.cellname_list)
 
         # XXX The legacy code in HNN-GUI _always_ defines 2 'common' and 5
         # 'unique' feeds. They are added here for backwards compatibility
@@ -236,6 +243,7 @@ class Network(object):
 
         # 'position' the artificial cells arbitrarily in the origin of the
         # network grid. Non-biophysical cell placement is irrelevant
+        # However, they must be present to be included in gid_dict!
         origin = self.pos_dict['origin']
 
         # COMMON FEEDS
@@ -253,8 +261,15 @@ class Network(object):
         unique_keys = sorted(self.p_unique.keys())
         self.feedname_list += unique_keys
 
-    def _create_gid_dict(self):
-        """Creates gid dicts."""
+        self._update_gid_dict()  # add feeds -> update the gid_dict
+
+    def _update_gid_dict(self):
+        """Creates gid dict from scratch every time called.
+
+        Any method that adds real or artificial cells to the network must
+        call this to update the list of GIDs. Note that it's based on the
+        content of pos_dict and the lists of real and artificial cell names.
+        """
         gid_lims = [0]  # start and end gids per cell type
         src_types = self.cellname_list + self.feedname_list
         for idx, src_type in enumerate(src_types):

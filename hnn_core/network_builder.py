@@ -278,12 +278,6 @@ class NetworkBuilder(object):
         self._feed_cells = []
         self.ncs = dict()
 
-        # To allow incremental building up of cells and drives in the
-        # network, hold off on initialising the GID dict of the Network
-        # until user calls NetworkBuilder. This method may be dropped later
-        # if GIDs can safely also be created on-the-fly, incrementally.
-        self.net._create_gid_dict()
-
         self._build()
 
     def _build(self):
@@ -300,6 +294,10 @@ class NetworkBuilder(object):
         self._clear_last_network_objects()
 
         self._gid_assign()
+
+        # initialise vectors for synaptic currents based on simulation params
+        n_times = np.arange(0., self.net.params['tstop'],
+                            self.net.params['dt']).size + 1
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
