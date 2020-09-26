@@ -67,6 +67,19 @@ with tempfile.TemporaryDirectory() as tmp_dir_name:
 spikes.plot()
 
 ###############################################################################
+# We can additionally calculate the mean spike rates for each cell class by
+# specifying a time window with tstart and tstop.
+all_rates = spikes.mean_rates(tstart=0, tstop=170, gid_dict=net.gid_dict,
+                              mean_type='all')
+trial_rates = spikes.mean_rates(tstart=0, tstop=170, gid_dict=net.gid_dict,
+                                mean_type='trial')
+print('Mean spike rates across trials:')
+print(all_rates)
+print('Mean spike rates for individual trials:')
+print(trial_rates)
+
+
+###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
 # synchronous and see what happens
 
