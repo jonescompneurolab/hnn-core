@@ -465,7 +465,7 @@ class Spikes(object):
 
         if mean_type not in ['all', 'trial', 'cell']:
             raise ValueError("Invalid mean_type. Valid arguments include "
-                             "'all', 'trial', or 'cell'.")
+                             f"'all', 'trial', or 'cell'. Got {mean_type}")
 
         # Validate tstart, tstop
         if not isinstance(tstart, (int, float)) or not isinstance(
