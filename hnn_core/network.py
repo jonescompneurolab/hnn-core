@@ -467,6 +467,13 @@ class Spikes(object):
             raise ValueError("Invalid mean_type. Valid arguments include "
                              "'all', 'trial', or 'cell'.")
 
+        # Validate tstart, tstop
+        if not isinstance(tstart, (int, float)) or not isinstance(
+                tstop, (int, float)):
+            raise ValueError('tstart and tstop must be of type int or float')
+        elif tstop <= tstart:
+            raise ValueError('tstop must be greater than tstart')
+
         for cell_type in cell_types:
             cell_type_gids = np.array(gid_dict[cell_type])
             gid_spike_rate = np.zeros((len(self._times), len(cell_type_gids)))
