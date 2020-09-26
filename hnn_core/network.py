@@ -151,8 +151,6 @@ class Network(object):
         (or input) types.
     spikes : Spikes
         An instance of the Spikes object.
-    vsoma : dict
-        Dictionary indexed by gids containing somatic voltages
     trial_idx : int
         Current trial number (starting from 0)
     """
@@ -197,7 +195,6 @@ class Network(object):
         # place to keep this information
         # XXX rename gid_dict in future
         self.gid_dict = dict()
-        self.vsoma = {}
 
         # When computing the network dynamics in parallel, the nodes of the
         # network (real and artificial cells) potentially get distributed
@@ -333,6 +330,8 @@ class Spikes(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_dict.
+    vsoma : dict
+        Dictionary indexed by gids containing somatic voltages
 
     Methods
     -------
@@ -378,6 +377,7 @@ class Spikes(object):
         self._times = times
         self._gids = gids
         self._types = types
+        self._vsoma = list()
 
     def __repr__(self):
         class_name = self.__class__.__name__
