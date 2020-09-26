@@ -476,7 +476,8 @@ class Spikes(object):
 
         for cell_type in cell_types:
             cell_type_gids = np.array(gid_dict[cell_type])
-            gid_spike_rate = np.zeros((len(self._times), len(cell_type_gids)))
+            n_trials, n_cells = len(self._times), len(cell_type_gids)
+            gid_spike_rate = np.zeros((n_trials, n_cells))
 
             trial_data = zip(self._types, self._gids)
             for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
