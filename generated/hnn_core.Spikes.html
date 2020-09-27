@@ -151,8 +151,8 @@ Each gid corresponds to a type via Network::gid_dict.</p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 20%" />
-<col style="width: 80%" />
+<col style="width: 33%" />
+<col style="width: 67%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><strong>update_types(gid_dict)</strong></p></td>
@@ -161,7 +161,10 @@ Each gid corresponds to a type via Network::gid_dict.</p>
 <tr class="row-even"><td><p><strong>plot(ax=None, show=True)</strong></p></td>
 <td><p>Plot and return a matplotlib Figure object showing the aggregate network spiking activity according to cell type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>write(fname)</strong></p></td>
+<tr class="row-odd"><td><p><strong>mean_rates(tstart, tstop, gid_dict, mean_type=’all’)</strong></p></td>
+<td><p>Calculate mean firing rate for each cell type. Specify averaging method with mean_type argument.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>write(fname)</strong></p></td>
 <td><p>Write spiking activity to a collection of spike trial files.</p></td>
 </tr>
 </tbody>
@@ -170,6 +173,41 @@ Each gid corresponds to a type via Network::gid_dict.</p>
 <dt id="hnn_core.Spikes.__repr__">
 <code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.Spikes.mean_rates">
+<code class="sig-name descname">mean_rates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tstart</span></em>, <em class="sig-param"><span class="n">tstop</span></em>, <em class="sig-param"><span class="n">gid_dict</span></em>, <em class="sig-param"><span class="n">mean_type</span><span class="o">=</span><span class="default_value">'all'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.mean_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean spike rates (Hz) by cell type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tstart</strong><span class="classifier">int | float | None</span></dt><dd><p>Value defining the start time of all trials.</p>
+</dd>
+<dt><strong>tstop</strong><span class="classifier">int | float | None</span></dt><dd><p>Value defining the stop time of all trials.</p>
+</dd>
+<dt><strong>gid_dict</strong><span class="classifier">dict of lists or range objects</span></dt><dd><p>Dictionary with keys ‘evprox1’, ‘evdist1’ etc.
+containing the range of Cell or input IDs of different
+cell or input types.</p>
+</dd>
+<dt><strong>mean_type</strong><span class="classifier">str</span></dt><dd><dl class="simple">
+<dt>‘all’<span class="classifier">Average over trials and cells</span></dt><dd><p>Returns mean rate for cell types</p>
+</dd>
+<dt>‘trial’<span class="classifier">Average over cell types</span></dt><dd><p>Returns trial mean rate for cell types</p>
+</dd>
+<dt>‘cell’<span class="classifier">Average over individual cells</span></dt><dd><p>Returns trial mean rate for individual cells</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>spike_rate</strong><span class="classifier">dict</span></dt><dd><p>Dictionary with keys ‘L5_pyramidal’, ‘L5_basket’, etc.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

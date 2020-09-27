@@ -35,27 +35,6 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core. ">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
-     :alt: Simulate dipole
-
-     :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_simulate_evoked
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using HNN-core. ">
 
 .. only:: html
@@ -95,6 +74,27 @@ Some introductory examples to get started with hnn-core
    :hidden:
 
    /auto_examples/plot_simulate_gamma
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core. ">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+     :alt: Simulate dipole
+
+     :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_simulate_evoked
 
 .. raw:: html
 

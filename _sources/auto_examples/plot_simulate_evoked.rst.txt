@@ -506,6 +506,40 @@ wildcard expressions.
 
 
 
+We can additionally calculate the mean spike rates for each cell class by
+specifying a time window with tstart and tstop.
+
+
+.. code-block:: default
+
+    all_rates = spikes.mean_rates(tstart=0, tstop=170, gid_dict=net.gid_dict,
+                                  mean_type='all')
+    trial_rates = spikes.mean_rates(tstart=0, tstop=170, gid_dict=net.gid_dict,
+                                    mean_type='trial')
+    print('Mean spike rates across trials:')
+    print(all_rates)
+    print('Mean spike rates for individual trials:')
+    print(trial_rates)
+
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Mean spike rates across trials:
+    {'L5_pyramidal': 23.20588235294118, 'L5_basket': 13.52941176470588, 'L2_pyramidal': 5.1764705882352935, 'L2_basket': 9.411764705882351}
+    Mean spike rates for individual trials:
+    {'L5_pyramidal': [23.29411764705883, 23.117647058823533], 'L5_basket': [14.453781512605042, 12.60504201680672], 'L2_pyramidal': [6.705882352941176, 3.6470588235294117], 'L2_basket': [9.243697478991596, 9.579831932773109]}
+
+
+
+
 Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens
 
@@ -573,7 +607,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 6 minutes  0.176 seconds)
+   **Total running time of the script:** ( 1 minutes  41.286 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

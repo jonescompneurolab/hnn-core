@@ -486,6 +486,25 @@ wildcard expressions.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
+<p>We can additionally calculate the mean spike rates for each cell class by
+specifying a time window with tstart and tstop.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">all_rates</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spikes</span></a><span class="o">.</span><span class="n">mean_rates</span><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">gid_dict</span><span class="o">=</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">gid_dict</span><span class="p">,</span>
+                              <span class="n">mean_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+<span class="n">trial_rates</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spikes</span></a><span class="o">.</span><span class="n">mean_rates</span><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">gid_dict</span><span class="o">=</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">gid_dict</span><span class="p">,</span>
+                                <span class="n">mean_type</span><span class="o">=</span><span class="s1">&#39;trial&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mean spike rates across trials:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">all_rates</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mean spike rates for individual trials:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trial_rates</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Mean spike rates across trials:
+{&#39;L5_pyramidal&#39;: 23.20588235294118, &#39;L5_basket&#39;: 13.52941176470588, &#39;L2_pyramidal&#39;: 5.1764705882352935, &#39;L2_basket&#39;: 9.411764705882351}
+Mean spike rates for individual trials:
+{&#39;L5_pyramidal&#39;: [23.29411764705883, 23.117647058823533], &#39;L5_basket&#39;: [14.453781512605042, 12.60504201680672], &#39;L2_pyramidal&#39;: [6.705882352941176, 3.6470588235294117], &#39;L2_basket&#39;: [9.243697478991596, 9.579831932773109]}
+</pre></div>
+</div>
 <p>Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;sync_evinput&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
@@ -518,7 +537,7 @@ Running 1 trials...
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 6 minutes  0.176 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  41.286 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
