@@ -396,6 +396,40 @@ class Spikes(object):
                 self._gids == other._gids and
                 self._types == other._types)
 
+    def __getitem__(self, gid_item):
+        if isinstance(gid_item, slice):
+            gid_item = np.arange(gid_item.stop)[gid_item]
+        elif isinstance(gid_item, int):
+            gid_item = np.array([gid_item])
+        else:
+            raise TypeError("indices must be integers or slices, "
+                            f"not {type(gid_item).__name__}")
+
+        n_trials = len(self._times)
+        times_slice = []
+        gids_slice = []
+        types_slice = []
+        vsoma_slice = []
+        for trial_idx in range(n_trials):
+            gid_mask = np.in1d(self._gids[trial_idx], gid_item)
+            times_trial = np.array(self._times[trial_idx])[gid_mask].tolist()
+            gids_trial = np.array(self._gids[trial_idx])[gid_mask].tolist()
+            types_trial = np.array(self._types[trial_idx])[gid_mask].tolist()
+
+            vsoma_trial = {gid: self._vsoma[trial_idx][gid] for gid in gid_item
+                           if gid in self._vsoma[trial_idx].keys()}
+
+            times_slice.append(times_trial)
+            gids_slice.append(gids_trial)
+            types_slice.append(types_trial)
+            vsoma_slice.append(vsoma_trial)
+
+        spikes_slice = Spikes(times=times_slice, gids=gids_slice,
+                              types=types_slice)
+        spikes_slice._vsoma = vsoma_slice
+
+        return spikes_slice
+
     @property
     def times(self):
         return self._times
