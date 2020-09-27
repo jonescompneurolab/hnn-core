@@ -397,6 +397,19 @@ class Spikes(object):
                 self._types == other._types)
 
     def __getitem__(self, gid_item):
+        """Returns a Spikes object with a copied subset filtered by gid.
+
+        Parameters
+        ----------
+        gid_item : int | slice
+            Subset of gids .
+
+        Returns
+        -------
+        spikes : instance of Spikes
+            See below for use cases.
+        """
+
         if isinstance(gid_item, slice):
             gid_item = np.arange(gid_item.stop)[gid_item]
         elif isinstance(gid_item, int):
