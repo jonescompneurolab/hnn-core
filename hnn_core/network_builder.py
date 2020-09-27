@@ -658,8 +658,8 @@ class NetworkBuilder(object):
             if _PC.gid_exists(gid):
                 _PC.spike_record(gid, self._spiketimes, self._spikegids)
 
-    # setup somatic voltage recording for this node
     def _record_voltages(self):
+        """Setup somatic voltage recording for this node"""
         for cell in self.cells:
             if _PC.gid_exists(cell.gid):
                 self._vsoma[cell.gid] = h.Vector().record(
