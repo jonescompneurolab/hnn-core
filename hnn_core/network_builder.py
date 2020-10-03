@@ -87,10 +87,13 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.allreduce(neuron_net.current['L5_pyramidal_soma'], 1)
     _PC.allreduce(neuron_net.current['L2_pyramidal_soma'], 1)
 
+    neuron_net.aggregate_voltages()
+    _PC.py_gather(neuron_net._vsoma, 0)
+    neuron_net._all_vsoma = neuron_net._vsoma
+
     # combine spiking data from each proc
     spiketimes_list = _PC.py_gather(neuron_net._spiketimes, 0)
     spikegids_list = _PC.py_gather(neuron_net._spikegids, 0)
-    vsoma_list = _PC.py_gather(neuron_net._vsoma, 0)
 
     # only rank 0's lists are complete
 
@@ -99,10 +102,6 @@ def _simulate_single_trial(neuron_net, trial_idx):
             neuron_net._all_spiketimes.append(spike_vec)
         for spike_vec in spikegids_list:
             neuron_net._all_spikegids.append(spike_vec)
-
-        for node_vsoma in vsoma_list:
-            vsoma_data = {k: v.to_python() for k, v in node_vsoma.items()}
-            neuron_net._all_vsoma.update(vsoma_data)
 
     _PC.barrier()  # get all nodes to this place before continuing
 
@@ -328,10 +327,8 @@ class NetworkBuilder(object):
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spiketimes = h.Vector()
         self._all_spikegids = h.Vector()
-        self._all_vsoma = dict()
 
         self._record_spikes()
-        self._record_voltages()
 
         self.move_cells_to_pos()  # position cells in 2D grid
 
@@ -658,13 +655,6 @@ class NetworkBuilder(object):
             if _PC.gid_exists(gid):
                 _PC.spike_record(gid, self._spiketimes, self._spikegids)
 
-    def _record_voltages(self):
-        """Setup somatic voltage recording for this node"""
-        for cell in self.cells:
-            if _PC.gid_exists(cell.gid):
-                self._vsoma[cell.gid] = h.Vector().record(
-                    cell.soma(0.5)._ref_v)
-
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
         """Aggregate somatic currents for Pyramidal cells."""
@@ -682,6 +672,11 @@ class NetworkBuilder(object):
         for cell in self.cells:
             if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
                 self.dipoles[cell.celltype].add(cell.dipole)
+
+    def aggregate_voltages(self):
+        """Organize voltage recordings into dictionary indexed by gid"""
+        for cell in self.cells:
+            self._vsoma[cell.gid] = cell.rec_v
 
     def state_init(self):
         """Initializes the state closer to baseline."""
@@ -747,11 +742,15 @@ class NetworkBuilder(object):
     def get_data_from_neuron(self):
         """Get copies of spike data that are pickleable"""
 
+        vsoma_py = {}
+        for gid, rec_v in self._vsoma.items():
+            vsoma_py[gid] = rec_v.to_python()
+
         from copy import deepcopy
         data = (self._all_spiketimes.to_python(),
                 self._all_spikegids.to_python(),
                 deepcopy(self.net.gid_dict),
-                deepcopy(self._all_vsoma))
+                deepcopy(vsoma_py))
         return data
 
     def _clear_last_network_objects(self):

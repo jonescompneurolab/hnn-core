@@ -207,6 +207,10 @@ class _Cell(ABC):
                 " but no self.synapses dict was found")
             pass
 
+    def record_voltage_soma(self):
+        """Record current at soma."""
+        self.rec_v = h.Vector().record(self.soma(0.5)._ref_v)
+
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
 

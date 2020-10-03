@@ -318,7 +318,15 @@ class L2Pyr(Pyr):
     def __init__(self, gid=-1, pos=None, params=None):
         Pyr.__init__(self, gid, pos, 'L2_pyramidal', params)
 
-    def _get_soma_props(self, pos, p_all):
+        # create synapses
+        self._synapse_create(p_syn)
+        # self.__synapse_create()
+
+        # run record_current_soma(), defined in Cell()
+        self.record_current_soma()
+        self.record_voltage_soma()
+
+    def _get_soma_props(self, pos):
         """Hardcoded somatic properties."""
         return {
             'pos': pos,
@@ -455,7 +463,45 @@ class L5Pyr(Pyr):
     def __init__(self, gid=-1, pos=None, params=None):
         """Get default L5Pyr params and update them with
             corresponding params in p."""
-        Pyr.__init__(self, gid, pos, 'L5_pyramidal', params)
+        p_all_default = get_L5Pyr_params_default()
+        self.p_all = compare_dictionaries(p_all_default, p)
+
+        # Get somatic, dendirtic, and synapse properties
+        p_soma = self._get_soma_props(pos)
+
+        Pyr.__init__(self, gid, p_soma)
+        p_dend = self._get_dend_props()
+        p_syn = self._get_syn_props()
+
+        self.celltype = 'L5_pyramidal'
+
+        # Geometry
+        # dend Cm and dend Ra set using soma Cm and soma Ra
+        self.create_dends(p_dend)  # just creates the sections
+        self.topol()  # sets the connectivity between sections
+        # sets geom properties; adjusted after translation from
+        # hoc (2009 model)
+        self.set_geometry(p_dend)
+
+        # biophysics
+        self.__biophys_soma()
+        self.__biophys_dends()
+
+        # Dictionary of length scales to calculate dipole without
+        # 3d shape. Comes from Pyr().
+        # dipole_insert() comes from Cell()
+        self.yscale = self.get_sectnames()
+        self.dipole_insert(self.yscale)
+
+        # create synapses
+        self._synapse_create(p_syn)
+
+        # insert iclamp
+        self.list_IClamp = []
+
+        # run record current soma, defined in Cell()
+        self.record_current_soma()
+        self.record_voltage_soma()
 
     def secs(self):
         """The geometry of the default sections in the Neuron."""

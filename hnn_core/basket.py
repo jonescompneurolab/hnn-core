@@ -73,6 +73,7 @@ class L2Basket(BasketSingle):
         self._synapse_create()
         self.set_biophysics()
         self.sect_loc = dict(proximal=['soma'], distal=['soma'])
+        self.record_voltage_soma()
 
 
 class L5Basket(BasketSingle):
@@ -86,3 +87,4 @@ class L5Basket(BasketSingle):
         self._synapse_create()
         self.set_biophysics()
         self.sect_loc = dict(proximal=['soma'], distal=[])
+        self.record_voltage_soma()
