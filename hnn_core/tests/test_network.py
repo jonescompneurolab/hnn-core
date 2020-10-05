@@ -111,7 +111,7 @@ def test_spikes(tmpdir):
                         types=spiketypes)
 
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
-    
+
     with pytest.raises(TypeError, match="indices must be integers or slices, "
                        "not str"):
         spikes['1']

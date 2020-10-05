@@ -151,8 +151,6 @@ class Network(object):
         (or input) types.
     spikes : Spikes
         An instance of the Spikes object.
-    trial_idx : int
-        Current trial number (starting from 0)
     """
 
     def __init__(self, params):
