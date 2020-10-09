@@ -75,7 +75,7 @@ class Pyr(_Cell):
         """Create dendrites."""
         for key in p_dend_props:
             self.dends[key] = h.Section(
-                name=self.name + '_' + key)  # create dend
+                name=key)  # create dend
         # apical: 0--4; basal: 5--7
         self.list_dend = [self.dends[key] for key in
                           ['apical_trunk', 'apical_oblique', 'apical_1',
@@ -98,23 +98,6 @@ class Pyr(_Cell):
                 # make dend.nseg odd for all sections
                 if not self.dends[key].nseg % 2:
                     self.dends[key].nseg += 1
-
-    def get_sections(self):
-        ls = [self.soma]
-        for key in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
-                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']:
-            if key in self.dends:
-                ls.append(self.dends[key])
-        return ls
-
-    def get_section_names(self):
-        """Get section names."""
-        ls = ['soma']
-        for key in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
-                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']:
-            if key in self.dends:
-                ls.append(key)
-        return ls
 
     def _get_dend_props(self):
         """Returns hardcoded dendritic properties."""
@@ -350,23 +333,36 @@ class L2Pyr(Pyr):
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
         pt3dclear = h.pt3dclear
         pt3dadd = h.pt3dadd
+
+        sec_pts = {
+          'soma': [[-50, 765, 0, 1], [-50, 778, 0, 1]],
+          'apicaltrunk': [[-50, 778, 0, 1], [-50, 813, 0, 1]],
+          'apical1': [[-50, 813, 0, 1], [-250, 813, 0, 1]],
+          'apical2': [[-50, 813, 0, 1], [-50, 993, 0, 1]],
+          'apicaltuft': [[-50, 993, 0, 1], [-50, 1133, 0, 1]],
+          'apicaloblique': [[0, 883, 0, 1], [0, 1133, 0, 1]],
+          'basal1': [[-50, 765, 0, 1], [-50, 715, 0, 1]],
+          'basal2': [[-50, 715, 0, 1], [-156, 609, 0, 1]],
+          'basal3': [[0, -50, 0, 1], [106, -156, 0, 1]]
+        }
+
         soma = self.soma
         dend = self.list_dend
         pt3dclear(sec=soma)
-        pt3dadd(-50, 765, 0, 1, sec=soma)
-        pt3dadd(-50, 778, 0, 1, sec=soma)
+        # pt3dadd(-50, 765, 0, 1, sec=soma)
+        # pt3dadd(-50, 778, 0, 1, sec=soma)
         pt3dclear(sec=dend[0])
-        pt3dadd(-50, 778, 0, 1, sec=dend[0])
-        pt3dadd(-50, 813, 0, 1, sec=dend[0])
+        # pt3dadd(-50, 778, 0, 1, sec=dend[0])
+        # pt3dadd(-50, 813, 0, 1, sec=dend[0])
         pt3dclear(sec=dend[1])
-        pt3dadd(-50, 813, 0, 1, sec=dend[1])
-        pt3dadd(-250, 813, 0, 1, sec=dend[1])
+        # pt3dadd(-50, 813, 0, 1, sec=dend[1])
+        # pt3dadd(-250, 813, 0, 1, sec=dend[1])
         pt3dclear(sec=dend[2])
-        pt3dadd(-50, 813, 0, 1, sec=dend[2])
-        pt3dadd(-50, 993, 0, 1, sec=dend[2])
+        # pt3dadd(-50, 813, 0, 1, sec=dend[2])
+        # pt3dadd(-50, 993, 0, 1, sec=dend[2])
         pt3dclear(sec=dend[3])
-        pt3dadd(-50, 993, 0, 1, sec=dend[3])
-        pt3dadd(-50, 1133, 0, 1, sec=dend[3])
+        # pt3dadd(-50, 993, 0, 1, sec=dend[3])
+        # pt3dadd(-50, 1133, 0, 1, sec=dend[3])
         pt3dclear(sec=dend[4])
         pt3dadd(-50, 765, 0, 1, sec=dend[4])
         pt3dadd(-50, 715, 0, 1, sec=dend[4])
@@ -482,34 +478,24 @@ class L5Pyr(Pyr):
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
         pt3dclear = h.pt3dclear
         pt3dadd = h.pt3dadd
-        dend = self.list_dend
         pt3dclear(sec=self.soma)
-        pt3dadd(0, 0, 0, 1, sec=self.soma)
-        pt3dadd(0, 23, 0, 1, sec=self.soma)
-        pt3dclear(sec=dend[0])
-        pt3dadd(0, 23, 0, 1, sec=dend[0])
-        pt3dadd(0, 83, 0, 1, sec=dend[0])
-        pt3dclear(sec=dend[1])
-        pt3dadd(0, 83, 0, 1, sec=dend[1])
-        pt3dadd(-150, 83, 0, 1, sec=dend[1])
-        pt3dclear(sec=dend[2])
-        pt3dadd(0, 83, 0, 1, sec=dend[2])
-        pt3dadd(0, 483, 0, 1, sec=dend[2])
-        pt3dclear(sec=dend[3])
-        pt3dadd(0, 483, 0, 1, sec=dend[3])
-        pt3dadd(0, 883, 0, 1, sec=dend[3])
-        pt3dclear(sec=dend[4])
-        pt3dadd(0, 883, 0, 1, sec=dend[4])
-        pt3dadd(0, 1133, 0, 1, sec=dend[4])
-        pt3dclear(sec=dend[5])
-        pt3dadd(0, 0, 0, 1, sec=dend[5])
-        pt3dadd(0, -50, 0, 1, sec=dend[5])
-        pt3dclear(sec=dend[6])
-        pt3dadd(0, -50, 0, 1, sec=dend[6])
-        pt3dadd(-106, -156, 0, 1, sec=dend[6])
-        pt3dclear(sec=dend[7])
-        pt3dadd(0, -50, 0, 1, sec=dend[7])
-        pt3dadd(106, -156, 0, 1, sec=dend[7])
+
+        sec_pts = {
+          'soma': [[0, 0, 0, 1], [0, 23, 0, 1]],
+          'apicaltrunk': [[0, 23, 0, 1], [0, 83, 0, 1]],
+          'apical1': [[0, 83, 0, 1], [-150, 83, 0, 1]],
+          'apical2': [[0, 83, 0, 1], [0, 483, 0, 1]],
+          'apicaltuft': [[0, 483, 0, 1], [0, 883, 0, 1]],
+          'apicaloblique': [[0, 883, 0, 1], [0, 1133, 0, 1]],
+          'basal1': [[0, 0, 0, 1], [0, -50, 0, 1]],
+          'basal2': [[0, -50, 0, 1], [-106, -156, 0, 1]],
+          'basal3': [[0, -50, 0, 1], [106, -156, 0, 1]]
+        }
+
+        for sec in [self.soma] + self.list_dend:
+            pt3dclear(sec=sec)
+            pt3dadd(sec_pts[sec.name()][0], sec=sec)
+            pt3dadd(sec_pts[sec.name()][1], sec=sec)
 
     def geom(self, p_dend):
         """The geometry."""
