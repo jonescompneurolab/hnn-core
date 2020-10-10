@@ -22,7 +22,7 @@ _CVODE = None
 _LAST_NETWORK = None
 
 
-def _simulate_single_trial(neuron_net, trial_idx, postproc=True):
+def _simulate_single_trial(neuron_net, trial_idx):
     """Simulate one trial."""
 
     from .dipole import Dipole
@@ -105,13 +105,6 @@ def _simulate_single_trial(neuron_net, trial_idx, postproc=True):
                      np.array(neuron_net.dipoles['L5_pyramidal'].to_python())]
 
     dpl = Dipole(times, dpl_data)
-    if rank == 0:
-
-        dpl.baseline_renormalize(neuron_net.net.params)
-        dpl.convert_fAm_to_nAm()
-        if postproc:
-            dpl.scale(neuron_net.net.params['dipole_scalefctr'])
-            dpl.smooth(neuron_net.net.params['dipole_smooth_win'] / h.dt)
 
     return dpl
 
