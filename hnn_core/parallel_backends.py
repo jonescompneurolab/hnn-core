@@ -142,8 +142,8 @@ class JoblibBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
-        postproc: bool
-            If False, no scaling or smoothing applied to the dipole
+        postproc : bool
+            If False, no postprocessing applied to the dipole
 
         Returns
         -------
@@ -360,6 +360,8 @@ class MPIBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
+        postproc: bool
+            If False, no postprocessing applied to the dipole
 
         Returns
         -------
