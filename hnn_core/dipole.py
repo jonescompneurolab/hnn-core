@@ -31,10 +31,15 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         net.params['N_trials'] will be used
     record_vsoma : bool
         Option to record somatic voltages from cells
+<<<<<<< HEAD
     record_isoma : bool
         Option to record somatic currents from cells
     postproc : bool
         Option to apply postprocessing 
+=======
+    postproc : bool
+        If False, no postprocessing applied to the dipole
+>>>>>>> a55bb0a... describe function arguments
 
     Returns
     -------
@@ -218,8 +223,10 @@ class Dipole(object):
 
         Parameters
         ----------
-        params : dict
-            The parameters
+        N_pyr_x : int
+            Nr of cells (x)
+        N_pyr_y : int
+            Nr of cells (y)
         """
         if self.units != 'fAm':
             print("Warning, no dipole renormalization done because units"
