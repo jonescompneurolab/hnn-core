@@ -22,7 +22,10 @@ def test_dipole(tmpdir):
     times = np.random.random(6000)
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
-    dipole.baseline_renormalize(params)
+    dipole.post_proc(params['N_pyr_x'], params['N_pyr_y'],
+                     params['dipole_smooth_win'] / params['dt'],
+                     params['dipole_scalefctr'])
+    dipole.baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
     dipole.convert_fAm_to_nAm()
     dipole.scale(params['dipole_scalefctr'])
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
