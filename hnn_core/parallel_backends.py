@@ -117,7 +117,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def _clone_and_simulate(self, net, trial_idx, postproc=True):
+    def _clone_and_simulate(self, net, trial_idx):
         # avoid relative lookups after being forked by joblib
         from hnn_core.network_builder import NetworkBuilder
         from hnn_core.network_builder import _simulate_single_trial
@@ -128,7 +128,7 @@ class JoblibBackend(object):
             net.params[param_key] += trial_idx
 
         neuron_net = NetworkBuilder(net)
-        dpl = _simulate_single_trial(neuron_net, trial_idx, postproc)
+        dpl = _simulate_single_trial(neuron_net, trial_idx)
 
         spikedata = neuron_net.get_data_from_neuron()
 
@@ -159,6 +159,15 @@ class JoblibBackend(object):
                             range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
+
+        if postproc:
+            N_pyr_x = net.params['N_pyr_x']
+            N_pyr_y = net.params['N_pyr_y']
+            winsz = net.params['dipole_smooth_win'] / net.params['dt']
+            fctr = net.params['dipole_scalefctr']
+            for idx in range(n_trials):
+                dpls[idx].post_proc(N_pyr_x, N_pyr_y, winsz, fctr)
+
         return dpls
 
 

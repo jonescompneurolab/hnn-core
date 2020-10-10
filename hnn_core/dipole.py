@@ -167,6 +167,12 @@ class Dipole(object):
         self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
         self.nave = nave
 
+    def post_proc(self, N_pyr_x, N_pyr_y, winsz, fctr):
+        self.baseline_renormalize(N_pyr_x, N_pyr_y)
+        self.convert_fAm_to_nAm()
+        self.scale(fctr)
+        self.smooth(winsz)
+
     def convert_fAm_to_nAm(self):
         """ must be run after baseline_renormalization()
         """
@@ -207,7 +213,7 @@ class Dipole(object):
         """
         return plot_dipole(dpl=self, ax=ax, layer=layer, show=show)
 
-    def baseline_renormalize(self, params):
+    def baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
 
         Parameters
@@ -220,8 +226,6 @@ class Dipole(object):
                   " were in %s" % (self.units))
             return
 
-        N_pyr_x = params['N_pyr_x']
-        N_pyr_y = params['N_pyr_y']
         # N_pyr cells in grid. This is PER LAYER
         N_pyr = N_pyr_x * N_pyr_y
         # dipole offset calculation: increasing number of pyr
