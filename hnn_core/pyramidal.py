@@ -478,24 +478,26 @@ class L5Pyr(Pyr):
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
         pt3dclear = h.pt3dclear
         pt3dadd = h.pt3dadd
-        pt3dclear(sec=self.soma)
 
         sec_pts = {
           'soma': [[0, 0, 0, 1], [0, 23, 0, 1]],
-          'apicaltrunk': [[0, 23, 0, 1], [0, 83, 0, 1]],
-          'apical1': [[0, 83, 0, 1], [-150, 83, 0, 1]],
-          'apical2': [[0, 83, 0, 1], [0, 483, 0, 1]],
-          'apicaltuft': [[0, 483, 0, 1], [0, 883, 0, 1]],
-          'apicaloblique': [[0, 883, 0, 1], [0, 1133, 0, 1]],
-          'basal1': [[0, 0, 0, 1], [0, -50, 0, 1]],
-          'basal2': [[0, -50, 0, 1], [-106, -156, 0, 1]],
-          'basal3': [[0, -50, 0, 1], [106, -156, 0, 1]]
+          'apical_trunk': [[0, 23, 0, 1], [0, 83, 0, 1]],
+          'apical_1': [[0, 83, 0, 1], [-150, 83, 0, 1]],
+          'apical_2': [[0, 83, 0, 1], [0, 483, 0, 1]],
+          'apical_tuft': [[0, 483, 0, 1], [0, 883, 0, 1]],
+          'apical_oblique': [[0, 883, 0, 1], [0, 1133, 0, 1]],
+          'basal_1': [[0, 0, 0, 1], [0, -50, 0, 1]],
+          'basal_2': [[0, -50, 0, 1], [-106, -156, 0, 1]],
+          'basal_3': [[0, -50, 0, 1], [106, -156, 0, 1]]
         }
 
-        for sec in [self.soma] + self.list_dend:
+        for sec in self.list_dend + [self.soma]:
             pt3dclear(sec=sec)
-            pt3dadd(sec_pts[sec.name()][0], sec=sec)
-            pt3dadd(sec_pts[sec.name()][1], sec=sec)
+            dims = sec_pts[sec.name()]
+            x, y, z, d = dims[0][0], dims[0][1], dims[0][2], dims[0][3]
+            pt3dadd(x, y, z, d, sec=sec)
+            x, y, z, d = dims[1][0], dims[1][1], dims[1][2], dims[1][3]
+            pt3dadd(x, y, z, d, sec=sec)
 
     def geom(self, p_dend):
         """The geometry."""
@@ -509,7 +511,7 @@ class L5Pyr(Pyr):
         # soma.diam = 18.95 # Bush 1999
         soma.diam = 28.9  # Bush 1993
 
-        for idx, dend in enumerate(self.list_dends):
+        for idx, dend in enumerate(self.list_dend):
             dend.L = sec_lens[idx]
             dend.diam = sec_diams[idx]
 
