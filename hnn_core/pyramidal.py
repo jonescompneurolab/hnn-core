@@ -71,6 +71,18 @@ class Pyr(_Cell):
                 d[key] = -d[key]
         return d
 
+    def basic_shape(self):
+        """Define shape of the neuron."""
+        # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
+
+        for sec in self.list_dend + [self.soma]:
+            h.pt3dclear(sec=sec)
+            dims = self.sec_pts()[sec.name()]
+            x, y, z, d = dims[0][0], dims[0][1], dims[0][2], dims[0][3]
+            h.pt3dadd(x, y, z, d, sec=sec)
+            x, y, z, d = dims[1][0], dims[1][1], dims[1][2], dims[1][3]
+            h.pt3dadd(x, y, z, d, sec=sec)
+
     def create_dends(self, p_dend_props):
         """Create dendrites."""
         for key in p_dend_props:
@@ -327,31 +339,17 @@ class L2Pyr(Pyr):
 
         self.basic_shape()  # translated from original hoc (2009 model)
 
-    def basic_shape(self):
-        """Define shape of the neuron."""
-        # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
-        pt3dclear = h.pt3dclear
-        pt3dadd = h.pt3dadd
-
-        sec_pts = {
-          'soma': [[-50, 765, 0, 1], [-50, 778, 0, 1]],
-          'apicaltrunk': [[-50, 778, 0, 1], [-50, 813, 0, 1]],
-          'apical1': [[-50, 813, 0, 1], [-250, 813, 0, 1]],
-          'apical2': [[-50, 813, 0, 1], [-50, 993, 0, 1]],
-          'apicaltuft': [[-50, 993, 0, 1], [-50, 1133, 0, 1]],
-          'apicaloblique': [[0, 883, 0, 1], [0, 1133, 0, 1]],
-          'basal1': [[-50, 765, 0, 1], [-50, 715, 0, 1]],
-          'basal2': [[-50, 715, 0, 1], [-156, 609, 0, 1]],
-          'basal3': [[0, -50, 0, 1], [106, -156, 0, 1]]
+    def sec_pts(self):
+        return {
+            'soma': [[-50, 765, 0, 1], [-50, 778, 0, 1]],
+            'apical_trunk': [[-50, 778, 0, 1], [-50, 813, 0, 1]],
+            'apical_oblique': [[-50, 813, 0, 1], [-250, 813, 0, 1]],
+            'apical_1': [[-50, 813, 0, 1], [-50, 993, 0, 1]],
+            'apical_tuft': [[-50, 993, 0, 1], [-50, 1133, 0, 1]],
+            'basal_1': [[-50, 765, 0, 1], [-50, 715, 0, 1]],
+            'basal_2': [[-50, 715, 0, 1], [-156, 609, 0, 1]],
+            'basal_3': [[-50, 715, 0, 1], [56, 609, 0, 1]],
         }
-
-        for sec in self.list_dend + [self.soma]:
-            pt3dclear(sec=sec)
-            dims = sec_pts[sec.name()]
-            x, y, z, d = dims[0][0], dims[0][1], dims[0][2], dims[0][3]
-            pt3dadd(x, y, z, d, sec=sec)
-            x, y, z, d = dims[1][0], dims[1][1], dims[1][2], dims[1][3]
-            pt3dadd(x, y, z, d, sec=sec)
 
     def _biophys_soma(self):
         """Adds biophysics to soma."""
@@ -453,31 +451,18 @@ class L5Pyr(Pyr):
         # run record current soma, defined in Cell()
         self.record_current_soma()
 
-    def basic_shape(self):
-        """The shape of the neuron."""
-        # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
-        pt3dclear = h.pt3dclear
-        pt3dadd = h.pt3dadd
-
-        sec_pts = {
-          'soma': [[0, 0, 0, 1], [0, 23, 0, 1]],
-          'apical_trunk': [[0, 23, 0, 1], [0, 83, 0, 1]],
-          'apical_1': [[0, 83, 0, 1], [-150, 83, 0, 1]],
-          'apical_2': [[0, 83, 0, 1], [0, 483, 0, 1]],
-          'apical_tuft': [[0, 483, 0, 1], [0, 883, 0, 1]],
-          'apical_oblique': [[0, 883, 0, 1], [0, 1133, 0, 1]],
-          'basal_1': [[0, 0, 0, 1], [0, -50, 0, 1]],
-          'basal_2': [[0, -50, 0, 1], [-106, -156, 0, 1]],
-          'basal_3': [[0, -50, 0, 1], [106, -156, 0, 1]]
+    def sec_pts(self):
+        return {
+            'soma': [[0, 0, 0, 1], [0, 23, 0, 1]],
+            'apical_trunk': [[0, 23, 0, 1], [0, 83, 0, 1]],
+            'apical_oblique': [[0, 83, 0, 1], [-150, 83, 0, 1]],
+            'apical_1': [[0, 83, 0, 1], [0, 483, 0, 1]],
+            'apical_2': [[0, 483, 0, 1], [0, 883, 0, 1]],
+            'apical_tuft': [[0, 883, 0, 1], [0, 1133, 0, 1]],
+            'basal_1': [[0, 0, 0, 1], [0, -50, 0, 1]],
+            'basal_2': [[0, -50, 0, 1], [-106, -156, 0, 1]],
+            'basal_3': [[0, -50, 0, 1], [106, -156, 0, 1]]
         }
-
-        for sec in self.list_dend + [self.soma]:
-            pt3dclear(sec=sec)
-            dims = sec_pts[sec.name()]
-            x, y, z, d = dims[0][0], dims[0][1], dims[0][2], dims[0][3]
-            pt3dadd(x, y, z, d, sec=sec)
-            x, y, z, d = dims[1][0], dims[1][1], dims[1][2], dims[1][3]
-            pt3dadd(x, y, z, d, sec=sec)
 
     def geom(self, p_dend):
         """The geometry."""
