@@ -74,8 +74,7 @@ class Pyr(_Cell):
     def create_dends(self, p_dend_props):
         """Create dendrites."""
         for key in p_dend_props:
-            self.dends[key] = h.Section(
-                name=key)  # create dend
+            self.dends[key] = h.Section(name=key)  # create dend
         # apical: 0--4; basal: 5--7
         self.list_dend = [self.dends[key] for key in
                           ['apical_trunk', 'apical_oblique', 'apical_1',
@@ -346,32 +345,13 @@ class L2Pyr(Pyr):
           'basal3': [[0, -50, 0, 1], [106, -156, 0, 1]]
         }
 
-        soma = self.soma
-        dend = self.list_dend
-        pt3dclear(sec=soma)
-        # pt3dadd(-50, 765, 0, 1, sec=soma)
-        # pt3dadd(-50, 778, 0, 1, sec=soma)
-        pt3dclear(sec=dend[0])
-        # pt3dadd(-50, 778, 0, 1, sec=dend[0])
-        # pt3dadd(-50, 813, 0, 1, sec=dend[0])
-        pt3dclear(sec=dend[1])
-        # pt3dadd(-50, 813, 0, 1, sec=dend[1])
-        # pt3dadd(-250, 813, 0, 1, sec=dend[1])
-        pt3dclear(sec=dend[2])
-        # pt3dadd(-50, 813, 0, 1, sec=dend[2])
-        # pt3dadd(-50, 993, 0, 1, sec=dend[2])
-        pt3dclear(sec=dend[3])
-        # pt3dadd(-50, 993, 0, 1, sec=dend[3])
-        # pt3dadd(-50, 1133, 0, 1, sec=dend[3])
-        pt3dclear(sec=dend[4])
-        pt3dadd(-50, 765, 0, 1, sec=dend[4])
-        pt3dadd(-50, 715, 0, 1, sec=dend[4])
-        pt3dclear(sec=dend[5])
-        pt3dadd(-50, 715, 0, 1, sec=dend[5])
-        pt3dadd(-156, 609, 0, 1, sec=dend[5])
-        pt3dclear(sec=dend[6])
-        pt3dadd(-50, 715, 0, 1, sec=dend[6])
-        pt3dadd(56, 609, 0, 1, sec=dend[6])
+        for sec in self.list_dend + [self.soma]:
+            pt3dclear(sec=sec)
+            dims = sec_pts[sec.name()]
+            x, y, z, d = dims[0][0], dims[0][1], dims[0][2], dims[0][3]
+            pt3dadd(x, y, z, d, sec=sec)
+            x, y, z, d = dims[1][0], dims[1][1], dims[1][2], dims[1][3]
+            pt3dadd(x, y, z, d, sec=sec)
 
     def _biophys_soma(self):
         """Adds biophysics to soma."""
