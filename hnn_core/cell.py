@@ -92,7 +92,7 @@ class _Cell(object):
         self.diam = soma_props['diam']
         self.pos = soma_props['pos']
 
-        self.soma = h.Section(cell=self, name=soma_props['name'] + '_soma')
+        self.soma = h.Section(name='soma')
         self.soma.L = soma_props['L']
         self.soma.diam = soma_props['diam']
         self.soma.Ra = soma_props['Ra']
