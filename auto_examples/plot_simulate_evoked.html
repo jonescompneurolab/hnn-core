@@ -488,9 +488,9 @@ wildcard expressions.</p>
 </div>
 <p>We can additionally calculate the mean spike rates for each cell class by
 specifying a time window with tstart and tstop.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">all_rates</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spikes</span></a><span class="o">.</span><span class="n">mean_rates</span><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">gid_dict</span><span class="o">=</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">gid_dict</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">all_rates</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.mean_rates" title="hnn_core.Spikes.mean_rates" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">spikes</span><span class="o">.</span><span class="n">mean_rates</span></a><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">gid_dict</span><span class="o">=</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">gid_dict</span><span class="p">,</span>
                               <span class="n">mean_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
-<span class="n">trial_rates</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spikes</span></a><span class="o">.</span><span class="n">mean_rates</span><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">gid_dict</span><span class="o">=</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">gid_dict</span><span class="p">,</span>
+<span class="n">trial_rates</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.mean_rates" title="hnn_core.Spikes.mean_rates" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">spikes</span><span class="o">.</span><span class="n">mean_rates</span></a><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">gid_dict</span><span class="o">=</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">gid_dict</span><span class="p">,</span>
                                 <span class="n">mean_type</span><span class="o">=</span><span class="s1">&#39;trial&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mean spike rates across trials:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">all_rates</span><span class="p">)</span>
@@ -533,11 +533,52 @@ openmpi, which must be installed on the system</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
 Running 1 trials...
+numprocs=2
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+Building the NEURON model
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+[Done]
+running trial 1 on 2 cores
+Simulation time: 0.03 ms...
+Simulation time: 10.0 ms...
+Simulation time: 20.0 ms...
+Simulation time: 30.0 ms...
+Simulation time: 40.0 ms...
+Simulation time: 50.0 ms...
+Simulation time: 60.0 ms...
+Simulation time: 70.0 ms...
+Simulation time: 80.0 ms...
+Simulation time: 90.0 ms...
+Simulation time: 100.0 ms...
+Simulation time: 110.0 ms...
+Simulation time: 120.0 ms...
+Simulation time: 130.0 ms...
+Simulation time: 140.0 ms...
+Simulation time: 150.0 ms...
+Simulation time: 160.0 ms...
+[2c253234e5df:01396] Read -1, expected 27208, errno = 1
+[2c253234e5df:01395] Read -1, expected 27200, errno = 1
+[2c253234e5df:01395] Read -1, expected 27208, errno = 1
+[2c253234e5df:01396] Read -1, expected 27200, errno = 1
+[2c253234e5df:01396] Read -1, expected 27208, errno = 1
+[2c253234e5df:01395] Read -1, expected 27200, errno = 1
+[2c253234e5df:01396] Read -1, expected 27200, errno = 1
+[2c253234e5df:01395] Read -1, expected 27208, errno = 1
+[2c253234e5df:01396] Read -1, expected 27208, errno = 1
+[2c253234e5df:01395] Read -1, expected 27200, errno = 1
+[2c253234e5df:01395] Read -1, expected 27208, errno = 1
+[2c253234e5df:01396] Read -1, expected 27200, errno = 1
+[2c253234e5df:01395] Read -1, expected 27200, errno = 1
+[2c253234e5df:01396] Read -1, expected 27208, errno = 1
+[2c253234e5df:01395] Read -1, expected 27208, errno = 1
+[2c253234e5df:01396] Read -1, expected 27200, errno = 1
+[2c253234e5df:01395] Read -1, expected 5559, errno = 1
+[2c253234e5df:01395] Read -1, expected 5559, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  41.286 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  13.933 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
