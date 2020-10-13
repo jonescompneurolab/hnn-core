@@ -78,10 +78,10 @@ class Pyr(_Cell):
         for sec in [self.soma] + self.list_dend:
             h.pt3dclear(sec=sec)
             dims = self.sec_pts()[sec.name()]
-            x, y, z, d = dims[0][0], dims[0][1], dims[0][2], dims[0][3]
-            h.pt3dadd(x, y, z, d, sec=sec)
-            x, y, z, d = dims[1][0], dims[1][1], dims[1][2], dims[1][3]
-            h.pt3dadd(x, y, z, d, sec=sec)
+            x, y, z = dims[0][0], dims[0][1], dims[0][2]
+            h.pt3dadd(x, y, z, 1, sec=sec)
+            x, y, z = dims[1][0], dims[1][1], dims[1][2]
+            h.pt3dadd(x, y, z, 1, sec=sec)
 
     def create_dends(self, p_dend_props):
         """Create dendrites."""
@@ -336,14 +336,14 @@ class L2Pyr(Pyr):
 
     def sec_pts(self):
         return {
-            'soma': [[-50, 765, 0, 1], [-50, 778, 0, 1]],
-            'apical_trunk': [[-50, 778, 0, 1], [-50, 813, 0, 1]],
-            'apical_oblique': [[-50, 813, 0, 1], [-250, 813, 0, 1]],
-            'apical_1': [[-50, 813, 0, 1], [-50, 993, 0, 1]],
-            'apical_tuft': [[-50, 993, 0, 1], [-50, 1133, 0, 1]],
-            'basal_1': [[-50, 765, 0, 1], [-50, 715, 0, 1]],
-            'basal_2': [[-50, 715, 0, 1], [-156, 609, 0, 1]],
-            'basal_3': [[-50, 715, 0, 1], [56, 609, 0, 1]],
+            'soma': [[-50, 765, 0], [-50, 778, 0]],
+            'apical_trunk': [[-50, 778, 0], [-50, 813, 0]],
+            'apical_oblique': [[-50, 813, 0], [-250, 813, 0]],
+            'apical_1': [[-50, 813, 0], [-50, 993, 0]],
+            'apical_tuft': [[-50, 993, 0], [-50, 1133, 0]],
+            'basal_1': [[-50, 765, 0], [-50, 715, 0]],
+            'basal_2': [[-50, 715, 0], [-156, 609, 0]],
+            'basal_3': [[-50, 715, 0], [56, 609, 0]],
         }
 
     def _biophys_soma(self):
@@ -448,15 +448,15 @@ class L5Pyr(Pyr):
 
     def sec_pts(self):
         return {
-            'soma': [[0, 0, 0, 1], [0, 23, 0, 1]],
-            'apical_trunk': [[0, 23, 0, 1], [0, 83, 0, 1]],
-            'apical_oblique': [[0, 83, 0, 1], [-150, 83, 0, 1]],
-            'apical_1': [[0, 83, 0, 1], [0, 483, 0, 1]],
-            'apical_2': [[0, 483, 0, 1], [0, 883, 0, 1]],
-            'apical_tuft': [[0, 883, 0, 1], [0, 1133, 0, 1]],
-            'basal_1': [[0, 0, 0, 1], [0, -50, 0, 1]],
-            'basal_2': [[0, -50, 0, 1], [-106, -156, 0, 1]],
-            'basal_3': [[0, -50, 0, 1], [106, -156, 0, 1]]
+            'soma': [[0, 0, 0], [0, 23, 0]],
+            'apical_trunk': [[0, 23, 0], [0, 83, 0]],
+            'apical_oblique': [[0, 83, 0], [-150, 83, 0]],
+            'apical_1': [[0, 83, 0], [0, 483, 0]],
+            'apical_2': [[0, 483, 0], [0, 883, 0]],
+            'apical_tuft': [[0, 883, 0], [0, 1133, 0]],
+            'basal_1': [[0, 0, 0], [0, -50, 0]],
+            'basal_2': [[0, -50, 0], [-106, -156, 0]],
+            'basal_3': [[0, -50, 0], [106, -156, 0]]
         }
 
     def geom(self, p_dend):
