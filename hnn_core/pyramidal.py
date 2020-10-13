@@ -74,19 +74,20 @@ class Pyr(_Cell):
     def basic_shape(self):
         """Define shape of the neuron."""
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
-
         for sec in [self.soma] + self.list_dend:
             h.pt3dclear(sec=sec)
-            dims = self.sec_pts()[sec.name()]
-            x, y, z = dims[0][0], dims[0][1], dims[0][2]
-            h.pt3dadd(x, y, z, 1, sec=sec)
-            x, y, z = dims[1][0], dims[1][1], dims[1][2]
-            h.pt3dadd(x, y, z, 1, sec=sec)
+            sec_name = sec.name().split('_', 1)[1]
+            for pt in self.sec_pts()[sec_name]:
+                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
 
     def create_dends(self, p_dend_props):
         """Create dendrites."""
+        # XXX: name should be unique even across cell types?
+        # otherwise Neuron cannot disambiguate, hence
+        # self.name + '_' + key
         for key in p_dend_props:
-            self.dends[key] = h.Section(name=key)  # create dend
+            self.dends[key] = h.Section(
+                name=self.name + '_' + key)  # create dend
         # apical: 0--4; basal: 5--7
         self.list_dend = [self.dends[key] for key in
                           ['apical_trunk', 'apical_oblique', 'apical_1',
