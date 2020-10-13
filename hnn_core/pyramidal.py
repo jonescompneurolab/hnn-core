@@ -302,7 +302,7 @@ class L2Pyr(Pyr):
         # increased by 70% for human
         soma = self.soma
         dend = self.list_dend
-        sec_lens = [59.5, 340, 306, 238, 85, 255, 255, 23.4]
+        sec_lens = [59.5, 340, 306, 238, 85, 255, 255]
         sec_diams = [4.25, 3.91, 4.08, 3.4, 4.25, 2.72, 2.72]
 
         soma.L = 22.1
@@ -311,7 +311,6 @@ class L2Pyr(Pyr):
         for idx, dend in enumerate(self.list_dend):
             dend.L = sec_lens[idx]
             dend.diam = sec_diams[idx]
-
 
         # resets length,diam,etc. based on param specification
         self.set_dend_props(p_dend)
