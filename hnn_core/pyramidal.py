@@ -75,7 +75,7 @@ class Pyr(_Cell):
         """Define shape of the neuron."""
         # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
 
-        for sec in self.list_dend + [self.soma]:
+        for sec in [self.soma] + self.list_dend:
             h.pt3dclear(sec=sec)
             dims = self.sec_pts()[sec.name()]
             x, y, z, d = dims[0][0], dims[0][1], dims[0][2], dims[0][3]
@@ -299,25 +299,20 @@ class L2Pyr(Pyr):
 
     def geom(self, p_dend):
         """The geometry."""
+        # increased by 70% for human
         soma = self.soma
         dend = self.list_dend
-        # increased by 70% for human
+        sec_lens = [59.5, 340, 306, 238, 85, 255, 255, 23.4]
+        sec_diams = [4.25, 3.91, 4.08, 3.4, 4.25, 2.72, 2.72]
+
         soma.L = 22.1
-        dend[0].L = 59.5
-        dend[1].L = 340
-        dend[2].L = 306
-        dend[3].L = 238
-        dend[4].L = 85
-        dend[5].L = 255
-        dend[6].L = 255
         soma.diam = 23.4
-        dend[0].diam = 4.25
-        dend[1].diam = 3.91
-        dend[2].diam = 4.08
-        dend[3].diam = 3.4
-        dend[4].diam = 4.25
-        dend[5].diam = 2.72
-        dend[6].diam = 2.72
+
+        for idx, dend in enumerate(self.list_dend):
+            dend.L = sec_lens[idx]
+            dend.diam = sec_diams[idx]
+
+
         # resets length,diam,etc. based on param specification
         self.set_dend_props(p_dend)
 
