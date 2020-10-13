@@ -23,7 +23,6 @@ def run_mpi_simulation():
 
     import pickle
     import codecs
-    import io
 
     from hnn_core import Network
     from hnn_core.network_builder import NetworkBuilder, _simulate_single_trial
@@ -65,27 +64,22 @@ def run_mpi_simulation():
             spikedata = neuron_net.get_data_from_neuron()
             sim_data.append((dpl, spikedata))
 
-    # the parent process is waiting for the string "sim_complete"
-    # to signal that the output will only contain sim_data
-    if rank == 0:
-        sys.stdout.write('sim_complete')
+    # flush output buffers from all ranks
     sys.stdout.flush()
-
-    # send results to stderr
-    if rank == 0:
-        data_iostream = io.BytesIO()
-
-        # send back dpls and spikedata
-        pickled_string = pickle.dumps(sim_data)
-
-        # encode as base64 before sending to stderr
-        repickled_bytes = codecs.encode(pickled_string,
-                                        'base64')
-        data_iostream.write(repickled_bytes)
+    sys.stderr.flush()
 
     if rank == 0:
-        data_str = data_iostream.getvalue().decode()
-        sys.stderr.write(data_str)
+        # the parent process is waiting for the string "sim_complete"
+        # to signal that the output will only contain sim_data
+        sys.stdout.write('sim_complete')
+        sys.stdout.flush()  # flush to ensure signal is not buffered
+
+        # pickle the data and encode as base64 before sending to stderr
+        pickled_str = pickle.dumps(sim_data)
+        pickled_bytes = codecs.encode(pickled_str,
+                                      'base64')
+        sys.stderr.write(pickled_bytes.decode())
+        sys.stderr.flush()
 
     MPI.Finalize()
     return 0
