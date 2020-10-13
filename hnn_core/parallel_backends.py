@@ -11,7 +11,7 @@ import pickle
 import codecs
 from warnings import warn
 from subprocess import Popen
-import select
+import selectors
 
 _BACKEND = None
 
@@ -223,6 +223,28 @@ class MPIBackend(object):
 
         _BACKEND = self._old_backend
 
+    def _read_data(self, fd, mask):
+        """read from fd until data includes padding characters"""
+        data = os.read(fd, 4096)
+        self.proc_data_bytes += data
+
+        # only _read_stdout gets a signal from the fd. the end of simulation
+        # data is signalled by the process terminating
+        return False
+
+    def _read_stdout(self, fd, mask):
+        """read from fd until receiving the process simulation is complete"""
+        data = os.read(fd, 4096)
+        if data:
+            str_data = data.decode()
+            if str_data == 'sim_complete':
+                return True
+
+            # output from process includes newlines
+            sys.stdout.write(str_data)
+
+        return False
+
     def simulate(self, net):
         """Simulate the HNN model in parallel on all cores
 
@@ -282,24 +304,35 @@ class MPIBackend(object):
         os.close(pipe_stdin_w)
         os.close(pipe_stdin_r)
 
-        proc_stderr_bytes = b''
-        # capture stdout while waiting for process to complete
+        # data will be stored here; output will be printed and discarded
+        self.proc_data_bytes = b''
+
+        # create the selector instance and register all input events
+        # with self.read_stdout which will only echo to stdout
+        self.sel = selectors.DefaultSelector()
+        self.sel.register(pipe_stdout_r, selectors.EVENT_READ,
+                          self._read_stdout)
+        self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
+                          self._read_stdout)
+
+        # loop while the process is running
         while proc.poll() is None:
-            ready = select.select([pipe_stdout_r, pipe_stderr_r], [], [], 0)[0]
-            if not ready:
-                continue
-            for stream in ready:
-                if stream == pipe_stdout_r:
-                    buf = os.read(pipe_stdout_r, 1024)
-                    # write processes stdout to our stdout (fd 0)
-                    try:
-                        stdout_fd = sys.stdout.fileno()
-                    except AttributeError:
-                        # for sphinx-gallery that replaces sys.stdout
-                        stdout_fd = 0
-                    os.write(stdout_fd, buf)
-                else:
-                    proc_stderr_bytes += os.read(pipe_stderr_r, 1024)
+            # wait for an event on the selector, timeout after 1s and check
+            # that process is still running
+            events = self.sel.select(timeout=1)
+            for key, mask in events:
+                callback = key.data
+                finished = callback(key.fileobj, mask)
+                if finished:
+                    # finishied receiving printable output
+                    self.sel.unregister(pipe_stdout_r)
+                    self.sel.unregister(pipe_stderr_r)
+                    # everything received should now be handled by _read_data
+                    self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
+                                      self._read_data)
+
+        self.sel.unregister(pipe_stderr_r)
+        self.sel.close()
 
         # done with stdout and stderr
         os.close(pipe_stdout_r)
@@ -307,42 +340,15 @@ class MPIBackend(object):
         os.close(pipe_stderr_r)
         os.close(pipe_stderr_w)
 
-        # covert to string to be able to look for padding
-        proc_stderr = proc_stderr_bytes.decode()
-
-        sim_failed = False
-        mpi_error_msg = ''
-
-        # data will always be padded with '===' at the end.
-        if "=" in proc_stderr:
-            # see if there are any error messages after data (padded with "==")
-            stderr_list = proc_stderr.split("=")
-            if len(stderr_list[-1]) > 0:
-                mpi_error_msg = stderr_list[-1]
-                data_str = stderr_list[0]  # padding removed
-                data_str_bytes = data_str.encode() + b"==="
-            else:
-                data_str = proc_stderr
-                data_str_bytes = data_str.encode()
-        else:
-            sim_failed = True
-            if len(proc_stderr) > 0:
-                mpi_error_msg = proc_stderr
-
-        if sim_failed or len(mpi_error_msg) > 0:
-            sys.stderr.write("MPI simulation returned extra messages:\n")
-            sys.stderr.write(mpi_error_msg)
-            sys.stderr.write("\n*** End MPI messages ***\n\n")
-
         # if simulation failed, raise exception
         if proc.returncode != 0:
             raise RuntimeError("MPI simulation failed")
 
-        if sim_failed:
+        if len(self.proc_data_bytes) == 0:
             raise RuntimeError("MPI simulation didn't return any data")
 
         # decode base64 object
-        data_pickled = codecs.decode(data_str_bytes, "base64")
+        data_pickled = codecs.decode(self.proc_data_bytes, "base64")
 
         # unpickle the data
         sim_data = pickle.loads(data_pickled)
