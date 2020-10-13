@@ -23,18 +23,7 @@ def run_mpi_simulation():
 
     import pickle
     import codecs
-    import os
     import io
-
-    # suppress output to stderr
-    stderr_fileno = sys.stderr.fileno()
-    null_fd = os.open(os.devnull, os.O_RDWR)
-    old_err_fd = os.dup(stderr_fileno)
-    os.dup2(null_fd, stderr_fileno)
-
-    # temporarily use a StringIO object to capture stderr
-    str_err = io.StringIO()
-    sys.stderr = str_err
 
     from hnn_core import Network
     from hnn_core.network_builder import NetworkBuilder, _simulate_single_trial
@@ -76,13 +65,15 @@ def run_mpi_simulation():
             spikedata = neuron_net.get_data_from_neuron()
             sim_data.append((dpl, spikedata))
 
+    # the parent process is waiting for the string "sim_complete"
+    # to signal that the output will only contain sim_data
+    if rank == 0:
+        sys.stdout.write('sim_complete')
+    sys.stdout.flush()
+
     # send results to stderr
     if rank == 0:
         data_iostream = io.BytesIO()
-
-        # Force the use of bytes streams under Python 3
-        if hasattr(data_iostream, 'buffer'):
-            data_iostream = data_iostream.buffer
 
         # send back dpls and spikedata
         pickled_string = pickle.dumps(sim_data)
@@ -90,24 +81,11 @@ def run_mpi_simulation():
         # encode as base64 before sending to stderr
         repickled_bytes = codecs.encode(pickled_string,
                                         'base64')
-
-        data_iostream.write(repickled_bytes + b"===")
-
-    # flush anything in stderr (still points to str_err) to stdout
-    sys.stderr.flush()
-    sys.stdout.write(sys.stderr.getvalue())
-
-    # restore the old stderr
-    os.dup2(old_err_fd, stderr_fileno)
-    sys.stderr = open(old_err_fd, 'w')
-    os.close(null_fd)
+        data_iostream.write(repickled_bytes)
 
     if rank == 0:
         data_str = data_iostream.getvalue().decode()
         sys.stderr.write(data_str)
-
-    # close the StringIO object
-    str_err.close()
 
     MPI.Finalize()
     return 0
