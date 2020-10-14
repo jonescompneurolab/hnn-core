@@ -112,9 +112,24 @@ def test_spikes(tmpdir):
 
     spikes = Spikes(times=spiketimes, gids=spikegids, types=spiketypes)
 
-    with pytest.raises(TypeError, match="indices must be integers or slices, "
-                       "not str"):
+    with pytest.raises(TypeError, match="indices must be int, slice, or "
+                       "array-like, not str"):
         spikes['1']
+
+    with pytest.raises(TypeError, match="indices must be int, slice, or "
+                       "array-like, not float"):
+        spikes[1.0]
+
+    with pytest.raises(ValueError, match="ndarray cannot exceed 1 dimension"):
+        spikes[np.array([[1, 2], [3, 4]])]
+
+    with pytest.raises(TypeError, match="gids must be of dtype int, "
+                       "not float64"):
+        spikes[np.array([1, 2, 3.0])]
+
+    with pytest.raises(TypeError, match="gids must be of dtype int, "
+                       "not float64"):
+        spikes[[0, 1, 2, 2.0]]
 
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
