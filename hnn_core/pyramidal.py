@@ -96,6 +96,14 @@ class Pyr(_Cell):
         self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
         self.sect_loc['distal'] = ['apicaltuft']
 
+    def get_sections(self):
+        ls = [self.soma]
+        for key in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
+                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']:
+            if key in self.dends:
+                ls.append(self.dends[key])
+        return ls
+
     def set_dend_props(self, p_dend_props):
         """"Iterate over keys in p_dend_props. Create dend for each key."""
         for key in p_dend_props:
