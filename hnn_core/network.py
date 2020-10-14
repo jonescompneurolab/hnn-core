@@ -410,11 +410,22 @@ class Spikes(object):
 
         if isinstance(gid_item, slice):
             gid_item = np.arange(gid_item.stop)[gid_item]
+        elif isinstance(gid_item, list):
+            gid_item = np.array(gid_item)
+        elif isinstance(gid_item, np.ndarray):
+            if gid_item.ndim > 1:
+                raise ValueError("ndarray cannot exceed 1 dimension")
+            else:
+                pass
         elif isinstance(gid_item, int):
             gid_item = np.array([gid_item])
         else:
-            raise TypeError("indices must be integers or slices, "
+            raise TypeError("indices must be int, slice, or array-like, "
                             f"not {type(gid_item).__name__}")
+
+        if not np.issubdtype(gid_item.dtype, np.integer):
+            raise TypeError("gids must be of dtype int, "
+                            f"not {gid_item.dtype.name}")
 
         n_trials = len(self._times)
         times_slice = []
