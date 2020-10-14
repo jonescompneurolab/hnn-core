@@ -98,10 +98,6 @@ class _Cell(object):
         self.soma.Ra = soma_props['Ra']
         self.soma.cm = soma_props['cm']
 
-    def get_sections(self):
-        """Get sections."""
-        return [self.soma]
-
     def get3dinfo(self):
         """Get 3d info."""
         ls = self.get_sections()
