@@ -71,14 +71,41 @@ class Pyr(_Cell):
                 d[key] = -d[key]
         return d
 
-    def basic_shape(self):
-        """Define shape of the neuron."""
-        # THESE AND LENGHTHS MUST CHANGE TOGETHER!!!
+    def set_geometry(self, p_dend):
+        """Define shape of the neuron.
+
+        Parameters
+        ----------
+        p_dend : dict | None
+            Nested dictionary. The outer dictionary has keys
+            with names of dendrites and the inner dictionary
+            specifies the parameters 'L', 'diam', 'cm' and 'Ra'
+            of these sections. See Neuron documentation of
+            h.Section for meaning of these parameters.
+        """
+        # Neuron shape based on Jones et al., 2009
+        sec_pts, sec_lens, sec_diams = self.secs()
         for sec in [self.soma] + self.list_dend:
             h.pt3dclear(sec=sec)
             sec_name = sec.name().split('_', 1)[1]
-            for pt in self.sec_pts()[sec_name]:
+            for pt in sec_pts[sec_name]:
                 h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
+            sec.L = sec_lens[sec_name]
+            sec.diam = sec_diams[sec_name]
+
+        # resets length,diam,etc. based on param specification
+        for key in p_dend:
+            # set dend props
+            self.dends[key].L = p_dend[key]['L']
+            self.dends[key].diam = p_dend[key]['diam']
+            self.dends[key].Ra = p_dend[key]['Ra']
+            self.dends[key].cm = p_dend[key]['cm']
+            # set dend nseg
+            if p_dend[key]['L'] > 100.:
+                self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
+                # make dend.nseg odd for all sections
+                if not self.dends[key].nseg % 2:
+                    self.dends[key].nseg += 1
 
     def create_dends(self, p_dend_props):
         """Create dendrites."""
@@ -103,21 +130,6 @@ class Pyr(_Cell):
             if key in self.dends:
                 ls.append(self.dends[key])
         return ls
-
-    def set_dend_props(self, p_dend_props):
-        """"Iterate over keys in p_dend_props. Create dend for each key."""
-        for key in p_dend_props:
-            # set dend props
-            self.dends[key].L = p_dend_props[key]['L']
-            self.dends[key].diam = p_dend_props[key]['diam']
-            self.dends[key].Ra = p_dend_props[key]['Ra']
-            self.dends[key].cm = p_dend_props[key]['cm']
-            # set dend nseg
-            if p_dend_props[key]['L'] > 100.:
-                self.dends[key].nseg = int(p_dend_props[key]['L'] / 50.)
-                # make dend.nseg odd for all sections
-                if not self.dends[key].nseg % 2:
-                    self.dends[key].nseg += 1
 
     def _get_dend_props(self):
         """Returns hardcoded dendritic properties."""
@@ -278,7 +290,7 @@ class L2Pyr(Pyr):
         self.topol()  # sets the connectivity between sections
         # sets geom properties;
         # adjusted after translation from hoc (2009 model)
-        self.geom(p_dend)
+        self.set_geometry(p_dend)
 
         # biophysics
         self._biophys_soma()
@@ -306,23 +318,40 @@ class L2Pyr(Pyr):
             'name': 'L2Pyr',
         }
 
-    def geom(self, p_dend):
-        """The geometry."""
+    def secs(self):
+        """The geometry of the default sections in the Neuron."""
+        sec_pts = {
+            'soma': [[-50, 765, 0], [-50, 778, 0]],
+            'apical_trunk': [[-50, 778, 0], [-50, 813, 0]],
+            'apical_oblique': [[-50, 813, 0], [-250, 813, 0]],
+            'apical_1': [[-50, 813, 0], [-50, 993, 0]],
+            'apical_tuft': [[-50, 993, 0], [-50, 1133, 0]],
+            'basal_1': [[-50, 765, 0], [-50, 715, 0]],
+            'basal_2': [[-50, 715, 0], [-156, 609, 0]],
+            'basal_3': [[-50, 715, 0], [56, 609, 0]],
+        }
         # increased by 70% for human
-        soma = self.soma
-        dend = self.list_dend
-        sec_lens = [59.5, 340, 306, 238, 85, 255, 255]
-        sec_diams = [4.25, 3.91, 4.08, 3.4, 4.25, 2.72, 2.72]
-
-        soma.L = 22.1
-        soma.diam = 23.4
-
-        for idx, dend in enumerate(self.list_dend):
-            dend.L = sec_lens[idx]
-            dend.diam = sec_diams[idx]
-
-        # resets length,diam,etc. based on param specification
-        self.set_dend_props(p_dend)
+        sec_lens = {
+            'soma': 22.1,
+            'apical_trunk': 59.5,
+            'apical_oblique': 340,
+            'apical_1': 306,
+            'apical_tuft': 238,
+            'basal_1': 85,
+            'basal_2': 255,
+            'basal_3': 255
+        }
+        sec_diams = {
+            'soma': 23.4,
+            'apical_trunk': 4.25,
+            'apical_oblique': 3.91,
+            'apical_1': 4.08,
+            'apical_tuft': 3.4,
+            'basal_1': 4.25,
+            'basal_2': 2.72,
+            'basal_3': 2.72
+        }
+        return sec_pts, sec_lens, sec_diams
 
     def topol(self):
         """Connects sections of THIS cell together."""
@@ -339,20 +368,6 @@ class L2Pyr(Pyr):
         self.dends['basal_1'].connect(self.soma, 0, 0)
         self.dends['basal_2'].connect(self.dends['basal_1'], 1, 0)
         self.dends['basal_3'].connect(self.dends['basal_1'], 1, 0)
-
-        self.basic_shape()  # translated from original hoc (2009 model)
-
-    def sec_pts(self):
-        return {
-            'soma': [[-50, 765, 0], [-50, 778, 0]],
-            'apical_trunk': [[-50, 778, 0], [-50, 813, 0]],
-            'apical_oblique': [[-50, 813, 0], [-250, 813, 0]],
-            'apical_1': [[-50, 813, 0], [-50, 993, 0]],
-            'apical_tuft': [[-50, 993, 0], [-50, 1133, 0]],
-            'basal_1': [[-50, 765, 0], [-50, 715, 0]],
-            'basal_2': [[-50, 715, 0], [-156, 609, 0]],
-            'basal_3': [[-50, 715, 0], [56, 609, 0]],
-        }
 
     def _biophys_soma(self):
         """Adds biophysics to soma."""
@@ -433,7 +448,7 @@ class L5Pyr(Pyr):
         self.topol()  # sets the connectivity between sections
         # sets geom properties; adjusted after translation from
         # hoc (2009 model)
-        self.geom(p_dend)
+        self.set_geometry(p_dend)
 
         # biophysics
         self.__biophys_soma()
@@ -454,8 +469,9 @@ class L5Pyr(Pyr):
         # run record current soma, defined in Cell()
         self.record_current_soma()
 
-    def sec_pts(self):
-        return {
+    def secs(self):
+        """The geometry of the default sections in the Neuron."""
+        sec_pts = {
             'soma': [[0, 0, 0], [0, 23, 0]],
             'apical_trunk': [[0, 23, 0], [0, 83, 0]],
             'apical_oblique': [[0, 83, 0], [-150, 83, 0]],
@@ -466,25 +482,29 @@ class L5Pyr(Pyr):
             'basal_2': [[0, -50, 0], [-106, -156, 0]],
             'basal_3': [[0, -50, 0], [106, -156, 0]]
         }
-
-    def geom(self, p_dend):
-        """The geometry."""
-        soma = self.soma
-        dend = self.list_dend
-        # soma.L = 13 # BUSH 1999 spike amp smaller
-        sec_lens = [102, 255, 680, 680, 425, 85, 255, 255]
-        sec_diams = [10.2, 5.1, 7.48, 4.93, 3.4, 6.8, 8.5, 8.5]
-
-        soma.L = 39  # Bush 1993
-        # soma.diam = 18.95 # Bush 1999
-        soma.diam = 28.9  # Bush 1993
-
-        for idx, dend in enumerate(self.list_dend):
-            dend.L = sec_lens[idx]
-            dend.diam = sec_diams[idx]
-
-        # resets length,diam,etc. based on param specification
-        self.set_dend_props(p_dend)
+        sec_lens = {
+            'soma': 39,
+            'apical_trunk': 102,
+            'apical_oblique': 255,
+            'apical_1': 680,
+            'apical_2': 680,
+            'apical_tuft': 425,
+            'basal_1': 85,
+            'basal_2': 255,
+            'basal_3': 255
+        }
+        sec_diams = {
+            'soma': 28.9,
+            'apical_trunk': 10.2,
+            'apical_oblique': 5.1,
+            'apical_1': 7.48,
+            'apical_2': 4.93,
+            'apical_tuft': 3.4,
+            'basal_1': 6.8,
+            'basal_2': 8.5,
+            'basal_3': 8.5
+        }
+        return sec_pts, sec_lens, sec_diams
 
     def __get_soma_props(self, pos):
         """Sets somatic properties. Returns dictionary."""
@@ -514,8 +534,6 @@ class L5Pyr(Pyr):
         self.dends['basal_1'].connect(self.soma, 0, 0)
         self.dends['basal_2'].connect(self.dends['basal_1'], 1, 0)
         self.dends['basal_3'].connect(self.dends['basal_1'], 1, 0)
-
-        self.basic_shape()  # translated from original hoc (2009 model)
 
     # adds biophysics to soma
     def __biophys_soma(self):
