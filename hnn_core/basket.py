@@ -46,6 +46,10 @@ class BasketSingle(_Cell):
             'name': cell_name,
         }
 
+    def get_sections(self):
+        """Get sections."""
+        return [self.soma]
+
     # creation of synapses
     def _synapse_create(self):
         # creates synapses onto this cell
