@@ -89,7 +89,6 @@ def _simulate_single_trial(neuron_net, trial_idx):
 
     neuron_net.aggregate_voltages()
     _PC.py_gather(neuron_net._vsoma, 0)
-    neuron_net._all_vsoma = neuron_net._vsoma
 
     # combine spiking data from each proc
     spiketimes_list = _PC.py_gather(neuron_net._spiketimes, 0)
