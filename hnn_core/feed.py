@@ -135,7 +135,7 @@ class ExtFeed(object):
         T = self.params['t_interval'][1]
         if t0 < 0:
             raise ValueError('The start time for Poisson inputs must be'
-                             f'greater than 0. Got {T}')
+                             f'greater than 0. Got {t0}')
         if T < t0:
             raise ValueError('The end time for Poisson inputs must be'
                              f'greater than start time. Got ({t0}, {T})')
