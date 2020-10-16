@@ -46,3 +46,17 @@ def test_extfeed():
         for layer in ['L2', 'L5']:
             key = 'input_{}_A_weight_{}Pyr_ampa'.format(loc, layer)
             assert feed.params[layer + 'Pyr_ampa'][0] == params[key]
+
+    # validate poisson input time interval
+    params = p_unique['extpois']
+    params['L2_basket'] = (1., 1., 0., 0.)
+    with pytest.raises(ValueError, match='The end time for Poisson input'):
+        params['t_interval'] = (params['t_interval'][0], -1)
+        feed = ExtFeed(feed_type='extpois',
+                       target_cell_type='L2_basket',
+                       params=params, gid=0)
+    with pytest.raises(ValueError, match='The start time for Poisson'):
+        params['t_interval'] = (-1, 5)
+        feed = ExtFeed(feed_type='extpois',
+                       target_cell_type='L2_basket',
+                       params=params, gid=0)

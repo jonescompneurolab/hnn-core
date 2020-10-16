@@ -133,6 +133,12 @@ class ExtFeed(object):
         # check the t interval
         t0 = self.params['t_interval'][0]
         T = self.params['t_interval'][1]
+        if t0 < 0:
+            raise ValueError('The start time for Poisson inputs must be'
+                             f'greater than 0. Got {T}')
+        if T < t0:
+            raise ValueError('The end time for Poisson inputs must be'
+                             f'greater than start time. Got ({t0}, {T})')
         lamtha = self.params[self.cell_type][3]  # ind 3 is frequency (lamtha)
         # values MUST be sorted for VecStim()!
         # start the initial value
