@@ -464,6 +464,10 @@ class Spikes(object):
     def types(self):
         return self._types
 
+    @property
+    def vsoma(self):
+        return self._vsoma
+
     def update_types(self, gid_dict):
         """Update spike types in the current instance of Spikes.
 
