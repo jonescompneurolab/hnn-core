@@ -322,6 +322,7 @@ class NetworkBuilder(object):
         self._spiketimes = h.Vector()
         self._spikegids = h.Vector()
         self._vsoma = dict()
+        self._t_vec = h.Vector()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spiketimes = h.Vector()
@@ -749,7 +750,8 @@ class NetworkBuilder(object):
         data = (self._all_spiketimes.to_python(),
                 self._all_spikegids.to_python(),
                 deepcopy(self.net.gid_dict),
-                deepcopy(vsoma_py))
+                deepcopy(vsoma_py),
+                self._t_vec.to_python())
         return data
 
     def _clear_last_network_objects(self):

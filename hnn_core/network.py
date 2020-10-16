@@ -330,6 +330,9 @@ class Spikes(object):
         Each gid corresponds to a type via Network::gid_dict.
     vsoma : dict
         Dictionary indexed by gids containing somatic voltages
+    t_vec : list
+        List of time points for samples in continuous data.
+        This includes vsoma.
 
     Methods
     -------
@@ -376,6 +379,7 @@ class Spikes(object):
         self._gids = gids
         self._types = types
         self._vsoma = list()
+        self._t_vec = list()
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -467,6 +471,10 @@ class Spikes(object):
     @property
     def vsoma(self):
         return self._vsoma
+
+    @property
+    def t_vec(self):
+        return self._t_vec
 
     def update_types(self, gid_dict):
         """Update spike types in the current instance of Spikes.
