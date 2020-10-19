@@ -256,6 +256,26 @@ class MPIBackend(object):
 
         return None
 
+    def _process_child_data(self, data_bytes, data_length):
+        if not data_length == len(data_bytes):
+            raise RuntimeError("Failed to receive all data from the child MPI"
+                               " process. Expecting %d bytes, got %d" %
+                               (data_length, len(data_bytes)))
+
+        if len(data_bytes) == 0:
+            raise RuntimeError("MPI simulation didn't return any data")
+
+        # decode base64 byte string
+        try:
+            data_pickled = codecs.decode(data_bytes, "base64")
+        except binascii.Error:
+            raise ValueError("Incorrect padding for data length %d bytes" %
+                             len(data_bytes), "(mod 4 = %d)" %
+                             len(data_bytes) % 4)
+
+        # unpickle the data
+        return pickle.loads(data_pickled)
+
     def simulate(self, net):
         """Simulate the HNN model in parallel on all cores
 
@@ -365,24 +385,7 @@ class MPIBackend(object):
         if proc.returncode != 0:
             raise RuntimeError("MPI simulation failed")
 
-        if not data_length == len(self.proc_data_bytes):
-            raise RuntimeError("Failed to receive all data from the child MPI"
-                               " process. Expecting %d bytes, got %d" %
-                               (data_length, len(self.proc_data_bytes)))
-
-        if len(self.proc_data_bytes) == 0:
-            raise RuntimeError("MPI simulation didn't return any data")
-
-        # decode base64 byte string
-        try:
-            data_pickled = codecs.decode(self.proc_data_bytes, "base64")
-        except binascii.Error:
-            raise ValueError("Incorrect padding for data length %d bytes" %
-                             len(self.proc_data_bytes), "(mod 4 = %d)" %
-                             len(self.proc_data_bytes) % 4)
-
-        # unpickle the data
-        sim_data = pickle.loads(data_pickled)
+        sim_data = self._process_child_data(self.proc_data_bytes, data_length)
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls

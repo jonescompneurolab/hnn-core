@@ -7,7 +7,6 @@ This script is called directly from MPIBackend.simulate()
 import sys
 import pickle
 import codecs
-from mpi4py import MPI
 
 
 def _read_all_bytes(stream_in, chunk_size=4096):
@@ -23,6 +22,10 @@ def _read_all_bytes(stream_in, chunk_size=4096):
 
 class MPISimulation(object):
     """The MPISimulation class.
+    Parameters
+    ----------
+    skip_MPI_import : bool | None
+        Skip importing MPI. Only useful for testing with pytest.
 
     Attributes
     ----------
@@ -32,15 +35,24 @@ class MPISimulation(object):
         The rank for each processor part of the MPI communicator
     """
 
-    def __init__(self):
-        self.comm = MPI.COMM_WORLD
-        self.rank = self.comm.Get_rank()
+    def __init__(self, skip_MPI_import=False):
+        self.skip_MPI_import = skip_MPI_import
+        if skip_MPI_import:
+            self.rank = 0
+        else:
+            from mpi4py import MPI
+
+            self.comm = MPI.COMM_WORLD
+            self.rank = self.comm.Get_rank()
 
     def __enter__(self):
         return self
 
     def __exit__(self, type, value, traceback):
-        MPI.Finalize()
+        # skip Finalize() if we didn't import MPI on __init__
+        if hasattr(self, 'comm'):
+            from mpi4py import MPI
+            MPI.Finalize()
 
     def _read_params(self):
         """Read params broadcasted to all ranks on stdin"""
@@ -63,11 +75,6 @@ class MPISimulation(object):
         # only have rank 0 write to stdout/stderr
         if self.rank > 0:
             return
-
-        # the parent process is waiting for "end_of_sim" to signal that
-        # the following stderr will only contain sim_data
-        sys.stdout.write('end_of_sim')
-        sys.stdout.flush()  # flush to ensure signal is not buffered
 
         # pickle the data and encode as base64 before sending to stderr
         pickled_str = pickle.dumps(sim_data)
@@ -105,6 +112,12 @@ class MPISimulation(object):
         # flush output buffers from all ranks (any errors or status mesages)
         sys.stdout.flush()
         sys.stderr.flush()
+
+        if self.rank == 0:
+            # the parent process is waiting for "end_of_sim" to signal that
+            # the following stderr will only contain sim_data
+            sys.stdout.write('end_of_sim')
+            sys.stdout.flush()  # flush to ensure signal is not buffered
 
         return sim_data
 
