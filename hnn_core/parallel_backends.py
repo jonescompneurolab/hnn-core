@@ -269,6 +269,9 @@ class MPIBackend(object):
         try:
             data_pickled = codecs.decode(data_bytes, "base64")
         except binascii.Error:
+            # This is here for future debugging purposes. Unit tests can't
+            # reproduce an incorrectly padded string, but this has been an
+            # issue before
             raise ValueError("Incorrect padding for data length %d bytes" %
                              len(data_bytes), "(mod 4 = %d)" %
                              len(data_bytes) % 4)

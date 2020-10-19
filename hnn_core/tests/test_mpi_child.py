@@ -66,19 +66,3 @@ def test_data_len_mismatch():
     with pytest.raises(RuntimeError, match="Failed to receive all data from "
                        "the child MPI process. Expecting 2 bytes, got 1"):
         backend._process_child_data(data_bytes, data_len)
-
-
-def test_data_padding():
-    """Test that an incorrect amount of padding raises RuntimeError"""
-
-    import pickle
-    import codecs
-
-    pickled_str = pickle.dumps({})
-    pickled_bytes = codecs.encode(pickled_str, 'base64')
-    pickled_bytes += b'='
-    data_len = 10
-    backend = MPIBackend()
-    with pytest.raises(RuntimeError, match="Incorrect padding for data length "
-                       " 10 bytes (mod 4 = 2)"):
-        backend._process_child_data(pickled_bytes, data_len)
