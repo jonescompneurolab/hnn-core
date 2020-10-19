@@ -17,6 +17,31 @@ import binascii
 _BACKEND = None
 
 
+def _clone_and_simulate(net, trial_idx, prng_seedcore_initial):
+    """Run a simulation including building the network
+
+    This is used by both backends. MPIBackend calls this in mpi_child.py, once
+    for each trial (blocking), and JoblibBackend calls this for each trial
+    (non-blocking)
+    """
+
+    # avoid relative lookups after being forked (Joblib)
+    from hnn_core.network_builder import NetworkBuilder
+    from hnn_core.network_builder import _simulate_single_trial
+
+    # XXX this should be built into NetworkBuilder
+    # update prng_seedcore params to provide jitter between trials
+    for param_key in net.params['prng_*'].keys():
+        net.params[param_key] += trial_idx
+
+    neuron_net = NetworkBuilder(net)
+    dpl = _simulate_single_trial(neuron_net, trial_idx)
+
+    spikedata = neuron_net.get_data_from_neuron()
+
+    return dpl, spikedata
+
+
 def _gather_trial_data(sim_data, net, n_trials):
     """Arrange data by trial
 
@@ -83,23 +108,6 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def _clone_and_simulate(self, net, trial_idx):
-        # avoid relative lookups after being forked by joblib
-        from hnn_core.network_builder import NetworkBuilder
-        from hnn_core.network_builder import _simulate_single_trial
-
-        # XXX this should be built into NetworkBuilder
-        # update prng_seedcore params to provide jitter between trials
-        for param_key in net.params['prng_*'].keys():
-            net.params[param_key] += trial_idx
-
-        neuron_net = NetworkBuilder(net)
-        dpl = _simulate_single_trial(neuron_net, trial_idx)
-
-        spikedata = neuron_net.get_data_from_neuron()
-
-        return dpl, spikedata
-
     def simulate(self, net):
         """Simulate the HNN model
 
@@ -118,8 +126,10 @@ class JoblibBackend(object):
         n_trials = net.params['N_trials']
         dpls = []
 
-        parallel, myfunc = self._parallel_func(self._clone_and_simulate)
-        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
+        prng_seedcore_initial = net.params['prng_*'].copy()
+        parallel, myfunc = self._parallel_func(_clone_and_simulate)
+        sim_data = parallel(myfunc(net, idx, prng_seedcore_initial)
+                            for idx in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
@@ -322,16 +332,16 @@ class MPIBackend(object):
             events = self.sel.select(timeout=1)
             for key, mask in events:
                 callback = key.data
-                completion_singal = callback(key.fileobj, mask)
-                if completion_singal is not None:
-                    if completion_singal == "end_of_sim":
+                completion_signal = callback(key.fileobj, mask)
+                if completion_signal is not None:
+                    if completion_signal == "end_of_sim":
                         # finishied receiving printable output
                         # everything else received is data
                         self.sel.unregister(pipe_stderr_r)
                         self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
                                           self._read_data)
-                    elif completion_singal.startswith("end_of_data"):
-                        split_string = completion_singal.split(':')
+                    elif completion_signal.startswith("end_of_data"):
+                        split_string = completion_signal.split(':')
                         if len(split_string) > 1:
                             data_length = int(split_string[1])
                             self.sel.unregister(pipe_stdout_r)
