@@ -69,17 +69,25 @@ def run_mpi_simulation():
     sys.stderr.flush()
 
     if rank == 0:
-        # the parent process is waiting for the string "sim_complete"
+        # the parent process is waiting for the string "end_of_sim"
         # to signal that the output will only contain sim_data
-        sys.stdout.write('sim_complete')
+        sys.stdout.write('end_of_sim')
         sys.stdout.flush()  # flush to ensure signal is not buffered
 
         # pickle the data and encode as base64 before sending to stderr
         pickled_str = pickle.dumps(sim_data)
-        pickled_bytes = codecs.encode(pickled_str,
-                                      'base64')
+        pickled_bytes = codecs.encode(pickled_str, 'base64')
+
+        # base64 encoding requires data padded to a multiple of 4
+        padding = len(pickled_bytes) % 4
+        pickled_bytes += b"===" * padding
         sys.stderr.write(pickled_bytes.decode())
         sys.stderr.flush()
+
+        # the parent process is waiting for the string "end_of_sim:"
+        # with the expected length of data it that it received
+        sys.stdout.write('end_of_data:%d' % len(pickled_bytes))
+        sys.stdout.flush()
 
     MPI.Finalize()
     return 0
