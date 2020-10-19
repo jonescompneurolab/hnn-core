@@ -5,6 +5,9 @@ This script is called directly from MPIBackend.simulate()
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 
 import sys
+import pickle
+import codecs
+from mpi4py import MPI
 
 
 def _read_all_bytes(stream_in, chunk_size=4096):
@@ -18,59 +21,51 @@ def _read_all_bytes(stream_in, chunk_size=4096):
     return all_data
 
 
-def run_mpi_simulation():
-    from mpi4py import MPI
+class MPISimulation(object):
+    """The MPISimulation class.
 
-    import pickle
-    import codecs
+    Attributes
+    ----------
+    comm : mpi4py.Comm object
+        The handle used for communicating among MPI processes
+    rank : int
+        The rank for each processor part of the MPI communicator
+    """
 
-    from hnn_core import Network
-    from hnn_core.network_builder import NetworkBuilder, _simulate_single_trial
+    def __init__(self):
+        self.comm = MPI.COMM_WORLD
+        self.rank = self.comm.Get_rank()
 
-    # using template for reading stdin from:
-    # https://github.com/cloudpipe/cloudpickle/blob/master/tests/testutils.py
+    def __enter__(self):
+        return self
 
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
+    def __exit__(self, type, value, traceback):
+        MPI.Finalize()
 
-    # get parameters from stdin
-    if rank == 0:
-        stream_in = sys.stdin
-        # Force the use of bytes streams under Python 3
-        if hasattr(sys.stdin, 'buffer'):
-            stream_in = sys.stdin.buffer
-        input_bytes = _read_all_bytes(stream_in)
-        stream_in.close()
+    def _read_params(self):
+        """Read params broadcasted to all ranks on stdin"""
 
-        params = pickle.loads(codecs.decode(input_bytes, "base64"))
-    else:
-        params = None
+        # get parameters from stdin
+        if self.rank == 0:
+            input_bytes = _read_all_bytes(sys.stdin.buffer)
+            sys.stdin.close()
 
-    params = comm.bcast(params, root=0)
-    net = Network(params)
-    # XXX store the initial prng_seedcore params to be referenced in each trial
-    prng_seedcore_initial = net.params['prng_*'].copy()
+            params = pickle.loads(codecs.decode(input_bytes, "base64"))
+        else:
+            params = None
 
-    sim_data = []
-    for trial_idx in range(params['N_trials']):
-        # XXX this should be built into NetworkBuilder
-        # update prng_seedcore params to provide jitter between trials
-        for param_key in prng_seedcore_initial.keys():
-            net.params[param_key] = (prng_seedcore_initial[param_key] +
-                                     trial_idx)
-        neuron_net = NetworkBuilder(net)
-        dpl = _simulate_single_trial(neuron_net, trial_idx)
-        if rank == 0:
-            spikedata = neuron_net.get_data_from_neuron()
-            sim_data.append((dpl, spikedata))
+        params = self.comm.bcast(params, root=0)
+        return params
 
-    # flush output buffers from all ranks
-    sys.stdout.flush()
-    sys.stderr.flush()
+    def _write_data_stderr(self, sim_data):
+        """write base64 encoded data to stderr"""
 
-    if rank == 0:
-        # the parent process is waiting for the string "end_of_sim"
-        # to signal that the output will only contain sim_data
+        # only have rank 0 write to stdout/stderr
+        if self.rank > 0:
+            return
+
+        # the parent process is waiting for "end_of_sim" to signal that
+        # the following stderr will only contain sim_data
         sys.stdout.write('end_of_sim')
         sys.stdout.flush()  # flush to ensure signal is not buffered
 
@@ -84,21 +79,51 @@ def run_mpi_simulation():
         sys.stderr.write(pickled_bytes.decode())
         sys.stderr.flush()
 
-        # the parent process is waiting for the string "end_of_sim:"
-        # with the expected length of data it that it received
+        # the parent process is waiting for "end_of_sim:[#bytes]" with the
+        # length of data
         sys.stdout.write('end_of_data:%d' % len(pickled_bytes))
-        sys.stdout.flush()
+        sys.stdout.flush()  # flush to ensure signal is not buffered
 
-    MPI.Finalize()
-    return 0
+    def run(self, params):
+        """Run MPI simulation(s) and write results to stderr"""
+
+        from hnn_core import Network
+        from hnn_core.parallel_backends import _clone_and_simulate
+
+        prng_seedcore_initial = params['prng_*']
+
+        net = Network(params)
+        sim_data = []
+        for trial_idx in range(params['N_trials']):
+            single_sim_data = _clone_and_simulate(net, trial_idx,
+                                                  prng_seedcore_initial)
+
+            # go ahead and append trial data for each rank, though
+            # only rank 0 has data that should be send back to MPIBackend
+            sim_data.append(single_sim_data)
+
+        # flush output buffers from all ranks (any errors or status mesages)
+        sys.stdout.flush()
+        sys.stderr.flush()
+
+        return sim_data
 
 
 if __name__ == '__main__':
+    """This file is called on command-line from nrniv"""
+
+    import traceback
+    rc = 0
+
     try:
-        rc = run_mpi_simulation()
-    except Exception as e:
+        with MPISimulation() as mpi_sim:
+            params = mpi_sim._read_params()
+            sim_data = mpi_sim.run(params)
+            mpi_sim._write_data_stderr(sim_data)
+    except Exception:
         # This can be useful to indicate the problem to the
         # caller (in parallel_backends.py)
-        print("Exception: %s" % e)
+        traceback.print_exc(file=sys.stdout)
         rc = 2
+
     sys.exit(rc)
