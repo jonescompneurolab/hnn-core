@@ -9,7 +9,7 @@ from hnn_core.network_builder import NetworkBuilder
 from hnn_core.cell import _ArtificialCell, _Cell
 
 matplotlib.use('agg')
-
+# this is for a test
 
 def test_cell():
     """Test cells object."""
