@@ -24,7 +24,7 @@ class MPISimulation(object):
     """The MPISimulation class.
     Parameters
     ----------
-    skip_MPI_import : bool | None
+    skip_mpi_import : bool | None
         Skip importing MPI. Only useful for testing with pytest.
 
     Attributes
@@ -35,9 +35,9 @@ class MPISimulation(object):
         The rank for each processor part of the MPI communicator
     """
 
-    def __init__(self, skip_MPI_import=False):
-        self.skip_MPI_import = skip_MPI_import
-        if skip_MPI_import:
+    def __init__(self, skip_mpi_import=False):
+        self.skip_mpi_import = skip_mpi_import
+        if skip_mpi_import:
             self.rank = 0
         else:
             from mpi4py import MPI
