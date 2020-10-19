@@ -43,7 +43,7 @@ def run_hnn_core(backend=None, n_jobs=1):
     net_reduced = Network(params_reduced)
 
     if backend == 'mpi':
-        with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
+        with MPIBackend(mpi_cmd='mpiexec'):
             dpl = simulate_dipole(net)[0]
             dpls_reduced = simulate_dipole(net_reduced)
     elif backend == 'joblib':
@@ -91,7 +91,7 @@ def test_compare_across_backends():
     try:
         import mpi4py
         mpi4py.__file__
-        # test consistency between mpi backend simulation (n_procs=2) & master
+        # test consistency between mpi backend simulation & master
         dpls_reduced_mpi = run_hnn_core(backend='mpi')
     except ImportError:
         print("Skipping MPIBackend test and dipole comparison because mpi4py "
@@ -130,3 +130,14 @@ def test_mpi_failure():
     assert "MPI processes are unable to reach each other" in stdout
 
     del environ["OMPI_MCA_btl"]
+
+
+def test_mpi_nprocs():
+    """Test that MPIBackend can use more than 1 processor"""
+
+    # if only 1 processor is available, then MPIBackend tests will not
+    # be valid
+    pytest.importorskip("mpi4py", reason="mpi4py not available")
+
+    backend = MPIBackend()
+    assert backend.n_procs > 1
