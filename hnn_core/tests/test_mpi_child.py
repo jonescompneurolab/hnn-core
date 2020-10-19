@@ -26,7 +26,7 @@ def test_child_run():
                            't_evprox_2': 20,
                            'N_trials': 2})
 
-    with MPISimulation(skip_MPI_import=True) as mpi_sim:
+    with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):
             sim_data = mpi_sim.run(params_reduced)
             stdout = buf.getvalue()

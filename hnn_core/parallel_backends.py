@@ -161,15 +161,17 @@ class MPIBackend(object):
 
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
-        self.n_procs = n_procs
         n_logical_cores = multiprocessing.cpu_count()
+
+        if n_procs is None:
+            self.n_procs = n_logical_cores
+        else:
+            self.n_procs = n_procs
 
         # obey limits set by scheduler
         if hasattr(os, 'sched_getaffinity'):
             scheduler_cores = len(os.sched_getaffinity(0))
             self.n_procs = min(self.n_procs, scheduler_cores)
-        elif n_procs is None:
-            self.n_procs = n_logical_cores
 
         # did user try to force running on more cores than available?
         oversubscribe = False
