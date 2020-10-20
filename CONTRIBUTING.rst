@@ -10,6 +10,8 @@ it can be incorporated into the master branch.
 To help developing ``hnn-core``, you will need a few adjustments to your
 installation as shown below.
 
+If your contributions will make use of parallel backends for using more than one core, please see the additional installation steps for `parallel_backends`_
+
 Running tests
 =============
 
@@ -65,3 +67,5 @@ Continuous Integration
 
 The repository is tested via continuous integration with Travis and Circle. The automated
 tests run on Travis while the documentation is built on Circle.
+
+.. _parallel_backends: https://jonescompneurolab.github.io/hnn-core/parallel.html
