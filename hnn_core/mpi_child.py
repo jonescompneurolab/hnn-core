@@ -106,7 +106,7 @@ class MPISimulation(object):
                                                   prng_seedcore_initial)
 
             # go ahead and append trial data for each rank, though
-            # only rank 0 has data that should be send back to MPIBackend
+            # only rank 0 has data that should be sent back to MPIBackend
             sim_data.append(single_sim_data)
 
         # flush output buffers from all ranks (any errors or status mesages)

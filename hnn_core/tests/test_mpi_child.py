@@ -39,30 +39,27 @@ def test_child_run():
             stderr = buf_err.getvalue()
         assert "end_of_data:" in stdout
 
-        split_stdout = stdout.split('end_of_data:')
         data = stderr.encode()
-        data_len = len(data)
-        expected_len = int(split_stdout[1])
-        print("len data: %d, expected: %d" % (data_len, expected_len))
+        expected_len = len(data)
         backend = MPIBackend()
-        sim_data = backend._process_child_data(data, data_len)
+        sim_data = backend._process_child_data(data, expected_len)
 
 
 def test_empty_data():
     """Test that an empty string raises RuntimeError"""
     data_bytes = b''
-    data_len = len(data_bytes)
+    expected_len = len(data_bytes)
     backend = MPIBackend()
     with pytest.raises(RuntimeError, match="MPI simulation didn't return any "
                        "data"):
-        backend._process_child_data(data_bytes, data_len)
+        backend._process_child_data(data_bytes, expected_len)
 
 
 def test_data_len_mismatch():
     """Test that an unexpected data length raises RuntimeError"""
     data_bytes = b'\0'
-    data_len = 2
+    expected_len = 2
     backend = MPIBackend()
     with pytest.raises(RuntimeError, match="Failed to receive all data from "
                        "the child MPI process. Expecting 2 bytes, got 1"):
-        backend._process_child_data(data_bytes, data_len)
+        backend._process_child_data(data_bytes, expected_len)

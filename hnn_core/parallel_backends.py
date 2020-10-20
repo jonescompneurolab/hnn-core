@@ -258,11 +258,11 @@ class MPIBackend(object):
 
         return None
 
-    def _process_child_data(self, data_bytes, data_length):
-        if not data_length == len(data_bytes):
+    def _process_child_data(self, data_bytes, data_len):
+        if not data_len == len(data_bytes):
             raise RuntimeError("Failed to receive all data from the child MPI"
                                " process. Expecting %d bytes, got %d" %
-                               (data_length, len(data_bytes)))
+                               (data_len, len(data_bytes)))
 
         if len(data_bytes) == 0:
             raise RuntimeError("MPI simulation didn't return any data")
@@ -368,7 +368,7 @@ class MPIBackend(object):
                     elif completion_signal.startswith("end_of_data"):
                         split_string = completion_signal.split(':')
                         if len(split_string) > 1:
-                            data_length = int(split_string[1])
+                            data_len = int(split_string[1])
                             self.sel.unregister(pipe_stdout_r)
                         else:
                             raise ValueError("Invalid data send completion "
@@ -390,7 +390,7 @@ class MPIBackend(object):
         if proc.returncode != 0:
             raise RuntimeError("MPI simulation failed")
 
-        sim_data = self._process_child_data(self.proc_data_bytes, data_length)
+        sim_data = self._process_child_data(self.proc_data_bytes, data_len)
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
