@@ -31,8 +31,8 @@ def _clone_and_simulate(net, trial_idx, prng_seedcore_initial):
 
     # XXX this should be built into NetworkBuilder
     # update prng_seedcore params to provide jitter between trials
-    for param_key in net.params['prng_*'].keys():
-        net.params[param_key] += trial_idx
+    for param_key in prng_seedcore_initial.keys():
+        net.params[param_key] = prng_seedcore_initial[param_key] + trial_idx
 
     neuron_net = NetworkBuilder(net)
     dpl = _simulate_single_trial(neuron_net, trial_idx)
