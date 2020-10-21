@@ -79,9 +79,11 @@ class Pyr(_Cell):
         p_dend : dict | None
             Nested dictionary. The outer dictionary has keys
             with names of dendrites and the inner dictionary
-            specifies the parameters 'L', 'diam', 'cm' and 'Ra'
-            of these sections. See Neuron documentation of
-            h.Section for meaning of these parameters.
+            specifies the parameters of these sections.
+                'L': length of a section in microns
+                'diam': diameter of a section in microns
+                'cm': membrane capacitance in micro-Farads
+                'Ra': axial resistivity in ohm-cm
         """
         # Neuron shape based on Jones et al., 2009
         sec_pts, sec_lens, sec_diams = self.secs()
@@ -319,7 +321,7 @@ class L2Pyr(Pyr):
         }
 
     def secs(self):
-        """The geometry of the default sections in the Neuron."""
+        """The geometry of the default sections in the neuron."""
         sec_pts = {
             'soma': [[-50, 765, 0], [-50, 778, 0]],
             'apical_trunk': [[-50, 778, 0], [-50, 813, 0]],
@@ -331,7 +333,7 @@ class L2Pyr(Pyr):
             'basal_3': [[-50, 715, 0], [56, 609, 0]],
         }
         # increased by 70% for human
-        sec_lens = {
+        sec_lens = {  # microns
             'soma': 22.1,
             'apical_trunk': 59.5,
             'apical_oblique': 340,
@@ -341,7 +343,7 @@ class L2Pyr(Pyr):
             'basal_2': 255,
             'basal_3': 255
         }
-        sec_diams = {
+        sec_diams = {  # microns
             'soma': 23.4,
             'apical_trunk': 4.25,
             'apical_oblique': 3.91,
@@ -482,7 +484,7 @@ class L5Pyr(Pyr):
             'basal_2': [[0, -50, 0], [-106, -156, 0]],
             'basal_3': [[0, -50, 0], [106, -156, 0]]
         }
-        sec_lens = {
+        sec_lens = {  # microns
             'soma': 39,
             'apical_trunk': 102,
             'apical_oblique': 255,
@@ -493,7 +495,7 @@ class L5Pyr(Pyr):
             'basal_2': 255,
             'basal_3': 255
         }
-        sec_diams = {
+        sec_diams = {  # microns
             'soma': 28.9,
             'apical_trunk': 10.2,
             'apical_oblique': 5.1,
