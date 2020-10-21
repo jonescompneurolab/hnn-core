@@ -290,7 +290,7 @@ class _Cell(ABC):
         nc_dict : dict
             Dictionary with keys: pos_src, A_weight, A_delay, lamtha
             Defines the connection parameters
-        postsyn : str
+        postsyn : instance of h.Exp2Syn
             The postsynaptic cell object.
 
         Returns
