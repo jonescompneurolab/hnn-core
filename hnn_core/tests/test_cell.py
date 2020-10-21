@@ -24,7 +24,15 @@ def test_cell():
     # test that ExpSyn always takes nrn.Segment, not float
     soma_props = {"L": 22.1, "diam": 23.4, "cm": 0.6195, "Ra": 200.0,
                   "pos": (0., 0., 0.), 'name': 'test_cell'}
-    cell = _Cell(gid=1, soma_props=soma_props)
+
+    with pytest.raises(TypeError, match='with abstract methods get_sections'):
+        cell = _Cell(gid=1, soma_props=soma_props)
+
+    class Cell(_Cell):
+        def get_sections(self):
+            return [self.soma]
+
+    cell = Cell(gid=1, soma_props=soma_props)
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 

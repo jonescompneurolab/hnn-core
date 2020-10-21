@@ -3,6 +3,8 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 from neuron import h, nrn
 
@@ -50,7 +52,7 @@ class _ArtificialCell:
         self.nrn_netcon.threshold = threshold
 
 
-class _Cell(object):
+class _Cell(ABC):
     """Create a cell object.
 
     Parameters
@@ -81,6 +83,11 @@ class _Cell(object):
              (soma_props['L'], soma_props['diam'],
               soma_props['Ra'], soma_props['cm']))
         return '<%s | %s>' % (class_name, s)
+
+    @abstractmethod
+    def get_sections(self):
+        """Get sections in a cell."""
+        pass
 
     def create_soma(self):
         """Create soma and set geometry."""
