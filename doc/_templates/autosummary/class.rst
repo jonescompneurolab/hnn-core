@@ -4,7 +4,7 @@
 .. currentmodule:: {{ module }}
 
 .. autoclass:: {{ objname }}
-   :members:
+   :inherited-members:
    :special-members: __getitem__, __repr__
 
    {% block methods %}
