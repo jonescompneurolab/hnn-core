@@ -6,7 +6,7 @@ This script is called directly from MPIBackend.simulate()
 
 import sys
 import pickle
-import codecs
+import base64
 
 
 def _read_all_bytes(stream_in, chunk_size=4096):
@@ -62,12 +62,19 @@ class MPISimulation(object):
             input_bytes = _read_all_bytes(sys.stdin.buffer)
             sys.stdin.close()
 
-            params = pickle.loads(codecs.decode(input_bytes, "base64"))
+            params = pickle.loads(base64.b64decode(input_bytes, validate=True))
         else:
             params = None
 
         params = self.comm.bcast(params, root=0)
         return params
+
+    def _pickle_data(self, sim_data):
+        # pickle the data and encode as base64 before sending to stderr
+        pickled_str = pickle.dumps(sim_data)
+        pickled_bytes = base64.b64encode(pickled_str)
+
+        return pickled_bytes
 
     def _write_data_stderr(self, sim_data):
         """write base64 encoded data to stderr"""
@@ -76,20 +83,15 @@ class MPISimulation(object):
         if self.rank > 0:
             return
 
-        # pickle the data and encode as base64 before sending to stderr
-        pickled_str = pickle.dumps(sim_data)
-        pickled_bytes = codecs.encode(pickled_str, 'base64')
+        pickled_bytes = self._pickle_data(sim_data)
 
-        # base64 encoding requires data padded to a multiple of 4
-        padding = len(pickled_bytes) % 4
-        pickled_bytes += b"===" * padding
         sys.stderr.write(pickled_bytes.decode())
         sys.stderr.flush()
 
         # the parent process is waiting for "end_of_sim:[#bytes]" with the
         # length of data
-        sys.stdout.write('end_of_data:%d' % len(pickled_bytes))
-        sys.stdout.flush()  # flush to ensure signal is not buffered
+        sys.stderr.write('end_of_data:%d' % len(pickled_bytes))
+        sys.stderr.flush()  # flush to ensure signal is not buffered
 
     def run(self, params):
         """Run MPI simulation(s) and write results to stderr"""
