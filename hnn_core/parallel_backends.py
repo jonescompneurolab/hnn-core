@@ -8,7 +8,7 @@ import sys
 import multiprocessing
 import shlex
 import pickle
-import codecs
+import base64
 from warnings import warn
 from subprocess import Popen
 import selectors
@@ -236,17 +236,22 @@ class MPIBackend(object):
 
         _BACKEND = self._old_backend
 
-    def _read_data(self, fd, mask):
-        """read from fd until data includes padding characters"""
+    def _read_stderr(self, fd, mask):
+        """read stderr from fd until end of simulation signal is received"""
         data = os.read(fd, 4096)
-        self.proc_data_bytes += data
+        if data:
+            str_data = data.decode()
+            if 'end_of_data' in str_data:
+                signal_index = str_data.rfind('end_of_data')
+                self.proc_data_bytes += str_data[0:signal_index].encode()
+                return str_data[signal_index:]
+            else:
+                self.proc_data_bytes += data
 
-        # only _read_stdout gets a signal from the fd. the end of simulation
-        # data is signalled by the process terminating
         return None
 
     def _read_stdout(self, fd, mask):
-        """read from fd until receiving the process simulation is complete"""
+        """read stdout fd until receiving the process simulation is complete"""
         data = os.read(fd, 4096)
         if data:
             str_data = data.decode()
@@ -260,23 +265,22 @@ class MPIBackend(object):
 
     def _process_child_data(self, data_bytes, data_len):
         if not data_len == len(data_bytes):
-            raise RuntimeError("Failed to receive all data from the child MPI"
-                               " process. Expecting %d bytes, got %d" %
-                               (data_len, len(data_bytes)))
+            warn("Length of received data unexpected. Expecting %d bytes, "
+                 "got %d" % (data_len, len(data_bytes)))
 
         if len(data_bytes) == 0:
             raise RuntimeError("MPI simulation didn't return any data")
 
         # decode base64 byte string
         try:
-            data_pickled = codecs.decode(data_bytes, "base64")
+            data_pickled = base64.b64decode(data_bytes, validate=True)
         except binascii.Error:
             # This is here for future debugging purposes. Unit tests can't
             # reproduce an incorrectly padded string, but this has been an
             # issue before
             raise ValueError("Incorrect padding for data length %d bytes" %
-                             len(data_bytes), "(mod 4 = %d)" %
-                             len(data_bytes) % 4)
+                             len(data_bytes) + " (mod 4 = %d)" %
+                             (len(data_bytes) % 4))
 
         # unpickle the data
         return pickle.loads(data_pickled)
@@ -309,10 +313,10 @@ class MPIBackend(object):
             use_posix = True
         else:
             use_posix = False
+
         cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
 
-        pickled_params = codecs.encode(pickle.dumps(net.params),
-                                       "base64")
+        pickled_params = base64.b64encode(pickle.dumps(net.params))
 
         # set some MPI environment variables
         my_env = os.environ.copy()
@@ -351,6 +355,7 @@ class MPIBackend(object):
         self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
                           self._read_stdout)
 
+        data_len = 0
         # loop while the process is running
         while proc.poll() is None:
             # wait for an event on the selector, timeout after 1s
@@ -364,7 +369,7 @@ class MPIBackend(object):
                         # everything else received is data
                         self.sel.unregister(pipe_stderr_r)
                         self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
-                                          self._read_data)
+                                          self._read_stderr)
                     elif completion_signal.startswith("end_of_data"):
                         split_string = completion_signal.split(':')
                         if len(split_string) > 1:

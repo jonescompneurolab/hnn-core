@@ -37,9 +37,10 @@ def test_child_run():
                 mpi_sim._write_data_stderr(sim_data)
                 stdout = buf_out.getvalue()
             stderr = buf_err.getvalue()
-        assert "end_of_data:" in stdout
+        assert "end_of_data:" in stderr
 
-        data = stderr.encode()
+        # data will all be before "end_of_data"
+        data = stderr.split('end_of_data')[0].encode()
         expected_len = len(data)
         backend = MPIBackend()
         sim_data = backend._process_child_data(data, expected_len)
