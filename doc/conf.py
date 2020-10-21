@@ -49,6 +49,10 @@ extensions = [
 
 # generate autosummary even if no references
 autosummary_generate = True
+autodoc_default_options = {'inherited-members': None}
+numpydoc_class_members_toctree = False
+numpydoc_attributes_as_param_list = True
+default_role = 'autolink'  # XXX silently allows bad syntax, someone should fix
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
