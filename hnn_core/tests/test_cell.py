@@ -13,14 +13,6 @@ matplotlib.use('agg')
 
 def test_cell():
     """Test cells object."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-    net = Network(params)
-    with NetworkBuilder(net) as neuron_net:
-        neuron_net.cells[0].plot_voltage()
-
     # test that ExpSyn always takes nrn.Segment, not float
     soma_props = {"L": 22.1, "diam": 23.4, "cm": 0.6195, "Ra": 200.0,
                   "pos": (0., 0., 0.), 'name': 'test_cell'}
