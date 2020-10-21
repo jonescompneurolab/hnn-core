@@ -22,7 +22,7 @@ class BasketSingle(_Cell):
     """
 
     def __init__(self, gid, pos, cell_name='Basket'):
-        self.props = self.__set_props(cell_name, pos)
+        self.props = self._get_soma_props(cell_name, pos)
         _Cell.__init__(self, gid, self.props)
         # store cell name for later
         self.name = cell_name
@@ -36,7 +36,7 @@ class BasketSingle(_Cell):
     def _biophysics(self):
         self.soma.insert('hh2')
 
-    def __set_props(self, cell_name, pos):
+    def _get_soma_props(self, cell_name, pos):
         return {
             'pos': pos,
             'L': 39.,

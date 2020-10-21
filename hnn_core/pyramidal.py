@@ -307,8 +307,8 @@ class L2Pyr(Pyr):
         # run record_current_soma(), defined in Cell()
         self.record_current_soma()
 
-    # Returns hardcoded somatic properties
     def _get_soma_props(self, pos):
+        """Hardcoded somatic properties."""
         return {
             'pos': pos,
             'L': self.p_all['L2Pyr_soma_L'],
@@ -434,7 +434,7 @@ class L5Pyr(Pyr):
         self.p_all = compare_dictionaries(p_all_default, p)
 
         # Get somatic, dendirtic, and synapse properties
-        p_soma = self.__get_soma_props(pos)
+        p_soma = self._get_soma_props(pos)
 
         Pyr.__init__(self, gid, p_soma)
         p_dend = self._get_dend_props()
@@ -506,7 +506,7 @@ class L5Pyr(Pyr):
         }
         return sec_pts, sec_lens, sec_diams
 
-    def __get_soma_props(self, pos):
+    def _get_soma_props(self, pos):
         """Sets somatic properties. Returns dictionary."""
         return {
             'pos': pos,
