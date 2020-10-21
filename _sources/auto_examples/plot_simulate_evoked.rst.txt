@@ -622,24 +622,24 @@ openmpi, which must be installed on the system
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
-    [0c9162bebea8:01394] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 27208, errno = 1
-    [0c9162bebea8:01395] Read -1, expected 27200, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 5559, errno = 1
-    [0c9162bebea8:01394] Read -1, expected 5559, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27208, errno = 1
+    [9b8490ae3318:01350] Read -1, expected 27200, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 5559, errno = 1
+    [9b8490ae3318:01349] Read -1, expected 5559, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -648,7 +648,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  50.057 seconds)
+   **Total running time of the script:** ( 1 minutes  44.057 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:
