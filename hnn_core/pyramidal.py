@@ -79,11 +79,12 @@ class Pyr(_Cell):
         p_dend : dict | None
             Nested dictionary. The outer dictionary has keys
             with names of dendrites and the inner dictionary
-            specifies the parameters of these sections.
-                'L': length of a section in microns
-                'diam': diameter of a section in microns
-                'cm': membrane capacitance in micro-Farads
-                'Ra': axial resistivity in ohm-cm
+            specifies the geometry of these sections.
+
+            * L: length of a section in microns
+            * diam: diameter of a section in microns
+            * cm: membrane capacitance in micro-Farads
+            * Ra: axial resistivity in ohm-cm
         """
         # Neuron shape based on Jones et al., 2009
         sec_pts, sec_lens, sec_diams = self.secs()
