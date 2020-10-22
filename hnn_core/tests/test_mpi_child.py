@@ -57,10 +57,19 @@ def test_empty_data():
 
 
 def test_data_len_mismatch():
-    """Test that an unexpected data length raises RuntimeError"""
-    data_bytes = b'\0'
-    expected_len = 2
+    """Test that padded data can be unpickled with warning for length """
+
+    with MPISimulation(skip_mpi_import=True) as mpi_sim:
+        pickled_bytes = mpi_sim._pickle_data({})
+
+    expected_len = len(pickled_bytes) + 1
+
     backend = MPIBackend()
-    with pytest.raises(RuntimeError, match="Failed to receive all data from "
-                       "the child MPI process. Expecting 2 bytes, got 1"):
-        backend._process_child_data(data_bytes, expected_len)
+    with pytest.warns(UserWarning) as record:
+        backend._process_child_data(pickled_bytes, expected_len)
+
+    expected_string = "Length of received data unexpected. " + \
+        "Expecting %d bytes, got %d" % (expected_len, len(pickled_bytes))
+
+    assert len(record) == 1
+    assert record[0].message.args[0] == expected_string
