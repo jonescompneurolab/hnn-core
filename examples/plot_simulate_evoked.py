@@ -46,7 +46,7 @@ net.plot_cells()
 from hnn_core import JoblibBackend
 
 with JoblibBackend(n_jobs=1):
-    dpls = simulate_dipole(net, n_trials=1,postproc=True)
+    dpls = simulate_dipole(net, n_trials=1, postproc=True)
 
 ###############################################################################
 # and then plot it
