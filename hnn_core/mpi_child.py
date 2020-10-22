@@ -88,9 +88,10 @@ class MPISimulation(object):
         sys.stderr.write(pickled_bytes.decode())
         sys.stderr.flush()
 
-        # the parent process is waiting for "end_of_sim:[#bytes]" with the
-        # length of data
-        sys.stderr.write('end_of_data:%d' % len(pickled_bytes))
+        # the parent process is waiting for "@end_of_sim:[#bytes]@" with the
+        # length of data. The '@' is not found in base64 encoding, so we can
+        # be certain it is the border of the signal
+        sys.stderr.write('@end_of_data:%d@' % len(pickled_bytes))
         sys.stderr.flush()  # flush to ensure signal is not buffered
 
     def run(self, params):

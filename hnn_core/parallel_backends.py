@@ -173,8 +173,9 @@ class MPIBackend(object):
 
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
-        n_logical_cores = multiprocessing.cpu_count()
+        self.proc_data_bytes = b''
 
+        n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
             self.n_procs = n_logical_cores
         else:
@@ -253,12 +254,36 @@ class MPIBackend(object):
         data = _read_all_bytes(fd)
         if data:
             str_data = data.decode()
-            if 'end_of_data' in str_data:
-                signal_index = str_data.rfind('end_of_data')
-                self.proc_data_bytes += str_data[0:signal_index].encode()
-                return str_data[signal_index:]
-            else:
-                self.proc_data_bytes += data
+            if '@' in str_data:
+                # extract the signal
+                signal_index_start = str_data.rfind('@end_of_data:')
+                signal_index_end = str_data.rfind('@')
+                if signal_index_start < 0 or signal_index_end < 0 or \
+                        signal_index_end <= signal_index_start:
+                    raise ValueError("Invalid signal start (%d) or end (%d) " %
+                                     (signal_index_start, signal_index_end) +
+                                     "index")
+
+                # signal without '@' on either side
+                signal = str_data[signal_index_start + 1:signal_index_end]
+
+                # remove the signal from the stderr output
+                spliced_str_data = str_data[0:signal_index_start] + \
+                    str_data[signal_index_end + 1:]
+
+                # add the output bytes and return the signal
+                self.proc_data_bytes += spliced_str_data.encode()
+
+                split_string = signal.split(':')
+                if len(split_string) > 1 and len(split_string[1]) > 0:
+                    data_len = int(split_string[1])
+                else:
+                    raise ValueError("Completion signal from child MPI process"
+                                     " did not contain data length.")
+
+                return data_len
+
+            self.proc_data_bytes += data
 
         return None
 
@@ -267,8 +292,11 @@ class MPIBackend(object):
         data = _read_all_bytes(fd)
         if data:
             str_data = data.decode()
-            if str_data == 'end_of_sim' or str_data.startswith('end_of_data'):
+            if str_data == 'end_of_sim':
                 return str_data
+            elif 'end_of_sim' in str_data:
+                sys.stdout.write(str_data.replace('end_of_sim', ''))
+                return 'end_of_sim'
 
             # output from process includes newlines
             sys.stdout.write(str_data)
@@ -277,6 +305,7 @@ class MPIBackend(object):
 
     def _process_child_data(self, data_bytes, data_len):
         if not data_len == len(data_bytes):
+            # This is indicative of a failure. For debugging purposes.
             warn("Length of received data unexpected. Expecting %d bytes, "
                  "got %d" % (data_len, len(data_bytes)))
 
@@ -356,9 +385,6 @@ class MPIBackend(object):
         os.close(pipe_stdin_w)
         os.close(pipe_stdin_r)
 
-        # data will be stored here; output will be printed and discarded
-        self.proc_data_bytes = b''
-
         # create the selector instance and register all input events
         # with self.read_stdout which will only echo to stdout
         self.sel = selectors.DefaultSelector()
@@ -376,6 +402,9 @@ class MPIBackend(object):
                 if completed is True:
                     break
                 elif timeout > 9:
+                    # This is indicative of a failure. For debugging purposes.
+                    warn("Timed out (10s) waiting for end of data after child "
+                         "process stopped")
                     break
                 else:
                     timeout += 1
@@ -393,17 +422,16 @@ class MPIBackend(object):
                         self.sel.unregister(pipe_stderr_r)
                         self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
                                           self._read_stderr)
-                    elif completion_signal.startswith("end_of_data"):
+                    elif isinstance(completion_signal, int):
+                        data_len = completion_signal
+                        self.sel.unregister(pipe_stdout_r)
                         completed = True
-                        split_string = completion_signal.split(':')
-                        if len(split_string) > 1:
-                            data_len = int(split_string[1])
-                            self.sel.unregister(pipe_stdout_r)
-                        else:
-                            raise ValueError("Invalid data send completion "
-                                             "signal from child MPI process")
+
                         # there could still be data in stderr, so we return
                         # to waiting until the process ends
+                    else:
+                        raise ValueError("Unrecognized signal received from "
+                                         "MPI child")
 
         # cleanup the selector
         self.sel.unregister(pipe_stderr_r)
