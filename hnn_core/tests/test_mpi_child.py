@@ -1,6 +1,9 @@
 import os.path as op
+import os
 import io
 from contextlib import redirect_stdout, redirect_stderr
+import selectors
+
 import pytest
 
 import hnn_core
@@ -9,8 +12,70 @@ from hnn_core.mpi_child import MPISimulation
 from hnn_core.parallel_backends import MPIBackend
 
 
+def test_read_stderr():
+    """Test the _read_stderr handler for processing data and signals"""
+    (pipe_stderr_r, pipe_stderr_w) = os.pipe()
+    stderr = os.fdopen(pipe_stderr_w, 'w')
+    backend = MPIBackend()
+
+    stderr.write("test_data")
+    stderr.flush()
+    backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
+    assert backend.proc_data_bytes == "test_data".encode()
+    backend.proc_data_bytes = b''
+
+    stderr.write("@")
+    stderr.flush()
+    with pytest.raises(ValueError, match="Invalid signal start"):
+        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
+
+    stderr.write("@end_of_data:")
+    stderr.flush()
+    with pytest.raises(ValueError, match="Invalid signal start"):
+        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
+
+    stderr.write("@end_of_data:@")
+    stderr.flush()
+    with pytest.raises(ValueError, match="Completion signal from child MPI "
+                       "process did not contain data length."):
+        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
+
+    stderr.write("blahblah@end_of_data:1000@blah")
+    stderr.flush()
+    data_len = backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
+    assert data_len == 1000
+    assert backend.proc_data_bytes == "blahblahblah".encode()
+
+
+def test_read_stdout():
+    """Test the _read_stdout handler for processing simulation messages"""
+    (pipe_stdout_r, pipe_stdout_w) = os.pipe()
+    stdout = os.fdopen(pipe_stdout_w, 'w')
+    backend = MPIBackend()
+
+    stdout.write("Test output")
+    stdout.flush()
+    with io.StringIO() as buf_out, redirect_stdout(buf_out):
+        backend._read_stdout(pipe_stdout_r, selectors.EVENT_READ)
+        output = buf_out.getvalue()
+    assert output == "Test output"
+
+    stdout.write("end_of_sim")
+    stdout.flush()
+    signal = backend._read_stdout(pipe_stdout_r, selectors.EVENT_READ)
+    assert signal == "end_of_sim"
+
+    stdout.write("blahend_of_simblahblah")
+    stdout.flush()
+    with io.StringIO() as buf_out, redirect_stdout(buf_out):
+        backend._read_stdout(pipe_stdout_r, selectors.EVENT_READ)
+        output = buf_out.getvalue()
+    assert output == "blahblahblah"
+    assert signal == "end_of_sim"
+
+
 def test_child_run():
-    """Test running the MPI child process"""
+    """Test running the child process without MPI"""
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -36,14 +101,23 @@ def test_child_run():
             with io.StringIO() as buf_out, redirect_stdout(buf_out):
                 mpi_sim._write_data_stderr(sim_data)
                 stdout = buf_out.getvalue()
-            stderr = buf_err.getvalue()
-        assert "end_of_data:" in stderr
+            stderr_str = buf_err.getvalue()
+        assert "@end_of_data:" in stderr_str
 
-        # data will all be before "end_of_data"
-        data = stderr.split('end_of_data')[0].encode()
-        expected_len = len(data)
+        # data will be before "@end_of_data:"
+        signal_index_start = stderr_str.rfind('@end_of_data:')
+        data = stderr_str[0:signal_index_start].encode()
+
+        # setup stderr pipe just for signal (with data_len)
+        (pipe_stderr_r, pipe_stderr_w) = os.pipe()
+        stderr_fd = os.fdopen(pipe_stderr_w, 'w')
+        stderr_fd.write(stderr_str[signal_index_start:])
+        stderr_fd.flush()
+
+        # use _read_stderr to get data_len (but not the data this time)
         backend = MPIBackend()
-        sim_data = backend._process_child_data(data, expected_len)
+        data_len = backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
+        sim_data = backend._process_child_data(data, data_len)
 
 
 def test_empty_data():
