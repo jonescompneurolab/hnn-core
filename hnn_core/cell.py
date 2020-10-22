@@ -228,8 +228,8 @@ class _Cell(ABC):
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def record_current_soma(self):
-        """Record current at soma."""
+    def record_response(self):
+        """Record current and voltage at soma."""
         # a soma exists at self.soma
         try:
             # assumes that self.synapses is a dict that exists
