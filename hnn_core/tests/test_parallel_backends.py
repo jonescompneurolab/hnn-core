@@ -3,6 +3,7 @@ from os import environ
 import pytest
 import io
 from contextlib import redirect_stdout
+from multiprocessing import cpu_count
 
 from numpy import loadtxt
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
@@ -13,13 +14,29 @@ from hnn_core import simulate_dipole, Network, read_params
 from hnn_core import MPIBackend, JoblibBackend
 
 
-def run_hnn_core_reduced(backend=None, n_jobs=1):
+def run_hnn_core(params, backend=None, n_procs=None, n_jobs=1):
+    net = Network(params)
+
+    if backend == 'mpi':
+        with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
+            dpls = simulate_dipole(net)
+    elif backend == 'joblib':
+        with JoblibBackend(n_jobs=n_jobs):
+            dpls = simulate_dipole(net)
+    else:
+        dpls = simulate_dipole(net)
+
+    return dpls, net
+
+
+def run_hnn_core_reduced(backend=None, n_procs=None, n_jobs=1):
     hnn_core_root = op.dirname(hnn_core.__file__)
 
     # default params
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     params_reduced = params.copy()
+    # reduced model params (2 trials)
     params_reduced.update({'N_pyr_x': 3,
                            'N_pyr_y': 3,
                            'tstop': 25,
@@ -28,22 +45,11 @@ def run_hnn_core_reduced(backend=None, n_jobs=1):
                            't_evprox_2': 20,
                            'N_trials': 2})
 
-    # run the simulation a reduced model (2 trials)
-    net_reduced = Network(params_reduced)
-
-    if backend == 'mpi':
-        with MPIBackend(mpi_cmd='mpiexec'):
-            dpls_reduced = simulate_dipole(net_reduced)
-    elif backend == 'joblib':
-        with JoblibBackend(n_jobs=n_jobs):
-            dpls_reduced = simulate_dipole(net_reduced)
-    else:
-        dpls_reduced = simulate_dipole(net_reduced)
-
-    return dpls_reduced
+    return run_hnn_core(params_reduced, backend=backend, n_procs=n_procs,
+                        n_jobs=n_jobs)
 
 
-def run_hnn_core(backend=None, n_jobs=1):
+def compare_hnn_core(backend=None, n_jobs=1):
     # small snippet of data on data branch for now. To be deleted
     # later. Data branch should have only commit so it does not
     # pollute the history.
@@ -59,17 +65,8 @@ def run_hnn_core(backend=None, n_jobs=1):
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    # run the simulation on full model (1 trial)
-    net = Network(params)
-
-    if backend == 'mpi':
-        with MPIBackend(mpi_cmd='mpiexec'):
-            dpl = simulate_dipole(net)[0]
-    elif backend == 'joblib':
-        with JoblibBackend(n_jobs=n_jobs):
-            dpl = simulate_dipole(net)[0]
-    else:
-        dpl = simulate_dipole(net)[0]
+    dpls, net = run_hnn_core(params, backend)
+    dpl = dpls[0]
 
     # write the dipole to a file and compare
     fname = './dpl2.txt'
@@ -113,7 +110,7 @@ class TestParallelBackends():
     def test_run_default(self):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
-        dpls_reduced_default = run_hnn_core_reduced(None)
+        dpls_reduced_default, _ = run_hnn_core_reduced(None)
         # test consistency across all parallel backends for multiple trials
         assert_raises(AssertionError, assert_array_equal,
                       dpls_reduced_default[0].data['agg'],
@@ -123,7 +120,8 @@ class TestParallelBackends():
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        dpls_reduced_joblib = run_hnn_core_reduced(backend='joblib', n_jobs=2)
+        dpls_reduced_joblib, _ = run_hnn_core_reduced(backend='joblib',
+                                                      n_jobs=2)
 
         for trial_idx in range(len(dpls_reduced_default)):
             assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
@@ -139,24 +137,32 @@ class TestParallelBackends():
         assert backend.n_procs > 1
 
     def test_run_mpibackend(self):
+        """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
         pytest.importorskip("mpi4py", reason="mpi4py not available")
-        dpls_reduced_mpi = run_hnn_core_reduced(backend='mpi')
+        dpls_reduced_mpi, _ = run_hnn_core_reduced(backend='mpi')
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
             assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
                             dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
                             atol=1e-14)
 
+    def test_run_mpibackend_oversubscribed(self):
+        """Test running MPIBackend with oversubscribed number of procs"""
+        pytest.importorskip("mpi4py", reason="mpi4py not available")
+
+        oversubscribed = cpu_count() * 1
+        run_hnn_core_reduced(backend='mpi', n_procs=oversubscribed)
+
     def test_compare_hnn_core(self):
-        """Test to check if hnn-core does not break."""
+        """Test hnn-core does not break."""
         # run one trial of each
-        run_hnn_core(backend='mpi')
-        run_hnn_core(backend='joblib')
+        compare_hnn_core(backend='mpi')
+        compare_hnn_core(backend='joblib')
 
 
-# there are no dependencies if this unit tests fails, so not necessary to
-# be part of incremental class
+# there are no dependencies if this unit tests fails; no need to be in
+# class marked incremental
 def test_mpi_failure():
     """Test that an MPI failure is handled and messages are printed"""
     pytest.importorskip("mpi4py", reason="mpi4py not available")
@@ -164,10 +170,17 @@ def test_mpi_failure():
     # this MPI paramter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
-    with io.StringIO() as buf, redirect_stdout(buf):
-        with pytest.raises(RuntimeError, match="MPI simulation failed"):
-            run_hnn_core_reduced(backend='mpi')
-        stdout = buf.getvalue()
+    with pytest.warns(UserWarning) as record:
+        with io.StringIO() as buf, redirect_stdout(buf):
+            with pytest.raises(RuntimeError, match="MPI simulation failed"):
+                run_hnn_core_reduced(backend='mpi')
+            stdout = buf.getvalue()
+
     assert "MPI processes are unable to reach each other" in stdout
+
+    expected_string = "Timed out (10s) waiting for end of data " + \
+        "after child process stopped"
+    assert len(record) == 1
+    assert record[0].message.args[0] == expected_string
 
     del environ["OMPI_MCA_btl"]
