@@ -13,6 +13,7 @@ from warnings import warn
 from subprocess import Popen
 import selectors
 import binascii
+from time import sleep
 
 _BACKEND = None
 
@@ -356,8 +357,19 @@ class MPIBackend(object):
                           self._read_stdout)
 
         data_len = 0
+        completed = False
+        timeout = 0
         # loop while the process is running
-        while proc.poll() is None:
+        while True:
+            if not proc.poll() is None:
+                if completed is True:
+                    break
+                elif timeout > 9:
+                    break
+                else:
+                    timeout += 1
+                    sleep(1)
+
             # wait for an event on the selector, timeout after 1s
             events = self.sel.select(timeout=1)
             for key, mask in events:
@@ -371,6 +383,7 @@ class MPIBackend(object):
                         self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
                                           self._read_stderr)
                     elif completion_signal.startswith("end_of_data"):
+                        completed = True
                         split_string = completion_signal.split(':')
                         if len(split_string) > 1:
                             data_len = int(split_string[1])
