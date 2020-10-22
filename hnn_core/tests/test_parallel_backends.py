@@ -178,7 +178,7 @@ def test_mpi_failure():
 
     assert "MPI processes are unable to reach each other" in stdout
 
-    expected_string = "Timed out (10s) waiting for end of data " + \
+    expected_string = "Timed out (5s) waiting for end of data " + \
         "after child process stopped"
     assert len(record) == 1
     assert record[0].message.args[0] == expected_string
