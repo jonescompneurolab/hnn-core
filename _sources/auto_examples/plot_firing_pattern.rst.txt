@@ -207,7 +207,7 @@ Let's do this for the rest of the cell types with a new NetworkBuilder object
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  31.790 seconds)
+   **Total running time of the script:** ( 0 minutes  44.414 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

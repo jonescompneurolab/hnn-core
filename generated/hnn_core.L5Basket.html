@@ -114,57 +114,171 @@
 <dt id="hnn_core.L5Basket">
 <em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L5Basket</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">pos</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for layer 5 basket cells.</p>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_soma</span></code>()</p></td>
-<td><p>Create soma and set geometry.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dipole_insert</span></code>(yscale)</p></td>
-<td><p>Insert dipole into each section of this cell.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get3dinfo</span></code>()</p></td>
-<td><p>Get 3d info.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sections</span></code>()</p></td>
-<td><p>Get sections.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getbbox</span></code>()</p></td>
-<td><p>Get cell’s bounding box.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code>()</p></td>
-<td><p>Move cell to position.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code>(gid_presyn, nc_dict, postsyn)</p></td>
-<td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_voltage</span></code>([ax, delay, duration, dt, …])</p></td>
-<td><p>Plot voltage on soma for an injected current</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_current_soma</span></code>()</p></td>
-<td><p>Record current at soma.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code>(threshold)</p></td>
-<td><p>Created for _PC.cell and specifies SOURCES of spikes.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape_soma</span></code>()</p></td>
-<td><p>Define 3D shape of soma.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code>(secloc, e, tau1, tau2)</p></td>
-<td><p>Create an h.Exp2Syn synapse.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate3d</span></code>(dx, dy, dz)</p></td>
-<td><p>Translate 3d.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_to</span></code>(x, y, z)</p></td>
-<td><p>Translate to position.</p></td>
-</tr>
-</tbody>
-</table>
+<dl class="py method">
+<dt id="hnn_core.L5Basket.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.create_soma">
+<code class="sig-name descname">create_soma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.create_soma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create soma and set geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.dipole_insert">
+<code class="sig-name descname">dipole_insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yscale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.dipole_insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert dipole into each section of this cell.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.get3dinfo">
+<code class="sig-name descname">get3dinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.get3dinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get 3d info.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.get_sections">
+<code class="sig-name descname">get_sections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.get_sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get sections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.getbbox">
+<code class="sig-name descname">getbbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.getbbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get cell’s bounding box.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.move_to_pos">
+<code class="sig-name descname">move_to_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.move_to_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move cell to position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.parconnect_from_src">
+<code class="sig-name descname">parconnect_from_src</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid_presyn</span></em>, <em class="sig-param"><span class="n">nc_dict</span></em>, <em class="sig-param"><span class="n">postsyn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.parconnect_from_src" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Parallel receptor-centric connect FROM presyn TO this cell,</dt><dd><p>based on GID.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gid_presyn</strong><span class="classifier">int</span></dt><dd><p>The cell ID of the presynaptic neuron</p>
+</dd>
+<dt><strong>nc_dict</strong><span class="classifier">dict</span></dt><dd><p>Dictionary with keys: pos_src, A_weight, A_delay, lamtha
+Defines the connection parameters</p>
+</dd>
+<dt><strong>postsyn</strong><span class="classifier">instance of h.Exp2Syn</span></dt><dd><p>The postsynaptic cell object.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>nc</strong><span class="classifier">instance of h.NetCon</span></dt><dd><p>A network connection object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.plot_voltage">
+<code class="sig-name descname">plot_voltage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">delay</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">duration</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">amplitude</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.plot_voltage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot voltage on soma for an injected current</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None,
+a new figure is created.</p>
+</dd>
+<dt><strong>delay</strong><span class="classifier">float (in ms)</span></dt><dd><p>The start time of the injection current.</p>
+</dd>
+<dt><strong>duration</strong><span class="classifier">float (in ms)</span></dt><dd><p>The duration of the injection current.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float (in ms)</span></dt><dd><p>The integration time step</p>
+</dd>
+<dt><strong>amplitude</strong><span class="classifier">float (in nA)</span></dt><dd><p>The amplitude of the injection current.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>Call plt.show() if True. Set to False if working in
+headless mode (e.g., over a remote connection).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.record_current_soma">
+<code class="sig-name descname">record_current_soma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.record_current_soma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record current at soma.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.setup_source_netcon">
+<code class="sig-name descname">setup_source_netcon</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">threshold</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.setup_source_netcon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Created for _PC.cell and specifies SOURCES of spikes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>The voltage threshold for action potential.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.shape_soma">
+<code class="sig-name descname">shape_soma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.shape_soma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define 3D shape of soma.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>needed for gui representation of cell
+DO NOT need to call h.define_shape() explicitly!</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.syn_create">
+<code class="sig-name descname">syn_create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">secloc</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">tau1</span></em>, <em class="sig-param"><span class="n">tau2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.syn_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an h.Exp2Syn synapse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>secloc</strong><span class="classifier">float (0. to 1.0)</span></dt><dd><p>The section location</p>
+</dd>
+<dt><strong>e: float</strong></dt><dd><p>Reverse potential</p>
+</dd>
+<dt><strong>tau1: float</strong></dt><dd><p>Rise time</p>
+</dd>
+<dt><strong>tau2: float</strong></dt><dd><p>Decay time</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>syn</strong><span class="classifier">instance of h.Exp2Syn</span></dt><dd><p>A two state kinetic scheme synapse.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.translate3d">
+<code class="sig-name descname">translate3d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em>, <em class="sig-param"><span class="n">dz</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.translate3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate 3d.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Basket.translate_to">
+<code class="sig-name descname">translate_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.translate_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate to position.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>

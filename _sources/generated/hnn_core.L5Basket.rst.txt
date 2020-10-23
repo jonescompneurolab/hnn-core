@@ -4,7 +4,7 @@
 .. currentmodule:: hnn_core
 
 .. autoclass:: L5Basket
-   :members:
+   :inherited-members:
    :special-members: __getitem__, __repr__
 
    
