@@ -160,9 +160,10 @@ class Network(object):
         # Number of time points
         # Originally used to create the empty vec for synaptic currents,
         # ensuring that they exist on this node irrespective of whether
-        # or not cells of relevant type actually do
-        self.n_times = np.arange(0., self.params['tstop'],
-                                 self.params['dt']).size + 1
+        # or not cells of relevant type actually
+        self.t_vec = np.arange(0., params['tstop'] + params['dt'],
+                               params['dt'])
+        self.n_times = self.t_vec.size
 
         # Source list of names, first real ones only!
         self.cellname_list = [
