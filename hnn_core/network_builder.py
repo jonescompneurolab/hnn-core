@@ -49,8 +49,16 @@ def _simulate_single_trial(neuron_net, trial_idx):
     h.celsius = neuron_net.net.params['celsius']  # 37.0 - set temperature
 
     # We define the arrays (Vector in numpy) for recording the signals
+<<<<<<< HEAD
     t_vec = h.Vector()
     t_vec.record(h._ref_t)  # time recording
+=======
+    t_vec = neuron_net.net.t_vec
+    dp_rec_L2 = h.Vector()
+    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
+    dp_rec_L5 = h.Vector()
+    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
+>>>>>>> Replace h.record() t_vec definition with np.arange() using params
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
@@ -109,7 +117,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
                      np.array(neuron_net.dipoles['L2_pyramidal'].to_python()),
                      np.array(neuron_net.dipoles['L5_pyramidal'].to_python())]
 
-    dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
+    dpl = Dipole(t_vec, dpl_data)
     if rank == 0:
         if neuron_net.net.params['save_dpl']:
             dpl.write('rawdpl.txt')
@@ -322,7 +330,6 @@ class NetworkBuilder(object):
         self._spiketimes = h.Vector()
         self._spikegids = h.Vector()
         self._vsoma = dict()
-        self._t_vec = h.Vector()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spiketimes = h.Vector()
@@ -750,8 +757,7 @@ class NetworkBuilder(object):
         data = (self._all_spiketimes.to_python(),
                 self._all_spikegids.to_python(),
                 deepcopy(self.net.gid_dict),
-                deepcopy(vsoma_py),
-                self._t_vec.to_python())
+                deepcopy(vsoma_py))
         return data
 
     def _clear_last_network_objects(self):
