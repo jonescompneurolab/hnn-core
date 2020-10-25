@@ -56,7 +56,8 @@ plt.show()
 ###############################################################################
 # Let's do this for the rest of the cell types
 fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
-for gid, ax in zip([35, 170], axes):
+for gid, ax in zip([gid_dict['L2_pyramidal'][0],
+                    gid_dict['L5_pyramidal'][0]], axes):
     ax.plot(t_vec, vsoma[gid])
     ax.set_title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
     ax.set_xlabel('Time (ms)')
