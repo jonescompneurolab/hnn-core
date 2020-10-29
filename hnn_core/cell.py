@@ -218,8 +218,8 @@ class _Cell(ABC):
 
         Parameters
         ----------
-        secloc : float (0. to 1.0)
-            The section location
+        secloc : instance of nrn.Segment
+            The section location. E.g., soma(0.5).
         e: float
             Reverse potential
         tau1: float
