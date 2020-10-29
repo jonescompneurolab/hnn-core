@@ -17,8 +17,32 @@ from .params_default import (get_L2Pyr_params_default,
 # Units for gbar: S/cm^2 unless otherwise noted
 
 
+def _read_geo_cells(fname):
+    from neuron import h
+    h.xopen(fname)
+
+    sec_pts = dict()
+    sec_lens = dict()
+    sec_diams = dict()
+    for sec in h.allsec():
+        name = sec.name()
+        sec_diams[name] = getattr(sec, 'diam', None)
+        sec_lens[name] = getattr(sec, 'L', None)
+        sec_pts[name] = list()
+        for idx in range(sec.n3d()):
+            sec_pts[name].append([sec.x3d(idx), sec.y3d(idx), sec.z3d(idx)])
+    return sec_pts, sec_lens, sec_diams
+
+
 class Pyr(_Cell):
     """Pyramidal neuron.
+
+    Parameters
+    ----------
+    gid : int
+        The cell ID
+    soma_props : dict
+        The soma properties
 
     Attributes
     ----------
@@ -256,8 +280,12 @@ class L2Pyr(Pyr):
     ----------
     gid : int
         The cell id.
-    p : dict
-        The parameters dictionary.
+    pos : tuple | None
+        The position of the cell.
+    geometry : dict | str | None
+        The parameters dictionary containing geometry.
+        If it's a string, then load the geometry from
+        a .geo file. If None, load the default geometry
 
     Attributes
     ----------
@@ -270,22 +298,27 @@ class L2Pyr(Pyr):
         List of dendrites.
     """
 
-    def __init__(self, gid=-1, pos=-1, p={}):
+    def __init__(self, gid=-1, pos=None, geometry=None):
         # Get default L2Pyr params and update them with any
         # corresponding params in p
-        p_all_default = get_L2Pyr_params_default()
-        self.p_all = compare_dictionaries(p_all_default, p)
+        if geometry is None:
+            geometry = get_L2Pyr_params_default()
+        elif isinstance(geometry, dict):
+            p_all_default = get_L2Pyr_params_default()
+            p_all = compare_dictionaries(p_all_default, params)
 
-        # Get somatic, dendritic, and synapse properties
-        p_soma = self._get_soma_props(pos)
+            # Get somatic, dendritic, and synapse properties
+            p_soma = self._get_soma_props(pos, p_all)
 
-        # usage: Pyr.__init__(self, soma_props)
-        Pyr.__init__(self, gid, p_soma)
+            # usage: Pyr.__init__(self, soma_props)
+            Pyr.__init__(self, gid, p_soma)
 
-        p_dend = self._get_dend_props()
-        p_syn = self._get_syn_props()
-
+            p_dend = self._get_dend_props(p_all)
+        elif isinstance(geometry, str):
+            p_dend = _read_geo_cells(geometry)
         self.celltype = 'L2_pyramidal'
+
+        p_syn = self._get_syn_props(p_all)
 
         # geometry
         # creates dict of dends: self.dends
@@ -412,6 +445,15 @@ class L2Pyr(Pyr):
 class L5Pyr(Pyr):
     """Layer 5 Pyramidal class.
 
+    Parameters
+    ----------
+    gid : int
+        The cell ID
+    pos : tuple | None
+        The position of the cell
+    params : dict | None
+        The params dictionary
+
     Attributes
     ----------
     name : str
@@ -423,11 +465,11 @@ class L5Pyr(Pyr):
         List of dendrites.
     """
 
-    def __init__(self, gid=-1, pos=-1, p={}):
+    def __init__(self, gid=-1, pos=None, params=None):
         """Get default L5Pyr params and update them with
             corresponding params in p."""
         p_all_default = get_L5Pyr_params_default()
-        self.p_all = compare_dictionaries(p_all_default, p)
+        self.p_all = compare_dictionaries(p_all_default, params)
 
         # Get somatic, dendirtic, and synapse properties
         p_soma = self._get_soma_props(pos)
