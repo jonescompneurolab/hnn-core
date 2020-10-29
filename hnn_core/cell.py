@@ -105,32 +105,6 @@ class _Cell(ABC):
         self.soma.Ra = soma_props['Ra']
         self.soma.cm = soma_props['cm']
 
-    def get3dinfo(self):
-        """Get 3d info."""
-        ls = self.get_sections()
-        lx, ly, lz, ldiam = [], [], [], []
-        for s in ls:
-            for i in range(s.n3d()):
-                lx.append(s.x3d(i))
-                ly.append(s.y3d(i))
-                lz.append(s.z3d(i))
-                ldiam.append(s.diam3d(i))
-        return lx, ly, lz, ldiam
-
-    def getbbox(self):
-        """Get cell's bounding box."""
-        lx, ly, lz, ldiam = self.get3dinfo()
-        minx, miny, minz = 1e9, 1e9, 1e9
-        maxx, maxy, maxz = -1e9, -1e9, -1e9
-        for x, y, z in zip(lx, ly, lz):
-            minx = min(x, minx)
-            miny = min(y, miny)
-            minz = min(z, minz)
-            maxx = max(x, maxx)
-            maxy = max(y, maxy)
-            maxz = max(z, maxz)
-        return ((minx, maxx), (miny, maxy), (minz, maxz))
-
     def translate3d(self, dx, dy, dz):
         """Translate 3d."""
         for s in self.get_sections():
