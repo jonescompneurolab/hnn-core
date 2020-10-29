@@ -295,9 +295,7 @@ class L2Pyr(Pyr):
         # adjusted after translation from hoc (2009 model)
         self.set_geometry(p_dend)
 
-        # biophysics
-        self._biophys_soma()
-        self._biophys_dends()
+        self._biophysics()
 
         # dipole_insert() comes from Cell()
         self.yscale = self.get_sectnames()
@@ -305,7 +303,6 @@ class L2Pyr(Pyr):
 
         # create synapses
         self._synapse_create(p_syn)
-        # self.__synapse_create()
 
         # run record_current_soma(), defined in Cell()
         self.record_current_soma()
@@ -372,10 +369,8 @@ class L2Pyr(Pyr):
         self.dends['basal_2'].connect(self.dends['basal_1'], 1, 0)
         self.dends['basal_3'].connect(self.dends['basal_1'], 1, 0)
 
-    def _biophys_soma(self):
+    def _biophysics(self):
         """Adds biophysics to soma."""
-        # set soma biophysics specified in Pyr
-        # self.pyr_biophys_soma()
 
         # Insert 'hh2' mechanism
         self.soma.insert('hh2')
@@ -389,8 +384,6 @@ class L2Pyr(Pyr):
         self.soma.insert('km')
         self.soma.gbar_km = self.p_all['L2Pyr_soma_gbar_km']
 
-    def _biophys_dends(self):
-        """Defining biophysics for dendrites."""
         # set dend biophysics
         # iterate over keys in self.dends and set biophysics for each dend
         for key in self.dends:
@@ -454,8 +447,7 @@ class L5Pyr(Pyr):
         self.set_geometry(p_dend)
 
         # biophysics
-        self.__biophys_soma()
-        self.__biophys_dends()
+        self._biophysics()
 
         # Dictionary of length scales to calculate dipole without
         # 3d shape. Comes from Pyr().
@@ -538,10 +530,8 @@ class L5Pyr(Pyr):
         self.dends['basal_2'].connect(self.dends['basal_1'], 1, 0)
         self.dends['basal_3'].connect(self.dends['basal_1'], 1, 0)
 
-    # adds biophysics to soma
-    def __biophys_soma(self):
-        # set soma biophysics specified in Pyr
-        # self.pyr_biophys_soma()
+    def _biophysics(self):
+        "Set the biophysics for the default Pyramidal cell."
 
         # Insert 'hh2' mechanism
         self.soma.insert('hh2')
@@ -577,10 +567,6 @@ class L5Pyr(Pyr):
         # insert 'ar' mechanism
         self.soma.insert('ar')
         self.soma.gbar_ar = self.p_all['L5Pyr_soma_gbar_ar']
-
-    def __biophys_dends(self):
-        # set dend biophysics specified in Pyr()
-        # self.pyr_biophys_dends()
 
         # set dend biophysics not specified in Pyr()
         for key in self.dends:
