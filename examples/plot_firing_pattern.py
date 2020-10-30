@@ -46,9 +46,9 @@ print(vsoma.keys())
 ###############################################################################
 # We can plot the firing pattern of individual cells by indexing with the gid
 gid = 170
-t_vec = net.spikes.t_vec[trial_idx]
+times = net.spikes.times[trial_idx]
 plt.figure(figsize=(4, 4))
-plt.plot(t_vec, vsoma[gid])
+plt.plot(times, vsoma[gid])
 plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
 plt.xlabel('Time (ms)')
 plt.ylabel('Voltage (mV)')
@@ -59,7 +59,7 @@ plt.show()
 fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
 for gid, ax in zip([gid_dict['L2_pyramidal'][0],
                     gid_dict['L5_pyramidal'][0]], axes):
-    ax.plot(t_vec, vsoma[gid])
+    ax.plot(times, vsoma[gid])
     ax.set_title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Voltage (mV)')
