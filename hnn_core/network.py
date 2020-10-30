@@ -51,11 +51,13 @@ def read_spikes(fname, gid_dict=None):
                                  "are unspecified in the file %s" % (file,))
             spike_types += [[]]
 
-    spikes = Spikes(times=spike_times, gids=spike_gids, types=spike_types)
+    spikes = Spikes(spiketimes=spike_times, spikegids=spike_gids,
+                    spiketypes=spike_types)
     if gid_dict is not None:
         spikes.update_types(gid_dict)
 
-    return Spikes(times=spike_times, gids=spike_gids, types=spike_types)
+    return Spikes(spiketimes=spike_times, spikegids=spike_gids,
+                  spiketypes=spike_types)
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
@@ -302,14 +304,14 @@ class Spikes(object):
 
     Parameters
     ----------
-    times : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spiketimes : list (n_trials,) of list (n_spikes,) of float, shape | None
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
-    gids : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spikegids : list (n_trials,) of list (n_spikes,) of float, shape | None
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    types : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spiketypes : list (n_trials,) of list (n_spikes,) of float, shape | None
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
@@ -317,14 +319,14 @@ class Spikes(object):
 
     Attributes
     ----------
-    times : list (n_trials,) of list (n_spikes,) of float, shape
+    spiketimes : list (n_trials,) of list (n_spikes,) of float, shape
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
-    gids : list (n_trials,) of list (n_spikes,) of float, shape
+    spikegids : list (n_trials,) of list (n_spikes,) of float, shape
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    types : list (n_trials,) of list (n_spikes,) of float, shape
+    spiketypes : list (n_trials,) of list (n_spikes,) of float, shape
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
@@ -349,17 +351,17 @@ class Spikes(object):
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, times=None, gids=None, types=None):
-        if times is None:
-            times = list()
-        if gids is None:
-            gids = list()
-        if types is None:
-            types = list()
+    def __init__(self, spiketimes=None, spikegids=None, spiketypes=None):
+        if spiketimes is None:
+            spiketimes = list()
+        if spikegids is None:
+            spikegids = list()
+        if spiketypes is None:
+            spiketypes = list()
 
         # Validate arguments
-        arg_names = ['times', 'gids', 'types']
-        for arg_idx, arg in enumerate([times, gids, types]):
+        arg_names = ['spiketimes', 'spikegids', 'spiketypes']
+        for arg_idx, arg in enumerate([spiketimes, spikegids, spiketypes]):
             # Validate outer list
             if not isinstance(arg, list):
                 raise TypeError('%s should be a list of lists'
@@ -369,22 +371,22 @@ class Spikes(object):
                 if not isinstance(trial_list, list):
                     raise TypeError('%s should be a list of lists'
                                     % (arg_names[arg_idx],))
-            # Set the length of 'times' as a references and validate
+            # Set the length of 'spiketimes' as a references and validate
             # uniform length
-            if arg == times:
-                n_trials = len(times)
+            if arg == spiketimes:
+                n_trials = len(spiketimes)
             if len(arg) != n_trials:
-                raise ValueError('times, gids, and types should be lists of '
-                                 'the same length')
-        self._times = times
-        self._gids = gids
-        self._types = types
+                raise ValueError('spike times, gids, and types should be '
+                                 'lists of the same length')
+        self._spiketimes = spiketimes
+        self._spikegids = spikegids
+        self._spiketypes = spiketypes
         self._vsoma = list()
         self._t_vec = list()
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        n_trials = len(self._times)
+        n_trials = len(self._spiketimes)
         return '<%s | %d simulation trials>' % (class_name, n_trials)
 
     def __eq__(self, other):
@@ -392,12 +394,12 @@ class Spikes(object):
             return NotImplemented
         # Round each time element
         times_self = [[round(time, 3) for time in trial]
-                      for trial in self._times]
+                      for trial in self._spiketimes]
         times_other = [[round(time, 3) for time in trial]
-                       for trial in other._times]
+                       for trial in other._spiketimes]
         return (times_self == times_other and
-                self._gids == other._gids and
-                self._types == other._types)
+                self._spikegids == other._spikegids and
+                self._spiketypes == other._spiketypes)
 
     def __getitem__(self, gid_item):
         """Returns a Spikes object with a copied subset filtered by gid.
@@ -432,16 +434,19 @@ class Spikes(object):
             raise TypeError("gids must be of dtype int, "
                             f"not {gid_item.dtype.name}")
 
-        n_trials = len(self._times)
+        n_trials = len(self._spiketimes)
         times_slice = []
         gids_slice = []
         types_slice = []
         vsoma_slice = []
         for trial_idx in range(n_trials):
-            gid_mask = np.in1d(self._gids[trial_idx], gid_item)
-            times_trial = np.array(self._times[trial_idx])[gid_mask].tolist()
-            gids_trial = np.array(self._gids[trial_idx])[gid_mask].tolist()
-            types_trial = np.array(self._types[trial_idx])[gid_mask].tolist()
+            gid_mask = np.in1d(self._spikegids[trial_idx], gid_item)
+            times_trial = np.array(
+                self._spiketimes[trial_idx])[gid_mask].tolist()
+            gids_trial = np.array(
+                self._spikegids[trial_idx])[gid_mask].tolist()
+            types_trial = np.array(
+                self._spiketypes[trial_idx])[gid_mask].tolist()
 
             vsoma_trial = {gid: self._vsoma[trial_idx][gid] for gid in gid_item
                            if gid in self._vsoma[trial_idx].keys()}
@@ -451,23 +456,23 @@ class Spikes(object):
             types_slice.append(types_trial)
             vsoma_slice.append(vsoma_trial)
 
-        spikes_slice = Spikes(times=times_slice, gids=gids_slice,
-                              types=types_slice)
+        spikes_slice = Spikes(spiketimes=times_slice, spikegids=gids_slice,
+                              spiketypes=types_slice)
         spikes_slice._vsoma = vsoma_slice
 
         return spikes_slice
 
     @property
-    def times(self):
-        return self._times
+    def spiketimes(self):
+        return self._spiketimes
 
     @property
-    def gids(self):
-        return self._gids
+    def spikegids(self):
+        return self._spikegids
 
     @property
-    def types(self):
-        return self._types
+    def spiketypes(self):
+        return self._spiketypes
 
     @property
     def vsoma(self):
@@ -499,14 +504,14 @@ class Spikes(object):
                                      'sets of gid values')
 
         spike_types = list()
-        for trial_idx in range(len(self._times)):
-            spike_types_trial = np.empty_like(self._times[trial_idx],
+        for trial_idx in range(len(self._spiketimes)):
+            spike_types_trial = np.empty_like(self._spiketimes[trial_idx],
                                               dtype='<U36')
             for gidtype, gids in gid_dict.items():
-                spike_gids_mask = np.in1d(self._gids[trial_idx], gids)
+                spike_gids_mask = np.in1d(self._spikegids[trial_idx], gids)
                 spike_types_trial[spike_gids_mask] = gidtype
             spike_types += [list(spike_types_trial)]
-        self._types = spike_types
+        self._spiketypes = spike_types
 
     def mean_rates(self, tstart, tstop, gid_dict, mean_type='all'):
         """Mean spike rates (Hz) by cell type.
@@ -550,10 +555,10 @@ class Spikes(object):
 
         for cell_type in cell_types:
             cell_type_gids = np.array(gid_dict[cell_type])
-            n_trials, n_cells = len(self._times), len(cell_type_gids)
+            n_trials, n_cells = len(self._spiketimes), len(cell_type_gids)
             gid_spike_rate = np.zeros((n_trials, n_cells))
 
-            trial_data = zip(self._types, self._gids)
+            trial_data = zip(self._spiketypes, self._spikegids)
             for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
                 trial_type_mask = np.in1d(spike_types, cell_type)
                 gids, gid_counts = np.unique(np.array(
@@ -640,10 +645,10 @@ class Spikes(object):
             3) gid type
         """
 
-        for trial_idx in range(len(self._times)):
+        for trial_idx in range(len(self._spiketimes)):
             with open(str(fname) % (trial_idx,), 'w') as f:
-                for spike_idx in range(len(self._times[trial_idx])):
+                for spike_idx in range(len(self._spiketimes[trial_idx])):
                     f.write('{:.3f}\t{}\t{}\n'.format(
-                        self._times[trial_idx][spike_idx],
-                        int(self._gids[trial_idx][spike_idx]),
-                        self._types[trial_idx][spike_idx]))
+                        self._spiketimes[trial_idx][spike_idx],
+                        int(self._spikegids[trial_idx][spike_idx]),
+                        self._spiketypes[trial_idx][spike_idx]))

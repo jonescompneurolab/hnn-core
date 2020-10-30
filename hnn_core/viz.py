@@ -78,8 +78,8 @@ def plot_spikes_hist(spikes, ax=None, spike_types=None, show=True):
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    spike_times = np.array(sum(spikes._times, []))
-    spike_types_data = np.array(sum(spikes._types, []))
+    spike_times = np.array(sum(spikes._spiketimes, []))
+    spike_types_data = np.array(sum(spikes._spiketypes, []))
 
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
@@ -166,8 +166,8 @@ def plot_spikes_raster(spikes, ax=None, show=True):
     """
 
     import matplotlib.pyplot as plt
-    spike_times = np.array(sum(spikes._times, []))
-    spike_types = np.array(sum(spikes._types, []))
+    spike_times = np.array(sum(spikes._spiketimes, []))
+    spike_types = np.array(sum(spikes._spiketypes, []))
     cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     spike_times_cell = [spike_times[spike_types == cell_type]
                         for cell_type in cell_types]
