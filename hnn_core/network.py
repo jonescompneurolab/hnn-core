@@ -163,9 +163,9 @@ class Network(object):
         # Originally used to create the empty vec for synaptic currents,
         # ensuring that they exist on this node irrespective of whether
         # or not cells of relevant type actually
-        self.t_vec = np.arange(0., params['tstop'] + params['dt'],
+        self.times = np.arange(0., params['tstop'] + params['dt'],
                                params['dt'])
-        self.n_times = self.t_vec.size
+        self.n_times = self.times.size
 
         # Source list of names, first real ones only!
         self.cellname_list = [
@@ -333,7 +333,7 @@ class Spikes(object):
         Each gid corresponds to a type via Network::gid_dict.
     vsoma : dict
         Dictionary indexed by gids containing somatic voltages
-    t_vec : list
+    times : list
         List of time points for samples in continuous data.
         This includes vsoma.
 
@@ -382,7 +382,7 @@ class Spikes(object):
         self._spikegids = spikegids
         self._spiketypes = spiketypes
         self._vsoma = list()
-        self._t_vec = list()
+        self._times = list()
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -479,8 +479,8 @@ class Spikes(object):
         return self._vsoma
 
     @property
-    def t_vec(self):
-        return self._t_vec
+    def times(self):
+        return self._times
 
     def update_types(self, gid_dict):
         """Update spike types in the current instance of Spikes.
