@@ -48,17 +48,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
     h.dt = neuron_net.net.params['dt']  # simulation duration and time-step
     h.celsius = neuron_net.net.params['celsius']  # 37.0 - set temperature
 
-    # We define the arrays (Vector in numpy) for recording the signals
-<<<<<<< HEAD
-    t_vec = h.Vector()
-    t_vec.record(h._ref_t)  # time recording
-=======
-    t_vec = neuron_net.net.t_vec
-    dp_rec_L2 = h.Vector()
-    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
-    dp_rec_L5 = h.Vector()
-    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
->>>>>>> Replace h.record() t_vec definition with np.arange() using params
+    times = neuron_net.net.times
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
@@ -117,7 +107,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
                      np.array(neuron_net.dipoles['L2_pyramidal'].to_python()),
                      np.array(neuron_net.dipoles['L5_pyramidal'].to_python())]
 
-    dpl = Dipole(t_vec, dpl_data)
+    dpl = Dipole(times, dpl_data)
     if rank == 0:
         if neuron_net.net.params['save_dpl']:
             dpl.write('rawdpl.txt')
