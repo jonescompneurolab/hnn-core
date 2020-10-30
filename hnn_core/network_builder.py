@@ -389,6 +389,7 @@ class NetworkBuilder(object):
         External inputs are not targets.
         """
         params = self.net.params
+        record_vsoma = params['record_vsoma']
         # Re-create external feed param dictionaries
         # Note that the only thing being updated here are the param['prng_*']
         # values
@@ -414,9 +415,9 @@ class NetworkBuilder(object):
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
                 Cell = type2class[src_type]
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    cell = Cell(gid, src_pos, params)
+                    cell = Cell(gid, src_pos, params, record_vsoma)
                 else:
-                    cell = Cell(gid, src_pos)
+                    cell = Cell(gid, src_pos, record_vsoma)
                 self.cells.append(cell)
 
             # external inputs are special types of artificial-cells

@@ -21,9 +21,9 @@ class BasketSingle(_Cell):
         names of section locations that are proximal or distal.
     """
 
-    def __init__(self, gid, pos, cell_name='Basket'):
+    def __init__(self, gid, pos, cell_name='Basket', record_vsoma=0):
         self.props = self._get_soma_props(cell_name, pos)
-        _Cell.__init__(self, gid, self.props)
+        _Cell.__init__(self, gid, self.props, record_vsoma)
         # store cell name for later
         self.name = cell_name
 
@@ -64,10 +64,10 @@ class BasketSingle(_Cell):
 class L2Basket(BasketSingle):
     """Class for layer 2 basket cells."""
 
-    def __init__(self, gid=-1, pos=-1):
+    def __init__(self, gid=-1, pos=-1, record_vsoma=0):
         # BasketSingle.__init__(self, pos, L, diam, Ra, cm)
         # Note: Basket cell properties set in BasketSingle())
-        BasketSingle.__init__(self, gid, pos, 'L2Basket')
+        BasketSingle.__init__(self, gid, pos, 'L2Basket', record_vsoma)
         self.celltype = 'L2_basket'
 
         self._synapse_create()
@@ -79,9 +79,9 @@ class L2Basket(BasketSingle):
 class L5Basket(BasketSingle):
     """Class for layer 5 basket cells."""
 
-    def __init__(self, gid=-1, pos=-1):
+    def __init__(self, gid=-1, pos=-1, record_vsoma=0):
         # Note: Cell properties are set in BasketSingle()
-        BasketSingle.__init__(self, gid, pos, 'L5Basket')
+        BasketSingle.__init__(self, gid, pos, 'L5Basket', record_vsoma)
         self.celltype = 'L5_basket'
 
         self._synapse_create()

@@ -469,7 +469,7 @@ class L5Pyr(Pyr):
         # Get somatic, dendirtic, and synapse properties
         p_soma = self._get_soma_props(pos)
 
-        Pyr.__init__(self, gid, p_soma)
+        Pyr.__init__(self, gid, p_soma, record_vsoma)
         p_dend = self._get_dend_props()
         p_syn = self._get_syn_props()
 

@@ -58,6 +58,8 @@ class _Cell(ABC):
     soma_props : dict
         The properties of the soma. Must contain
         keys 'L', 'diam', and 'pos'
+    record_vsoma : bool
+        Option to record somatic voltages from cells
 
     Attributes
     ----------
@@ -69,12 +71,13 @@ class _Cell(ABC):
         The soma currents (keys are soma_gabaa, soma_gabab etc.)
     """
 
-    def __init__(self, gid, soma_props):
+    def __init__(self, gid, soma_props, record_vsoma=0):
         self.gid = gid
         # variable for the list_IClamp
         self.list_IClamp = None
         self.soma_props = soma_props
         self.create_soma()
+        self.record_vsoma = record_vsoma
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -209,7 +212,10 @@ class _Cell(ABC):
 
     def record_voltage_soma(self):
         """Record current at soma."""
-        self.rec_v = h.Vector().record(self.soma(0.5)._ref_v)
+        if self.record_vsoma:
+            self.rec_v = h.Vector().record(self.soma(0.5)._ref_v)
+        else:
+            self.rec_v = h.Vector()
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
