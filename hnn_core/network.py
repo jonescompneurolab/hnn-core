@@ -165,7 +165,6 @@ class Network(object):
         # or not cells of relevant type actually
         self.times = np.arange(0., params['tstop'] + params['dt'],
                                params['dt'])
-        self.n_times = self.times.size
 
         # Source list of names, first real ones only!
         self.cellname_list = [
