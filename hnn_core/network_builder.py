@@ -303,13 +303,13 @@ class NetworkBuilder(object):
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
-            'L5_pyramidal_soma': h.Vector(self.net.n_times, 0),
-            'L2_pyramidal_soma': h.Vector(self.net.n_times, 0),
+            'L5_pyramidal_soma': h.Vector(self.net.times.size, 0),
+            'L2_pyramidal_soma': h.Vector(self.net.times.size, 0)
         }
 
         self.dipoles = {
-            'L5_pyramidal': h.Vector(self.net.n_times, 0),
-            'L2_pyramidal': h.Vector(self.net.n_times, 0),
+            'L5_pyramidal': h.Vector(self.net.times.size, 0),
+            'L2_pyramidal': h.Vector(self.net.times.size, 0)
         }
 
         self._create_cells_and_feeds()
