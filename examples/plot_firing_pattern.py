@@ -20,9 +20,10 @@ from hnn_core import read_params, Network, simulate_dipole
 hnn_core_root = op.dirname(hnn_core.__file__)
 
 ###############################################################################
-# Then we read the parameters file
+# Then we read the parameters file and enable somatic voltage recording
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
+params['record_vsoma'] = 1
 
 ###############################################################################
 # Now let's build the network
