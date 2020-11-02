@@ -132,20 +132,27 @@ class _Cell(ABC):
     # 2. a list needs to be created with a Dipole (Point Process) in each
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
-    def dipole_insert(self, yscale):
-        """Insert dipole into each section of this cell."""
+    def insert_dipole(self, yscale):
+        """Insert dipole into each section of this cell.
+
+        Parameters
+        ----------
+        yscale : dict
+            Dictionary of length scales to calculate dipole without
+            3d shape.
+        """
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma
         seclist = h.SectionList()
         seclist.wholetree(sec=self.soma)
         # create a python section list list_all
-        self.list_all = [sec for sec in seclist]
-        for sect in self.list_all:
+        list_all = [sec for sec in seclist]
+        for sect in list_all:
             sect.insert('dipole')
         # Dipole is defined in dipole_pp.mod
-        self.dipole_pp = [h.Dipole(1, sec=sect) for sect in self.list_all]
+        self.dipole_pp = [h.Dipole(1, sec=sect) for sect in list_all]
         # setting pointers and ztan values
-        for sect, dpp in zip(self.list_all, self.dipole_pp):
+        for sect, dpp in zip(list_all, self.dipole_pp):
             # assign internal resistance values to dipole point process (dpp)
             dpp.ri = h.ri(1, sec=sect)
             # sets pointers in dipole mod file to the correct locations
