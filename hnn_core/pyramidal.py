@@ -368,7 +368,7 @@ class L2Pyr(Pyr):
             'apical_oblique': 0.,
             'apical_1': 1.,
             'apical_tuft': 1.,
-            'basal_1': 1.,
+            'basal_1': -1.,
             'basal_2': -np.sqrt(2.) / 2.,
             'basal_3': -np.sqrt(2.) / 2.
         }
@@ -499,7 +499,7 @@ class L5Pyr(Pyr):
             'apical_1': 1.,
             'apical_2': 1.,
             'apical_tuft': 1.,
-            'basal_1': 1.,
+            'basal_1': -1.,
             'basal_2': -np.sqrt(2.) / 2.,
             'basal_3': -np.sqrt(2.) / 2.
         }
