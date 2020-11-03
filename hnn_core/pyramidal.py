@@ -58,26 +58,6 @@ class Pyr(_Cell):
         self.list_dend = []
         self.celltype = 'Pyramidal'
 
-    def get_sect_scales(self):
-        """Create dictionary of section names with entries
-           to scale section lengths to length along z-axis."""
-        seclist = h.SectionList()
-        seclist.wholetree(sec=self.soma)
-        d = dict((sect.name(), 1.) for sect in seclist)
-        for key in d.keys():
-            # basal_2 and basal_3 at 45 degree angle to z-axis.
-            if 'basal_2' in key:
-                d[key] = np.sqrt(2) / 2.
-            elif 'basal_3' in key:
-                d[key] = np.sqrt(2) / 2.
-            # apical_oblique at 90 perpendicular to z-axis
-            elif 'apical_oblique' in key:
-                d[key] = 0.
-            # All basalar dendrites extend along negative z-axis
-            if 'basal' in key:
-                d[key] = -d[key]
-        return d
-
     def set_geometry(self, p_dend):
         """Define shape of the neuron and connect sections.
 
