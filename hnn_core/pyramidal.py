@@ -26,6 +26,12 @@ class Pyr(_Cell):
         The cell ID
     soma_props : dict
         The soma properties
+    pos : tuple
+        The position of the cell.
+    celltype : str
+        Either 'L2_Pyramidal' or 'L5_Pyramidal'
+    params : dict
+        The params dictionary.
 
     Attributes
     ----------
@@ -45,7 +51,18 @@ class Pyr(_Cell):
         The synapses that the cell can use for connections.
     """
 
-    def __init__(self, gid, soma_props):
+    def __init__(self, gid, pos, celltype, params):
+
+        if celltype == 'L5_pyramidal':
+            p_all_default = get_L5Pyr_params_default()
+        elif celltype == 'L2_pyramidal':
+            p_all_default = get_L2Pyr_params_default()
+
+        p_all = compare_dictionaries(p_all_default, params)
+
+        # Get somatic, dendirtic, and synapse properties
+        soma_props = self._get_soma_props(pos, p_all)
+
         _Cell.__init__(self, gid, soma_props)
         self.create_soma()
         # store cell_name as self variable for later use
@@ -56,7 +73,33 @@ class Pyr(_Cell):
         self.sect_loc = dict()
         # for legacy use with L5Pyr
         self.list_dend = []
-        self.celltype = 'Pyramidal'
+        self.celltype = celltype
+
+        p_dend = self._get_dend_props(p_all)
+        p_syn = self._get_syn_props(p_all)
+
+        # Geometry
+        # dend Cm and dend Ra set using soma Cm and soma Ra
+        self.create_dends(p_dend)  # just creates the sections
+        # sets geom properties; adjusted after translation from
+        # hoc (2009 model)
+        self.set_geometry(p_dend)
+
+        # biophysics
+        self._biophysics(p_all)
+
+        # insert dipole
+        yscale = self.secs()[3]
+        self.insert_dipole(yscale)
+
+        # create synapses
+        self._synapse_create(p_syn)
+
+        # insert iclamp
+        self.list_IClamp = []
+
+        # run record current soma, defined in Cell()
+        self.record_current_soma()
 
     def set_geometry(self, p_dend):
         """Define shape of the neuron and connect sections.
@@ -273,40 +316,7 @@ class L2Pyr(Pyr):
     """
 
     def __init__(self, gid=-1, pos=None, params=None):
-        # Get default L2Pyr params and update them with any
-        # corresponding params in p
-        p_all_default = get_L2Pyr_params_default()
-        p_all = compare_dictionaries(p_all_default, params)
-
-        # Get somatic, dendritic, and synapse properties
-        p_soma = self._get_soma_props(pos, p_all)
-
-        # usage: Pyr.__init__(self, soma_props)
-        Pyr.__init__(self, gid, p_soma)
-        p_dend = self._get_dend_props(p_all)
-        p_syn = self._get_syn_props(p_all)
-
-        self.celltype = 'L2_pyramidal'
-
-
-        # geometry
-        # creates dict of dends: self.dends
-        self.create_dends(p_dend)
-        # sets geom properties;
-        # adjusted after translation from hoc (2009 model)
-        self.set_geometry(p_dend)
-
-        self._biophysics(p_all)
-
-        # insert dipole
-        yscale = self.secs()[3]
-        self.insert_dipole(yscale)
-
-        # create synapses
-        self._synapse_create(p_syn)
-
-        # run record_current_soma(), defined in Cell()
-        self.record_current_soma()
+        Pyr.__init__(self, gid, pos, 'L2_pyramidal', params)
 
     def _get_soma_props(self, pos, p_all):
         """Hardcoded somatic properties."""
@@ -445,40 +455,7 @@ class L5Pyr(Pyr):
     def __init__(self, gid=-1, pos=None, params=None):
         """Get default L5Pyr params and update them with
             corresponding params in p."""
-        p_all_default = get_L5Pyr_params_default()
-        p_all = compare_dictionaries(p_all_default, params)
-
-        # Get somatic, dendirtic, and synapse properties
-        p_soma = self._get_soma_props(pos, p_all)
-
-        Pyr.__init__(self, gid, p_soma)
-        p_dend = self._get_dend_props(p_all)
-        p_syn = self._get_syn_props(p_all)
-
-        self.celltype = 'L5_pyramidal'
-
-        # Geometry
-        # dend Cm and dend Ra set using soma Cm and soma Ra
-        self.create_dends(p_dend)  # just creates the sections
-        # sets geom properties; adjusted after translation from
-        # hoc (2009 model)
-        self.set_geometry(p_dend)
-
-        # biophysics
-        self._biophysics(p_all)
-
-        # insert dipole
-        yscale = self.secs()[3]
-        self.insert_dipole(yscale)
-
-        # create synapses
-        self._synapse_create(p_syn)
-
-        # insert iclamp
-        self.list_IClamp = []
-
-        # run record current soma, defined in Cell()
-        self.record_current_soma()
+        Pyr.__init__(self, gid, pos, 'L5_pyramidal', params)
 
     def secs(self):
         """The geometry of the default sections in the Neuron."""
