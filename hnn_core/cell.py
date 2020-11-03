@@ -167,7 +167,7 @@ class _Cell(ABC):
                 # range variable 'dipole'
                 # set pointers to previous segment's voltage, with
                 # boundary condition
-                if i:
+                if i > 0:
                     h.setpointer(sect(loc[i - 1])._ref_v,
                                  'pv', sect(loc[i]).dipole)
                 else:
