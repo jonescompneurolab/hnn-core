@@ -55,9 +55,6 @@ class Pyr(_Cell):
         names of section locations that are proximal or distal.
     celltype : str
         The cell type, 'L5_Pyramidal' or 'L2_Pyramidal'
-
-    Attributes with reference to Neuron objects
-    -------------------------------------------
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.
@@ -296,9 +293,6 @@ class L2Pyr(Pyr):
         The name of the cell
     list_dend : list of str
         List of dendrites.
-
-    Attributes with reference to Neuron objects
-    -------------------------------------------
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.
@@ -468,9 +462,6 @@ class L5Pyr(Pyr):
         The name of the cell
     list_dend : list of str
         List of dendrites.
-
-    Attributes with reference to Neuron objects
-    -------------------------------------------
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.

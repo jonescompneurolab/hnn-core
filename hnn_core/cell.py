@@ -228,11 +228,11 @@ class _Cell(ABC):
         secloc : instance of nrn.Segment
             The section location. E.g., soma(0.5).
         e: float
-            Reverse potential
+            Reverse potential (in mV)
         tau1: float
-            Rise time
+            Rise time (in ms)
         tau2: float
-            Decay time
+            Decay time (in ms)
 
         Returns
         -------
