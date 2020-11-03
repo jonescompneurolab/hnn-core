@@ -8,10 +8,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 from neuron import h, nrn
 
-# global variables, should be node-independent
-h("dp_total_L2 = 0.")
-h("dp_total_L5 = 0.")  # put here since these variables used in cells
-
 # Units for e: mV
 # Units for gbar: S/cm^2
 
@@ -150,10 +146,7 @@ class _Cell(ABC):
             # sets pointers in dipole mod file to the correct locations
             # h.setpointer(ref, ptr, obj)
             h.setpointer(sect(0.99)._ref_v, 'pv', dpp)
-            if self.celltype.startswith('L2'):
-                h.setpointer(h._ref_dp_total_L2, 'Qtotal', dpp)
-            elif self.celltype.startswith('L5'):
-                h.setpointer(h._ref_dp_total_L5, 'Qtotal', dpp)
+            h.setpointer(cell_dipole_ref, 'Qtotal', dpp)
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
             loc = np.array([seg.x for seg in sect])
