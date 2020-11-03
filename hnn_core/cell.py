@@ -174,12 +174,7 @@ class _Cell(ABC):
                     h.setpointer(sect(0)._ref_v, 'pv', sect(loc[i]).dipole)
                 # set aggregate pointers
                 h.setpointer(dpp._ref_Qsum, 'Qsum', sect(loc[i]).dipole)
-                if self.celltype.startswith('L2'):
-                    h.setpointer(h._ref_dp_total_L2, 'Qtotal',
-                                 sect(loc[i]).dipole)
-                elif self.celltype.startswith('L5'):
-                    h.setpointer(h._ref_dp_total_L5, 'Qtotal',
-                                 sect(loc[i]).dipole)
+                h.setpointer(cell_dipole_ref, 'Qtotal', sect(loc[i]).dipole)
                 # add ztan values
                 sect(loc[i]).dipole.ztan = y_diff[i]
             # set the pp dipole's ztan value to the last value from y_diff
