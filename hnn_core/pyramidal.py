@@ -96,7 +96,7 @@ class Pyr(_Cell):
         return d
 
     def set_geometry(self, p_dend):
-        """Define shape of the neuron.
+        """Define shape of the neuron and connect sections.
 
         Parameters
         ----------
@@ -110,8 +110,19 @@ class Pyr(_Cell):
             * cm: membrane capacitance in micro-Farads
             * Ra: axial resistivity in ohm-cm
         """
+        sec_pts, sec_lens, sec_diams, topology = self.secs()
+
+        # Connects sections of THIS cell together.
+        for connection in topology:
+            # XXX: risky to use self.soma as default. Unfortunately there isn't
+            # a dictionary with all the sections (including soma)
+            parent_sec = self.dends.get(connection[0], self.soma)
+            parent_loc = connection[1]
+            child_sec = self.dends.get(connection[2], self.soma)
+            child_loc = connection[3]
+            child_sec.connect(parent_sec, parent_loc, child_loc)
+
         # Neuron shape based on Jones et al., 2009
-        sec_pts, sec_lens, sec_diams = self.secs()
         for sec in [self.soma] + self.list_dend:
             h.pt3dclear(sec=sec)
             sec_name = sec.name().split('_', 1)[1]
@@ -325,7 +336,6 @@ class L2Pyr(Pyr):
         # geometry
         # creates dict of dends: self.dends
         self.create_dends(p_dend)
-        self.topol()  # sets the connectivity between sections
         # sets geom properties;
         # adjusted after translation from hoc (2009 model)
         self.set_geometry(p_dend)
@@ -386,23 +396,20 @@ class L2Pyr(Pyr):
             'basal_2': 2.72,
             'basal_3': 2.72
         }
-        return sec_pts, sec_lens, sec_diams
-
-    def topol(self):
-        """Connects sections of THIS cell together."""
-        # child.connect(parent, parent_end, {child_start=0})
-        # Distal (Apical)
-        self.dends['apical_trunk'].connect(self.soma, 1, 0)
-        self.dends['apical_1'].connect(self.dends['apical_trunk'], 1, 0)
-        self.dends['apical_tuft'].connect(self.dends['apical_1'], 1, 0)
-
-        # apical_oblique comes off distal end of apical_trunk
-        self.dends['apical_oblique'].connect(self.dends['apical_trunk'], 1, 0)
-
-        # Proximal (basal)
-        self.dends['basal_1'].connect(self.soma, 0, 0)
-        self.dends['basal_2'].connect(self.dends['basal_1'], 1, 0)
-        self.dends['basal_3'].connect(self.dends['basal_1'], 1, 0)
+        # parent, parent_end, child, {child_start=0} 
+        topology = [
+            # Distal (Apical)
+            ['soma', 1, 'apical_trunk', 0],
+            ['apical_trunk', 1, 'apical_1', 0],
+            ['apical_1', 1, 'apical_tuft', 0],
+            # apical_oblique comes off distal end of apical_trunk
+            ['apical_trunk', 1, 'apical_oblique', 0],
+            # Proximal (basal)
+            ['soma', 0, 'basal_1', 0],
+            ['basal_1', 1, 'basal_2', 0],
+            ['basal_1', 1, 'basal_3', 0]
+        ]
+        return sec_pts, sec_lens, sec_diams, topology
 
     def _biophysics(self, p_all):
         """Adds biophysics to soma."""
@@ -487,7 +494,6 @@ class L5Pyr(Pyr):
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
         self.create_dends(p_dend)  # just creates the sections
-        self.topol()  # sets the connectivity between sections
         # sets geom properties; adjusted after translation from
         # hoc (2009 model)
         self.set_geometry(p_dend)
@@ -543,7 +549,20 @@ class L5Pyr(Pyr):
             'basal_2': 8.5,
             'basal_3': 8.5
         }
-        return sec_pts, sec_lens, sec_diams
+        topology = [
+            # Distal (Apical)
+            ['soma', 1, 'apical_trunk', 0],
+            ['apical_trunk', 1, 'apical_1', 0],
+            ['apical_1', 1, 'apical_2', 0],
+            ['apical_2', 1, 'apical_tuft', 0],
+            # apical_oblique comes off distal end of apical_trunk
+            ['apical_trunk', 1, 'apical_oblique', 0],
+            # Proximal (basal)
+            ['soma', 0, 'basal_1', 0],
+            ['basal_1', 1, 'basal_2', 0],
+            ['basal_1', 1, 'basal_3', 0]
+        ]
+        return sec_pts, sec_lens, sec_diams, topology
 
     def _get_soma_props(self, pos, p_all):
         """Sets somatic properties. Returns dictionary."""
@@ -555,24 +574,6 @@ class L5Pyr(Pyr):
             'Ra': p_all['L5Pyr_soma_Ra'],
             'name': 'L5Pyr',
         }
-
-    def topol(self):
-        """Connects sections of this cell together."""
-
-        # child.connect(parent, parent_end, {child_start=0})
-        # Distal (apical)
-        self.dends['apical_trunk'].connect(self.soma, 1, 0)
-        self.dends['apical_1'].connect(self.dends['apical_trunk'], 1, 0)
-        self.dends['apical_2'].connect(self.dends['apical_1'], 1, 0)
-        self.dends['apical_tuft'].connect(self.dends['apical_2'], 1, 0)
-
-        # apical_oblique comes off distal end of apical_trunk
-        self.dends['apical_oblique'].connect(self.dends['apical_trunk'], 1, 0)
-
-        # Proximal (basal)
-        self.dends['basal_1'].connect(self.soma, 0, 0)
-        self.dends['basal_2'].connect(self.dends['basal_1'], 1, 0)
-        self.dends['basal_3'].connect(self.dends['basal_1'], 1, 0)
 
     def _biophysics(self, p_all):
         "Set the biophysics for the default Pyramidal cell."
