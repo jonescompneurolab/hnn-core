@@ -75,7 +75,7 @@ class Pyr(_Cell):
         self.list_dend = []
         self.celltype = 'Pyramidal'
 
-    def get_sectnames(self):
+    def get_sect_scales(self):
         """Create dictionary of section names with entries
            to scale section lengths to length along z-axis."""
         seclist = h.SectionList()
@@ -110,7 +110,7 @@ class Pyr(_Cell):
             * cm: membrane capacitance in micro-Farads
             * Ra: axial resistivity in ohm-cm
         """
-        sec_pts, sec_lens, sec_diams, topology = self.secs()
+        sec_pts, sec_lens, sec_diams, _, topology = self.secs()
 
         # Connects sections of THIS cell together.
         for connection in topology:
@@ -343,7 +343,7 @@ class L2Pyr(Pyr):
         self._biophysics(p_all)
 
         # insert dipole
-        yscale = self.get_sectnames()
+        yscale = self.secs()[3]
         self.insert_dipole(yscale)
 
         # create synapses
@@ -396,7 +396,17 @@ class L2Pyr(Pyr):
             'basal_2': 2.72,
             'basal_3': 2.72
         }
-        # parent, parent_end, child, {child_start=0} 
+        sec_scales = {  # factor to scale the dipole by
+            'soma': 1.,
+            'apical_trunk': 1.,
+            'apical_oblique': 0.,
+            'apical_1': 1.,
+            'apical_tuft': 1.,
+            'basal_1': 1.,
+            'basal_2': -np.sqrt(2.) / 2.,
+            'basal_3': -np.sqrt(2.) / 2.
+        }
+        # parent, parent_end, child, {child_start=0}
         topology = [
             # Distal (Apical)
             ['soma', 1, 'apical_trunk', 0],
@@ -409,7 +419,7 @@ class L2Pyr(Pyr):
             ['basal_1', 1, 'basal_2', 0],
             ['basal_1', 1, 'basal_3', 0]
         ]
-        return sec_pts, sec_lens, sec_diams, topology
+        return sec_pts, sec_lens, sec_diams, sec_scales, topology
 
     def _biophysics(self, p_all):
         """Adds biophysics to soma."""
@@ -502,7 +512,7 @@ class L5Pyr(Pyr):
         self._biophysics(p_all)
 
         # insert dipole
-        yscale = self.get_sectnames()
+        yscale = self.secs()[3]
         self.insert_dipole(yscale)
 
         # create synapses
@@ -549,6 +559,17 @@ class L5Pyr(Pyr):
             'basal_2': 8.5,
             'basal_3': 8.5
         }
+        sec_scales = {  # factor to scale the dipole by
+            'soma': 1.,
+            'apical_trunk': 1.,
+            'apical_oblique': 0.,
+            'apical_1': 1.,
+            'apical_2': 1.,
+            'apical_tuft': 1.,
+            'basal_1': 1.,
+            'basal_2': -np.sqrt(2.) / 2.,
+            'basal_3': -np.sqrt(2.) / 2.
+        }
         topology = [
             # Distal (Apical)
             ['soma', 1, 'apical_trunk', 0],
@@ -562,7 +583,7 @@ class L5Pyr(Pyr):
             ['basal_1', 1, 'basal_2', 0],
             ['basal_1', 1, 'basal_3', 0]
         ]
-        return sec_pts, sec_lens, sec_diams, topology
+        return sec_pts, sec_lens, sec_diams, sec_scales, topology
 
     def _get_soma_props(self, pos, p_all):
         """Sets somatic properties. Returns dictionary."""

@@ -169,7 +169,7 @@ class _Cell(ABC):
             pos = np.array([seg.x for seg in sect.allseg()])
             # diff in yvals, scaled against the pos np.array. y_long as
             # in longitudinal
-            y_scale = (yscale[sect.name()] * sect.L) * pos
+            y_scale = (yscale[sect.name().split('_', 1)[1]] * sect.L) * pos
             # y_long = (h.y3d(1, sec=sect) - h.y3d(0, sec=sect)) * pos
             # diff values calculate length between successive section points
             y_diff = np.diff(y_scale)
