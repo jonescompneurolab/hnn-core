@@ -43,10 +43,6 @@ def _simulate_single_trial(neuron_net, trial_idx):
         print("running trial %d on %d cores" %
               (trial_idx + 1, nhosts))
 
-    # create or reinitialize scalars in NEURON (hoc) context
-    h("dp_total_L2 = 0.")
-    h("dp_total_L5 = 0.")
-
     # Set tstop before instantiating any classes
     h.tstop = neuron_net.net.params['tstop']
     h.dt = neuron_net.net.params['dt']  # simulation duration and time-step
@@ -55,10 +51,6 @@ def _simulate_single_trial(neuron_net, trial_idx):
     # We define the arrays (Vector in numpy) for recording the signals
     t_vec = h.Vector()
     t_vec.record(h._ref_t)  # time recording
-    dp_rec_L2 = h.Vector()
-    dp_rec_L2.record(h._ref_dp_total_L2)  # L2 dipole recording
-    dp_rec_L5 = h.Vector()
-    dp_rec_L5.record(h._ref_dp_total_L5)  # L5 dipole recording
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
