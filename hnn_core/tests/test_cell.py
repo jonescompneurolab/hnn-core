@@ -15,13 +15,22 @@ def test_cell():
                   "pos": (0., 0., 0.), 'name': 'test_cell'}
 
     with pytest.raises(TypeError, match='with abstract methods get_sections'):
-        cell = _Cell(gid=1, soma_props=soma_props)
+        cell = _Cell(soma_props=soma_props)
 
     class Cell(_Cell):
         def get_sections(self):
             return [self.soma]
 
-    cell = Cell(gid=1, soma_props=soma_props)
+    # GID is assigned exactly once for each cell, either at initialisation...
+    cell = Cell(soma_props=soma_props, gid=42)
+    assert cell.gid == 42
+    with pytest.raises(RuntimeError,
+                       match='Global ID for this cell already assigned!'):
+        cell.gid += 1
+    # ... or later
+    cell = Cell(soma_props=soma_props)  # cells can exist fine without gid
+    cell.gid = 42
+    assert cell.gid == 42
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
@@ -39,3 +48,14 @@ def test_artificial_cell():
     # the h.Netcon() instance should reference the h.VecStim() instance
     assert artificial_cell.nrn_netcon.pre() == artificial_cell.nrn_vecstim
     assert artificial_cell.nrn_netcon.threshold == threshold
+
+    # GID is assigned exactly once for each cell, either at initialisation...
+    cell = _ArtificialCell(event_times, threshold, gid=42)
+    assert cell.gid == 42
+    with pytest.raises(RuntimeError,
+                       match='Global ID for this cell already assigned!'):
+        cell.gid += 1
+    # ... or later
+    cell = _ArtificialCell(event_times, threshold)  # fine without gid
+    cell.gid = 42
+    assert cell.gid == 42

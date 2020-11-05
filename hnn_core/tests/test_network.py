@@ -4,6 +4,7 @@ from copy import deepcopy
 import os.path as op
 from glob import glob
 import numpy as np
+from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
@@ -34,30 +35,46 @@ def test_network():
     print(network_builder.cells[:2])
 
     # Assert that proper number of gids are created for Network inputs
-    assert len(net.gid_dict['common']) == 2
-    assert len(net.gid_dict['extgauss']) == net.n_cells
-    assert len(net.gid_dict['extpois']) == net.n_cells
+    assert len(net.gid_ranges['common']) == 2
+    assert len(net.gid_ranges['extgauss']) == net.n_cells
+    assert len(net.gid_ranges['extpois']) == net.n_cells
     for ev_input in params['t_ev*']:
         type_key = ev_input[2: -2] + ev_input[-1]
-        assert len(net.gid_dict[type_key]) == net.n_cells
+        assert len(net.gid_ranges[type_key]) == net.n_cells
 
     # Assert that an empty Spikes object is created as an attribute
     assert net.spikes == Spikes()
 
     # Assert that all external feeds are initialized
-    n_evoked_sources = 270 * 3
-    n_pois_sources = 270
-    n_gaus_sources = 270
+    n_evoked_sources = net.n_cells * 3
+    n_pois_sources = net.n_cells
+    n_gaus_sources = net.n_cells
     n_common_sources = 2
+
+    # test that expected number of external driving events are created, and
+    # make sure the PRNGs are consistent.
+    assert isinstance(net.trial_event_times, list)
+    assert len(net.trial_event_times) == 1  # single trial simulated
+    assert len(net.trial_event_times[0]['common']) == n_common_sources
+    assert len(net.trial_event_times[0]['common'][0]) == 40  # 40 spikes
+    assert isinstance(net.trial_event_times[0]['evprox1'][0], list)
+    assert len(net.trial_event_times[0]['evprox1']) == net.n_cells
+    assert_allclose(net.trial_event_times[0]['evprox1'][0],
+                    [23.80641637082997], rtol=1e-12)
+
     assert len(network_builder._feed_cells) == (n_evoked_sources +
                                                 n_pois_sources +
                                                 n_gaus_sources +
                                                 n_common_sources)
+    assert len(network_builder._gid_list) ==\
+        len(network_builder._feed_cells) + net.n_cells
+    # first 'evoked feed' comes after real cells and common inputs
+    assert network_builder._feed_cells[2].gid == net.n_cells + n_common_sources
 
     # Assert that netcons are created properly
     # proximal
     assert 'L2Pyr_L2Pyr_nmda' in network_builder.ncs
-    n_pyr = len(net.gid_dict['L2_pyramidal'])
+    n_pyr = len(net.gid_ranges['L2_pyramidal'])
     n_connections = 3 * (n_pyr ** 2 - n_pyr)  # 3 synapses / cell
     assert len(network_builder.ncs['L2Pyr_L2Pyr_nmda']) == n_connections
     nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
@@ -70,14 +87,14 @@ def test_network():
         'common', 'L5Basket', 'soma', 'gabaa', nc_dict,
         unique=False)
     assert 'common_L5Basket_gabaa' in network_builder.ncs
-    n_conn = len(net.gid_dict['common']) * len(net.gid_dict['L5_basket'])
+    n_conn = len(net.gid_ranges['common']) * len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['common_L5Basket_gabaa']) == n_conn
 
     # try unique=True
     network_builder._connect_celltypes(
         'extgauss', 'L5Basket', 'soma', 'gabaa', nc_dict,
         unique=True)
-    n_conn = len(net.gid_dict['L5_basket'])
+    n_conn = len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
 
@@ -90,8 +107,8 @@ def test_spikes(tmpdir):
     spike_types = [['L2_pyramidal', 'L2_basket'],
                    ['L5_pyramidal', 'L5_basket']]
     tstart, tstop = 0.1, 98.4
-    gid_dict = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
-                'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
+    gid_ranges = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
+                  'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
     spikes = Spikes(spike_times=spike_times, spike_gids=spike_gids,
                     spike_types=spike_types)
     spikes.plot_hist(show=False)
@@ -155,44 +172,44 @@ def test_spikes(tmpdir):
 
     with pytest.raises(ValueError, match="tstart and tstop must be of type "
                        "int or float"):
-        spikes.mean_rates(tstart=0.1, tstop='ABC', gid_dict=gid_dict)
+        spikes.mean_rates(tstart=0.1, tstop='ABC', gid_ranges=gid_ranges)
 
     with pytest.raises(ValueError, match="tstop must be greater than tstart"):
-        spikes.mean_rates(tstart=0.1, tstop=-1.0, gid_dict=gid_dict)
+        spikes.mean_rates(tstart=0.1, tstop=-1.0, gid_ranges=gid_ranges)
 
     with pytest.raises(ValueError, match="Invalid mean_type. Valid "
                        "arguments include 'all', 'trial', or 'cell'."):
-        spikes.mean_rates(tstart=tstart, tstop=tstop, gid_dict=gid_dict,
+        spikes.mean_rates(tstart=tstart, tstop=tstop, gid_ranges=gid_ranges,
                           mean_type='ABC')
 
     test_rate = (1 / (tstop - tstart)) * 1000
 
-    assert spikes.mean_rates(tstart, tstop, gid_dict) == {
+    assert spikes.mean_rates(tstart, tstop, gid_ranges) == {
         'L5_pyramidal': test_rate / 2,
         'L5_basket': test_rate / 2,
         'L2_pyramidal': test_rate / 2,
         'L2_basket': test_rate / 2}
-    assert spikes.mean_rates(tstart, tstop, gid_dict, mean_type='trial') == {
+    assert spikes.mean_rates(tstart, tstop, gid_ranges, mean_type='trial') == {
         'L5_pyramidal': [0.0, test_rate],
         'L5_basket': [0.0, test_rate],
         'L2_pyramidal': [test_rate, 0.0],
         'L2_basket': [test_rate, 0.0]}
-    assert spikes.mean_rates(tstart, tstop, gid_dict, mean_type='cell') == {
+    assert spikes.mean_rates(tstart, tstop, gid_ranges, mean_type='cell') == {
         'L5_pyramidal': [[0.0], [test_rate]],
         'L5_basket': [[0.0], [test_rate]],
         'L2_pyramidal': [[test_rate], [0.0]],
         'L2_basket': [[test_rate], [0.0]]}
 
     # Write spike file with no 'types' column
-    # Check for gid_dict errors
+    # Check for gid_ranges errors
     for fname in sorted(glob(str(tmpdir.join('spk_*.txt')))):
         times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
-    with pytest.raises(ValueError, match="gid_dict must be provided if spike "
-                       "types are unspecified in the file "):
+    with pytest.raises(ValueError, match="gid_ranges must be provided if "
+                       "spike types are unspecified in the file "):
         spikes = read_spikes(tmpdir.join('spk_*.txt'))
-    with pytest.raises(ValueError, match="gid_dict should contain only "
+    with pytest.raises(ValueError, match="gid_ranges should contain only "
                        "disjoint sets of gid values"):
-        gid_dict = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
-                    'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
-        spikes = read_spikes(tmpdir.join('spk_*.txt'), gid_dict=gid_dict)
+        gid_ranges = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
+                      'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
+        spikes = read_spikes(tmpdir.join('spk_*.txt'), gid_ranges=gid_ranges)

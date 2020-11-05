@@ -21,9 +21,9 @@ class BasketSingle(_Cell):
         names of section locations that are proximal or distal.
     """
 
-    def __init__(self, gid, pos, cell_name='Basket'):
+    def __init__(self, pos, cell_name='Basket', gid=None):
         self.props = self._get_soma_props(cell_name, pos)
-        _Cell.__init__(self, gid, self.props)
+        _Cell.__init__(self, self.props, gid=gid)
         # store cell name for later
         self.name = cell_name
 
@@ -62,12 +62,22 @@ class BasketSingle(_Cell):
 
 
 class L2Basket(BasketSingle):
-    """Class for layer 2 basket cells."""
+    """Class for layer 2 basket cells.
 
-    def __init__(self, gid=-1, pos=-1):
+    Parameters
+    ----------
+    pos : tuple
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+        The GID is an integer from 0 to n_cells, or None if the cell is not
+        yet attached to a network. Once the GID is set, it cannot be changed.
+    """
+
+    def __init__(self, pos, gid=None):
         # BasketSingle.__init__(self, pos, L, diam, Ra, cm)
         # Note: Basket cell properties set in BasketSingle())
-        BasketSingle.__init__(self, gid, pos, 'L2Basket')
+        BasketSingle.__init__(self, pos, cell_name='L2Basket', gid=gid)
         self.celltype = 'L2_basket'
 
         self._synapse_create()
@@ -76,11 +86,21 @@ class L2Basket(BasketSingle):
 
 
 class L5Basket(BasketSingle):
-    """Class for layer 5 basket cells."""
+    """Class for layer 5 basket cells.
 
-    def __init__(self, gid=-1, pos=-1):
+    Parameters
+    ----------
+    pos : tuple
+        Coordinates of cell soma in xyz-space
+    gid : int or None (optional)
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+        The GID is an integer from 0 to n_cells, or None if the cell is not
+        yet attached to a network. Once the GID is set, it cannot be changed.
+    """
+
+    def __init__(self, pos, gid=None):
         # Note: Cell properties are set in BasketSingle()
-        BasketSingle.__init__(self, gid, pos, 'L5Basket')
+        BasketSingle.__init__(self, pos, cell_name='L5Basket', gid=gid)
         self.celltype = 'L5_basket'
 
         self._synapse_create()

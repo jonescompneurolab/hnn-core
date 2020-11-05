@@ -22,16 +22,16 @@ class Pyr(_Cell):
 
     Parameters
     ----------
-    gid : int
-        The cell ID
-    soma_props : dict
-        The soma properties
     pos : tuple
-        The position of the cell.
+        Coordinates of cell soma in xyz-space
     celltype : str
         Either 'L2_Pyramidal' or 'L5_Pyramidal'
-    params : dict
-        The params dictionary.
+    override_params : dict or None (optional)
+        Parameters specific to L2 pyramidal neurons to override the default set
+    gid : int or None (optional)
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+        The GID is an integer from 0 to n_cells, or None if the cell is not
+        yet attached to a network. Once the GID is set, it cannot be changed..
 
     Attributes
     ----------
@@ -51,19 +51,24 @@ class Pyr(_Cell):
         The synapses that the cell can use for connections.
     """
 
-    def __init__(self, gid, pos, celltype, params):
+    def __init__(self, pos, celltype, override_params=None, gid=None):
 
         if celltype == 'L5_pyramidal':
             p_all_default = get_L5Pyr_params_default()
         elif celltype == 'L2_pyramidal':
             p_all_default = get_L2Pyr_params_default()
+        else:
+            raise ValueError(f'Unknown pyramidal cell type: {celltype}')
 
-        p_all = compare_dictionaries(p_all_default, params)
+        p_all = p_all_default
+        if override_params is not None:
+            assert isinstance(override_params, dict)
+            p_all = compare_dictionaries(p_all_default, override_params)
 
-        # Get somatic, dendirtic, and synapse properties
+        # Get somatic, dendritic, and synapse properties
         soma_props = self._get_soma_props(pos, p_all)
 
-        _Cell.__init__(self, gid, soma_props)
+        _Cell.__init__(self, soma_props, gid=gid)
         self.create_soma()
         # store cell_name as self variable for later use
         self.name = soma_props['name']
@@ -295,12 +300,14 @@ class L2Pyr(Pyr):
 
     Parameters
     ----------
-    gid : int
-        The cell id.
-    pos : tuple | None
-        The position of the cell.
-    params : dict | None
-        The parameters dictionary.
+    pos : tuple
+        Coordinates of cell soma in xyz-space
+    override_params : dict or None (optional)
+        Parameters specific to L2 pyramidal neurons to override the default set
+    gid : int or None (optional)
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+        The GID is an integer from 0 to n_cells, or None if the cell is not
+        yet attached to a network. Once the GID is set, it cannot be changed.
 
     Attributes
     ----------
@@ -315,8 +322,8 @@ class L2Pyr(Pyr):
         The synapses that the cell can use for connections.
     """
 
-    def __init__(self, gid=-1, pos=None, params=None):
-        Pyr.__init__(self, gid, pos, 'L2_pyramidal', params)
+    def __init__(self, pos=None, override_params=None, gid=None):
+        Pyr.__init__(self, pos, 'L2_pyramidal', override_params, gid=gid)
 
     def _get_soma_props(self, pos, p_all):
         """Hardcoded somatic properties."""
@@ -432,12 +439,14 @@ class L5Pyr(Pyr):
 
     Parameters
     ----------
-    gid : int
-        The cell ID
-    pos : tuple | None
-        The position of the cell
-    params : dict | None
-        The params dictionary
+    pos : tuple
+        Coordinates of cell soma in xyz-space
+    override_params : dict or None (optional)
+        Parameters specific to L2 pyramidal neurons to override the default set
+    gid : int or None (optional)
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+        The GID is an integer from 0 to n_cells, or None if the cell is not
+        yet attached to a network. Once the GID is set, it cannot be changed.
 
     Attributes
     ----------
@@ -452,10 +461,10 @@ class L5Pyr(Pyr):
         The synapses that the cell can use for connections.
     """
 
-    def __init__(self, gid=-1, pos=None, params=None):
+    def __init__(self, pos=None, override_params=None, gid=None):
         """Get default L5Pyr params and update them with
             corresponding params in p."""
-        Pyr.__init__(self, gid, pos, 'L5_pyramidal', params)
+        Pyr.__init__(self, pos, 'L5_pyramidal', override_params, gid=gid)
 
     def secs(self):
         """The geometry of the default sections in the Neuron."""

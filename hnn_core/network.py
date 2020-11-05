@@ -7,12 +7,13 @@
 import itertools as it
 import numpy as np
 from glob import glob
+from .feed import ExtFeed
 
 from .params import create_pext
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
-def read_spikes(fname, gid_dict=None):
+def read_spikes(fname, gid_ranges=None):
     """Read spiking activity from a collection of spike trial files.
 
     Parameters
@@ -20,7 +21,7 @@ def read_spikes(fname, gid_dict=None):
     fname : str
         Wildcard expression (e.g., '<pathname>/spk_*.txt') of the
         path to the spike file(s).
-    gid_dict : dict of lists or range objects | None
+    gid_ranges : dict of lists or range objects | None
         Dictionary with keys 'evprox1', 'evdist1' etc.
         containing the range of Cell or input IDs of different
         cell or input types. If None, each spike file must contain
@@ -41,20 +42,20 @@ def read_spikes(fname, gid_dict=None):
         spike_gids += [list(spike_trial[:, 1].astype(int))]
 
         # Note that legacy HNN 'spk.txt' files don't contain a 3rd column for
-        # spike type. If reading a legacy version, validate that a gid_dict is
-        # provided.
+        # spike type. If reading a legacy version, validate that a gid_ranges
+        # is provided.
         if spike_trial.shape[1] == 3:
             spike_types += [list(spike_trial[:, 2].astype(str))]
         else:
-            if gid_dict is None:
-                raise ValueError("gid_dict must be provided if spike types "
+            if gid_ranges is None:
+                raise ValueError("gid_ranges must be provided if spike types "
                                  "are unspecified in the file %s" % (file,))
             spike_types += [[]]
 
     spikes = Spikes(spike_times=spike_times, spike_gids=spike_gids,
                     spike_types=spike_types)
-    if gid_dict is not None:
-        spikes.update_types(gid_dict)
+    if gid_ranges is not None:
+        spikes.update_types(gid_ranges)
 
     return Spikes(spike_times=spike_times, spike_gids=spike_gids,
                   spike_types=spike_types)
@@ -147,12 +148,12 @@ class Network(object):
         The names of real cell types in the network (e.g. 'L2_basket')
     feedname_list : list
         The names of external drivers ('feeds') to the network (e.g. 'evdist1')
-    gid_dict : dict
+    gid_ranges : dict
         A dictionary of unique identifiers of each real and artificial cell
         in the network. Every cell type is represented by a key read from
         cellname_list, followed by entries read from feedname_list. The value
         of each key is a range of ints, one for each cell in given category.
-        Examples: 'L2_basal': range(0, 270), 'evdist1': range(272, 542), etc
+        Examples: 'L2_basket': range(0, 270), 'evdist1': range(272, 542), etc
     pos_dict : dict
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
@@ -164,22 +165,13 @@ class Network(object):
     def __init__(self, params):
         # Save the parameters used to create the Network
         self.params = params
-        # Initialise a dictionary of cell ID's, which get assigned when the
+        # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
         # interrogate a built and simulated net. In addition, Spikes are
         # attached to a Network during simulation---Network is the natural
         # place to keep this information
-        # XXX rename gid_dict in future
-        self.gid_dict = dict()
-
-        # When computing the network dynamics in parallel, the nodes of the
-        # network (real and artificial cells) potentially get distributed
-        # on different host machines/threads. NetworkBuilder._gid_assign
-        # assigns each node, identified by its unique GID, to one of the
-        # possible hosts/threads for computations. _gid_list here contains
-        # the GIDs of all the nodes assigned to the current host/thread.
-        self._gid_list = []
+        self.gid_ranges = dict()
 
         # Number of time points
         # Originally used to create the empty vec for synaptic currents,
@@ -198,23 +190,21 @@ class Network(object):
             'L5_pyramidal',
         ]
         self.feedname_list = []  # no feeds defined yet
+        self.trial_event_times = []  # list of len == n_trials
 
-        # cell position lists, also will give counts: must be known
-        # by ALL nodes
-        # XXX structure of pos_dict determines all downstream inferences of
+        # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self.pos_dict = _create_cell_coords(n_pyr_x=self.params['N_pyr_x'],
                                             n_pyr_y=self.params['N_pyr_y'],
                                             zdiff=1307.4)
-        # XXX not strictly necessary here (_add_external_feeds calls it blw.)
-        # but perhaps should be encouraged on adding new cells?
-        self._update_gid_dict()
+        # Every time pos_dict is updated, gid_ranges must be updated too
+        self._update_gid_ranges()
 
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cellname_list)
 
-        # XXX The legacy code in HNN-GUI _always_ defines 2 'common' and 5
+        # The legacy code in HNN-GUI _always_ defines 2 'common' and 5
         # 'unique' feeds. They are added here for backwards compatibility
         # until a new handling of external NetworkDrives's is completed.
         self._add_external_feeds()
@@ -237,20 +227,20 @@ class Network(object):
         # Global number of external inputs ... automatic counting
         # makes more sense
         # p_unique represent ext inputs that are going to go to each cell
-        self.p_common, self.p_unique = create_pext(self.params,
-                                                   self.params['tstop'])
-        self.n_common_feeds = len(self.p_common)
+        self._p_common, self._p_unique = create_pext(self.params,
+                                                     self.params['tstop'])
+        self._n_common_feeds = len(self._p_common)
 
         # 'position' the artificial cells arbitrarily in the origin of the
         # network grid. Non-biophysical cell placement is irrelevant
-        # However, they must be present to be included in gid_dict!
+        # However, they must be present to be included in gid_ranges!
         origin = self.pos_dict['origin']
 
         # COMMON FEEDS
-        self.pos_dict['common'] = [origin for i in range(self.n_common_feeds)]
+        self.pos_dict['common'] = [origin for i in range(self._n_common_feeds)]
 
         # UNIQUE FEEDS
-        for key in self.p_unique.keys():
+        for key in self._p_unique.keys():
             # create the pos_dict for all the sources
             self.pos_dict[key] = [origin for i in range(self.n_cells)]
 
@@ -258,13 +248,69 @@ class Network(object):
         self.feedname_list.append('common')
         # grab the keys for the unique set of inputs and sort the names
         # append them to the src list along with the number of cells
-        unique_keys = sorted(self.p_unique.keys())
+        unique_keys = sorted(self._p_unique.keys())
         self.feedname_list += unique_keys
 
-        self._update_gid_dict()  # add feeds -> update the gid_dict
+        # Every time pos_dict is updated, gid_ranges must be updated too
+        self._update_gid_ranges()
 
-    def _update_gid_dict(self):
-        """Creates gid dict from scratch every time called.
+        # Create the feed dynamics (event_times)
+        self._instantiate_feeds()
+
+    def _instantiate_feeds(self):
+        '''Creates event_time vectors for all feeds and all trials
+
+        NB this must be a separate method because dipole.py:simulate_dipole
+        accepts an n_trials-argument, which overrides the N_trials-parameter
+        used at intialisation time. The good news is that only the event_times
+        need to be recalculated, all the GIDs etc remain the same.
+        '''
+        # each trial needs unique event time vectors
+
+        self.trial_event_times = []  # reset if called again from dipole.py
+        n_trials = self.params['N_trials']
+
+        cur_params = self.params.copy()  # these get mangled below!
+        for trial_idx in range(n_trials):
+
+            prng_seedcore_initial = cur_params['prng_*'].copy()
+            for param_key in prng_seedcore_initial.keys():
+                cur_params[param_key] =\
+                    prng_seedcore_initial[param_key] + trial_idx
+            # needs to be re-run to create the dicts going into ExtFeed
+            # the only thing changing is the initial seed
+            p_common, p_unique = create_pext(cur_params,
+                                             cur_params['tstop'])
+
+            src_types = self.feedname_list
+            event_times_per_source = {}
+            for src_type in src_types:
+                event_times = []
+                if src_type == 'common':
+                    for idx, gid in enumerate(self.gid_ranges['common']):
+                        gid_target = None  # 'common' attaches to all
+                        feed = ExtFeed(feed_type=src_type,
+                                       target_cell_type=gid_target,
+                                       params=p_common[idx],
+                                       gid=gid)
+                        event_times.append(feed.event_times)
+
+                elif src_type in p_unique.keys():
+                    for gid in self.gid_ranges[src_type]:
+                        gid_target = gid - self.gid_ranges[src_type][0]
+                        target_cell_type = self.gid_to_type(gid_target)
+                        feed = ExtFeed(feed_type=src_type,
+                                       target_cell_type=target_cell_type,
+                                       params=p_unique[src_type],
+                                       gid=gid)
+                        event_times.append(feed.event_times)
+                event_times_per_source.update({src_type: event_times})
+
+            # list of dict of list of list
+            self.trial_event_times.append(event_times_per_source.copy())
+
+    def _update_gid_ranges(self):
+        """Creates gid ranges from scratch every time called.
 
         Any method that adds real or artificial cells to the network must
         call this to update the list of GIDs. Note that it's based on the
@@ -275,12 +321,12 @@ class Network(object):
         for idx, src_type in enumerate(src_types):
             n_srcs = len(self.pos_dict[src_type])
             gid_lims.append(gid_lims[idx] + n_srcs)
-            self.gid_dict[src_type] = range(gid_lims[idx],
-                                            gid_lims[idx + 1])
+            self.gid_ranges[src_type] = range(gid_lims[idx],
+                                              gid_lims[idx + 1])
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
-        for gidtype, gids in self.gid_dict.items():
+        for gidtype, gids in self.gid_ranges.items():
             if gid in gids:
                 return gidtype
 
@@ -289,7 +335,7 @@ class Network(object):
 
         # get type of cell and pos via gid
         src_type = self.gid_to_type(gid)
-        type_pos_ind = gid - self.gid_dict[src_type][0]
+        type_pos_ind = gid - self.gid_ranges[src_type][0]
         src_pos = self.pos_dict[src_type][type_pos_ind]
 
         return src_type, src_pos, src_type in self.cellname_list
@@ -329,7 +375,7 @@ class Spikes(object):
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
-        Each gid corresponds to a type via Network().gid_dict.
+        Each gid corresponds to a type via Network().gid_ranges.
 
     Attributes
     ----------
@@ -344,7 +390,7 @@ class Spikes(object):
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
-        Each gid corresponds to a type via Network::gid_dict.
+        Each gid corresponds to a type via Network::gid_ranges.
     vsoma : dict
         Dictionary indexed by gids containing somatic voltages
     times : list
@@ -353,12 +399,12 @@ class Spikes(object):
 
     Methods
     -------
-    update_types(gid_dict)
+    update_types(gid_ranges)
         Update spike types in the current instance of Spikes.
     plot(ax=None, show=True)
         Plot and return a matplotlib Figure object showing the
         aggregate network spiking activity according to cell type.
-    mean_rates(tstart, tstop, gid_dict, mean_type='all')
+    mean_rates(tstart, tstop, gid_ranges, mean_type='all')
         Calculate mean firing rate for each cell type. Specify
         averaging method with mean_type argument.
     write(fname)
@@ -496,38 +542,38 @@ class Spikes(object):
     def times(self):
         return self._times
 
-    def update_types(self, gid_dict):
+    def update_types(self, gid_ranges):
         """Update spike types in the current instance of Spikes.
 
         Parameters
         ----------
-        gid_dict : dict of lists or range objects
+        gid_ranges : dict of lists or range objects
             Dictionary with keys 'evprox1', 'evdist1' etc.
             containing the range of Cell or input IDs of different
             cell or input types.
         """
 
-        # Validate gid_dict
-        gid_dict_ranges = list(gid_dict.values())
-        for item_idx_1 in range(len(gid_dict_ranges)):
-            for item_idx_2 in range(item_idx_1 + 1, len(gid_dict_ranges)):
-                gid_set_1 = set(gid_dict_ranges[item_idx_1])
-                gid_set_2 = set(gid_dict_ranges[item_idx_2])
+        # Validate gid_ranges
+        all_gid_ranges = list(gid_ranges.values())
+        for item_idx_1 in range(len(all_gid_ranges)):
+            for item_idx_2 in range(item_idx_1 + 1, len(all_gid_ranges)):
+                gid_set_1 = set(all_gid_ranges[item_idx_1])
+                gid_set_2 = set(all_gid_ranges[item_idx_2])
                 if not gid_set_1.isdisjoint(gid_set_2):
-                    raise ValueError('gid_dict should contain only disjoint '
+                    raise ValueError('gid_ranges should contain only disjoint '
                                      'sets of gid values')
 
         spike_types = list()
         for trial_idx in range(len(self._spike_times)):
             spike_types_trial = np.empty_like(self._spike_times[trial_idx],
                                               dtype='<U36')
-            for gidtype, gids in gid_dict.items():
+            for gidtype, gids in gid_ranges.items():
                 spike_gids_mask = np.in1d(self._spike_gids[trial_idx], gids)
                 spike_types_trial[spike_gids_mask] = gidtype
             spike_types += [list(spike_types_trial)]
         self._spike_types = spike_types
 
-    def mean_rates(self, tstart, tstop, gid_dict, mean_type='all'):
+    def mean_rates(self, tstart, tstop, gid_ranges, mean_type='all'):
         """Mean spike rates (Hz) by cell type.
 
         Parameters
@@ -536,7 +582,7 @@ class Spikes(object):
             Value defining the start time of all trials.
         tstop : int | float | None
             Value defining the stop time of all trials.
-        gid_dict : dict of lists or range objects
+        gid_ranges : dict of lists or range objects
             Dictionary with keys 'evprox1', 'evdist1' etc.
             containing the range of Cell or input IDs of different
             cell or input types.
@@ -568,7 +614,7 @@ class Spikes(object):
             raise ValueError('tstop must be greater than tstart')
 
         for cell_type in cell_types:
-            cell_type_gids = np.array(gid_dict[cell_type])
+            cell_type_gids = np.array(gid_ranges[cell_type])
             n_trials, n_cells = len(self._spike_times), len(cell_type_gids)
             gid_spike_rate = np.zeros((n_trials, n_cells))
 

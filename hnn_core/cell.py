@@ -22,6 +22,10 @@ class _ArtificialCell:
         associated with a unique gid).
     threshold : float
         Membrane potential threshold that demarks a spike.
+    gid : int or None (optional)
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+        The GID is an integer from 0 to n_cells, or None if the cell is not
+        yet attached to a network. Once the GID is set, it cannot be changed.
 
     Attributes
     ----------
@@ -33,8 +37,10 @@ class _ArtificialCell:
     nrn_netcon : instance of h.NetCon()
         NEURON h.NetCon() object that creates the spike
         source-to-target references for nrn_vecstim.
+    gid : int
+        GID of the cell in a network (or None if not yet assigned)
     """
-    def __init__(self, event_times, threshold):
+    def __init__(self, event_times, threshold, gid=None):
         # Convert event times into nrn vector
         self.nrn_eventvec = h.Vector()
         self.nrn_eventvec.from_python(event_times)
@@ -47,17 +53,35 @@ class _ArtificialCell:
         self.nrn_netcon = h.NetCon(self.nrn_vecstim, None)
         self.nrn_netcon.threshold = threshold
 
+        self._assigned_gid = None
+        self.gid = gid
+
+    @property
+    def gid(self):
+        return self._assigned_gid
+
+    @gid.setter
+    def gid(self, gid):
+        if gid is None:
+            pass
+        elif self._assigned_gid is None:
+            self._assigned_gid = gid
+        else:
+            raise RuntimeError('Global ID for this cell already assigned!')
+
 
 class _Cell(ABC):
     """Create a cell object.
 
     Parameters
     ----------
-    gid : int
-        The cell ID
     soma_props : dict
         The properties of the soma. Must contain
         keys 'L', 'diam', and 'pos'
+    gid : int or None (optional)
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+        The GID is an integer from 0 to n_cells, or None if the cell is not
+        yet attached to a network. Once the GID is set, it cannot be changed.
 
     Attributes
     ----------
@@ -70,15 +94,18 @@ class _Cell(ABC):
     rec_v : h.Vector()
         Recording of somatic voltage. Must be enabled
         by running simulate_dipole(net, record_vsoma=True)
+    gid : int
+        GID of the cell in a network (or None if not yet assigned)
     """
 
-    def __init__(self, gid, soma_props):
-        self.gid = gid
+    def __init__(self, soma_props, gid=None):
         # variable for the list_IClamp
         self.list_IClamp = None
         self.soma_props = soma_props
         self.create_soma()
         self.rec_v = h.Vector()
+        self._assigned_gid = None
+        self.gid = gid
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -87,6 +114,19 @@ class _Cell(ABC):
              (soma_props['L'], soma_props['diam'],
               soma_props['Ra'], soma_props['cm']))
         return '<%s | %s>' % (class_name, s)
+
+    @property
+    def gid(self):
+        return self._assigned_gid
+
+    @gid.setter
+    def gid(self, gid):
+        if gid is None:
+            pass
+        elif self._assigned_gid is None:
+            self._assigned_gid = gid
+        else:
+            raise RuntimeError('Global ID for this cell already assigned!')
 
     @abstractmethod
     def get_sections(self):

@@ -44,6 +44,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False):
 
     if n_trials is not None:
         net.params['N_trials'] = n_trials
+        net._instantiate_feeds()  # need to redo these if n_trials changed!
     else:
         n_trials = net.params['N_trials']
 

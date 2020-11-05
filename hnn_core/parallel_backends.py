@@ -18,7 +18,7 @@ from time import sleep
 _BACKEND = None
 
 
-def _clone_and_simulate(net, trial_idx, prng_seedcore_initial):
+def _clone_and_simulate(net, trial_idx):
     """Run a simulation including building the network
 
     This is used by both backends. MPIBackend calls this in mpi_child.py, once
@@ -30,12 +30,7 @@ def _clone_and_simulate(net, trial_idx, prng_seedcore_initial):
     from hnn_core.network_builder import NetworkBuilder
     from hnn_core.network_builder import _simulate_single_trial
 
-    # XXX this should be built into NetworkBuilder
-    # update prng_seedcore params to provide jitter between trials
-    for param_key in prng_seedcore_initial.keys():
-        net.params[param_key] = prng_seedcore_initial[param_key] + trial_idx
-
-    neuron_net = NetworkBuilder(net)
+    neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
     dpl = _simulate_single_trial(neuron_net, trial_idx)
 
     spikedata = neuron_net.get_data_from_neuron()
@@ -56,8 +51,8 @@ def _gather_trial_data(sim_data, net, n_trials):
         spikedata = sim_data[idx][1]
         net.spikes._spike_times.append(spikedata[0])
         net.spikes._spike_gids.append(spikedata[1])
-        net.gid_dict = spikedata[2]  # only have one gid_dict
-        net.spikes.update_types(net.gid_dict)
+        net.gid_ranges = spikedata[2]  # only have one gid_ranges
+        net.spikes.update_types(net.gid_ranges)
         net.spikes._vsoma.append(spikedata[3])
         net.spikes._times.append(net.times.tolist())
 
@@ -140,10 +135,8 @@ class JoblibBackend(object):
         n_trials = net.params['N_trials']
         dpls = []
 
-        prng_seedcore_initial = net.params['prng_*'].copy()
         parallel, myfunc = self._parallel_func(_clone_and_simulate)
-        sim_data = parallel(myfunc(net, idx, prng_seedcore_initial)
-                            for idx in range(n_trials))
+        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
