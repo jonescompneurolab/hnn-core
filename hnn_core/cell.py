@@ -133,8 +133,8 @@ class _Cell(ABC):
             Dictionary of length scales to calculate dipole without
             3d shape.
         """
-        dpl_vec = h.Vector(1)
-        dpl_ref = dpl_vec._ref_x[0]
+        self.dpl_vec = h.Vector(1)
+        self.dpl_ref = self.dpl_vec._ref_x[0]
 
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma
@@ -153,7 +153,7 @@ class _Cell(ABC):
             # sets pointers in dipole mod file to the correct locations
             # h.setpointer(ref, ptr, obj)
             h.setpointer(sect(0.99)._ref_v, 'pv', dpp)
-            h.setpointer(dpl_ref, 'Qtotal', dpp)
+            h.setpointer(self.dpl_ref, 'Qtotal', dpp)
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
             loc = np.array([seg.x for seg in sect])
@@ -181,12 +181,12 @@ class _Cell(ABC):
                     h.setpointer(sect(0)._ref_v, 'pv', sect(loc[i]).dipole)
                 # set aggregate pointers
                 h.setpointer(dpp._ref_Qsum, 'Qsum', sect(loc[i]).dipole)
-                h.setpointer(dpl_ref, 'Qtotal', sect(loc[i]).dipole)
+                h.setpointer(self.dpl_ref, 'Qtotal', sect(loc[i]).dipole)
                 # add ztan values
                 sect(loc[i]).dipole.ztan = y_diff[i]
             # set the pp dipole's ztan value to the last value from y_diff
             dpp.ztan = y_diff[-1]
-        self.dipole = h.Vector().record(dpl_ref)
+        self.dipole = h.Vector().record(self.dpl_ref)
 
     def record_current_soma(self):
         """Record current at soma."""
