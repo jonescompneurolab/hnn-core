@@ -77,9 +77,10 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.barrier()
 
     # these calls aggregate data across procs/nodes
-    _PC.allreduce(dp_rec_L2, 1)
-    # combine dp_rec on every node, 1=add contributions together
-    _PC.allreduce(dp_rec_L5, 1)
+    neuron_net.aggregate_dipoles()
+    _PC.allreduce(neuron_net.dipole['L5_pyramidal'], 1)
+    _PC.allreduce(neuron_net.dipole['L2_pyramidal'], 1)
+
     # aggregate the currents independently on each proc
     neuron_net.aggregate_currents()
     # combine neuron_net.current{} variables from each proc
@@ -99,10 +100,10 @@ def _simulate_single_trial(neuron_net, trial_idx):
 
     _PC.barrier()  # get all nodes to this place before continuing
 
-    dpl_data = np.c_[np.array(dp_rec_L2.to_python()) +
-                     np.array(dp_rec_L5.to_python()),
-                     np.array(dp_rec_L2.to_python()),
-                     np.array(dp_rec_L5.to_python())]
+    dpl_data = np.c_[np.array(neuron_net.dipole['L2_pyramidal'].to_python()) +
+                     np.array(neuron_net.dipole['L5_pyramidal'].to_python()),
+                     np.array(neuron_net.dipole['L2_pyramidal'].to_python()),
+                     np.array(neuron_net.dipole['L5_pyramidal'].to_python())]
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
     if rank == 0:
@@ -649,6 +650,11 @@ class NetworkBuilder(object):
                     # self.current_L5Pyr_soma was created upon
                     # in parallel, each node has its own Net()
                     self.current['%s_soma' % cell.name].add(I_soma)
+
+    def aggregate_dipoles(self):
+        for cell in self.cells:
+            if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
+                self.dipoles[cell.celltype].add(cell.dipole)
 
     def state_init(self):
         """Initializes the state closer to baseline."""
