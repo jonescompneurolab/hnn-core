@@ -63,10 +63,10 @@ class _Cell(ABC):
     ----------
     pos : list of length 3
         The position of the cell.
-    dipole_pp : list of h.Dipole
+    dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
-    dict_currents : dict of h.Vector
-        The soma currents (the only key is 'soma'?)
+    dict_currents : dict of h.Vector()
+        The soma currents (keys are soma_gabaa, soma_gabab etc.)
     """
 
     def __init__(self, gid, soma_props):
