@@ -78,8 +78,8 @@ def _simulate_single_trial(neuron_net, trial_idx):
 
     # these calls aggregate data across procs/nodes
     neuron_net.aggregate_dipoles()
-    _PC.allreduce(neuron_net.dipole['L5_pyramidal'], 1)
-    _PC.allreduce(neuron_net.dipole['L2_pyramidal'], 1)
+    _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
+    _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
 
     # aggregate the currents independently on each proc
     neuron_net.aggregate_currents()
@@ -297,6 +297,11 @@ class NetworkBuilder(object):
         self.current = {
             'L5Pyr_soma': h.Vector(self.net.n_times, 0),
             'L2Pyr_soma': h.Vector(self.net.n_times, 0),
+        }
+
+        self.dipoles = {
+            'L5_pyramidal': h.Vector(1, 0),
+            'L2_pyramidal': h.Vector(1, 0),
         }
 
         self._create_cells_and_feeds()
