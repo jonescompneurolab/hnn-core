@@ -191,7 +191,6 @@ class _Cell(ABC):
     def record_current_soma(self):
         """Record current at soma."""
         # a soma exists at self.soma
-        self.rec_i = h.Vector()
         try:
             # assumes that self.synapses is a dict that exists
             list_syn_soma = [key for key in self.synapses.keys()
