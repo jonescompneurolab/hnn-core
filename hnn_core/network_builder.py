@@ -100,10 +100,10 @@ def _simulate_single_trial(neuron_net, trial_idx):
 
     _PC.barrier()  # get all nodes to this place before continuing
 
-    dpl_data = np.c_[np.array(neuron_net.dipole['L2_pyramidal'].to_python()) +
-                     np.array(neuron_net.dipole['L5_pyramidal'].to_python()),
-                     np.array(neuron_net.dipole['L2_pyramidal'].to_python()),
-                     np.array(neuron_net.dipole['L5_pyramidal'].to_python())]
+    dpl_data = np.c_[np.array(neuron_net.dipoles['L2_pyramidal'].to_python()) +
+                     np.array(neuron_net.dipoles['L5_pyramidal'].to_python()),
+                     np.array(neuron_net.dipoles['L2_pyramidal'].to_python()),
+                     np.array(neuron_net.dipoles['L5_pyramidal'].to_python())]
 
     dpl = Dipole(np.array(t_vec.to_python()), dpl_data)
     if rank == 0:
@@ -244,6 +244,8 @@ class NetworkBuilder(object):
     ncs : dict of list
         A dictionary with key describing the types of cell objects connected
         and contains a list of NetCon objects.
+    dipoles : dict of h.Vector()
+        A dictionary of dipoles.
 
     Notes
     -----
@@ -300,8 +302,8 @@ class NetworkBuilder(object):
         }
 
         self.dipoles = {
-            'L5_pyramidal': h.Vector(1, 0),
-            'L2_pyramidal': h.Vector(1, 0),
+            'L5_pyramidal': h.Vector(self.net.n_times, 0),
+            'L2_pyramidal': h.Vector(self.net.n_times, 0),
         }
 
         self._create_cells_and_feeds()
@@ -657,6 +659,7 @@ class NetworkBuilder(object):
                     self.current['%s_soma' % cell.name].add(I_soma)
 
     def aggregate_dipoles(self):
+        """Aggregate dipoles."""
         for cell in self.cells:
             if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
                 self.dipoles[cell.celltype].add(cell.dipole)
