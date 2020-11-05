@@ -31,6 +31,9 @@ def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
                        'N_trials': 2})
     net = Network(params)
 
+    # number of trials simulated
+    assert len(net.trial_event_times) == params['N_trials']
+
     if backend == 'mpi':
         with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
             dpls = simulate_dipole(net)

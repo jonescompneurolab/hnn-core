@@ -100,13 +100,10 @@ class MPISimulation(object):
         from hnn_core import Network
         from hnn_core.parallel_backends import _clone_and_simulate
 
-        prng_seedcore_initial = params['prng_*']
-
         net = Network(params)
         sim_data = []
         for trial_idx in range(params['N_trials']):
-            single_sim_data = _clone_and_simulate(net, trial_idx,
-                                                  prng_seedcore_initial)
+            single_sim_data = _clone_and_simulate(net, trial_idx)
 
             # go ahead and append trial data for each rank, though
             # only rank 0 has data that should be sent back to MPIBackend

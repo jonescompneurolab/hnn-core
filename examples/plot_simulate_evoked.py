@@ -69,9 +69,9 @@ spikes.plot()
 ###############################################################################
 # We can additionally calculate the mean spike rates for each cell class by
 # specifying a time window with tstart and tstop.
-all_rates = spikes.mean_rates(tstart=0, tstop=170, gid_dict=net.gid_dict,
+all_rates = spikes.mean_rates(tstart=0, tstop=170, gid_ranges=net.gid_ranges,
                               mean_type='all')
-trial_rates = spikes.mean_rates(tstart=0, tstop=170, gid_dict=net.gid_dict,
+trial_rates = spikes.mean_rates(tstart=0, tstop=170, gid_ranges=net.gid_ranges,
                                 mean_type='trial')
 print('Mean spike rates across trials:')
 print(all_rates)

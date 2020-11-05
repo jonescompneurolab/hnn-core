@@ -22,7 +22,7 @@ def test_extfeed():
     pytest.raises(ValueError, ExtFeed,
                   'ev', None, p_bogus, 0)  # ambiguous
 
-    # XXX 'unique' external feeds are always created; why?
+    # 'unique' external feeds are always created
     for feed_type in ['extpois', 'extgauss']:
         feed = ExtFeed(feed_type=feed_type,
                        target_cell_type='L2_basket',
@@ -30,7 +30,7 @@ def test_extfeed():
                        gid=0)
         print(feed)  # test repr
 
-    # XXX but 'common' (rhythmic) feeds are not
+    # but 'common' (rhythmic) feeds are not
     for ii in range(len(p_common)):  # len == 0 for def. params
         feed = ExtFeed(feed_type='common',
                        target_cell_type=None,

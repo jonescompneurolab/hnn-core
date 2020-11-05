@@ -7,11 +7,9 @@
 import numpy as np
 from neuron import h
 
-from .feed import ExtFeed
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
-from .params import create_pext
 
 # a few globals
 _PC = None
@@ -232,17 +230,16 @@ class NetworkBuilder(object):
     ----------
     net : Network object
         The instance of Network to instantiate in NEURON-Python
+    trial_idx : int (optional)
+        Index number of the trial being processed (different event statistics).
+        Defaults to 0.
 
     Attributes
     ----------
-    params : dict
-        The parameters
+    trial_idx : int
+        The index number of the current trial of a simulation.
     cells : list of Cell objects.
-        The list of cells
-    gid_dict : dict
-        Dictionary with keys 'evprox1', 'evdist1' etc.
-        containing the range of Cell IDs of different cell
-        (or input) types.
+        The list of cells containing features used in a NEURON simulation.
     ncs : dict of list
         A dictionary with key describing the types of cell objects connected
         and contains a list of NetCon objects.
@@ -266,8 +263,21 @@ class NetworkBuilder(object):
     `self.net.params` and the network is ready for another simulation.
     """
 
-    def __init__(self, net):
+    def __init__(self, net, trial_idx=0):
         self.net = net
+        self.trial_idx = trial_idx
+
+        # When computing the network dynamics in parallel, the nodes of the
+        # network (real and artificial cells) potentially get distributed
+        # on different host machines/threads. NetworkBuilder._gid_assign
+        # assigns each node, identified by its unique GID, to one of the
+        # possible hosts/threads for computations. _gid_list here contains
+        # the GIDs of all the nodes assigned to the current host/thread.
+        self._gid_list = []
+        # Note that GIDs are already defined in Network.gid_ranges
+        # All that's left for NetworkBuilder is then to:
+        # - _PC.set_gid2node(gid, rank)
+        # - _PC.cell(gid, nrn_netcon) (or _PC.cell(feed_cell.gid, nrn_netcon))
 
         # create cells (and create self.origin in create_cells_pyr())
         self.cells = []
@@ -276,6 +286,7 @@ class NetworkBuilder(object):
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
         self._feed_cells = []
+
         self.ncs = dict()
 
         self._build()
@@ -293,24 +304,27 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        self._gid_assign()
-
         # initialise vectors for synaptic currents based on simulation params
         n_times = np.arange(0., self.net.params['tstop'],
                             self.net.params['dt']).size + 1
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
-            'L5_pyramidal_soma': h.Vector(self.net.times.size, 0),
-            'L2_pyramidal_soma': h.Vector(self.net.times.size, 0)
+            'L5_pyramidal_soma': h.Vector(n_times, 0),
+            'L2_pyramidal_soma': h.Vector(n_times, 0),
         }
 
         self.dipoles = {
-            'L5_pyramidal': h.Vector(self.net.times.size, 0),
-            'L2_pyramidal': h.Vector(self.net.times.size, 0)
+            'L5_pyramidal': h.Vector(n_times, 0),
+            'L2_pyramidal': h.Vector(n_times, 0),
         }
 
-        self._create_cells_and_feeds()
+        self._gid_assign()
+
+        record_vsoma = self.net.params['record_vsoma']
+        self._create_cells_and_feeds(threshold=self.net.params['threshold'],
+                                     record_vsoma=record_vsoma)
+
         self.state_init()
         self._parnet_connect()
 
@@ -342,7 +356,7 @@ class NetworkBuilder(object):
             _LAST_NETWORK._clear_neuron_objects()
 
     # this happens on EACH node
-    # creates self.net._gid_list for THIS node
+    # creates self._gid_list for THIS node
     def _gid_assign(self):
 
         rank = _get_rank()
@@ -352,113 +366,78 @@ class NetworkBuilder(object):
         for gid in range(rank, self.net.n_cells, nhosts):
             # set the cell gid
             _PC.set_gid2node(gid, rank)
-            self.net._gid_list.append(gid)
+            self._gid_list.append(gid)
             # now to do the cell-specific external input gids on the same proc
             # these are guaranteed to exist because all of
             # these inputs were created for each cell
-            for key in self.net.p_unique.keys():
-                gid_input = gid + self.net.gid_dict[key][0]
+            # get list of all NetworkDrives that contact this cell, and
+            # make sure the corresponding _ArtificialCell gids are associated
+            # with the current node/rank
+            for key in self.net._p_unique.keys():
+                gid_input = gid + self.net.gid_ranges[key][0]
                 _PC.set_gid2node(gid_input, rank)
-                self.net._gid_list.append(gid_input)
+                self._gid_list.append(gid_input)
 
-        for gid_base in range(rank, self.net.n_common_feeds, nhosts):
+        for gid_base in range(rank, self.net._n_common_feeds, nhosts):
             # shift the gid_base to the common gid
-            gid = gid_base + self.net.gid_dict['common'][0]
+            gid = gid_base + self.net.gid_ranges['common'][0]
             # set as usual
             _PC.set_gid2node(gid, rank)
-            self.net._gid_list.append(gid)
+            self._gid_list.append(gid)
         # extremely important to get the gids in the right order
-        self.net._gid_list.sort()
+        self._gid_list.sort()
 
-    def _create_cells_and_feeds(self):
+    def _create_cells_and_feeds(self, threshold, record_vsoma=False):
         """Parallel create cells AND external inputs (feeds)
+
+        NB: _Cell.__init__ calls h.Section -> non-picklable!
+        NB: _ArtificialCell.__init__ calls h.*** -> non-picklable!
 
         These feeds are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-        params = self.net.params
-        record_vsoma = params['record_vsoma']
-        # Re-create external feed param dictionaries
-        # Note that the only thing being updated here are the param['prng_*']
-        # values
-        self.net.p_common, self.net.p_unique = create_pext(params,
-                                                           params['tstop'])
+        type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
+                      'L2_basket': L2Basket, 'L5_basket': L5Basket}
+        # loop through ALL gids
+        # have to loop over self._gid_list, since this is what we got
+        # on this rank (MPI)
 
-        # loop through gids on this node
-        for gid in self.net._gid_list:
+        # mechanism for Builder to keep track of which trial it's on
+        this_trial_event_times = self.net.trial_event_times[self.trial_idx]
 
+        for gid in self._gid_list:
             src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
-
-            # check existence of gid with Neuron
-            if not _PC.gid_exists(gid):
-                msg = ('Source of type %s with ID %d does not exists in '
-                       'Network' % (src_type, gid))
-                raise RuntimeError(msg)
 
             if is_cell:  # not a feed
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
-                # creates a NetCon object internally to Neuron
-                type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
-                              'L2_basket': L2Basket, 'L5_basket': L5Basket}
-                Cell = type2class[src_type]
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    cell = Cell(gid, src_pos, params)
+                    PyramidalCell = type2class[src_type]
+                    # XXX Why doesn't a _Cell have a .threshold? Would make a
+                    # lot of sense to include it, as _ArtificialCells do.
+                    cell = PyramidalCell(src_pos, override_params=None,
+                                         gid=gid)
                 else:
-                    cell = Cell(gid, src_pos)
-
+                    BasketCell = type2class[src_type]
+                    cell = BasketCell(src_pos, gid=gid)
                 if record_vsoma:
                     cell.record_voltage_soma()
+
+                # this calls seems to belong in init of a _Cell (w/threshold)?
+                nrn_netcon = cell.setup_source_netcon(threshold)
+                _PC.cell(cell.gid, nrn_netcon)
                 self.cells.append(cell)
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
-            # events. NB: cell types can still have different weights for how
-            # such 'common' spikes influence them
-            elif src_type == 'common':
-                # print('cell_type',cell_type)
-                # to find param index, take difference between REAL gid
-                # here and gid start point of the items
-                p_ind = gid - self.net.gid_dict['common'][0]
-
-                # new ExtFeed: target cell type irrelevant (None) since input
-                # timing will be identical for all cells
-                feed = ExtFeed(feed_type=src_type,
-                               target_cell_type=None,
-                               params=self.net.p_common[p_ind],
-                               gid=gid)
-                feed_cell = _ArtificialCell(feed.event_times,
-                                            params['threshold'])
-                self._feed_cells.append(feed_cell)
-
-            # external inputs can also be Poisson- or Gaussian-
-            # distributed, or 'evoked' inputs (proximal or distal)
-            # these are cell-specific ('unique')
-            # XXX src_type is 'common', 'evprox1', 'evdist1', 'evgauss', etc.
-            elif src_type in self.net.p_unique.keys():
-                gid_target = gid - self.net.gid_dict[src_type][0]
-                target_cell_type = self.net.gid_to_type(gid_target)
-
-                # new ExtFeed, where now both feed type and target cell type
-                # specified because these feeds have cell-specific
-                # CONNECTION parameters, i.e., AMPA and NMDA weights
-                feed = ExtFeed(feed_type=src_type,
-                               target_cell_type=target_cell_type,
-                               params=self.net.p_unique[src_type],
-                               gid=gid)
-                feed_cell = _ArtificialCell(feed.event_times,
-                                            params['threshold'])
-                self._feed_cells.append(feed_cell)
+            # events. NB: cell types can still have different weights for
+            # how such 'common' spikes influence them
             else:
-                raise ValueError('No parameters specified for external feed '
-                                 'type: %s' % src_type)
-
-            # Now let's associate the cell objects with a netcon
-            if is_cell:
-                nrn_netcon = cell.setup_source_netcon(params['threshold'])
-                _PC.cell(gid, nrn_netcon)
-            else:
-                _PC.cell(gid, feed_cell.nrn_netcon)
+                gid_idx = gid - self.net.gid_ranges[src_type][0]
+                et = this_trial_event_times[src_type][gid_idx]
+                feed_cell = _ArtificialCell(et, threshold, gid=gid)
+                _PC.cell(feed_cell.gid, feed_cell.nrn_netcon)
+                self._feed_cells.append(feed_cell)
 
     def _connect_celltypes(self, src_type, target_type, loc,
                            receptor, nc_dict, unique=False,
@@ -491,21 +470,22 @@ class NetworkBuilder(object):
         connection_name = f'{src_type}_{target_type}_{receptor}'
         if connection_name not in self.ncs:
             self.ncs[connection_name] = list()
-        # XXX: self.cells and net._gid_list are not same length
-        # ideally self.cells should be a dict of list
-        for gid_target, target_cell in zip(self.net._gid_list, self.cells):
+
+        assert len(self.cells) == len(self._gid_list) - len(self._feed_cells)
+        # NB this assumes that REAL cells are first in the _gid_list
+        for gid_target, target_cell in zip(self._gid_list, self.cells):
             is_target_gid = (gid_target in
-                             self.net.gid_dict[_long_name(target_type)])
+                             self.net.gid_ranges[_long_name(target_type)])
             if _PC.gid_exists(gid_target) and is_target_gid:
-                gid_srcs = net.gid_dict[_long_name(src_type)]
+                gid_srcs = net.gid_ranges[_long_name(src_type)]
                 if unique:
-                    gid_srcs = [gid_target + net.gid_dict[src_type][0]]
+                    gid_srcs = [gid_target + net.gid_ranges[src_type][0]]
                 for gid_src in gid_srcs:
 
                     if not allow_autapses and gid_src == gid_target:
                         continue
 
-                    pos_idx = gid_src - net.gid_dict[_long_name(src_type)][0]
+                    pos_idx = gid_src - net.gid_ranges[_long_name(src_type)][0]
                     nc_dict['pos_src'] = net.pos_dict[
                         _long_name(src_type)][pos_idx]
 
@@ -603,7 +583,7 @@ class NetworkBuilder(object):
                                 nc_dict)
 
         # common feed -> xx
-        for p_common in self.net.p_common:
+        for p_common in self.net._p_common:
             for target_cell_type in ['L2Basket', 'L5Basket', 'L5Pyr', 'L2Pyr']:
                 if (target_cell_type == 'L5Basket' and
                         p_common['loc'] == 'distal'):
@@ -620,7 +600,7 @@ class NetworkBuilder(object):
                                                 nc_dict)
 
         # unique feed -> xx
-        p_unique = self.net.p_unique
+        p_unique = self.net._p_unique
         for src_cell_type in p_unique:
 
             p_src = p_unique[src_cell_type]
@@ -650,7 +630,7 @@ class NetworkBuilder(object):
         # iterate through gids on this node and
         # set to record spikes in spike time vec and id vec
         # agnostic to type of source, will sort that out later
-        for gid in self.net._gid_list:
+        for gid in self._gid_list:
             if _PC.gid_exists(gid):
                 _PC.spike_record(gid, self._spike_times, self._spike_gids)
 
@@ -720,7 +700,7 @@ class NetworkBuilder(object):
         _PC.gid_clear()
 
         # dereference cell and NetConn objects
-        for gid, cell in zip(self.net._gid_list, self.cells):
+        for gid, cell in zip(self._gid_list, self.cells):
             # only work on cells on this node
             if _PC.gid_exists(gid):
                 for nc_key in self.ncs:
@@ -735,7 +715,7 @@ class NetworkBuilder(object):
                                 del cell_obj2
                             del nc
 
-        self.net._gid_list = []
+        self._gid_list = []
         self.cells = []
 
     def get_data_from_neuron(self):
@@ -748,7 +728,7 @@ class NetworkBuilder(object):
         from copy import deepcopy
         data = (self._all_spike_times.to_python(),
                 self._all_spike_gids.to_python(),
-                deepcopy(self.net.gid_dict),
+                deepcopy(self.net.gid_ranges),
                 deepcopy(vsoma_py))
         return data
 
