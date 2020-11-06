@@ -105,27 +105,19 @@ class _Cell(ABC):
         self.soma.Ra = soma_props['Ra']
         self.soma.cm = soma_props['cm']
 
-    def translate3d(self, dx, dy, dz):
-        """Translate 3d."""
+    def move_to_pos(self):
+        """Move cell to position."""
+        x0 = self.soma.x3d(0)
+        y0 = self.soma.y3d(0)
+        z0 = self.soma.z3d(0)
+        dx = self.pos[0] * 100 - x0
+        dy = self.pos[2] - y0
+        dz = self.pos[1] * 100 - z0
+
         for s in self.get_sections():
             for i in range(s.n3d()):
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
                              s.z3d(i) + dz, s.diam3d(i), sec=s)
-
-    def translate_to(self, x, y, z):
-        """Translate to position."""
-        x0 = self.soma.x3d(0)
-        y0 = self.soma.y3d(0)
-        z0 = self.soma.z3d(0)
-        dx = x - x0
-        dy = y - y0
-        dz = z - z0
-        # print('dx:',dx,'dy:',dy,'dz:',dz)
-        self.translate3d(dx, dy, dz)
-
-    def move_to_pos(self):
-        """Move cell to position."""
-        self.translate_to(self.pos[0] * 100, self.pos[2], self.pos[1] * 100)
 
     # two things need to happen here for h:
     # 1. dipole needs to be inserted into each section
