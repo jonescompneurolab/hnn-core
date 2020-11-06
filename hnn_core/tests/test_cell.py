@@ -5,7 +5,7 @@ import os.path as op
 
 import hnn_core
 from hnn_core import read_params, Network
-from hnn_core.network_builder import NetworkBuilder
+from hnn_core.network_builder import NetworkBuilder, load_custom_mechanisms
 from hnn_core.cell import _ArtificialCell, _Cell
 
 matplotlib.use('agg')
@@ -31,6 +31,7 @@ def test_cell():
 
 def test_artificial_cell():
     """Test artificial cell object."""
+    load_custom_mechanisms()
     event_times = [1, 2, 3]
     threshold = 0.0
     artificial_cell = _ArtificialCell(event_times, threshold)
