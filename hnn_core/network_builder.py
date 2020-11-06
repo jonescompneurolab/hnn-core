@@ -84,8 +84,8 @@ def _simulate_single_trial(neuron_net, trial_idx):
     # aggregate the currents independently on each proc
     neuron_net.aggregate_currents()
     # combine neuron_net.current{} variables from each proc
-    _PC.allreduce(neuron_net.current['L5Pyr_soma'], 1)
-    _PC.allreduce(neuron_net.current['L2Pyr_soma'], 1)
+    _PC.allreduce(neuron_net.current['L5_pyramidal_soma'], 1)
+    _PC.allreduce(neuron_net.current['L2_pyramidal_soma'], 1)
 
     # combine spiking data from each proc
     spiketimes_list = _PC.py_gather(neuron_net._spiketimes, 0)
@@ -245,7 +245,11 @@ class NetworkBuilder(object):
         A dictionary with key describing the types of cell objects connected
         and contains a list of NetCon objects.
     dipoles : dict of h.Vector()
-        A dictionary of dipoles.
+        A dictionary containing total magnetic dipole moment over cell types.
+        Keys are L2_pyramidal and L5_pyramidal.
+    current : dict of h.Vector()
+        A dictionary containing total somatic currents over cell types.
+        Keys are L2_pyramidal and L5_pyramidal.
 
     Notes
     -----
@@ -297,8 +301,8 @@ class NetworkBuilder(object):
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
-            'L5Pyr_soma': h.Vector(self.net.n_times, 0),
-            'L2Pyr_soma': h.Vector(self.net.n_times, 0),
+            'L5_pyramidal_soma': h.Vector(self.net.n_times, 0),
+            'L2_pyramidal_soma': h.Vector(self.net.n_times, 0),
         }
 
         self.dipoles = {
@@ -644,19 +648,16 @@ class NetworkBuilder(object):
             if _PC.gid_exists(gid):
                 _PC.spike_record(gid, self._spiketimes, self._spikegids)
 
-    # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
-        """This method must be run post-integration."""
-        # this is quite ugly
+        """Aggregate somatic currents for Pyramidal cells."""
         for cell in self.cells:
-            # check for celltype
             if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
-                # iterate over somatic currents, assumes this list exists
-                # is guaranteed in L5Pyr()
-                for key, I_soma in cell.dict_currents.items():
-                    # self.current_L5Pyr_soma was created upon
-                    # in parallel, each node has its own Net()
-                    self.current['%s_soma' % cell.name].add(I_soma)
+                # iterate over dict_currents created in
+                # cell.record_current_soma()
+                for _, I_soma in cell.dict_currents.items():
+                    # self.current['L5_pyramidal_soma'] was created upon
+                    # in parallel, each node has its own NetworkBuilder()
+                    self.current['%s_soma' % cell.celltype].add(I_soma)
 
     def aggregate_dipoles(self):
         """Aggregate dipoles."""
