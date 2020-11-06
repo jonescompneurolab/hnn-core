@@ -86,7 +86,7 @@ class Pyr(_Cell):
         self.set_geometry(p_dend)
 
         # biophysics
-        self._biophysics(p_all)
+        self.set_biophysics(p_all)
 
         # insert dipole
         yscale = self.secs()[3]
@@ -387,7 +387,7 @@ class L2Pyr(Pyr):
         ]
         return sec_pts, sec_lens, sec_diams, sec_scales, topology
 
-    def _biophysics(self, p_all):
+    def set_biophysics(self, p_all):
         """Adds biophysics to soma."""
 
         # Insert 'hh2' mechanism
@@ -529,7 +529,7 @@ class L5Pyr(Pyr):
             'name': 'L5Pyr',
         }
 
-    def _biophysics(self, p_all):
+    def set_biophysics(self, p_all):
         "Set the biophysics for the default Pyramidal cell."
 
         # Insert 'hh2' mechanism

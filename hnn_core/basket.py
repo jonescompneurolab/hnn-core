@@ -33,7 +33,7 @@ class BasketSingle(_Cell):
         self.shape_soma()
         self.synapses = dict()
 
-    def _biophysics(self):
+    def set_biophysics(self):
         self.soma.insert('hh2')
 
     def _get_soma_props(self, cell_name, pos):
@@ -71,7 +71,7 @@ class L2Basket(BasketSingle):
         self.celltype = 'L2_basket'
 
         self._synapse_create()
-        self._biophysics()
+        self.set_biophysics()
         self.sect_loc = dict(proximal=['soma'], distal=['soma'])
 
 
@@ -84,5 +84,5 @@ class L5Basket(BasketSingle):
         self.celltype = 'L5_basket'
 
         self._synapse_create()
-        self._biophysics()
+        self.set_biophysics()
         self.sect_loc = dict(proximal=['soma'], distal=[])
