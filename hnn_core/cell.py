@@ -71,7 +71,7 @@ class _Cell(ABC):
         The soma currents (keys are soma_gabaa, soma_gabab etc.)
     """
 
-    def __init__(self, gid, soma_props, record_vsoma=0):
+    def __init__(self, gid, soma_props, record_vsoma=False):
         self.gid = gid
         # variable for the list_IClamp
         self.list_IClamp = None
