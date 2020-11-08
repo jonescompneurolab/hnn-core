@@ -69,7 +69,7 @@ class _Cell(ABC):
         The soma currents (keys are soma_gabaa, soma_gabab etc.)
     rec_v : h.Vector()
         Recording of somatic voltage. Must be enabled
-        by running simulate_dipole(record_vsoma = True)
+        by running simulate_dipole(net, record_vsoma=True)
     """
 
     def __init__(self, gid, soma_props):

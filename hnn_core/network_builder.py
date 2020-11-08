@@ -89,16 +89,16 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.py_gather(neuron_net._vsoma, 0)
 
     # combine spiking data from each proc
-    spiketimes_list = _PC.py_gather(neuron_net._spiketimes, 0)
-    spikegids_list = _PC.py_gather(neuron_net._spikegids, 0)
+    spike_times_list = _PC.py_gather(neuron_net._spike_times, 0)
+    spike_gids_list = _PC.py_gather(neuron_net._spike_gids, 0)
 
     # only rank 0's lists are complete
 
     if rank == 0:
-        for spike_vec in spiketimes_list:
-            neuron_net._all_spiketimes.append(spike_vec)
-        for spike_vec in spikegids_list:
-            neuron_net._all_spikegids.append(spike_vec)
+        for spike_vec in spike_times_list:
+            neuron_net._all_spike_times.append(spike_vec)
+        for spike_vec in spike_gids_list:
+            neuron_net._all_spike_gids.append(spike_vec)
 
     _PC.barrier()  # get all nodes to this place before continuing
 
@@ -317,13 +317,13 @@ class NetworkBuilder(object):
         self._parnet_connect()
 
         # set to record spikes and somatic voltages
-        self._spiketimes = h.Vector()
-        self._spikegids = h.Vector()
+        self._spike_times = h.Vector()
+        self._spike_gids = h.Vector()
         self._vsoma = dict()
 
         # used by rank 0 for spikes across all procs (MPI)
-        self._all_spiketimes = h.Vector()
-        self._all_spikegids = h.Vector()
+        self._all_spike_times = h.Vector()
+        self._all_spike_gids = h.Vector()
 
         self._record_spikes()
 
@@ -654,7 +654,7 @@ class NetworkBuilder(object):
         # agnostic to type of source, will sort that out later
         for gid in self.net._gid_list:
             if _PC.gid_exists(gid):
-                _PC.spike_record(gid, self._spiketimes, self._spikegids)
+                _PC.spike_record(gid, self._spike_times, self._spike_gids)
 
     # aggregate recording all the somatic voltages for pyr
     def aggregate_currents(self):
@@ -748,8 +748,8 @@ class NetworkBuilder(object):
             vsoma_py[gid] = rec_v.to_python()
 
         from copy import deepcopy
-        data = (self._all_spiketimes.to_python(),
-                self._all_spikegids.to_python(),
+        data = (self._all_spike_times.to_python(),
+                self._all_spike_gids.to_python(),
                 deepcopy(self.net.gid_dict),
                 deepcopy(vsoma_py))
         return data

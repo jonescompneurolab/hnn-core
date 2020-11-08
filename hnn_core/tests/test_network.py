@@ -85,14 +85,14 @@ def test_spikes(tmpdir):
     """Test spikes object."""
 
     # Round-trip test
-    spiketimes = [[2.3456, 7.89], [4.2812, 93.2]]
-    spikegids = [[1, 3], [5, 7]]
-    spiketypes = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
+    spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
+    spike_gids = [[1, 3], [5, 7]]
+    spike_types = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
     tstart, tstop = 0.1, 98.4
     gid_dict = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
                 'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
-    spikes = Spikes(spiketimes=spiketimes, spikegids=spikegids,
-                    spiketypes=spiketypes)
+    spikes = Spikes(spike_times=spike_times, spike_gids=spike_gids,
+                    spike_types=spike_types)
     spikes.plot_hist(show=False)
     spikes.write(tmpdir.join('spk_%d.txt'))
     assert spikes == read_spikes(tmpdir.join('spk_*.txt'))
@@ -100,22 +100,22 @@ def test_spikes(tmpdir):
     assert ("Spikes | 2 simulation trials" in repr(spikes))
 
     with pytest.raises(TypeError,
-                       match="spiketimes should be a list of lists"):
-        spikes = Spikes(spiketimes=([2.3456, 7.89], [4.2812, 93.2]),
-                        spikegids=spikegids, spiketypes=spiketypes)
+                       match="spike_times should be a list of lists"):
+        spikes = Spikes(spike_times=([2.3456, 7.89], [4.2812, 93.2]),
+                        spike_gids=spike_gids, spike_types=spike_types)
 
     with pytest.raises(TypeError,
-                       match="spiketimes should be a list of lists"):
-        spikes = Spikes(spiketimes=[1, 2], spikegids=spikegids,
-                        spiketypes=spiketypes)
+                       match="spike_times should be a list of lists"):
+        spikes = Spikes(spike_times=[1, 2], spike_gids=spike_gids,
+                        spike_types=spike_types)
 
     with pytest.raises(ValueError, match="spike times, gids, and types should "
                        "be lists of the same length"):
-        spikes = Spikes(spiketimes=[[2.3456, 7.89]], spikegids=spikegids,
-                        spiketypes=spiketypes)
+        spikes = Spikes(spike_times=[[2.3456, 7.89]], spike_gids=spike_gids,
+                        spike_types=spike_types)
 
-    spikes = Spikes(spiketimes=spiketimes, spikegids=spikegids,
-                    spiketypes=spiketypes)
+    spikes = Spikes(spike_times=spike_times, spike_gids=spike_gids,
+                    spike_types=spike_types)
 
     with pytest.raises(TypeError, match="indices must be int, slice, or "
                        "array-like, not str"):
