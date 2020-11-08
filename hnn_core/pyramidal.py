@@ -324,7 +324,6 @@ class L2Pyr(Pyr):
 
         # run record_current_soma(), defined in Cell()
         self.record_current_soma()
-        self.record_voltage_soma()
 
     def _get_soma_props(self, pos):
         """Hardcoded somatic properties."""
@@ -469,7 +468,7 @@ class L5Pyr(Pyr):
         # Get somatic, dendirtic, and synapse properties
         p_soma = self._get_soma_props(pos)
 
-        Pyr.__init__(self, gid, p_soma, record_vsoma)
+        Pyr.__init__(self, gid, p_soma)
         p_dend = self._get_dend_props()
         p_syn = self._get_syn_props()
 
@@ -501,7 +500,6 @@ class L5Pyr(Pyr):
 
         # run record current soma, defined in Cell()
         self.record_current_soma()
-        self.record_voltage_soma()
 
     def secs(self):
         """The geometry of the default sections in the Neuron."""

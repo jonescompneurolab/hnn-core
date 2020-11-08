@@ -405,9 +405,12 @@ class NetworkBuilder(object):
                               'L2_basket': L2Basket, 'L5_basket': L5Basket}
                 Cell = type2class[src_type]
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    cell = Cell(gid, src_pos, params, record_vsoma)
+                    cell = Cell(gid, src_pos, params)
                 else:
-                    cell = Cell(gid, src_pos, record_vsoma)
+                    cell = Cell(gid, src_pos)
+
+                if record_vsoma:
+                    cell.record_voltage_soma()
                 self.cells.append(cell)
 
             # external inputs are special types of artificial-cells

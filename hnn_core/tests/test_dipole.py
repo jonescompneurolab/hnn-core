@@ -53,3 +53,5 @@ def test_num_trials():
     net = Network(params)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, n_trials=0)
+    with pytest.raises(TypeError, match="record_vsoma must be bool, got int"):
+        simulate_dipole(net, n_trials=1, record_vsoma=0)

@@ -23,14 +23,13 @@ hnn_core_root = op.dirname(hnn_core.__file__)
 # Then we read the parameters file and enable somatic voltage recording
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
-params['record_vsoma'] = 1
 
 ###############################################################################
 # Now let's build the network
 import matplotlib.pyplot as plt
 
 net = Network(params)
-dpls = simulate_dipole(net, n_trials=1)
+dpls = simulate_dipole(net, n_trials=1, record_vsoma=True)
 
 ###############################################################################
 # The cell IDs (gids) are stored in the network object as a dictionary
