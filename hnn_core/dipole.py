@@ -17,7 +17,7 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
-def simulate_dipole(net, n_trials=None):
+def simulate_dipole(net, n_trials=None, record_vsoma=None):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -28,6 +28,8 @@ def simulate_dipole(net, n_trials=None):
     n_trials : int | None
         The number of trials to simulate. If None the value in
         net.params['N_trials'] will be used
+    record_vsoma : bool
+        Option to record somatic voltages from cells
 
     Returns
     -------
@@ -47,6 +49,15 @@ def simulate_dipole(net, n_trials=None):
 
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
+
+    if record_vsoma is not None:
+        net.params['record_vsoma'] = record_vsoma
+    else:
+        record_vsoma = net.params['vsoma']
+
+    if not isinstance(record_vsoma, bool):
+        raise TypeError("record_vsoma must be bool, got %s"
+                        % type(record_vsoma).__name__)
 
     dpls = _BACKEND.simulate(net)
 
