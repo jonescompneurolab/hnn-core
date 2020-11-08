@@ -87,7 +87,8 @@ def test_spikes(tmpdir):
     # Round-trip test
     spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
     spike_gids = [[1, 3], [5, 7]]
-    spike_types = [['L2_pyramidal', 'L2_basket'], ['L5_pyramidal', 'L5_basket']]
+    spike_types = [['L2_pyramidal', 'L2_basket'],
+                   ['L5_pyramidal', 'L5_basket']]
     tstart, tstop = 0.1, 98.4
     gid_dict = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
                 'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
