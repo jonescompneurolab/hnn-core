@@ -1,10 +1,8 @@
 import pytest
 
 import matplotlib
-import os.path as op
 
-import hnn_core
-from hnn_core.network_builder import NetworkBuilder, load_custom_mechanisms
+from hnn_core.network_builder import load_custom_mechanisms
 from hnn_core.cell import _ArtificialCell, _Cell
 
 matplotlib.use('agg')

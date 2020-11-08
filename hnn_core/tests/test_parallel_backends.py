@@ -38,6 +38,7 @@ def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
         with JoblibBackend(n_jobs=n_jobs):
             dpls = simulate_dipole(net)
     else:
+<<<<<<< HEAD
         dpls = simulate_dipole(net)
 
     return dpls, net
@@ -91,6 +92,66 @@ class TestParallelBackends():
         dpls_reduced_mpi, _ = run_hnn_core(backend='mpi', reduced=True)
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
+=======
+        dpl = simulate_dipole(net)[0]
+        dpls_reduced = simulate_dipole(net_reduced)
+
+    # write the dipole to a file and compare
+    fname = './dpl2.txt'
+    dpl.write(fname)
+
+    dpl_pr = loadtxt(fname)
+    assert_array_equal(dpl_pr[:, 2], dpl_master[:, 2])  # L2
+    assert_array_equal(dpl_pr[:, 3], dpl_master[:, 3])  # L5
+
+    # Test spike type counts
+    spike_type_counts = {}
+    for spike_gid in net.spikes.spike_gids[0]:
+        if net.gid_to_type(spike_gid) not in spike_type_counts:
+            spike_type_counts[net.gid_to_type(spike_gid)] = 0
+        else:
+            spike_type_counts[net.gid_to_type(spike_gid)] += 1
+    assert 'common' not in spike_type_counts
+    assert 'exgauss' not in spike_type_counts
+    assert 'extpois' not in spike_type_counts
+    assert spike_type_counts == {'evprox1': 269,
+                                 'L2_basket': 54,
+                                 'L2_pyramidal': 113,
+                                 'L5_pyramidal': 395,
+                                 'L5_basket': 85,
+                                 'evdist1': 234,
+                                 'evprox2': 269}
+    return dpls_reduced
+
+
+def test_compare_across_backends():
+    """Test that trials are generated consistently across parallel backends."""
+
+    # test consistency between default backend simulation and master
+    dpls_reduced_default = run_hnn_core(None)
+
+    try:
+        import mpi4py
+        mpi4py.__file__
+        # test consistency between mpi backend simulation & master
+        dpls_reduced_mpi = run_hnn_core(backend='mpi')
+    except ImportError:
+        print("Skipping MPIBackend test and dipole comparison because mpi4py "
+              "could not be imported...")
+        dpls_reduced_mpi = None
+
+    # test consistency between joblib backend simulation (n_jobs=2) with master
+    dpls_reduced_joblib = run_hnn_core(backend='joblib', n_jobs=2)
+
+    # test consistency across all parallel backends for multiple trials
+    assert_raises(AssertionError, assert_array_equal,
+                  dpls_reduced_default[0].data['agg'],
+                  dpls_reduced_default[1].data['agg'])
+
+    for trial_idx in range(len(dpls_reduced_default)):
+        # account for rounding error incured during MPI parallelization
+        if dpls_reduced_mpi:
+>>>>>>> Flake8 fixes
             assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
                             dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
                             atol=1e-14)
