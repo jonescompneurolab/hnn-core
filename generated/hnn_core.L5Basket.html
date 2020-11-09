@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.L5Basket &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
@@ -127,27 +127,24 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L5Basket.dipole_insert">
-<code class="sig-name descname">dipole_insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yscale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.dipole_insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert dipole into each section of this cell.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L5Basket.get3dinfo">
-<code class="sig-name descname">get3dinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.get3dinfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get 3d info.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="hnn_core.L5Basket.get_sections">
 <code class="sig-name descname">get_sections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.get_sections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get sections.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L5Basket.getbbox">
-<code class="sig-name descname">getbbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.getbbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get cell’s bounding box.</p>
+<dt id="hnn_core.L5Basket.insert_dipole">
+<code class="sig-name descname">insert_dipole</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yscale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.insert_dipole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert dipole into each section of this cell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>yscale</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of length scales to calculate dipole without
+3d shape.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -248,13 +245,13 @@ DO NOT need to call h.define_shape() explicitly!</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>secloc</strong><span class="classifier">float (0. to 1.0)</span></dt><dd><p>The section location</p>
+<dt><strong>secloc</strong><span class="classifier">instance of nrn.Segment</span></dt><dd><p>The section location. E.g., soma(0.5).</p>
 </dd>
-<dt><strong>e: float</strong></dt><dd><p>Reverse potential</p>
+<dt><strong>e: float</strong></dt><dd><p>Reverse potential (in mV)</p>
 </dd>
-<dt><strong>tau1: float</strong></dt><dd><p>Rise time</p>
+<dt><strong>tau1: float</strong></dt><dd><p>Rise time (in ms)</p>
 </dd>
-<dt><strong>tau2: float</strong></dt><dd><p>Decay time</p>
+<dt><strong>tau2: float</strong></dt><dd><p>Decay time (in ms)</p>
 </dd>
 </dl>
 </dd>
@@ -265,18 +262,6 @@ DO NOT need to call h.define_shape() explicitly!</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L5Basket.translate3d">
-<code class="sig-name descname">translate3d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em>, <em class="sig-param"><span class="n">dz</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.translate3d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate 3d.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L5Basket.translate_to">
-<code class="sig-name descname">translate_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Basket.translate_to" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate to position.</p>
 </dd></dl>
 
 </dd></dl>
@@ -296,7 +281,7 @@ DO NOT need to call h.define_shape() explicitly!</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
     </p>
   </div>
 </footer>

@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.L2Pyr &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
@@ -112,14 +112,16 @@
 <h1>hnn_core.L2Pyr<a class="headerlink" href="#hnn-core-l2pyr" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="hnn_core.L2Pyr">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L2Pyr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">pos</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">p</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L2Pyr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">pos</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Layer 2 pyramidal cell class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>The cell id.</p>
 </dd>
-<dt><strong>p</strong><span class="classifier">dict</span></dt><dd><p>The parameters dictionary.</p>
+<dt><strong>pos</strong><span class="classifier">tuple | None</span></dt><dd><p>The position of the cell.</p>
+</dd>
+<dt><strong>params</strong><span class="classifier">dict | None</span></dt><dd><p>The parameters dictionary.</p>
 </dd>
 </dl>
 </dd>
@@ -127,10 +129,12 @@
 <dd class="field-even"><dl class="simple">
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the cell</p>
 </dd>
+<dt><strong>list_dend</strong><span class="classifier">list of str</span></dt><dd><p>List of dendrites.</p>
+</dd>
 <dt><strong>dends</strong><span class="classifier">dict</span></dt><dd><p>The dendrites. The key is the name of the dendrite
 and the value is an instance of h.Section.</p>
 </dd>
-<dt><strong>list_dend</strong><span class="classifier">list of h.Section</span></dt><dd><p>List of dendrites.</p>
+<dt><strong>synapses</strong><span class="classifier">dict</span></dt><dd><p>The synapses that the cell can use for connections.</p>
 </dd>
 </dl>
 </dd>
@@ -154,34 +158,24 @@ and the value is an instance of h.Section.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Pyr.dipole_insert">
-<code class="sig-name descname">dipole_insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yscale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.dipole_insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert dipole into each section of this cell.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L2Pyr.get3dinfo">
-<code class="sig-name descname">get3dinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.get3dinfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get 3d info.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="hnn_core.L2Pyr.get_sections">
 <code class="sig-name descname">get_sections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.get_sections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get sections in a cell.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Pyr.get_sectnames">
-<code class="sig-name descname">get_sectnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.get_sectnames" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create dictionary of section names with entries
-to scale section lengths to length along z-axis.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L2Pyr.getbbox">
-<code class="sig-name descname">getbbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.getbbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get cell’s bounding box.</p>
+<dt id="hnn_core.L2Pyr.insert_dipole">
+<code class="sig-name descname">insert_dipole</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">yscale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.insert_dipole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert dipole into each section of this cell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>yscale</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of length scales to calculate dipole without
+3d shape.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -257,9 +251,15 @@ headless mode (e.g., over a remote connection).</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="hnn_core.L2Pyr.set_biophysics">
+<code class="sig-name descname">set_biophysics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_all</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.set_biophysics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds biophysics to soma.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="hnn_core.L2Pyr.set_geometry">
 <code class="sig-name descname">set_geometry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_dend</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.set_geometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define shape of the neuron.</p>
+<dd><p>Define shape of the neuron and connect sections.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -310,13 +310,13 @@ DO NOT need to call h.define_shape() explicitly!</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>secloc</strong><span class="classifier">float (0. to 1.0)</span></dt><dd><p>The section location</p>
+<dt><strong>secloc</strong><span class="classifier">instance of nrn.Segment</span></dt><dd><p>The section location. E.g., soma(0.5).</p>
 </dd>
-<dt><strong>e: float</strong></dt><dd><p>Reverse potential</p>
+<dt><strong>e: float</strong></dt><dd><p>Reverse potential (in mV)</p>
 </dd>
-<dt><strong>tau1: float</strong></dt><dd><p>Rise time</p>
+<dt><strong>tau1: float</strong></dt><dd><p>Rise time (in ms)</p>
 </dd>
-<dt><strong>tau2: float</strong></dt><dd><p>Decay time</p>
+<dt><strong>tau2: float</strong></dt><dd><p>Decay time (in ms)</p>
 </dd>
 </dl>
 </dd>
@@ -327,24 +327,6 @@ DO NOT need to call h.define_shape() explicitly!</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L2Pyr.topol">
-<code class="sig-name descname">topol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.topol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connects sections of THIS cell together.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L2Pyr.translate3d">
-<code class="sig-name descname">translate3d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em>, <em class="sig-param"><span class="n">dz</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.translate3d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate 3d.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L2Pyr.translate_to">
-<code class="sig-name descname">translate_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Pyr.translate_to" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate to position.</p>
 </dd></dl>
 
 </dd></dl>
@@ -364,7 +346,7 @@ DO NOT need to call h.define_shape() explicitly!</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
     </p>
   </div>
 </footer>
