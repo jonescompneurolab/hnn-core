@@ -15,6 +15,12 @@ def pytest_runtest_makereport(item, call):
 
     if "incremental" in item.keywords:
         # incremental marker is used
+
+        # The following condition was modifed from the example linked above.
+        # We don't want to step out of the incremental testing block if
+        # a previous test was marked "Skipped". For instance if MPI tests
+        # are skipped because mpi4py is not installed, still continue with
+        # all other tests that do not require mpi4py
         if call.excinfo is not None and not call.excinfo.typename == "Skipped":
             # the test has failed, but was not skiped
 
