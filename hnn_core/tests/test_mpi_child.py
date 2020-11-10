@@ -34,6 +34,12 @@ def test_read_stderr():
     with pytest.raises(ValueError, match="Invalid signal start"):
         backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
 
+    stderr.write("blahblah@end_of_data:100")
+    stderr.flush()
+    # actually invalid end (only match first part of string)
+    with pytest.raises(ValueError, match="Invalid signal start"):
+        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
+
     stderr.write("@end_of_data:@")
     stderr.flush()
     with pytest.raises(ValueError, match="Completion signal from child MPI "
