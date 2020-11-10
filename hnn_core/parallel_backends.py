@@ -170,6 +170,8 @@ class MPIBackend(object):
         if mpi4py could not be loaded.
     mpi_cmd_str : str
         The string of the mpi command with number of procs and options
+    proc_data_bytes: bytes object
+        This will contain data received from the MPI child process via stderr.
 
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
@@ -252,7 +254,7 @@ class MPIBackend(object):
     def _read_stderr(self, fd, mask):
         """read stderr from fd until end of simulation signal is received"""
         data = _read_all_bytes(fd)
-        if data:
+        if len(data) > 0:
             str_data = data.decode()
             if '@' in str_data:
                 # extract the signal
@@ -290,7 +292,7 @@ class MPIBackend(object):
     def _read_stdout(self, fd, mask):
         """read stdout fd until receiving the process simulation is complete"""
         data = _read_all_bytes(fd)
-        if data:
+        if len(data) > 0:
             str_data = data.decode()
             if str_data == 'end_of_sim':
                 return str_data
