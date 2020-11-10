@@ -1,14 +1,14 @@
 import os.path as op
 from os import environ
-import pytest
 import io
 from contextlib import redirect_stdout
 from multiprocessing import cpu_count
-
 from numpy import loadtxt
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
+import pytest
 from mne.utils import _fetch_file
+
 import hnn_core
 from hnn_core import simulate_dipole, Network, read_params
 from hnn_core import MPIBackend, JoblibBackend
@@ -99,7 +99,7 @@ class TestParallelBackends():
         """Test running MPIBackend with oversubscribed number of procs"""
         pytest.importorskip("mpi4py", reason="mpi4py not available")
 
-        oversubscribed = cpu_count() * 1
+        oversubscribed = round(cpu_count() * 1.5)
         run_hnn_core(backend='mpi', n_procs=oversubscribed, reduced=True)
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
