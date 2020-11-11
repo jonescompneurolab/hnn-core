@@ -31,6 +31,8 @@ If you update a mod file, you will have to rebuild them using the command::
 
     $ python setup.py build_mod
 
+MPI tests are skipped if the `mpi4py` module is not installed. This allows testing features not related to parallelization without installing the extra dependecies as described in `parallel_backends`_.
+
 Updating documentation
 ======================
 
