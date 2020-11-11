@@ -15,7 +15,7 @@ If your contributions will make use of parallel backends for using more than one
 Running tests
 =============
 
-To run the tests using `pytest`, you need to have the git cloned `hnn-core`
+To run the tests using ``pytest``, you need to have the git cloned ``hnn-core``
 repository with an editable pip install::
 
     $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
@@ -31,12 +31,12 @@ If you update a mod file, you will have to rebuild them using the command::
 
     $ python setup.py build_mod
 
-MPI tests are skipped if the `mpi4py` module is not installed. This allows testing features not related to parallelization without installing the extra dependecies as described in `parallel_backends`_.
+MPI tests are skipped if the ``mpi4py`` module is not installed. This allows testing features not related to parallelization without installing the extra dependencies as described in `parallel_backends`_.
 
 Updating documentation
 ======================
 
-Update `doc/api.rst` and `doc/whats_new.rst` as appropriate.
+Update ``doc/api.rst`` and ``doc/whats_new.rst`` as appropriate.
 
 Building the documentation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,7 +46,7 @@ install the following::
 
     $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
 
-If you are using a newer version of pip, you may be prompted to use the flag --use-feature=2020-resolver. If this happens, please add it as recommended::
+If you are using a newer version of pip, you may be prompted to use the flag ``--use-feature=2020-resolver``. If this happens, please add it as recommended::
 
     $ pip install --use-feature=2020-resolver matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
 
