@@ -43,6 +43,17 @@ def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
     return dpls, net
 
 
+# Travis CI should fail if it cannot import mpi4py. Otherwise tests below
+# would be skipped and will not trigger a CI failure.
+def test_mpi4py_needed():
+    try:
+        import mpi4py
+        assert hasattr(mpi4py, '__version__')
+    except:
+        if "TRAVIS_OS_NAME" in environ:
+            pytest.fail("Travis CI requires mpi4py to test MPIBackend")
+
+
 # The purpose of this incremental mark is to avoid running the full length
 # simulation when there are failures in previous (faster) tests. When a test
 # in the sequence fails, all subsequent tests will be marked "xfailed" rather
