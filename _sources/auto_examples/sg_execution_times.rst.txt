@@ -5,16 +5,16 @@
 
 Computation times
 =================
-**07:28.712** total execution time for **auto_examples** files:
+**07:05.140** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` (``plot_simulate_evoked.py``) | 03:03.602 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` (``plot_simulate_evoked.py``) | 02:33.080 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py` (``plot_simulate_gamma.py``)   | 01:27.354 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py` (``plot_simulate_gamma.py``)   | 01:32.255 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)   | 01:16.780 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)   | 01:20.279 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_somato.py` (``plot_simulate_somato.py``) | 01:05.373 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_somato.py` (``plot_simulate_somato.py``) | 01:06.829 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_firing_pattern.py` (``plot_firing_pattern.py``)   | 00:35.603 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_firing_pattern.py` (``plot_firing_pattern.py``)   | 00:32.696 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+
