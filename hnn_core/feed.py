@@ -180,7 +180,6 @@ class ExtFeed(object):
         event_times : array
             The event times.
         """
-        # check the t interval
         if t0 < 0:
             raise ValueError('The start time for Poisson inputs must be'
                              f'greater than 0. Got {t0}')
@@ -289,58 +288,45 @@ class ExtFeed(object):
         prng : instance of RandomState
             The random state used for jitter to start time (see t0_stdev).
         """
+        if distribution not in ('normal', 'uniform'):
+            raise ValueError("Indicated distribution not recognized. "
+                             "Not making any common feeds.")
+
         # store f_input as self variable for later use if it exists in p
         if t0 == -1:
             t0 = prng.uniform(25., 125.)
         elif t0_stdev > 0.0:
             t0 = prng2.normal(t0, t0_stdev)
-        # events_per_cycle = 1
-        if events_per_cycle > 2 or events_per_cycle <= 0:
+
+        if events_per_cycle != 1:
             print("events_per_cycle should be either 1 or 2, trying 2")
             events_per_cycle = 2
-        # If frequency is 0, create empty vector if input times
-        if not f_input:
-            t_input = np.array([])
-        elif distribution == 'normal':
+
+        if distribution == 'normal':
             # array of mean stimulus times, starts at t0
             isi_array = np.arange(t0, tstop, 1000. / f_input)
             # array of single stimulus times -- no doublets
-            if stdev:
+            if stdev > 0:
                 t_array = prng.normal(np.repeat(isi_array, repeats), stdev)
             else:
                 t_array = isi_array
-            if events_per_cycle == 2:  # spikes/burst in GUI
-                # Two arrays store doublet times
-                t_array_low = t_array - 5
-                t_array_high = t_array + 5
-                # Array with ALL stimulus times for input
-                # np.append concatenates two np arrays
-                t_input = np.append(t_array_low, t_array_high)
-            elif events_per_cycle == 1:
-                t_input = t_array
-            # brute force remove zero times. Might result in fewer vals than
-            # desired
-            t_input = t_input[t_input > 0]
-            t_input.sort()
-        # Uniform Distribution
         elif distribution == 'uniform':
             n_inputs = repeats * f_input * (tstop - t0) / 1000.
             t_array = prng.uniform(t0, tstop, n_inputs)
-            if events_per_cycle == 2:
-                # Two arrays store doublet times
-                t_input_low = t_array - 5
-                t_input_high = t_array + 5
-                # Array with ALL stimulus times for input
-                # np.append concatenates two np arrays
-                t_input = np.append(t_input_low, t_input_high)
-            elif events_per_cycle == 1:
-                t_input = t_array
-            # brute force remove non-zero times. Might result in fewer vals
-            # than desired
-            t_input = t_input[t_input > 0]
-            t_input.sort()
-        else:
-            print("Indicated distribution not recognized. "
-                  "Not making any common feeds.")
-            t_input = np.array([])
+
+        t_input = np.array([])
+        if events_per_cycle == 2:
+            # Two arrays store doublet times
+            t_input_low = t_array - 5
+            t_input_high = t_array + 5
+            # Array with ALL stimulus times for input
+            # np.append concatenates two np arrays
+            t_input = np.append(t_input_low, t_input_high)
+        elif events_per_cycle == 1:
+            t_input = t_array
+        # brute force remove non-zero times. Might result in fewer vals
+        # than desired
+        t_input = t_input[t_input > 0]
+        t_input.sort()
+
         return t_input.tolist()
