@@ -128,9 +128,12 @@ class ExtFeed(object):
                 # ind 3 is sigma_t (stdev))
                 sigma=self.params[self.cell_type][3],
                 numspikes=int(self.params['numspikes']),
-                prng=self.prng,)
+                prng=self.prng)
         elif self.feed_type == 'extgauss':
-            self._create_extgauss()
+            event_times = self._create_extgauss(
+                mu=self.params[self.cell_type][3]
+                sigma=self.params[self.cell_type][4],
+                prng=self.prng)
         elif self.feed_type == 'common':
             self._create_common_input()
 
@@ -204,25 +207,31 @@ class ExtFeed(object):
             val_evoked.sort()
         return val_evoked.tolist()
 
-    def _create_extgauss(self):
+    def _create_extgauss(self, mu, sigma, prng):
+        """Create gaussian input.
+
+        Parameters
+        ----------
+        mu : float
+            The mean time of spikes.
+        sigma : float
+            The standard deviation.
+
+        Note : non-zero values are removed (why?)
+        """
         # assign the params
         if self.params[self.cell_type][0] <= 0.0 and \
                 self.params[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
-        mu = self.params[self.cell_type][3]
-        sigma = self.params[self.cell_type][4]
-        # mu and sigma values come from p
+
         # one single value from Gaussian dist.
         # values MUST be sorted for VecStim()!
-        val_gauss = self.prng.normal(mu, sigma, 50)
+        val_gauss = prng.normal(mu, sigma, 50)
         # val_gauss = np.random.normal(mu, sigma, 50)
-        # remove non-zero values brute force-ly
         val_gauss = val_gauss[val_gauss > 0]
         # sort values - critical for nrn
         val_gauss.sort()
-        # if len(val_gauss)>0: print('val_gauss:',val_gauss)
-        # Convert array into nrn vector
-        self.event_times = val_gauss.tolist()
+        return val_gauss.tolist()
 
     def _create_common_input(self):
         """Creates the common ongoing external inputs.
