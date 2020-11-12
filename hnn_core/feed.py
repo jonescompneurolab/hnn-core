@@ -111,11 +111,14 @@ class ExtFeed(object):
         elif len(matches) > 1:
             raise ValueError('Ambiguous external feed: %s' % self.feed_type)
 
-        # Each of these methods creates self.event_times
         # Return values not checked: False if all weights for given feed type
         # are zero. Designed to be silent so that zeroing input weights
         # effectively disables each.
-        if self.feed_type == 'extpois':
+        zero_ampa_nmda = False
+        if self.cell_type is not None:
+            zero_ampa_nmda = (self.params[self.cell_type][0] <= 0.0 and
+                              self.params[self.cell_type][1] <= 0.0)
+        if self.feed_type == 'extpois' and not zero_ampa_nmda:
             event_times = self._create_extpois(
                 t0=self.params['t_interval'][0],
                 T=self.params['t_interval'][1],
@@ -129,7 +132,7 @@ class ExtFeed(object):
                 sigma=self.params[self.cell_type][3],
                 numspikes=int(self.params['numspikes']),
                 prng=self.prng)
-        elif self.feed_type == 'extgauss':
+        elif self.feed_type == 'extgauss' and not zero_ampa_nmda:
             event_times = self._create_extgauss(
                 mu=self.params[self.cell_type][3],
                 sigma=self.params[self.cell_type][4],
@@ -158,11 +161,6 @@ class ExtFeed(object):
         event_times : array
             The event times.
         """
-        # XXX Check whether both AMPA and NMDA connections are zero
-        # If so, return without updating self.event_times (from empty list)
-        if self.params[self.cell_type][0] <= 0.0 and \
-                self.params[self.cell_type][1] <= 0.0:
-            return False  # 0 ampa and 0 nmda weight
         # check the t interval
         if t0 < 0:
             raise ValueError('The start time for Poisson inputs must be'
@@ -236,11 +234,6 @@ class ExtFeed(object):
         -----
         non-zero values are removed (why?)
         """
-        # assign the params
-        if self.params[self.cell_type][0] <= 0.0 and \
-                self.params[self.cell_type][1] <= 0.0:
-            return False  # 0 ampa and 0 nmda weight
-
         # one single value from Gaussian dist.
         # values MUST be sorted for VecStim()!
         val_gauss = prng.normal(mu, sigma, 50)
