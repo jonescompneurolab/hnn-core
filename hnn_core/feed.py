@@ -121,10 +121,7 @@ class ExtFeed(object):
 
         all_syn_weights_zero = True
         for key in self.params.keys():
-            if key.startswith('L2Pyr') or \
-                    key.startswith('L5Pyr') or \
-                    key.startswith('L2Bask') or \
-                    key.startswith('L5Bask'):
+            if key.startswith(('L2Pyr', 'L5Pyr', 'L2Bask', 'L5Bask')):
                 if self.params[key][0] > 0.0:
                     all_syn_weights_zero = False
 
