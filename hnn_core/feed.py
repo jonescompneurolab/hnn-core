@@ -169,10 +169,10 @@ def _create_extpois(t0, T, lamtha, prng):
     """
     if t0 < 0:
         raise ValueError('The start time for Poisson inputs must be'
-                            f'greater than 0. Got {t0}')
+                         f'greater than 0. Got {t0}')
     if T < t0:
         raise ValueError('The end time for Poisson inputs must be'
-                            f'greater than start time. Got ({t0}, {T})')
+                         f'greater than start time. Got ({t0}, {T})')
 
     # start the initial value
     event_times = np.array([])
@@ -273,7 +273,7 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
     """
     if distribution not in ('normal', 'uniform'):
         raise ValueError("Indicated distribution not recognized. "
-                            "Not making any common feeds.")
+                         "Not making any common feeds.")
 
     # store f_input as self variable for later use if it exists in p
     if t0 == -1:
