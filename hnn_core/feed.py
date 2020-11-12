@@ -7,6 +7,12 @@
 import numpy as np
 
 
+# based on cdf for exp wait time distribution from unif [0, 1)
+# returns in ms based on lamtha in Hz
+def _t_wait(prng, lamtha):
+    return -1000. * np.log(1. - prng.rand()) / lamtha
+
+
 class ExtFeed(object):
     """The ExtFeed class of external spike input times.
 
@@ -110,7 +116,12 @@ class ExtFeed(object):
         # are zero. Designed to be silent so that zeroing input weights
         # effectively disables each.
         if self.feed_type == 'extpois':
-            self._create_extpois()
+            event_times = self._create_extpois(
+                t0=self.params['t_interval'][0],
+                T=self.params['t_interval'][1],
+                # ind 3 is frequency (lamtha))
+                lamtha=self.params[self.cell_type][3],
+                prng=self.prng)
         elif self.feed_type.startswith(('evprox', 'evdist')):
             self._create_evoked()
         elif self.feed_type == 'extgauss':
@@ -118,49 +129,49 @@ class ExtFeed(object):
         elif self.feed_type == 'common':
             self._create_common_input()
 
-    # based on cdf for exp wait time distribution from unif [0, 1)
-    # returns in ms based on lamtha in Hz
-    def _t_wait(self, lamtha):
-        return -1000. * np.log(1. - self.prng.rand()) / lamtha
+        self.event_times = event_times
 
-    # new external pois designation
-    def _create_extpois(self):
+    def _create_extpois(self, t0, T, lamtha, prng):
+        """Create poisson inputs.
+
+        Parameters
+        ----------
+        t0 : float
+            The start time.
+        T : float
+            The end time.
+        lamtha : float
+            The spatial decay lambda.
+        prng : instance of RandomState
+            The random state.
+        """
         # XXX Check whether both AMPA and NMDA connections are zero
         # If so, return without updating self.event_times (from empty list)
         if self.params[self.cell_type][0] <= 0.0 and \
                 self.params[self.cell_type][1] <= 0.0:
             return False  # 0 ampa and 0 nmda weight
         # check the t interval
-        t0 = self.params['t_interval'][0]
-        T = self.params['t_interval'][1]
         if t0 < 0:
             raise ValueError('The start time for Poisson inputs must be'
                              f'greater than 0. Got {t0}')
         if T < t0:
             raise ValueError('The end time for Poisson inputs must be'
                              f'greater than start time. Got ({t0}, {T})')
-        lamtha = self.params[self.cell_type][3]  # ind 3 is frequency (lamtha)
         # values MUST be sorted for VecStim()!
         # start the initial value
         val_pois = np.array([])
         if lamtha > 0.:
-            t_gen = t0 + self._t_wait(lamtha)
+            t_gen = t0 + _t_wait(prng, lamtha)
             if t_gen < T:
                 np.append(val_pois, t_gen)
             # vals are guaranteed to be monotonically increasing, no need to
             # sort
             while t_gen < T:
                 # so as to not clobber confusingly base off of t_gen ...
-                t_gen += self._t_wait(lamtha)
+                t_gen += _t_wait(prng, lamtha)
                 if t_gen < T:
                     val_pois = np.append(val_pois, t_gen)
-        # checks the distribution stats
-        # if len(val_pois):
-        #     xdiff = np.diff(val_pois/1000)
-        #     print(lamtha, np.mean(xdiff), np.var(xdiff), 1/lamtha**2)
-        # Convert array into nrn vector
-        # if len(val_pois)>0: print('val_pois:',val_pois)
-        self.event_times = val_pois.tolist()
+        return val_pois.tolist()
 
     # mu and sigma vals come from p
     def _create_evoked(self):
