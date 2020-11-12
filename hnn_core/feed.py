@@ -32,8 +32,12 @@ def _get_prng(seed, gid, sync_evinput=False):
     prng2 : instance of RandomState
         The seed for start times.
     """
-
-    prng2 = np.random.RandomState(seed)
+    # XXX: some param files use seed < 0 but numpy
+    # does not allow this.
+    if seed > 0:
+        prng2 = np.random.RandomState(seed)
+    else:
+        prng2 = None
 
     if not sync_evinput:
         seed = seed + gid
@@ -94,9 +98,9 @@ class ExtFeed(object):
         self.feed_type = feed_type
         self.gid = gid
         prng, prng2 = _get_prng(
-            sync_evinput=self.params.get('sync_evinput', False),
             seed=self.params['prng_seedcore'],
-            gid=self.gid)
+            gid=self.gid,
+            sync_evinput=self.params.get('sync_evinput', False))
         self.prng, self.prng2 = prng, prng2
         self.event_times = list()
         self.set_event_times()
