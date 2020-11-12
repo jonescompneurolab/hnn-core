@@ -60,3 +60,10 @@ def test_extfeed():
         feed = ExtFeed(feed_type='extpois',
                        target_cell_type='L2_basket',
                        params=params, gid=0)
+
+    # checks the distribution stats
+    # if len(val_pois):
+    #     xdiff = np.diff(val_pois/1000)
+    #     print(lamtha, np.mean(xdiff), np.var(xdiff), 1/lamtha**2)
+    # Convert array into nrn vector
+    # if len(val_pois)>0: print('val_pois:',val_pois)
