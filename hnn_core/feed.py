@@ -13,6 +13,35 @@ def _t_wait(prng, lamtha):
     return -1000. * np.log(1. - prng.rand()) / lamtha
 
 
+def _get_prng(seed, gid, sync_evinput=False):
+    """Random generator for this instance.
+
+    Parameters
+    ----------
+    seed : int
+        The seed for random state generator.
+    gid : int
+        The cell ID
+    sync_evinput : bool
+        If True, all cells get the same prng
+
+    Returns
+    -------
+    prng : instance of RandomState
+        The seed for events assuming a given start time.
+    prng2 : instance of RandomState
+        The seed for start times.
+    """
+
+    prng2 = np.random.RandomState(seed)
+
+    if not sync_evinput:
+        seed = seed + gid
+
+    prng = np.random.RandomState(seed)
+    return prng, prng2
+
+
 class ExtFeed(object):
     """The ExtFeed class of external spike input times.
 
@@ -64,7 +93,11 @@ class ExtFeed(object):
         self.cell_type = target_cell_type
         self.feed_type = feed_type
         self.gid = gid
-        self.set_prng()  # sets seeds for random num generator
+        prng, prng2 = _get_prng(
+            sync_evinput=self.params.get('sync_evinput', False),
+            seed=self.params['prng_seedcore'],
+            gid=self.gid)
+        self.prng, self.prng2 = prng, prng2
         self.event_times = list()
         self.set_event_times()
 
@@ -72,33 +105,8 @@ class ExtFeed(object):
         class_name = self.__class__.__name__
         repr_str = "<%s of type '%s' " % (class_name, self.feed_type)
         repr_str += 'with %d events ' % len(self.event_times)
-        repr_str += '| seed %d, gid %d>' % (self.seed, self.gid)
+        repr_str += '| gid %d>' % (self.gid)
         return repr_str
-
-    def set_prng(self, seed=None):
-        if seed is None:  # no seed specified then use params to determine seed
-            # random generator for this instance
-            # qnd hack to make the seeds the same across all gids
-            # for just evoked
-            if self.feed_type.startswith(('evprox', 'evdist')):
-                if self.params['sync_evinput']:
-                    self.seed = self.params['prng_seedcore']
-                else:
-                    self.seed = self.params['prng_seedcore'] + self.gid
-            elif self.feed_type.startswith('common'):
-                # seed for events assuming a given start time
-                self.seed = self.params['prng_seedcore'] + self.gid
-                # separate seed for start times
-                self.seed2 = self.params['prng_seedcore']
-            else:
-                self.seed = self.params['prng_seedcore'] + self.gid
-        else:  # if seed explicitly specified use it
-            self.seed = seed
-            if hasattr(self, 'seed2'):
-                self.seed2 = seed
-        self.prng = np.random.RandomState(self.seed)
-        if hasattr(self, 'seed2'):
-            self.prng2 = np.random.RandomState(self.seed2)
 
     def set_event_times(self):
 
