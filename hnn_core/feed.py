@@ -223,15 +223,14 @@ class ExtFeed(object):
             The event times.
         """
         val_evoked = np.array([])
-        if self.cell_type in self.params.keys():
-            if sigma > 0:
-                val_evoked = self.prng.normal(mu, sigma, numspikes)
-            else:
-                # if sigma is specified at 0
-                val_evoked = np.array([mu] * numspikes)
-            val_evoked = val_evoked[val_evoked > 0]
-            # vals must be sorted
-            val_evoked.sort()
+        if sigma > 0:
+            val_evoked = prng.normal(mu, sigma, numspikes)
+        else:
+            # if sigma is specified at 0
+            val_evoked = np.array([mu] * numspikes)
+        val_evoked = val_evoked[val_evoked > 0]
+        # vals must be sorted
+        val_evoked.sort()
         return val_evoked.tolist()
 
     def _create_extgauss(self, mu, sigma, prng):
@@ -256,9 +255,7 @@ class ExtFeed(object):
         # one single value from Gaussian dist.
         # values MUST be sorted for VecStim()!
         val_gauss = prng.normal(mu, sigma, 50)
-        # val_gauss = np.random.normal(mu, sigma, 50)
         val_gauss = val_gauss[val_gauss > 0]
-        # sort values - critical for nrn
         val_gauss.sort()
         return val_gauss.tolist()
 
@@ -328,7 +325,7 @@ class ExtFeed(object):
         # Uniform Distribution
         elif distribution == 'uniform':
             n_inputs = repeats * f_input * (tstop - t0) / 1000.
-            t_array = self.prng.uniform(t0, tstop, n_inputs)
+            t_array = prng.uniform(t0, tstop, n_inputs)
             if events_per_cycle == 2:
                 # Two arrays store doublet times
                 t_input_low = t_array - 5
