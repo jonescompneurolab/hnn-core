@@ -22,9 +22,6 @@ def test_dipole(tmpdir):
     times = np.random.random(6000)
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
-    dipole.post_proc(params['N_pyr_x'], params['N_pyr_y'],
-                     params['dipole_smooth_win'] / params['dt'],
-                     params['dipole_scalefctr'])
     dipole.baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
     dipole.convert_fAm_to_nAm()
     dipole.scale(params['dipole_scalefctr'])
@@ -47,6 +44,28 @@ def test_dipole(tmpdir):
     with pytest.raises(ValueError, match="Dipole at index 0 was already an "
                        "average of 2 trials"):
         dipole_avg = average_dipoles([dipole_avg, dipole_read])
+
+    # test postproc
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    params_reduced = params.copy()
+    params_reduced.update({'N_pyr_x': 3,
+                           'N_pyr_y': 3,
+                           'tstop': 25,
+                           't_evprox_1': 5,
+                           't_evdist_1': 10,
+                           't_evprox_2': 20,
+                           'N_trials': 2})
+    net = Network(params_reduced)
+    dpls_raw = simulate_dipole(net, postproc=False)
+    dpls = simulate_dipole(net, postproc=True)
+    with pytest.raises(AssertionError):
+        assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
+    dpls_raw[0].post_proc(params['N_pyr_x'], params['N_pyr_y'],
+                          params['dipole_smooth_win'] / params['dt'],
+                          params['dipole_scalefctr'])
+    assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
 
 
 def test_dipole_simulation():
