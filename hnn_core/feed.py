@@ -147,7 +147,17 @@ class ExtFeed(object):
                 sigma=self.params[self.cell_type][4],
                 prng=self.prng)
         elif self.feed_type == 'common' and not all_syn_weights_zero:
-            event_times = self._create_common_input()
+            event_times = self._create_common_input(
+                distribution=self.params['distribution'],
+                t0=self.params['t0'],
+                t0_stdev=self.params['t0_stdev'],
+                tstop=self.params['tstop'],
+                f_input=self.params['f_input'],
+                stdev=self.params['stdev'],
+                repeats=self.params['repeats'],
+                events_per_cycle=self.params['events_per_cycle'],
+                prng=self.prng,
+                prng2=self.prng2)
 
         self.event_times = event_times
 
@@ -252,25 +262,41 @@ class ExtFeed(object):
         val_gauss.sort()
         return val_gauss.tolist()
 
-    def _create_common_input(self):
+    def _create_common_input(self, distribution, t0, t0_stdev, tstop, f_input,
+                             stdev, repeats, events_per_cycle, prng, prng2):
         """Creates the common ongoing external inputs.
 
-        Used for, e.g., for rhythmic inputs in alpha/beta generation
+        Used for, e.g., for rhythmic inputs in alpha/beta generation.
+
+        Parameters
+        ----------
+        distribution : str
+            The distribution for each burst. One of 'normal' or 'uniform'.
+        t0 : float
+            The start times. If -1, then randomize the start time
+            of inputs.
+        t0_stdev : float
+            Standard deviation of jitter to start time.
+        tstop : float
+            The stop time.
+        f_input : float
+            The frequency of input bursts.
+        stdev : float
+            The standard deviation.
+        repeats : int
+            The number of repeats.
+        events_per_cycle : float
+            The events per cycle. Must be 1 or 2.
+        prng : instance of RandomState
+            The random state.
+        prng : instance of RandomState
+            The random state used for jitter to start time (see t0_stdev).
         """
         # store f_input as self variable for later use if it exists in p
-        # t0 is always defined
-        t0 = self.params['t0']
-        # If t0 is -1, randomize start time of inputs
         if t0 == -1:
-            t0 = self.prng.uniform(25., 125.)
-        # randomize start time based on t0_stdev
-        elif self.params['t0_stdev'] > 0.0:
-            # start time uses different prng
-            t0 = self.prng2.normal(t0, self.params['t0_stdev'])
-        f_input = self.params['f_input']
-        stdev = self.params['stdev']
-        events_per_cycle = self.params['events_per_cycle']
-        distribution = self.params['distribution']
+            t0 = prng.uniform(25., 125.)
+        elif t0_stdev > 0.0:
+            t0 = prng2.normal(t0, t0_stdev)
         # events_per_cycle = 1
         if events_per_cycle > 2 or events_per_cycle <= 0:
             print("events_per_cycle should be either 1 or 2, trying 2")
@@ -280,11 +306,10 @@ class ExtFeed(object):
             t_input = np.array([])
         elif distribution == 'normal':
             # array of mean stimulus times, starts at t0
-            isi_array = np.arange(t0, self.params['tstop'], 1000. / f_input)
+            isi_array = np.arange(t0, tstop, 1000. / f_input)
             # array of single stimulus times -- no doublets
             if stdev:
-                t_array = self.prng.normal(
-                    np.repeat(isi_array, self.params['repeats']), stdev)
+                t_array = prng.normal(np.repeat(isi_array, repeats), stdev)
             else:
                 t_array = isi_array
             if events_per_cycle == 2:  # spikes/burst in GUI
@@ -302,9 +327,8 @@ class ExtFeed(object):
             t_input.sort()
         # Uniform Distribution
         elif distribution == 'uniform':
-            n_inputs = self.params['repeats'] * \
-                f_input * (self.params['tstop'] - t0) / 1000.
-            t_array = self.prng.uniform(t0, self.params['tstop'], n_inputs)
+            n_inputs = repeats * f_input * (tstop - t0) / 1000.
+            t_array = self.prng.uniform(t0, tstop, n_inputs)
             if events_per_cycle == 2:
                 # Two arrays store doublet times
                 t_input_low = t_array - 5
