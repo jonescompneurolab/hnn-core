@@ -240,7 +240,6 @@ class ExtFeed(object):
         event_times : array
             The event times.
         """
-        event_times = np.array([])
         if sigma > 0:
             event_times = prng.normal(mu, sigma, numspikes)
         else:
@@ -264,7 +263,6 @@ class ExtFeed(object):
         event_times : array
             The event times.
         """
-        # one single value from Gaussian dist.
         event_times = prng.normal(mu, sigma, 50)
         return event_times
 
