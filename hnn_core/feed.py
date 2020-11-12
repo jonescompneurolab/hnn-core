@@ -171,6 +171,14 @@ class ExtFeed(object):
                 prng=self.prng,
                 prng2=self.prng2)
 
+        # brute force remove non-zero times. Might result in fewer vals
+        # than desired
+        # values MUST be sorted for VecStim()!
+        if len(event_times) > 0:
+            event_times = event_times[event_times > 0]
+            event_times.sort()
+            event_times.tolist()
+
         self.event_times = event_times
 
     def _create_extpois(self, t0, T, lamtha, prng):
@@ -198,21 +206,20 @@ class ExtFeed(object):
         if T < t0:
             raise ValueError('The end time for Poisson inputs must be'
                              f'greater than start time. Got ({t0}, {T})')
-        # values MUST be sorted for VecStim()!
+
         # start the initial value
-        val_pois = np.array([])
+        event_times = np.array([])
         if lamtha > 0.:
             t_gen = t0 + _t_wait(prng, lamtha)
             if t_gen < T:
-                np.append(val_pois, t_gen)
-            # vals are guaranteed to be monotonically increasing, no need to
-            # sort
+                np.append(event_times, t_gen)
+
             while t_gen < T:
                 # so as to not clobber confusingly base off of t_gen ...
                 t_gen += _t_wait(prng, lamtha)
                 if t_gen < T:
-                    val_pois = np.append(val_pois, t_gen)
-        return val_pois.tolist()
+                    event_times = np.append(event_times, t_gen)
+        return event_times
 
     def _create_evoked(self, mu, sigma, numspikes, prng):
         """Create evoked inputs.
@@ -233,16 +240,14 @@ class ExtFeed(object):
         event_times : array
             The event times.
         """
-        val_evoked = np.array([])
+        event_times = np.array([])
         if sigma > 0:
-            val_evoked = prng.normal(mu, sigma, numspikes)
+            event_times = prng.normal(mu, sigma, numspikes)
         else:
             # if sigma is specified at 0
-            val_evoked = np.array([mu] * numspikes)
-        val_evoked = val_evoked[val_evoked > 0]
-        # vals must be sorted
-        val_evoked.sort()
-        return val_evoked.tolist()
+            event_times = np.array([mu] * numspikes)
+
+        return event_times
 
     def _create_extgauss(self, mu, sigma, prng):
         """Create gaussian input.
@@ -258,17 +263,10 @@ class ExtFeed(object):
         -------
         event_times : array
             The event times.
-
-        Notes
-        -----
-        non-zero values are removed (why?)
         """
         # one single value from Gaussian dist.
-        # values MUST be sorted for VecStim()!
-        val_gauss = prng.normal(mu, sigma, 50)
-        val_gauss = val_gauss[val_gauss > 0]
-        val_gauss.sort()
-        return val_gauss.tolist()
+        event_times = prng.normal(mu, sigma, 50)
+        return event_times
 
     def _create_common_input(self, distribution, t0, t0_stdev, tstop, f_input,
                              stdev, repeats, events_per_cycle, prng, prng2):
@@ -299,6 +297,11 @@ class ExtFeed(object):
             The random state.
         prng : instance of RandomState
             The random state used for jitter to start time (see t0_stdev).
+
+        Returns
+        -------
+        event_times : array
+            The event times.
         """
         if distribution not in ('normal', 'uniform'):
             raise ValueError("Indicated distribution not recognized. "
@@ -336,9 +339,5 @@ class ExtFeed(object):
             t_input = np.append(t_input_low, t_input_high)
         elif events_per_cycle == 1:
             t_input = t_array
-        # brute force remove non-zero times. Might result in fewer vals
-        # than desired
-        t_input = t_input[t_input > 0]
-        t_input.sort()
 
-        return t_input.tolist()
+        return t_input
