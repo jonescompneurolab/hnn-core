@@ -118,6 +118,18 @@ class ExtFeed(object):
         if self.cell_type is not None:
             zero_ampa_nmda = (self.params[self.cell_type][0] <= 0.0 and
                               self.params[self.cell_type][1] <= 0.0)
+
+        # Return if all synaptic weights are 0
+        all_syn_weights_zero = True
+        for key in self.params.keys():
+            if key.startswith('L2Pyr') or \
+                    key.startswith('L5Pyr') or \
+                    key.startswith('L2Bask') or \
+                    key.startswith('L5Bask'):
+                if self.params[key][0] > 0.0:
+                    all_syn_weights_zero = False
+
+        event_times = list()
         if self.feed_type == 'extpois' and not zero_ampa_nmda:
             event_times = self._create_extpois(
                 t0=self.params['t_interval'][0],
@@ -137,7 +149,7 @@ class ExtFeed(object):
                 mu=self.params[self.cell_type][3],
                 sigma=self.params[self.cell_type][4],
                 prng=self.prng)
-        elif self.feed_type == 'common':
+        elif self.feed_type == 'common' and not all_syn_weights_zero:
             event_times = self._create_common_input()
 
         self.event_times = event_times
@@ -248,18 +260,6 @@ class ExtFeed(object):
 
         Used for, e.g., for rhythmic inputs in alpha/beta generation
         """
-        # Return if all synaptic weights are 0
-        all_syn_weights_zero = True
-        for key in self.params.keys():
-            if key.startswith('L2Pyr') or \
-                    key.startswith('L5Pyr') or \
-                    key.startswith('L2Bask') or \
-                    key.startswith('L5Bask'):
-                if self.params[key][0] > 0.0:
-                    all_syn_weights_zero = False
-        if all_syn_weights_zero:
-            return False
-
         # store f_input as self variable for later use if it exists in p
         # t0 is always defined
         t0 = self.params['t0']
