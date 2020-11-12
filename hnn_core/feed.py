@@ -115,11 +115,10 @@ class ExtFeed(object):
         # are zero. Designed to be silent so that zeroing input weights
         # effectively disables each.
         zero_ampa_nmda = False
-        if self.cell_type is not None:
+        if self.cell_type in self.params:
             zero_ampa_nmda = (self.params[self.cell_type][0] <= 0.0 and
                               self.params[self.cell_type][1] <= 0.0)
 
-        # Return if all synaptic weights are 0
         all_syn_weights_zero = True
         for key in self.params.keys():
             if key.startswith('L2Pyr') or \
@@ -137,7 +136,8 @@ class ExtFeed(object):
                 # ind 3 is frequency (lamtha))
                 lamtha=self.params[self.cell_type][3],
                 prng=self.prng)
-        elif self.feed_type.startswith(('evprox', 'evdist')):
+        elif self.feed_type.startswith(('evprox', 'evdist')) and \
+                self.cell_type in self.params:
             event_times = self._create_evoked(
                 mu=self.params['t0'],
                 # ind 3 is sigma_t (stdev))
