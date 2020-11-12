@@ -123,7 +123,12 @@ class ExtFeed(object):
                 lamtha=self.params[self.cell_type][3],
                 prng=self.prng)
         elif self.feed_type.startswith(('evprox', 'evdist')):
-            self._create_evoked()
+            event_times = self._create_evoked(
+                mu=self.params['t0'],
+                # ind 3 is sigma_t (stdev))
+                sigma=self.params[self.cell_type][3],
+                numspikes=int(self.params['numspikes']),
+                prng=self.prng,)
         elif self.feed_type == 'extgauss':
             self._create_extgauss()
         elif self.feed_type == 'common':
@@ -173,16 +178,23 @@ class ExtFeed(object):
                     val_pois = np.append(val_pois, t_gen)
         return val_pois.tolist()
 
-    # mu and sigma vals come from p
-    def _create_evoked(self):
+    def _create_evoked(self, mu, sigma, numspikes, prng):
+        """Create evoked inputs.
+
+        Parameters
+        ----------
+        mu : float
+            The mean time of spikes.
+        sigma : float
+            The standard deviation.
+        numspikes : float
+            The number of spikes.
+        prng : instance of RandomState
+            The random state.
+        """
         val_evoked = np.array([])
         if self.cell_type in self.params.keys():
-            # assign the params
-            mu = self.params['t0']
-            sigma = self.params[self.cell_type][3]  # ind 3 is sigma_t (stdev)
-            numspikes = int(self.params['numspikes'])
-            # if a non-zero sigma is specified
-            if sigma:
+            if sigma > 0:
                 val_evoked = self.prng.normal(mu, sigma, numspikes)
             else:
                 # if sigma is specified at 0
@@ -190,7 +202,7 @@ class ExtFeed(object):
             val_evoked = val_evoked[val_evoked > 0]
             # vals must be sorted
             val_evoked.sort()
-        self.event_times = val_evoked.tolist()
+        return val_evoked.tolist()
 
     def _create_extgauss(self):
         # assign the params
