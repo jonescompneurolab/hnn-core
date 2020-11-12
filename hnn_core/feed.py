@@ -131,11 +131,11 @@ class ExtFeed(object):
                 prng=self.prng)
         elif self.feed_type == 'extgauss':
             event_times = self._create_extgauss(
-                mu=self.params[self.cell_type][3]
+                mu=self.params[self.cell_type][3],
                 sigma=self.params[self.cell_type][4],
                 prng=self.prng)
         elif self.feed_type == 'common':
-            self._create_common_input()
+            event_times = self._create_common_input()
 
         self.event_times = event_times
 
@@ -152,6 +152,11 @@ class ExtFeed(object):
             The spatial decay lambda.
         prng : instance of RandomState
             The random state.
+
+        Returns
+        -------
+        event_times : array
+            The event times.
         """
         # XXX Check whether both AMPA and NMDA connections are zero
         # If so, return without updating self.event_times (from empty list)
@@ -194,6 +199,11 @@ class ExtFeed(object):
             The number of spikes.
         prng : instance of RandomState
             The random state.
+
+        Returns
+        -------
+        event_times : array
+            The event times.
         """
         val_evoked = np.array([])
         if self.cell_type in self.params.keys():
@@ -217,7 +227,14 @@ class ExtFeed(object):
         sigma : float
             The standard deviation.
 
-        Note : non-zero values are removed (why?)
+        Returns
+        -------
+        event_times : array
+            The event times.
+
+        Notes
+        -----
+        non-zero values are removed (why?)
         """
         # assign the params
         if self.params[self.cell_type][0] <= 0.0 and \
@@ -315,4 +332,4 @@ class ExtFeed(object):
             print("Indicated distribution not recognized. "
                   "Not making any common feeds.")
             t_input = np.array([])
-        self.event_times = t_input.tolist()
+        return t_input.tolist()
