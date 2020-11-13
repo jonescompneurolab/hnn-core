@@ -45,13 +45,23 @@ def test_dipole(tmpdir):
         dipole_avg = average_dipoles([dipole_avg, dipole_read])
 
 
-def test_num_trials():
-    """Test that running 0 trials retuns an exception."""
+def test_dipole_simulation():
+    """Test data produced from simulate_dipole() call."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3,
+                   'tstop': 25,
+                   't_evprox_1': 5,
+                   't_evdist_1': 10,
+                   't_evprox_2': 20})
     net = Network(params)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, n_trials=0)
     with pytest.raises(TypeError, match="record_vsoma must be bool, got int"):
         simulate_dipole(net, n_trials=1, record_vsoma=0)
+
+    simulate_dipole(net, n_trials=2, record_vsoma=True)
+    assert len(net.spikes.vsoma) == 2
+    assert len(net.spikes.vsoma[0]) == 24
