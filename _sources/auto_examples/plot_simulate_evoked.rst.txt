@@ -278,6 +278,7 @@ Then we read the parameters file
         "prng_seedcore_extpois": 2,
         "prng_seedcore_input_dist": 2,
         "prng_seedcore_input_prox": 2,
+        "record_vsoma": 0,
         "repeats_dist": 10,
         "repeats_prox": 10,
         "save_dpl": 0,
@@ -622,24 +623,25 @@ openmpi, which must be installed on the system
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
-    [1aecd9311a10:01364] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01365] Read -1, expected 27200, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 27208, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 5559, errno = 1
-    [1aecd9311a10:01364] Read -1, expected 5559, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01364] Read -1, expected 27200, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 27208, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 5616, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 5559, errno = 1
+    [c0c32e18a5a1:01363] Read -1, expected 5559, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -648,7 +650,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  33.080 seconds)
+   **Total running time of the script:** ( 2 minutes  42.530 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

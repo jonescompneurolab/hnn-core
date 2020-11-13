@@ -112,19 +112,19 @@
 <h1>hnn_core.Spikes<a class="headerlink" href="#hnn-core-spikes" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="hnn_core.Spikes">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">Spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">Spikes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spike_times</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spike_gids</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spike_types</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Spikes class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the time stamps of spikes.</p>
 </dd>
-<dt><strong>gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the cell IDs of neurons that
 spiked.</p>
 </dd>
-<dt><strong>types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the type of spike (e.g., evprox1
 or L2_pyramidal) that occured at the corresonding time stamp.
 Each gid corresponds to a type via Network().gid_dict.</p>
@@ -133,17 +133,22 @@ Each gid corresponds to a type via Network().gid_dict.</p>
 </dd>
 <dt class="field-even">Attributes</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the time stamps of spikes.</p>
 </dd>
-<dt><strong>gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the cell IDs of neurons that
 spiked.</p>
 </dd>
-<dt><strong>types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the type of spike (e.g., evprox1
 or L2_pyramidal) that occured at the corresonding time stamp.
 Each gid corresponds to a type via Network::gid_dict.</p>
+</dd>
+<dt><strong>vsoma</strong><span class="classifier">dict</span></dt><dd><p>Dictionary indexed by gids containing somatic voltages</p>
+</dd>
+<dt><strong>times</strong><span class="classifier">list</span></dt><dd><p>List of time points for samples in continuous data.
+This includes vsoma.</p>
 </dd>
 </dl>
 </dd>
@@ -169,6 +174,26 @@ Each gid corresponds to a type via Network::gid_dict.</p>
 </tr>
 </tbody>
 </table>
+<dl class="py method">
+<dt id="hnn_core.Spikes.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid_item</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Spikes object with a copied subset filtered by gid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gid_item</strong><span class="classifier">int | slice</span></dt><dd><p>Subset of gids .</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>spikes</strong><span class="classifier">instance of Spikes</span></dt><dd><p>See below for use cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="hnn_core.Spikes.__repr__">
 <code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Spikes.__repr__" title="Permalink to this definition">¶</a></dt>
@@ -319,7 +344,7 @@ path to the output spike file(s).</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.1.<br/>
     </p>
   </div>
 </footer>

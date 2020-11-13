@@ -112,7 +112,7 @@
 <h1>hnn_core.dipole.simulate_dipole<a class="headerlink" href="#hnn-core-dipole-simulate-dipole" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="hnn_core.dipole.simulate_dipole">
-<code class="sig-prename descclassname">hnn_core.dipole.</code><code class="sig-name descname">simulate_dipole</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span></em>, <em class="sig-param"><span class="n">n_trials</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.simulate_dipole" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">hnn_core.dipole.</code><code class="sig-name descname">simulate_dipole</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span></em>, <em class="sig-param"><span class="n">n_trials</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">record_vsoma</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.simulate_dipole" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simulate a dipole given the experiment parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -122,6 +122,8 @@ connected.</p>
 </dd>
 <dt><strong>n_trials</strong><span class="classifier">int | None</span></dt><dd><p>The number of trials to simulate. If None the value in
 net.params[‘N_trials’] will be used</p>
+</dd>
+<dt><strong>record_vsoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic voltages from cells</p>
 </dd>
 </dl>
 </dd>
@@ -149,7 +151,7 @@ net.params[‘N_trials’] will be used</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.1.<br/>
     </p>
   </div>
 </footer>
