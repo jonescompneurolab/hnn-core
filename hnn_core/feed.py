@@ -30,7 +30,8 @@ def _get_prng(seed, gid, sync_evinput=False):
     prng : instance of RandomState
         The seed for events assuming a given start time.
     prng2 : instance of RandomState
-        The seed for start times.
+        The seed for generating randomized start times.
+        Used in _create_common_input
     """
     # XXX: some param files use seed < 0 but numpy
     # does not allow this.
@@ -263,7 +264,7 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
         The events per cycle. Must be 1 or 2.
     prng : instance of RandomState
         The random state.
-    prng : instance of RandomState
+    prng2 : instance of RandomState
         The random state used for jitter to start time (see t0_stdev).
 
     Returns
