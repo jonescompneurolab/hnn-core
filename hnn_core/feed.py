@@ -114,16 +114,17 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
             prng=prng)
     elif feed_type.startswith(('evprox', 'evdist')) and \
             target_cell_type in params:
-        event_times = _create_evoked(
+        event_times = _create_gauss(
             mu=params['t0'],
             # ind 3 is sigma_t (stdev))
             sigma=params[target_cell_type][3],
             numspikes=int(params['numspikes']),
             prng=prng)
     elif feed_type == 'extgauss' and not zero_ampa_nmda:
-        event_times = _create_extgauss(
+        event_times = _create_gauss(
             mu=params[target_cell_type][3],
             sigma=params[target_cell_type][4],
+            numspikes=50,
             prng=prng)
     elif feed_type == 'common' and not all_syn_weights_zero:
         event_times = _create_common_input(
@@ -190,15 +191,17 @@ def _create_extpois(t0, T, lamtha, prng):
     return event_times
 
 
-def _create_evoked(mu, sigma, numspikes, prng):
-    """Create evoked inputs.
+def _create_gauss(mu, sigma, numspikes, prng):
+    """Create gaussian inputs (used by extgauss and evoked).
 
     Parameters
     ----------
     mu : float
         The mean time of spikes.
     sigma : float
-        The standard deviation.
+        The standard deviation. If sigma is 0,
+        then return array of len numspikes
+        containing only mu.
     numspikes : float
         The number of spikes.
     prng : instance of RandomState
@@ -215,25 +218,6 @@ def _create_evoked(mu, sigma, numspikes, prng):
         # if sigma is specified at 0
         event_times = np.array([mu] * numspikes)
 
-    return event_times
-
-
-def _create_extgauss(mu, sigma, prng):
-    """Create gaussian input.
-
-    Parameters
-    ----------
-    mu : float
-        The mean time of spikes.
-    sigma : float
-        The standard deviation.
-
-    Returns
-    -------
-    event_times : array
-        The event times.
-    """
-    event_times = prng.normal(mu, sigma, 50)
     return event_times
 
 
