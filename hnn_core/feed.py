@@ -199,9 +199,7 @@ def _create_gauss(mu, sigma, numspikes, prng):
     mu : float
         The mean time of spikes.
     sigma : float
-        The standard deviation. If sigma is 0,
-        then return array of len numspikes
-        containing only mu.
+        The standard deviation.
     numspikes : float
         The number of spikes.
     prng : instance of RandomState
@@ -212,13 +210,7 @@ def _create_gauss(mu, sigma, numspikes, prng):
     event_times : array
         The event times.
     """
-    if sigma > 0:
-        event_times = prng.normal(mu, sigma, numspikes)
-    else:
-        # if sigma is specified at 0
-        event_times = np.array([mu] * numspikes)
-
-    return event_times
+    return prng.normal(mu, sigma, numspikes)
 
 
 def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
@@ -274,10 +266,7 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
         # array of mean stimulus times, starts at t0
         isi_array = np.arange(t0, tstop, 1000. / f_input)
         # array of single stimulus times -- no doublets
-        if stdev > 0:
-            t_array = prng.normal(np.repeat(isi_array, repeats), stdev)
-        else:
-            t_array = isi_array
+        t_array = prng.normal(np.repeat(isi_array, repeats), stdev)
     elif distribution == 'uniform':
         n_inputs = repeats * f_input * (tstop - t0) / 1000.
         t_array = prng.uniform(t0, tstop, n_inputs)
