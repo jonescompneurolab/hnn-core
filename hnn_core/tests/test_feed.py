@@ -6,7 +6,8 @@ import pytest
 import numpy as np
 
 from hnn_core import Params
-from hnn_core.feed import feed_event_times, _create_extpois
+from hnn_core.feed import (feed_event_times, _get_prng, _create_extpois,
+                           _create_common_input)
 from hnn_core.params import create_pext
 
 
@@ -76,3 +77,23 @@ def test_extfeed():
         _create_extpois(t0=50, T=20, lamtha=lamtha, prng=prng)
     with pytest.raises(ValueError, match='Rate must be > 0'):
         _create_extpois(t0=0, T=1000, lamtha=-5, prng=prng)
+
+    # check "common" input
+    distribution = 'blah'
+    t0 = 0
+    t0_stdev = 5
+    tstop = 100
+    f_input = 100.
+    stdev = 5.
+    repeats = 2
+    events_per_cycle = 2
+    prng, prng2 = _get_prng(seed=0, gid=5, sync_evinput=False)
+    with pytest.raises(ValueError, match='distribution not recognized'):
+        _create_common_input('blah', t0, t0_stdev, tstop, f_input,
+                             stdev, repeats, events_per_cycle, prng, prng2)
+
+    events_per_cycle = 3.
+    distribution = 'uniform'
+    with pytest.raises(ValueError, match='events_per_cycle should be'):
+        _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
+                             stdev, repeats, events_per_cycle, prng, prng2)

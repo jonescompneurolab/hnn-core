@@ -29,7 +29,7 @@ def _get_prng(seed, gid, sync_evinput=False):
     """
     # XXX: some param files use seed < 0 but numpy
     # does not allow this.
-    if seed > 0:
+    if seed >= 0:
         prng2 = np.random.RandomState(seed)
     else:
         prng2 = None
@@ -217,19 +217,22 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
         The distribution for each burst. One of 'normal' or 'uniform'.
     t0 : float
         The start times. If -1, then randomize the start time
-        of inputs.
+        of inputs uniformly between 25 ms and 125 ms.
     t0_stdev : float
-        Standard deviation of jitter to start time.
+        If greater than 0 and t0 != -1, randomize start time
+        of inputs from a normal distribution with t0_stdev as standard
+        deviation.
     tstop : float
         The stop time.
     f_input : float
         The frequency of input bursts.
     stdev : float
-        The standard deviation.
+        The standard deviation. Only for 'normal' distribution.
     repeats : int
         The number of repeats.
     events_per_cycle : float
-        The events per cycle. Must be 1 or 2.
+        The events per cycle. Must be 1 or 2. If it is 2, then
+        return doublets 10 ms apart.
     prng : instance of RandomState
         The random state.
     prng2 : instance of RandomState
@@ -250,9 +253,9 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
     elif t0_stdev > 0.0:
         t0 = prng2.normal(t0, t0_stdev)
 
-    if events_per_cycle != 1:
-        print("events_per_cycle should be either 1 or 2, trying 2")
-        events_per_cycle = 2
+    if events_per_cycle != 1 and events_per_cycle != 2:
+        raise ValueError(f'events_per_cycle should be either 1 or 2. '
+                         f'Got {events_per_cycle}')
 
     if distribution == 'normal':
         # array of mean stimulus times, starts at t0
@@ -263,15 +266,6 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
         n_inputs = repeats * f_input * (tstop - t0) / 1000.
         t_array = prng.uniform(t0, tstop, n_inputs)
 
-    t_input = np.array([])
     if events_per_cycle == 2:
-        # Two arrays store doublet times
-        t_input_low = t_array - 5
-        t_input_high = t_array + 5
-        # Array with ALL stimulus times for input
-        # np.append concatenates two np arrays
-        t_input = np.append(t_input_low, t_input_high)
-    elif events_per_cycle == 1:
-        t_input = t_array
-
-    return t_input
+        return np.append(t_array - 5, t_array + 5)
+    return t_array
