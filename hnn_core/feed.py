@@ -87,10 +87,10 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
     # Return values not checked: False if all weights for given feed type
     # are zero. Designed to be silent so that zeroing input weights
     # effectively disables each.
-    zero_ampa_nmda = False
+    target_syn_weights_zero = False
     if target_cell_type in params:
-        zero_ampa_nmda = (params[target_cell_type][0] <= 0.0 and
-                          params[target_cell_type][1] <= 0.0)
+        target_syn_weights_zero = (params[target_cell_type][0] <= 0.0 and
+                                   params[target_cell_type][1] <= 0.0)
 
     all_syn_weights_zero = True
     for key in params.keys():
@@ -99,7 +99,7 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
                 all_syn_weights_zero = False
 
     event_times = list()
-    if feed_type == 'extpois' and not zero_ampa_nmda:
+    if feed_type == 'extpois' and not target_syn_weights_zero:
         event_times = _create_extpois(
             t0=params['t_interval'][0],
             T=params['t_interval'][1],
@@ -114,7 +114,7 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
             sigma=params[target_cell_type][3],
             numspikes=int(params['numspikes']),
             prng=prng)
-    elif feed_type == 'extgauss' and not zero_ampa_nmda:
+    elif feed_type == 'extgauss' and not target_syn_weights_zero:
         event_times = _create_gauss(
             mu=params[target_cell_type][3],
             sigma=params[target_cell_type][4],
