@@ -3,8 +3,10 @@
 
 import pytest
 
+import numpy as np
+
 from hnn_core import Params
-from hnn_core.feed import feed_event_times
+from hnn_core.feed import feed_event_times, _create_extpois
 from hnn_core.params import create_pext
 
 
@@ -61,9 +63,16 @@ def test_extfeed():
             target_cell_type='L2_basket',
             params=params, gid=0)
 
-    # checks the distribution stats
-    # if len(val_pois):
-    #     xdiff = np.diff(val_pois/1000)
-    #     print(lamtha, np.mean(xdiff), np.var(xdiff), 1/lamtha**2)
-    # Convert array into nrn vector
-    # if len(val_pois)>0: print('val_pois:',val_pois)
+    # checks the poisson spike train generation
+    prng = np.random.RandomState()
+    lamtha = 50.
+    event_times = _create_extpois(t0=0, T=100000, lamtha=lamtha, prng=prng)
+    event_intervals = np.diff(event_times)
+    assert pytest.approx(event_intervals.mean(), abs=1.) == 1000 * 1 / lamtha
+
+    with pytest.raises(ValueError, match='The start time for Poisson'):
+        _create_extpois(t0=-5, T=5, lamtha=lamtha, prng=prng)
+    with pytest.raises(ValueError, match='The end time for Poisson'):
+        _create_extpois(t0=50, T=20, lamtha=lamtha, prng=prng)
+    with pytest.raises(ValueError, match='Rate must be > 0'):
+        _create_extpois(t0=0, T=1000, lamtha=-5, prng=prng)

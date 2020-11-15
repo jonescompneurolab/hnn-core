@@ -7,12 +7,6 @@
 import numpy as np
 
 
-# based on cdf for exp wait time distribution from unif [0, 1)
-# returns in ms based on lamtha in Hz
-def _t_wait(prng, lamtha):
-    return -1000. * np.log(1. - prng.rand()) / lamtha
-
-
 def _get_prng(seed, gid, sync_evinput=False):
     """Random generator for this instance.
 
@@ -156,11 +150,11 @@ def _create_extpois(t0, T, lamtha, prng):
     Parameters
     ----------
     t0 : float
-        The start time.
+        The start time (in ms).
     T : float
-        The end time.
+        The end time (in ms).
     lamtha : float
-        The spatial decay lambda.
+        The rate parameter for spike train (in Hz)
     prng : instance of RandomState
         The random state.
 
@@ -169,26 +163,24 @@ def _create_extpois(t0, T, lamtha, prng):
     event_times : array
         The event times.
     """
+    # see: http://www.cns.nyu.edu/~david/handouts/poisson.pdf
     if t0 < 0:
         raise ValueError('The start time for Poisson inputs must be'
                          f'greater than 0. Got {t0}')
     if T < t0:
         raise ValueError('The end time for Poisson inputs must be'
                          f'greater than start time. Got ({t0}, {T})')
+    if lamtha <= 0.:
+        raise ValueError(f'Rate must be > 0. Got {lamtha}')
 
-    # start the initial value
-    event_times = np.array([])
-    if lamtha > 0.:
-        t_gen = t0 + _t_wait(prng, lamtha)
+    event_times = list()
+    t_gen = t0
+    while t_gen < T:
+        t_gen += prng.exponential(1. / lamtha) * 1000.
         if t_gen < T:
-            np.append(event_times, t_gen)
+            event_times.append(t_gen)
 
-        while t_gen < T:
-            # so as to not clobber confusingly base off of t_gen ...
-            t_gen += _t_wait(prng, lamtha)
-            if t_gen < T:
-                event_times = np.append(event_times, t_gen)
-    return event_times
+    return np.array(event_times)
 
 
 def _create_gauss(mu, sigma, numspikes, prng):
