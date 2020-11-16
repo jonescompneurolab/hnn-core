@@ -27,13 +27,18 @@ def test_cell():
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
+    # ... or later
+    cell = Cell(soma_props=soma_props)  # cells can exist fine without gid
+    assert cell.gid is None  # check that it's initialised to None
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
         cell.gid = [1]
-    # ... or later
-    cell = Cell(soma_props=soma_props)  # cells can exist fine without gid
     cell.gid = 42
     assert cell.gid == 42
+    with pytest.raises(ValueError,
+                       match='gid must be an integer'):
+        cell = Cell(soma_props=soma_props, gid='one')  # test init checks gid
+
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
@@ -63,5 +68,9 @@ def test_artificial_cell():
         cell.gid = [1]
     # ... or later
     cell = _ArtificialCell(event_times, threshold)  # fine without gid
+    assert cell.gid is None  # check that it's initialised to None
     cell.gid = 42
     assert cell.gid == 42
+    with pytest.raises(ValueError,  # test init checks gid
+                       match='gid must be an integer'):
+        cell = _ArtificialCell(event_times, threshold, gid='one')
