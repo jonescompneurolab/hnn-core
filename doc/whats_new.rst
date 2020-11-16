@@ -33,6 +33,8 @@ Changelog
 
 - Add ability to record somatic voltages from all cells, by `Nick Tolley`_ in `#190 <https://github.com/jonescompneurolab/hnn-core/pull/190>`_
 
+- Add ability to instantiate external feed event times of a network prior to building it, by `Christopher Bailey`_ in `#191 <https://github.com/jonescompneurolab/hnn-core/pull/191>`_
+
 Bug
 ~~~
 
