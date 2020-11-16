@@ -7,7 +7,6 @@
 import numpy as np
 from neuron import h
 
-from .feed import feed_event_times
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket

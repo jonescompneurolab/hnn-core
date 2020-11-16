@@ -7,8 +7,8 @@
 import itertools as it
 import numpy as np
 from glob import glob
-from .feed import ExtFeed
 
+from .feed import feed_event_times
 from .params import create_pext
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
@@ -284,27 +284,31 @@ class Network(object):
                                              cur_params['tstop'])
 
             src_types = self.feedname_list
-            event_times_per_source = {}
+            event_times_per_source = dict()
             for src_type in src_types:
-                event_times = []
+                event_times = list()
                 if src_type == 'common':
                     for idx, gid in enumerate(self.gid_ranges['common']):
                         gid_target = None  # 'common' attaches to all
-                        feed = ExtFeed(feed_type=src_type,
-                                       target_cell_type=gid_target,
-                                       params=p_common[idx],
-                                       gid=gid)
-                        event_times.append(feed.event_times)
+                        event_times.append(
+                            feed_event_times(
+                                feed_type=src_type,
+                                target_cell_type=gid_target,
+                                params=p_common[idx],
+                                gid=gid)
+                        )
 
                 elif src_type in p_unique.keys():
                     for gid in self.gid_ranges[src_type]:
                         gid_target = gid - self.gid_ranges[src_type][0]
                         target_cell_type = self.gid_to_type(gid_target)
-                        feed = ExtFeed(feed_type=src_type,
-                                       target_cell_type=target_cell_type,
-                                       params=p_unique[src_type],
-                                       gid=gid)
-                        event_times.append(feed.event_times)
+                        event_times.append(
+                            feed_event_times(
+                                feed_type=src_type,
+                                target_cell_type=target_cell_type,
+                                params=p_unique[src_type],
+                                gid=gid)
+                        )
                 event_times_per_source.update({src_type: event_times})
 
             # list of dict of list of list
