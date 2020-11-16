@@ -69,6 +69,11 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
         Parameters of the external input feed, arranged into a dictionary.
     gid : int
         The cell ID.
+
+    Returns
+    -------
+    event_times : list
+        The event times at which spikes occur.
     """
     prng, prng2 = _get_prng(
         seed=params['prng_seedcore'],
@@ -139,7 +144,7 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
     if len(event_times) > 0:
         event_times = event_times[event_times > 0]
         event_times.sort()
-        event_times.tolist()
+        event_times = event_times.tolist()
 
     return event_times
 
