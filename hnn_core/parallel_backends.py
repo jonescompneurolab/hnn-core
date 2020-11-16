@@ -54,7 +54,6 @@ def _gather_trial_data(sim_data, net, n_trials):
         net.gid_ranges = spikedata[2]  # only have one gid_ranges
         net.spikes.update_types(net.gid_ranges)
         net.spikes._vsoma.append(spikedata[3])
-        net.spikes._times.append(net.times.tolist())
 
     return dpls
 

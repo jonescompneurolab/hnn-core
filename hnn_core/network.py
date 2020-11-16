@@ -177,10 +177,9 @@ class Network(object):
         # Originally used to create the empty vec for synaptic currents,
         # ensuring that they exist on this node irrespective of whether
         # or not cells of relevant type actually
-        self.times = np.arange(0., params['tstop'] + params['dt'],
-                               params['dt'])
-        # Create empty spikes object
-        self.spikes = Spikes()
+        times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
+        # Create spikes object, initialised with simulation time points
+        self.spikes = Spikes(times=times)
 
         # Source list of names, first real ones only!
         self.cellname_list = [
@@ -397,8 +396,8 @@ class Spikes(object):
         Each gid corresponds to a type via Network::gid_ranges.
     vsoma : dict
         Dictionary indexed by gids containing somatic voltages
-    times : list
-        List of time points for samples in continuous data.
+    times : numpy array
+        Array of time points for samples in continuous data.
         This includes vsoma.
 
     Methods
@@ -415,7 +414,8 @@ class Spikes(object):
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, spike_times=None, spike_gids=None, spike_types=None):
+    def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
+                 times=None):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
@@ -446,7 +446,10 @@ class Spikes(object):
         self._spike_gids = spike_gids
         self._spike_types = spike_types
         self._vsoma = list()
-        self._times = list()
+        if times is not None:
+            assert isinstance(times, np.ndarray),\
+                "'times' is an array of simulation times"
+        self._times = times
 
     def __repr__(self):
         class_name = self.__class__.__name__
