@@ -8,6 +8,7 @@ pattern of cells in the HNN model.
 """
 
 # Authors: Mainak Jas <mjas@harvard.mgh.edu>
+#          Nick Tolley <nick nicholas_tolley@brown.edu>
 
 import os.path as op
 
@@ -37,7 +38,7 @@ gid_dict = net.gid_dict
 print(net.gid_dict)
 
 ###############################################################################
-# Simulated cell responses are stored in the Spikes object as a dictionary.
+# Simulated voltage in the soma is stored in the Spikes object as a dictionary.
 trial_idx = 0
 vsoma = net.spikes.vsoma[trial_idx]
 print(vsoma.keys())
@@ -54,24 +55,15 @@ plt.ylabel('Voltage (mV)')
 plt.show()
 
 ###############################################################################
-# Let's do this for the rest of the cell types
-fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
-for gid, ax in zip([gid_dict['L2_pyramidal'][0],
-                    gid_dict['L5_pyramidal'][0]], axes):
-    ax.plot(times, vsoma[gid])
-    ax.set_title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
-    ax.set_xlabel('Time (ms)')
-    ax.set_ylabel('Voltage (mV)')
-plt.show()
+# Let's plot the soma voltage along with the spiking activity with raster
+# plots and histograms for the Pyramidal cells.
 
-###############################################################################
-# The spiking activity across cell types can also be visualized with raster
-# plots and histograms
+fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
 
-# Spike raster plot
-net.spikes.plot()
-
-# Spike histogram
-fig, axes = plt.subplots(1, 1, figsize=(8, 4))
-net.spikes.plot_hist(ax=axes, spike_types=['L2_pyramidal', 'L5_pyramidal'])
-axes.set_xlabel('Time (ms)')
+for idx in range(10):  # only 10 cells per cell-type
+    gid = gid_dict['L2_pyramidal'][idx]
+    axes[0].plot(times, vsoma[gid], color='g')
+    gid = gid_dict['L5_pyramidal'][idx]
+    axes[0].plot(times, vsoma[gid], color='r')
+net.spikes.plot(ax=axes[1])
+net.spikes.plot_hist(ax=axes[2], spike_types=['L5_pyramidal', 'L2_pyramidal'])
