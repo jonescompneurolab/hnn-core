@@ -173,10 +173,8 @@ class Network(object):
         # place to keep this information
         self.gid_ranges = dict()
 
-        # Number of time points
-        # Originally used to create the empty vec for synaptic currents,
-        # ensuring that they exist on this node irrespective of whether
-        # or not cells of relevant type actually
+        # Create array of equally sampled time points for simulating currents
+        # NB (only) used to initialise self.spikes._times
         times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
         # Create spikes object, initialised with simulation time points
         self.spikes = Spikes(times=times)
@@ -447,8 +445,8 @@ class Spikes(object):
         self._spike_types = spike_types
         self._vsoma = list()
         if times is not None:
-            assert isinstance(times, np.ndarray),\
-                "'times' is an array of simulation times"
+            if not isinstance(times, np.ndarray):
+                raise TypeError("'times' is an np.ndarray of simulation times")
         self._times = times
 
     def __repr__(self):
