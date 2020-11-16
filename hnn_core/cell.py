@@ -53,18 +53,20 @@ class _ArtificialCell:
         self.nrn_netcon = h.NetCon(self.nrn_vecstim, None)
         self.nrn_netcon.threshold = threshold
 
-        self._assigned_gid = gid
+        self._gid = None
+        if gid is not None:
+            self.gid = gid  # use setter method to check input argument gid
 
     @property
     def gid(self):
-        return self._assigned_gid
+        return self._gid
 
     @gid.setter
     def gid(self, gid):
         if not isinstance(gid, int):
             raise ValueError('gid must be an integer')
-        if self._assigned_gid is None:
-            self._assigned_gid = gid
+        if self._gid is None:
+            self._gid = gid
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
@@ -103,7 +105,9 @@ class _Cell(ABC):
         self.soma_props = soma_props
         self.create_soma()
         self.rec_v = h.Vector()
-        self._assigned_gid = gid
+        self._gid = None
+        if gid is not None:
+            self.gid = gid  # use setter method to check input argument gid
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -115,14 +119,14 @@ class _Cell(ABC):
 
     @property
     def gid(self):
-        return self._assigned_gid
+        return self._gid
 
     @gid.setter
     def gid(self, gid):
         if not isinstance(gid, int):
             raise ValueError('gid must be an integer')
-        if self._assigned_gid is None:
-            self._assigned_gid = gid
+        if self._gid is None:
+            self._gid = gid
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
