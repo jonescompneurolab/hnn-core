@@ -255,20 +255,24 @@ class Network(object):
         self._update_gid_ranges()
 
         # Create the feed dynamics (event_times)
-        self._instantiate_feeds()
+        self._instantiate_feeds(n_trials=self.params['N_trials'])
 
-    def _instantiate_feeds(self):
-        '''Creates event_time vectors for all feeds and all trials
+    def _instantiate_feeds(self, n_trials=1):
+        """Creates event_time vectors for all feeds and all trials
+
+        Parameters
+        ----------
+        n_trials : int
+            Number of trials to create events for (default: 1)
 
         NB this must be a separate method because dipole.py:simulate_dipole
         accepts an n_trials-argument, which overrides the N_trials-parameter
         used at intialisation time. The good news is that only the event_times
         need to be recalculated, all the GIDs etc remain the same.
-        '''
+        """
         # each trial needs unique event time vectors
 
         self.trial_event_times = []  # reset if called again from dipole.py
-        n_trials = self.params['N_trials']
 
         cur_params = self.params.copy()  # these get mangled below!
         for trial_idx in range(n_trials):
