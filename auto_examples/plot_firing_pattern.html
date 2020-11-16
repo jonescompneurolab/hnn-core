@@ -117,6 +117,7 @@
 <p>This example demonstrates how to inspect the firing
 pattern of cells in the HNN model.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Mainak Jas &lt;mjas@harvard.mgh.edu&gt;</span>
+<span class="c1">#          Nick Tolley &lt;nick nicholas_tolley@brown.edu&gt;</span>
 
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 </pre></div>
@@ -174,7 +175,7 @@ Simulation time: 160.0 ms...
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;L2_basket&#39;: range(0, 35), &#39;L2_pyramidal&#39;: range(35, 135), &#39;L5_basket&#39;: range(135, 170), &#39;L5_pyramidal&#39;: range(170, 270), &#39;common&#39;: range(270, 272), &#39;evdist1&#39;: range(272, 542), &#39;evprox1&#39;: range(542, 812), &#39;evprox2&#39;: range(812, 1082), &#39;extgauss&#39;: range(1082, 1352), &#39;extpois&#39;: range(1352, 1622)}
 </pre></div>
 </div>
-<p>Simulated cell responses are stored in the Spikes object as a dictionary.</p>
+<p>Simulated voltage in the soma is stored in the Spikes object as a dictionary.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">trial_idx</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">vsoma</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">vsoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">vsoma</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -196,40 +197,25 @@ Simulation time: 160.0 ms...
 </pre></div>
 </div>
 <img alt="L5_pyramidal (gid=170)" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_firing_pattern_001.png" />
-<p>Let’s do this for the rest of the cell types</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">gid</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">gid_dict</span><span class="p">[</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="n">gid_dict</span><span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span> <span class="n">axes</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">vsoma</span><span class="p">[</span><span class="n">gid</span><span class="p">])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (gid=</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">gid_to_type</span></a><span class="p">(</span><span class="n">gid</span><span class="p">),</span> <span class="n">gid</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Voltage (mV)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<img alt="L2_pyramidal (gid=35), L5_pyramidal (gid=170)" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_firing_pattern_002.png" />
-<p>The spiking activity across cell types can also be visualized with raster
-plots and histograms</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Spike raster plot</span>
-<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.plot" title="hnn_core.Spikes.plot" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">plot</span></a><span class="p">()</span>
+<p>Let’s plot the soma voltage along with the spiking activity with raster
+plots and histograms for the Pyramidal cells.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Spike histogram</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.plot_hist" title="hnn_core.Spikes.plot_hist" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">plot_hist</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">])</span>
-<span class="n">axes</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>  <span class="c1"># only 10 cells per cell-type</span>
+    <span class="n">gid</span> <span class="o">=</span> <span class="n">gid_dict</span><span class="p">[</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">vsoma</span><span class="p">[</span><span class="n">gid</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+    <span class="n">gid</span> <span class="o">=</span> <span class="n">gid_dict</span><span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">vsoma</span><span class="p">[</span><span class="n">gid</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.plot" title="hnn_core.Spikes.plot" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Spikes.html#hnn_core.Spikes.plot_hist" title="hnn_core.Spikes.plot_hist" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">spikes</span><span class="o">.</span><span class="n">plot_hist</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img alt="plot firing pattern" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_firing_pattern_003.png" />
-</li>
-<li><img alt="plot firing pattern" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_firing_pattern_004.png" />
-</li>
-</ul>
+<img alt="plot firing pattern" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_firing_pattern_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 14.722222222222216, &#39;Time (ms)&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 500x700 with 3 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  45.208 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  51.212 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-firing-pattern-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_firing_pattern.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>

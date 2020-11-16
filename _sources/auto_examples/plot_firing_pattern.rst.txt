@@ -21,6 +21,7 @@ pattern of cells in the HNN model.
 
 
     # Authors: Mainak Jas <mjas@harvard.mgh.edu>
+    #          Nick Tolley <nick nicholas_tolley@brown.edu>
 
     import os.path as op
 
@@ -133,7 +134,7 @@ The cell IDs (gids) are stored in the network object as a dictionary
 
 
 
-Simulated cell responses are stored in the Spikes object as a dictionary.
+Simulated voltage in the soma is stored in the Spikes object as a dictionary.
 
 
 .. code-block:: default
@@ -182,62 +183,28 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
 
 
-Let's do this for the rest of the cell types
+Let's plot the soma voltage along with the spiking activity with raster
+plots and histograms for the Pyramidal cells.
 
 
 .. code-block:: default
 
-    fig, axes = plt.subplots(1, 2, sharey=True, figsize=(8, 4))
-    for gid, ax in zip([gid_dict['L2_pyramidal'][0],
-                        gid_dict['L5_pyramidal'][0]], axes):
-        ax.plot(times, vsoma[gid])
-        ax.set_title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
-        ax.set_xlabel('Time (ms)')
-        ax.set_ylabel('Voltage (mV)')
-    plt.show()
 
+    fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
+
+    for idx in range(10):  # only 10 cells per cell-type
+        gid = gid_dict['L2_pyramidal'][idx]
+        axes[0].plot(times, vsoma[gid], color='g')
+        gid = gid_dict['L5_pyramidal'][idx]
+        axes[0].plot(times, vsoma[gid], color='r')
+    net.spikes.plot(ax=axes[1])
+    net.spikes.plot_hist(ax=axes[2], spike_types=['L5_pyramidal', 'L2_pyramidal'])
 
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_002.png
-    :alt: L2_pyramidal (gid=35), L5_pyramidal (gid=170)
+    :alt: plot firing pattern
     :class: sphx-glr-single-img
-
-
-
-
-
-The spiking activity across cell types can also be visualized with raster
-plots and histograms
-
-
-.. code-block:: default
-
-
-    # Spike raster plot
-    net.spikes.plot()
-
-    # Spike histogram
-    fig, axes = plt.subplots(1, 1, figsize=(8, 4))
-    net.spikes.plot_hist(ax=axes, spike_types=['L2_pyramidal', 'L5_pyramidal'])
-    axes.set_xlabel('Time (ms)')
-
-
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_003.png
-          :alt: plot firing pattern
-          :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_004.png
-          :alt: plot firing pattern
-          :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -247,14 +214,14 @@ plots and histograms
  .. code-block:: none
 
 
-    Text(0.5, 14.722222222222216, 'Time (ms)')
+    <Figure size 500x700 with 3 Axes>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  45.208 seconds)
+   **Total running time of the script:** ( 0 minutes  51.212 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:
