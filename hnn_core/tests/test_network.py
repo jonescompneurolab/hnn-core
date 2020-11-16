@@ -46,9 +46,8 @@ def test_network():
     assert net.spikes == Spikes()
     # array of simulation times is created in Network.__init__, but passed
     # to Spikes-constructor for storage (Network is agnostic of time)
-    # times should be a Numpy ND-array, not a list
-    with pytest.raises(AssertionError,
-                       match="'times' is an array of simulation times"):
+    with pytest.raises(TypeError,
+                       match="'times' is an np.ndarray of simulation times"):
         _ = Spikes(times=[1, 2, 3])
 
     # Assert that all external feeds are initialized
