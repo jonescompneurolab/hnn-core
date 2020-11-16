@@ -34,8 +34,8 @@ dpls = simulate_dipole(net, n_trials=1, record_vsoma=True)
 
 ###############################################################################
 # The cell IDs (gids) are stored in the network object as a dictionary
-gid_dict = net.gid_dict
-print(net.gid_dict)
+gid_ranges = net.gid_ranges
+print(net.gid_ranges)
 
 ###############################################################################
 # Simulated voltage in the soma is stored in the Spikes object as a dictionary.
@@ -46,9 +46,8 @@ print(vsoma.keys())
 ###############################################################################
 # We can plot the firing pattern of individual cells by indexing with the gid
 gid = 170
-times = net.spikes.times[trial_idx]
 plt.figure(figsize=(4, 4))
-plt.plot(times, vsoma[gid])
+plt.plot(net.spikes.times, vsoma[gid])
 plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
 plt.xlabel('Time (ms)')
 plt.ylabel('Voltage (mV)')
@@ -61,9 +60,9 @@ plt.show()
 fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
 
 for idx in range(10):  # only 10 cells per cell-type
-    gid = gid_dict['L2_pyramidal'][idx]
-    axes[0].plot(times, vsoma[gid], color='g')
-    gid = gid_dict['L5_pyramidal'][idx]
-    axes[0].plot(times, vsoma[gid], color='r')
+    gid = gid_ranges['L2_pyramidal'][idx]
+    axes[0].plot(net.spikes.times, vsoma[gid], color='g')
+    gid = gid_ranges['L5_pyramidal'][idx]
+    axes[0].plot(net.spikes.times, vsoma[gid], color='r')
 net.spikes.plot(ax=axes[1])
 net.spikes.plot_hist(ax=axes[2], spike_types=['L5_pyramidal', 'L2_pyramidal'])

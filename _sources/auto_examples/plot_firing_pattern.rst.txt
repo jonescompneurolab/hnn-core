@@ -116,8 +116,8 @@ The cell IDs (gids) are stored in the network object as a dictionary
 
 .. code-block:: default
 
-    gid_dict = net.gid_dict
-    print(net.gid_dict)
+    gid_ranges = net.gid_ranges
+    print(net.gid_ranges)
 
 
 
@@ -164,9 +164,8 @@ We can plot the firing pattern of individual cells by indexing with the gid
 .. code-block:: default
 
     gid = 170
-    times = net.spikes.times[trial_idx]
     plt.figure(figsize=(4, 4))
-    plt.plot(times, vsoma[gid])
+    plt.plot(net.spikes.times, vsoma[gid])
     plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
     plt.xlabel('Time (ms)')
     plt.ylabel('Voltage (mV)')
@@ -193,10 +192,10 @@ plots and histograms for the Pyramidal cells.
     fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
 
     for idx in range(10):  # only 10 cells per cell-type
-        gid = gid_dict['L2_pyramidal'][idx]
-        axes[0].plot(times, vsoma[gid], color='g')
-        gid = gid_dict['L5_pyramidal'][idx]
-        axes[0].plot(times, vsoma[gid], color='r')
+        gid = gid_ranges['L2_pyramidal'][idx]
+        axes[0].plot(net.spikes.times, vsoma[gid], color='g')
+        gid = gid_ranges['L5_pyramidal'][idx]
+        axes[0].plot(net.spikes.times, vsoma[gid], color='r')
     net.spikes.plot(ax=axes[1])
     net.spikes.plot_hist(ax=axes[2], spike_types=['L5_pyramidal', 'L2_pyramidal'])
 
@@ -221,7 +220,7 @@ plots and histograms for the Pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  51.212 seconds)
+   **Total running time of the script:** ( 0 minutes  47.444 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

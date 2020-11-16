@@ -112,16 +112,18 @@
 <h1>hnn_core.L5Pyr<a class="headerlink" href="#hnn-core-l5pyr" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="hnn_core.L5Pyr">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L5Pyr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">pos</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">hnn_core.</code><code class="sig-name descname">L5Pyr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pos</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">override_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Layer 5 Pyramidal class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>The cell ID</p>
+<dt><strong>pos</strong><span class="classifier">tuple</span></dt><dd><p>Coordinates of cell soma in xyz-space</p>
 </dd>
-<dt><strong>pos</strong><span class="classifier">tuple | None</span></dt><dd><p>The position of the cell</p>
+<dt><strong>override_params</strong><span class="classifier">dict or None (optional)</span></dt><dd><p>Parameters specific to L2 pyramidal neurons to override the default set</p>
 </dd>
-<dt><strong>params</strong><span class="classifier">dict | None</span></dt><dd><p>The params dictionary</p>
+<dt><strong>gid</strong><span class="classifier">int or None (optional)</span></dt><dd><p>Each cell in a network is uniquely identified by it’s “global ID”: GID.
+The GID is an integer from 0 to n_cells, or None if the cell is not
+yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </dd>
 </dl>
 </dd>

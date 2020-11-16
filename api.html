@@ -126,16 +126,16 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.L2Pyr.html#hnn_core.L2Pyr" title="hnn_core.L2Pyr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2Pyr</span></code></a>([gid, pos, params])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.L2Pyr.html#hnn_core.L2Pyr" title="hnn_core.L2Pyr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2Pyr</span></code></a>([pos, override_params, gid])</p></td>
 <td><p>Layer 2 pyramidal cell class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.L5Pyr.html#hnn_core.L5Pyr" title="hnn_core.L5Pyr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L5Pyr</span></code></a>([gid, pos, params])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.L5Pyr.html#hnn_core.L5Pyr" title="hnn_core.L5Pyr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L5Pyr</span></code></a>([pos, override_params, gid])</p></td>
 <td><p>Layer 5 Pyramidal class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.L2Basket.html#hnn_core.L2Basket" title="hnn_core.L2Basket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2Basket</span></code></a>([gid, pos])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.L2Basket.html#hnn_core.L2Basket" title="hnn_core.L2Basket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2Basket</span></code></a>(pos[, gid])</p></td>
 <td><p>Class for layer 2 basket cells.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.L5Basket.html#hnn_core.L5Basket" title="hnn_core.L5Basket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L5Basket</span></code></a>([gid, pos])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.L5Basket.html#hnn_core.L5Basket" title="hnn_core.L5Basket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L5Basket</span></code></a>(pos[, gid])</p></td>
 <td><p>Class for layer 5 basket cells.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.ExtFeed.html#hnn_core.ExtFeed" title="hnn_core.ExtFeed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtFeed</span></code></a>(feed_type, target_cell_type, params, gid)</p></td>
@@ -147,7 +147,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a>(params)</p></td>
 <td><p>The Network class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spikes</span></code></a>([spike_times, spike_gids, spike_types])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spikes</span></code></a>([spike_times, spike_gids, …])</p></td>
 <td><p>The Spikes class.</p></td>
 </tr>
 </tbody>
@@ -241,7 +241,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname[, units])</p></td>
 <td><p>Read dipole values from a file and create a Dipole instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spikes</span></code></a>(fname[, gid_dict])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spikes</span></code></a>(fname[, gid_ranges])</p></td>
 <td><p>Read spiking activity from a collection of spike trial files.</p></td>
 </tr>
 </tbody>
