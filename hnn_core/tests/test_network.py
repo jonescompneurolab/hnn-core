@@ -47,7 +47,7 @@ def test_network():
     # array of simulation times is created in Network.__init__, but passed
     # to Spikes-constructor for storage (Network is agnostic of time)
     # times should be a Numpy ND-array, not a list
-    with pytest.raises(TypeError,
+    with pytest.raises(AssertionError,
                        match="'times' is an array of simulation times"):
         _ = Spikes(times=[1, 2, 3])
 
