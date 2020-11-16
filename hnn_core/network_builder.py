@@ -46,7 +46,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
     h.dt = neuron_net.net.params['dt']  # simulation duration and time-step
     h.celsius = neuron_net.net.params['celsius']  # 37.0 - set temperature
 
-    times = neuron_net.net.times
+    times = neuron_net.net.spikes.times
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
@@ -304,19 +304,15 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        # initialise vectors for synaptic currents based on simulation params
-        n_times = np.arange(0., self.net.params['tstop'],
-                            self.net.params['dt']).size + 1
-
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.current = {
-            'L5_pyramidal_soma': h.Vector(n_times, 0),
-            'L2_pyramidal_soma': h.Vector(n_times, 0),
+            'L5_pyramidal_soma': h.Vector(self.net.spikes.times.size, 0),
+            'L2_pyramidal_soma': h.Vector(self.net.spikes.times.size, 0),
         }
 
         self.dipoles = {
-            'L5_pyramidal': h.Vector(n_times, 0),
-            'L2_pyramidal': h.Vector(n_times, 0),
+            'L5_pyramidal': h.Vector(self.net.spikes.times.size, 0),
+            'L2_pyramidal': h.Vector(self.net.spikes.times.size, 0),
         }
 
         self._gid_assign()
@@ -423,7 +419,7 @@ class NetworkBuilder(object):
                 if record_vsoma:
                     cell.record_voltage_soma()
 
-                # this calls seems to belong in init of a _Cell (w/threshold)?
+                # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
                 _PC.cell(cell.gid, nrn_netcon)
                 self.cells.append(cell)
