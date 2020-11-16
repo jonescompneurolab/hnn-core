@@ -27,6 +27,9 @@ def test_cell():
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
+    with pytest.raises(ValueError,
+                       match='gid must be an integer'):
+        cell.gid = [1]
     # ... or later
     cell = Cell(soma_props=soma_props)  # cells can exist fine without gid
     cell.gid = 42
@@ -55,6 +58,9 @@ def test_artificial_cell():
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
+    with pytest.raises(ValueError,
+                       match='gid must be an integer'):
+        cell.gid = [1]
     # ... or later
     cell = _ArtificialCell(event_times, threshold)  # fine without gid
     cell.gid = 42
