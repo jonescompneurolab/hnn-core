@@ -27,7 +27,7 @@ Dependencies
 * numpy
 * scipy
 * matplotlib
-* Neuron: installation instructions here: https://neuron.yale.edu/neuron/
+* Neuron: installation instructions here: https://neuron.yale.edu/neuron/ (>=7.7)
 
 Optional dependencies
 ---------------------

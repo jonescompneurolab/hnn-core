@@ -197,13 +197,12 @@ class _Cell(ABC):
             # assign internal resistance values to dipole point process (dpp)
             dpp.ri = h.ri(1, sec=sect)
             # sets pointers in dipole mod file to the correct locations
-            # h.setpointer(ref, ptr, obj)
-            h.setpointer(sect(0.99)._ref_v, 'pv', dpp)
-            h.setpointer(self.dpl_ref, 'Qtotal', dpp)
+            dpp._ref_pv = sect(0.99)._ref_v
+            dpp._ref_Qtotal = self.dpl_ref
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
             loc = np.array([seg.x for seg in sect])
-            # these are the positions, including 0 but not L
+            # these are the positions, including 0 and L
             pos = np.array([seg.x for seg in sect.allseg()])
             # diff in yvals, scaled against the pos np.array. y_long as
             # in longitudinal
@@ -221,13 +220,12 @@ class _Cell(ABC):
                 # set pointers to previous segment's voltage, with
                 # boundary condition
                 if i > 0:
-                    h.setpointer(sect(loc[i - 1])._ref_v,
-                                 'pv', sect(loc[i]).dipole)
+                    sect(loc[i]).dipole._ref_pv = sect(loc[i - 1])._ref_v
                 else:
-                    h.setpointer(sect(0)._ref_v, 'pv', sect(loc[i]).dipole)
+                    sect(loc[i]).dipole._ref_pv = sect(0)._ref_v
                 # set aggregate pointers
-                h.setpointer(dpp._ref_Qsum, 'Qsum', sect(loc[i]).dipole)
-                h.setpointer(self.dpl_ref, 'Qtotal', sect(loc[i]).dipole)
+                sect(loc[i]).dipole._ref_Qsum = dpp._ref_Qsum
+                sect(loc[i]).dipole._ref_Qtotal = self.dpl_ref
                 # add ztan values
                 sect(loc[i]).dipole.ztan = y_diff[i]
             # set the pp dipole's ztan value to the last value from y_diff
