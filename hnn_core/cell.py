@@ -184,16 +184,15 @@ class _Cell(ABC):
 
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma
-        seclist = h.SectionList()
-        seclist.wholetree(sec=self.soma)
-        # create a python section list list_all
-        list_all = [sec for sec in seclist]
-        for sect in list_all:
+        sec_list = h.SectionList()
+        sec_list.wholetree(sec=self.soma)
+        sec_list = [sec for sec in sec_list]
+        for sect in sec_list:
             sect.insert('dipole')
         # Dipole is defined in dipole_pp.mod
-        self.dipole_pp = [h.Dipole(1, sec=sect) for sect in list_all]
+        self.dipole_pp = [h.Dipole(1, sec=sect) for sect in sec_list]
         # setting pointers and ztan values
-        for sect, dpp in zip(list_all, self.dipole_pp):
+        for sect, dpp in zip(sec_list, self.dipole_pp):
             # assign internal resistance values to dipole point process (dpp)
             dpp.ri = h.ri(1, sec=sect)
             # sets pointers in dipole mod file to the correct locations
@@ -201,9 +200,8 @@ class _Cell(ABC):
             dpp._ref_Qtotal = self.dpl_ref
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
-            loc = np.array([seg.x for seg in sect])
-            # these are the positions, including 0 and L
             pos = np.array([seg.x for seg in sect.allseg()])
+            loc = pos[1:-1]  # positions without 0 and L
             # diff in yvals, scaled against the pos np.array. y_long as
             # in longitudinal
             y_scale = (yscale[sect.name().split('_', 1)[1]] * sect.L) * pos
