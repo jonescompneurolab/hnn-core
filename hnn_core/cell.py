@@ -189,12 +189,10 @@ class _Cell(ABC):
         sec_list = [sec for sec in sec_list]
         for sect in sec_list:
             sect.insert('dipole')
-        # Dipole is defined in dipole_pp.mod
-        self.dipole_pp = [h.Dipole(1, sec=sect) for sect in sec_list]
         # setting pointers and ztan values
-        for sect, dpp in zip(sec_list, self.dipole_pp):
-            # assign internal resistance values to dipole point process (dpp)
-            dpp.ri = h.ri(1, sec=sect)
+        for sect in sec_list:
+            dpp = h.Dipole(1, sec=sect)  # defined in dipole_pp.mod
+            dpp.ri = h.ri(1, sec=sect)  # assign internal resistance
             # sets pointers in dipole mod file to the correct locations
             dpp._ref_pv = sect(0.99)._ref_v
             dpp._ref_Qtotal = self.dpl_ref
