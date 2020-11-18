@@ -61,7 +61,12 @@ def test_dipole_simulation():
         simulate_dipole(net, n_trials=0)
     with pytest.raises(TypeError, match="record_vsoma must be bool, got int"):
         simulate_dipole(net, n_trials=1, record_vsoma=0)
+    with pytest.raises(TypeError, match="record_isoma must be bool, got int"):
+        simulate_dipole(net, n_trials=1, record_isoma=0)
 
-    simulate_dipole(net, n_trials=2, record_vsoma=True)
+    simulate_dipole(net, n_trials=2, record_vsoma=True, record_isoma=True)
     assert len(net.spikes.vsoma) == 2
-    assert len(net.spikes.vsoma[0]) == 24
+    assert len(net.spikes.isoma) == 2
+    n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
+    assert len(net.spikes.vsoma[0][1]) == n_times
+    assert len(net.spikes.isoma[0][1]['soma_gabaa']) == n_times
