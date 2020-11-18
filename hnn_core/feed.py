@@ -237,7 +237,8 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
         The number of repeats.
     events_per_cycle : float
         The events per cycle. Must be 1 or 2. If it is 2, then
-        return doublets 10 ms apart.
+        return doublets 10 ms apart. This is the spikes/burst
+        parameter in GUI.
     prng : instance of RandomState
         The random state.
     prng2 : instance of RandomState
