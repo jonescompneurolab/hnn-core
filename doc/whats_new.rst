@@ -50,6 +50,8 @@ Bug
 
 - MPI and Joblib backends now apply jitter across multiple trials identically, by `Ryan Thorpe`_ in `#171 <https://github.com/jonescompneurolab/hnn-core/pull/171>`_
 
+- Fix bug in Poisson input where the first spike was being missed after the start time, by `Mainak Jas`_ in `#204 <https://github.com/jonescompneurolab/hnn-core/pull/204/>`_
+
 API
 ~~~
 
