@@ -310,8 +310,10 @@ class NetworkBuilder(object):
         self._gid_assign()
 
         record_vsoma = self.net.params['record_vsoma']
+        record_isoma = self.net.params['record_isoma']
         self._create_cells_and_feeds(threshold=self.net.params['threshold'],
-                                     record_vsoma=record_vsoma)
+                                     record_vsoma=record_vsoma,
+                                     record_isoma=record_isoma)
 
         self.state_init()
         self._parnet_connect()
@@ -376,7 +378,8 @@ class NetworkBuilder(object):
         # extremely important to get the gids in the right order
         self._gid_list.sort()
 
-    def _create_cells_and_feeds(self, threshold, record_vsoma=False):
+    def _create_cells_and_feeds(self, threshold, record_vsoma=False,
+                                record_isoma=False):
         """Parallel create cells AND external inputs (feeds)
 
         NB: _Cell.__init__ calls h.Section -> non-picklable!
@@ -390,14 +393,6 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
-        params = self.net.params
-        record_vsoma = params['record_vsoma']
-        record_isoma = params['record_isoma']
-        # Re-create external feed param dictionaries
-        # Note that the only thing being updated here are the param['prng_*']
-        # values
-        self.net.p_common, self.net.p_unique = create_pext(params,
-                                                           params['tstop'])
 
         # mechanism for Builder to keep track of which trial it's on
         this_trial_event_times = self.net.trial_event_times[self.trial_idx]
