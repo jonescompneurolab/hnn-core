@@ -146,6 +146,7 @@ def get_params_default(nprox=2, ndist=1):
         'save_figs': 0,
         'save_dpl': 0,  # whether to write dipole output to a file
         'record_vsoma': 0,  # whether to record somatic voltages
+        'record_isoma': 0,  # whether to record somatic currents
 
         # numerics
         # N_trials of 1 means that seed is set by rank

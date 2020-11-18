@@ -77,14 +77,11 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
 
-    # aggregate the currents independently on each proc
+    # aggregate the currents and voltages independently on each proc
     neuron_net.aggregate_currents()
-    # combine neuron_net.current{} variables from each proc
-    _PC.allreduce(neuron_net.current['L5_pyramidal_soma'], 1)
-    _PC.allreduce(neuron_net.current['L2_pyramidal_soma'], 1)
-
     neuron_net.aggregate_voltages()
     _PC.py_gather(neuron_net._vsoma, 0)
+    _PC.py_gather(neuron_net._isoma, 0)
 
     # combine spiking data from each proc
     spike_times_list = _PC.py_gather(neuron_net._spike_times, 0)
@@ -305,11 +302,6 @@ class NetworkBuilder(object):
         self._clear_last_network_objects()
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
-        self.current = {
-            'L5_pyramidal_soma': h.Vector(self.net.spikes.times.size, 0),
-            'L2_pyramidal_soma': h.Vector(self.net.spikes.times.size, 0),
-        }
-
         self.dipoles = {
             'L5_pyramidal': h.Vector(self.net.spikes.times.size, 0),
             'L2_pyramidal': h.Vector(self.net.spikes.times.size, 0),
@@ -328,6 +320,7 @@ class NetworkBuilder(object):
         self._spike_times = h.Vector()
         self._spike_gids = h.Vector()
         self._vsoma = dict()
+        self._isoma = dict()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spike_times = h.Vector()
@@ -397,6 +390,14 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
+        params = self.net.params
+        record_vsoma = params['record_vsoma']
+        record_isoma = params['record_isoma']
+        # Re-create external feed param dictionaries
+        # Note that the only thing being updated here are the param['prng_*']
+        # values
+        self.net.p_common, self.net.p_unique = create_pext(params,
+                                                           params['tstop'])
 
         # mechanism for Builder to keep track of which trial it's on
         this_trial_event_times = self.net.trial_event_times[self.trial_idx]
@@ -418,6 +419,8 @@ class NetworkBuilder(object):
                     cell = BasketCell(src_pos, gid=gid)
                 if record_vsoma:
                     cell.record_voltage_soma()
+                if record_isoma:
+                    cell.record_current_soma()
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
@@ -634,13 +637,7 @@ class NetworkBuilder(object):
     def aggregate_currents(self):
         """Aggregate somatic currents for Pyramidal cells."""
         for cell in self.cells:
-            if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
-                # iterate over dict_currents created in
-                # cell.record_current_soma()
-                for _, I_soma in cell.dict_currents.items():
-                    # self.current['L5_pyramidal_soma'] was created upon
-                    # in parallel, each node has its own NetworkBuilder()
-                    self.current['%s_soma' % cell.celltype].add(I_soma)
+            self._isoma[cell.gid] = cell.dict_currents
 
     def aggregate_dipoles(self):
         """Aggregate dipoles."""
@@ -721,11 +718,17 @@ class NetworkBuilder(object):
         for gid, rec_v in self._vsoma.items():
             vsoma_py[gid] = rec_v.to_python()
 
+        isoma_py = {}
+        for gid, dict_currents in self._isoma.items():
+            isoma_py[gid] = {key: rec_i.to_python()
+                             for key, rec_i in dict_currents.items()}
+
         from copy import deepcopy
         data = (self._all_spike_times.to_python(),
                 self._all_spike_gids.to_python(),
                 deepcopy(self.net.gid_ranges),
-                deepcopy(vsoma_py))
+                deepcopy(vsoma_py),
+                deepcopy(isoma_py))
         return data
 
     def _clear_last_network_objects(self):

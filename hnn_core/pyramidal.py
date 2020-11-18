@@ -103,9 +103,6 @@ class Pyr(_Cell):
         # insert iclamp
         self.list_IClamp = []
 
-        # run record current soma, defined in Cell()
-        self.record_current_soma()
-
     def set_geometry(self, p_dend):
         """Define shape of the neuron and connect sections.
 

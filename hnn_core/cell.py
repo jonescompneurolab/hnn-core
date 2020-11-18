@@ -97,6 +97,10 @@ class _Cell(ABC):
         by running simulate_dipole(net, record_vsoma=True)
     gid : int
         GID of the cell in a network (or None if not yet assigned)
+    dict_currents : dict
+        Contains recording of somatic currents indexed
+        by synapse type. Must be enabled by running
+        simulate_dipole(net, record_isoma=True)
     """
 
     def __init__(self, soma_props, gid=None):
@@ -105,6 +109,7 @@ class _Cell(ABC):
         self.soma_props = soma_props
         self.create_soma()
         self.rec_v = h.Vector()
+        self.dict_currents = dict()
         self._gid = None
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
@@ -228,8 +233,8 @@ class _Cell(ABC):
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def record_response(self):
-        """Record current and voltage at soma."""
+    def record_current_soma(self):
+        """Record current at soma."""
         # a soma exists at self.soma
         try:
             # assumes that self.synapses is a dict that exists

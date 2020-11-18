@@ -398,9 +398,11 @@ class Spikes(object):
         Each gid corresponds to a type via Network::gid_ranges.
     vsoma : dict
         Dictionary indexed by gids containing somatic voltages
+    isoma : dict
+        Dictionary indexed by gids containing somatic currents
     times : numpy array
         Array of time points for samples in continuous data.
-        This includes vsoma.
+        This includes vsoma and isoma.
 
     Methods
     -------
@@ -448,6 +450,7 @@ class Spikes(object):
         self._spike_gids = spike_gids
         self._spike_types = spike_types
         self._vsoma = list()
+        self._isoma = list()
         if times is not None:
             if not isinstance(times, np.ndarray):
                 raise TypeError("'times' is an np.ndarray of simulation times")
@@ -508,6 +511,7 @@ class Spikes(object):
         gids_slice = []
         types_slice = []
         vsoma_slice = []
+        isoma_slice = []
         for trial_idx in range(n_trials):
             gid_mask = np.in1d(self._spike_gids[trial_idx], gid_item)
             times_trial = np.array(
@@ -520,14 +524,19 @@ class Spikes(object):
             vsoma_trial = {gid: self._vsoma[trial_idx][gid] for gid in gid_item
                            if gid in self._vsoma[trial_idx].keys()}
 
+            isoma_trial = {gid: self._isoma[trial_idx][gid] for gid in gid_item
+                           if gid in self._isoma[trial_idx].keys()}
+
             times_slice.append(times_trial)
             gids_slice.append(gids_trial)
             types_slice.append(types_trial)
             vsoma_slice.append(vsoma_trial)
+            isoma_slice.append(isoma_trial)
 
         spikes_slice = Spikes(spike_times=times_slice, spike_gids=gids_slice,
                               spike_types=types_slice)
         spikes_slice._vsoma = vsoma_slice
+        spikes_slice._isoma = isoma_slice
 
         return spikes_slice
 
@@ -546,6 +555,10 @@ class Spikes(object):
     @property
     def vsoma(self):
         return self._vsoma
+
+    @property
+    def isoma(self):
+        return self._isoma
 
     @property
     def times(self):
