@@ -200,7 +200,6 @@ class _Cell(ABC):
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
             pos_all = np.array([seg.x for seg in sect.allseg()])
-            pos_internal = pos_all[1:-1]  # positions without 0 and L
             # diff in yvals, scaled against the pos np.array. y_long as
             # in longitudinal
             sect_name = sect.name().split('_', 1)[1]
@@ -211,23 +210,20 @@ class _Cell(ABC):
             # y_diff = np.diff(y_long)
             # doing range to index multiple values of the same
             # np.array simultaneously
-            for i in range(len(pos_internal)):
+            for idx, pos in enumerate(pos_all[1:-1]):
                 # assign the ri value to the dipole
-                sect(pos_internal[i]).dipole.ri = h.ri(pos_internal[i],
-                                                       sec=sect)
+                # ri not defined at 0 and L
+                sect(pos).dipole.ri = h.ri(pos, sec=sect)
                 # range variable 'dipole'
                 # set pointers to previous segment's voltage, with
                 # boundary condition
-                if i > 0:
-                    sect(pos_internal[i]).dipole._ref_pv = \
-                        sect(pos_internal[i - 1])._ref_v
-                else:
-                    sect(pos_internal[i]).dipole._ref_pv = sect(0)._ref_v
+                sect(pos).dipole._ref_pv = sect(pos_all[idx])._ref_v
+
                 # set aggregate pointers
-                sect(pos_internal[i]).dipole._ref_Qsum = dpp._ref_Qsum
-                sect(pos_internal[i]).dipole._ref_Qtotal = self.dpl_ref
+                sect(pos).dipole._ref_Qsum = dpp._ref_Qsum
+                sect(pos).dipole._ref_Qtotal = self.dpl_ref
                 # add ztan values
-                sect(pos_internal[i]).dipole.ztan = y_diff[i]
+                sect(pos).dipole.ztan = y_diff[idx]
             # set the pp dipole's ztan value to the last value from y_diff
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
