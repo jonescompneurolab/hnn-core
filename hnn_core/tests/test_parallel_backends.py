@@ -43,15 +43,16 @@ def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
     return dpls, net
 
 
-# Travis CI should fail if it cannot import mpi4py. Otherwise tests below
-# would be skipped and will not trigger a CI failure.
-def test_mpi4py_needed():
+def requires_mpi4py(function):
     try:
         import mpi4py
         assert hasattr(mpi4py, '__version__')
-    except:
-        if "TRAVIS_OS_NAME" in environ:
-            pytest.fail("Travis CI requires mpi4py to test MPIBackend")
+    except (ImportError, ModuleNotFoundError) as err:
+        if "TRAVIS_OS_NAME" not in environ:
+            reason = 'mpi4py not available'
+            return pytest.mark.skipif(True, reason=reason)(function)
+        else:
+            raise ImportError(err)
 
 
 # The purpose of this incremental mark is to avoid running the full length
@@ -86,19 +87,18 @@ class TestParallelBackends():
             assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
                                dpls_reduced_joblib[trial_idx].data['agg'])
 
+    @requires_mpi4py
     def test_mpi_nprocs(self):
         """Test that MPIBackend can use more than 1 processor"""
         # if only 1 processor is available, then MPIBackend tests will not
         # be valid
-        pytest.importorskip("mpi4py", reason="mpi4py not available")
-
         backend = MPIBackend()
         assert backend.n_procs > 1
 
+    @requires_mpi4py
     def test_run_mpibackend(self):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
-        pytest.importorskip("mpi4py", reason="mpi4py not available")
         dpls_reduced_mpi, _ = run_hnn_core(backend='mpi', reduced=True)
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
@@ -106,10 +106,9 @@ class TestParallelBackends():
                             dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
                             atol=1e-14)
 
+    @requires_mpi4py
     def test_run_mpibackend_oversubscribed(self):
         """Test running MPIBackend with oversubscribed number of procs"""
-        pytest.importorskip("mpi4py", reason="mpi4py not available")
-
         oversubscribed = round(cpu_count() * 1.5)
         run_hnn_core(backend='mpi', n_procs=oversubscribed, reduced=True)
 
@@ -163,10 +162,9 @@ class TestParallelBackends():
 
 # there are no dependencies if this unit tests fails; no need to be in
 # class marked incremental
+@requires_mpi4py
 def test_mpi_failure():
     """Test that an MPI failure is handled and messages are printed"""
-    pytest.importorskip("mpi4py", reason="mpi4py not available")
-
     # this MPI paramter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
