@@ -309,8 +309,8 @@ class NetworkBuilder(object):
 
         self._gid_assign()
 
-        record_vsoma = self.net.params['record_vsoma']
-        record_isoma = self.net.params['record_isoma']
+        record_vsoma = self.net._record_vsoma
+        record_isoma = self.net._record_isoma
         self._create_cells_and_feeds(threshold=self.net.params['threshold'],
                                      record_vsoma=record_vsoma,
                                      record_isoma=record_isoma)
