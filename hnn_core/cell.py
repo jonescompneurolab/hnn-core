@@ -231,14 +231,22 @@ class _Cell(ABC):
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_all_IClamp(self, p):
-        # list of sections for this celltype
-        sect_list_IClamp = [
-            'soma',
-        ]
+    def create_tonic_feed(self, p, amplitude, delay, duration, loc=0.5):
+        """Create tonic feed.
 
-        # some parameters
-        t_delay = p['Itonic_t0_L2Pyr_soma']
+        Parameters
+        ----------
+        amplitude : float
+            The amplitude of the input.
+        delay : float
+            The time delay before start of tonic input (in ms).
+        duration : float
+            The duration of tonic input (in ms).
+        loc : float (0 to 1)
+            The location of the input in the section.
+        """
+        # list of sections for this celltype
+        sect_list_IClamp = ['soma']
 
         # T = -1 means use h.tstop
         if p['Itonic_T_L2Pyr_soma'] == -1:
@@ -249,39 +257,24 @@ class _Cell(ABC):
             t_dur = p['Itonic_T_L2Pyr_soma'] - t_delay
 
         # t_dur must be nonnegative, I imagine
-        if t_dur < 0.:
-            t_dur = 0.
-
-        # properties of the IClamp
-        props_IClamp = {
-            'loc': 0.5,
-            'delay': t_delay,
-            'dur': t_dur,
-            'amp': p['Itonic_A_L2Pyr_soma']
-        }
+        if duration < 0.:
+            raise ValueError('Duration of tonic input cannot be negative')
 
         # iterate through list of sect_list_IClamp to create a persistent IClamp object
         # the insert_IClamp procedure is in Cell() and checks on names
         # so names must be actual section names, or else it will fail silently
-        self.list_IClamp = [self.insert_IClamp(sect_name, props_IClamp) for
-                            sect_name in sect_list_IClamp]
-
-    def insert_IClamp(self, sect_name, props_IClamp):
-        # def insert_iclamp(self, sect_name, seg_loc, tstart, tstop, weight):
-        # gather list of all sections
-        seclist = h.SectionList()
-        seclist.wholetree(sec=self.soma)
-        # find specified sect in section list, insert IClamp, set props
-        for sect in seclist:
-            if sect_name in sect.name():
-                stim = h.IClamp(sect(props_IClamp['loc']))
-                stim.delay = props_IClamp['delay']
-                stim.dur = props_IClamp['dur']
-                stim.amp = props_IClamp['amp']
-        # stim.dur = tstop - tstart
-        # stim = h.IClamp(sect(seg_loc))
-        # object must exist for NEURON somewhere and needs to be saved
-        return stim
+        self.list_IClamp = list()
+        for sect_name in sect_list_IClamp:
+            seclist = h.SectionList()
+            seclist.wholetree(sec=self.soma)
+            # find specified sect in section list, insert IClamp, set props
+            for sect in seclist:
+                if sect_name in sect.name():
+                    stim = h.IClamp(sect(loc))
+                    stim.delay = delay
+                    stim.dur = duration
+                    stim.amp = amplitude
+            self.list_IClamp.append(stim)
 
     def record_soma(self, record_vsoma=False, record_isoma=False):
         """Record current and voltage at soma.
