@@ -161,6 +161,8 @@ class Network(object):
         'common', or any of the elements of the cellname or feedname lists.
     cell_response : CellResponse
         An instance of the CellResponse object.
+    feed_times : list (n_trials) of dict of list (n_cells) of list (n_times)
+        The event times of input feeds
     """
 
     def __init__(self, params):
@@ -188,7 +190,7 @@ class Network(object):
             'L5_pyramidal',
         ]
         self.feedname_list = []  # no feeds defined yet
-        self.trial_event_times = []  # list of len == n_trials
+        self.feed_times = []  # list of len == n_trials
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -270,7 +272,7 @@ class Network(object):
         """
         # each trial needs unique event time vectors
 
-        self.trial_event_times = []  # reset if called again from dipole.py
+        self.feed_times = []  # reset if called again from dipole.py
 
         cur_params = self.params.copy()  # these get mangled below!
         for trial_idx in range(n_trials):
@@ -313,7 +315,7 @@ class Network(object):
                 event_times_per_source.update({src_type: event_times})
 
             # list of dict of list of list
-            self.trial_event_times.append(event_times_per_source.copy())
+            self.feed_times.append(event_times_per_source.copy())
 
     def _update_gid_ranges(self):
         """Creates gid ranges from scratch every time called.
