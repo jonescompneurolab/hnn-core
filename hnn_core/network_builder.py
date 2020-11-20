@@ -388,9 +388,6 @@ class NetworkBuilder(object):
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
 
-        # mechanism for Builder to keep track of which trial it's on
-        this_feed_times = self.net.feed_times[self.trial_idx]
-
         for gid in self._gid_list:
             src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
 
@@ -421,7 +418,7 @@ class NetworkBuilder(object):
             # how such 'common' spikes influence them
             else:
                 gid_idx = gid - self.net.gid_ranges[src_type][0]
-                et = this_feed_times[src_type][gid_idx]
+                et = self.net.feed_times[src_type][self.trial_idx][gid_idx]
                 feed_cell = _ArtificialCell(et, threshold, gid=gid)
                 _PC.cell(feed_cell.gid, feed_cell.nrn_netcon)
                 self._feed_cells.append(feed_cell)

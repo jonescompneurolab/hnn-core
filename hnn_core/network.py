@@ -161,7 +161,7 @@ class Network(object):
         'common', or any of the elements of the cellname or feedname lists.
     cell_response : CellResponse
         An instance of the CellResponse object.
-    feed_times : list (n_trials) of dict of list (n_cells) of list (n_times)
+    feed_times : dict of list (n_trials) of list (n_cells) of list (n_times)
         The event times of input feeds
     """
 
@@ -272,7 +272,9 @@ class Network(object):
         """
         # each trial needs unique event time vectors
 
-        self.feed_times = []  # reset if called again from dipole.py
+        # reset if called again from dipole.py
+        src_types = self.feedname_list
+        feed_times = {src_type: list() for src_type in src_types}
 
         cur_params = self.params.copy()  # these get mangled below!
         for trial_idx in range(n_trials):
@@ -286,8 +288,6 @@ class Network(object):
             p_common, p_unique = create_pext(cur_params,
                                              cur_params['tstop'])
 
-            src_types = self.feedname_list
-            event_times_per_source = dict()
             for src_type in src_types:
                 event_times = list()
                 if src_type == 'common':
@@ -312,10 +312,10 @@ class Network(object):
                                 params=p_unique[src_type],
                                 gid=gid)
                         )
-                event_times_per_source.update({src_type: event_times})
+                feed_times[src_type].append(event_times)
 
             # list of dict of list of list
-            self.feed_times.append(event_times_per_source.copy())
+            self.feed_times = feed_times
 
     def _update_gid_ranges(self):
         """Creates gid ranges from scratch every time called.

@@ -58,13 +58,15 @@ def test_network():
 
     # test that expected number of external driving events are created, and
     # make sure the PRNGs are consistent.
-    assert isinstance(net.trial_event_times, list)
-    assert len(net.trial_event_times) == 1  # single trial simulated
-    assert len(net.trial_event_times[0]['common']) == n_common_sources
-    assert len(net.trial_event_times[0]['common'][0]) == 40  # 40 spikes
-    assert isinstance(net.trial_event_times[0]['evprox1'][0], list)
-    assert len(net.trial_event_times[0]['evprox1']) == net.n_cells
-    assert_allclose(net.trial_event_times[0]['evprox1'][0],
+    assert isinstance(net.feed_times, dict)
+    # single trial simulated
+    assert all(len(src_feed_times) == 1 for
+               _, src_feed_times in net.feed_times.items())
+    assert len(net.feed_times['common'][0]) == n_common_sources
+    assert len(net.feed_times['common'][0][0]) == 40  # 40 spikes
+    assert isinstance(net.feed_times['evprox1'][0][0], list)
+    assert len(net.feed_times['evprox1'][0]) == net.n_cells
+    assert_allclose(net.feed_times['evprox1'][0][0],
                     [23.80641637082997], rtol=1e-12)
 
     assert len(network_builder._feed_cells) == (n_evoked_sources +
