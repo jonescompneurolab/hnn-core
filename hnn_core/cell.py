@@ -263,7 +263,8 @@ class _Cell(ABC):
         # iterate through list of sect_list_IClamp to create a persistent IClamp object
         # the insert_IClamp procedure is in Cell() and checks on names
         # so names must be actual section names, or else it will fail silently
-        self.list_IClamp = [self.insert_IClamp(sect_name, props_IClamp) for sect_name in sect_list_IClamp]
+        self.list_IClamp = [self.insert_IClamp(sect_name, props_IClamp) for
+                            sect_name in sect_list_IClamp]
 
     def insert_IClamp(self, sect_name, props_IClamp):
         # def insert_iclamp(self, sect_name, seg_loc, tstart, tstop, weight):
