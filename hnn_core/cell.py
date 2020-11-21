@@ -247,21 +247,15 @@ class _Cell(ABC):
         """
         # a soma exists at self.soma
         if record_isoma:
-            try:
-                # assumes that self.synapses is a dict that exists
-                list_syn_soma = [key for key in self.synapses.keys()
-                                 if key.startswith('soma_')]
-                # matching dict from the list_syn_soma keys
-                self.dict_currents = dict.fromkeys(list_syn_soma)
-                # iterate through keys and record currents appropriately
-                for key in self.dict_currents:
-                    self.dict_currents[key] = h.Vector()
-                    self.dict_currents[key].record(self.synapses[key]._ref_i)
-            except:
-                print(
-                    "Warning in Cell(): record_soma() was called,"
-                    " but no self.synapses dict was found")
-                pass
+            # assumes that self.synapses is a dict that exists
+            list_syn_soma = [key for key in self.synapses.keys()
+                             if key.startswith('soma_')]
+            # matching dict from the list_syn_soma keys
+            self.dict_currents = dict.fromkeys(list_syn_soma)
+            # iterate through keys and record currents appropriately
+            for key in self.dict_currents:
+                self.dict_currents[key] = h.Vector()
+                self.dict_currents[key].record(self.synapses[key]._ref_i)
 
         if record_vsoma:
             self.rec_v.record(self.soma(0.5)._ref_v)
