@@ -70,3 +70,12 @@ def test_dipole_simulation():
     n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
     assert len(net.spikes.vsoma[0][1]) == n_times
     assert len(net.spikes.isoma[0][1]['soma_gabaa']) == n_times
+
+    gid, v_thresh = 7, 0.0
+    times = np.array(net.spikes.times)
+    spike_times = np.array(net.spikes.spike_times[0])
+    spike_gids = np.array(net.spikes.spike_gids[0])
+    vsoma = np.array(net.spikes.vsoma[0][gid])
+    v_mask = vsoma > v_thresh
+    assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
+                   spike_times[spike_gids == gid] < times[v_mask][-1]])
