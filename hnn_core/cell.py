@@ -90,17 +90,15 @@ class _Cell(ABC):
         The position of the cell.
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
-    dict_currents : dict of h.Vector()
-        The soma currents (keys are soma_gabaa, soma_gabab etc.)
     rec_v : h.Vector()
         Recording of somatic voltage. Must be enabled
         by running simulate_dipole(net, record_vsoma=True)
+    rec_i : dict
+        Contains recording of somatic currents indexed
+        by synapse type. (keys are soma_gabaa, soma_gabab etc.)
+        Must be enabled by running simulate_dipole(net, record_isoma=True)
     gid : int
         GID of the cell in a network (or None if not yet assigned)
-    dict_currents : dict
-        Contains recording of somatic currents indexed
-        by synapse type. Must be enabled by running
-        simulate_dipole(net, record_isoma=True)
     """
 
     def __init__(self, soma_props, gid=None):
@@ -109,7 +107,7 @@ class _Cell(ABC):
         self.soma_props = soma_props
         self.create_soma()
         self.rec_v = h.Vector()
-        self.dict_currents = dict()
+        self.rec_i= dict()
         self._gid = None
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
@@ -251,11 +249,11 @@ class _Cell(ABC):
             list_syn_soma = [key for key in self.synapses.keys()
                              if key.startswith('soma_')]
             # matching dict from the list_syn_soma keys
-            self.dict_currents = dict.fromkeys(list_syn_soma)
+            self.rec_i = dict.fromkeys(list_syn_soma)
             # iterate through keys and record currents appropriately
-            for key in self.dict_currents:
-                self.dict_currents[key] = h.Vector()
-                self.dict_currents[key].record(self.synapses[key]._ref_i)
+            for key in self.rec_i:
+                self.rec_i[key] = h.Vector()
+                self.rec_i[key].record(self.synapses[key]._ref_i)
 
         if record_vsoma:
             self.rec_v.record(self.soma(0.5)._ref_v)
