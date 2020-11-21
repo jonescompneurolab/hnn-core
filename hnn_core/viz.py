@@ -53,7 +53,7 @@ def plot_spikes_hist(spikes, ax=None, spike_types=None, show=True):
 
     Parameters
     ----------
-    spikes : instance of Spikes
+    spikes : instance of CellResponse
         The spikes object from net.spikes
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None,
@@ -151,7 +151,7 @@ def plot_spikes_raster(spikes, ax=None, show=True):
 
     Parameters
     ----------
-    spikes : instance of Spikes
+    spikes : instance of CellResponse
         The spikes object from net.spikes
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None,

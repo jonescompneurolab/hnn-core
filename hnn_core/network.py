@@ -29,8 +29,8 @@ def read_spikes(fname, gid_ranges=None):
 
     Returns
     ----------
-    spikes : Spikes
-        An instance of the Spikes object.
+    spikes : CellResponse
+        An instance of the CellResponse object.
     """
 
     spike_times = []
@@ -52,13 +52,13 @@ def read_spikes(fname, gid_ranges=None):
                                  "are unspecified in the file %s" % (file,))
             spike_types += [[]]
 
-    spikes = Spikes(spike_times=spike_times, spike_gids=spike_gids,
-                    spike_types=spike_types)
+    spikes = CellResponse(spike_times=spike_times, spike_gids=spike_gids,
+                          spike_types=spike_types)
     if gid_ranges is not None:
         spikes.update_types(gid_ranges)
 
-    return Spikes(spike_times=spike_times, spike_gids=spike_gids,
-                  spike_types=spike_types)
+    return CellResponse(spike_times=spike_times, spike_gids=spike_gids,
+                        spike_types=spike_types)
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
@@ -158,8 +158,8 @@ class Network(object):
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
         'common', or any of the elements of the cellname or feedname lists.
-    spikes : Spikes
-        An instance of the Spikes object.
+    spikes : CellResponse
+        An instance of the CellResponse object.
     """
 
     def __init__(self, params):
@@ -168,7 +168,7 @@ class Network(object):
         # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
-        # interrogate a built and simulated net. In addition, Spikes are
+        # interrogate a built and simulated net. In addition, CellResponse is
         # attached to a Network during simulation---Network is the natural
         # place to keep this information
         self.gid_ranges = dict()
@@ -177,7 +177,7 @@ class Network(object):
         # NB (only) used to initialise self.spikes._times
         times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
         # Create spikes object, initialised with simulation time points
-        self.spikes = Spikes(times=times)
+        self.spikes = CellResponse(times=times)
 
         # Source list of names, first real ones only!
         self.cellname_list = [
@@ -367,8 +367,8 @@ class Network(object):
         return plot_cells(net=self, ax=ax, show=show)
 
 
-class Spikes(object):
-    """The Spikes class.
+class CellResponse(object):
+    """The CellResponse class.
 
     Parameters
     ----------
@@ -410,7 +410,7 @@ class Spikes(object):
     Methods
     -------
     update_types(gid_ranges)
-        Update spike types in the current instance of Spikes.
+        Update spike types in the current instance of CellResponse.
     plot(ax=None, show=True)
         Plot and return a matplotlib Figure object showing the
         aggregate network spiking activity according to cell type.
@@ -465,7 +465,7 @@ class Spikes(object):
         return '<%s | %d simulation trials>' % (class_name, n_trials)
 
     def __eq__(self, other):
-        if not isinstance(other, Spikes):
+        if not isinstance(other, CellResponse):
             return NotImplemented
         # Round each time element
         times_self = [[round(time, 3) for time in trial]
@@ -477,7 +477,7 @@ class Spikes(object):
                 self._spike_types == other._spike_types)
 
     def __getitem__(self, gid_item):
-        """Returns a Spikes object with a copied subset filtered by gid.
+        """Returns a CellResponse object with a copied subset filtered by gid.
 
         Parameters
         ----------
@@ -486,7 +486,7 @@ class Spikes(object):
 
         Returns
         -------
-        spikes : instance of Spikes
+        spikes : instance of CellResponse
             See below for use cases.
         """
 
@@ -536,8 +536,9 @@ class Spikes(object):
             vsoma_slice.append(vsoma_trial)
             isoma_slice.append(isoma_trial)
 
-        spikes_slice = Spikes(spike_times=times_slice, spike_gids=gids_slice,
-                              spike_types=types_slice)
+        spikes_slice = CellResponse(spike_times=times_slice,
+                                    spike_gids=gids_slice,
+                                    spike_types=types_slice)
         spikes_slice._vsoma = vsoma_slice
         spikes_slice._isoma = isoma_slice
 
@@ -568,7 +569,7 @@ class Spikes(object):
         return self._times
 
     def update_types(self, gid_ranges):
-        """Update spike types in the current instance of Spikes.
+        """Update spike types in the current instance of CellResponse.
 
         Parameters
         ----------

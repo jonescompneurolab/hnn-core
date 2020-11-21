@@ -8,7 +8,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Network, Spikes, read_spikes
+from hnn_core import read_params, Network, CellResponse, read_spikes
 from hnn_core.network_builder import NetworkBuilder
 
 
@@ -42,13 +42,13 @@ def test_network():
         type_key = ev_input[2: -2] + ev_input[-1]
         assert len(net.gid_ranges[type_key]) == net.n_cells
 
-    # Assert that an empty Spikes object is created as an attribute
-    assert net.spikes == Spikes()
+    # Assert that an empty CellResponse object is created as an attribute
+    assert net.spikes == CellResponse()
     # array of simulation times is created in Network.__init__, but passed
-    # to Spikes-constructor for storage (Network is agnostic of time)
+    # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError,
                        match="'times' is an np.ndarray of simulation times"):
-        _ = Spikes(times=[1, 2, 3])
+        _ = CellResponse(times=[1, 2, 3])
 
     # Assert that all external feeds are initialized
     n_evoked_sources = net.n_cells * 3
@@ -114,31 +114,32 @@ def test_spikes(tmpdir):
     tstart, tstop = 0.1, 98.4
     gid_ranges = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
                   'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
-    spikes = Spikes(spike_times=spike_times, spike_gids=spike_gids,
-                    spike_types=spike_types)
+    spikes = CellResponse(spike_times=spike_times, spike_gids=spike_gids,
+                          spike_types=spike_types)
     spikes.plot_hist(show=False)
     spikes.write(tmpdir.join('spk_%d.txt'))
     assert spikes == read_spikes(tmpdir.join('spk_*.txt'))
 
-    assert ("Spikes | 2 simulation trials" in repr(spikes))
+    assert ("CellResponse | 2 simulation trials" in repr(spikes))
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
-        spikes = Spikes(spike_times=([2.3456, 7.89], [4.2812, 93.2]),
-                        spike_gids=spike_gids, spike_types=spike_types)
+        spikes = CellResponse(spike_times=([2.3456, 7.89], [4.2812, 93.2]),
+                              spike_gids=spike_gids, spike_types=spike_types)
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
-        spikes = Spikes(spike_times=[1, 2], spike_gids=spike_gids,
-                        spike_types=spike_types)
+        spikes = CellResponse(spike_times=[1, 2], spike_gids=spike_gids,
+                              spike_types=spike_types)
 
     with pytest.raises(ValueError, match="spike times, gids, and types should "
                        "be lists of the same length"):
-        spikes = Spikes(spike_times=[[2.3456, 7.89]], spike_gids=spike_gids,
-                        spike_types=spike_types)
+        spikes = CellResponse(spike_times=[[2.3456, 7.89]],
+                              spike_gids=spike_gids,
+                              spike_types=spike_types)
 
-    spikes = Spikes(spike_times=spike_times, spike_gids=spike_gids,
-                    spike_types=spike_types)
+    spikes = CellResponse(spike_times=spike_times, spike_gids=spike_gids,
+                          spike_types=spike_types)
 
     with pytest.raises(TypeError, match="indices must be int, slice, or "
                        "array-like, not str"):
