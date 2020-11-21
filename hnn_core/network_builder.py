@@ -73,13 +73,11 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.barrier()
 
     # these calls aggregate data across procs/nodes
-    neuron_net.aggregate_dipoles()
+    neuron_net.aggregate_data()
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
 
     # aggregate the currents and voltages independently on each proc
-    neuron_net.aggregate_currents()
-    neuron_net.aggregate_voltages()
     _PC.py_gather(neuron_net._vsoma, 0)
     _PC.py_gather(neuron_net._isoma, 0)
 
@@ -627,21 +625,14 @@ class NetworkBuilder(object):
                 _PC.spike_record(gid, self._spike_times, self._spike_gids)
 
     # aggregate recording all the somatic voltages for pyr
-    def aggregate_currents(self):
-        """Aggregate somatic currents for Pyramidal cells."""
-        for cell in self.cells:
-            self._isoma[cell.gid] = cell.dict_currents
-
-    def aggregate_dipoles(self):
-        """Aggregate dipoles."""
+    def aggregate_data(self):
+        """Aggregate somatic currents, voltages, and dipoles."""
         for cell in self.cells:
             if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
                 self.dipoles[cell.celltype].add(cell.dipole)
 
-    def aggregate_voltages(self):
-        """Organize voltage recordings into dictionary indexed by gid"""
-        for cell in self.cells:
             self._vsoma[cell.gid] = cell.rec_v
+            self._isoma[cell.gid] = cell.dict_currents
 
     def state_init(self):
         """Initializes the state closer to baseline."""
