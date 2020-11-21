@@ -29,7 +29,7 @@ def read_spikes(fname, gid_ranges=None):
 
     Returns
     ----------
-    spikes : CellResponse
+    cell_response : CellResponse
         An instance of the CellResponse object.
     """
 
@@ -52,10 +52,11 @@ def read_spikes(fname, gid_ranges=None):
                                  "are unspecified in the file %s" % (file,))
             spike_types += [[]]
 
-    spikes = CellResponse(spike_times=spike_times, spike_gids=spike_gids,
-                          spike_types=spike_types)
+    cell_response = CellResponse(spike_times=spike_times,
+                                 spike_gids=spike_gids,
+                                 spike_types=spike_types)
     if gid_ranges is not None:
-        spikes.update_types(gid_ranges)
+        cell_response.update_types(gid_ranges)
 
     return CellResponse(spike_times=spike_times, spike_gids=spike_gids,
                         spike_types=spike_types)
@@ -158,7 +159,7 @@ class Network(object):
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
         'common', or any of the elements of the cellname or feedname lists.
-    spikes : CellResponse
+    cell_response : CellResponse
         An instance of the CellResponse object.
     """
 
@@ -174,10 +175,10 @@ class Network(object):
         self.gid_ranges = dict()
 
         # Create array of equally sampled time points for simulating currents
-        # NB (only) used to initialise self.spikes._times
+        # NB (only) used to initialise self.cell_response._times
         times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
-        # Create spikes object, initialised with simulation time points
-        self.spikes = CellResponse(times=times)
+        # Create CellResponse object, initialised with simulation time points
+        self.cell_response = CellResponse(times=times)
 
         # Source list of names, first real ones only!
         self.cellname_list = [
@@ -486,7 +487,7 @@ class CellResponse(object):
 
         Returns
         -------
-        spikes : instance of CellResponse
+        cell_response : instance of CellResponse
             See below for use cases.
         """
 
@@ -536,13 +537,13 @@ class CellResponse(object):
             vsoma_slice.append(vsoma_trial)
             isoma_slice.append(isoma_trial)
 
-        spikes_slice = CellResponse(spike_times=times_slice,
-                                    spike_gids=gids_slice,
-                                    spike_types=types_slice)
-        spikes_slice._vsoma = vsoma_slice
-        spikes_slice._isoma = isoma_slice
+        cell_response_slice = CellResponse(spike_times=times_slice,
+                                           spike_gids=gids_slice,
+                                           spike_types=types_slice)
+        cell_response_slice._vsoma = vsoma_slice
+        cell_response_slice._isoma = isoma_slice
 
-        return spikes_slice
+        return cell_response_slice
 
     @property
     def spike_times(self):
@@ -681,7 +682,7 @@ class CellResponse(object):
         fig : instance of matplotlib Figure
             The matplotlib figure object.
         """
-        return plot_spikes_raster(spikes=self, ax=ax, show=show)
+        return plot_spikes_raster(cell_response=self, ax=ax, show=show)
 
     def plot_hist(self, ax=None, spike_types=None, show=True):
         """Plot the histogram of spiking activity across trials.
