@@ -231,47 +231,39 @@ class _Cell(ABC):
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_tonic_feed(self, p, amplitude, delay, duration, loc=0.5):
-        """Create tonic feed.
+    def create_tonic_feed(self, amplitude, t0, T, loc=0.5):
+        """Create tonic feed at the soma.
 
         Parameters
         ----------
         amplitude : float
             The amplitude of the input.
-        delay : float
-            The time delay before start of tonic input (in ms).
-        duration : float
-            The duration of tonic input (in ms).
+        t0 : float
+            The start time of tonic input (in ms).
+        T : float
+            The end time of tonic input (in ms).
         loc : float (0 to 1)
             The location of the input in the section.
         """
-        # list of sections for this celltype
-        sect_list_IClamp = ['soma']
+        duration = T - t0
 
-        # T = -1 means use h.tstop
-        if p['Itonic_T_L2Pyr_soma'] == -1:
-            # t_delay = 50.
-            t_dur = h.tstop - t_delay
+        if T < 0.:
+            raise ValueError('End time of tonic input cannot be negative')
 
-        else:
-            t_dur = p['Itonic_T_L2Pyr_soma'] - t_delay
-
-        # t_dur must be nonnegative, I imagine
         if duration < 0.:
             raise ValueError('Duration of tonic input cannot be negative')
 
-        # iterate through list of sect_list_IClamp to create a persistent IClamp object
-        # the insert_IClamp procedure is in Cell() and checks on names
+        # iterate through list of sect_list_IClamp to create a persistent
+        # IClamp object
         # so names must be actual section names, or else it will fail silently
         self.list_IClamp = list()
-        for sect_name in sect_list_IClamp:
+        for sect_name in ['soma']:
             seclist = h.SectionList()
             seclist.wholetree(sec=self.soma)
-            # find specified sect in section list, insert IClamp, set props
             for sect in seclist:
                 if sect_name in sect.name():
                     stim = h.IClamp(sect(loc))
-                    stim.delay = delay
+                    stim.delay = t0
                     stim.dur = duration
                     stim.amp = amplitude
             self.list_IClamp.append(stim)

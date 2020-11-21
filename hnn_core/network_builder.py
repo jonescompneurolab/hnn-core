@@ -404,7 +404,8 @@ class NetworkBuilder(object):
                     BasketCell = type2class[src_type]
                     cell = BasketCell(src_pos, gid=gid)
 
-                cell.create_tonic_feed(p, loc, delay, duration)
+                if src_type in self.net.feed_times['tonic']:
+                    cell.create_tonic_feed(**self.net.feed_times[src_type])
                 cell.record_soma(record_vsoma, record_isoma)
 
                 # this call could belong in init of a _Cell (with threshold)?
