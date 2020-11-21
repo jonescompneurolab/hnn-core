@@ -233,28 +233,28 @@ class _Cell(ABC):
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def record_current_soma(self):
-        """Record current at soma."""
+    def record_soma(self, record_vsoma=False, record_isoma=False):
+        """Record current and voltage at soma."""
         # a soma exists at self.soma
-        try:
-            # assumes that self.synapses is a dict that exists
-            list_syn_soma = [key for key in self.synapses.keys()
-                             if key.startswith('soma_')]
-            # matching dict from the list_syn_soma keys
-            self.dict_currents = dict.fromkeys(list_syn_soma)
-            # iterate through keys and record currents appropriately
-            for key in self.dict_currents:
-                self.dict_currents[key] = h.Vector()
-                self.dict_currents[key].record(self.synapses[key]._ref_i)
-        except:
-            print(
-                "Warning in Cell(): record_current_soma() was called,"
-                " but no self.synapses dict was found")
-            pass
+        if record_isoma:
+            try:
+                # assumes that self.synapses is a dict that exists
+                list_syn_soma = [key for key in self.synapses.keys()
+                                 if key.startswith('soma_')]
+                # matching dict from the list_syn_soma keys
+                self.dict_currents = dict.fromkeys(list_syn_soma)
+                # iterate through keys and record currents appropriately
+                for key in self.dict_currents:
+                    self.dict_currents[key] = h.Vector()
+                    self.dict_currents[key].record(self.synapses[key]._ref_i)
+            except:
+                print(
+                    "Warning in Cell(): record_soma() was called,"
+                    " but no self.synapses dict was found")
+                pass
 
-    def record_voltage_soma(self):
-        """Record voltage at soma."""
-        self.rec_v.record(self.soma(0.5)._ref_v)
+        if record_vsoma:
+            self.rec_v.record(self.soma(0.5)._ref_v)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
