@@ -38,7 +38,7 @@ gid_ranges = net.gid_ranges
 print(net.gid_ranges)
 
 ###############################################################################
-# Simulated voltage in the soma is stored in the Spikes object as a dictionary.
+# Simulated voltage in the soma is stored in CellResponse as a dictionary.
 trial_idx = 0
 vsoma = net.spikes.vsoma[trial_idx]
 print(vsoma.keys())
