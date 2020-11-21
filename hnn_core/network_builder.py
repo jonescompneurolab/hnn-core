@@ -632,7 +632,7 @@ class NetworkBuilder(object):
                 self.dipoles[cell.celltype].add(cell.dipole)
 
             self._vsoma[cell.gid] = cell.rec_v
-            self._isoma[cell.gid] = cell.dict_currents
+            self._isoma[cell.gid] = cell.rec_i
 
     def state_init(self):
         """Initializes the state closer to baseline."""
@@ -703,9 +703,9 @@ class NetworkBuilder(object):
             vsoma_py[gid] = rec_v.to_python()
 
         isoma_py = {}
-        for gid, dict_currents in self._isoma.items():
+        for gid, rec_i in self._isoma.items():
             isoma_py[gid] = {key: rec_i.to_python()
-                             for key, rec_i in dict_currents.items()}
+                             for key, rec_i in rec_i.items()}
 
         from copy import deepcopy
         data = (self._all_spike_times.to_python(),
