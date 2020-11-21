@@ -412,10 +412,8 @@ class NetworkBuilder(object):
                 else:
                     BasketCell = type2class[src_type]
                     cell = BasketCell(src_pos, gid=gid)
-                if record_vsoma:
-                    cell.record_voltage_soma()
-                if record_isoma:
-                    cell.record_current_soma()
+
+                cell.record_soma(record_vsoma, record_isoma)
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
