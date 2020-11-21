@@ -234,7 +234,17 @@ class _Cell(ABC):
         self.dipole = h.Vector().record(self.dpl_ref)
 
     def record_soma(self, record_vsoma=False, record_isoma=False):
-        """Record current and voltage at soma."""
+        """Record current and voltage at soma.
+
+        Parameters
+        ----------
+        record_vsoma : bool
+            Option to record somatic voltages from cells
+            net.params['N_trials'] will be used
+        record_isoma : bool
+            Option to record somatic currents from cells
+
+        """
         # a soma exists at self.soma
         if record_isoma:
             try:
