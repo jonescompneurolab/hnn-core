@@ -146,7 +146,7 @@ class TestParallelBackends():
 
         # Test spike type counts
         spike_type_counts = {}
-        for spike_gid in net.spikes.spike_gids[0]:
+        for spike_gid in net.cell_response.spike_gids[0]:
             if net.gid_to_type(spike_gid) not in spike_type_counts:
                 spike_type_counts[net.gid_to_type(spike_gid)] = 0
             else:

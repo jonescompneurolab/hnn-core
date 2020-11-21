@@ -107,7 +107,7 @@ class _Cell(ABC):
         self.soma_props = soma_props
         self.create_soma()
         self.rec_v = h.Vector()
-        self.rec_i= dict()
+        self.rec_i = dict()
         self._gid = None
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid

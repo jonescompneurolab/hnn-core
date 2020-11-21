@@ -46,7 +46,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
     h.dt = neuron_net.net.params['dt']  # simulation duration and time-step
     h.celsius = neuron_net.net.params['celsius']  # 37.0 - set temperature
 
-    times = neuron_net.net.spikes.times
+    times = neuron_net.net.cell_response.times
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
@@ -301,8 +301,8 @@ class NetworkBuilder(object):
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.dipoles = {
-            'L5_pyramidal': h.Vector(self.net.spikes.times.size, 0),
-            'L2_pyramidal': h.Vector(self.net.spikes.times.size, 0),
+            'L5_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
+            'L2_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
         }
 
         self._gid_assign()

@@ -40,14 +40,14 @@ print(net.gid_ranges)
 ###############################################################################
 # Simulated voltage in the soma is stored in CellResponse as a dictionary.
 trial_idx = 0
-vsoma = net.spikes.vsoma[trial_idx]
+vsoma = net.cell_response.vsoma[trial_idx]
 print(vsoma.keys())
 
 ###############################################################################
 # We can plot the firing pattern of individual cells by indexing with the gid
 gid = 170
 plt.figure(figsize=(4, 4))
-plt.plot(net.spikes.times, vsoma[gid])
+plt.plot(net.cell_response.times, vsoma[gid])
 plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
 plt.xlabel('Time (ms)')
 plt.ylabel('Voltage (mV)')
@@ -61,8 +61,9 @@ fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
 
 for idx in range(10):  # only 10 cells per cell-type
     gid = gid_ranges['L2_pyramidal'][idx]
-    axes[0].plot(net.spikes.times, vsoma[gid], color='g')
+    axes[0].plot(net.cell_response.times, vsoma[gid], color='g')
     gid = gid_ranges['L5_pyramidal'][idx]
-    axes[0].plot(net.spikes.times, vsoma[gid], color='r')
-net.spikes.plot(ax=axes[1])
-net.spikes.plot_hist(ax=axes[2], spike_types=['L5_pyramidal', 'L2_pyramidal'])
+    axes[0].plot(net.cell_response.times, vsoma[gid], color='r')
+net.cell_response.plot(ax=axes[1])
+net.cell_response.plot_hist(ax=axes[2],
+                            spike_types=['L5_pyramidal', 'L2_pyramidal'])
