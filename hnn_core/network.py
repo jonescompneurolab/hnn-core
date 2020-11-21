@@ -257,6 +257,21 @@ class Network(object):
         # Create the feed dynamics (event_times)
         self._instantiate_feeds(n_trials=self.params['N_trials'])
 
+        # Add tonic inputs if present
+        for cell_type in ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']:
+            is_tonic_present = [f'Itonic_{p}_{cell_type}' in self.params
+                                for p in ['A', 't0', 'T']]
+            if any(is_tonic_present) and not all(is_tonic_present):
+                raise ValueError(f'Tonic input must have the amplitude, '
+                                 f'start time and end time specified. One '
+                                 f'or more parameter may be missing for '
+                                 f'cell type {cell_type}')
+            self.feed_times['tonic'][cell_type] = {
+                'amplitude': self.params[f'Itonic_A_{cell_type}'],
+                't0': self.params[f'Itonic_t0_{cell_type}'],
+                'T': self.params[f'Itonic_T_{cell_type}']
+            }
+
     def _instantiate_feeds(self, n_trials=1):
         """Creates event_time vectors for all feeds and all trials
 
