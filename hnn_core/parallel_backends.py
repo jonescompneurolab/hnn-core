@@ -38,7 +38,7 @@ def _clone_and_simulate(net, trial_idx):
     return dpl, spikedata
 
 
-def _gather_trial_data(sim_data, net, n_trials):
+def _gather_trial_data(sim_data, net, n_trials, postproc):
     """Arrange data by trial
 
     To be called after simulate(). Returns list of Dipoles, one for each trial,
@@ -55,6 +55,13 @@ def _gather_trial_data(sim_data, net, n_trials):
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsoma.append(spikedata[3])
         net.cell_response._isoma.append(spikedata[4])
+
+        if postproc:
+            N_pyr_x = net.params['N_pyr_x']
+            N_pyr_y = net.params['N_pyr_y']
+            winsz = net.params['dipole_smooth_win'] / net.params['dt']
+            fctr = net.params['dipole_scalefctr']
+            dpls[-1].post_proc(N_pyr_x, N_pyr_y, winsz, fctr)
 
     return dpls
 
@@ -155,18 +162,9 @@ class JoblibBackend(object):
         dpls = []
 
         parallel, myfunc = self._parallel_func(self._clone_and_simulate)
-        sim_data = parallel(myfunc(net, idx, postproc) for idx in
-                            range(n_trials))
+        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
 
-        dpls = _gather_trial_data(sim_data, net, n_trials)
-
-        if postproc:
-            N_pyr_x = net.params['N_pyr_x']
-            N_pyr_y = net.params['N_pyr_y']
-            winsz = net.params['dipole_smooth_win'] / net.params['dt']
-            fctr = net.params['dipole_scalefctr']
-            for idx in range(n_trials):
-                dpls[idx].post_proc(N_pyr_x, N_pyr_y, winsz, fctr)
+        dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
 
         return dpls
 
@@ -477,5 +475,5 @@ class MPIBackend(object):
 
         sim_data = self._process_child_data(self.proc_data_bytes, data_len)
 
-        dpls = _gather_trial_data(sim_data, net, n_trials)
+        dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
