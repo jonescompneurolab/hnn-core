@@ -7,6 +7,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles, viz, Network
+from hnn_core import JoblibBackend, MPIBackend
 from hnn_core.dipole import Dipole, simulate_dipole
 
 matplotlib.use('agg')
@@ -64,12 +65,23 @@ def test_dipole_simulation():
     with pytest.raises(TypeError, match="record_isoma must be bool, got int"):
         simulate_dipole(net, n_trials=1, record_vsoma=False, record_isoma=0)
 
-    simulate_dipole(net, n_trials=2, record_vsoma=True, record_isoma=True)
-    assert len(net.cell_response.vsoma) == 2
-    assert len(net.cell_response.isoma) == 2
-    n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
-    assert len(net.cell_response.vsoma[0][1]) == n_times
-    assert len(net.cell_response.isoma[0][1]['soma_gabaa']) == n_times
+    with MPIBackend(n_procs=None, mpi_cmd='mpiexec'):
+        simulate_dipole(net, n_trials=2, record_vsoma=True, record_isoma=True)
+        assert len(net.cell_response.vsoma) == 2
+        assert len(net.cell_response.isoma) == 2
+        n_times = np.arange(0., params['tstop'] + params['dt'],
+                            params['dt']).size
+        assert len(net.cell_response.vsoma[0][1]) == n_times
+        assert len(net.cell_response.isoma[0][1]['soma_gabaa']) == n_times
+
+    with JoblibBackend(n_jobs=1):
+        simulate_dipole(net, n_trials=2, record_vsoma=True, record_isoma=True)
+        assert len(net.cell_response.vsoma) == 2
+        assert len(net.cell_response.isoma) == 2
+        n_times = np.arange(0., params['tstop'] + params['dt'],
+                            params['dt']).size
+        assert len(net.cell_response.vsoma[0][1]) == n_times
+        assert len(net.cell_response.isoma[0][1]['soma_gabaa']) == n_times
 
     gid, v_thresh = 7, 0.0
     times = np.array(net.cell_response.times)
