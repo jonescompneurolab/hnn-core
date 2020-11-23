@@ -82,5 +82,5 @@ dpl = simulate_dipole(net, n_trials=1)
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 dpl[0].plot(ax=axes[0], show=False)
-net.cell_response.plot_hist(ax=axes[1])
-net.cell_response.plot()
+net.cell_response.plot_spikes_hist(ax=axes[1])
+net.cell_response.plot_spikes_raster()

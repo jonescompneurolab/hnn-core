@@ -53,18 +53,19 @@ with JoblibBackend(n_jobs=1):
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
-net.cell_response.plot_hist(ax=axes[1], spike_types=['evprox', 'evdist'])
+net.cell_response.plot_spikes_hist(ax=axes[1],
+                                   spike_types=['evprox', 'evdist'])
 
 ###############################################################################
 # Also, we can plot the spikes and write them to txt files.
 # Note that we can use formatting syntax to specify the filename pattern
 # with which each trial will be written. To read spikes back in, we can use
 # wildcard expressions.
-net.cell_response.plot()
+net.cell_response.plot_spikes_raster()
 with tempfile.TemporaryDirectory() as tmp_dir_name:
     net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
     cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
-cell_response.plot()
+cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can additionally calculate the mean spike rates for each cell class by
@@ -99,4 +100,4 @@ with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
     dpls_sync = simulate_dipole(net_sync, n_trials=1)
 
 dpls_sync[0].plot()
-net_sync.cell_response.plot_hist()
+net_sync.cell_response.plot_spikes_hist()

@@ -64,6 +64,7 @@ for idx in range(10):  # only 10 cells per cell-type
     axes[0].plot(net.cell_response.times, vsoma[gid], color='g')
     gid = gid_ranges['L5_pyramidal'][idx]
     axes[0].plot(net.cell_response.times, vsoma[gid], color='r')
-net.cell_response.plot(ax=axes[1])
-net.cell_response.plot_hist(ax=axes[2],
-                            spike_types=['L5_pyramidal', 'L2_pyramidal'])
+net.cell_response.plot_spikes_raster(ax=axes[1])
+net.cell_response.plot_spikes_hist(ax=axes[2],
+                                   spike_types=['L5_pyramidal',
+                                                'L2_pyramidal'])
