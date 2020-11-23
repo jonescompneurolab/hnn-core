@@ -207,9 +207,6 @@ class Network(object):
         # until a new handling of external NetworkDrives's is completed.
         self._add_external_feeds()
 
-        self._record_vsoma = False
-        self._record_isoma = False
-
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"

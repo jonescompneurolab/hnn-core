@@ -57,13 +57,13 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
     if isinstance(record_vsoma, bool):
-        net._record_vsoma = record_vsoma
+        net.params['record_vsoma'] = record_vsoma
     else:
         raise TypeError("record_vsoma must be bool, got %s"
                         % type(record_vsoma).__name__)
 
     if isinstance(record_isoma, bool):
-        net._record_isoma = record_isoma
+        net.params['record_isoma'] = record_isoma
     else:
         raise TypeError("record_isoma must be bool, got %s"
                         % type(record_isoma).__name__)
