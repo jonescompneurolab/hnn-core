@@ -71,17 +71,18 @@ def test_dipole_simulation():
         assert len(net.cell_response.isoma) == 2
         n_times = np.arange(0., params['tstop'] + params['dt'],
                             params['dt']).size
-        assert len(net.cell_response.vsoma[0][1]) == n_times
-        assert len(net.cell_response.isoma[0][1]['soma_gabaa']) == n_times
+        assert len(net.cell_response.vsoma[0][8]) == n_times
+        assert len(net.cell_response.isoma[0][8]['soma_gabaa']) == n_times
 
+    net = Network(params)
     with JoblibBackend(n_jobs=1):
         simulate_dipole(net, n_trials=2, record_vsoma=True, record_isoma=True)
         assert len(net.cell_response.vsoma) == 2
         assert len(net.cell_response.isoma) == 2
         n_times = np.arange(0., params['tstop'] + params['dt'],
                             params['dt']).size
-        assert len(net.cell_response.vsoma[0][1]) == n_times
-        assert len(net.cell_response.isoma[0][1]['soma_gabaa']) == n_times
+        assert len(net.cell_response.vsoma[0][8]) == n_times
+        assert len(net.cell_response.isoma[0][8]['soma_gabaa']) == n_times
 
     gid, v_thresh = 7, 0.0
     times = np.array(net.cell_response.times)
