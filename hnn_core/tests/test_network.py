@@ -117,7 +117,7 @@ def test_cell_response(tmpdir):
     cell_response = CellResponse(spike_times=spike_times,
                                  spike_gids=spike_gids,
                                  spike_types=spike_types)
-    cell_response.plot_hist(show=False)
+    cell_response.plot_spikes_hist(show=False)
     cell_response.write(tmpdir.join('spk_%d.txt'))
     assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
 
@@ -166,20 +166,21 @@ def test_cell_response(tmpdir):
 
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
-        cell_response.plot_hist(spike_types=1, show=False)
+        cell_response.plot_spikes_hist(spike_types=1, show=False)
 
     with pytest.raises(TypeError, match=r"spike_types\[ev\] must be a list\. "
                                         r"Got int\."):
-        cell_response.plot_hist(spike_types={'ev': 1}, show=False)
+        cell_response.plot_spikes_hist(spike_types={'ev': 1}, show=False)
 
     with pytest.raises(ValueError, match=r"Elements of spike_types must map to"
                        r" mutually exclusive input types\. L2_basket is found"
                        r" more than once\."):
-        cell_response.plot_hist(spike_types={'ev': ['L2_basket', 'L2_b']},
-                                show=False)
+        cell_response.plot_spikes_hist(spike_types={'ev':
+                                       ['L2_basket', 'L2_b']},
+                                       show=False)
 
     with pytest.raises(ValueError, match="No input types found for ABC"):
-        cell_response.plot_hist(spike_types='ABC', show=False)
+        cell_response.plot_spikes_hist(spike_types='ABC', show=False)
 
     with pytest.raises(ValueError, match="tstart and tstop must be of type "
                        "int or float"):
