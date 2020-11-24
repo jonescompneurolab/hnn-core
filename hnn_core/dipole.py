@@ -31,7 +31,6 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         net.params['N_trials'] will be used
     record_vsoma : bool
         Option to record somatic voltages from cells
-            net.params['N_trials'] will be used
     record_isoma : bool
         Option to record somatic currents from cells
 
