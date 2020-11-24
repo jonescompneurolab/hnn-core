@@ -54,20 +54,20 @@ class MPISimulation(object):
             from mpi4py import MPI
             MPI.Finalize()
 
-    def _read_params(self):
-        """Read params broadcasted to all ranks on stdin"""
+    def _read_obj(self):
+        """Read object broadcasted to all ranks on stdin"""
 
-        # get parameters from stdin
+        # get object from stdin
         if self.rank == 0:
             input_bytes = _read_all_bytes(sys.stdin.buffer)
             sys.stdin.close()
 
-            params = pickle.loads(base64.b64decode(input_bytes, validate=True))
+            obj = pickle.loads(base64.b64decode(input_bytes, validate=True))
         else:
-            params = None
+            obj = None
 
-        params = self.comm.bcast(params, root=0)
-        return params
+        obj = self.comm.bcast(obj, root=0)
+        return obj
 
     def _pickle_data(self, sim_data):
         # pickle the data and encode as base64 before sending to stderr
@@ -94,15 +94,13 @@ class MPISimulation(object):
         sys.stderr.write('@end_of_data:%d@' % len(pickled_bytes))
         sys.stderr.flush()  # flush to ensure signal is not buffered
 
-    def run(self, params):
+    def run(self, net):
         """Run MPI simulation(s) and write results to stderr"""
 
-        from hnn_core import Network
         from hnn_core.parallel_backends import _clone_and_simulate
 
-        net = Network(params)
         sim_data = []
-        for trial_idx in range(params['N_trials']):
+        for trial_idx in range(net.params['N_trials']):
             single_sim_data = _clone_and_simulate(net, trial_idx)
 
             # go ahead and append trial data for each rank, though
@@ -130,8 +128,8 @@ if __name__ == '__main__':
 
     try:
         with MPISimulation() as mpi_sim:
-            params = mpi_sim._read_params()
-            sim_data = mpi_sim.run(params)
+            net = mpi_sim._read_obj()
+            sim_data = mpi_sim.run(net)
             mpi_sim._write_data_stderr(sim_data)
     except Exception:
         # This can be useful to indicate the problem to the

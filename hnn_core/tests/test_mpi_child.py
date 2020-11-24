@@ -7,7 +7,7 @@ import selectors
 import pytest
 
 import hnn_core
-from hnn_core import read_params
+from hnn_core import read_params, Network
 from hnn_core.mpi_child import MPISimulation
 from hnn_core.parallel_backends import (
     _read_stderr, _read_stdout, _process_child_data)
@@ -95,10 +95,11 @@ def test_child_run():
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
+    net = Network(params_reduced)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):
-            sim_data = mpi_sim.run(params_reduced)
+            sim_data = mpi_sim.run(net)
             stdout = buf.getvalue()
         assert "end_of_sim" in stdout
 

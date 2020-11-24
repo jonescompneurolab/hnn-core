@@ -485,7 +485,6 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-
         n_trials = net.params['N_trials']
         print("Running %d trials..." % (n_trials))
         dpls = []
@@ -498,13 +497,12 @@ class MPIBackend(object):
 
         cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
 
-        pickled_params = base64.b64encode(pickle.dumps(net.params))
+        pickled_params = base64.b64encode(pickle.dumps(net))
         env = _get_mpi_env()
 
         proc, proc_data_bytes, data_len = run_subprocess(
             cmdargs, pickled_obj=pickled_params, timeout=4,
-            env=env, cwd=os.getcwd(),
-            universal_newlines=True)
+            env=env, cwd=os.getcwd(), universal_newlines=True)
 
         sim_data = _process_child_data(proc_data_bytes, data_len)
 
