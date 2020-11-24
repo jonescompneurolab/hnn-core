@@ -284,18 +284,19 @@ def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
         for key, mask in events:
             callback = key.data
             callback_result = callback(key.fileobj, mask)
-            if callback.__name__ == '_read_stderr':
+            if callback.__name__ == '_read_stdout':
                 if callback_result == "end_of_sim":
                     # finishied receiving printable output
                     # everything else received is data
                     sel.unregister(pipe_stderr_r)
                     sel.register(pipe_stderr_r, selectors.EVENT_READ,
                                  data=_read_stderr)
-                elif isinstance(callback_result, int):
-                    data_len = callback_result
+            elif callback.__name__ == '_read_stderr':
+                if isinstance(callback_result, tuple):
+                    data_len = callback_result[0]
+                    proc_data_bytes += callback_result[1]
                     sel.unregister(pipe_stdout_r)
                     completed = True
-
                     # there could still be data in stderr, so we return
                     # to waiting until the process ends
                 else:
