@@ -69,78 +69,6 @@ def _read_all_bytes(fd, chunk_size=4096):
     return all_data
 
 
-class JoblibBackend(object):
-    """The JoblibBackend class.
-
-    Parameters
-    ----------
-    n_jobs : int | None
-        The number of jobs to start in parallel. If None, then 1 trial will be
-        started without parallelism
-
-    Attributes
-    ----------
-    n_jobs : int
-        The number of jobs to start in parallel
-    """
-    def __init__(self, n_jobs=1):
-        self.n_jobs = n_jobs
-        print("joblib will run over %d jobs" % (self.n_jobs))
-
-    def _parallel_func(self, func):
-        if self.n_jobs != 1:
-            try:
-                from joblib import Parallel, delayed
-            except ImportError:
-                warn('joblib not installed. Cannot run in parallel.')
-                self.n_jobs = 1
-        if self.n_jobs == 1:
-            my_func = func
-            parallel = list
-        else:
-            parallel = Parallel(self.n_jobs)
-            my_func = delayed(func)
-
-        return parallel, my_func
-
-    def __enter__(self):
-        global _BACKEND
-
-        self._old_backend = _BACKEND
-        _BACKEND = self
-
-        return self
-
-    def __exit__(self, type, value, traceback):
-        global _BACKEND
-
-        _BACKEND = self._old_backend
-
-    def simulate(self, net):
-        """Simulate the HNN model
-
-        Parameters
-        ----------
-        net : Network object
-            The Network object specifying how cells are
-            connected.
-
-        Returns
-        -------
-        dpl: list of Dipole
-            The Dipole results from each simulation trial
-        """
-
-        n_trials = net.params['N_trials']
-        dpls = []
-
-        parallel, myfunc = self._parallel_func(_clone_and_simulate)
-        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
-
-        dpls = _gather_trial_data(sim_data, net, n_trials)
-        return dpls
-
-
 def _read_stdout(fd, mask):
     """Read stdout fd until receiving the process simulation is complete
 
@@ -217,16 +145,17 @@ def _read_stderr(fd, mask):
 
 
 def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
-    """Run asynchronous Popen.
+    """Run process asynchronously and communicate with it.
 
     Parameters
     ----------
     command : list of str | str
         Command to run as subprocess (see subprocess.Popen documentation).
     pickled_obj : str
-        The pickled object to write to stdin after starting child process.
+        The pickled object to write to stdin after starting child process
+        through MPI command.
     timeout : float
-        The timeout (in sec.)
+        The number of seconds to wait after process ends.
     *args, **kwargs : arguments
         Additional arguments to pass to subprocess.Popen.
 
@@ -349,6 +278,78 @@ def _process_child_data(data_bytes, data_len):
 
     # unpickle the data
     return pickle.loads(data_pickled)
+
+
+class JoblibBackend(object):
+    """The JoblibBackend class.
+
+    Parameters
+    ----------
+    n_jobs : int | None
+        The number of jobs to start in parallel. If None, then 1 trial will be
+        started without parallelism
+
+    Attributes
+    ----------
+    n_jobs : int
+        The number of jobs to start in parallel
+    """
+    def __init__(self, n_jobs=1):
+        self.n_jobs = n_jobs
+        print("joblib will run over %d jobs" % (self.n_jobs))
+
+    def _parallel_func(self, func):
+        if self.n_jobs != 1:
+            try:
+                from joblib import Parallel, delayed
+            except ImportError:
+                warn('joblib not installed. Cannot run in parallel.')
+                self.n_jobs = 1
+        if self.n_jobs == 1:
+            my_func = func
+            parallel = list
+        else:
+            parallel = Parallel(self.n_jobs)
+            my_func = delayed(func)
+
+        return parallel, my_func
+
+    def __enter__(self):
+        global _BACKEND
+
+        self._old_backend = _BACKEND
+        _BACKEND = self
+
+        return self
+
+    def __exit__(self, type, value, traceback):
+        global _BACKEND
+
+        _BACKEND = self._old_backend
+
+    def simulate(self, net):
+        """Simulate the HNN model
+
+        Parameters
+        ----------
+        net : Network object
+            The Network object specifying how cells are
+            connected.
+
+        Returns
+        -------
+        dpl: list of Dipole
+            The Dipole results from each simulation trial
+        """
+
+        n_trials = net.params['N_trials']
+        dpls = []
+
+        parallel, myfunc = self._parallel_func(_clone_and_simulate)
+        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
+
+        dpls = _gather_trial_data(sim_data, net, n_trials)
+        return dpls
 
 
 class MPIBackend(object):
