@@ -485,6 +485,10 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
+        # just use the joblib backend for a single core
+        if self.n_procs == 1:
+            return JoblibBackend(n_jobs=1).simulate(net)
+
         n_trials = net.params['N_trials']
         print("Running %d trials..." % (n_trials))
         dpls = []
