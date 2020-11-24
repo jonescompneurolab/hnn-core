@@ -142,7 +142,13 @@ class JoblibBackend(object):
 
 
 def _read_stdout(fd, mask):
-    """read stdout fd until receiving the process simulation is complete"""
+    """Read stdout fd until receiving the process simulation is complete
+
+    Returns
+    -------
+    completion_signal : str | None
+        If completed, return 'end_of_sim'. Else, return None.
+    """
     data = _read_all_bytes(fd)
     if len(data) > 0:
         str_data = data.decode()
@@ -159,7 +165,7 @@ def _read_stdout(fd, mask):
 
 
 def _read_stderr(fd, mask):
-    """read stderr from fd until end of simulation signal is received.
+    """Read stderr from fd until end of simulation signal is received.
 
     Parameters
     ----------
@@ -169,12 +175,12 @@ def _read_stderr(fd, mask):
     Returns
     -------
     proc_data_bytes : str
-        The processed data bytes.
-    data_len : int
-        The data length.
+        The processed data bytes before @.
+    data_len : str | int
+        The data length found as in @end_of_data:42@
+        where 42 is the data length. Returned only if
+        @ is found in the data read from stderr.
     """
-    proc_data_bytes = b''
-
     data = _read_all_bytes(fd)
     if len(data) > 0:
         str_data = data.decode()
@@ -196,7 +202,7 @@ def _read_stderr(fd, mask):
                 str_data[signal_index_end + 1:]
 
             # add the output bytes and return the signal
-            proc_data_bytes += spliced_str_data.encode()
+            proc_data_bytes = spliced_str_data.encode()
 
             split_string = signal.split(':')
             if len(split_string) > 1 and len(split_string[1]) > 0:
@@ -205,27 +211,35 @@ def _read_stderr(fd, mask):
                 raise ValueError("Completion signal from child MPI process"
                                  " did not contain data length.")
 
-            return data_len
+            return data_len, proc_data_bytes
 
-        proc_data_bytes += data
-
-    return proc_data_bytes, data_len
+    return proc_data_bytes
 
 
 def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
-    """Popen async.
+    """Run asynchronous Popen.
 
     Parameters
     ----------
     command : list of str | str
         Command to run as subprocess (see subprocess.Popen documentation).
+    pickled_params : str
+        The pickled parameters to write to stdin after starting child process.
+    timeout : float
+        The timeout (in sec.)
     *args, **kwargs : arguments
         Additional arguments to pass to subprocess.Popen.
 
     Returns
     -------
-    proc : blah
+    proc : instance of Popen
+        The process instance.
+    proc_data_bytes : str
+        The processed data bytes.
+    data_len : int
+        The length of data.
     """
+    proc_data_bytes = b''
 
     # set up pairs of pipes to communicate with subprocess
     (pipe_stdin_r, pipe_stdin_w) = os.pipe()
@@ -251,15 +265,15 @@ def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
     data_len = 0
     completed = False
     total_time = 0
-    # loop while the process is running
+    # wait timeout seconds after process stops to exit loop
     while True:
-        if not proc.poll() is None:
+        if proc.poll() is not None:
             if completed is True:
                 break
             elif total_time > timeout:
                 # This is indicative of a failure. For debugging purposes.
-                warn(f"Timed out ({timeout}s) waiting for end of data after child "
-                     "process stopped")
+                warn(f"Timed out ({timeout}s) waiting for end of data after"
+                     " child process stopped")
                 break
             else:
                 total_time += 1
@@ -269,24 +283,23 @@ def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
         events = sel.select(timeout=1)
         for key, mask in events:
             callback = key.data
-            completion_signal = callback(key.fileobj, mask)
-            if completion_signal is not None:
-                if completion_signal == "end_of_sim":
+            callback_result = callback(key.fileobj, mask)
+            if callback.__name__ == '_read_stderr':
+                if callback_result == "end_of_sim":
                     # finishied receiving printable output
                     # everything else received is data
                     sel.unregister(pipe_stderr_r)
-                    key = sel.register(pipe_stderr_r, selectors.EVENT_READ,
-                                       data=_read_stderr)
-                elif isinstance(completion_signal, int):
-                    data_len = completion_signal
+                    sel.register(pipe_stderr_r, selectors.EVENT_READ,
+                                 data=_read_stderr)
+                elif isinstance(callback_result, int):
+                    data_len = callback_result
                     sel.unregister(pipe_stdout_r)
                     completed = True
 
                     # there could still be data in stderr, so we return
                     # to waiting until the process ends
                 else:
-                    raise ValueError("Unrecognized signal received from "
-                                     "MPI child")
+                    proc_data_bytes += callback_result
 
     # cleanup the selector
     sel.unregister(pipe_stderr_r)
@@ -298,16 +311,26 @@ def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
     os.close(pipe_stderr_r)
     os.close(pipe_stderr_w)
 
-    proc_data_bytes, data_len = key.data
-
     return proc, proc_data_bytes, data_len
 
 
 def _process_child_data(data_bytes, data_len):
+    """Process the data returned by child process.
+
+    Parameters
+    ----------
+    data_bytes : str
+        The data bytes
+
+    Returns
+    -------
+    data_unpickled : obj
+        The unpickled data.
+    """
     if not data_len == len(data_bytes):
         # This is indicative of a failure. For debugging purposes.
         warn("Length of received data unexpected. Expecting %d bytes, "
-                "got %d" % (data_len, len(data_bytes)))
+             "got %d" % (data_len, len(data_bytes)))
 
     if len(data_bytes) == 0:
         raise RuntimeError("MPI simulation didn't return any data")
@@ -468,9 +491,9 @@ class MPIBackend(object):
         if 'darwin' in sys.platform:
             my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
             my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
-        
+
         proc, proc_data_bytes, data_len = run_subprocess(
-            cmdargs, pickled_params=pickled_params,
+            cmdargs, pickled_params=pickled_params, timeout=4,
             env=my_env, cwd=os.getcwd(),
             universal_newlines=True)
 

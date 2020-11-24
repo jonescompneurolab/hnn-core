@@ -73,7 +73,10 @@ Verifies that MPI, NEURON, and Python are all working together.
 
 **Notes for contributors**::
 
-MPI parallelization with NEURON requires that the simulation be launched with the ``nrniv`` binary from the command-line. The ``mpiexec`` command is used to launch multiple ``nrniv`` processes which communicate via MPI. This is done using ``subprocess.Popen()`` in ``MPIBackend.simulate()`` to launch parallel child processes (``MPISimulation``) to carry out the simulation. The communication sequence between ``MPIBackend`` and ``MPISimulation`` is outlined below.
+MPI parallelization with NEURON requires that the simulation be launched with the ``nrniv`` binary from the command-line.
+The ``mpiexec`` command is used to launch multiple ``nrniv`` processes which communicate via MPI. This is done using
+``subprocess.Popen()`` in ``MPIBackend.simulate()`` to launch parallel child processes (``MPISimulation``) to carry out
+the simulation. The communication sequence between ``MPIBackend`` and ``MPISimulation`` is outlined below.
 
 #. In order to pass the parameters from ``MPIBackend`` the child ``MPISimulation`` processes' ``stdin`` is used. 
    Parameters are pickled and base64 encoded before being written to the processes' ``stdin``. 
@@ -92,6 +95,10 @@ MPI parallelization with NEURON requires that the simulation be launched with th
    transfer has completed and it will verify the length of data it receives, printing a ``UserWarning`` if the
    lengths don't match.
 
-It is important that ``MPISimulation`` uses the ``flush()`` method after each signal to ensure that the signal will immediately be available for reading by ``MPIBackend`` and not buffered with other output.
+It is important that ``MPISimulation`` uses the ``flush()`` method after each signal to ensure that the signal
+will immediately be available for reading by ``MPIBackend`` and not buffered with other output.
 
-Tests for parallel backends utilize a special ``@pytest.mark.incremental`` decorator (defined in ``conftest.py``) that causes a test failure to skip subsequent tests in the incremental block. For example, if a test running a simple MPI simulation fails, subsequent tests that compare simulation output between different backends will be skipped. These types of failures will be marked as a failure in CI.
+Tests for parallel backends utilize a special ``@pytest.mark.incremental`` decorator (defined in ``conftest.py``)
+that causes a test failure to skip subsequent tests in the incremental block. For example, if a test running a
+simple MPI simulation fails, subsequent tests that compare simulation output between different backends will be
+skipped. These types of failures will be marked as a failure in CI.
