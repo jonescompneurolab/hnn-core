@@ -78,8 +78,8 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
 
     # aggregate the currents and voltages independently on each proc
-    _PC.py_gather(neuron_net._vsoma, 0)
-    _PC.py_gather(neuron_net._isoma, 0)
+    vsoma_list = _PC.py_gather(neuron_net._vsoma, 0)
+    isoma_list = _PC.py_gather(neuron_net._isoma, 0)
 
     # combine spiking data from each proc
     spike_times_list = _PC.py_gather(neuron_net._spike_times, 0)
@@ -92,6 +92,10 @@ def _simulate_single_trial(neuron_net, trial_idx):
             neuron_net._all_spike_times.append(spike_vec)
         for spike_vec in spike_gids_list:
             neuron_net._all_spike_gids.append(spike_vec)
+        for vsoma in vsoma_list:
+            neuron_net._vsoma.update(vsoma)
+        for isoma in isoma_list:
+            neuron_net._isoma.update(isoma)
 
     _PC.barrier()  # get all nodes to this place before continuing
 
