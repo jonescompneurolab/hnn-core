@@ -388,14 +388,10 @@ class MPIBackend(object):
         can be less than the user specified value if limited by the cores on
         the system, the number of cores allowed by the job scheduler, or
         if mpi4py could not be loaded.
-    mpi_cmd_str : str
-        The string of the mpi command with number of procs and options
-    proc_data_bytes: bytes object
-        This will contain data received from the MPI child process via stderr.
-
+    mpi_cmd : list
+        The mpi command with number of procs and options to be passed to Popen
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
-        self.proc_data_bytes = b''
 
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
@@ -437,7 +433,7 @@ class MPIBackend(object):
             warn('mpi4py not installed. will run on single processor')
             self.n_procs = 1
 
-        self.mpi_cmd_str = mpi_cmd
+        self.mpi_cmd = mpi_cmd
 
         if self.n_procs == 1:
             print("Backend will use 1 core. Running simulation without MPI")
@@ -446,17 +442,24 @@ class MPIBackend(object):
             print("MPI will run over %d processes" % (self.n_procs))
 
         if hyperthreading:
-            self.mpi_cmd_str += ' --use-hwthread-cpus'
+            self.mpi_cmd += ' --use-hwthread-cpus'
 
         if oversubscribe:
-            self.mpi_cmd_str += ' --oversubscribe'
+            self.mpi_cmd += ' --oversubscribe'
 
-        self.mpi_cmd_str += ' -np ' + str(self.n_procs)
+        self.mpi_cmd += ' -np ' + str(self.n_procs)
 
-        self.mpi_cmd_str += ' nrniv -python -mpi -nobanner ' + \
+        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
+
+        # Split the command into shell arguments for passing to Popen
+        if 'win' in sys.platform:
+            use_posix = True
+        else:
+            use_posix = False
+        self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
 
     def __enter__(self):
         global _BACKEND
@@ -493,19 +496,11 @@ class MPIBackend(object):
         print("Running %d trials..." % (n_trials))
         dpls = []
 
-        # Split the command into shell arguments for passing to Popen
-        if 'win' in sys.platform:
-            use_posix = True
-        else:
-            use_posix = False
-
-        cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
-
-        pickled_params = base64.b64encode(pickle.dumps(net))
+        pickled_net = base64.b64encode(pickle.dumps(net))
         env = _get_mpi_env()
 
         proc, proc_data_bytes, data_len = run_subprocess(
-            cmdargs, pickled_obj=pickled_params, timeout=4,
+            command=self.mpi_cmd, pickled_obj=pickled_net, timeout=4,
             env=env, cwd=os.getcwd(), universal_newlines=True)
 
         sim_data = _process_child_data(proc_data_bytes, data_len)
