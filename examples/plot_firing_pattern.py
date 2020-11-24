@@ -39,6 +39,8 @@ print(net.gid_ranges)
 
 ###############################################################################
 # Simulated voltage in the soma is stored in CellResponse as a dictionary.
+# The CellResponse object stores data produced by individual cells including
+# spikes, somatic voltages and currents.
 trial_idx = 0
 vsoma = net.cell_response.vsoma[trial_idx]
 print(vsoma.keys())
