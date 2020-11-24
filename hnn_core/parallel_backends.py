@@ -58,6 +58,18 @@ def _gather_trial_data(sim_data, net, n_trials):
     return dpls
 
 
+def _get_mpi_env():
+    """Set some MPI environment variables."""
+    my_env = os.environ.copy()
+    if 'win' not in sys.platform:
+        my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
+
+    if 'darwin' in sys.platform:
+        my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
+        my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
+    return my_env
+
+
 def _read_all_bytes(fd, chunk_size=4096):
     all_data = b""
     while True:
@@ -153,7 +165,7 @@ def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
         Command to run as subprocess (see subprocess.Popen documentation).
     pickled_obj : str
         The pickled object to write to stdin after starting child process
-        through MPI command.
+        with MPI command.
     timeout : float
         The number of seconds to wait after process ends.
     *args, **kwargs : arguments
@@ -164,7 +176,7 @@ def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
     proc : instance of Popen
         The process instance.
     proc_data_bytes : str
-        The processed data bytes.
+        The processed data bytes returned by stdout.
     data_len : int
         The length of data.
     """
@@ -191,7 +203,6 @@ def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
     sel.register(pipe_stdout_r, selectors.EVENT_READ, _read_stdout)
     sel.register(pipe_stderr_r, selectors.EVENT_READ, _read_stdout)
 
-    data_len = 0
     completed = False
     total_time = 0
     # wait timeout seconds after process stops to exit loop
@@ -240,6 +251,10 @@ def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
     os.close(pipe_stdout_w)
     os.close(pipe_stderr_r)
     os.close(pipe_stderr_w)
+
+    # if simulation failed, raise exception
+    if proc.returncode != 0:
+        raise RuntimeError("MPI simulation failed")
 
     return proc, proc_data_bytes, data_len
 
@@ -484,24 +499,12 @@ class MPIBackend(object):
         cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
 
         pickled_params = base64.b64encode(pickle.dumps(net.params))
-
-        # set some MPI environment variables
-        my_env = os.environ.copy()
-        if 'win' not in sys.platform:
-            my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
-
-        if 'darwin' in sys.platform:
-            my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
-            my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
+        env = _get_mpi_env()
 
         proc, proc_data_bytes, data_len = run_subprocess(
             cmdargs, pickled_obj=pickled_params, timeout=4,
-            env=my_env, cwd=os.getcwd(),
+            env=env, cwd=os.getcwd(),
             universal_newlines=True)
-
-        # if simulation failed, raise exception
-        if proc.returncode != 0:
-            raise RuntimeError("MPI simulation failed")
 
         sim_data = _process_child_data(proc_data_bytes, data_len)
 
