@@ -141,6 +141,192 @@ class JoblibBackend(object):
         return dpls
 
 
+def _read_stdout(fd, mask):
+    """read stdout fd until receiving the process simulation is complete"""
+    data = _read_all_bytes(fd)
+    if len(data) > 0:
+        str_data = data.decode()
+        if str_data == 'end_of_sim':
+            return str_data
+        elif 'end_of_sim' in str_data:
+            sys.stdout.write(str_data.replace('end_of_sim', ''))
+            return 'end_of_sim'
+
+        # output from process includes newlines
+        sys.stdout.write(str_data)
+
+    return None
+
+
+def _read_stderr(fd, mask):
+    """read stderr from fd until end of simulation signal is received.
+
+    Parameters
+    ----------
+    fd : file object
+        The file object.
+
+    Returns
+    -------
+    proc_data_bytes : str
+        The processed data bytes.
+    data_len : int
+        The data length.
+    """
+    proc_data_bytes = b''
+
+    data = _read_all_bytes(fd)
+    if len(data) > 0:
+        str_data = data.decode()
+        if '@' in str_data:
+            # extract the signal
+            signal_index_start = str_data.rfind('@end_of_data:')
+            signal_index_end = str_data.rfind('@')
+            if signal_index_start < 0 or signal_index_end < 0 or \
+                    signal_index_end <= signal_index_start:
+                raise ValueError("Invalid signal start (%d) or end (%d) " %
+                                 (signal_index_start, signal_index_end) +
+                                 "index")
+
+            # signal without '@' on either side
+            signal = str_data[signal_index_start + 1:signal_index_end]
+
+            # remove the signal from the stderr output
+            spliced_str_data = str_data[0:signal_index_start] + \
+                str_data[signal_index_end + 1:]
+
+            # add the output bytes and return the signal
+            proc_data_bytes += spliced_str_data.encode()
+
+            split_string = signal.split(':')
+            if len(split_string) > 1 and len(split_string[1]) > 0:
+                data_len = int(split_string[1])
+            else:
+                raise ValueError("Completion signal from child MPI process"
+                                 " did not contain data length.")
+
+            return data_len
+
+        proc_data_bytes += data
+
+    return proc_data_bytes, data_len
+
+
+def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
+    """Popen async.
+
+    Parameters
+    ----------
+    command : list of str | str
+        Command to run as subprocess (see subprocess.Popen documentation).
+    *args, **kwargs : arguments
+        Additional arguments to pass to subprocess.Popen.
+
+    Returns
+    -------
+    proc : blah
+    """
+
+    # set up pairs of pipes to communicate with subprocess
+    (pipe_stdin_r, pipe_stdin_w) = os.pipe()
+    (pipe_stdout_r, pipe_stdout_w) = os.pipe()
+    (pipe_stderr_r, pipe_stderr_w) = os.pipe()
+
+    proc = Popen(command, stdin=pipe_stdin_r, stdout=pipe_stdout_w,
+                 stderr=pipe_stderr_w, *args, **kwargs)
+
+    # process will read stdin on startup for params
+    os.write(pipe_stdin_w, pickled_params)
+
+    # signal that we are done writing params
+    os.close(pipe_stdin_w)
+    os.close(pipe_stdin_r)
+
+    # create the selector instance and register all input events
+    # with read_stdout which will only echo to stdout
+    sel = selectors.DefaultSelector()
+    sel.register(pipe_stdout_r, selectors.EVENT_READ, _read_stdout)
+    sel.register(pipe_stderr_r, selectors.EVENT_READ, _read_stdout)
+
+    data_len = 0
+    completed = False
+    total_time = 0
+    # loop while the process is running
+    while True:
+        if not proc.poll() is None:
+            if completed is True:
+                break
+            elif total_time > timeout:
+                # This is indicative of a failure. For debugging purposes.
+                warn(f"Timed out ({timeout}s) waiting for end of data after child "
+                     "process stopped")
+                break
+            else:
+                total_time += 1
+                sleep(1)
+
+        # wait for an event on the selector, timeout after 1s
+        events = sel.select(timeout=1)
+        for key, mask in events:
+            callback = key.data
+            completion_signal = callback(key.fileobj, mask)
+            if completion_signal is not None:
+                if completion_signal == "end_of_sim":
+                    # finishied receiving printable output
+                    # everything else received is data
+                    sel.unregister(pipe_stderr_r)
+                    key = sel.register(pipe_stderr_r, selectors.EVENT_READ,
+                                       data=_read_stderr)
+                elif isinstance(completion_signal, int):
+                    data_len = completion_signal
+                    sel.unregister(pipe_stdout_r)
+                    completed = True
+
+                    # there could still be data in stderr, so we return
+                    # to waiting until the process ends
+                else:
+                    raise ValueError("Unrecognized signal received from "
+                                     "MPI child")
+
+    # cleanup the selector
+    sel.unregister(pipe_stderr_r)
+    sel.close()
+
+    # done with stdout and stderr
+    os.close(pipe_stdout_r)
+    os.close(pipe_stdout_w)
+    os.close(pipe_stderr_r)
+    os.close(pipe_stderr_w)
+
+    proc_data_bytes, data_len = key.data
+
+    return proc, proc_data_bytes, data_len
+
+
+def _process_child_data(data_bytes, data_len):
+    if not data_len == len(data_bytes):
+        # This is indicative of a failure. For debugging purposes.
+        warn("Length of received data unexpected. Expecting %d bytes, "
+                "got %d" % (data_len, len(data_bytes)))
+
+    if len(data_bytes) == 0:
+        raise RuntimeError("MPI simulation didn't return any data")
+
+    # decode base64 byte string
+    try:
+        data_pickled = base64.b64decode(data_bytes, validate=True)
+    except binascii.Error:
+        # This is here for future debugging purposes. Unit tests can't
+        # reproduce an incorrectly padded string, but this has been an
+        # issue before
+        raise ValueError("Incorrect padding for data length %d bytes" %
+                         len(data_bytes) + " (mod 4 = %d)" %
+                         (len(data_bytes) % 4))
+
+    # unpickle the data
+    return pickle.loads(data_pickled)
+
+
 class MPIBackend(object):
     """The MPIBackend class.
 
@@ -245,83 +431,6 @@ class MPIBackend(object):
 
         _BACKEND = self._old_backend
 
-    def _read_stderr(self, fd, mask):
-        """read stderr from fd until end of simulation signal is received"""
-        data = _read_all_bytes(fd)
-        if len(data) > 0:
-            str_data = data.decode()
-            if '@' in str_data:
-                # extract the signal
-                signal_index_start = str_data.rfind('@end_of_data:')
-                signal_index_end = str_data.rfind('@')
-                if signal_index_start < 0 or signal_index_end < 0 or \
-                        signal_index_end <= signal_index_start:
-                    raise ValueError("Invalid signal start (%d) or end (%d) " %
-                                     (signal_index_start, signal_index_end) +
-                                     "index")
-
-                # signal without '@' on either side
-                signal = str_data[signal_index_start + 1:signal_index_end]
-
-                # remove the signal from the stderr output
-                spliced_str_data = str_data[0:signal_index_start] + \
-                    str_data[signal_index_end + 1:]
-
-                # add the output bytes and return the signal
-                self.proc_data_bytes += spliced_str_data.encode()
-
-                split_string = signal.split(':')
-                if len(split_string) > 1 and len(split_string[1]) > 0:
-                    data_len = int(split_string[1])
-                else:
-                    raise ValueError("Completion signal from child MPI process"
-                                     " did not contain data length.")
-
-                return data_len
-
-            self.proc_data_bytes += data
-
-        return None
-
-    def _read_stdout(self, fd, mask):
-        """read stdout fd until receiving the process simulation is complete"""
-        data = _read_all_bytes(fd)
-        if len(data) > 0:
-            str_data = data.decode()
-            if str_data == 'end_of_sim':
-                return str_data
-            elif 'end_of_sim' in str_data:
-                sys.stdout.write(str_data.replace('end_of_sim', ''))
-                return 'end_of_sim'
-
-            # output from process includes newlines
-            sys.stdout.write(str_data)
-
-        return None
-
-    def _process_child_data(self, data_bytes, data_len):
-        if not data_len == len(data_bytes):
-            # This is indicative of a failure. For debugging purposes.
-            warn("Length of received data unexpected. Expecting %d bytes, "
-                 "got %d" % (data_len, len(data_bytes)))
-
-        if len(data_bytes) == 0:
-            raise RuntimeError("MPI simulation didn't return any data")
-
-        # decode base64 byte string
-        try:
-            data_pickled = base64.b64decode(data_bytes, validate=True)
-        except binascii.Error:
-            # This is here for future debugging purposes. Unit tests can't
-            # reproduce an incorrectly padded string, but this has been an
-            # issue before
-            raise ValueError("Incorrect padding for data length %d bytes" %
-                             len(data_bytes) + " (mod 4 = %d)" %
-                             (len(data_bytes) % 4))
-
-        # unpickle the data
-        return pickle.loads(data_pickled)
-
     def simulate(self, net):
         """Simulate the HNN model in parallel on all cores
 
@@ -359,87 +468,17 @@ class MPIBackend(object):
         if 'darwin' in sys.platform:
             my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
             my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
-
-        # set up pairs of pipes to communicate with subprocess
-        (pipe_stdin_r, pipe_stdin_w) = os.pipe()
-        (pipe_stdout_r, pipe_stdout_w) = os.pipe()
-        (pipe_stderr_r, pipe_stderr_w) = os.pipe()
-
-        # Start the simulation in parallel!
-        proc = Popen(cmdargs, stdin=pipe_stdin_r, stdout=pipe_stdout_w,
-                     stderr=pipe_stderr_w, env=my_env, cwd=os.getcwd(),
-                     universal_newlines=True)
-
-        # process will read stdin on startup for params
-        os.write(pipe_stdin_w, pickled_params)
-
-        # signal that we are done writing params
-        os.close(pipe_stdin_w)
-        os.close(pipe_stdin_r)
-
-        # create the selector instance and register all input events
-        # with self.read_stdout which will only echo to stdout
-        self.sel = selectors.DefaultSelector()
-        self.sel.register(pipe_stdout_r, selectors.EVENT_READ,
-                          self._read_stdout)
-        self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
-                          self._read_stdout)
-
-        data_len = 0
-        completed = False
-        timeout = 0
-        # loop while the process is running
-        while True:
-            if not proc.poll() is None:
-                if completed is True:
-                    break
-                elif timeout > 4:
-                    # This is indicative of a failure. For debugging purposes.
-                    warn("Timed out (5s) waiting for end of data after child "
-                         "process stopped")
-                    break
-                else:
-                    timeout += 1
-                    sleep(1)
-
-            # wait for an event on the selector, timeout after 1s
-            events = self.sel.select(timeout=1)
-            for key, mask in events:
-                callback = key.data
-                completion_signal = callback(key.fileobj, mask)
-                if completion_signal is not None:
-                    if completion_signal == "end_of_sim":
-                        # finishied receiving printable output
-                        # everything else received is data
-                        self.sel.unregister(pipe_stderr_r)
-                        self.sel.register(pipe_stderr_r, selectors.EVENT_READ,
-                                          self._read_stderr)
-                    elif isinstance(completion_signal, int):
-                        data_len = completion_signal
-                        self.sel.unregister(pipe_stdout_r)
-                        completed = True
-
-                        # there could still be data in stderr, so we return
-                        # to waiting until the process ends
-                    else:
-                        raise ValueError("Unrecognized signal received from "
-                                         "MPI child")
-
-        # cleanup the selector
-        self.sel.unregister(pipe_stderr_r)
-        self.sel.close()
-
-        # done with stdout and stderr
-        os.close(pipe_stdout_r)
-        os.close(pipe_stdout_w)
-        os.close(pipe_stderr_r)
-        os.close(pipe_stderr_w)
+        
+        proc, proc_data_bytes, data_len = run_subprocess(
+            cmdargs, pickled_params=pickled_params,
+            env=my_env, cwd=os.getcwd(),
+            universal_newlines=True)
 
         # if simulation failed, raise exception
         if proc.returncode != 0:
             raise RuntimeError("MPI simulation failed")
 
-        sim_data = self._process_child_data(self.proc_data_bytes, data_len)
+        sim_data = _process_child_data(proc_data_bytes, data_len)
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
