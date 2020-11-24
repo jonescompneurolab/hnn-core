@@ -46,11 +46,6 @@ def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
     return dpls, net
 
 
-def test_run_mpibackend2():
-    """Test running a MPIBackend on reduced model"""
-    dpls_reduced_mpi, _ = run_hnn_core(backend='mpi', reduced=True)
-
-
 def requires_mpi4py(function):
     try:
         import mpi4py

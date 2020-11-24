@@ -211,20 +211,20 @@ def _read_stderr(fd, mask):
                 raise ValueError("Completion signal from child MPI process"
                                  " did not contain data length.")
 
-            return data_len, proc_data_bytes
+            return proc_data_bytes, data_len
 
-    return proc_data_bytes
+    return data
 
 
-def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
+def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
     """Run asynchronous Popen.
 
     Parameters
     ----------
     command : list of str | str
         Command to run as subprocess (see subprocess.Popen documentation).
-    pickled_params : str
-        The pickled parameters to write to stdin after starting child process.
+    pickled_obj : str
+        The pickled object to write to stdin after starting child process.
     timeout : float
         The timeout (in sec.)
     *args, **kwargs : arguments
@@ -249,10 +249,10 @@ def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
     proc = Popen(command, stdin=pipe_stdin_r, stdout=pipe_stdout_w,
                  stderr=pipe_stderr_w, *args, **kwargs)
 
-    # process will read stdin on startup for params
-    os.write(pipe_stdin_w, pickled_params)
+    # process will read stdin on startup
+    os.write(pipe_stdin_w, pickled_obj)
 
-    # signal that we are done writing params
+    # signal that we are done writing pickled object
     os.close(pipe_stdin_w)
     os.close(pipe_stdin_r)
 
@@ -293,8 +293,8 @@ def run_subprocess(command, pickled_params, timeout, *args, **kwargs):
                                  data=_read_stderr)
             elif callback.__name__ == '_read_stderr':
                 if isinstance(callback_result, tuple):
-                    data_len = callback_result[0]
-                    proc_data_bytes += callback_result[1]
+                    proc_data_bytes += callback_result[0]
+                    data_len = callback_result[1]
                     sel.unregister(pipe_stdout_r)
                     completed = True
                     # there could still be data in stderr, so we return
@@ -494,7 +494,7 @@ class MPIBackend(object):
             my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
 
         proc, proc_data_bytes, data_len = run_subprocess(
-            cmdargs, pickled_params=pickled_params, timeout=4,
+            cmdargs, pickled_obj=pickled_params, timeout=4,
             env=my_env, cwd=os.getcwd(),
             universal_newlines=True)
 
