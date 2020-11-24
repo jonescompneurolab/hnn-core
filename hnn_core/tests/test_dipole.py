@@ -89,6 +89,7 @@ def test_dipole_simulation():
     assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
     assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
 
+    # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
     times = np.array(joblib_net.cell_response.times)
     spike_times = np.array(joblib_net.cell_response.spike_times[trial])
