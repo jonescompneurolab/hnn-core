@@ -66,34 +66,34 @@ def test_dipole_simulation():
         simulate_dipole(net, n_trials=1, record_vsoma=False, record_isoma=0)
 
     trial, n_trials, gid = 0, 2, 7
+    n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
+    mpi_net = Network(params)
     with MPIBackend(n_procs=None, mpi_cmd='mpiexec'):
-        simulate_dipole(net, n_trials=n_trials, record_vsoma=True,
+        simulate_dipole(mpi_net, n_trials=n_trials, record_vsoma=True,
                         record_isoma=True)
-        assert len(net.cell_response.vsoma) == n_trials
-        assert len(net.cell_response.isoma) == n_trials
-        n_times = np.arange(0., params['tstop'] + params['dt'],
-                            params['dt']).size
-        assert len(net.cell_response.vsoma[trial][gid]) == n_times
-        assert len(net.cell_response.isoma[
+        assert len(mpi_net.cell_response.vsoma) == n_trials
+        assert len(mpi_net.cell_response.isoma) == n_trials
+        assert len(mpi_net.cell_response.vsoma[trial][gid]) == n_times
+        assert len(mpi_net.cell_response.isoma[
                    trial][gid]['soma_gabaa']) == n_times
 
-    net = Network(params)
+    joblib_net = Network(params)
     with JoblibBackend(n_jobs=1):
-        simulate_dipole(net, n_trials=n_trials, record_vsoma=True,
+        simulate_dipole(joblib_net, n_trials=n_trials, record_vsoma=True,
                         record_isoma=True)
-        assert len(net.cell_response.vsoma) == n_trials
-        assert len(net.cell_response.isoma) == n_trials
-        n_times = np.arange(0., params['tstop'] + params['dt'],
-                            params['dt']).size
-        assert len(net.cell_response.vsoma[trial][gid]) == n_times
-        assert len(net.cell_response.isoma[
+        assert len(joblib_net.cell_response.vsoma) == n_trials
+        assert len(joblib_net.cell_response.isoma) == n_trials
+        assert len(joblib_net.cell_response.vsoma[trial][gid]) == n_times
+        assert len(joblib_net.cell_response.isoma[
                    trial][gid]['soma_gabaa']) == n_times
+    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
+    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
 
     v_thresh = 0.0
-    times = np.array(net.cell_response.times)
-    spike_times = np.array(net.cell_response.spike_times[trial])
-    spike_gids = np.array(net.cell_response.spike_gids[trial])
-    vsoma = np.array(net.cell_response.vsoma[trial][gid])
+    times = np.array(joblib_net.cell_response.times)
+    spike_times = np.array(joblib_net.cell_response.spike_times[trial])
+    spike_gids = np.array(joblib_net.cell_response.spike_gids[trial])
+    vsoma = np.array(joblib_net.cell_response.vsoma[trial][gid])
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
                    spike_times[spike_gids == gid] < times[v_mask][-1]])
