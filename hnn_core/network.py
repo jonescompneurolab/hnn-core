@@ -274,7 +274,7 @@ class Network(object):
         cur_params = self.params.copy()  # these get mangled below!
         for trial_idx in range(n_trials):
 
-            prng_seedcore_initial = cur_params['prng_*'].copy()
+            prng_seedcore_initial = self.params['prng_*'].copy()
             for param_key in prng_seedcore_initial.keys():
                 cur_params[param_key] =\
                     prng_seedcore_initial[param_key] + trial_idx
