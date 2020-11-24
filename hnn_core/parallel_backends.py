@@ -156,15 +156,15 @@ def _read_stderr(fd, mask):
     return data
 
 
-def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
+def run_subprocess(command, obj, timeout, *args, **kwargs):
     """Run process asynchronously and communicate with it.
 
     Parameters
     ----------
     command : list of str | str
         Command to run as subprocess (see subprocess.Popen documentation).
-    pickled_obj : str
-        The pickled object to write to stdin after starting child process
+    obj : object
+        The object to write to stdin after starting child process
         with MPI command.
     timeout : float
         The number of seconds to wait after process ends.
@@ -175,12 +175,12 @@ def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
     -------
     proc : instance of Popen
         The process instance.
-    proc_data_bytes : str
-        The processed data bytes returned by stdout.
-    data_len : int
-        The length of data.
+    child_data : object
+        The data returned by the child process.
     """
     proc_data_bytes = b''
+
+    pickled_obj = base64.b64encode(pickle.dumps(obj))
 
     # set up pairs of pipes to communicate with subprocess
     (pipe_stdin_r, pipe_stdin_w) = os.pipe()
@@ -256,7 +256,9 @@ def run_subprocess(command, pickled_obj, timeout, *args, **kwargs):
     if proc.returncode != 0:
         raise RuntimeError("MPI simulation failed")
 
-    return proc, proc_data_bytes, data_len
+    child_data = _process_child_data(proc_data_bytes, data_len)
+
+    return proc, child_data
 
 
 def _process_child_data(data_bytes, data_len):
@@ -269,7 +271,7 @@ def _process_child_data(data_bytes, data_len):
 
     Returns
     -------
-    data_unpickled : obj
+    data_unpickled : object
         The unpickled data.
     """
     if not data_len == len(data_bytes):
@@ -496,14 +498,11 @@ class MPIBackend(object):
         print("Running %d trials..." % (n_trials))
         dpls = []
 
-        pickled_net = base64.b64encode(pickle.dumps(net))
         env = _get_mpi_env()
 
-        proc, proc_data_bytes, data_len = run_subprocess(
-            command=self.mpi_cmd, pickled_obj=pickled_net, timeout=4,
+        proc, sim_data = run_subprocess(
+            command=self.mpi_cmd, obj=net, timeout=4,
             env=env, cwd=os.getcwd(), universal_newlines=True)
-
-        sim_data = _process_child_data(proc_data_bytes, data_len)
 
         dpls = _gather_trial_data(sim_data, net, n_trials)
         return dpls
