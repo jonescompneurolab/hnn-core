@@ -6,10 +6,15 @@ https://pytest.org/en/stable/example/simple.html#incremental-testing-test-steps
 from typing import Dict, Tuple
 import pytest
 
+<<<<<<< HEAD
 import os.path as op
 import hnn_core
 from hnn_core import read_params, Network, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
+=======
+import hnn_core
+import os.path as op
+>>>>>>> TST params fixture
 
 # store history of failures per test class name and per index in parametrize
 # (if parametrize used)
