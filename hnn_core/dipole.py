@@ -173,6 +173,19 @@ class Dipole(object):
         self.nave = nave
 
     def post_proc(self, N_pyr_x, N_pyr_y, winsz, fctr):
+        """ Apply baseline, unit conversion, scaling and smoothing
+
+       Parameters
+        ----------
+        N_pyr_x : int
+            Number of Pyramidal cells in x direction
+        N_pyr_y : int
+            Number of Pyramidal cells in y direction
+        winsz : int
+            Smoothing window
+        fctr : int
+            Scaling factor
+        """
         self.baseline_renormalize(N_pyr_x, N_pyr_y)
         self.convert_fAm_to_nAm()
         self.scale(fctr)

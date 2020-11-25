@@ -124,23 +124,6 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def _clone_and_simulate(self, net, trial_idx):
-        # avoid relative lookups after being forked by joblib
-        from hnn_core.network_builder import NetworkBuilder
-        from hnn_core.network_builder import _simulate_single_trial
-
-        # XXX this should be built into NetworkBuilder
-        # update prng_seedcore params to provide jitter between trials
-        for param_key in net.params['prng_*'].keys():
-            net.params[param_key] += trial_idx
-
-        neuron_net = NetworkBuilder(net)
-        dpl = _simulate_single_trial(neuron_net, trial_idx)
-
-        spikedata = neuron_net.get_data_from_neuron()
-
-        return dpl, spikedata
-
     def simulate(self, net, postproc=True):
         """Simulate the HNN model
 
@@ -161,7 +144,7 @@ class JoblibBackend(object):
         n_trials = net.params['N_trials']
         dpls = []
 
-        parallel, myfunc = self._parallel_func(self._clone_and_simulate)
+        parallel, myfunc = self._parallel_func(_clone_and_simulate)
         sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
