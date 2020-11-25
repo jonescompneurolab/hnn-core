@@ -397,10 +397,13 @@ class CellResponse(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_ranges.
-    vsoma : dict
-        Dictionary indexed by gids containing somatic voltages
-    isoma : dict
-        Dictionary indexed by gids containing somatic currents
+    vsoma : list (n_trials,) of dict, shape
+        Each element of the outer list is a trial.
+        Dictionary indexed by gids containing somatic voltages.
+    isoma : list (n_trials,) of dict, shape
+        Each element of the outer list is a trial.
+        Dictionary indexed by gids containing somatic currents.
+
     times : numpy array
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
