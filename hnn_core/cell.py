@@ -97,6 +97,9 @@ class _Cell(ABC):
         Contains recording of somatic currents indexed
         by synapse type. (keys are soma_gabaa, soma_gabab etc.)
         Must be enabled by running simulate_dipole(net, record_isoma=True)
+    list_IClamp : list of h.IClamp
+        The current clamps inserted at each section in all the
+        sections of the cell.
     gid : int
         GID of the cell in a network (or None if not yet assigned)
     """
@@ -253,9 +256,7 @@ class _Cell(ABC):
         if duration < 0.:
             raise ValueError('Duration of tonic input cannot be negative')
 
-        # iterate through list of sect_list_IClamp to create a persistent
-        # IClamp object
-        # so names must be actual section names, or else it will fail silently
+        # names must be actual section names, or else it will fail silently
         self.list_IClamp = list()
         for sect_name in ['soma']:
             seclist = h.SectionList()
