@@ -120,3 +120,6 @@ def test_cell_response_backends(run_hnn_core_fixture):
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
                    spike_times[spike_gids == gid] < times[v_mask][-1]])
+    simulate_dipole(net, n_trials=2, record_vsoma=True)
+    assert len(net.spikes.vsoma) == 2
+    assert len(net.spikes.vsoma[0]) == 24

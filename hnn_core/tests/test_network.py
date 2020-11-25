@@ -61,7 +61,8 @@ def test_network():
     assert isinstance(net.feed_times, dict)
     # single trial simulated
     assert all(len(src_feed_times) == 1 for
-               _, src_feed_times in net.feed_times.items())
+               src_type, src_feed_times in net.feed_times.items()
+               if src_type != 'tonic')
     assert len(net.feed_times['common'][0]) == n_common_sources
     assert len(net.feed_times['common'][0][0]) == 40  # 40 spikes
     assert isinstance(net.feed_times['evprox1'][0][0], list)

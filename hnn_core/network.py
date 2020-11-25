@@ -257,23 +257,6 @@ class Network(object):
         # Create the feed dynamics (event_times)
         self._instantiate_feeds(n_trials=self.params['N_trials'])
 
-        # Add tonic inputs if present
-        self.feed_times['tonic'] = dict()
-        for cell_type in ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']:
-            is_tonic_present = [f'Itonic_{p}_{cell_type}_soma' in self.params
-                                for p in ['A', 't0', 'T']]
-            if any(is_tonic_present):
-                if not all(is_tonic_present):
-                    raise ValueError(f'Tonic input must have the amplitude, '
-                                     f'start time and end time specified. One '
-                                     f'or more parameter may be missing for '
-                                     f'cell type {cell_type}')
-                self.feed_times['tonic'][cell_type] = {
-                    'amplitude': self.params[f'Itonic_A_{cell_type}_soma'],
-                    't0': self.params[f'Itonic_t0_{cell_type}_soma'],
-                    'T': self.params[f'Itonic_T_{cell_type}_soma']
-                }
-
     def _instantiate_feeds(self, n_trials=1):
         """Creates event_time vectors for all feeds and all trials
 
@@ -331,8 +314,25 @@ class Network(object):
                         )
                 feed_times[src_type].append(event_times)
 
-            # list of dict of list of list
-            self.feed_times = feed_times
+        # Add tonic inputs if present
+        feed_times['tonic'] = dict()
+        for cell_type in ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']:
+            is_tonic_present = [f'Itonic_{p}_{cell_type}_soma' in self.params
+                                for p in ['A', 't0', 'T']]
+            if any(is_tonic_present):
+                if not all(is_tonic_present):
+                    raise ValueError(f'Tonic input must have the amplitude, '
+                                     f'start time and end time specified. One '
+                                     f'or more parameter may be missing for '
+                                     f'cell type {cell_type}')
+                feed_times['tonic'][cell_type] = {
+                    'amplitude': self.params[f'Itonic_A_{cell_type}_soma'],
+                    't0': self.params[f'Itonic_t0_{cell_type}_soma'],
+                    'T': self.params[f'Itonic_T_{cell_type}_soma']
+                }
+
+        # list of dict of list of list
+        self.feed_times = feed_times
 
     def _update_gid_ranges(self):
         """Creates gid ranges from scratch every time called.
