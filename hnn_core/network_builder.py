@@ -214,6 +214,14 @@ def _long_name(short_name):
     return short_name
 
 
+def _short_name(short_name):
+    long_name = dict(L2_basket='L2Basket', L5_basket='L5Basket',
+                     L2_pyramidal='L2Pyr', L5_pyramidal='L5Pyr')
+    if short_name in long_name:
+        return long_name[short_name]
+    return short_name
+
+
 class NetworkBuilder(object):
     """The NetworkBuilder class.
 
@@ -403,10 +411,9 @@ class NetworkBuilder(object):
                 else:
                     BasketCell = type2class[src_type]
                     cell = BasketCell(src_pos, gid=gid)
-
-                if 'tonic' in self.net.feed_times:
-                    if src_type in self.net.feed_times['tonic']:
-                        cell.create_tonic_feed(**self.net.feed_times[src_type])
+                if _short_name(src_type) in self.net.feed_times['tonic']:
+                    cell.create_tonic_feed(
+                        **self.net.feed_times['tonic'][_short_name(src_type)])
                 cell.record_soma(record_vsoma, record_isoma)
 
                 # this call could belong in init of a _Cell (with threshold)?

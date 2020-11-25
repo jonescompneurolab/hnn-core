@@ -97,3 +97,37 @@ def test_extfeed():
     with pytest.raises(ValueError, match='events_per_cycle should be'):
         _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
                              stdev, repeats, events_per_cycle, prng, prng2)
+
+    # test tonic inputs
+    import hnn_core
+    import os.path as op
+
+    hnn_core_root = op.dirname(hnn_core.__file__)
+
+    # default params
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = hnn_core.read_params(params_fname)
+
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3,
+                   'tstop': 25,
+                   't_evprox_1': 5,
+                   't_evdist_1': 10,
+                   't_evprox_2': 20,
+                   'N_trials': 1})
+
+    params.update({
+        'Itonic_A_L2Pyr_soma': 1.0,
+        'Itonic_t0_L2Pyr_soma': 5.0,
+        'Itonic_T_L2Pyr_soma': -1.0
+    })
+    net = hnn_core.Network(params)
+
+    with pytest.raises(ValueError, match='End time of tonic input cannot be'
+                       ' negative'):
+        hnn_core.simulate_dipole(net)
+    params['Itonic_T_L2Pyr_soma'] = 4
+    net = hnn_core.Network(params)
+    with pytest.raises(ValueError, match='Duration of tonic input cannot be'
+                       ' negative'):
+        hnn_core.simulate_dipole(net)
