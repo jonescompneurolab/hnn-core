@@ -138,14 +138,14 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.L5Basket.html#hnn_core.L5Basket" title="hnn_core.L5Basket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L5Basket</span></code></a>(pos[, gid])</p></td>
 <td><p>Class for layer 5 basket cells.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, record_vsoma])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, …])</p></td>
 <td><p>Simulate a dipole given the experiment parameters.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a>(params)</p></td>
 <td><p>The Network class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.Spikes.html#hnn_core.Spikes" title="hnn_core.Spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spikes</span></code></a>([spike_times, spike_gids, …])</p></td>
-<td><p>The Spikes class.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CellResponse</span></code></a>([spike_times, spike_gids, …])</p></td>
+<td><p>The CellResponse class.</p></td>
 </tr>
 </tbody>
 </table>
@@ -158,7 +158,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.simulate_dipole.html#hnn_core.dipole.simulate_dipole" title="hnn_core.dipole.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, record_vsoma])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.simulate_dipole.html#hnn_core.dipole.simulate_dipole" title="hnn_core.dipole.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, …])</p></td>
 <td><p>Simulate a dipole given the experiment parameters.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.dipole.read_dipole.html#hnn_core.dipole.read_dipole" title="hnn_core.dipole.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname[, units])</p></td>
@@ -198,10 +198,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_dipole</span></code></a>(dpl[, ax, layer, show])</p></td>
 <td><p>Simple layer-specific plot function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist" title="hnn_core.viz.plot_spikes_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes_hist</span></code></a>(spikes[, ax, spike_types, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist" title="hnn_core.viz.plot_spikes_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes_hist</span></code></a>(cell_response[, ax, …])</p></td>
 <td><p>Plot the histogram of spiking activity across trials.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster" title="hnn_core.viz.plot_spikes_raster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes_raster</span></code></a>(spikes[, ax, show])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster" title="hnn_core.viz.plot_spikes_raster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes_raster</span></code></a>(cell_response[, ax, show])</p></td>
 <td><p>Plot the aggregate spiking activity according to cell type.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_cells.html#hnn_core.viz.plot_cells" title="hnn_core.viz.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>(net[, ax, show])</p></td>

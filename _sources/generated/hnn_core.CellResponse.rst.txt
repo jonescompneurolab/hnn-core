@@ -1,9 +1,9 @@
-﻿hnn_core.Spikes
-===============
+﻿hnn_core.CellResponse
+=====================
 
 .. currentmodule:: hnn_core
 
-.. autoclass:: Spikes
+.. autoclass:: CellResponse
    :inherited-members:
    :special-members: __getitem__, __repr__
 

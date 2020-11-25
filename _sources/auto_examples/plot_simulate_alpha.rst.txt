@@ -287,6 +287,7 @@ Then we read the default parameters file
         "prng_seedcore_extpois": 2,
         "prng_seedcore_input_dist": 2,
         "prng_seedcore_input_prox": 2,
+        "record_isoma": 0,
         "record_vsoma": 0,
         "repeats_dist": 10,
         "repeats_prox": 10,
@@ -459,7 +460,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  28.236 seconds)
+   **Total running time of the script:** ( 1 minutes  19.673 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

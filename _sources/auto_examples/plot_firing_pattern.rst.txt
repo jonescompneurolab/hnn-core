@@ -134,13 +134,15 @@ The cell IDs (gids) are stored in the network object as a dictionary
 
 
 
-Simulated voltage in the soma is stored in the Spikes object as a dictionary.
+Simulated voltage in the soma is stored in CellResponse as a dictionary.
+The CellResponse object stores data produced by individual cells including
+spikes, somatic voltages and currents.
 
 
 .. code-block:: default
 
     trial_idx = 0
-    vsoma = net.spikes.vsoma[trial_idx]
+    vsoma = net.cell_response.vsoma[trial_idx]
     print(vsoma.keys())
 
 
@@ -165,7 +167,7 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
     gid = 170
     plt.figure(figsize=(4, 4))
-    plt.plot(net.spikes.times, vsoma[gid])
+    plt.plot(net.cell_response.times, vsoma[gid])
     plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
     plt.xlabel('Time (ms)')
     plt.ylabel('Voltage (mV)')
@@ -193,11 +195,13 @@ plots and histograms for the Pyramidal cells.
 
     for idx in range(10):  # only 10 cells per cell-type
         gid = gid_ranges['L2_pyramidal'][idx]
-        axes[0].plot(net.spikes.times, vsoma[gid], color='g')
+        axes[0].plot(net.cell_response.times, vsoma[gid], color='g')
         gid = gid_ranges['L5_pyramidal'][idx]
-        axes[0].plot(net.spikes.times, vsoma[gid], color='r')
-    net.spikes.plot(ax=axes[1])
-    net.spikes.plot_hist(ax=axes[2], spike_types=['L5_pyramidal', 'L2_pyramidal'])
+        axes[0].plot(net.cell_response.times, vsoma[gid], color='r')
+    net.cell_response.plot_spikes_raster(ax=axes[1])
+    net.cell_response.plot_spikes_hist(ax=axes[2],
+                                       spike_types=['L5_pyramidal',
+                                                    'L2_pyramidal'])
 
 
 
@@ -220,7 +224,7 @@ plots and histograms for the Pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  45.790 seconds)
+   **Total running time of the script:** ( 0 minutes  48.343 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

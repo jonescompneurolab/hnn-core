@@ -215,15 +215,20 @@ Defines the connection parameters</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L5Pyr.record_current_soma">
-<code class="sig-name descname">record_current_soma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.record_current_soma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record current at soma.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L5Pyr.record_voltage_soma">
-<code class="sig-name descname">record_voltage_soma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.record_voltage_soma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record voltage at soma.</p>
+<dt id="hnn_core.L5Pyr.record_soma">
+<code class="sig-name descname">record_soma</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record_vsoma</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">record_isoma</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.record_soma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record current and voltage at soma.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>record_vsoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic voltages from cells
+net.params[‘N_trials’] will be used</p>
+</dd>
+<dt><strong>record_isoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic currents from cells</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

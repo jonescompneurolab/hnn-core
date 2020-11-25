@@ -278,6 +278,7 @@ Then we read the parameters file
         "prng_seedcore_extpois": 2,
         "prng_seedcore_input_dist": 2,
         "prng_seedcore_input_prox": 2,
+        "record_isoma": 0,
         "record_vsoma": 0,
         "repeats_dist": 10,
         "repeats_prox": 10,
@@ -442,7 +443,8 @@ and then plot it
     import matplotlib.pyplot as plt
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
     plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
-    net.spikes.plot_hist(ax=axes[1], spike_types=['evprox', 'evdist'])
+    net.cell_response.plot_spikes_hist(ax=axes[1],
+                                       spike_types=['evprox', 'evdist'])
 
 
 
@@ -471,11 +473,11 @@ wildcard expressions.
 
 .. code-block:: default
 
-    net.spikes.plot()
+    net.cell_response.plot_spikes_raster()
     with tempfile.TemporaryDirectory() as tmp_dir_name:
-        net.spikes.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-        spikes = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
-    spikes.plot()
+        net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
+        cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
+    cell_response.plot_spikes_raster()
 
 
 
@@ -513,10 +515,12 @@ specifying a time window with tstart and tstop.
 
 .. code-block:: default
 
-    all_rates = spikes.mean_rates(tstart=0, tstop=170, gid_ranges=net.gid_ranges,
-                                  mean_type='all')
-    trial_rates = spikes.mean_rates(tstart=0, tstop=170, gid_ranges=net.gid_ranges,
-                                    mean_type='trial')
+    all_rates = cell_response.mean_rates(tstart=0, tstop=170,
+                                         gid_ranges=net.gid_ranges,
+                                         mean_type='all')
+    trial_rates = cell_response.mean_rates(tstart=0, tstop=170,
+                                           gid_ranges=net.gid_ranges,
+                                           mean_type='trial')
     print('Mean spike rates across trials:')
     print(all_rates)
     print('Mean spike rates for individual trials:')
@@ -572,7 +576,7 @@ openmpi, which must be installed on the system
         dpls_sync = simulate_dipole(net_sync, n_trials=1)
 
     dpls_sync[0].plot()
-    net_sync.spikes.plot_hist()
+    net_sync.cell_response.plot_spikes_hist()
 
 
 
@@ -623,25 +627,17 @@ openmpi, which must be installed on the system
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
-    [42ff4a9ac9ad:01369] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01369] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01369] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01369] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01369] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01369] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01369] Read -1, expected 27208, errno = 1
-    [42ff4a9ac9ad:01369] Read -1, expected 27200, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 5616, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 5703, errno = 1
-    [42ff4a9ac9ad:01368] Read -1, expected 5703, errno = 1
+    [ed3b78982216:01354] Read -1, expected 27208, errno = 1
+    [ed3b78982216:01354] Read -1, expected 27200, errno = 1
+    [ed3b78982216:01353] Read -1, expected 27200, errno = 1
+    [ed3b78982216:01353] Read -1, expected 27208, errno = 1
+    [ed3b78982216:01353] Read -1, expected 27200, errno = 1
+    [ed3b78982216:01354] Read -1, expected 27208, errno = 1
+    [ed3b78982216:01354] Read -1, expected 27200, errno = 1
+    [ed3b78982216:01353] Read -1, expected 27208, errno = 1
+    [ed3b78982216:01353] Read -1, expected 5616, errno = 1
+    [ed3b78982216:01353] Read -1, expected 5703, errno = 1
+    [ed3b78982216:01353] Read -1, expected 5703, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -650,7 +646,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  35.140 seconds)
+   **Total running time of the script:** ( 2 minutes  9.813 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

@@ -21,7 +21,7 @@ Simulation (:py:mod:`hnn_core`):
    ExtFeed
    simulate_dipole
    Network
-   Spikes
+   CellResponse
 
 Dipole (:py:mod:`hnn_core.dipole`):
 ------
