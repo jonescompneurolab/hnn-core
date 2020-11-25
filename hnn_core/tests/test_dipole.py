@@ -62,9 +62,10 @@ def test_dipole(tmpdir):
     dpls = simulate_dipole(net, postproc=True)
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
-    dpls_raw[0].post_proc(params['N_pyr_x'], params['N_pyr_y'],
-                          params['dipole_smooth_win'] / params['dt'],
-                          params['dipole_scalefctr'])
+    dpls_raw[0].post_proc(params_reduced['N_pyr_x'], params_reduced['N_pyr_y'],
+                          params_reduced['dipole_smooth_win'] /
+                          params_reduced['dt'],
+                          params_reduced['dipole_scalefctr'])
     assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
 
 
