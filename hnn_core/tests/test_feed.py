@@ -5,16 +5,15 @@ import pytest
 
 import numpy as np
 
-from hnn_core import Params
+import hnn_core
 from hnn_core.feed import (feed_event_times, _get_prng, _create_extpois,
                            _create_common_input)
 from hnn_core.params import create_pext
 
 
-def test_extfeed():
+def test_extfeed(params):
     """Test the different external feeds."""
 
-    params = Params()
     p_common, p_unique = create_pext(params,
                                      params['tstop'])
 
@@ -49,20 +48,20 @@ def test_extfeed():
             assert p_common[ii][layer + 'Pyr_ampa'][0] == params[key]
 
     # validate poisson input time interval
-    params = p_unique['extpois']
-    params['L2_basket'] = (1., 1., 0., 0.)
+    p_extpois = p_unique['extpois']
+    p_extpois['L2_basket'] = (1., 1., 0., 0.)
     with pytest.raises(ValueError, match='The end time for Poisson input'):
-        params['t_interval'] = (params['t_interval'][0], -1)
+        p_extpois['t_interval'] = (p_extpois['t_interval'][0], -1)
         event_times = feed_event_times(
             feed_type='extpois',
             target_cell_type='L2_basket',
-            params=params, gid=0)
+            params=p_extpois, gid=0)
     with pytest.raises(ValueError, match='The start time for Poisson'):
-        params['t_interval'] = (-1, 5)
+        p_extpois['t_interval'] = (-1, 5)
         event_times = feed_event_times(
             feed_type='extpois',
             target_cell_type='L2_basket',
-            params=params, gid=0)
+            params=p_extpois, gid=0)
 
     # checks the poisson spike train generation
     prng = np.random.RandomState()
@@ -99,24 +98,15 @@ def test_extfeed():
                              stdev, repeats, events_per_cycle, prng, prng2)
 
     # test tonic inputs
-    import hnn_core
-    import os.path as op
-
-    hnn_core_root = op.dirname(hnn_core.__file__)
-
-    # default params
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = hnn_core.read_params(params_fname)
-
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   'tstop': 25,
-                   't_evprox_1': 5,
-                   't_evdist_1': 10,
-                   't_evprox_2': 20,
-                   'N_trials': 1})
-
     params.update({
+        'N_pyr_x': 3,
+        'N_pyr_y': 3,
+        'tstop': 25,
+        't_evprox_1': 5,
+        't_evdist_1': 10,
+        't_evprox_2': 20,
+        'N_trials': 1,
+        # tonic inputs
         'Itonic_A_L2Pyr_soma': 1.0,
         'Itonic_t0_L2Pyr_soma': 5.0,
         'Itonic_T_L2Pyr_soma': -1.0
