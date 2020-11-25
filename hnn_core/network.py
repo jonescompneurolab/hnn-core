@@ -190,7 +190,7 @@ class Network(object):
             'L5_pyramidal',
         ]
         self.feedname_list = []  # no feeds defined yet
-        self.feed_times = []  # list of len == n_trials
+        self.feed_times = []
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
