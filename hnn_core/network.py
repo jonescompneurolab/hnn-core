@@ -279,11 +279,8 @@ class Network(object):
 
         cur_params = self.params.copy()  # these get mangled below!
         for trial_idx in range(n_trials):
-
-            prng_seedcore_initial = self.params['prng_*'].copy()
-            for param_key in prng_seedcore_initial.keys():
-                cur_params[param_key] =\
-                    prng_seedcore_initial[param_key] + trial_idx
+            for param_key in self.params['prng_*'].keys():
+                cur_params[param_key] = self.params[param_key] + trial_idx
             # needs to be re-run to create the dicts going into ExtFeed
             # the only thing changing is the initial seed
             p_common, p_unique = create_pext(cur_params,
