@@ -9,6 +9,7 @@ import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles, viz, Network
 from hnn_core import JoblibBackend, MPIBackend
 from hnn_core.dipole import Dipole, simulate_dipole
+from hnn_core.parallel_backends import requires_mpi4py
 
 matplotlib.use('agg')
 
@@ -90,15 +91,6 @@ def test_dipole_simulation():
 
     trial, n_trials, gid = 0, 2, 7
     n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
-    mpi_net = Network(params)
-    with MPIBackend(n_procs=None, mpi_cmd='mpiexec'):
-        simulate_dipole(mpi_net, n_trials=n_trials, record_vsoma=True,
-                        record_isoma=True)
-        assert len(mpi_net.cell_response.vsoma) == n_trials
-        assert len(mpi_net.cell_response.isoma) == n_trials
-        assert len(mpi_net.cell_response.vsoma[trial][gid]) == n_times
-        assert len(mpi_net.cell_response.isoma[
-                   trial][gid]['soma_gabaa']) == n_times
 
     joblib_net = Network(params)
     with JoblibBackend(n_jobs=1):
@@ -109,8 +101,6 @@ def test_dipole_simulation():
         assert len(joblib_net.cell_response.vsoma[trial][gid]) == n_times
         assert len(joblib_net.cell_response.isoma[
                    trial][gid]['soma_gabaa']) == n_times
-    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
-    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
 
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
@@ -121,3 +111,34 @@ def test_dipole_simulation():
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
                    spike_times[spike_gids == gid] < times[v_mask][-1]])
+
+
+@requires_mpi4py
+def test_dipole_simulation_MPI():
+    """Test data produced from simulate_dipole() call across backends."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3,
+                   'tstop': 25,
+                   't_evprox_1': 5,
+                   't_evdist_1': 10,
+                   't_evprox_2': 20})
+    joblib_net = Network(params)
+    mpi_net = Network(params)
+    trial, n_trials, gid = 0, 2, 7
+    n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
+    with JoblibBackend(n_jobs=1):
+        simulate_dipole(joblib_net, n_trials=n_trials, record_vsoma=True,
+                        record_isoma=True)
+    with MPIBackend(n_procs=None, mpi_cmd='mpiexec'):
+        simulate_dipole(mpi_net, n_trials=n_trials, record_vsoma=True,
+                        record_isoma=True)
+        assert len(mpi_net.cell_response.vsoma) == n_trials
+        assert len(mpi_net.cell_response.isoma) == n_trials
+        assert len(mpi_net.cell_response.vsoma[trial][gid]) == n_times
+        assert len(mpi_net.cell_response.isoma[
+                   trial][gid]['soma_gabaa']) == n_times
+    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
+    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma

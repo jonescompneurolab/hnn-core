@@ -12,6 +12,7 @@ from mne.utils import _fetch_file
 import hnn_core
 from hnn_core import simulate_dipole, Network, read_params
 from hnn_core import MPIBackend, JoblibBackend
+from hnn_core.parallel_backends import requires_mpi4py
 
 
 def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
@@ -44,18 +45,6 @@ def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
         dpls = simulate_dipole(net)
 
     return dpls, net
-
-
-def requires_mpi4py(function):
-    try:
-        import mpi4py
-        assert hasattr(mpi4py, '__version__')
-    except (ImportError, ModuleNotFoundError) as err:
-        if "TRAVIS_OS_NAME" not in environ:
-            reason = 'mpi4py not available'
-            return pytest.mark.skipif(True, reason=reason)(function)
-        else:
-            raise ImportError(err)
 
 
 # The purpose of this incremental mark is to avoid running the full length
