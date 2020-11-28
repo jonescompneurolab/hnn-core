@@ -14,6 +14,8 @@ from subprocess import Popen
 import selectors
 import binascii
 from time import sleep
+from os import environ
+import pytest
 
 _BACKEND = None
 
@@ -75,6 +77,18 @@ def _read_all_bytes(fd, chunk_size=4096):
             break
 
     return all_data
+
+
+def requires_mpi4py(function):
+    try:
+        import mpi4py
+        assert hasattr(mpi4py, '__version__')
+    except (ImportError, ModuleNotFoundError) as err:
+        if "TRAVIS_OS_NAME" not in environ:
+            reason = 'mpi4py not available'
+            return pytest.mark.skipif(True, reason=reason)(function)
+        else:
+            raise ImportError(err)
 
 
 class JoblibBackend(object):
