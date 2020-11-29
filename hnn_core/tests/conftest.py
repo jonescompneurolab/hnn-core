@@ -6,6 +6,11 @@ https://pytest.org/en/stable/example/simple.html#incremental-testing-test-steps
 from typing import Dict, Tuple
 import pytest
 
+import os.path as op
+import hnn_core
+from hnn_core import read_params, Network, simulate_dipole
+from hnn_core import MPIBackend, JoblibBackend
+
 # store history of failures per test class name and per index in parametrize
 # (if parametrize used)
 _test_failed_incremental: Dict[str, Dict[Tuple[int, ...], str]] = {}
@@ -63,3 +68,42 @@ def pytest_runtest_setup(item):
             # and test name
             if test_name is not None:
                 pytest.xfail("previous test failed ({})".format(test_name))
+
+
+@pytest.fixture(scope='module')
+def run_hnn_core():
+    def _run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False,
+                      record_vsoma=False, record_isoma=False):
+        hnn_core_root = op.dirname(hnn_core.__file__)
+
+        # default params
+        params_fname = op.join(hnn_core_root, 'param', 'default.json')
+        params = read_params(params_fname)
+
+        if reduced:
+            params.update({'N_pyr_x': 3,
+                           'N_pyr_y': 3,
+                           'tstop': 25,
+                           't_evprox_1': 5,
+                           't_evdist_1': 10,
+                           't_evprox_2': 20,
+                           'N_trials': 2})
+        net = Network(params)
+
+        # number of trials simulated
+        assert len(net.trial_event_times) == params['N_trials']
+
+        if backend == 'mpi':
+            with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
+                dpls = simulate_dipole(net, record_vsoma=record_isoma,
+                                       record_isoma=record_vsoma)
+        elif backend == 'joblib':
+            with JoblibBackend(n_jobs=n_jobs):
+                dpls = simulate_dipole(net, record_vsoma=record_isoma,
+                                       record_isoma=record_vsoma)
+        else:
+            dpls = simulate_dipole(net, record_vsoma=record_isoma,
+                                   record_isoma=record_vsoma)
+
+        return dpls, net
+    return _run_hnn_core

@@ -14,39 +14,6 @@ from hnn_core import simulate_dipole, Network, read_params
 from hnn_core import MPIBackend, JoblibBackend
 from hnn_core.parallel_backends import requires_mpi4py
 
-
-def run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False):
-    hnn_core_root = op.dirname(hnn_core.__file__)
-
-    # default params
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-    if reduced:
-        params.update({'N_pyr_x': 3,
-                       'N_pyr_y': 3,
-                       'tstop': 25,
-                       't_evprox_1': 5,
-                       't_evdist_1': 10,
-                       't_evprox_2': 20,
-                       'N_trials': 2})
-    net = Network(params)
-
-    # number of trials simulated
-    assert len(net.trial_event_times) == params['N_trials']
-
-    if backend == 'mpi':
-        with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-            dpls = simulate_dipole(net)
-    elif backend == 'joblib':
-        with JoblibBackend(n_jobs=n_jobs):
-            dpls = simulate_dipole(net)
-    else:
-        dpls = simulate_dipole(net)
-
-    return dpls, net
-
-
 # The purpose of this incremental mark is to avoid running the full length
 # simulation when there are failures in previous (faster) tests. When a test
 # in the sequence fails, all subsequent tests will be marked "xfailed" rather
@@ -59,7 +26,7 @@ class TestParallelBackends():
     dpls_reduced_default = None
     dpls_reduced_joblib = None
 
-    def test_run_default(self):
+    def test_run_default(self, run_hnn_core):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
         dpls_reduced_default, _ = run_hnn_core(None, reduced=True)
@@ -68,7 +35,7 @@ class TestParallelBackends():
                       dpls_reduced_default[0].data['agg'],
                       dpls_reduced_default[1].data['agg'])
 
-    def test_run_joblibbackend(self):
+    def test_run_joblibbackend(self, run_hnn_core):
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
@@ -88,7 +55,7 @@ class TestParallelBackends():
         assert backend.n_procs > 1
 
     @requires_mpi4py
-    def test_run_mpibackend(self):
+    def test_run_mpibackend(self, run_hnn_core):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
         dpls_reduced_mpi, _ = run_hnn_core(backend='mpi', reduced=True)
@@ -99,13 +66,13 @@ class TestParallelBackends():
                             atol=1e-14)
 
     @requires_mpi4py
-    def test_run_mpibackend_oversubscribed(self):
+    def test_run_mpibackend_oversubscribed(self, run_hnn_core):
         """Test running MPIBackend with oversubscribed number of procs"""
         oversubscribed = round(cpu_count() * 1.5)
         run_hnn_core(backend='mpi', n_procs=oversubscribed, reduced=True)
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
-    def test_compare_hnn_core(self, backend, n_jobs=1):
+    def test_compare_hnn_core(self, run_hnn_core, backend, n_jobs=1):
         """Test hnn-core does not break."""
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
@@ -155,7 +122,7 @@ class TestParallelBackends():
 # there are no dependencies if this unit tests fails; no need to be in
 # class marked incremental
 @requires_mpi4py
-def test_mpi_failure():
+def test_mpi_failure(run_hnn_core):
     """Test that an MPI failure is handled and messages are printed"""
     # this MPI paramter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
