@@ -10,8 +10,8 @@ import pytest
 from mne.utils import _fetch_file
 
 import hnn_core
-from hnn_core import simulate_dipole, Network, read_params
-from hnn_core import MPIBackend, JoblibBackend
+from hnn_core import read_params
+from hnn_core import MPIBackend
 from hnn_core.parallel_backends import requires_mpi4py
 
 # The purpose of this incremental mark is to avoid running the full length

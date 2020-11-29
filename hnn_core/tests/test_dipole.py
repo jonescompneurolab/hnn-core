@@ -6,8 +6,8 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, read_dipole, average_dipoles, viz, Network
-from hnn_core import JoblibBackend, MPIBackend
+from hnn_core import read_params, read_dipole, average_dipoles, Network
+from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole
 from hnn_core.parallel_backends import requires_mpi4py
 
@@ -28,7 +28,7 @@ def test_dipole(tmpdir):
     dipole.scale(params['dipole_scalefctr'])
     dipole.smooth(params['dipole_smooth_win'] / params['dt'])
     dipole.plot(show=False)
-    viz.plot_dipole([dipole, dipole], show=False)
+    plot_dipole([dipole, dipole], show=False)
     dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.times, dipole.times, rtol=0, atol=0.00051)
@@ -106,13 +106,13 @@ def test_cell_response_backends(run_hnn_core):
     assert len(joblib_net.cell_response.isoma) == n_trials
     assert len(joblib_net.cell_response.vsoma[trial_idx][gid]) == n_times
     assert len(joblib_net.cell_response.isoma[
-                trial_idx][gid]['soma_gabaa']) == n_times
+               trial_idx][gid]['soma_gabaa']) == n_times
 
     assert len(mpi_net.cell_response.vsoma) == n_trials
     assert len(mpi_net.cell_response.isoma) == n_trials
     assert len(mpi_net.cell_response.vsoma[trial_idx][gid]) == n_times
     assert len(mpi_net.cell_response.isoma[
-                trial_idx][gid]['soma_gabaa']) == n_times
+               trial_idx][gid]['soma_gabaa']) == n_times
     assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
     assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
 
