@@ -79,18 +79,20 @@ def _read_all_bytes(fd, chunk_size=4096):
 
 
 def requires_mpi4py(function):
-    from os import environ
+    """Decorator for testing functions that require MPI."""
     import pytest
 
     try:
         import mpi4py
         assert hasattr(mpi4py, '__version__')
+        skip = False
     except (ImportError, ModuleNotFoundError) as err:
-        if "TRAVIS_OS_NAME" not in environ:
-            reason = 'mpi4py not available'
-            return pytest.mark.skipif(True, reason=reason)(function)
+        if "TRAVIS_OS_NAME" not in os.environ:
+            skip = True
         else:
             raise ImportError(err)
+    reason = 'mpi4py not available'
+    return pytest.mark.skipif(skip, reason=reason)(function)
 
 
 class JoblibBackend(object):
