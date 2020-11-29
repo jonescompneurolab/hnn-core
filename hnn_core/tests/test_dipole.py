@@ -89,56 +89,40 @@ def test_dipole_simulation():
     with pytest.raises(TypeError, match="record_isoma must be bool, got int"):
         simulate_dipole(net, n_trials=1, record_vsoma=False, record_isoma=0)
 
-    trial, n_trials, gid = 0, 2, 7
-    n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
 
-    joblib_net = Network(params)
-    with JoblibBackend(n_jobs=1):
-        simulate_dipole(joblib_net, n_trials=n_trials, record_vsoma=True,
-                        record_isoma=True)
-        assert len(joblib_net.cell_response.vsoma) == n_trials
-        assert len(joblib_net.cell_response.isoma) == n_trials
-        assert len(joblib_net.cell_response.vsoma[trial][gid]) == n_times
-        assert len(joblib_net.cell_response.isoma[
-                   trial][gid]['soma_gabaa']) == n_times
+@requires_mpi4py
+def test_cell_response_backends(run_hnn_core):
+    """Test cell_response outputs across backends."""
+
+    # reduced simulation has n_trials=2
+    trial_idx, n_trials, gid = 0, 2, 7
+    _, joblib_net = run_hnn_core(backend='joblib', n_jobs=1, reduced=True,
+                                 record_isoma=True, record_vsoma=True)
+    _, mpi_net = run_hnn_core(backend='mpi', n_jobs=1, reduced=True,
+                              record_isoma=True, record_vsoma=True)
+    n_times = len(joblib_net.cell_response.times)
+
+    assert len(joblib_net.cell_response.vsoma) == n_trials
+    assert len(joblib_net.cell_response.isoma) == n_trials
+    assert len(joblib_net.cell_response.vsoma[trial_idx][gid]) == n_times
+    assert len(joblib_net.cell_response.isoma[
+                trial_idx][gid]['soma_gabaa']) == n_times
+
+    assert len(mpi_net.cell_response.vsoma) == n_trials
+    assert len(mpi_net.cell_response.isoma) == n_trials
+    assert len(mpi_net.cell_response.vsoma[trial_idx][gid]) == n_times
+    assert len(mpi_net.cell_response.isoma[
+                trial_idx][gid]['soma_gabaa']) == n_times
+    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
+    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
 
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
     times = np.array(joblib_net.cell_response.times)
-    spike_times = np.array(joblib_net.cell_response.spike_times[trial])
-    spike_gids = np.array(joblib_net.cell_response.spike_gids[trial])
-    vsoma = np.array(joblib_net.cell_response.vsoma[trial][gid])
+    spike_times = np.array(joblib_net.cell_response.spike_times[trial_idx])
+    spike_gids = np.array(joblib_net.cell_response.spike_gids[trial_idx])
+    vsoma = np.array(joblib_net.cell_response.vsoma[trial_idx][gid])
+
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
                    spike_times[spike_gids == gid] < times[v_mask][-1]])
-
-
-@requires_mpi4py
-def test_dipole_simulation_MPI():
-    """Test data produced from simulate_dipole() call across backends."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   'tstop': 25,
-                   't_evprox_1': 5,
-                   't_evdist_1': 10,
-                   't_evprox_2': 20})
-    joblib_net = Network(params)
-    mpi_net = Network(params)
-    trial, n_trials, gid = 0, 2, 7
-    n_times = np.arange(0., params['tstop'] + params['dt'], params['dt']).size
-    with JoblibBackend(n_jobs=1):
-        simulate_dipole(joblib_net, n_trials=n_trials, record_vsoma=True,
-                        record_isoma=True)
-    with MPIBackend(n_procs=None, mpi_cmd='mpiexec'):
-        simulate_dipole(mpi_net, n_trials=n_trials, record_vsoma=True,
-                        record_isoma=True)
-        assert len(mpi_net.cell_response.vsoma) == n_trials
-        assert len(mpi_net.cell_response.isoma) == n_trials
-        assert len(mpi_net.cell_response.vsoma[trial][gid]) == n_times
-        assert len(mpi_net.cell_response.isoma[
-                   trial][gid]['soma_gabaa']) == n_times
-    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
-    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
