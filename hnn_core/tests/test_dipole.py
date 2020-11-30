@@ -14,7 +14,7 @@ from hnn_core.parallel_backends import requires_mpi4py
 matplotlib.use('agg')
 
 
-def test_dipole(tmpdir):
+def test_dipole(tmpdir, run_hnn_core):
     """Test dipole object."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -47,26 +47,18 @@ def test_dipole(tmpdir):
         dipole_avg = average_dipoles([dipole_avg, dipole_read])
 
     # test postproc
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-    params_reduced = params.copy()
-    params_reduced.update({'N_pyr_x': 3,
-                           'N_pyr_y': 3,
-                           'tstop': 25,
-                           't_evprox_1': 5,
-                           't_evdist_1': 10,
-                           't_evprox_2': 20,
-                           'N_trials': 2})
-    net = Network(params_reduced)
-    dpls_raw = simulate_dipole(net, postproc=False)
-    dpls = simulate_dipole(net, postproc=True)
+    dpls_raw, net = run_hnn_core(backend='joblib', n_jobs=1, reduced=True,
+                                 record_isoma=True, record_vsoma=True,
+                                 postproc=False)
+    dpls, _ = run_hnn_core(backend='joblib', n_jobs=1, reduced=True,
+                           record_isoma=True, record_vsoma=True, postproc=True)
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
-    dpls_raw[0].post_proc(params_reduced['N_pyr_x'], params_reduced['N_pyr_y'],
-                          params_reduced['dipole_smooth_win'] /
-                          params_reduced['dt'],
-                          params_reduced['dipole_scalefctr'])
+
+    dpls_raw[0].post_proc(net.params['N_pyr_x'], net.params['N_pyr_y'],
+                          net.params['dipole_smooth_win'] /
+                          net.params['dt'],
+                          net.params['dipole_scalefctr'])
     assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
 
 

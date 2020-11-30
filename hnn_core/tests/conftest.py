@@ -73,7 +73,7 @@ def pytest_runtest_setup(item):
 @pytest.fixture(scope='module')
 def run_hnn_core():
     def _run_hnn_core(backend=None, n_procs=None, n_jobs=1, reduced=False,
-                      record_vsoma=False, record_isoma=False):
+                      record_vsoma=False, record_isoma=False, postproc=True):
         hnn_core_root = op.dirname(hnn_core.__file__)
 
         # default params
@@ -92,18 +92,21 @@ def run_hnn_core():
 
         # number of trials simulated
         assert len(net.trial_event_times) == params['N_trials']
-
+        print(postproc)
         if backend == 'mpi':
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
-                                       record_isoma=record_vsoma)
+                                       record_isoma=record_vsoma,
+                                       postproc=postproc)
         elif backend == 'joblib':
             with JoblibBackend(n_jobs=n_jobs):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
-                                       record_isoma=record_vsoma)
+                                       record_isoma=record_vsoma,
+                                       postproc=postproc)
         else:
             dpls = simulate_dipole(net, record_vsoma=record_isoma,
-                                   record_isoma=record_vsoma)
+                                   record_isoma=record_vsoma,
+                                   postproc=postproc)
 
         return dpls, net
     return _run_hnn_core
