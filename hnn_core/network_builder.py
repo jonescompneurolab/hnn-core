@@ -284,7 +284,7 @@ class NetworkBuilder(object):
         # artificial cells must be appended to a list in order to preserve
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
-        self._feed_cells = []
+        self._drive_cells = []
 
         self.ncs = dict()
 
@@ -366,17 +366,16 @@ class NetworkBuilder(object):
             # get list of all NetworkDrives that contact this cell, and
             # make sure the corresponding _ArtificialCell gids are associated
             # with the current node/rank
-            for key in self.net._p_unique.keys():
-                gid_input = gid + self.net.gid_ranges[key][0]
-                _PC.set_gid2node(gid_input, rank)
-                self._gid_list.append(gid_input)
+            for drive_gid in self.net._cell_gid_to_drive[f'{gid}']:
+                if drive_gid not in self.net._global_drive_gids:
+                    _PC.set_gid2node(drive_gid, rank)
+                    self._gid_list.append(drive_gid)
 
-        for gid_base in range(rank, self.net._n_common_feeds, nhosts):
-            # shift the gid_base to the common gid
-            gid = gid_base + self.net.gid_ranges['common'][0]
-            # set as usual
+        for idx, gid in enumerate(self.net._global_drive_gids):
+            rank = idx % nhosts
             _PC.set_gid2node(gid, rank)
             self._gid_list.append(gid)
+
         # extremely important to get the gids in the right order
         self._gid_list.sort()
 
@@ -411,9 +410,10 @@ class NetworkBuilder(object):
                 else:
                     BasketCell = type2class[src_type]
                     cell = BasketCell(src_pos, gid=gid)
-                if _short_name(src_type) in self.net.feed_times['tonic']:
-                    cell.add_tonic_input(
-                        **self.net.feed_times['tonic'][_short_name(src_type)])
+                if ('tonic' in self.net.external_biases and
+                        src_type in self.net.external_biases['tonic']):
+                    cell.create_tonic_bias(**self.net.external_biases
+                                           ['tonic'][src_type])
                 cell.record_soma(record_vsoma, record_isoma)
 
                 # this call could belong in init of a _Cell (with threshold)?
@@ -427,10 +427,11 @@ class NetworkBuilder(object):
             # how such 'common' spikes influence them
             else:
                 gid_idx = gid - self.net.gid_ranges[src_type][0]
-                et = self.net.feed_times[src_type][self.trial_idx][gid_idx]
-                feed_cell = _ArtificialCell(et, threshold, gid=gid)
-                _PC.cell(feed_cell.gid, feed_cell.nrn_netcon)
-                self._feed_cells.append(feed_cell)
+                et = self.net.external_drives[
+                    src_type]['events'][self.trial_idx][gid_idx]
+                drive_cell = _ArtificialCell(et, threshold, gid=gid)
+                _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
+                self._drive_cells.append(drive_cell)
 
     def _connect_celltypes(self, src_type, target_type, loc,
                            receptor, nc_dict, unique=False,
@@ -464,7 +465,7 @@ class NetworkBuilder(object):
         if connection_name not in self.ncs:
             self.ncs[connection_name] = list()
 
-        assert len(self.cells) == len(self._gid_list) - len(self._feed_cells)
+        assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
         # NB this assumes that REAL cells are first in the _gid_list
         for gid_target, target_cell in zip(self._gid_list, self.cells):
             is_target_gid = (gid_target in
@@ -575,47 +576,36 @@ class NetworkBuilder(object):
         self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
 
-        # common feed -> xx
-        for p_common in self.net._p_common:
-            for target_cell_type in ['L2Basket', 'L5Basket', 'L5Pyr', 'L2Pyr']:
-                if (target_cell_type == 'L5Basket' and
-                        p_common['loc'] == 'distal'):
-                    continue
-                for receptor in ['ampa', 'nmda']:
-                    if f'{target_cell_type}_{receptor}' in p_common.keys():
-                        nc_dict['lamtha'] = p_common['lamtha']
-                        nc_dict['A_weight'] = \
-                            p_common[f'{target_cell_type}_{receptor}'][0]
-                        nc_dict['A_delay'] = \
-                            p_common[f'{target_cell_type}_{receptor}'][1]
-                        self._connect_celltypes('common', target_cell_type,
-                                                p_common['loc'], receptor,
-                                                nc_dict)
+        for drive_name in self.net.external_drives:
+            for drive_cell in self.net.external_drives[
+                    drive_name]['cells']:
 
-        # unique feed -> xx
-        p_unique = self.net._p_unique
-        for src_cell_type in p_unique:
+                drive_type = self.net.external_drives[drive_name]['type']
 
-            p_src = p_unique[src_cell_type]
-            receptors = ['ampa', 'nmda']
-            if src_cell_type == 'extgauss':
-                receptors = ['ampa']
+                receptors = ['ampa', 'nmda']
+                if drive_type == 'gaussian':
+                    receptors = ['ampa']
 
-            for target_cell_type in ['L2Basket', 'L5Basket', 'L5Pyr', 'L2Pyr']:
-                # XXX: hack for distal connection
-                if target_cell_type == 'L5Basket' and p_src['loc'] == 'distal':
-                    continue
                 for receptor in receptors:
-                    target_cell_long = _long_name(target_cell_type)
-                    nc_dict['lamtha'] = p_src['lamtha']
-                    nc_dict['A_delay'] = p_src[target_cell_long][2]
-                    if receptor == 'ampa':
-                        nc_dict['A_weight'] = p_src[target_cell_long][0]
-                    elif receptor == 'nmda':
-                        nc_dict['A_weight'] = p_src[target_cell_long][1]
-                    self._connect_celltypes(src_cell_type, target_cell_type,
-                                            p_src['loc'], receptor, nc_dict,
-                                            unique=True)
+                    if len(drive_cell[receptor]) > 0:
+                        nc_dict['lamtha'] = drive_cell[receptor]['lamtha']
+                        nc_dict['A_delay'] = drive_cell[receptor]['A_delay']
+                        nc_dict['A_weight'] = drive_cell[receptor]['A_weight']
+                        unique = self.net.external_drives[
+                            drive_name]['cell_specific']
+                        for target_type in drive_cell['target_types']:
+
+                            # XXX: hack for distal connection XXX: Why?!
+                            if (target_type == 'L5_basket' and
+                                    drive_cell['location'] == 'distal'):
+                                continue
+
+                            short_trg_name = _short_name(target_type)
+                            self._connect_celltypes(drive_name,
+                                                    short_trg_name,
+                                                    drive_cell['location'],
+                                                    receptor, nc_dict,
+                                                    unique=unique)
 
     # setup spike recording for this node
     def _record_spikes(self):

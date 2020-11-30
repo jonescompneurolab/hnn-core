@@ -97,9 +97,9 @@ class _Cell(ABC):
         Contains recording of somatic currents indexed
         by synapse type. (keys are soma_gabaa, soma_gabab etc.)
         Must be enabled by running simulate_dipole(net, record_isoma=True)
-    tonic_feeds : list of h.IClamp
+    tonic_biases : list of h.IClamp
         The current clamps inserted at each section of the cell
-        for tonic inputs.
+        for tonic biasing inputs.
     gid : int
         GID of the cell in a network (or None if not yet assigned)
     """
@@ -112,6 +112,7 @@ class _Cell(ABC):
         self.rec_v = h.Vector()
         self.rec_i = dict()
         self._gid = None
+        self.tonic_biases = []
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 
@@ -234,8 +235,8 @@ class _Cell(ABC):
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def add_tonic_input(self, amplitude, t0, T, loc=0.5):
-        """Create tonic feed at the soma.
+    def create_tonic_bias(self, amplitude, t0, T, loc=0.5):
+        """Create tonic bias at the soma.
 
         Parameters
         ----------
@@ -248,12 +249,11 @@ class _Cell(ABC):
         loc : float (0 to 1)
             The location of the input in the soma section.
         """
-        self.tonic_feeds = list()
         stim = h.IClamp(self.soma(loc))
         stim.delay = t0
         stim.dur = T - t0
         stim.amp = amplitude
-        self.tonic_feeds.append(stim)
+        self.tonic_biases.append(stim)
 
     def record_soma(self, record_vsoma=False, record_isoma=False):
         """Record current and voltage at soma.

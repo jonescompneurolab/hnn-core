@@ -41,7 +41,98 @@ def _get_prng(seed, gid, sync_evinput=False):
     return prng, prng2
 
 
-def feed_event_times(feed_type, target_cell_type, params, gid):
+def drive_cell_event_times(drive_type, drive_cell, dynamics, trial_idx=0,
+                           seedcore=0):
+    """Generate event times for one drive cell based on dynamics.
+
+    Parameters
+    ----------
+    drive_type : str
+        The drive type, which is one of
+        'poisson' : Poisson-distributed dynamics from t0 to T
+        'gaussian' : Gaussian-distributed dynamics from t0 to T
+        'evoked' : Spikes occur at specified time (mu) with dispersion (sigma)
+
+        'bursty' : As opposed to other drive types, these have timing that is
+        identical (synchronous) for all real cells in the network.
+    drive_cell : dict
+        Each drive is associated with a number of 'artificial cells', each
+        with their spatial connectivity and temporal dynamics.
+    dynamics : dict
+        Parameters event time dynamics to simulate
+    trial_idx : int
+        The index number of the current trial of a simulation (default=1).
+    seedcore : int
+        Optional initial seed for random number generator.
+
+    Returns
+    -------
+    event_times : list
+        The event times at which spikes occur.
+    """
+    sync_evinput = False
+    if drive_type == 'evoked':
+        if dynamics['sigma'] == 0.:
+            sync_evinput = True
+    prng, prng2 = _get_prng(seed=seedcore + trial_idx,
+                            gid=drive_cell['gid'],
+                            sync_evinput=sync_evinput)
+
+    # check feed name validity, allowing substring matches
+    valid_feeds = ['evoked', 'poisson', 'gaussian', 'bursty']
+    # NB check if feed_type has a valid substring, not vice versa
+    matches = [f for f in valid_feeds if f in drive_type]
+    if len(matches) == 0:
+        raise ValueError('Invalid external drive: %s' % drive_type)
+    elif len(matches) > 1:
+        raise ValueError('Ambiguous external drive: %s' % drive_type)
+
+    # Return values not checked: False if all weights for given feed type
+    # are zero. Designed to be silent so that zeroing input weights
+    # effectively disables each.
+    n_ampa_nmda_weights = (len(drive_cell['ampa'].keys()) +
+                           len(drive_cell['nmda'].keys()))
+    target_syn_weights_zero = True if n_ampa_nmda_weights == 0 else False
+
+    event_times = list()
+    if drive_type == 'poisson' and not target_syn_weights_zero:
+        event_times = _create_extpois(
+            t0=dynamics['t0'],
+            T=dynamics['T'],
+            lamtha=dynamics['rate_constant'],
+            prng=prng)
+    elif not target_syn_weights_zero and (drive_type == 'evoked' or
+                                          drive_type == 'gaussian'):
+        event_times = _create_gauss(
+            mu=dynamics['mu'],
+            sigma=dynamics['sigma'],
+            numspikes=dynamics['numspikes'],
+            prng=prng)
+    elif drive_type == 'bursty' and not target_syn_weights_zero:
+        event_times = _create_common_input(
+            distribution=dynamics['distribution'],
+            t0=dynamics['t0'],
+            t0_stdev=dynamics['sigma_t0'],
+            tstop=dynamics['T'],
+            f_input=dynamics['burst_f'],
+            stdev=dynamics['burst_sigma_f'],
+            repeats=dynamics['repeats'],
+            events_per_cycle=dynamics['numspikes'],
+            prng=prng,
+            prng2=prng2)
+
+    # brute force remove non-zero times. Might result in fewer vals
+    # than desired
+    # values MUST be sorted for VecStim()!
+    if len(event_times) > 0:
+        event_times = event_times[event_times > 0]
+        event_times.sort()
+        event_times = event_times.tolist()
+
+    return event_times
+
+
+def feed_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
     """External spike input times.
 
     An external input "feed" to the network, i.e., one that is independent of
@@ -69,6 +160,8 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
         Parameters of the external input feed, arranged into a dictionary.
     gid : int
         The cell ID.
+    trial_idx : int
+        The index number of the current trial of a simulation.
 
     Returns
     -------
@@ -76,7 +169,7 @@ def feed_event_times(feed_type, target_cell_type, params, gid):
         The event times at which spikes occur.
     """
     prng, prng2 = _get_prng(
-        seed=params['prng_seedcore'],
+        seed=params['prng_seedcore'] + trial_idx,
         gid=gid,
         sync_evinput=params.get('sync_evinput', False))
 

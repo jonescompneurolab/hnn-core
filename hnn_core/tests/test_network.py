@@ -34,13 +34,54 @@ def test_network():
     print(network_builder)
     print(network_builder.cells[:2])
 
-    # Assert that proper number of gids are created for Network inputs
-    assert len(net.gid_ranges['common']) == 2
-    assert len(net.gid_ranges['extgauss']) == net.n_cells
-    assert len(net.gid_ranges['extpois']) == net.n_cells
-    for ev_input in params['t_ev*']:
-        type_key = ev_input[2: -2] + ev_input[-1]
-        assert len(net.gid_ranges[type_key]) == net.n_cells
+    # Assert that proper number of gids are created for Network drives
+    dns_from_gids = [name for name in net.gid_ranges.keys() if
+                     name not in net.cellname_list]
+    assert len(dns_from_gids) == len(net.external_drives)
+    for dn in dns_from_gids:
+        assert dn in net.external_drives.keys()
+        assert len(net.gid_ranges[dn]) == len(net.external_drives[dn]['gids'])
+        assert len(net.external_drives[dn]['events']) == 1  # single trial!
+
+    # cell GIDs from the reverse-lookup dict: each cell must be present
+    cell_gids_from_drive = [int(s) for s in net._cell_gid_to_drive.keys()]
+    assert set(cell_gids_from_drive) == set(list(range(0, net.n_cells)))
+    assert len(net._global_drive_gids) == 2
+    assert len(net.gid_ranges['bursty1']) == 1
+    for drive in net.external_drives.values():
+        assert len(drive['events']) == 1  # single trial simulated
+        if drive['cell_specific']:
+            assert len(drive['gids']) == net.n_cells
+        if drive['type'] == 'evoked':
+            for kw in ['mu', 'sigma', 'numspikes']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == net.n_cells
+            # this also implicitly tests that events are always a list
+            assert len(drive['events'][0][0]) == drive['dynamics']['numspikes']
+        elif drive['type'] == 'gaussian':
+            for kw in ['mu', 'sigma', 'numspikes']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == net.n_cells
+        elif drive['type'] == 'poisson':
+            for kw in ['t0', 'T', 'rate_constants']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == net.n_cells
+
+        elif drive['type'] == 'bursty':
+            for kw in ['distribution', 't0', 'sigma_t0', 'T', 'burst_f',
+                       'burst_sigma_f', 'numspikes', 'repeats']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == 1
+            n_events = (
+                drive['dynamics']['numspikes'] *  # 2
+                drive['dynamics']['repeats'] *  # 10
+                (1 + (drive['dynamics']['T'] - drive['dynamics']['t0'] - 1) //
+                    (1000. / drive['dynamics']['burst_f'])))
+            assert len(drive['events'][0][0]) == n_events  # 40
+
+    # make sure the PRNGs are consistent.
+    assert_allclose(net.external_drives['evprox1']['events'][0][0],
+                    [23.80641637082997], rtol=1e-12)
 
     # Assert that an empty CellResponse object is created as an attribute
     assert net.cell_response == CellResponse()
@@ -50,34 +91,22 @@ def test_network():
                        match="'times' is an np.ndarray of simulation times"):
         _ = CellResponse(times=[1, 2, 3])
 
-    # Assert that all external feeds are initialized
+    # Assert that all external drives are initialized
     n_evoked_sources = net.n_cells * 3
     n_pois_sources = net.n_cells
     n_gaus_sources = net.n_cells
-    n_common_sources = 2
+    n_bursty_sources = 2
 
-    # test that expected number of external driving events are created, and
-    # make sure the PRNGs are consistent.
-    assert isinstance(net.feed_times, dict)
-    # single trial simulated
-    assert all(len(src_feed_times) == 1 for
-               src_type, src_feed_times in net.feed_times.items()
-               if src_type != 'tonic')
-    assert len(net.feed_times['common'][0]) == n_common_sources
-    assert len(net.feed_times['common'][0][0]) == 40  # 40 spikes
-    assert isinstance(net.feed_times['evprox1'][0][0], list)
-    assert len(net.feed_times['evprox1'][0]) == net.n_cells
-    assert_allclose(net.feed_times['evprox1'][0][0],
-                    [23.80641637082997], rtol=1e-12)
-
-    assert len(network_builder._feed_cells) == (n_evoked_sources +
-                                                n_pois_sources +
-                                                n_gaus_sources +
-                                                n_common_sources)
+    # test that expected number of external driving events are created
+    assert len(network_builder._drive_cells) == (n_evoked_sources +
+                                                 n_pois_sources +
+                                                 n_gaus_sources +
+                                                 n_bursty_sources)
     assert len(network_builder._gid_list) ==\
-        len(network_builder._feed_cells) + net.n_cells
-    # first 'evoked feed' comes after real cells and common inputs
-    assert network_builder._feed_cells[2].gid == net.n_cells + n_common_sources
+        len(network_builder._drive_cells) + net.n_cells
+    # first 'evoked drive' comes after real cells and common inputs
+    assert network_builder._drive_cells[2].gid ==\
+        net.n_cells + n_bursty_sources
 
     # Assert that netcons are created properly
     # proximal
@@ -92,11 +121,11 @@ def test_network():
     nc_dict = {'A_delay': 1, 'A_weight': 1e-5, 'lamtha': 20,
                'threshold': 0.5}
     network_builder._connect_celltypes(
-        'common', 'L5Basket', 'soma', 'gabaa', nc_dict,
+        'bursty1', 'L5Basket', 'soma', 'gabaa', nc_dict,
         unique=False)
-    assert 'common_L5Basket_gabaa' in network_builder.ncs
-    n_conn = len(net.gid_ranges['common']) * len(net.gid_ranges['L5_basket'])
-    assert len(network_builder.ncs['common_L5Basket_gabaa']) == n_conn
+    assert 'bursty1_L5Basket_gabaa' in network_builder.ncs
+    n_conn = len(net.gid_ranges['bursty1']) * len(net.gid_ranges['L5_basket'])
+    assert len(network_builder.ncs['bursty1_L5Basket_gabaa']) == n_conn
 
     # try unique=True
     network_builder._connect_celltypes(
