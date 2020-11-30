@@ -26,21 +26,21 @@ class TestParallelBackends():
     dpls_reduced_default = None
     dpls_reduced_joblib = None
 
-    def test_run_default(self, run_hnn_core):
+    def test_run_default(self, run_hnn_core_fixture):
         """Test consistency between default backend simulation and master"""
         global dpls_reduced_default
-        dpls_reduced_default, _ = run_hnn_core(None, reduced=True)
+        dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
         # test consistency across all parallel backends for multiple trials
         assert_raises(AssertionError, assert_array_equal,
                       dpls_reduced_default[0].data['agg'],
                       dpls_reduced_default[1].data['agg'])
 
-    def test_run_joblibbackend(self, run_hnn_core):
+    def test_run_joblibbackend(self, run_hnn_core_fixture):
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        dpls_reduced_joblib, _ = run_hnn_core(backend='joblib',
-                                              n_jobs=2, reduced=True)
+        dpls_reduced_joblib, _ = run_hnn_core_fixture(backend='joblib',
+                                                      n_jobs=2, reduced=True)
 
         for trial_idx in range(len(dpls_reduced_default)):
             assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
@@ -55,10 +55,10 @@ class TestParallelBackends():
         assert backend.n_procs > 1
 
     @requires_mpi4py
-    def test_run_mpibackend(self, run_hnn_core):
+    def test_run_mpibackend(self, run_hnn_core_fixture):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
-        dpls_reduced_mpi, _ = run_hnn_core(backend='mpi', reduced=True)
+        dpls_reduced_mpi, _ = run_hnn_core_fixture(backend='mpi', reduced=True)
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
             assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
@@ -66,13 +66,14 @@ class TestParallelBackends():
                             atol=1e-14)
 
     @requires_mpi4py
-    def test_run_mpibackend_oversubscribed(self, run_hnn_core):
+    def test_run_mpibackend_oversubscribed(self, run_hnn_core_fixture):
         """Test running MPIBackend with oversubscribed number of procs"""
         oversubscribed = round(cpu_count() * 1.5)
-        run_hnn_core(backend='mpi', n_procs=oversubscribed, reduced=True)
+        run_hnn_core_fixture(backend='mpi', n_procs=oversubscribed,
+                             reduced=True)
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
-    def test_compare_hnn_core(self, run_hnn_core, backend, n_jobs=1):
+    def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
         """Test hnn-core does not break."""
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
@@ -89,7 +90,7 @@ class TestParallelBackends():
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
 
-        dpls, net = run_hnn_core(params, backend)
+        dpls, net = run_hnn_core_fixture(params, backend)
         dpl = dpls[0]
 
         # write the dipole to a file and compare
@@ -122,7 +123,7 @@ class TestParallelBackends():
 # there are no dependencies if this unit tests fails; no need to be in
 # class marked incremental
 @requires_mpi4py
-def test_mpi_failure(run_hnn_core):
+def test_mpi_failure(run_hnn_core_fixture):
     """Test that an MPI failure is handled and messages are printed"""
     # this MPI paramter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
@@ -130,7 +131,7 @@ def test_mpi_failure(run_hnn_core):
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):
-                run_hnn_core(backend='mpi', reduced=True)
+                run_hnn_core_fixture(backend='mpi', reduced=True)
             stdout = buf.getvalue()
 
     assert "MPI processes are unable to reach each other" in stdout

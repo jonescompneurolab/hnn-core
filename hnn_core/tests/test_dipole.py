@@ -14,7 +14,7 @@ from hnn_core.parallel_backends import requires_mpi4py
 matplotlib.use('agg')
 
 
-def test_dipole(tmpdir, run_hnn_core):
+def test_dipole(tmpdir, run_hnn_core_fixture):
     """Test dipole object."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -47,11 +47,12 @@ def test_dipole(tmpdir, run_hnn_core):
         dipole_avg = average_dipoles([dipole_avg, dipole_read])
 
     # test postproc
-    dpls_raw, net = run_hnn_core(backend='joblib', n_jobs=1, reduced=True,
-                                 record_isoma=True, record_vsoma=True,
-                                 postproc=False)
-    dpls, _ = run_hnn_core(backend='joblib', n_jobs=1, reduced=True,
-                           record_isoma=True, record_vsoma=True, postproc=True)
+    dpls_raw, net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
+                                         reduced=True, record_isoma=True,
+                                         record_vsoma=True, postproc=False)
+    dpls, _ = run_hnn_core_fixture(backend='joblib', n_jobs=1, reduced=True,
+                                   record_isoma=True, record_vsoma=True,
+                                   postproc=True)
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
 
@@ -83,15 +84,16 @@ def test_dipole_simulation():
 
 
 @requires_mpi4py
-def test_cell_response_backends(run_hnn_core):
+def test_cell_response_backends(run_hnn_core_fixture):
     """Test cell_response outputs across backends."""
 
     # reduced simulation has n_trials=2
     trial_idx, n_trials, gid = 0, 2, 7
-    _, joblib_net = run_hnn_core(backend='joblib', n_jobs=1, reduced=True,
-                                 record_isoma=True, record_vsoma=True)
-    _, mpi_net = run_hnn_core(backend='mpi', n_jobs=1, reduced=True,
-                              record_isoma=True, record_vsoma=True)
+    _, joblib_net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
+                                         reduced=True, record_isoma=True,
+                                         record_vsoma=True)
+    _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
+                                      record_isoma=True, record_vsoma=True)
     n_times = len(joblib_net.cell_response.times)
 
     assert len(joblib_net.cell_response.vsoma) == n_trials
