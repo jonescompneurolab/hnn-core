@@ -378,7 +378,7 @@ To run them in parallel we could set n_jobs to equal the number of trials.
     from hnn_core import JoblibBackend
 
     with JoblibBackend(n_jobs=1):
-        dpls = simulate_dipole(net, n_trials=2)
+        dpls = simulate_dipole(net, n_trials=2, postproc=True)
 
 
 
@@ -627,17 +627,17 @@ openmpi, which must be installed on the system
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
-    [ed3b78982216:01354] Read -1, expected 27208, errno = 1
-    [ed3b78982216:01354] Read -1, expected 27200, errno = 1
-    [ed3b78982216:01353] Read -1, expected 27200, errno = 1
-    [ed3b78982216:01353] Read -1, expected 27208, errno = 1
-    [ed3b78982216:01353] Read -1, expected 27200, errno = 1
-    [ed3b78982216:01354] Read -1, expected 27208, errno = 1
-    [ed3b78982216:01354] Read -1, expected 27200, errno = 1
-    [ed3b78982216:01353] Read -1, expected 27208, errno = 1
-    [ed3b78982216:01353] Read -1, expected 5616, errno = 1
-    [ed3b78982216:01353] Read -1, expected 5703, errno = 1
-    [ed3b78982216:01353] Read -1, expected 5703, errno = 1
+    [97715a9770ef:01364] Read -1, expected 27208, errno = 1
+    [97715a9770ef:01363] Read -1, expected 27200, errno = 1
+    [97715a9770ef:01364] Read -1, expected 27200, errno = 1
+    [97715a9770ef:01363] Read -1, expected 27208, errno = 1
+    [97715a9770ef:01363] Read -1, expected 27200, errno = 1
+    [97715a9770ef:01364] Read -1, expected 27208, errno = 1
+    [97715a9770ef:01364] Read -1, expected 27200, errno = 1
+    [97715a9770ef:01363] Read -1, expected 27208, errno = 1
+    [97715a9770ef:01363] Read -1, expected 5616, errno = 1
+    [97715a9770ef:01363] Read -1, expected 5703, errno = 1
+    [97715a9770ef:01363] Read -1, expected 5703, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -646,7 +646,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  9.813 seconds)
+   **Total running time of the script:** ( 1 minutes  54.814 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

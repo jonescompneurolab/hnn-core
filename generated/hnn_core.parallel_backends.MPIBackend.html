@@ -142,13 +142,15 @@ if mpi4py could not be loaded.</p>
 </dl>
 <dl class="py method">
 <dt id="hnn_core.parallel_backends.MPIBackend.simulate">
-<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.MPIBackend.simulate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span></em>, <em class="sig-param"><span class="n">postproc</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.MPIBackend.simulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simulate the HNN model in parallel on all cores</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>net</strong><span class="classifier">Network object</span></dt><dd><p>The Network object specifying how cells are
 connected.</p>
+</dd>
+<dt><strong>postproc: bool</strong></dt><dd><p>If False, no postprocessing applied to the dipole</p>
 </dd>
 </dl>
 </dd>
