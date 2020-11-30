@@ -37,6 +37,8 @@ Changelog
 
 - Add ability to record somatic currents from all cells, by `Nick Tolley`_ in `#199 <https://github.com/jonescompneurolab/hnn-core/pull/199>`_
 
+- Add option to turn off dipole postprocessing, by `Carmen Kohl`_ in `#188 <https://github.com/jonescompneurolab/hnn-core/pull/188>`_
+
 Bug
 ~~~
 
@@ -72,3 +74,4 @@ API
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Christopher Bailey: https://github.com/cjayb
 .. _Nick Tolley: https://github.com/ntolley
+.. _Carmen Kohl: https://github.com/kohl-carmen
