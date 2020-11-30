@@ -30,13 +30,11 @@ print(params)
 
 ###############################################################################
 # Remove all evoked proximal feed parameters
-evoked_prox_keys = params['*evprox*'].keys()
-for key in evoked_prox_keys:
+for key in params['*evprox*']:
     del params[key]
 
 # Remove all evoked distal feed parameters
-evoked_dist_keys = params['*evdist*'].keys()
-for key in evoked_dist_keys:
+for key in params['*evdist*']:
     del params[key]
 
 ###############################################################################
