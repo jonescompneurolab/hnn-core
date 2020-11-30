@@ -86,7 +86,6 @@ Now let's build the network with somatic voltage recordings enabled
  .. code-block:: none
 
     joblib will run over 1 jobs
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     [Done]
     running trial 1 on 1 cores
@@ -224,7 +223,7 @@ plots and histograms for the Pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  43.331 seconds)
+   **Total running time of the script:** ( 0 minutes  56.057 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

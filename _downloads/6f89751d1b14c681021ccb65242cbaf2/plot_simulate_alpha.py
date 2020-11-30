@@ -29,31 +29,27 @@ params = read_params(params_fname)
 print(params)
 
 ###############################################################################
-# Now, we update a few parameters
+# Remove all evoked proximal feed parameters
+for key in params['*evprox*']:
+    del params[key]
+
+# Remove all evoked distal feed parameters
+for key in params['*evdist*']:
+    del params[key]
+
+###############################################################################
+# Now, we update a few rhythmic feed parameters
 params.update({
     'dipole_scalefctr': 150000.0,
     'dipole_smooth_win': 0,
     'tstop': 310.0,
-    't0_input_prox': 2000.0,
-    'tstop_input_prox': 310.0,
     't0_input_dist': 50.0,
     'tstop_input_dist': 1001.0,
-    't_evprox_1': 1000,
-    'sigma_t_evprox_1': 2.5,
-    't_evprox_2': 2000.0,
-    'sigma_t_evprox_2': 7.0,
-    't_evdist_1': 2000.0,
-    'sigma_t_evdist_1': 6.0,
     'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
     'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
     'sync_evinput': 1,
     "prng_seedcore_input_dist": 3
 })
-
-###############################################################################
-# And we update all the conductances gbar related to the inputs
-# by using the pattern gbar_ev*
-params['gbar_ev*'] = 0.0
 
 ###############################################################################
 # Now let's simulate the dipole and plot it

@@ -372,31 +372,27 @@ HNN-core.</p>
 }
 </pre></div>
 </div>
-<p>Now, we update a few parameters</p>
+<p>Remove all evoked proximal feed parameters</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;*evprox*&#39;</span><span class="p">]:</span>
+    <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+<span class="c1"># Remove all evoked distal feed parameters</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;*evdist*&#39;</span><span class="p">]:</span>
+    <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now, we update a few rhythmic feed parameters</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
     <span class="s1">&#39;dipole_scalefctr&#39;</span><span class="p">:</span> <span class="mf">150000.0</span><span class="p">,</span>
     <span class="s1">&#39;dipole_smooth_win&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mf">310.0</span><span class="p">,</span>
-    <span class="s1">&#39;t0_input_prox&#39;</span><span class="p">:</span> <span class="mf">2000.0</span><span class="p">,</span>
-    <span class="s1">&#39;tstop_input_prox&#39;</span><span class="p">:</span> <span class="mf">310.0</span><span class="p">,</span>
     <span class="s1">&#39;t0_input_dist&#39;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span>
     <span class="s1">&#39;tstop_input_dist&#39;</span><span class="p">:</span> <span class="mf">1001.0</span><span class="p">,</span>
-    <span class="s1">&#39;t_evprox_1&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
-    <span class="s1">&#39;sigma_t_evprox_1&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
-    <span class="s1">&#39;t_evprox_2&#39;</span><span class="p">:</span> <span class="mf">2000.0</span><span class="p">,</span>
-    <span class="s1">&#39;sigma_t_evprox_2&#39;</span><span class="p">:</span> <span class="mf">7.0</span><span class="p">,</span>
-    <span class="s1">&#39;t_evdist_1&#39;</span><span class="p">:</span> <span class="mf">2000.0</span><span class="p">,</span>
-    <span class="s1">&#39;sigma_t_evdist_1&#39;</span><span class="p">:</span> <span class="mf">6.0</span><span class="p">,</span>
     <span class="s1">&#39;input_dist_A_weight_L2Pyr_ampa&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">,</span>
     <span class="s1">&#39;input_dist_A_weight_L5Pyr_ampa&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">,</span>
     <span class="s1">&#39;sync_evinput&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s2">&quot;prng_seedcore_input_dist&quot;</span><span class="p">:</span> <span class="mi">3</span>
 <span class="p">})</span>
-</pre></div>
-</div>
-<p>And we update all the conductances gbar related to the inputs
-by using the pattern gbar_ev*</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;gbar_ev*&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 </pre></div>
 </div>
 <p>Now let’s simulate the dipole and plot it</p>
@@ -408,6 +404,7 @@ by using the pattern gbar_ev*</p>
 <img alt="agg" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 [Done]
 running trial 1 on 1 cores
@@ -464,7 +461,7 @@ Simulation time: 300.0 ms...
 </pre></div>
 </div>
 <img alt="plot simulate alpha" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_alpha_002.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  13.102 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  23.732 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-alpha-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_alpha.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
