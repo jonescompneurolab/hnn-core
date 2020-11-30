@@ -3,13 +3,15 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
+#          Christopher Bailey <cjb@cfin.au.dk>
 
 import itertools as it
 import numpy as np
 from glob import glob
 
-from .feed import feed_event_times
+from .feed import drive_cell_event_times
 from .params import create_pext
+from .network_builder import _short_name  # XXX placement?!
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
@@ -133,7 +135,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     origin_z = np.floor(zdiff / 2)
     origin = (origin_x, origin_y, origin_z)
 
-    # save the origin for adding external feeds later
+    # save the origin for adding external drives later
     pos_dict['origin'] = origin
 
     return pos_dict
@@ -146,6 +148,8 @@ class Network(object):
     ----------
     params : dict
         The parameters to use for constructing the network.
+    initialise_hnn_drives : bool
+        If True (default), attach and instantiate drives as in HNN-GUI
 
     Attributes
     ----------
@@ -153,26 +157,27 @@ class Network(object):
         The parameters of the network
     cellname_list : list
         The names of real cell types in the network (e.g. 'L2_basket')
-    feedname_list : list
-        The names of external drivers ('feeds') to the network (e.g. 'evdist1')
     gid_ranges : dict
         A dictionary of unique identifiers of each real and artificial cell
         in the network. Every cell type is represented by a key read from
-        cellname_list, followed by entries read from feedname_list. The value
+        cellname_list, followed by keys read from external_drives. The value
         of each key is a range of ints, one for each cell in given category.
         Examples: 'L2_basket': range(0, 270), 'evdist1': range(272, 542), etc
     pos_dict : dict
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        'common', or any of the elements of the cellname or feedname lists.
+        or any external drive name
     cell_response : CellResponse
         An instance of the CellResponse object.
-    feed_times : dict of [list (n_trials) of list (n_cells) of list (n_times)]
-        The event times of input feeds. Only feed_times['tonic'] is a
-        dictionary, other input types are nested lists.
+    external_drives : dict of list
+        The parameters of external driving inputs to the network.
+    external_biases : dict of list
+        The parameters of bias inputs to cell somata, e.g., tonic current clamp
+    drive_event_times : dict of list (trials) of list (cells) of list (times)
+        The event times of input drives (empty before initialised)
     """
 
-    def __init__(self, params):
+    def __init__(self, params, initialise_hnn_drives=True):
         # Save the parameters used to create the Network
         self.params = params
         # Initialise a dictionary of cell ID's, which get used when the
@@ -182,6 +187,8 @@ class Network(object):
         # attached to a Network during simulation---Network is the natural
         # place to keep this information
         self.gid_ranges = dict()
+        self._n_gids = 0  # utility: keep track of last GID
+        self._legacy_mode = initialise_hnn_drives  # for GID seeding
 
         # Create array of equally sampled time points for simulating currents
         # NB (only) used to initialise self.cell_response._times
@@ -196,8 +203,16 @@ class Network(object):
             'L5_basket',
             'L5_pyramidal',
         ]
-        self.feedname_list = []  # no feeds defined yet
-        self.feed_times = dict()
+
+        # external drives and biases
+        self.external_drives = dict()
+        self.external_biases = dict()
+        self._cell_gid_to_drive = dict()  # reverse-lookup table for Builder
+
+        # this is needed network_builder.py:_gid_assign() because there's no
+        # way to keep track of which gids are already assigned to other nodes;
+        # without it, we can't round-robin assign the non-cell specfiic drives
+        self._global_drive_gids = []
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -211,10 +226,58 @@ class Network(object):
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cellname_list)
 
-        # The legacy code in HNN-GUI _always_ defines 2 'common' and 5
-        # 'unique' feeds. They are added here for backwards compatibility
-        # until a new handling of external NetworkDrives's is completed.
-        self._add_external_feeds()
+        if initialise_hnn_drives:
+            drive_specs = self._extract_drive_specs_from_hnn_params()
+            bias_specs = self._extract_bias_specs_from_hnn_params()
+
+            for drive_name in sorted(drive_specs.keys()):  # order matters
+                specs = drive_specs[drive_name]
+                if specs['type'] == 'evoked':
+                    self.add_evoked_drive(
+                        drive_name, specs['dynamics']['mu'],
+                        specs['dynamics']['sigma'],
+                        specs['dynamics']['numspikes'],
+                        specs['weights_ampa'], specs['weights_nmda'],
+                        specs['location'], seedcore=specs['seedcore'],
+                        space_constant=specs['space_constant'])
+                elif specs['type'] == 'poisson':
+                    self.add_poisson_drive(
+                        drive_name, specs['dynamics']['t0'],
+                        specs['dynamics']['T'],
+                        specs['dynamics']['rate_constants'],
+                        specs['weights_ampa'], specs['weights_nmda'],
+                        specs['location'], seedcore=specs['seedcore'],
+                        space_constant=specs['space_constant'])
+                elif specs['type'] == 'gaussian':
+                    self.add_gaussian_drive(
+                        drive_name, specs['dynamics']['mu'],
+                        specs['dynamics']['sigma'],
+                        specs['dynamics']['numspikes'],
+                        specs['weights_ampa'], specs['weights_nmda'],
+                        specs['location'], seedcore=specs['seedcore'],
+                        space_constant=specs['space_constant'])
+                elif specs['type'] == 'bursty':
+                    self.add_bursty_drive(
+                        drive_name, specs['dynamics']['distribution'],
+                        specs['dynamics']['t0'], specs['dynamics']['sigma_t0'],
+                        specs['dynamics']['T'], specs['dynamics']['burst_f'],
+                        specs['dynamics']['burst_sigma_f'],
+                        specs['dynamics']['numspikes'],
+                        specs['dynamics']['repeats'],
+                        specs['weights_ampa'], specs['weights_nmda'],
+                        specs['synaptic_delays'], specs['location'],
+                        space_constant=specs['space_constant'],
+                        seedcore=specs['seedcore'])
+
+            # add tonic biases if present in params
+            for cellname in bias_specs['tonic']:
+                self.add_tonic_bias(
+                    cell_type=cellname,
+                    amplitude=bias_specs['tonic'][cellname]['amplitude'],
+                    t0=bias_specs['tonic'][cellname]['t0'],
+                    T=bias_specs['tonic'][cellname]['T'])
+
+            self.instantiate_drives(n_trials=self.params['N_trials'])
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -225,47 +288,184 @@ class Network(object):
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
 
-    def _add_external_feeds(self):
-        """Legacy function, for backward compatibility with original HNN-GUI
+    def _create_drive_cells(self, target_populations, weights_by_receptor,
+                            location, space_constant, synaptic_delays,
+                            cell_specific=True):
+        if isinstance(synaptic_delays, dict):
+            for receptor in ['ampa', 'nmda']:
+                if not (
+                    set(list(weights_by_receptor[receptor].keys())).issubset(
+                        set(list(synaptic_delays[receptor].keys())))):
+                    raise ValueError(
+                        'synaptic_delays is either common (float), or needs '
+                        'to be specified for each non-zero AMPA/NMDA weight')
 
-        This function is called exactly once during initialisation
+        next_gid = self._n_gids
+        drive_gids = []
+        drive_cells = []
+        if cell_specific:
+            for cellname in target_populations:
+                for target_gid in self.gid_ranges[cellname]:
+                    drive_cell = dict()
+
+                    drive_cell['target_gid'] = target_gid
+                    # NB list! This is used later in _parnet_connect
+                    drive_cell['target_types'] = [cellname]
+                    drive_cell['gid'] = next_gid
+                    next_gid += 1
+                    drive_cell['location'] = location
+
+                    # reverse-lookup: real_cell-to-drive_cell
+                    if f'{target_gid}' not in self._cell_gid_to_drive:
+                        self._cell_gid_to_drive[f'{target_gid}'] = []
+                    self._cell_gid_to_drive[
+                        f'{target_gid}'].append(drive_cell['gid'])
+
+                    for receptor, weights in weights_by_receptor.items():
+                        drive_cell[receptor] = dict()
+                        if cellname in weights:
+                            drive_cell[receptor]['lamtha'] = space_constant
+                            drive_cell[receptor]['A_delay'] = synaptic_delays
+                            drive_cell[receptor][
+                                'A_weight'] = weights[cellname]
+
+                    drive_gids += [drive_cell['gid']]  # for convenience
+                    drive_cells.append(drive_cell)
+        else:
+            drive_cell = dict()
+
+            # NB list! This is used later in _parnet_connect
+            drive_cell['target_types'] = target_populations  # all cells
+            drive_cell['gid'] = next_gid
+            next_gid += 1
+            drive_cell['location'] = location
+            for cellname in target_populations:
+                for target_gid in self.gid_ranges[cellname]:
+                    # reverse-lookup: real_cell-to-drive_cell
+                    if f'{target_gid}' not in self._cell_gid_to_drive:
+                        self._cell_gid_to_drive[f'{target_gid}'] = []
+                    self._cell_gid_to_drive[
+                        f'{target_gid}'].append(drive_cell['gid'])
+                    for receptor, weights in weights_by_receptor.items():
+                        drive_cell[receptor] = dict()
+
+                        if cellname in weights:
+                            drive_cell[receptor]['lamtha'] = space_constant
+                            drive_cell[receptor]['A_delay'] = synaptic_delays[
+                                receptor][cellname]
+                            drive_cell[receptor][
+                                'A_weight'] = weights[cellname]
+            drive_gids += [drive_cell['gid']]  # for convenience
+            drive_cells.append(drive_cell)
+
+        return(drive_cells, drive_gids)
+
+    def add_evoked_drive(self, name, mu, sigma, numspikes, weights_ampa,
+                         weights_nmda, location, space_constant=3.,
+                         seedcore=None):
         """
-        # params of common external feeds inputs in p_common
-        # Global number of external inputs ... automatic counting
-        # makes more sense
-        # p_unique represent ext inputs that are going to go to each cell
-        self._p_common, self._p_unique = create_pext(self.params,
-                                                     self.params['tstop'])
-        self._n_common_feeds = len(self._p_common)
+        """
+        # CHECK name not exists!
+        drive = NetworkDrive()
+        drive['type'] = 'evoked'
+        drive['cell_specific'] = True
+        drive['seedcore'] = seedcore
 
-        # 'position' the artificial cells arbitrarily in the origin of the
-        # network grid. Non-biophysical cell placement is irrelevant
-        # However, they must be present to be included in gid_ranges!
-        origin = self.pos_dict['origin']
+        drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
+        drive['events'] = []
 
-        # COMMON FEEDS
-        self.pos_dict['common'] = [origin for i in range(self._n_common_feeds)]
+        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
+                           space_constant)
 
-        # UNIQUE FEEDS
-        for key in self._p_unique.keys():
-            # create the pos_dict for all the sources
-            self.pos_dict[key] = [origin for i in range(self.n_cells)]
+    def add_poisson_drive(self, name, t0, T, rate_constants, weights_ampa,
+                          weights_nmda, location, space_constant=100.,
+                          seedcore=None):
+        """
+        """
+        # CHECK name not exists!
+        # CHECK rate_constants == dict
 
-        # Now add the names of the feeds to a list
-        self.feedname_list.append('common')
-        # grab the keys for the unique set of inputs and sort the names
-        # append them to the src list along with the number of cells
-        unique_keys = sorted(self._p_unique.keys())
-        self.feedname_list += unique_keys
+        drive = NetworkDrive()
+        drive['type'] = 'poisson'
+        drive['cell_specific'] = True
+        drive['seedcore'] = seedcore
 
+        drive['dynamics'] = dict(t0=t0, T=T, rate_constants=rate_constants)
+        drive['events'] = []
+        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
+                           space_constant)
+
+    def add_gaussian_drive(self, name, mu, sigma, numspikes, weights_ampa,
+                           weights_nmda, location, space_constant=100.,
+                           seedcore=None):
+        """
+        """
+        # CHECK name not exists!
+
+        drive = NetworkDrive()
+        drive['type'] = 'gaussian'
+        drive['cell_specific'] = True
+        drive['seedcore'] = seedcore
+
+        drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
+        drive['events'] = []
+
+        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
+                           space_constant)
+
+    def add_bursty_drive(self, name, distribution, t0, sigma_t0, T, burst_f,
+                         burst_sigma_f, numspikes, repeats, weights_ampa,
+                         weights_nmda, synaptic_delays, location,
+                         space_constant=100., seedcore=None):
+        """
+        """
+        # CHECK name not exists!
+
+        drive = NetworkDrive()
+        drive['type'] = 'bursty'
+        drive['cell_specific'] = False
+        drive['seedcore'] = seedcore
+
+        drive['dynamics'] = dict(distribution=distribution, t0=t0,
+                                 sigma_t0=sigma_t0, T=T, burst_f=burst_f,
+                                 burst_sigma_f=burst_sigma_f,
+                                 numspikes=numspikes, repeats=repeats
+                                 )
+        drive['events'] = []
+
+        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
+                           space_constant, cell_specific=False,
+                           synaptic_delays=synaptic_delays)
+
+    def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
+                      space_constant, synaptic_delays=0.1, cell_specific=True):
+        # CHECKS
+
+        target_populations = (set(weights_ampa.keys()) |
+                              set(weights_nmda.keys()))
+        if not target_populations.issubset(set(self.cellname_list)):
+            raise ValueError('Allowed target cell types are: ',
+                             f'{self.cellname_list}')
+        if self._legacy_mode:
+            target_populations = self.cellname_list
+
+        weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
+
+        drive['cells'], drive['gids'] = self._create_drive_cells(
+            target_populations, weights_by_receptor, location,
+            space_constant, synaptic_delays, cell_specific=cell_specific)
+
+        self.external_drives[name] = drive
+        if not cell_specific:
+            self._global_drive_gids.extend(drive['gids'])  # for Builder
+
+        # Must remember to update the GID ranges based on pos_dict!
+        self.pos_dict[name] = [self.pos_dict['origin'] for dg in drive['gids']]
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
-        # Create the feed dynamics (event_times)
-        self._instantiate_feeds(n_trials=self.params['N_trials'])
-
-    def _instantiate_feeds(self, n_trials=1):
-        """Creates event_time vectors for all feeds and all trials
+    def instantiate_drives(self, n_trials=1):
+        """Creates drive_event_times vectors for all drives and all trials
 
         Parameters
         ----------
@@ -277,81 +477,38 @@ class Network(object):
         used at intialisation time. The good news is that only the event_times
         need to be recalculated, all the GIDs etc remain the same.
         """
+        # reset every time called again, e.g., from dipole.py
+        for drive_name in self.external_drives.keys():
+            self.external_drives[drive_name]['events'] = []
+
         # each trial needs unique event time vectors
-
-        # reset if called again from dipole.py
-        src_types = self.feedname_list
-        if hasattr(self, 'feed_times'):
-            feed_times = self.feed_times
-        else:
-            feed_times = dict()
-        feed_times.update({src_type: list() for src_type in src_types})
-
-        cur_params = self.params.copy()  # these get mangled below!
         for trial_idx in range(n_trials):
-            for param_key in self.params['prng_*'].keys():
-                cur_params[param_key] = self.params[param_key] + trial_idx
-            # needs to be re-run to create the dicts going into ExtFeed
-            # the only thing changing is the initial seed
-            p_common, p_unique = create_pext(cur_params,
-                                             cur_params['tstop'])
+            for drive_name in self.external_drives.keys():
+                event_times = list()  # new list for each trial and drive
 
-            for src_type in src_types:
-                event_times = list()
-                if src_type == 'common':
-                    for idx, gid in enumerate(self.gid_ranges['common']):
-                        gid_target = None  # 'common' attaches to all
-                        event_times.append(
-                            feed_event_times(
-                                feed_type=src_type,
-                                target_cell_type=gid_target,
-                                params=p_common[idx],
-                                gid=gid)
-                        )
+                dyn_specs = self.external_drives[drive_name]['dynamics']
+                drive_type = self.external_drives[drive_name]['type']
+                seedcore = self.external_drives[drive_name]['seedcore']
 
-                elif src_type in p_unique.keys():
-                    for gid in self.gid_ranges[src_type]:
-                        gid_target = gid - self.gid_ranges[src_type][0]
-                        target_cell_type = self.gid_to_type(gid_target)
-                        event_times.append(
-                            feed_event_times(
-                                feed_type=src_type,
-                                target_cell_type=target_cell_type,
-                                params=p_unique[src_type],
-                                gid=gid)
-                        )
-                feed_times[src_type].append(event_times)
+                # loop over drive 'cells' and create event times for each
+                for drive_cell in self.external_drives[drive_name]['cells']:
+                    event_times.append(
+                        drive_cell_event_times(drive_type, drive_cell,
+                                               dyn_specs, trial_idx=trial_idx,
+                                               seedcore=seedcore)
+                    )
+                # 'events': list (trials) of list (cells) of list (events)
+                self.external_drives[
+                    drive_name]['events'].append(event_times)
 
-        self.feed_times = feed_times
-
-        # Add tonic inputs from param files
-        # do not overwrite tonic_inputs when called from dipole.py
-        if 'tonic' not in self.feed_times:
-            self.feed_times['tonic'] = dict()
-        for cell_type in ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']:
-            is_tonic_present = [f'Itonic_{p}_{cell_type}_soma' in self.params
-                                for p in ['A', 't0', 'T']]
-            if any(is_tonic_present):
-                if not all(is_tonic_present):
-                    raise ValueError(f'Tonic input must have the amplitude, '
-                                     f'start time and end time specified. One '
-                                     f'or more parameter may be missing for '
-                                     f'cell type {cell_type}')
-                self.add_tonic_input(
-                    cell_type=cell_type,
-                    amplitude=self.params[f'Itonic_A_{cell_type}_soma'],
-                    t0=self.params[f'Itonic_t0_{cell_type}_soma'],
-                    T=self.params[f'Itonic_T_{cell_type}_soma']
-                )
-
-    def add_tonic_input(self, cell_type, amplitude, t0, T):
-        """Create tonic feed for a given cell type.
+    def add_tonic_bias(self, cell_type, amplitude, t0, T):
+        """Attach parameters of tonic biasing input for a given cell type.
 
         Parameters
         ----------
         cell_type : str
             The cell type whose cells will get the tonic input.
-            Valid inputs include 'L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr'.
+            Valid inputs are those in `net.cellname_list`.
         amplitude : float
             The amplitude of the input.
         t0 : float
@@ -365,15 +522,14 @@ class Network(object):
         if T > tstop:
             raise ValueError(f'End time of tonic input cannot exceed '
                              f'simulation end time {tstop}. Got {T}.')
-        valid_cell_types = ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']
-        if cell_type not in valid_cell_types:
-            raise ValueError(f'cell_type must be one of {valid_cell_types}'
-                             f'Got {cell_type}')
+        if cell_type not in self.cellname_list:
+            raise ValueError(f'cell_type must be one of {self.cellname_list}'
+                             f'. Got {cell_type}')
         duration = T - t0
         if duration < 0.:
             raise ValueError('Duration of tonic input cannot be negative')
 
-        self.feed_times['tonic'][cell_type] = {
+        self.external_biases['tonic'][cell_type] = {
             'amplitude': amplitude,
             't0': t0,
             'T': T
@@ -386,13 +542,16 @@ class Network(object):
         call this to update the list of GIDs. Note that it's based on the
         content of pos_dict and the lists of real and artificial cell names.
         """
+        # if external drives dict is empty, list will also be empty
+        ext_drive_names = list(self.external_drives.keys())
         gid_lims = [0]  # start and end gids per cell type
-        src_types = self.cellname_list + self.feedname_list
+        src_types = self.cellname_list + ext_drive_names
         for idx, src_type in enumerate(src_types):
             n_srcs = len(self.pos_dict[src_type])
             gid_lims.append(gid_lims[idx] + n_srcs)
             self.gid_ranges[src_type] = range(gid_lims[idx],
                                               gid_lims[idx + 1])
+        self._n_gids = gid_lims[idx + 1]
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
@@ -409,6 +568,150 @@ class Network(object):
         src_pos = self.pos_dict[src_type][type_pos_ind]
 
         return src_type, src_pos, src_type in self.cellname_list
+
+    def _extract_bias_specs_from_hnn_params(self):
+        """Create 'bias specification' dicts from saved parameters
+        """
+        bias_specs = {'tonic': {}}  # currently only 'tonic' biases known
+        for cellname in self.cellname_list:
+            short_name = _short_name(cellname)
+            is_tonic_present = [f'Itonic_{p}_{short_name}_soma' in
+                                self.params for p in ['A', 't0', 'T']]
+            if any(is_tonic_present):
+                if not all(is_tonic_present):
+                    raise ValueError(
+                        f'Tonic input must have the amplitude, '
+                        f'start time and end time specified. One '
+                        f'or more parameter may be missing for '
+                        f'cell type {cellname}')
+                bias_specs['tonic'][cellname] = {
+                    'amplitude': self.params[f'Itonic_A_{short_name}_soma'],
+                    't0': self.params[f'Itonic_t0_{short_name}_soma'],
+                    'T': self.params[f'Itonic_T_{short_name}_soma']
+                }
+        return(bias_specs)
+
+    def _extract_drive_specs_from_hnn_params(self):
+        """Create 'drive specification' dicts from saved parameters
+        """
+        # convert legacy params-dict to legacy "feeds" dicts
+        p_common, p_unique = create_pext(self.params, self.params['tstop'])
+
+        # Using 'feed' for legacy compatibility, 'drives' for new API
+        drive_specs = {}
+        for ic, par in enumerate(p_common):
+            feed_name = f'bursty{ic + 1}'
+            drive = dict()
+            drive['type'] = 'bursty'
+            drive['cell_specific'] = False
+            drive['dynamics'] = {'distribution': par['distribution'],
+                                 't0': par['t0'],
+                                 'sigma_t0': par['t0_stdev'],
+                                 'T': par['tstop'],
+                                 'burst_f': par['f_input'],
+                                 'burst_sigma_f': par['stdev'],
+                                 'numspikes': par['events_per_cycle'],
+                                 'repeats': par['repeats']}
+            drive['location'] = par['loc']
+            drive['space_constant'] = par['lamtha']
+            drive['seedcore'] = par['prng_seedcore']
+            drive['weights_ampa'] = {}
+            drive['weights_nmda'] = {}
+            drive['synaptic_delays'] = {'ampa': {}, 'nmda': {}}
+
+            for cellname in self.cellname_list:
+                cname_ampa = _short_name(cellname) + '_ampa'
+                cname_nmda = _short_name(cellname) + '_nmda'
+                if cname_ampa in par:
+                    ampa_w = par[cname_ampa][0]
+                    ampa_d = par[cname_ampa][1]
+                    if ampa_w > 0.:
+                        drive['weights_ampa'][cellname] = ampa_w
+                    if ampa_d > 0.:
+                        drive['synaptic_delays']['ampa'][cellname] = ampa_d
+                if cname_nmda in par:
+                    nmda_w = par[cname_nmda][0]
+                    nmda_d = par[cname_nmda][1]
+                    if nmda_w > 0.:
+                        drive['weights_nmda'][cellname] = nmda_w
+                    if nmda_d > 0.:
+                        drive['synaptic_delays']['nmda'][cellname] = nmda_d
+
+            drive_specs[feed_name] = drive
+
+        for feed_name, par in p_unique.items():
+            drive = dict()
+            drive['cell_specific'] = True
+            if (feed_name.startswith('evprox') or
+                    feed_name.startswith('evdist')):
+                drive['type'] = 'evoked'
+                if feed_name.startswith('evprox'):
+                    drive['location'] = 'proximal'
+                else:
+                    drive['location'] = 'distal'
+
+                if par['sync_evinput']:
+                    sigma = 0.
+                else:
+                    sigma = par['L2_basket'][3]  # NB IID for all cells!
+
+                drive['dynamics'] = {'mu': par['t0'],
+                                     'sigma': sigma,
+                                     'numspikes': par['numspikes']}
+                drive['space_constant'] = par['lamtha']
+                drive['seedcore'] = par['prng_seedcore']
+                drive['weights_ampa'] = {}
+                drive['weights_nmda'] = {}
+                for cellname in self.cellname_list:
+                    if cellname in par:
+                        ampa_w = par[cellname][0]
+                        nmda_w = par[cellname][1]
+                        if ampa_w > 0.:
+                            drive['weights_ampa'][cellname] = ampa_w
+                        if nmda_w > 0.:
+                            drive['weights_nmda'][cellname] = nmda_w
+            elif feed_name.startswith('extgauss'):
+                drive['type'] = 'gaussian'
+                drive['location'] = par['loc']
+
+                drive['dynamics'] = {'mu': par['L2_basket'][3],  # NB IID
+                                     'sigma': par['L2_basket'][4],
+                                     'numspikes': 50}  # NB hard-coded in GUI!
+                drive['space_constant'] = par['lamtha']
+                drive['seedcore'] = par['prng_seedcore']
+                drive['weights_ampa'] = {}
+                drive['weights_nmda'] = {}
+                for cellname in self.cellname_list:
+                    if cellname in par:
+                        ampa_w = par[cellname][0]
+                        if ampa_w > 0.:
+                            drive['weights_ampa'][cellname] = ampa_w
+                drive['weights_nmda'] = {}  # no NMDA weights for Gaussians
+            elif feed_name.startswith('extpois'):
+                drive['type'] = 'poisson'
+                drive['location'] = par['loc']
+
+                rate_params = {}
+                for cellname in self.cellname_list:
+                    if cellname in par:
+                        rate_params[cellname] = par[cellname][3]
+                        ampa_w = par[cellname][0]
+                        nmda_w = par[cellname][1]
+                        if ampa_w > 0.:
+                            drive['weights_ampa'][cellname] = ampa_w
+                        if nmda_w > 0.:
+                            drive['weights_nmda'][cellname] = nmda_w
+
+                drive['dynamics'] = {'t0': par['t_interval'][0],
+                                     'T': par['t_interval'][1],
+                                     'rate_constants': rate_params}
+                drive['space_constant'] = par['lamtha']
+                drive['seedcore'] = par['prng_seedcore']
+                drive['weights_ampa'] = {}
+                drive['weights_nmda'] = {}
+                drive['weights_nmda'] = {}  # no NMDA weights for Gaussians
+            drive_specs[feed_name] = drive
+        return(drive_specs)
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
@@ -427,6 +730,18 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+
+class NetworkDrive(dict):
+    """Foo
+    """
+
+    def __repr__(self):
+        entr = '<NetworkDrive'
+        if 'type' in self.keys():
+            entr += f" of type {self['type']}"
+        entr += '>'
+        return(entr)
 
 
 class CellResponse(object):

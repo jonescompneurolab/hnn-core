@@ -112,11 +112,11 @@ def test_tonic_inputs():
     net = hnn_core.Network(params)
     with pytest.raises(ValueError, match='Duration of tonic input cannot be'
                        ' negative'):
-        net.add_tonic_input('L2Pyr', amplitude=1.0, t0=5.0, T=4.0)
+        net._attach_tonic_bias('L2Pyr', amplitude=1.0, t0=5.0, T=4.0)
 
     with pytest.raises(ValueError, match='End time of tonic input cannot be'
                        ' negative'):
-        net.add_tonic_input('L2Pyr', amplitude=1.0, t0=5.0, T=-1.)
+        net._attach_tonic_bias('L2Pyr', amplitude=1.0, t0=5.0, T=-1.)
 
     with pytest.raises(ValueError, match='parameter may be missing'):
         params['Itonic_T_L2Pyr_soma'] = 5.0

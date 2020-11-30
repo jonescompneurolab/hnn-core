@@ -92,9 +92,8 @@ def run_hnn_core_fixture():
         net = Network(params)
 
         # number of trials simulated
-        assert all(len(src_feed_times) == params['N_trials'] for
-                   src_type, src_feed_times in net.feed_times.items()
-                   if src_type != 'tonic')
+        assert all(len(src_event_times) == params['N_trials'] for
+                   src_type, src_event_times in net.drive_event_times.items())
         if backend == 'mpi':
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
