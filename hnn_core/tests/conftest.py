@@ -6,15 +6,10 @@ https://pytest.org/en/stable/example/simple.html#incremental-testing-test-steps
 from typing import Dict, Tuple
 import pytest
 
-<<<<<<< HEAD
 import os.path as op
 import hnn_core
 from hnn_core import read_params, Network, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
-=======
-import hnn_core
-import os.path as op
->>>>>>> TST params fixture
 
 # store history of failures per test class name and per index in parametrize
 # (if parametrize used)
@@ -97,8 +92,9 @@ def run_hnn_core_fixture():
         net = Network(params)
 
         # number of trials simulated
-        assert len(net.trial_event_times) == params['N_trials']
-        print(postproc)
+        assert all(len(src_feed_times) == params['N_trials'] for
+                   src_type, src_feed_times in net.feed_times.items()
+                   if src_type != 'tonic')
         if backend == 'mpi':
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
