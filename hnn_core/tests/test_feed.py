@@ -1,19 +1,22 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
+import os.path as op
 import pytest
 
 import numpy as np
 
 import hnn_core
+from hnn_core import Params, read_params
 from hnn_core.feed import (feed_event_times, _get_prng, _create_extpois,
                            _create_common_input)
 from hnn_core.params import create_pext
 
 
-def test_extfeed(params):
+def test_extfeed():
     """Test the different external feeds."""
 
+    params = Params()
     p_common, p_unique = create_pext(params,
                                      params['tstop'])
 
@@ -98,6 +101,12 @@ def test_extfeed(params):
                              stdev, repeats, events_per_cycle, prng, prng2)
 
     # test tonic inputs
+    hnn_core_root = op.dirname(hnn_core.__file__)
+
+    # default params
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
     params.update({
         'N_pyr_x': 3,
         'N_pyr_y': 3,
