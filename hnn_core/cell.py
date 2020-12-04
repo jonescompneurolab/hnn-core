@@ -234,7 +234,7 @@ class _Cell(ABC):
             dpp.ztan = y_diff[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_tonic_feed(self, amplitude, t0, T, loc=0.5):
+    def add_tonic_input(self, amplitude, t0, T, loc=0.5):
         """Create tonic feed at the soma.
 
         Parameters
@@ -249,13 +249,6 @@ class _Cell(ABC):
             The location of the input in the section.
         """
         duration = T - t0
-
-        if T < 0.:
-            raise ValueError('End time of tonic input cannot be negative')
-
-        if duration < 0.:
-            raise ValueError('Duration of tonic input cannot be negative')
-
         # names must be actual section names, or else it will fail silently
         self.tonic_feeds = list()
         for sect_name in ['soma']:

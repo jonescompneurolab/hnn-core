@@ -190,7 +190,7 @@ class Network(object):
             'L5_pyramidal',
         ]
         self.feedname_list = []  # no feeds defined yet
-        self.feed_times = []
+        self.feed_times = dict()
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -314,8 +314,10 @@ class Network(object):
                         )
                 feed_times[src_type].append(event_times)
 
-        # Add tonic inputs if present
-        feed_times['tonic'] = dict()
+        self.feed_times = feed_times
+
+        # Add tonic inputs from param files
+        self.feed_times['tonic'] = dict()
         for cell_type in ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']:
             is_tonic_present = [f'Itonic_{p}_{cell_type}_soma' in self.params
                                 for p in ['A', 't0', 'T']]
@@ -325,14 +327,47 @@ class Network(object):
                                      f'start time and end time specified. One '
                                      f'or more parameter may be missing for '
                                      f'cell type {cell_type}')
-                feed_times['tonic'][cell_type] = {
-                    'amplitude': self.params[f'Itonic_A_{cell_type}_soma'],
-                    't0': self.params[f'Itonic_t0_{cell_type}_soma'],
-                    'T': self.params[f'Itonic_T_{cell_type}_soma']
-                }
+                self.add_tonic_input(
+                    cell_type=cell_type,
+                    amplitude=self.params[f'Itonic_A_{cell_type}_soma'],
+                    t0=self.params[f'Itonic_t0_{cell_type}_soma'],
+                    T=self.params[f'Itonic_T_{cell_type}_soma']
+                )
 
-        # list of dict of list of list
-        self.feed_times = feed_times
+    def add_tonic_input(self, cell_type, amplitude, t0, T):
+        """Create tonic feed for a given cell type.
+
+        Parameters
+        ----------
+        cell_type : str
+            The cell type whose cells will get the tonic input.
+            Valid inputs include 'L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr'.
+        amplitude : float
+            The amplitude of the input.
+        t0 : float
+            The start time of tonic input (in ms).
+        T : float
+            The end time of tonic input (in ms).
+        """
+        if T < 0.:
+            raise ValueError('End time of tonic input cannot be negative')
+        tstop = self.cell_response.times[-1]
+        if T > tstop:
+            raise ValueError(f'End time of tonic input cannot exceed '
+                             f'simulation end time {tstop}. Got {T}.')
+        valid_cell_types = ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']
+        if cell_type not in valid_cell_types:
+            raise ValueError(f'cell_type must be one of {valid_cell_types}'
+                             f'Got {cell_type}')
+        duration = T - t0
+        if duration < 0.:
+            raise ValueError('Duration of tonic input cannot be negative')
+
+        self.feed_times['tonic'][cell_type] = {
+            'amplitude': amplitude,
+            't0': t0,
+            'T': T
+        }
 
     def _update_gid_ranges(self):
         """Creates gid ranges from scratch every time called.
