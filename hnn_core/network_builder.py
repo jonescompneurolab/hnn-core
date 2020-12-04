@@ -412,7 +412,7 @@ class NetworkBuilder(object):
                     BasketCell = type2class[src_type]
                     cell = BasketCell(src_pos, gid=gid)
                 if _short_name(src_type) in self.net.feed_times['tonic']:
-                    cell.create_tonic_feed(
+                    cell.add_tonic_input(
                         **self.net.feed_times['tonic'][_short_name(src_type)])
                 cell.record_soma(record_vsoma, record_isoma)
 

@@ -39,7 +39,7 @@ Changelog
 
 - Add option to turn off dipole postprocessing, by `Carmen Kohl`_ in `#188 <https://github.com/jonescompneurolab/hnn-core/pull/188>`_
 
-- Add ability to add tonic inputs to the cell, by `Mainak Jas`_ in `#209 <https://github.com/jonescompneurolab/hnn-core/pull/209>`_
+- Add ability to add tonic inputs to cell types with :func:`hnn_core.Network.add_tonic_input`, by `Mainak Jas`_ in `#209 <https://github.com/jonescompneurolab/hnn-core/pull/209>`_
 
 Bug
 ~~~

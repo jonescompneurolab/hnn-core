@@ -11,7 +11,8 @@ from mne.utils import _fetch_file
 
 import hnn_core
 from hnn_core import read_params
-from hnn_core.parallel_backends import MPIBackend, requires_mpi4py
+from hnn_core import MPIBackend
+from hnn_core.parallel_backends import requires_mpi4py
 
 # The purpose of this incremental mark is to avoid running the full length
 # simulation when there are failures in previous (faster) tests. When a test
