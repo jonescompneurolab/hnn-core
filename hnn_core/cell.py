@@ -246,21 +246,14 @@ class _Cell(ABC):
         T : float
             The end time of tonic input (in ms).
         loc : float (0 to 1)
-            The location of the input in the section.
+            The location of the input in the soma section.
         """
-        duration = T - t0
-        # names must be actual section names, or else it will fail silently
         self.tonic_feeds = list()
-        for sect_name in ['soma']:
-            seclist = h.SectionList()
-            seclist.wholetree(sec=self.soma)
-            for sect in seclist:
-                if sect_name in sect.name():
-                    stim = h.IClamp(sect(loc))
-                    stim.delay = t0
-                    stim.dur = duration
-                    stim.amp = amplitude
-            self.tonic_feeds.append(stim)
+        stim = h.IClamp(self.soma(loc))
+        stim.delay = t0
+        stim.dur = T - t0
+        stim.amp = amplitude
+        self.tonic_feeds.append(stim)
 
     def record_soma(self, record_vsoma=False, record_isoma=False):
         """Record current and voltage at soma.
