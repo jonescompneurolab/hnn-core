@@ -161,8 +161,9 @@ class Network(object):
         'common', or any of the elements of the cellname or feedname lists.
     cell_response : CellResponse
         An instance of the CellResponse object.
-    feed_times : dict of list (n_trials) of list (n_cells) of list (n_times)
-        The event times of input feeds
+    feed_times : dict of [list (n_trials) of list (n_cells) of list (n_times)]
+        The event times of input feeds. Only feed_times['tonic'] is a
+        dictionary, other input types are nested lists.
     """
 
     def __init__(self, params):
