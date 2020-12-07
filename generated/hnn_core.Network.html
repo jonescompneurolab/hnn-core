@@ -141,6 +141,9 @@ Keys are ‘L2_pyramidal’, ‘L5_pyramidal’, ‘L2_basket’, ‘L5_basket�
 </dd>
 <dt><strong>cell_response</strong><span class="classifier">CellResponse</span></dt><dd><p>An instance of the CellResponse object.</p>
 </dd>
+<dt><strong>feed_times</strong><span class="classifier">dict of [list (n_trials) of list (n_cells) of list (n_times)]</span></dt><dd><p>The event times of input feeds. Only feed_times[‘tonic’] is a
+dictionary, other input types are nested lists.</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -148,6 +151,27 @@ Keys are ‘L2_pyramidal’, ‘L5_pyramidal’, ‘L2_basket’, ‘L5_basket�
 <dt id="hnn_core.Network.__repr__">
 <code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.Network.add_tonic_input">
+<code class="sig-name descname">add_tonic_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell_type</span></em>, <em class="sig-param"><span class="n">amplitude</span></em>, <em class="sig-param"><span class="n">t0</span></em>, <em class="sig-param"><span class="n">T</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_tonic_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create tonic feed for a given cell type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cell_type</strong><span class="classifier">str</span></dt><dd><p>The cell type whose cells will get the tonic input.
+Valid inputs include ‘L2Basket’, ‘L5Basket’, ‘L2Pyr’, ‘L5Pyr’.</p>
+</dd>
+<dt><strong>amplitude</strong><span class="classifier">float</span></dt><dd><p>The amplitude of the input.</p>
+</dd>
+<dt><strong>t0</strong><span class="classifier">float</span></dt><dd><p>The start time of tonic input (in ms).</p>
+</dd>
+<dt><strong>T</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms).</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
