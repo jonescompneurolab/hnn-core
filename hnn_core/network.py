@@ -425,7 +425,7 @@ class CellResponse(object):
     gid : float | None
         Numeric cell identifier.
         Each gid corresponds to a type via Network::gid_ranges.
-    spike_type : str | None
+    cell_type : str | None
         Cell type (example: L2_basket)
     spike_times : list (n_trials,) of list (n_spikes,) of float, shape | None
         Each element of the outer list is a trial.
@@ -436,7 +436,7 @@ class CellResponse(object):
     gid : float | None
         Numeric cell identifier.
         Each gid corresponds to a type via Network::gid_ranges.
-    spike_type : str | None
+    cell_type : str | None
         Cell type (example: L2_basket)
     spike_times : list (n_trials,) of list (n_spikes,) of float, shape
         Each element of the outer list is a trial.
@@ -465,18 +465,18 @@ class CellResponse(object):
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, spike_times=None, gid=None, spike_type=None,
+    def __init__(self, spike_times=None, gid=None, cell_type=None,
                  times=None):
         if spike_times is None:
             spike_times = list()
         if gid is None:
             spike_gids = list()
-        if spike_type is None:
-            spike_type = list()
+        if cell_type is None:
+            cell_type = list()
 
         # Validate arguments
-        arg_names = ['spike_times', 'gid', 'spike_type']
-        for arg_idx, arg in enumerate([spike_times, spike_gids, spike_type]):
+        arg_names = ['spike_times', 'gid', 'cell_type']
+        for arg_idx, arg in enumerate([spike_times, spike_gids, cell_type]):
             # Validate outer list
             if not isinstance(arg, list):
                 raise TypeError('%s should be a list of lists'
@@ -495,7 +495,7 @@ class CellResponse(object):
                                  'lists of the same length')
         self._spike_times = spike_times
         self._gid = gid
-        self._spike_type = spike_type
+        self._cell_type = cell_type
         self._vsoma = list()
         self._isoma = list()
         if times is not None:
@@ -518,7 +518,7 @@ class CellResponse(object):
                        for trial in other._spike_times]
         return (times_self == times_other and
                 self._gid == other._gid and
-                self._spike_type == other._spike_type)
+                self._cell_type == other._cell_type)
 
     @property
     def spike_times(self):
@@ -529,8 +529,8 @@ class CellResponse(object):
         return self._gid
 
     @property
-    def spike_type(self):
-        return self._spike_type
+    def cell_type(self):
+        return self._cell_type
 
     @property
     def vsoma(self):
