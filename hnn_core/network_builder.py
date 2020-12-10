@@ -366,10 +366,11 @@ class NetworkBuilder(object):
             # get list of all NetworkDrives that contact this cell, and
             # make sure the corresponding _ArtificialCell gids are associated
             # with the current node/rank
-            for key in self.net._p_unique.keys():
-                gid_input = gid + self.net.gid_ranges[key][0]
-                _PC.set_gid2node(gid_input, rank)
-                self._gid_list.append(gid_input)
+            for key in self.net.feedname_list():
+                if len(self.net.pos_dict) == self.net.n_cells:    
+                    gid_input = gid + self.net.gid_ranges[key][0]
+                    _PC.set_gid2node(gid_input, rank)
+                    self._gid_list.append(gid_input)
 
         for gid_base in range(rank, self.net._n_common_feeds, nhosts):
             # shift the gid_base to the common gid
@@ -616,6 +617,24 @@ class NetworkBuilder(object):
                     self._connect_celltypes(src_cell_type, target_cell_type,
                                             p_src['loc'], receptor, nc_dict,
                                             unique=True)
+
+        for drive_name in self.net.feedname_list:
+            drive = self.net.feed_times[drive_name]
+            target_cell_type = drive['times']
+            for receptor in drive['weight']:
+                target_cell_type = drive[target_cell_type]
+                nc_dict = {
+                    'A_delay': drive['weight'][receptor],
+                    'lamtha': drive['spatial_lamtha']
+                }
+                unique = False
+                n_cells = len(self.net.gid_ranges[target_cell_type])
+                n_drives = len(self.pos_dict[drive_name])
+                if n_cells == n_drives:
+                    unique = True
+                self._connect_celltypes(drive_name, target_cell_type,
+                                        drive['loc'], receptor, nc_dict,
+                                        unique=unique)
 
     # setup spike recording for this node
     def _record_spikes(self):

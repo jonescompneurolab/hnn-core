@@ -258,6 +258,64 @@ class Network(object):
         # Create the feed dynamics (event_times)
         self._instantiate_feeds(n_trials=self.params['N_trials'])
 
+    def add_poisson_drive(self, name, t0, T, lamtha, target_cell_type,
+                          weight_ampa, weight_nmda, spatial_lamtha, loc, prng):
+        """Add poisson drive target a specific cell type
+
+        Parameters
+        ----------
+        name : str
+            The name of the input drive
+        t0 : float
+            The start time (in ms).
+        T : float
+            The end time (in ms).
+        lamtha : float
+            The rate parameter for spike train (in Hz)
+        target_cell_type : str
+            'L2Basket', 'L2Pyr' etc.
+        weight_ampa : float
+            The weight of the AMPA connections.
+        weight_nmda : float
+            The weight of the NMDA connections.
+        spatial_lamtha : float
+            The decay
+        loc : str
+            'proximal' or 'distal'
+        prng : instance of RandomState
+            The random state.
+        """
+        from .feed import _create_extpois
+
+        origin = self.pos_dict['origin']
+        n_trials = self.params['N_trials']
+
+        if name in self.pos_dict:
+            raise ValueError('name already exists')
+
+        n_cells = len(self.gid_ranges[target_cell_type])
+        self.pos_dict[name] = [origin for i in range(n_cells)]
+        self.feedname_list = sorted(self._p_unique.keys() + name)
+
+        self._update_gid_ranges()
+
+        for trial_idx in range(n_trials):
+            prng_trial = prng + trial_idx
+            for gid in self.gid_ranges[name]:
+                gid_target = gid - self.gid_ranges[name][0]
+                target_cell_type = self.gid_to_type(gid_target)
+                event_times = _create_extpois(
+                    t0=t0, T=T,
+                    # ind 3 is frequency (lamtha))
+                    lamtha=lamtha, prng=prng_trial)
+
+            self.feed_times[name]['times'].append(event_times)
+            self.feed_times[name]['target_cell_type'] = target_cell_type
+            self.feed_times[name]['loc'] = loc
+            self.feed_times[name]['spatial_lamtha'] = spatial_lamtha
+            self.feed_times[name]['weight']['ampa'] = weight_ampa
+            self.feed_times[name]['weight']['nmda'] = weight_nmda
+
     def _instantiate_feeds(self, n_trials=1):
         """Creates event_time vectors for all feeds and all trials
 
