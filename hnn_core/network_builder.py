@@ -10,6 +10,7 @@ from neuron import h
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
+from .network import CellResponse
 
 # a few globals
 _PC = None
@@ -46,7 +47,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
     h.dt = neuron_net.net.params['dt']  # simulation duration and time-step
     h.celsius = neuron_net.net.params['celsius']  # 37.0 - set temperature
 
-    times = neuron_net.net.cell_response.times
+    times = neuron_net.net.times
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
@@ -305,8 +306,8 @@ class NetworkBuilder(object):
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.dipoles = {
-            'L5_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
-            'L2_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
+            'L5_pyramidal': h.Vector(self.net.times.size, 0),
+            'L2_pyramidal': h.Vector(self.net.times.size, 0),
         }
 
         self._gid_assign()
@@ -415,6 +416,8 @@ class NetworkBuilder(object):
                     cell.add_tonic_input(
                         **self.net.feed_times['tonic'][_short_name(src_type)])
                 cell.record_soma(record_vsoma, record_isoma)
+                self.net.cell_response[gid] = CellResponse(
+                    gid=gid, cell_type=src_type, times=self.net.times)
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)

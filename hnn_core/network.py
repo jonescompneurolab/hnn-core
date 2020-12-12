@@ -159,8 +159,8 @@ class Network(object):
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
         'common', or any of the elements of the cellname or feedname lists.
-    cell_response : CellResponse
-        An instance of the CellResponse object.
+    cell_response : list
+        List of CellResponse objects.
     feed_times : dict of [list (n_trials) of list (n_cells) of list (n_times)]
         The event times of input feeds. Only feed_times['tonic'] is a
         dictionary, other input types are nested lists.
@@ -179,9 +179,9 @@ class Network(object):
 
         # Create array of equally sampled time points for simulating currents
         # NB (only) used to initialise self.cell_response._times
-        times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
+        self.times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
         # Create CellResponse object, initialised with simulation time points
-        self.cell_response = CellResponse(times=times)
+        self.cell_response = dict()
 
         # Source list of names, first real ones only!
         self.cellname_list = [
@@ -349,7 +349,7 @@ class Network(object):
         """
         if T < 0.:
             raise ValueError('End time of tonic input cannot be negative')
-        tstop = self.cell_response.times[-1]
+        tstop = self.times[-1]
         if T > tstop:
             raise ValueError(f'End time of tonic input cannot exceed '
                              f'simulation end time {tstop}. Got {T}.')
@@ -470,29 +470,18 @@ class CellResponse(object):
         if spike_times is None:
             spike_times = list()
         if gid is None:
-            spike_gids = list()
+            gid = float
         if cell_type is None:
-            cell_type = list()
+            cell_type = str
 
-        # Validate arguments
-        arg_names = ['spike_times', 'gid', 'cell_type']
-        for arg_idx, arg in enumerate([spike_times, spike_gids, cell_type]):
-            # Validate outer list
-            if not isinstance(arg, list):
-                raise TypeError('%s should be a list of lists'
-                                % (arg_names[arg_idx],))
-            # If arg is not an empty list, validate inner list
-            for trial_list in arg:
-                if not isinstance(trial_list, list):
-                    raise TypeError('%s should be a list of lists'
-                                    % (arg_names[arg_idx],))
-            # Set the length of 'spike_times' as a references and validate
-            # uniform length
-            if arg == spike_times:
-                n_trials = len(spike_times)
-            if len(arg) != n_trials:
-                raise ValueError('spike times, gids, and types should be '
-                                 'lists of the same length')
+        # Validate outer list
+        if not isinstance(spike_times, list):
+            raise TypeError('spike_times should be a list of lists')
+        # If arg is not an empty list, validate inner list
+        for trial_list in spike_times:
+            if not isinstance(trial_list, list):
+                raise TypeError('spike_times should be a list of lists')
+            
         self._spike_times = spike_times
         self._gid = gid
         self._cell_type = cell_type

@@ -14,7 +14,7 @@ from subprocess import Popen
 import selectors
 import binascii
 from time import sleep
-
+import numpy as np
 
 _BACKEND = None
 
@@ -50,12 +50,17 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     for idx in range(n_trials):
         dpls.append(sim_data[idx][0])
         spikedata = sim_data[idx][1]
-        net.cell_response._spike_times.append(spikedata[0])
-        net.cell_response._spike_gids.append(spikedata[1])
+        spike_times = spikedata[0]
+        spike_gids = spikedata[1]
         net.gid_ranges = spikedata[2]  # only have one gid_ranges
-        net.cell_response.update_types(net.gid_ranges)
-        net.cell_response._vsoma.append(spikedata[3])
-        net.cell_response._isoma.append(spikedata[4])
+        for cell_type, gid_range in net.gid_ranges.items():
+            if cell_type in net.cellname_list:
+                for gid in gid_range:
+                    gid_mask = np.in1d(spike_gids, gid)
+                    gid_spike_times = np.array(spike_times)[gid_mask].tolist()
+                    net.cell_response[gid]._spike_times.append(gid_spike_times)
+                    net.cell_response[gid]._vsoma.append(spikedata[3][gid])
+                    net.cell_response[gid]._isoma.append(spikedata[4][gid])
 
         if postproc:
             N_pyr_x = net.params['N_pyr_x']
