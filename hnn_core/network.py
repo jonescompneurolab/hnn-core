@@ -181,7 +181,7 @@ class Network(object):
         # NB (only) used to initialise self.cell_response._times
         self.times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
         # Create CellResponse object, initialised with simulation time points
-        self.cell_response = dict()
+        self.cell_response = list()
 
         # Source list of names, first real ones only!
         self.cellname_list = [
