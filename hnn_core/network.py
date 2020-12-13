@@ -182,6 +182,9 @@ class Network(object):
         self.times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
         # Create CellResponse object, initialised with simulation time points
         self.cell_response = list()
+        self._spike_times = list()
+        self._spike_gids = list()
+        self._spike_types = list()
 
         # Source list of names, first real ones only!
         self.cellname_list = [
@@ -416,6 +419,177 @@ class Network(object):
         """
         return plot_cells(net=self, ax=ax, show=show)
 
+    def mean_rates(self, tstart, tstop, gid_ranges, mean_type='all'):
+        """Mean spike rates (Hz) by cell type.
+
+        Parameters
+        ----------
+        tstart : int | float | None
+            Value defining the start time of all trials.
+        tstop : int | float | None
+            Value defining the stop time of all trials.
+        gid_ranges : dict of lists or range objects
+            Dictionary with keys 'evprox1', 'evdist1' etc.
+            containing the range of Cell or input IDs of different
+            cell or input types.
+        mean_type : str
+            'all' : Average over trials and cells
+                Returns mean rate for cell types
+            'trial' : Average over cell types
+                Returns trial mean rate for cell types
+            'cell' : Average over individual cells
+                Returns trial mean rate for individual cells
+
+        Returns
+        -------
+        spike_rate : dict
+            Dictionary with keys 'L5_pyramidal', 'L5_basket', etc.
+        """
+        cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+        spike_rates = dict()
+
+        if mean_type not in ['all', 'trial', 'cell']:
+            raise ValueError("Invalid mean_type. Valid arguments include "
+                             f"'all', 'trial', or 'cell'. Got {mean_type}")
+
+        # Validate tstart, tstop
+        if not isinstance(tstart, (int, float)) or not isinstance(
+                tstop, (int, float)):
+            raise ValueError('tstart and tstop must be of type int or float')
+        elif tstop <= tstart:
+            raise ValueError('tstop must be greater than tstart')
+
+        for cell_type in cell_types:
+            cell_type_gids = np.array(gid_ranges[cell_type])
+            n_trials, n_cells = len(self._spike_times), len(cell_type_gids)
+            gid_spike_rate = np.zeros((n_trials, n_cells))
+
+            trial_data = zip(self._spike_types, self._spike_gids)
+            for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
+                trial_type_mask = np.in1d(spike_types, cell_type)
+                gids, gid_counts = np.unique(np.array(
+                    spike_gids)[trial_type_mask], return_counts=True)
+
+                gid_spike_rate[trial_idx, np.in1d(cell_type_gids, gids)] = (
+                    gid_counts / (tstop - tstart)) * 1000
+
+            if mean_type == 'all':
+                spike_rates[cell_type] = np.mean(
+                    gid_spike_rate.mean(axis=1))
+            if mean_type == 'trial':
+                spike_rates[cell_type] = np.mean(
+                    gid_spike_rate, axis=1).tolist()
+            if mean_type == 'cell':
+                spike_rates[cell_type] = [gid_trial_rate.tolist()
+                                          for gid_trial_rate in gid_spike_rate]
+
+        return spike_rates
+
+    def plot_spikes_raster(self, ax=None, show=True):
+        """Plot the aggregate spiking activity according to cell type.
+
+        Parameters
+        ----------
+        ax : instance of matplotlib axis | None
+            An axis object from matplotlib. If None,
+            a new figure is created.
+        show : bool
+            If True, show the figure.
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure object.
+        """
+        return plot_spikes_raster(cell_response=self, ax=ax, show=show)
+
+    def plot_spikes_hist(self, ax=None, spike_types=None, show=True):
+        """Plot the histogram of spiking activity across trials.
+
+        Parameters
+        ----------
+        ax : instance of matplotlib axis | None
+            An axis object from matplotlib. If None,
+            a new figure is created.
+        spike_types: string | list | dictionary | None
+            String input of a valid spike type is plotted individually.
+                Ex: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
+            List of valid string inputs will plot each spike type individually.
+                Ex: ['common', 'evdist']
+            Dictionary of valid lists will plot list elements as a group.
+                Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
+            If None, all input spike types are plotted individually if any
+            are present. Otherwise spikes from all cells are plotted.
+            Valid strings also include leading characters of spike types
+                Example: 'ext' is equivalent to ['extgauss', 'extpois']
+        show : bool
+            If True, show the figure.
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+        return plot_spikes_hist(
+            self, ax=ax, spike_types=spike_types, show=show)
+
+    def update_types(self, gid_ranges):
+        """Update spike types in the current instance of CellResponse.
+
+        Parameters
+        ----------
+        gid_ranges : dict of lists or range objects
+            Dictionary with keys 'evprox1', 'evdist1' etc.
+            containing the range of Cell or input IDs of different
+            cell or input types.
+        """
+
+        # Validate gid_ranges
+        all_gid_ranges = list(gid_ranges.values())
+        for item_idx_1 in range(len(all_gid_ranges)):
+            for item_idx_2 in range(item_idx_1 + 1, len(all_gid_ranges)):
+                gid_set_1 = set(all_gid_ranges[item_idx_1])
+                gid_set_2 = set(all_gid_ranges[item_idx_2])
+                if not gid_set_1.isdisjoint(gid_set_2):
+                    raise ValueError('gid_ranges should contain only disjoint '
+                                     'sets of gid values')
+
+        spike_types = list()
+        for trial_idx in range(len(self._spike_times)):
+            spike_types_trial = np.empty_like(self._spike_times[trial_idx],
+                                              dtype='<U36')
+            for gidtype, gids in gid_ranges.items():
+                spike_gids_mask = np.in1d(self._spike_gids[trial_idx], gids)
+                spike_types_trial[spike_gids_mask] = gidtype
+            spike_types += [list(spike_types_trial)]
+        self._spike_types = spike_types
+
+    def write(self, fname):
+        """Write spiking activity per trial to a collection of files.
+
+        Parameters
+        ----------
+        fname : str
+            String format (e.g., '<pathname>/spk_%d.txt') of the
+            path to the output spike file(s).
+
+        Outputs
+        -------
+        A tab separated txt file for each trial where rows
+            correspond to spikes, and columns correspond to
+            1) spike time (s),
+            2) spike gid, and
+            3) gid type
+        """
+
+        for trial_idx in range(len(self._spike_times)):
+            with open(str(fname) % (trial_idx,), 'w') as f:
+                for spike_idx in range(len(self._spike_times[trial_idx])):
+                    f.write('{:.3f}\t{}\t{}\n'.format(
+                        self._spike_times[trial_idx][spike_idx],
+                        int(self._spike_gids[trial_idx][spike_idx]),
+                        self._spike_types[trial_idx][spike_idx]))
+
 
 class CellResponse(object):
     """The CellResponse class.
@@ -481,7 +655,7 @@ class CellResponse(object):
         for trial_list in spike_times:
             if not isinstance(trial_list, list):
                 raise TypeError('spike_times should be a list of lists')
-            
+
         self._spike_times = spike_times
         self._gid = gid
         self._cell_type = cell_type
@@ -532,174 +706,3 @@ class CellResponse(object):
     @property
     def times(self):
         return self._times
-
-    # def update_types(self, gid_ranges):
-    #     """Update spike types in the current instance of CellResponse.
-
-    #     Parameters
-    #     ----------
-    #     gid_ranges : dict of lists or range objects
-    #         Dictionary with keys 'evprox1', 'evdist1' etc.
-    #         containing the range of Cell or input IDs of different
-    #         cell or input types.
-    #     """
-
-    #     # Validate gid_ranges
-    #     all_gid_ranges = list(gid_ranges.values())
-    #     for item_idx_1 in range(len(all_gid_ranges)):
-    #         for item_idx_2 in range(item_idx_1 + 1, len(all_gid_ranges)):
-    #             gid_set_1 = set(all_gid_ranges[item_idx_1])
-    #             gid_set_2 = set(all_gid_ranges[item_idx_2])
-    #             if not gid_set_1.isdisjoint(gid_set_2):
-    #                 raise ValueError('gid_ranges should contain only disjoint '
-    #                                  'sets of gid values')
-
-    #     spike_types = list()
-    #     for trial_idx in range(len(self._spike_times)):
-    #         spike_types_trial = np.empty_like(self._spike_times[trial_idx],
-    #                                           dtype='<U36')
-    #         for gidtype, gids in gid_ranges.items():
-    #             spike_gids_mask = np.in1d(self._spike_gids[trial_idx], gids)
-    #             spike_types_trial[spike_gids_mask] = gidtype
-    #         spike_types += [list(spike_types_trial)]
-    #     self._spike_types = spike_types
-
-    # def mean_rates(self, tstart, tstop, gid_ranges, mean_type='all'):
-    #     """Mean spike rates (Hz) by cell type.
-
-    #     Parameters
-    #     ----------
-    #     tstart : int | float | None
-    #         Value defining the start time of all trials.
-    #     tstop : int | float | None
-    #         Value defining the stop time of all trials.
-    #     gid_ranges : dict of lists or range objects
-    #         Dictionary with keys 'evprox1', 'evdist1' etc.
-    #         containing the range of Cell or input IDs of different
-    #         cell or input types.
-    #     mean_type : str
-    #         'all' : Average over trials and cells
-    #             Returns mean rate for cell types
-    #         'trial' : Average over cell types
-    #             Returns trial mean rate for cell types
-    #         'cell' : Average over individual cells
-    #             Returns trial mean rate for individual cells
-
-    #     Returns
-    #     -------
-    #     spike_rate : dict
-    #         Dictionary with keys 'L5_pyramidal', 'L5_basket', etc.
-    #     """
-    #     cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-    #     spike_rates = dict()
-
-    #     if mean_type not in ['all', 'trial', 'cell']:
-    #         raise ValueError("Invalid mean_type. Valid arguments include "
-    #                          f"'all', 'trial', or 'cell'. Got {mean_type}")
-
-    #     # Validate tstart, tstop
-    #     if not isinstance(tstart, (int, float)) or not isinstance(
-    #             tstop, (int, float)):
-    #         raise ValueError('tstart and tstop must be of type int or float')
-    #     elif tstop <= tstart:
-    #         raise ValueError('tstop must be greater than tstart')
-
-    #     for cell_type in cell_types:
-    #         cell_type_gids = np.array(gid_ranges[cell_type])
-    #         n_trials, n_cells = len(self._spike_times), len(cell_type_gids)
-    #         gid_spike_rate = np.zeros((n_trials, n_cells))
-
-    #         trial_data = zip(self._spike_types, self._spike_gids)
-    #         for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
-    #             trial_type_mask = np.in1d(spike_types, cell_type)
-    #             gids, gid_counts = np.unique(np.array(
-    #                 spike_gids)[trial_type_mask], return_counts=True)
-
-    #             gid_spike_rate[trial_idx, np.in1d(cell_type_gids, gids)] = (
-    #                 gid_counts / (tstop - tstart)) * 1000
-
-    #         if mean_type == 'all':
-    #             spike_rates[cell_type] = np.mean(
-    #                 gid_spike_rate.mean(axis=1))
-    #         if mean_type == 'trial':
-    #             spike_rates[cell_type] = np.mean(
-    #                 gid_spike_rate, axis=1).tolist()
-    #         if mean_type == 'cell':
-    #             spike_rates[cell_type] = [gid_trial_rate.tolist()
-    #                                       for gid_trial_rate in gid_spike_rate]
-
-    #     return spike_rates
-
-    # def plot_spikes_raster(self, ax=None, show=True):
-    #     """Plot the aggregate spiking activity according to cell type.
-
-    #     Parameters
-    #     ----------
-    #     ax : instance of matplotlib axis | None
-    #         An axis object from matplotlib. If None,
-    #         a new figure is created.
-    #     show : bool
-    #         If True, show the figure.
-
-    #     Returns
-    #     -------
-    #     fig : instance of matplotlib Figure
-    #         The matplotlib figure object.
-    #     """
-    #     return plot_spikes_raster(cell_response=self, ax=ax, show=show)
-
-    # def plot_spikes_hist(self, ax=None, spike_types=None, show=True):
-    #     """Plot the histogram of spiking activity across trials.
-
-    #     Parameters
-    #     ----------
-    #     ax : instance of matplotlib axis | None
-    #         An axis object from matplotlib. If None,
-    #         a new figure is created.
-    #     spike_types: string | list | dictionary | None
-    #         String input of a valid spike type is plotted individually.
-    #             Ex: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
-    #         List of valid string inputs will plot each spike type individually.
-    #             Ex: ['common', 'evdist']
-    #         Dictionary of valid lists will plot list elements as a group.
-    #             Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
-    #         If None, all input spike types are plotted individually if any
-    #         are present. Otherwise spikes from all cells are plotted.
-    #         Valid strings also include leading characters of spike types
-    #             Example: 'ext' is equivalent to ['extgauss', 'extpois']
-    #     show : bool
-    #         If True, show the figure.
-
-    #     Returns
-    #     -------
-    #     fig : instance of matplotlib Figure
-    #         The matplotlib figure handle.
-    #     """
-    #     return plot_spikes_hist(
-    #         self, ax=ax, spike_types=spike_types, show=show)
-
-    # def write(self, fname):
-    #     """Write spiking activity per trial to a collection of files.
-
-    #     Parameters
-    #     ----------
-    #     fname : str
-    #         String format (e.g., '<pathname>/spk_%d.txt') of the
-    #         path to the output spike file(s).
-
-    #     Outputs
-    #     -------
-    #     A tab separated txt file for each trial where rows
-    #         correspond to spikes, and columns correspond to
-    #         1) spike time (s),
-    #         2) spike gid, and
-    #         3) gid type
-    #     """
-
-    #     for trial_idx in range(len(self._spike_times)):
-    #         with open(str(fname) % (trial_idx,), 'w') as f:
-    #             for spike_idx in range(len(self._spike_times[trial_idx])):
-    #                 f.write('{:.3f}\t{}\t{}\n'.format(
-    #                     self._spike_times[trial_idx][spike_idx],
-    #                     int(self._spike_gids[trial_idx][spike_idx]),
-    #                     self._spike_types[trial_idx][spike_idx]))

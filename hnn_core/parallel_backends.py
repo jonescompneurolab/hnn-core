@@ -53,6 +53,9 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         spike_times = spikedata[0]
         spike_gids = spikedata[1]
         net.gid_ranges = spikedata[2]  # only have one gid_ranges
+        net._spike_times.append(spike_times)
+        net._spike_gids.append(spike_gids)
+        net.update_types(net.gid_ranges)
         for cell_type, gid_range in net.gid_ranges.items():
             if cell_type in net.cellname_list:
                 for gid in gid_range:
