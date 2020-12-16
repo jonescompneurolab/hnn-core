@@ -360,21 +360,18 @@ class NetworkBuilder(object):
             # set the cell gid
             _PC.set_gid2node(gid, rank)
             self._gid_list.append(gid)
-            # now to do the cell-specific external input gids on the same proc
-            # these are guaranteed to exist because all of
-            # these inputs were created for each cell
-            # get list of all NetworkDrives that contact this cell, and
-            # make sure the corresponding _ArtificialCell gids are associated
-            # with the current node/rank
-            for drive_gid in self.net._cell_gid_to_drive[f'{gid}']:
-                if drive_gid not in self.net._global_drive_gids:
-                    _PC.set_gid2node(drive_gid, rank)
-                    self._gid_list.append(drive_gid)
 
-        for idx, gid in enumerate(self.net._global_drive_gids):
-            rank = idx % nhosts
-            _PC.set_gid2node(gid, rank)
-            self._gid_list.append(gid)
+        # loop over all drives, then all cell types, then all artificial cells
+        # only assign a "source" artificial cell to this rank if its target
+        # exists in _gid_list. "Global" drives get placed on different ranks
+        for drive in self.net.external_drives.values():
+            for conn in drive['conn'].values():  # all cell types
+                for src_gid, trg_gid in zip(conn['src_gids'],
+                                            conn['trg_gids']):
+                    if (trg_gid in self._gid_list and
+                            src_gid not in self._gid_list):
+                        _PC.set_gid2node(src_gid, rank)
+                        self._gid_list.append(src_gid)
 
         # extremely important to get the gids in the right order
         self._gid_list.sort()
@@ -464,7 +461,6 @@ class NetworkBuilder(object):
         connection_name = f'{src_type}_{target_type}_{receptor}'
         if connection_name not in self.ncs:
             self.ncs[connection_name] = list()
-
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
         # NB this assumes that REAL cells are first in the _gid_list
         for gid_target, target_cell in zip(self._gid_list, self.cells):
@@ -480,6 +476,7 @@ class NetworkBuilder(object):
                         continue
 
                     pos_idx = gid_src - net.gid_ranges[_long_name(src_type)][0]
+                    # NB pos_dict for this drive must include ALL cell types!
                     nc_dict['pos_src'] = net.pos_dict[
                         _long_name(src_type)][pos_idx]
 
@@ -576,36 +573,30 @@ class NetworkBuilder(object):
         self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
                                 nc_dict)
 
-        for drive_name in self.net.external_drives:
-            for drive_cell in self.net.external_drives[
-                    drive_name]['cells']:
+        # loop over _all_ drives, _connect_celltypes picks ones on this rank
+        for drive in self.net.external_drives.values():
 
-                drive_type = self.net.external_drives[drive_name]['type']
-
-                receptors = ['ampa', 'nmda']
-                if drive_type == 'gaussian':
-                    receptors = ['ampa']
-
+            receptors = ['ampa', 'nmda']
+            if drive['type'] == 'gaussian':
+                receptors = ['ampa']
+            # conn-parameters are for each target cell type
+            for target_cell_type, drive_conn in drive['conn'].items():
+                # XXX: hack for distal connection XXX: Why?!
+                if (target_cell_type == 'L5_basket' and
+                        drive_conn['location'] == 'distal'):
+                    continue
                 for receptor in receptors:
-                    if len(drive_cell[receptor]) > 0:
-                        nc_dict['lamtha'] = drive_cell[receptor]['lamtha']
-                        nc_dict['A_delay'] = drive_cell[receptor]['A_delay']
-                        nc_dict['A_weight'] = drive_cell[receptor]['A_weight']
-                        unique = self.net.external_drives[
-                            drive_name]['cell_specific']
-                        for target_type in drive_cell['target_types']:
-
-                            # XXX: hack for distal connection XXX: Why?!
-                            if (target_type == 'L5_basket' and
-                                    drive_cell['location'] == 'distal'):
-                                continue
-
-                            short_trg_name = _short_name(target_type)
-                            self._connect_celltypes(drive_name,
-                                                    short_trg_name,
-                                                    drive_cell['location'],
-                                                    receptor, nc_dict,
-                                                    unique=unique)
+                    if len(drive_conn[receptor]) > 0:
+                        nc_dict['lamtha'] = drive_conn[
+                            receptor]['lamtha']
+                        nc_dict['A_delay'] = drive_conn[
+                            receptor]['A_delay']
+                        nc_dict['A_weight'] = drive_conn[
+                            receptor]['A_weight']
+                        self._connect_celltypes(
+                            drive['name'], target_cell_type,
+                            drive_conn['location'], receptor, nc_dict,
+                            unique=drive['cell_specific'])
 
     # setup spike recording for this node
     def _record_spikes(self):

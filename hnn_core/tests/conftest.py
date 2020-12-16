@@ -84,7 +84,7 @@ def run_hnn_core_fixture():
         if reduced:
             params.update({'N_pyr_x': 3,
                            'N_pyr_y': 3,
-                           'tstop': 25,
+                           'tstop': 40,
                            't_evprox_1': 5,
                            't_evdist_1': 10,
                            't_evprox_2': 20,
@@ -92,8 +92,9 @@ def run_hnn_core_fixture():
         net = Network(params)
 
         # number of trials simulated
-        assert all(len(src_event_times) == params['N_trials'] for
-                   src_type, src_event_times in net.drive_event_times.items())
+        for drive in net.external_drives.values():
+            assert len(drive['events']) == params['N_trials']
+
         if backend == 'mpi':
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
