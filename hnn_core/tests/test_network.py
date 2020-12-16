@@ -40,18 +40,15 @@ def test_network():
     assert len(dns_from_gids) == len(net.external_drives)
     for dn in dns_from_gids:
         assert dn in net.external_drives.keys()
-        assert len(net.gid_ranges[dn]) == len(net.external_drives[dn]['gids'])
+        this_src_gids = set([gid for drive_conn in
+                             net.external_drives[dn]['conn'].values() for
+                             gid in drive_conn['src_gids']])  # NB set: globals
+        assert len(net.gid_ranges[dn]) == len(this_src_gids)
         assert len(net.external_drives[dn]['events']) == 1  # single trial!
 
-    # cell GIDs from the reverse-lookup dict: each cell must be present
-    cell_gids_from_drive = [int(s) for s in net._cell_gid_to_drive.keys()]
-    assert set(cell_gids_from_drive) == set(list(range(0, net.n_cells)))
-    assert len(net._global_drive_gids) == 2
     assert len(net.gid_ranges['bursty1']) == 1
     for drive in net.external_drives.values():
         assert len(drive['events']) == 1  # single trial simulated
-        if drive['cell_specific']:
-            assert len(drive['gids']) == net.n_cells
         if drive['type'] == 'evoked':
             for kw in ['mu', 'sigma', 'numspikes']:
                 assert kw in drive['dynamics'].keys()
@@ -80,8 +77,13 @@ def test_network():
             assert len(drive['events'][0][0]) == n_events  # 40
 
     # make sure the PRNGs are consistent.
-    assert_allclose(net.external_drives['evprox1']['events'][0][0],
-                    [23.80641637082997], rtol=1e-12)
+    target_times = {'evdist1': [66.30498327062551, 61.54362532343694],
+                    'evprox1': [23.80641637082997, 30.857310915553647],
+                    'evprox2': [141.76252038319825, 137.73942375578602]}
+    for drive_name in target_times:
+        for idx in [0, -1]:  # first and last
+            assert_allclose(net.external_drives[drive_name]['events'][0][idx],
+                            target_times[drive_name][idx], rtol=1e-12)
 
     # Assert that an empty CellResponse object is created as an attribute
     assert net.cell_response == CellResponse()

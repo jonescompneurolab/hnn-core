@@ -9,7 +9,7 @@ import itertools as it
 import numpy as np
 from glob import glob
 
-from .feed import drive_cell_event_times
+from .feed import _drive_cell_event_times
 from .params import create_pext
 from .network_builder import _short_name  # XXX placement?!
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
@@ -207,12 +207,6 @@ class Network(object):
         # external drives and biases
         self.external_drives = dict()
         self.external_biases = dict()
-        self._cell_gid_to_drive = dict()  # reverse-lookup table for Builder
-
-        # this is needed network_builder.py:_gid_assign() because there's no
-        # way to keep track of which gids are already assigned to other nodes;
-        # without it, we can't round-robin assign the non-cell specfiic drives
-        self._global_drive_gids = []
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -239,6 +233,7 @@ class Network(object):
                         specs['dynamics']['numspikes'],
                         specs['weights_ampa'], specs['weights_nmda'],
                         specs['location'], seedcore=specs['seedcore'],
+                        dispersion_time=specs['dispersion_time'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'poisson':
                     self.add_poisson_drive(
@@ -247,6 +242,7 @@ class Network(object):
                         specs['dynamics']['rate_constants'],
                         specs['weights_ampa'], specs['weights_nmda'],
                         specs['location'], seedcore=specs['seedcore'],
+                        dispersion_time=specs['dispersion_time'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'gaussian':
                     self.add_gaussian_drive(
@@ -255,6 +251,7 @@ class Network(object):
                         specs['dynamics']['numspikes'],
                         specs['weights_ampa'], specs['weights_nmda'],
                         specs['location'], seedcore=specs['seedcore'],
+                        dispersion_time=specs['dispersion_time'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'bursty':
                     self.add_bursty_drive(
@@ -265,8 +262,9 @@ class Network(object):
                         specs['dynamics']['numspikes'],
                         specs['dynamics']['repeats'],
                         specs['weights_ampa'], specs['weights_nmda'],
-                        specs['synaptic_delays'], specs['location'],
+                        specs['location'],
                         space_constant=specs['space_constant'],
+                        dispersion_time=specs['dispersion_time'],
                         seedcore=specs['seedcore'])
 
             # add tonic biases if present in params
@@ -288,81 +286,76 @@ class Network(object):
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
 
-    def _create_drive_cells(self, target_populations, weights_by_receptor,
-                            location, space_constant, synaptic_delays,
+    def _create_drive_conns(self, target_populations, weights_by_receptor,
+                            location, space_constant, dispersion_time,
                             cell_specific=True):
-        if isinstance(synaptic_delays, dict):
+        if isinstance(dispersion_time, dict):
             for receptor in ['ampa', 'nmda']:
                 if not (
                     set(list(weights_by_receptor[receptor].keys())).issubset(
-                        set(list(synaptic_delays[receptor].keys())))):
+                        set(list(dispersion_time.keys())))):
                     raise ValueError(
-                        'synaptic_delays is either common (float), or needs '
-                        'to be specified for each non-zero AMPA/NMDA weight')
+                        'dispersion_time is either common (float), or needs '
+                        'to be specified for each cell type')
 
-        next_gid = self._n_gids
-        drive_gids = []
-        drive_cells = []
+        drive_conn_by_cell = dict()
+        src_gid_ran_begin = self._n_gids
+        # XXX this if-else block can no doubt be simplified & unified!
         if cell_specific:
             for cellname in target_populations:
-                for target_gid in self.gid_ranges[cellname]:
-                    drive_cell = dict()
+                drive_conn = dict()
+                drive_conn['trg_gids'] = self.gid_ranges[cellname]
+                # NB list! This is used later in _parnet_connect
+                drive_conn['target_type'] = cellname
+                drive_conn['src_gids'] = range(
+                    self._n_gids, self._n_gids + len(drive_conn['trg_gids']))
+                self._n_gids += len(drive_conn['trg_gids'])
+                drive_conn['location'] = location
 
-                    drive_cell['target_gid'] = target_gid
-                    # NB list! This is used later in _parnet_connect
-                    drive_cell['target_types'] = [cellname]
-                    drive_cell['gid'] = next_gid
-                    next_gid += 1
-                    drive_cell['location'] = location
+                for receptor, weights in weights_by_receptor.items():
+                    drive_conn[receptor] = dict()
+                    if cellname in weights:
+                        drive_conn[receptor]['lamtha'] = space_constant
+                        if isinstance(dispersion_time, float):
+                            drive_conn[receptor]['A_delay'] = dispersion_time
+                        else:
+                            drive_conn[receptor][
+                                'A_delay'] = dispersion_time[cellname]
+                        drive_conn[receptor][
+                            'A_weight'] = weights[cellname]
 
-                    # reverse-lookup: real_cell-to-drive_cell
-                    if f'{target_gid}' not in self._cell_gid_to_drive:
-                        self._cell_gid_to_drive[f'{target_gid}'] = []
-                    self._cell_gid_to_drive[
-                        f'{target_gid}'].append(drive_cell['gid'])
-
-                    for receptor, weights in weights_by_receptor.items():
-                        drive_cell[receptor] = dict()
-                        if cellname in weights:
-                            drive_cell[receptor]['lamtha'] = space_constant
-                            drive_cell[receptor]['A_delay'] = synaptic_delays
-                            drive_cell[receptor][
-                                'A_weight'] = weights[cellname]
-
-                    drive_gids += [drive_cell['gid']]  # for convenience
-                    drive_cells.append(drive_cell)
+                drive_conn_by_cell[cellname] = drive_conn
         else:
-            drive_cell = dict()
+            drive_conn = dict()
 
             # NB list! This is used later in _parnet_connect
-            drive_cell['target_types'] = target_populations  # all cells
-            drive_cell['gid'] = next_gid
-            next_gid += 1
-            drive_cell['location'] = location
+            drive_conn['src_gids'] = [self._n_gids]
+            self._n_gids += 1
+            drive_conn['location'] = location
+
+            drive_conn['trg_gids'] = []  # fill in below
             for cellname in target_populations:
-                for target_gid in self.gid_ranges[cellname]:
-                    # reverse-lookup: real_cell-to-drive_cell
-                    if f'{target_gid}' not in self._cell_gid_to_drive:
-                        self._cell_gid_to_drive[f'{target_gid}'] = []
-                    self._cell_gid_to_drive[
-                        f'{target_gid}'].append(drive_cell['gid'])
-                    for receptor, weights in weights_by_receptor.items():
-                        drive_cell[receptor] = dict()
+                drive_conn['trg_gids'].extend(self.gid_ranges[cellname])
+                drive_conn['target_type'] = cellname
 
-                        if cellname in weights:
-                            drive_cell[receptor]['lamtha'] = space_constant
-                            drive_cell[receptor]['A_delay'] = synaptic_delays[
-                                receptor][cellname]
-                            drive_cell[receptor][
-                                'A_weight'] = weights[cellname]
-            drive_gids += [drive_cell['gid']]  # for convenience
-            drive_cells.append(drive_cell)
+                for receptor, weights in weights_by_receptor.items():
+                    drive_conn[receptor] = dict()
+                    if cellname in weights:
+                        drive_conn[receptor]['lamtha'] = space_constant
+                        if isinstance(dispersion_time, float):
+                            drive_conn[receptor]['A_delay'] = dispersion_time
+                        else:
+                            drive_conn[receptor][
+                                'A_delay'] = dispersion_time[cellname]
+                        drive_conn[receptor][
+                            'A_weight'] = weights[cellname]
+                drive_conn_by_cell[cellname] = drive_conn
 
-        return(drive_cells, drive_gids)
+        return drive_conn_by_cell, range(src_gid_ran_begin, self._n_gids)
 
     def add_evoked_drive(self, name, mu, sigma, numspikes, weights_ampa,
                          weights_nmda, location, space_constant=3.,
-                         seedcore=None):
+                         dispersion_time=0.1, seedcore=None):
         """
         """
         # CHECK name not exists!
@@ -375,11 +368,11 @@ class Network(object):
         drive['events'] = []
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant)
+                           space_constant, dispersion_time)
 
     def add_poisson_drive(self, name, t0, T, rate_constants, weights_ampa,
                           weights_nmda, location, space_constant=100.,
-                          seedcore=None):
+                          dispersion_time=0.1, seedcore=None):
         """
         """
         # CHECK name not exists!
@@ -393,11 +386,11 @@ class Network(object):
         drive['dynamics'] = dict(t0=t0, T=T, rate_constants=rate_constants)
         drive['events'] = []
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant)
+                           space_constant, dispersion_time)
 
     def add_gaussian_drive(self, name, mu, sigma, numspikes, weights_ampa,
                            weights_nmda, location, space_constant=100.,
-                           seedcore=None):
+                           dispersion_time=0.1, seedcore=None):
         """
         """
         # CHECK name not exists!
@@ -411,11 +404,11 @@ class Network(object):
         drive['events'] = []
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant)
+                           space_constant, dispersion_time)
 
     def add_bursty_drive(self, name, distribution, t0, sigma_t0, T, burst_f,
                          burst_sigma_f, numspikes, repeats, weights_ampa,
-                         weights_nmda, synaptic_delays, location,
+                         weights_nmda, location, dispersion_time=0.1,
                          space_constant=100., seedcore=None):
         """
         """
@@ -434,11 +427,11 @@ class Network(object):
         drive['events'] = []
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant, cell_specific=False,
-                           synaptic_delays=synaptic_delays)
+                           space_constant, dispersion_time,
+                           cell_specific=False)
 
     def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
-                      space_constant, synaptic_delays=0.1, cell_specific=True):
+                      space_constant, dispersion_time, cell_specific=True):
         # CHECKS
 
         target_populations = (set(weights_ampa.keys()) |
@@ -446,21 +439,28 @@ class Network(object):
         if not target_populations.issubset(set(self.cellname_list)):
             raise ValueError('Allowed target cell types are: ',
                              f'{self.cellname_list}')
+        # this is needed to keep the drive GIDs identical to those in HNN,
+        # e.g., 'evdist1': range(272, 542), even when no L5_basket cells
+        # are targeted (event times lists are empty). The logic in
+        # _connect_celltypes is hard-coded to use these implict gid ranges
         if self._legacy_mode:
             target_populations = self.cellname_list
 
+        drive['name'] = name  # for easier for-looping later
+        drive['target_types'] = target_populations  # for _connect_celltypes
+
         weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
 
-        drive['cells'], drive['gids'] = self._create_drive_cells(
+        drive['conn'], src_gid_ran = self._create_drive_conns(
             target_populations, weights_by_receptor, location,
-            space_constant, synaptic_delays, cell_specific=cell_specific)
-
-        self.external_drives[name] = drive
-        if not cell_specific:
-            self._global_drive_gids.extend(drive['gids'])  # for Builder
+            space_constant, dispersion_time, cell_specific=cell_specific)
 
         # Must remember to update the GID ranges based on pos_dict!
-        self.pos_dict[name] = [self.pos_dict['origin'] for dg in drive['gids']]
+        self.pos_dict[name] = [self.pos_dict['origin'] for
+                               dg in src_gid_ran]
+
+        # NB _update_gid_ranges checks external_drives[name] for drives!
+        self.external_drives[name] = drive
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
@@ -483,23 +483,25 @@ class Network(object):
 
         # each trial needs unique event time vectors
         for trial_idx in range(n_trials):
-            for drive_name in self.external_drives.keys():
+            for drive in self.external_drives.values():
                 event_times = list()  # new list for each trial and drive
 
-                dyn_specs = self.external_drives[drive_name]['dynamics']
-                drive_type = self.external_drives[drive_name]['type']
-                seedcore = self.external_drives[drive_name]['seedcore']
-
                 # loop over drive 'cells' and create event times for each
-                for drive_cell in self.external_drives[drive_name]['cells']:
-                    event_times.append(
-                        drive_cell_event_times(drive_type, drive_cell,
-                                               dyn_specs, trial_idx=trial_idx,
-                                               seedcore=seedcore)
-                    )
+                for this_cell_drive_conn in drive['conn'].values():
+                    for drive_cell_gid in this_cell_drive_conn['src_gids']:
+                        event_times.append(_drive_cell_event_times(
+                            drive['type'], this_cell_drive_conn,
+                            drive['dynamics'], trial_idx=trial_idx,
+                            drive_cell_gid=drive_cell_gid,
+                            seedcore=drive['seedcore'])
+                        )
+                    # only create one event_times list for globals
+                    if not drive['cell_specific']:
+                        break  # loop over drive['conn'].values
+
                 # 'events': list (trials) of list (cells) of list (events)
                 self.external_drives[
-                    drive_name]['events'].append(event_times)
+                    drive['name']]['events'].append(event_times)
 
     def add_tonic_bias(self, cell_type, amplitude, t0, T):
         """Attach parameters of tonic biasing input for a given cell type.
@@ -529,6 +531,8 @@ class Network(object):
         if duration < 0.:
             raise ValueError('Duration of tonic input cannot be negative')
 
+        if 'tonic' not in self.external_biases:
+            self.external_biases['tonic'] = dict()
         self.external_biases['tonic'][cell_type] = {
             'amplitude': amplitude,
             't0': t0,
@@ -617,7 +621,7 @@ class Network(object):
             drive['seedcore'] = par['prng_seedcore']
             drive['weights_ampa'] = {}
             drive['weights_nmda'] = {}
-            drive['synaptic_delays'] = {'ampa': {}, 'nmda': {}}
+            drive['dispersion_time'] = {}
 
             for cellname in self.cellname_list:
                 cname_ampa = _short_name(cellname) + '_ampa'
@@ -627,21 +631,24 @@ class Network(object):
                     ampa_d = par[cname_ampa][1]
                     if ampa_w > 0.:
                         drive['weights_ampa'][cellname] = ampa_w
-                    if ampa_d > 0.:
-                        drive['synaptic_delays']['ampa'][cellname] = ampa_d
+
+                    # NB dispersion time same for NMDA, read only for AMPA
+                    drive['dispersion_time'][cellname] = ampa_d
+
                 if cname_nmda in par:
                     nmda_w = par[cname_nmda][0]
-                    nmda_d = par[cname_nmda][1]
                     if nmda_w > 0.:
                         drive['weights_nmda'][cellname] = nmda_w
-                    if nmda_d > 0.:
-                        drive['synaptic_delays']['nmda'][cellname] = nmda_d
 
             drive_specs[feed_name] = drive
 
         for feed_name, par in p_unique.items():
             drive = dict()
             drive['cell_specific'] = True
+            drive['weights_ampa'] = {}
+            drive['weights_nmda'] = {}
+            drive['dispersion_time'] = {}
+
             if (feed_name.startswith('evprox') or
                     feed_name.startswith('evdist')):
                 drive['type'] = 'evoked'
@@ -653,23 +660,26 @@ class Network(object):
                 if par['sync_evinput']:
                     sigma = 0.
                 else:
-                    sigma = par['L2_basket'][3]  # NB IID for all cells!
+                    cell_keys_present = [key for key in par
+                                         if key in self.cellname_list]
+                    sigma = par[cell_keys_present[0]][3]  # IID for all cells!
 
                 drive['dynamics'] = {'mu': par['t0'],
                                      'sigma': sigma,
                                      'numspikes': par['numspikes']}
                 drive['space_constant'] = par['lamtha']
                 drive['seedcore'] = par['prng_seedcore']
-                drive['weights_ampa'] = {}
-                drive['weights_nmda'] = {}
                 for cellname in self.cellname_list:
                     if cellname in par:
                         ampa_w = par[cellname][0]
                         nmda_w = par[cellname][1]
+                        dispersion_time = par[cellname][2]
                         if ampa_w > 0.:
                             drive['weights_ampa'][cellname] = ampa_w
                         if nmda_w > 0.:
                             drive['weights_nmda'][cellname] = nmda_w
+                        drive['dispersion_time'][cellname] = dispersion_time
+
             elif feed_name.startswith('extgauss'):
                 drive['type'] = 'gaussian'
                 drive['location'] = par['loc']
@@ -679,17 +689,21 @@ class Network(object):
                                      'numspikes': 50}  # NB hard-coded in GUI!
                 drive['space_constant'] = par['lamtha']
                 drive['seedcore'] = par['prng_seedcore']
-                drive['weights_ampa'] = {}
-                drive['weights_nmda'] = {}
+
                 for cellname in self.cellname_list:
                     if cellname in par:
                         ampa_w = par[cellname][0]
+                        dispersion_time = par[cellname][3]
                         if ampa_w > 0.:
                             drive['weights_ampa'][cellname] = ampa_w
+                        drive['dispersion_time'][cellname] = dispersion_time
+
                 drive['weights_nmda'] = {}  # no NMDA weights for Gaussians
             elif feed_name.startswith('extpois'):
                 drive['type'] = 'poisson'
                 drive['location'] = par['loc']
+                drive['space_constant'] = par['lamtha']
+                drive['seedcore'] = par['prng_seedcore']
 
                 rate_params = {}
                 for cellname in self.cellname_list:
@@ -697,19 +711,17 @@ class Network(object):
                         rate_params[cellname] = par[cellname][3]
                         ampa_w = par[cellname][0]
                         nmda_w = par[cellname][1]
+                        dispersion_time = par[cellname][2]
                         if ampa_w > 0.:
                             drive['weights_ampa'][cellname] = ampa_w
                         if nmda_w > 0.:
                             drive['weights_nmda'][cellname] = nmda_w
+                        drive['dispersion_time'][cellname] = dispersion_time
 
                 drive['dynamics'] = {'t0': par['t_interval'][0],
                                      'T': par['t_interval'][1],
                                      'rate_constants': rate_params}
-                drive['space_constant'] = par['lamtha']
-                drive['seedcore'] = par['prng_seedcore']
-                drive['weights_ampa'] = {}
-                drive['weights_nmda'] = {}
-                drive['weights_nmda'] = {}  # no NMDA weights for Gaussians
+
             drive_specs[feed_name] = drive
         return(drive_specs)
 

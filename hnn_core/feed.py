@@ -41,8 +41,8 @@ def _get_prng(seed, gid, sync_evinput=False):
     return prng, prng2
 
 
-def drive_cell_event_times(drive_type, drive_cell, dynamics, trial_idx=0,
-                           seedcore=0):
+def _drive_cell_event_times(drive_type, drive_conn, dynamics,
+                            trial_idx=0, drive_cell_gid=0, seedcore=0):
     """Generate event times for one drive cell based on dynamics.
 
     Parameters
@@ -55,13 +55,16 @@ def drive_cell_event_times(drive_type, drive_cell, dynamics, trial_idx=0,
 
         'bursty' : As opposed to other drive types, these have timing that is
         identical (synchronous) for all real cells in the network.
-    drive_cell : dict
-        Each drive is associated with a number of 'artificial cells', each
-        with their spatial connectivity and temporal dynamics.
+    drive_conn : dict
+        A drive is associated with a number of 'artificial cells', each
+        with its spatial connectivity (and temporal dynamics). drive_conn
+        defines AMPA and NMDA weights, and the cell target (e.g. 'L2_basket')
     dynamics : dict
         Parameters event time dynamics to simulate
     trial_idx : int
         The index number of the current trial of a simulation (default=1).
+    drive_cell_gid : int
+        Optional gid of current artificial cell (used for seeding)
     seedcore : int
         Optional initial seed for random number generator.
 
@@ -75,7 +78,7 @@ def drive_cell_event_times(drive_type, drive_cell, dynamics, trial_idx=0,
         if dynamics['sigma'] == 0.:
             sync_evinput = True
     prng, prng2 = _get_prng(seed=seedcore + trial_idx,
-                            gid=drive_cell['gid'],
+                            gid=drive_cell_gid,
                             sync_evinput=sync_evinput)
 
     # check feed name validity, allowing substring matches
@@ -90,8 +93,8 @@ def drive_cell_event_times(drive_type, drive_cell, dynamics, trial_idx=0,
     # Return values not checked: False if all weights for given feed type
     # are zero. Designed to be silent so that zeroing input weights
     # effectively disables each.
-    n_ampa_nmda_weights = (len(drive_cell['ampa'].keys()) +
-                           len(drive_cell['nmda'].keys()))
+    n_ampa_nmda_weights = (len(drive_conn['ampa'].keys()) +
+                           len(drive_conn['nmda'].keys()))
     target_syn_weights_zero = True if n_ampa_nmda_weights == 0 else False
 
     event_times = list()
@@ -99,7 +102,7 @@ def drive_cell_event_times(drive_type, drive_cell, dynamics, trial_idx=0,
         event_times = _create_extpois(
             t0=dynamics['t0'],
             T=dynamics['T'],
-            lamtha=dynamics['rate_constant'],
+            lamtha=dynamics['rate_constants'][drive_conn['target_type']],
             prng=prng)
     elif not target_syn_weights_zero and (drive_type == 'evoked' or
                                           drive_type == 'gaussian'):

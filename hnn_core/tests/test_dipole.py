@@ -126,3 +126,11 @@ def test_cell_response_backends(run_hnn_core_fixture):
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
                    spike_times[spike_gids == gid] < times[v_mask][-1]])
+
+    # test that event times before and after simulation are the same
+    for drive_name, drive in joblib_net.external_drives.items():
+        gid_ran = joblib_net.gid_ranges[drive_name]
+        for idx_drive, event_times in enumerate(drive['events'][trial_idx]):
+            net_ets = [spike_times[i] for i, g in enumerate(spike_gids) if
+                       g == gid_ran[idx_drive]]
+            assert_allclose(np.array(event_times), np.array(net_ets))
