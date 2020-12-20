@@ -52,15 +52,49 @@ def read_spikes(fname, gid_ranges=None):
                                  "are unspecified in the file %s" % (file,))
             spike_types += [[]]
 
-    cell_response = CellResponse(spike_times=spike_times,
-                                 spike_gids=spike_gids,
-                                 spike_types=spike_types)
+    all_spike_gids = np.array(sum(spike_gids, []))
+    all_spike_types = np.array(sum(spike_types, []))
+    gid_list = np.unique(all_spike_gids)
+        
     if gid_ranges is not None:
-        cell_response.update_types(gid_ranges)
+        validate_gid_ranges(gid_ranges)
+        cell_response = []
+        for cell_type, gid_range in gid_ranges.items():
+            for gid in gid_range:
+                cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
 
-    return CellResponse(spike_times=spike_times, spike_gids=spike_gids,
-                        spike_types=spike_types)
+    else:
+        cell_response = [CellResponse(gid=gid) for gid in range(np.max(gid_list))]
+        for gid in gid_list:
+            cell_type_idx = np.where(all_spike_gids == gid)[0]
 
+    for trial in range(len(spike_times)):
+        for gid in np.unique(spike_gids[trial]):
+            gid_mask = np.array(spike_gids[trial]) == gid
+            gid_spike_times = np.array(spike_times)[trial][gid_mask].tolist()
+            cell_response[gid].spike_times.append(gid_spike_times)
+
+    return cell_response
+
+def validate_gid_ranges(gid_ranges):
+    """Check for non-overlapping gid ranges.
+
+    Parameters
+    ----------
+    gid_ranges : dict of lists or range objects
+        Dictionary with keys 'evprox1', 'evdist1' etc.
+        containing the range of Cell or input IDs of different
+        cell or input types.
+    """
+    all_gid_ranges = list(gid_ranges.values())
+    for item_idx_1 in range(len(all_gid_ranges)):
+        for item_idx_2 in range(item_idx_1 + 1, len(all_gid_ranges)):
+            gid_set_1 = set(all_gid_ranges[item_idx_1])
+            gid_set_2 = set(all_gid_ranges[item_idx_2])
+            if not gid_set_1.isdisjoint(gid_set_2):
+                raise ValueError('gid_ranges should contain only disjoint '
+                                    'sets of gid values')
+    return
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     """Creates coordinate grid and place cells in it.
@@ -164,6 +198,19 @@ class Network(object):
     feed_times : dict of [list (n_trials) of list (n_cells) of list (n_times)]
         The event times of input feeds. Only feed_times['tonic'] is a
         dictionary, other input types are nested lists.
+
+    Methods
+    -------
+    update_types(gid_ranges)
+        Update spike types in the current instance of CellResponse.
+    plot(ax=None, show=True)
+        Plot and return a matplotlib Figure object showing the
+        aggregate network spiking activity according to cell type.
+    mean_rates(tstart, tstop, gid_ranges, mean_type='all')
+        Calculate mean firing rate for each cell type. Specify
+        averaging method with mean_type argument.
+    write(fname)
+        Write spiking activity to a collection of spike trial files.
     """
 
     def __init__(self, params):
@@ -544,15 +591,7 @@ class Network(object):
             cell or input types.
         """
 
-        # Validate gid_ranges
-        all_gid_ranges = list(gid_ranges.values())
-        for item_idx_1 in range(len(all_gid_ranges)):
-            for item_idx_2 in range(item_idx_1 + 1, len(all_gid_ranges)):
-                gid_set_1 = set(all_gid_ranges[item_idx_1])
-                gid_set_2 = set(all_gid_ranges[item_idx_2])
-                if not gid_set_1.isdisjoint(gid_set_2):
-                    raise ValueError('gid_ranges should contain only disjoint '
-                                     'sets of gid values')
+        validate_gid_ranges(gid_ranges)
 
         spike_types = list()
         for trial_idx in range(len(self._spike_times)):
@@ -624,19 +663,6 @@ class CellResponse(object):
     times : numpy array
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
-
-    Methods
-    -------
-    update_types(gid_ranges)
-        Update spike types in the current instance of CellResponse.
-    plot(ax=None, show=True)
-        Plot and return a matplotlib Figure object showing the
-        aggregate network spiking activity according to cell type.
-    mean_rates(tstart, tstop, gid_ranges, mean_type='all')
-        Calculate mean firing rate for each cell type. Specify
-        averaging method with mean_type argument.
-    write(fname)
-        Write spiking activity to a collection of spike trial files.
     """
 
     def __init__(self, spike_times=None, gid=None, cell_type=None,

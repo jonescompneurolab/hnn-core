@@ -105,113 +105,64 @@ def test_network():
     n_conn = len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
-
-def test_cell_response(tmpdir):
-    """Test CellResponse object."""
-
-    # Round-trip test
-    spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
-    spike_gids = [[1, 3], [5, 7]]
-    spike_types = [['L2_pyramidal', 'L2_basket'],
-                   ['L5_pyramidal', 'L5_basket']]
+    # Test Network plotting functions
+    net._spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
+    net._spike_gids = [[1, 3], [5, 7]]
+    net._spike_types = [['L2_pyramidal', 'L2_basket'],
+                        ['L5_pyramidal', 'L5_basket']]
     tstart, tstop = 0.1, 98.4
     gid_ranges = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
                   'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
-    cell_response = CellResponse(spike_times=spike_times,
-                                 spike_gids=spike_gids,
-                                 spike_types=spike_types)
-    cell_response.plot_spikes_hist(show=False)
-    cell_response.write(tmpdir.join('spk_%d.txt'))
-    assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
 
-    assert ("CellResponse | 2 simulation trials" in repr(cell_response))
-
-    with pytest.raises(TypeError,
-                       match="spike_times should be a list of lists"):
-        cell_response = CellResponse(spike_times=([2.3456, 7.89],
-                                     [4.2812, 93.2]),
-                                     spike_gids=spike_gids,
-                                     spike_types=spike_types)
-
-    with pytest.raises(TypeError,
-                       match="spike_times should be a list of lists"):
-        cell_response = CellResponse(spike_times=[1, 2], spike_gids=spike_gids,
-                                     spike_types=spike_types)
-
-    with pytest.raises(ValueError, match="spike times, gids, and types should "
-                       "be lists of the same length"):
-        cell_response = CellResponse(spike_times=[[2.3456, 7.89]],
-                                     spike_gids=spike_gids,
-                                     spike_types=spike_types)
-
-    cell_response = CellResponse(spike_times=spike_times,
-                                 spike_gids=spike_gids,
-                                 spike_types=spike_types)
-
-    with pytest.raises(TypeError, match="indices must be int, slice, or "
-                       "array-like, not str"):
-        cell_response['1']
-
-    with pytest.raises(TypeError, match="indices must be int, slice, or "
-                       "array-like, not float"):
-        cell_response[1.0]
-
-    with pytest.raises(ValueError, match="ndarray cannot exceed 1 dimension"):
-        cell_response[np.array([[1, 2], [3, 4]])]
-
-    with pytest.raises(TypeError, match="gids must be of dtype int, "
-                       "not float64"):
-        cell_response[np.array([1, 2, 3.0])]
-
-    with pytest.raises(TypeError, match="gids must be of dtype int, "
-                       "not float64"):
-        cell_response[[0, 1, 2, 2.0]]
+    net.plot_spikes_hist(show=False)
+    net.write(tmpdir.join('spk_%d.txt'))
+    assert net.cell_response == read_spikes(tmpdir.join('spk_*.txt'))
 
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
-        cell_response.plot_spikes_hist(spike_types=1, show=False)
+        net.plot_spikes_hist(spike_types=1, show=False)
 
     with pytest.raises(TypeError, match=r"spike_types\[ev\] must be a list\. "
                                         r"Got int\."):
-        cell_response.plot_spikes_hist(spike_types={'ev': 1}, show=False)
+        net.plot_spikes_hist(spike_types={'ev': 1}, show=False)
 
     with pytest.raises(ValueError, match=r"Elements of spike_types must map to"
                        r" mutually exclusive input types\. L2_basket is found"
                        r" more than once\."):
-        cell_response.plot_spikes_hist(spike_types={'ev':
+        net.plot_spikes_hist(spike_types={'ev':
                                        ['L2_basket', 'L2_b']},
                                        show=False)
 
     with pytest.raises(ValueError, match="No input types found for ABC"):
-        cell_response.plot_spikes_hist(spike_types='ABC', show=False)
+        net.plot_spikes_hist(spike_types='ABC', show=False)
 
     with pytest.raises(ValueError, match="tstart and tstop must be of type "
                        "int or float"):
-        cell_response.mean_rates(tstart=0.1, tstop='ABC',
+        net.mean_rates(tstart=0.1, tstop='ABC',
                                  gid_ranges=gid_ranges)
 
     with pytest.raises(ValueError, match="tstop must be greater than tstart"):
-        cell_response.mean_rates(tstart=0.1, tstop=-1.0, gid_ranges=gid_ranges)
+        net.mean_rates(tstart=0.1, tstop=-1.0, gid_ranges=gid_ranges)
 
     with pytest.raises(ValueError, match="Invalid mean_type. Valid "
                        "arguments include 'all', 'trial', or 'cell'."):
-        cell_response.mean_rates(tstart=tstart, tstop=tstop,
+        net.mean_rates(tstart=tstart, tstop=tstop,
                                  gid_ranges=gid_ranges, mean_type='ABC')
 
     test_rate = (1 / (tstop - tstart)) * 1000
 
-    assert cell_response.mean_rates(tstart, tstop, gid_ranges) == {
+    assert net.mean_rates(tstart, tstop, gid_ranges) == {
         'L5_pyramidal': test_rate / 2,
         'L5_basket': test_rate / 2,
         'L2_pyramidal': test_rate / 2,
         'L2_basket': test_rate / 2}
-    assert cell_response.mean_rates(tstart, tstop, gid_ranges,
+    assert net.mean_rates(tstart, tstop, gid_ranges,
                                     mean_type='trial') == {
         'L5_pyramidal': [0.0, test_rate],
         'L5_basket': [0.0, test_rate],
         'L2_pyramidal': [test_rate, 0.0],
         'L2_basket': [test_rate, 0.0]}
-    assert cell_response.mean_rates(tstart, tstop, gid_ranges,
+    assert net.mean_rates(tstart, tstop, gid_ranges,
                                     mean_type='cell') == {
         'L5_pyramidal': [[0.0], [test_rate]],
         'L5_basket': [[0.0], [test_rate]],
@@ -232,3 +183,35 @@ def test_cell_response(tmpdir):
                       'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
         cell_response = read_spikes(tmpdir.join('spk_*.txt'),
                                     gid_ranges=gid_ranges)
+
+
+def test_cell_response(tmpdir):
+    """Test CellResponse object."""
+
+    # Round-trip test
+    spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
+    gid = 1
+    cell_type = 'L2_pyramidal'
+    tstart, tstop = 0.1, 98.4
+    gid_ranges = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
+                  'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
+    cell_response = CellResponse(spike_times=spike_times,
+                                 gid=gid,
+                                 cell_type=cell_type)
+    assert cell_response == read_spikes(tmpdir.join('spk_*.txt'), gid_ranges)
+
+    assert ("CellResponse | 2 simulation trials" in repr(cell_response))
+
+    with pytest.raises(TypeError,
+                       match="spike_times should be a list of lists"):
+        cell_response = CellResponse(spike_times=([2.3456, 7.89],
+                                     [4.2812, 93.2]),
+                                     gid=gid, cell_type=cell_type)
+
+    with pytest.raises(TypeError,
+                       match="spike_times should be a list of lists"):
+        cell_response = CellResponse(spike_times=[1, 2], gid=gid,
+                                     cell_type=cell_type)
+
+    cell_response = CellResponse(spike_times=spike_times,
+                                 gid=gid, cell_type=cell_type)
