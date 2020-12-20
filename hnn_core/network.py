@@ -319,7 +319,7 @@ class Network(object):
         self.feed_times = feed_times
 
         # Add tonic inputs from param files
-        # do not tonic_inputs when called from dipole.py
+        # do not overwrite tonic_inputs when called from dipole.py
         if 'tonic' not in self.feed_times:
             self.feed_times['tonic'] = dict()
         for cell_type in ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']:

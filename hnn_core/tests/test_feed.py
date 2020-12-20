@@ -136,3 +136,5 @@ def test_tonic_inputs():
     net = hnn_core.Network(params)
     # smoke test for tonic inputs
     hnn_core.simulate_dipole(net)
+    assert 'tonic' in net.feed_times
+    assert 'L2Pyr' in net.feed_times['tonic']
