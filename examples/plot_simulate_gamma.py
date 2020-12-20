@@ -71,3 +71,11 @@ cbar_ax = fig.add_axes([0.85, 0.12, 0.03, 0.33])
 fig.colorbar(im, cax=cbar_ax)
 
 plt.show()
+
+###############################################################################
+# As a final exercise, let us try to re-run the simulation with tonic inputs
+# to the L5 Pyramidal cells.
+net.add_tonic_input(cell_type='L5Pyr', amplitude=6., t0=0, T=params['tstop'])
+dpls = simulate_dipole(net, n_trials=1)
+
+dpls[0].plot()
