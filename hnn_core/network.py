@@ -275,7 +275,11 @@ class Network(object):
 
         # reset if called again from dipole.py
         src_types = self.feedname_list
-        feed_times = {src_type: list() for src_type in src_types}
+        if hasattr(self, 'feed_times'):
+            feed_times = self.feed_times
+        else:
+            feed_times = dict()
+        feed_times.update({src_type: list() for src_type in src_types})
 
         cur_params = self.params.copy()  # these get mangled below!
         for trial_idx in range(n_trials):
@@ -315,7 +319,9 @@ class Network(object):
         self.feed_times = feed_times
 
         # Add tonic inputs from param files
-        self.feed_times['tonic'] = dict()
+        # do not tonic_inputs when called from dipole.py
+        if 'tonic' not in self.feed_times:
+            self.feed_times['tonic'] = dict()
         for cell_type in ['L2Basket', 'L5Basket', 'L2Pyr', 'L5Pyr']:
             is_tonic_present = [f'Itonic_{p}_{cell_type}_soma' in self.params
                                 for p in ['A', 't0', 'T']]
