@@ -84,7 +84,7 @@ def run_hnn_core_fixture():
         if reduced:
             params.update({'N_pyr_x': 3,
                            'N_pyr_y': 3,
-                           'tstop': 25,
+                           'tstop': 40,
                            't_evprox_1': 5,
                            't_evdist_1': 10,
                            't_evprox_2': 20,
