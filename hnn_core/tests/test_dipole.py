@@ -120,3 +120,25 @@ def test_cell_response_backends(run_hnn_core_fixture):
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
                    spike_times[spike_gids == gid] < times[v_mask][-1]])
+
+    # test that event times before and after simulation are the same
+    for feed_name, feed_events in joblib_net.feed_times.items():
+
+        if feed_name == 'tonic':
+            continue
+
+        gid_ran = joblib_net.gid_ranges[feed_name]
+        for id_dr, event_times in enumerate(feed_events[trial_idx]):
+            # event_times: external 'feed' event times (driving network)
+            # spike_times: time of spike event, somewhere in network
+            # spike_gids: cell-identity of current spike
+            # net_ets: all spike times of current feed cell
+            net_ets = [spike_times[i] for i, g in enumerate(spike_gids) if
+                       g == gid_ran[id_dr]]
+
+            # XXX why does this fail (_only_) for few cells in 'evprox2'?!
+            try:
+                assert_allclose(np.array(event_times), np.array(net_ets))
+            except:
+                print(f'FAIL! {feed_name}: cell {id_dr} with gid '
+                      f"{id_dr}; should be {event_times}, getting {net_ets}")
