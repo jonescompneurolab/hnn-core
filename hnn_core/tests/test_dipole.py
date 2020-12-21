@@ -141,4 +141,5 @@ def test_cell_response_backends(run_hnn_core_fixture):
                 assert_allclose(np.array(event_times), np.array(net_ets))
             except:
                 print(f'FAIL! {feed_name}: cell {id_dr} with gid '
-                      f"{id_dr}; should be {event_times}, getting {net_ets}")
+                      f"{gid_ran[id_dr]}; should be {event_times}, "
+                      f"getting {net_ets}")
