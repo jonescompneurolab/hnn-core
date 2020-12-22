@@ -137,7 +137,9 @@ def test_network(tmpdir):
     net.cell_response = cell_response
 
     net.write(tmpdir.join('spk_%d.txt'))
-    assert net.cell_response == read_spikes(tmpdir.join('spk_*.txt'), gid_ranges)
+    cell_response_read = read_spikes(tmpdir.join('spk_*.txt'), gid_ranges)
+    assert ("CellResponse | 2 simulation trials" in repr(cell_response[0]))
+    assert net.cell_response == cell_response_read
 
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
@@ -218,7 +220,7 @@ def test_cell_response(tmpdir):
   
     # assert cell_response == read_spikes(tmpdir.join('spk_*.txt'), gid_ranges)
 
-    assert ("CellResponse | 2 simulation trials" in repr(cell_response))
+    # assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
