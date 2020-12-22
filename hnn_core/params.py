@@ -106,6 +106,177 @@ def read_params(params_fname):
     return params
 
 
+def _long_name(short_name):
+    long_name = dict(L2Basket='L2_basket', L5Basket='L5_basket',
+                     L2Pyr='L2_pyramidal', L5Pyr='L5_pyramidal')
+    if short_name in long_name:
+        return long_name[short_name]
+    return short_name
+
+
+def _short_name(short_name):
+    long_name = dict(L2_basket='L2Basket', L5_basket='L5Basket',
+                     L2_pyramidal='L2Pyr', L5_pyramidal='L5Pyr')
+    if short_name in long_name:
+        return long_name[short_name]
+    return short_name
+
+
+def _extract_bias_specs_from_hnn_params(params, cellname_list):
+    """Create 'bias specification' dicts from saved parameters
+    """
+    bias_specs = {'tonic': {}}  # currently only 'tonic' biases known
+    for cellname in cellname_list:
+        short_name = _short_name(cellname)
+        is_tonic_present = [f'Itonic_{p}_{short_name}_soma' in
+                            params for p in ['A', 't0', 'T']]
+        if any(is_tonic_present):
+            if not all(is_tonic_present):
+                raise ValueError(
+                    f'Tonic input must have the amplitude, '
+                    f'start time and end time specified. One '
+                    f'or more parameter may be missing for '
+                    f'cell type {cellname}')
+            bias_specs['tonic'][cellname] = {
+                'amplitude': params[f'Itonic_A_{short_name}_soma'],
+                't0': params[f'Itonic_t0_{short_name}_soma'],
+                'T': params[f'Itonic_T_{short_name}_soma']
+            }
+    return bias_specs
+
+
+def _extract_drive_specs_from_hnn_params(params, cellname_list):
+    """Create 'drive specification' dicts from saved parameters
+    """
+    # convert legacy params-dict to legacy "feeds" dicts
+    p_common, p_unique = create_pext(params, params['tstop'])
+
+    # Using 'feed' for legacy compatibility, 'drives' for new API
+    drive_specs = {}
+    for ic, par in enumerate(p_common):
+        feed_name = f'bursty{ic + 1}'
+        drive = dict()
+        drive['type'] = 'bursty'
+        drive['cell_specific'] = False
+        drive['dynamics'] = {'distribution': par['distribution'],
+                             't0': par['t0'],
+                             'sigma_t0': par['t0_stdev'],
+                             'T': par['tstop'],
+                             'burst_f': par['f_input'],
+                             'burst_sigma_f': par['stdev'],
+                             'numspikes': par['events_per_cycle'],
+                             'repeats': par['repeats']}
+        drive['location'] = par['loc']
+        drive['space_constant'] = par['lamtha']
+        drive['seedcore'] = par['prng_seedcore']
+        drive['weights_ampa'] = {}
+        drive['weights_nmda'] = {}
+        drive['dispersion_time'] = {}
+
+        for cellname in cellname_list:
+            cname_ampa = _short_name(cellname) + '_ampa'
+            cname_nmda = _short_name(cellname) + '_nmda'
+            if cname_ampa in par:
+                ampa_w = par[cname_ampa][0]
+                ampa_d = par[cname_ampa][1]
+                if ampa_w > 0.:
+                    drive['weights_ampa'][cellname] = ampa_w
+
+                # NB dispersion time same for NMDA, read only for AMPA
+                drive['dispersion_time'][cellname] = ampa_d
+
+            if cname_nmda in par:
+                nmda_w = par[cname_nmda][0]
+                if nmda_w > 0.:
+                    drive['weights_nmda'][cellname] = nmda_w
+
+        drive_specs[feed_name] = drive
+
+    for feed_name, par in p_unique.items():
+        drive = dict()
+        drive['cell_specific'] = True
+        drive['weights_ampa'] = {}
+        drive['weights_nmda'] = {}
+        drive['dispersion_time'] = {}
+
+        if (feed_name.startswith('evprox') or
+                feed_name.startswith('evdist')):
+            drive['type'] = 'evoked'
+            if feed_name.startswith('evprox'):
+                drive['location'] = 'proximal'
+            else:
+                drive['location'] = 'distal'
+
+            if par['sync_evinput']:
+                sigma = 0.
+            else:
+                cell_keys_present = [key for key in par if
+                                     key in cellname_list]
+                sigma = par[cell_keys_present[0]][3]  # IID for all cells!
+
+            drive['dynamics'] = {'mu': par['t0'],
+                                 'sigma': sigma,
+                                 'numspikes': par['numspikes']}
+            drive['space_constant'] = par['lamtha']
+            drive['seedcore'] = par['prng_seedcore']
+            for cellname in cellname_list:
+                if cellname in par:
+                    ampa_w = par[cellname][0]
+                    nmda_w = par[cellname][1]
+                    dispersion_time = par[cellname][2]
+                    if ampa_w > 0.:
+                        drive['weights_ampa'][cellname] = ampa_w
+                    if nmda_w > 0.:
+                        drive['weights_nmda'][cellname] = nmda_w
+                    drive['dispersion_time'][cellname] = dispersion_time
+
+        elif feed_name.startswith('extgauss'):
+            drive['type'] = 'gaussian'
+            drive['location'] = par['loc']
+
+            drive['dynamics'] = {'mu': par['L2_basket'][3],  # NB IID
+                                 'sigma': par['L2_basket'][4],
+                                 'numspikes': 50}  # NB hard-coded in GUI!
+            drive['space_constant'] = par['lamtha']
+            drive['seedcore'] = par['prng_seedcore']
+
+            for cellname in cellname_list:
+                if cellname in par:
+                    ampa_w = par[cellname][0]
+                    dispersion_time = par[cellname][3]
+                    if ampa_w > 0.:
+                        drive['weights_ampa'][cellname] = ampa_w
+                    drive['dispersion_time'][cellname] = dispersion_time
+
+            drive['weights_nmda'] = {}  # no NMDA weights for Gaussians
+        elif feed_name.startswith('extpois'):
+            drive['type'] = 'poisson'
+            drive['location'] = par['loc']
+            drive['space_constant'] = par['lamtha']
+            drive['seedcore'] = par['prng_seedcore']
+
+            rate_params = {}
+            for cellname in cellname_list:
+                if cellname in par:
+                    rate_params[cellname] = par[cellname][3]
+                    ampa_w = par[cellname][0]
+                    nmda_w = par[cellname][1]
+                    dispersion_time = par[cellname][2]
+                    if ampa_w > 0.:
+                        drive['weights_ampa'][cellname] = ampa_w
+                    if nmda_w > 0.:
+                        drive['weights_nmda'][cellname] = nmda_w
+                    drive['dispersion_time'][cellname] = dispersion_time
+
+            # do NOT allow negative times
+            drive['dynamics'] = {'t0': max(0, par['t_interval'][0]),
+                                 'T': max(0, par['t_interval'][1]),
+                                 'rate_constants': rate_params}
+
+        drive_specs[feed_name] = drive
+    return drive_specs
+
+
 class Params(dict):
     """Params object.
 

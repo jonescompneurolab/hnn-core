@@ -10,8 +10,8 @@ import numpy as np
 from glob import glob
 
 from .feed import _drive_cell_event_times
-from .params import create_pext
-from .network_builder import _short_name  # XXX placement?!
+from .params import _extract_bias_specs_from_hnn_params
+from .params import _extract_drive_specs_from_hnn_params
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
@@ -143,7 +143,9 @@ class Network(object):
     params : dict
         The parameters to use for constructing the network.
     initialise_hnn_drives : bool
-        If True (default), attach and instantiate drives as in HNN-GUI
+        If True (default), add drives as in HNN-GUI (two global ("common")
+        bursty drives providing rhythmic drive, one distal and two proximal
+        evoked drives, one Gaussian and one Poisson background drive).
 
     Attributes
     ----------
@@ -163,12 +165,14 @@ class Network(object):
         or any external drive name
     cell_response : CellResponse
         An instance of the CellResponse object.
-    external_drives : dict of list
-        The parameters of external driving inputs to the network.
-    external_biases : dict of list
+    external_drives : dict of NetworkDrive
+        The external driving inputs to the network. Drives are added by
+        defining their spike-time dynamics, and their connectivity to the real
+        cells of the network. Event times are instantiated before simulation,
+        and are stored in each NetworkDrive['events'] (list of list; first
+        index for trials, second for event time lists for each drive cell).
+    external_biases : dict of dict (bias parameters for each cell type)
         The parameters of bias inputs to cell somata, e.g., tonic current clamp
-    drive_event_times : dict of list (trials) of list (cells) of list (times)
-        The event times of input drives (empty before initialised)
     """
 
     def __init__(self, params, initialise_hnn_drives=True):
@@ -182,7 +186,7 @@ class Network(object):
         # place to keep this information
         self.gid_ranges = dict()
         self._n_gids = 0  # utility: keep track of last GID
-        self._legacy_mode = initialise_hnn_drives  # for GID seeding
+        self._legacy_mode = True  # creates nc_dict-entries for ALL cell types
 
         # Create array of equally sampled time points for simulating currents
         # NB (only) used to initialise self.cell_response._times
@@ -215,8 +219,10 @@ class Network(object):
                            self.cellname_list)
 
         if initialise_hnn_drives:
-            drive_specs = self._extract_drive_specs_from_hnn_params()
-            bias_specs = self._extract_bias_specs_from_hnn_params()
+            drive_specs = _extract_drive_specs_from_hnn_params(
+                self.params, self.cellname_list)
+            bias_specs = _extract_bias_specs_from_hnn_params(
+                self.params, self.cellname_list)
 
             for drive_name in sorted(drive_specs.keys()):  # order matters
                 specs = drive_specs[drive_name]
@@ -269,7 +275,7 @@ class Network(object):
                     t0=bias_specs['tonic'][cellname]['t0'],
                     T=bias_specs['tonic'][cellname]['T'])
 
-            self.instantiate_drives(n_trials=self.params['N_trials'])
+            self._instantiate_drives(n_trials=self.params['N_trials'])
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -280,81 +286,97 @@ class Network(object):
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
 
-    def _create_drive_conns(self, target_populations, weights_by_receptor,
-                            location, space_constant, dispersion_time,
-                            cell_specific=True):
-        if isinstance(dispersion_time, dict):
-            for receptor in ['ampa', 'nmda']:
-                if not (
-                    set(list(weights_by_receptor[receptor].keys())).issubset(
-                        set(list(dispersion_time.keys())))):
-                    raise ValueError(
-                        'dispersion_time is either common (float), or needs '
-                        'to be specified for each cell type')
-
-        drive_conn_by_cell = dict()
-        src_gid_ran_begin = self._n_gids
-        # XXX this if-else block can no doubt be simplified & unified!
-        if cell_specific:
-            for cellname in target_populations:
-                drive_conn = dict()
-                drive_conn['trg_gids'] = self.gid_ranges[cellname]
-                # NB list! This is used later in _parnet_connect
-                drive_conn['target_type'] = cellname
-                drive_conn['src_gids'] = range(
-                    self._n_gids, self._n_gids + len(drive_conn['trg_gids']))
-                self._n_gids += len(drive_conn['trg_gids'])
-                drive_conn['location'] = location
-
-                for receptor, weights in weights_by_receptor.items():
-                    drive_conn[receptor] = dict()
-                    if cellname in weights:
-                        drive_conn[receptor]['lamtha'] = space_constant
-                        if isinstance(dispersion_time, float):
-                            drive_conn[receptor]['A_delay'] = dispersion_time
-                        else:
-                            drive_conn[receptor][
-                                'A_delay'] = dispersion_time[cellname]
-                        drive_conn[receptor][
-                            'A_weight'] = weights[cellname]
-
-                drive_conn_by_cell[cellname] = drive_conn
-        else:
-            drive_conn = dict()
-
-            # NB list! This is used later in _parnet_connect
-            drive_conn['src_gids'] = [self._n_gids]
-            self._n_gids += 1
-            drive_conn['location'] = location
-
-            drive_conn['trg_gids'] = []  # fill in below
-            for cellname in target_populations:
-                drive_conn['trg_gids'].extend(self.gid_ranges[cellname])
-                drive_conn['target_type'] = cellname
-
-                for receptor, weights in weights_by_receptor.items():
-                    drive_conn[receptor] = dict()
-                    if cellname in weights:
-                        drive_conn[receptor]['lamtha'] = space_constant
-                        if isinstance(dispersion_time, float):
-                            drive_conn[receptor]['A_delay'] = dispersion_time
-                        else:
-                            drive_conn[receptor][
-                                'A_delay'] = dispersion_time[cellname]
-                        drive_conn[receptor][
-                            'A_weight'] = weights[cellname]
-                drive_conn_by_cell[cellname] = drive_conn
-
-        return drive_conn_by_cell, range(src_gid_ran_begin, self._n_gids)
-
     def add_evoked_drive(self, name, mu, sigma, numspikes, weights_ampa,
                          weights_nmda, location, space_constant=3.,
-                         dispersion_time=0.1, seedcore=None):
+                         dispersion_time=0.1, seedcore=42):
+        """Add an 'evoked' external drive to the network
+
+        Parameters
+        ----------
+        name : str
+            Unique name for drive
+        mu : float
+            Mean of Gaussian event time distribution (across target cells)
+        sigma : float
+            Standard deviation of event time distribution (across target cells)
+            Set to zero for "synchronous" evoked drive.
+        numspikes : int
+            Number of spikes at each target cell
+        weights_ampa : dict
+            Synaptic weights of AMPA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        weights_nmda : dict
+            Synaptic weights of NMDA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        location : str
+            Target location of synapses ('distal' or 'proximal')
+        space_constant : float
+            Describes lateral dispersion (from column origin) of synaptic
+            delays within the simulated column
+        dispersion_time : float or dict
+            Synaptic delay at the column origin, dispersed laterally as a
+            function of the space_constant. If float, applies to all target
+            cell types. Use dict, to create dispersion->cell mapping.
+        seedcore : int
+            Optional initial seed for random number generator (default: 42).
+            Each artificial drive cell has seed = seedcore + gid
         """
+        self._add_evoked_or_gaussian_drive(
+            'evoked', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
+            location, space_constant=space_constant,
+            dispersion_time=dispersion_time, seedcore=seedcore)
+
+    def add_gaussian_drive(self, name, mu, sigma, numspikes, weights_ampa,
+                           weights_nmda, location, space_constant=100.,
+                           dispersion_time=0.1, seedcore=42):
+        """Add an 'evoked' external drive to the network
+
+        Parameters
+        ----------
+        name : str
+            Unique name for drive
+        mu : float
+            Mean of Gaussian event time distribution (across target cells)
+        sigma : float
+            Standard deviation of event time distribution (across target cells)
+        numspikes : int
+            Number of spikes at each target cell
+        weights_ampa : dict
+            Synaptic weights of AMPA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        weights_nmda : dict
+            Synaptic weights of NMDA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        location : str
+            Target location of synapses ('distal' or 'proximal')
+        space_constant : float
+            Describes lateral dispersion (from column origin) of synaptic
+            delays within the simulated column
+        dispersion_time : float or dict
+            Synaptic delay at the column origin, dispersed laterally as a
+            function of the space_constant. If float, applies to all target
+            cell types. Use dict, to create dispersion->cell mapping.
+        seedcore : int
+            Optional initial seed for random number generator (default: 42).
+            Each artificial drive cell has seed = seedcore + gid
         """
-        # CHECK name not exists!
+        self._add_evoked_or_gaussian_drive(
+            'gaussian', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
+            location, space_constant=space_constant,
+            dispersion_time=dispersion_time, seedcore=seedcore)
+
+    def _add_evoked_or_gaussian_drive(
+        self, dtype, name, mu, sigma, numspikes, weights_ampa, weights_nmda,
+            location, space_constant, dispersion_time, seedcore):
+        """Utility function for gaussian-type drives
+        """
+        if sigma < 0.:
+            raise ValueError('Standard deviation cannot be negative')
+        if not numspikes > 0:
+            raise ValueError('Number of spikes must be greater than zero')
+
         drive = NetworkDrive()
-        drive['type'] = 'evoked'
+        drive['type'] = dtype
         drive['cell_specific'] = True
         drive['seedcore'] = seedcore
 
@@ -366,11 +388,55 @@ class Network(object):
 
     def add_poisson_drive(self, name, t0, T, rate_constants, weights_ampa,
                           weights_nmda, location, space_constant=100.,
-                          dispersion_time=0.1, seedcore=None):
+                          dispersion_time=0.1, seedcore=42):
+        """Add a Poisson-distributed external drive to the network
+
+        Parameters
+        ----------
+        name : str
+            Unique name for drive
+        t0 : float
+            Start time of Poisson-distributed spike train
+        T : float
+            End time of spike train
+        rate_constants : dict of floats
+            Rate constant (lambda) of renewal-process generating the samples.
+            Dict keys are the cell names targeted.
+        weights_ampa : dict
+            Synaptic weights of AMPA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        weights_nmda : dict
+            Synaptic weights of NMDA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        location : str
+            Target location of synapses ('distal' or 'proximal')
+        space_constant : float
+            Describes lateral dispersion (from column origin) of synaptic
+            delays within the simulated column
+        dispersion_time : float or dict
+            Synaptic delay at the column origin, dispersed laterally as a
+            function of the space_constant. If float, applies to all target
+            cell types. Use dict, to create dispersion->cell mapping.
+        seedcore : int
+            Optional initial seed for random number generator (default: 42).
+            Each artificial drive cell has seed = seedcore + gid
         """
-        """
-        # CHECK name not exists!
-        # CHECK rate_constants == dict
+        if T < 0.:
+            raise ValueError('End time of Poisson input cannot be negative')
+        tstop = self.cell_response.times[-1]
+        if T > tstop:
+            raise ValueError(f'End time of Poisson drive cannot exceed '
+                             f'simulation end time {tstop}. Got {T}.')
+        duration = T - t0
+        if duration < 0.:
+            raise ValueError('Duration of Poisson drive cannot be negative')
+
+        if not isinstance(rate_constants, dict):
+            raise ValueError('rate_constants must be a dict of floats')
+        if not set(rate_constants.keys()).issubset(self.cellname_list):
+            raise ValueError(
+                f"Rate constants should be defined for {self.cellname_list}. "
+                f"Got {list(rate_constants.keys())}")
 
         drive = NetworkDrive()
         drive['type'] = 'poisson'
@@ -382,31 +448,55 @@ class Network(object):
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, dispersion_time)
 
-    def add_gaussian_drive(self, name, mu, sigma, numspikes, weights_ampa,
-                           weights_nmda, location, space_constant=100.,
-                           dispersion_time=0.1, seedcore=None):
-        """
-        """
-        # CHECK name not exists!
-
-        drive = NetworkDrive()
-        drive['type'] = 'gaussian'
-        drive['cell_specific'] = True
-        drive['seedcore'] = seedcore
-
-        drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
-        drive['events'] = []
-
-        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant, dispersion_time)
-
     def add_bursty_drive(self, name, distribution, t0, sigma_t0, T, burst_f,
                          burst_sigma_f, numspikes, repeats, weights_ampa,
                          weights_nmda, location, dispersion_time=0.1,
-                         space_constant=100., seedcore=None):
+                         space_constant=100., seedcore=42):
+        """Add a bursty (rhythmic) external drive to all cells of the network
+
+        Parameters
+        ----------
+        name : str
+            Unique name for drive
+        distribution : str
+            The distribution for each burst. Either 'normal' or 'uniform'.
+        t0 : float
+            Start time of the burst trains
+        sigma_t0 : float
+            If greater than 0 randomize start times with standard deviation
+            sigma_t0.
+        T : float
+            End of burst trains
+        burst_f : float
+            The frequency of input bursts.
+        burst_sigma_f : float
+            The standard deviation of spike times within burst. Only applied
+            to 'normal' distribution.
+        numspikes : int
+            The events per cycle. Must be 1 or 2. If it is 2, then
+            return doublets 10 ms apart. This is the spikes/burst
+            parameter in GUI.
+        repeats : int
+            The number of repeats.
+        weights_ampa : dict
+            Synaptic weights of AMPA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        weights_nmda : dict
+            Synaptic weights of NMDA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        location : str
+            Target location of synapses ('distal' or 'proximal')
+        space_constant : float
+            Describes lateral dispersion (from column origin) of synaptic
+            delays within the simulated column
+        dispersion_time : float or dict
+            Synaptic delay at the column origin, dispersed laterally as a
+            function of the space_constant. If float, applies to all target
+            cell types. Use dict, to create dispersion->cell mapping.
+        seedcore : int
+            Optional initial seed for random number generator (default: 42).
+            Each artificial drive cell has seed = seedcore + gid
         """
-        """
-        # CHECK name not exists!
 
         drive = NetworkDrive()
         drive['type'] = 'bursty'
@@ -426,8 +516,37 @@ class Network(object):
 
     def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
                       space_constant, dispersion_time, cell_specific=True):
-        # CHECKS
+        """Attach a drive to network based on connectivity information
 
+        Parameters
+        ----------
+        name : str
+            Name of drive (must be unique)
+        drive : instance of NetworkDrive
+            Collection of parameters defining the dynamics of the drive
+        weights_ampa : dict
+            Synaptic weights of AMPA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        weights_nmda : dict
+            Synaptic weights of NMDA receptors on each targeted cell type
+            (keys). Weights can be zero or left omitted.
+        location : str
+            Target location of synapses ('distal' or 'proximal')
+        space_constant : float
+            Describes lateral dispersion (from column origin) of synaptic
+            delays within the simulated column
+        dispersion_time : dict
+            Synaptic delay at the column origin, dispersed laterally as a
+            function of the space_constant
+        cell_specific : bool
+            Whether each cell has unique connection parameters (default: True)
+            or all cells have common connections to a global (single) drive.
+
+        Attached drive is stored in self.external_drives[name]
+        self.pos_dict is updated, and self._update_gid_ranges() called
+        """
+        if name in self.external_drives:
+            raise ValueError(f"Drive {name} already defined")
         target_populations = (set(weights_ampa.keys()) |
                               set(weights_nmda.keys()))
         if not target_populations.issubset(set(self.cellname_list)):
@@ -458,7 +577,120 @@ class Network(object):
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
-    def instantiate_drives(self, n_trials=1):
+    def _create_drive_conns(self, target_populations, weights_by_receptor,
+                            location, space_constant, dispersion_time,
+                            cell_specific=True):
+        """Create parameter dictionary defining how drive connects to network
+
+        Parameters
+        ----------
+        target_populations : list
+            Cell names/types to attach the drive to
+        weights_by_receptor : dict (keys: 'ampa' and 'nmda')
+            Synaptic weights for each receptor type
+        location : str
+            Target location of synapses ('distal' or 'proximal')
+        space_constant : float
+            Describes lateral dispersion (from column origin) of synaptic
+            delays within the simulated column
+        dispersion_time : dict
+            Synaptic delay at the column origin, dispersed laterally as a
+            function of the space_constant
+        cell_specific : bool
+            Whether each cell has unique connection parameters (default: True)
+            or all cells have common connections to a global (single) drive.
+
+        Returns
+        -------
+        drive_conn_by_cell : dict
+            Keys are target_populations, each item is itself a dict with keys
+            relevant to how the drive connects to the rest of the network.
+        src_gid_ran : range
+            For convenience, return back the range of GIDs associated with
+            all the driving units (they become _ArtificialCell's later)
+
+        Note
+        ----
+        drive_conn : dict
+            'target_gids': range of target cell GIDs
+            'target_type': target cell type (e.g. 'L2_basket')
+            'src_gids': range of source (artificial) cell GIDs
+            'location': 'distal' or 'proximal'
+            'ampa' and 'nmda': dict
+                'A_weight': synaptic weight
+                'A_delay': dispersion time (used with space constant)
+                'lamtha': space constant
+        """
+        if isinstance(dispersion_time, dict):
+            for receptor in ['ampa', 'nmda']:
+                if not (
+                    set(list(weights_by_receptor[receptor].keys())).issubset(
+                        set(list(dispersion_time.keys())))):
+                    raise ValueError(
+                        'dispersion_time is either common (float), or needs '
+                        'to be specified for each cell type')
+
+        drive_conn_by_cell = dict()
+        src_gid_ran_begin = self._n_gids
+
+        # Here be Dragons! It's tempting to try to refactor this to remove the
+        # duplication of the innermost for-loop, but a drive_conn must be
+        # created for every target population separately (cell_specific) or
+        # (global drive) a single drive_conn contains all target populations
+        if cell_specific:
+            for cellname in target_populations:
+                drive_conn = dict()  # NB created inside target_pop-loop
+                drive_conn['target_gids'] = self.gid_ranges[cellname]
+                # NB list! This is used later in _parnet_connect
+                drive_conn['target_type'] = cellname
+                drive_conn['src_gids'] = range(
+                    self._n_gids,
+                    self._n_gids + len(drive_conn['target_gids']))
+                self._n_gids += len(drive_conn['target_gids'])
+                drive_conn['location'] = location
+
+                for receptor, weights in weights_by_receptor.items():
+                    drive_conn[receptor] = dict()
+                    if cellname in weights:
+                        drive_conn[receptor]['lamtha'] = space_constant
+                        if isinstance(dispersion_time, float):
+                            drive_conn[receptor]['A_delay'] = dispersion_time
+                        else:
+                            drive_conn[receptor][
+                                'A_delay'] = dispersion_time[cellname]
+                        drive_conn[receptor][
+                            'A_weight'] = weights[cellname]
+
+                drive_conn_by_cell[cellname] = drive_conn
+        else:
+            drive_conn = dict()
+
+            # NB list! This is used later in _parnet_connect
+            drive_conn['src_gids'] = [self._n_gids]
+            self._n_gids += 1
+            drive_conn['location'] = location
+
+            drive_conn['target_gids'] = []  # fill in below
+            for cellname in target_populations:
+                drive_conn['target_gids'].extend(self.gid_ranges[cellname])
+                drive_conn['target_type'] = cellname
+
+                for receptor, weights in weights_by_receptor.items():
+                    drive_conn[receptor] = dict()
+                    if cellname in weights:
+                        drive_conn[receptor]['lamtha'] = space_constant
+                        if isinstance(dispersion_time, float):
+                            drive_conn[receptor]['A_delay'] = dispersion_time
+                        else:
+                            drive_conn[receptor][
+                                'A_delay'] = dispersion_time[cellname]
+                        drive_conn[receptor][
+                            'A_weight'] = weights[cellname]
+                drive_conn_by_cell[cellname] = drive_conn
+
+        return drive_conn_by_cell, range(src_gid_ran_begin, self._n_gids)
+
+    def _instantiate_drives(self, n_trials=1):
         """Creates drive_event_times vectors for all drives and all trials
 
         Parameters
@@ -567,158 +799,6 @@ class Network(object):
 
         return src_type, src_pos, src_type in self.cellname_list
 
-    def _extract_bias_specs_from_hnn_params(self):
-        """Create 'bias specification' dicts from saved parameters
-        """
-        bias_specs = {'tonic': {}}  # currently only 'tonic' biases known
-        for cellname in self.cellname_list:
-            short_name = _short_name(cellname)
-            is_tonic_present = [f'Itonic_{p}_{short_name}_soma' in
-                                self.params for p in ['A', 't0', 'T']]
-            if any(is_tonic_present):
-                if not all(is_tonic_present):
-                    raise ValueError(
-                        f'Tonic input must have the amplitude, '
-                        f'start time and end time specified. One '
-                        f'or more parameter may be missing for '
-                        f'cell type {cellname}')
-                bias_specs['tonic'][cellname] = {
-                    'amplitude': self.params[f'Itonic_A_{short_name}_soma'],
-                    't0': self.params[f'Itonic_t0_{short_name}_soma'],
-                    'T': self.params[f'Itonic_T_{short_name}_soma']
-                }
-        return(bias_specs)
-
-    def _extract_drive_specs_from_hnn_params(self):
-        """Create 'drive specification' dicts from saved parameters
-        """
-        # convert legacy params-dict to legacy "feeds" dicts
-        p_common, p_unique = create_pext(self.params, self.params['tstop'])
-
-        # Using 'feed' for legacy compatibility, 'drives' for new API
-        drive_specs = {}
-        for ic, par in enumerate(p_common):
-            feed_name = f'bursty{ic + 1}'
-            drive = dict()
-            drive['type'] = 'bursty'
-            drive['cell_specific'] = False
-            drive['dynamics'] = {'distribution': par['distribution'],
-                                 't0': par['t0'],
-                                 'sigma_t0': par['t0_stdev'],
-                                 'T': par['tstop'],
-                                 'burst_f': par['f_input'],
-                                 'burst_sigma_f': par['stdev'],
-                                 'numspikes': par['events_per_cycle'],
-                                 'repeats': par['repeats']}
-            drive['location'] = par['loc']
-            drive['space_constant'] = par['lamtha']
-            drive['seedcore'] = par['prng_seedcore']
-            drive['weights_ampa'] = {}
-            drive['weights_nmda'] = {}
-            drive['dispersion_time'] = {}
-
-            for cellname in self.cellname_list:
-                cname_ampa = _short_name(cellname) + '_ampa'
-                cname_nmda = _short_name(cellname) + '_nmda'
-                if cname_ampa in par:
-                    ampa_w = par[cname_ampa][0]
-                    ampa_d = par[cname_ampa][1]
-                    if ampa_w > 0.:
-                        drive['weights_ampa'][cellname] = ampa_w
-
-                    # NB dispersion time same for NMDA, read only for AMPA
-                    drive['dispersion_time'][cellname] = ampa_d
-
-                if cname_nmda in par:
-                    nmda_w = par[cname_nmda][0]
-                    if nmda_w > 0.:
-                        drive['weights_nmda'][cellname] = nmda_w
-
-            drive_specs[feed_name] = drive
-
-        for feed_name, par in p_unique.items():
-            drive = dict()
-            drive['cell_specific'] = True
-            drive['weights_ampa'] = {}
-            drive['weights_nmda'] = {}
-            drive['dispersion_time'] = {}
-
-            if (feed_name.startswith('evprox') or
-                    feed_name.startswith('evdist')):
-                drive['type'] = 'evoked'
-                if feed_name.startswith('evprox'):
-                    drive['location'] = 'proximal'
-                else:
-                    drive['location'] = 'distal'
-
-                if par['sync_evinput']:
-                    sigma = 0.
-                else:
-                    cell_keys_present = [key for key in par
-                                         if key in self.cellname_list]
-                    sigma = par[cell_keys_present[0]][3]  # IID for all cells!
-
-                drive['dynamics'] = {'mu': par['t0'],
-                                     'sigma': sigma,
-                                     'numspikes': par['numspikes']}
-                drive['space_constant'] = par['lamtha']
-                drive['seedcore'] = par['prng_seedcore']
-                for cellname in self.cellname_list:
-                    if cellname in par:
-                        ampa_w = par[cellname][0]
-                        nmda_w = par[cellname][1]
-                        dispersion_time = par[cellname][2]
-                        if ampa_w > 0.:
-                            drive['weights_ampa'][cellname] = ampa_w
-                        if nmda_w > 0.:
-                            drive['weights_nmda'][cellname] = nmda_w
-                        drive['dispersion_time'][cellname] = dispersion_time
-
-            elif feed_name.startswith('extgauss'):
-                drive['type'] = 'gaussian'
-                drive['location'] = par['loc']
-
-                drive['dynamics'] = {'mu': par['L2_basket'][3],  # NB IID
-                                     'sigma': par['L2_basket'][4],
-                                     'numspikes': 50}  # NB hard-coded in GUI!
-                drive['space_constant'] = par['lamtha']
-                drive['seedcore'] = par['prng_seedcore']
-
-                for cellname in self.cellname_list:
-                    if cellname in par:
-                        ampa_w = par[cellname][0]
-                        dispersion_time = par[cellname][3]
-                        if ampa_w > 0.:
-                            drive['weights_ampa'][cellname] = ampa_w
-                        drive['dispersion_time'][cellname] = dispersion_time
-
-                drive['weights_nmda'] = {}  # no NMDA weights for Gaussians
-            elif feed_name.startswith('extpois'):
-                drive['type'] = 'poisson'
-                drive['location'] = par['loc']
-                drive['space_constant'] = par['lamtha']
-                drive['seedcore'] = par['prng_seedcore']
-
-                rate_params = {}
-                for cellname in self.cellname_list:
-                    if cellname in par:
-                        rate_params[cellname] = par[cellname][3]
-                        ampa_w = par[cellname][0]
-                        nmda_w = par[cellname][1]
-                        dispersion_time = par[cellname][2]
-                        if ampa_w > 0.:
-                            drive['weights_ampa'][cellname] = ampa_w
-                        if nmda_w > 0.:
-                            drive['weights_nmda'][cellname] = nmda_w
-                        drive['dispersion_time'][cellname] = dispersion_time
-
-                drive['dynamics'] = {'t0': par['t_interval'][0],
-                                     'T': par['t_interval'][1],
-                                     'rate_constants': rate_params}
-
-            drive_specs[feed_name] = drive
-        return(drive_specs)
-
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
 
@@ -739,15 +819,17 @@ class Network(object):
 
 
 class NetworkDrive(dict):
-    """Foo
+    """A class for containing the parameters of external drives
     """
+    # XXX description of all possible (allowed) keys missing for NetworkDrive
 
+    # add methods for plotting and statistics
     def __repr__(self):
         entr = '<NetworkDrive'
         if 'type' in self.keys():
             entr += f" of type {self['type']}"
         entr += '>'
-        return(entr)
+        return entr
 
 
 class CellResponse(object):

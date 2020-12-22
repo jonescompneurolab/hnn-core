@@ -10,6 +10,7 @@ from neuron import h
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
+from .params import _long_name
 
 # a few globals
 _PC = None
@@ -206,22 +207,6 @@ def _create_parallel_context(n_cores=None):
         _PC.done()
 
 
-def _long_name(short_name):
-    long_name = dict(L2Basket='L2_basket', L5Basket='L5_basket',
-                     L2Pyr='L2_pyramidal', L5Pyr='L5_pyramidal')
-    if short_name in long_name:
-        return long_name[short_name]
-    return short_name
-
-
-def _short_name(short_name):
-    long_name = dict(L2_basket='L2Basket', L5_basket='L5Basket',
-                     L2_pyramidal='L2Pyr', L5_pyramidal='L5Pyr')
-    if short_name in long_name:
-        return long_name[short_name]
-    return short_name
-
-
 class NetworkBuilder(object):
     """The NetworkBuilder class.
 
@@ -366,9 +351,9 @@ class NetworkBuilder(object):
         # exists in _gid_list. "Global" drives get placed on different ranks
         for drive in self.net.external_drives.values():
             for conn in drive['conn'].values():  # all cell types
-                for src_gid, trg_gid in zip(conn['src_gids'],
-                                            conn['trg_gids']):
-                    if (trg_gid in self._gid_list and
+                for src_gid, target_gid in zip(conn['src_gids'],
+                                            conn['target_gids']):
+                    if (target_gid in self._gid_list and
                             src_gid not in self._gid_list):
                         _PC.set_gid2node(src_gid, rank)
                         self._gid_list.append(src_gid)

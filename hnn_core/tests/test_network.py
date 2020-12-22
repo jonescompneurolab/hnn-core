@@ -85,6 +85,31 @@ def test_network():
             assert_allclose(net.external_drives[drive_name]['events'][0][idx],
                             target_times[drive_name][idx], rtol=1e-12)
 
+    # check select AMPA weights
+    target_weights = {'evdist1': {'L2_basket': 0.006562,
+                                  'L5_pyramidal': 0.142300},
+                      'evprox1': {'L2_basket': 0.08831,
+                                  'L5_pyramidal': 0.00865},
+                      'evprox2': {'L2_basket': 0.000003,
+                                  'L5_pyramidal': 0.684013}}
+    for drive_name in target_weights:
+        for cellname in target_weights[drive_name]:
+            assert_allclose(
+                net.external_drives[
+                    drive_name]['conn'][cellname]['ampa']['A_weight'],
+                target_weights[drive_name][cellname], rtol=1e-12)
+
+    # check select dispersion times
+    target_dispersions = {'evdist1': {'L2_basket': 0.1, 'L5_pyramidal': 0.1},
+                          'evprox1': {'L2_basket': 0.1, 'L5_pyramidal': 1.},
+                          'evprox2': {'L2_basket': 0.1, 'L5_pyramidal': 1.}}
+    for drive_name in target_dispersions:
+        for cellname in target_dispersions[drive_name]:
+            assert_allclose(
+                net.external_drives[
+                    drive_name]['conn'][cellname]['ampa']['A_delay'],
+                target_dispersions[drive_name][cellname], rtol=1e-12)
+
     # Assert that an empty CellResponse object is created as an attribute
     assert net.cell_response == CellResponse()
     # array of simulation times is created in Network.__init__, but passed
