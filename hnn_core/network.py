@@ -55,17 +55,20 @@ def read_spikes(fname, gid_ranges=None):
     all_spike_gids = np.array(sum(spike_gids, []))
     all_spike_types = np.array(sum(spike_types, []))
     gid_list = np.unique(all_spike_gids)
-        
+
     if gid_ranges is not None:
         validate_gid_ranges(gid_ranges)
         cell_response = []
         for cell_type, gid_range in gid_ranges.items():
-            if cell_type in ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']:
+            if cell_type in ['L2_basket', 'L2_pyramidal',
+                             'L5_basket', 'L5_pyramidal']:
                 for gid in gid_range:
-                    cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
+                    cell_response.append(CellResponse(gid=gid,
+                                                      cell_type=cell_type))
 
     else:
-        cell_response = [CellResponse(gid=gid) for gid in range(np.max(gid_list))]
+        cell_response = [CellResponse(gid=gid) for
+                         gid in range(np.max(gid_list))]
         for gid in gid_list:
             cell_type_idx = np.where(all_spike_gids == gid)[0]
             cell_response[gid].cell_type = all_spike_types[cell_type_idx]
@@ -78,6 +81,7 @@ def read_spikes(fname, gid_ranges=None):
             cell_response[gid].spike_times.append(gid_spike_times)
 
     return cell_response
+
 
 def validate_gid_ranges(gid_ranges):
     """Check for non-overlapping gid ranges.
@@ -96,8 +100,9 @@ def validate_gid_ranges(gid_ranges):
             gid_set_2 = set(all_gid_ranges[item_idx_2])
             if not gid_set_1.isdisjoint(gid_set_2):
                 raise ValueError('gid_ranges should contain only disjoint '
-                                    'sets of gid values')
+                                 'sets of gid values')
     return
+
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     """Creates coordinate grid and place cells in it.
@@ -229,7 +234,8 @@ class Network(object):
 
         # Create array of equally sampled time points for simulating currents
         # NB (only) used to initialise self.cell_response._times
-        self.times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
+        self.times = np.arange(0., params['tstop'] + params['dt'],
+                               params['dt'])
         # Create CellResponse object, initialised with simulation time points
         self.cell_response = list()
         self._spike_times = list()

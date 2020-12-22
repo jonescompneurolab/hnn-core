@@ -47,7 +47,8 @@ def test_network(tmpdir):
     for cell_type, gid_range in net.gid_ranges.items():
         if cell_type in net.cellname_list:
             for gid in gid_range:
-                cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
+                cell_response.append(CellResponse(gid=gid,
+                                                  cell_type=cell_type))
     assert net.cell_response == cell_response
 
     # array of simulation times is created in Network.__init__, but passed
@@ -126,12 +127,13 @@ def test_network(tmpdir):
     for cell_type, gid_range in gid_ranges.items():
         for gid in gid_range:
             cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
-            
+
     for trial in range(len(net._spike_times)):
         for cell_resp in cell_response:
             gid = cell_resp.gid
             gid_mask = np.array(net._spike_gids[trial]) == gid
-            gid_spike_times = np.array(net._spike_times)[trial][gid_mask].tolist()
+            gid_spike_times = np.array(
+                net._spike_times)[trial][gid_mask].tolist()
             cell_response[gid].spike_times.append(gid_spike_times)
 
     net.cell_response = cell_response
@@ -153,8 +155,7 @@ def test_network(tmpdir):
                        r" mutually exclusive input types\. L2_basket is found"
                        r" more than once\."):
         net.plot_spikes_hist(spike_types={'ev':
-                                       ['L2_basket', 'L2_b']},
-                                       show=False)
+                             ['L2_basket', 'L2_b']}, show=False)
 
     with pytest.raises(ValueError, match="No input types found for ABC"):
         net.plot_spikes_hist(spike_types='ABC', show=False)
@@ -162,7 +163,7 @@ def test_network(tmpdir):
     with pytest.raises(ValueError, match="tstart and tstop must be of type "
                        "int or float"):
         net.mean_rates(tstart=0.1, tstop='ABC',
-                                 gid_ranges=gid_ranges)
+                       gid_ranges=gid_ranges)
 
     with pytest.raises(ValueError, match="tstop must be greater than tstart"):
         net.mean_rates(tstart=0.1, tstop=-1.0, gid_ranges=gid_ranges)
@@ -170,7 +171,7 @@ def test_network(tmpdir):
     with pytest.raises(ValueError, match="Invalid mean_type. Valid "
                        "arguments include 'all', 'trial', or 'cell'."):
         net.mean_rates(tstart=tstart, tstop=tstop,
-                                 gid_ranges=gid_ranges, mean_type='ABC')
+                       gid_ranges=gid_ranges, mean_type='ABC')
 
     test_rate = (1 / (tstop - tstart)) * 1000
 
@@ -180,13 +181,13 @@ def test_network(tmpdir):
         'L2_pyramidal': test_rate / 4,
         'L2_basket': test_rate / 4}
     assert net.mean_rates(tstart, tstop, gid_ranges,
-                                    mean_type='trial') == {
+                          mean_type='trial') == {
         'L5_pyramidal': [0.0, test_rate / 2],
         'L5_basket': [0.0, test_rate / 2],
         'L2_pyramidal': [test_rate / 2, 0.0],
         'L2_basket': [test_rate / 2, 0.0]}
     assert net.mean_rates(tstart, tstop, gid_ranges,
-                                    mean_type='cell') == {
+                          mean_type='cell') == {
         'L5_pyramidal': [[0.0, 0.0], [0.0, test_rate]],
         'L5_basket': [[0.0, 0.0], [0.0, test_rate]],
         'L2_pyramidal': [[0.0, test_rate], [0.0, 0.0]],
@@ -212,26 +213,14 @@ def test_cell_response(tmpdir):
     """Test CellResponse object."""
 
     # Round-trip test
-    # spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
-    # gid = 1
-    # cell_type = 'L2_pyramidal'
-    # gid_ranges = {'L2_pyramidal': range(0, 2), 'L2_basket': range(2, 4),
-    #               'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
-  
-    # assert cell_response == read_spikes(tmpdir.join('spk_*.txt'), gid_ranges)
-
-    # assert ("CellResponse | 2 simulation trials" in repr(cell_response))
+    gid = 1
+    cell_type = 'L2_pyramidal'
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
-        cell_response = CellResponse(spike_times=([2.3456, 7.89],
-                                     [4.2812, 93.2]),
-                                     gid=gid, cell_type=cell_type)
+        CellResponse(spike_times=([2.3456, 7.89], [4.2812, 93.2]),
+                     gid=gid, cell_type=cell_type)
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
-        cell_response = CellResponse(spike_times=[1, 2], gid=gid,
-                                     cell_type=cell_type)
-
-    cell_response = CellResponse(spike_times=spike_times,
-                                 gid=gid, cell_type=cell_type)
+        CellResponse(spike_times=[1, 2], gid=gid, cell_type=cell_type)
