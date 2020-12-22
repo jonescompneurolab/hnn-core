@@ -173,22 +173,22 @@ def test_network(tmpdir):
     test_rate = (1 / (tstop - tstart)) * 1000
 
     assert net.mean_rates(tstart, tstop, gid_ranges) == {
-        'L5_pyramidal': test_rate / 2,
-        'L5_basket': test_rate / 2,
-        'L2_pyramidal': test_rate / 2,
-        'L2_basket': test_rate / 2}
+        'L5_pyramidal': test_rate / 4,
+        'L5_basket': test_rate / 4,
+        'L2_pyramidal': test_rate / 4,
+        'L2_basket': test_rate / 4}
     assert net.mean_rates(tstart, tstop, gid_ranges,
                                     mean_type='trial') == {
-        'L5_pyramidal': [0.0, test_rate],
-        'L5_basket': [0.0, test_rate],
-        'L2_pyramidal': [test_rate, 0.0],
-        'L2_basket': [test_rate, 0.0]}
+        'L5_pyramidal': [0.0, test_rate / 2],
+        'L5_basket': [0.0, test_rate / 2],
+        'L2_pyramidal': [test_rate / 2, 0.0],
+        'L2_basket': [test_rate / 2, 0.0]}
     assert net.mean_rates(tstart, tstop, gid_ranges,
                                     mean_type='cell') == {
-        'L5_pyramidal': [[0.0], [test_rate]],
-        'L5_basket': [[0.0], [test_rate]],
-        'L2_pyramidal': [[test_rate], [0.0]],
-        'L2_basket': [[test_rate], [0.0]]}
+        'L5_pyramidal': [[0.0, 0.0], [0.0, test_rate]],
+        'L5_basket': [[0.0, 0.0], [0.0, test_rate]],
+        'L2_pyramidal': [[0.0, test_rate], [0.0, 0.0]],
+        'L2_basket': [[0.0, test_rate], [0.0, 0.0]]}
 
     # Write spike file with no 'types' column
     # Check for gid_ranges errors
