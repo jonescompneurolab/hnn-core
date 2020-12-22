@@ -12,7 +12,7 @@ from hnn_core import read_params, Network, CellResponse, read_spikes
 from hnn_core.network_builder import NetworkBuilder
 
 
-def test_network():
+def test_network(tmpdir):
     """Test network object."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -117,12 +117,27 @@ def test_network():
     net._spike_types = [['L2_pyramidal', 'L2_basket'],
                         ['L5_pyramidal', 'L5_basket']]
     tstart, tstop = 0.1, 98.4
-    gid_ranges = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
-                  'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
+    gid_ranges = {'L2_pyramidal': range(0, 2), 'L2_basket': range(2, 4),
+                  'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
 
     net.plot_spikes_hist(show=False)
+
+    cell_response = []
+    for cell_type, gid_range in gid_ranges.items():
+        for gid in gid_range:
+            cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
+            
+    for trial in range(len(net._spike_times)):
+        for cell_resp in cell_response:
+            gid = cell_resp.gid
+            gid_mask = np.array(net._spike_gids[trial]) == gid
+            gid_spike_times = np.array(net._spike_times)[trial][gid_mask].tolist()
+            cell_response[gid].spike_times.append(gid_spike_times)
+
+    net.cell_response = cell_response
+
     net.write(tmpdir.join('spk_%d.txt'))
-    assert net.cell_response == read_spikes(tmpdir.join('spk_*.txt'))
+    assert net.cell_response == read_spikes(tmpdir.join('spk_*.txt'), gid_ranges)
 
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):

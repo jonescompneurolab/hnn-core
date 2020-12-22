@@ -60,16 +60,19 @@ def read_spikes(fname, gid_ranges=None):
         validate_gid_ranges(gid_ranges)
         cell_response = []
         for cell_type, gid_range in gid_ranges.items():
-            for gid in gid_range:
-                cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
+            if cell_type in ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']:
+                for gid in gid_range:
+                    cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
 
     else:
         cell_response = [CellResponse(gid=gid) for gid in range(np.max(gid_list))]
         for gid in gid_list:
             cell_type_idx = np.where(all_spike_gids == gid)[0]
+            cell_response[gid].cell_type = all_spike_types[cell_type_idx]
 
     for trial in range(len(spike_times)):
-        for gid in np.unique(spike_gids[trial]):
+        for cell_resp in cell_response:
+            gid = cell_resp.gid
             gid_mask = np.array(spike_gids[trial]) == gid
             gid_spike_times = np.array(spike_times)[trial][gid_mask].tolist()
             cell_response[gid].spike_times.append(gid_spike_times)
