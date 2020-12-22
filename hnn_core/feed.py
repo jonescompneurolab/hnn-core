@@ -43,7 +43,7 @@ def _get_prng(seed, gid, sync_evinput=False):
 
 def _drive_cell_event_times(drive_type, drive_conn, dynamics,
                             trial_idx=0, drive_cell_gid=0, seedcore=0):
-    """Generate event times for one drive cell based on dynamics.
+    """Generate event times for one artificial drive cell based on dynamics.
 
     Parameters
     ----------
@@ -60,7 +60,7 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
         with its spatial connectivity (and temporal dynamics). drive_conn
         defines AMPA and NMDA weights, and the cell target (e.g. 'L2_basket')
     dynamics : dict
-        Parameters event time dynamics to simulate
+        Parameters of the event time dynamics to simulate
     trial_idx : int
         The index number of the current trial of a simulation (default=1).
     drive_cell_gid : int

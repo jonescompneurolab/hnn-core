@@ -75,6 +75,8 @@ API
 
 - Add average_dipoles function to `hnn_core.dipole`, by `Blake Caldwell`_ in `#156 <https://github.com/jonescompneurolab/hnn-core/pull/156>`_
 
+- Create a new API for defining external drives and biases to network, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Blake Caldwell: https://github.com/blakecaldwell
 .. _Ryan Thorpe: https://github.com/rythorpe
