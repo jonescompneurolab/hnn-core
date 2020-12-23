@@ -176,15 +176,15 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    count = 0
+    ypos = 0
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
-            cell_type_ypos.append(np.repeat(count, len(gid_time)))
-            count = count - 1
+            cell_type_ypos.append(np.repeat(ypos, len(gid_time)))
+            ypos = ypos - 1
 
         cell_type_times = np.concatenate(cell_type_times)
         cell_type_ypos = np.concatenate(cell_type_ypos)
