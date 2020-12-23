@@ -168,19 +168,34 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
     import matplotlib.pyplot as plt
     spike_times = np.array(sum(cell_response._spike_times, []))
     spike_types = np.array(sum(cell_response._spike_types, []))
+    spike_gids = np.array(sum(cell_response._spike_gids, []))
     cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-    spike_times_cell = [spike_times[spike_types == cell_type]
-                        for cell_type in cell_types]
+    cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
+                        'L2_pyramidal': 'g', 'L2_basket': 'w'}
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    ax.eventplot(spike_times_cell, colors=['r', 'b', 'g', 'w'])
-    ax.legend(cell_types, ncol=2)
+    count = 0
+    for cell_type in cell_types:
+        cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
+        cell_type_times, cell_type_ypos = [], []
+        for gid in cell_type_gids:
+            gid_time = spike_times[spike_gids == gid]
+            cell_type_times.append(gid_time)
+            cell_type_ypos.append(np.repeat(count, len(gid_time)))
+            count = count - 1
+
+        cell_type_times = np.concatenate(cell_type_times)
+        cell_type_ypos = np.concatenate(cell_type_ypos)
+
+        ax.scatter(cell_type_times, cell_type_ypos, label=cell_type,
+                   color=cell_type_colors[cell_type])
+
+    ax.legend(loc=1)
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
-    ax.set_ylim((-1, 4.5))
     ax.set_xlim(left=0)
 
     if show:
