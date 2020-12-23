@@ -41,6 +41,8 @@ Changelog
 
 - Add ability to add tonic inputs to cell types with :func:`hnn_core.Network.add_tonic_input`, by `Mainak Jas`_ in `#209 <https://github.com/jonescompneurolab/hnn-core/pull/209>`_
 
+- Modify plot_spikes_raster() to display individual gids, by `Nick Tolley`_ in `#231 <https://github.com/jonescompneurolab/hnn-core/pull/231>`_
+
 Bug
 ~~~
 
