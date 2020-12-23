@@ -52,6 +52,18 @@ net.plot_cells()
 # required. Weights are prescribed separately for AMPA and NMDA receptors
 # (receptors that are not used can be omitted or set to zero)
 
+# Two "silent" bursty drives (not connected, but affect seeds via gid assgnmt)
+for ii in range(2):
+    weights_ampa = {}
+    weights_nmda = {}
+    dispersion_time = 0.1
+    net.add_bursty_drive(
+        f'bursty{ii + 1}', distribution='normal', t0=0, sigma_t0=1., T=1.,
+        burst_f=10, burst_sigma_f=2., numspikes=2, repeats=20,
+        weights_ampa=weights_ampa, weights_nmda=weights_nmda,
+        location='distal', seedcore=2,
+        space_constant=3., dispersion_time=dispersion_time)
+
 # Distal evoked drive
 weights_ampa = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
                 'L5_pyramidal': 0.142300}
@@ -128,13 +140,58 @@ print(all_rates)
 print('Mean spike rates for individual trials:')
 print(trial_rates)
 
-
 ###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
-# synchronous and see what happens
+# synchronous and see what happens. This is achieved by setting sigma=0.
 
-params.update({'sync_evinput': True})
-net_sync = Network(params)
+net_sync = Network(params, initialise_hnn_drives=False)
+
+# Two "silent" bursty drives (not connected, but affect seeds via gid assgnmt)
+for ii in range(2):
+    weights_ampa = {}
+    weights_nmda = {}
+    dispersion_time = 0.1
+    net_sync.add_bursty_drive(
+        f'bursty{ii + 1}', distribution='normal', t0=0, sigma_t0=1., T=1.,
+        burst_f=10, burst_sigma_f=2., numspikes=2, repeats=20,
+        weights_ampa=weights_ampa, weights_nmda=weights_nmda,
+        location='distal', seedcore=2,
+        space_constant=3., dispersion_time=dispersion_time)
+
+# Distal evoked drive
+weights_ampa = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
+                'L5_pyramidal': 0.142300}
+weights_nmda = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
+                'L5_pyramidal': 0.080074}
+dispersion_time = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                   'L5_pyramidal': 0.1}
+net_sync.add_evoked_drive(
+    'evdist1', mu=63.53, sigma=0, numspikes=1, weights_ampa=weights_ampa,
+    weights_nmda=weights_nmda, location='distal', seedcore=2,
+    space_constant=3., dispersion_time=dispersion_time)
+
+# First proximal evoked drive
+weights_ampa = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
+                'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+weights_nmda = {'L2_basket': 0., 'L2_pyramidal': 0.,
+                'L5_basket': 0., 'L5_pyramidal': 0.}  # all weights zero
+dispersion_time = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                   'L5_basket': 1., 'L5_pyramidal': 1.}
+net_sync.add_evoked_drive(
+    'evprox1', mu=26.61, sigma=0, numspikes=1, weights_ampa=weights_ampa,
+    weights_nmda=weights_nmda, location='proximal', seedcore=2,
+    space_constant=3., dispersion_time=dispersion_time)
+
+# Second proximal evoked drive
+weights_ampa = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+weights_nmda = {}  # all weights zero: pass an empty dict to the add-method
+dispersion_time = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                   'L5_basket': 1., 'L5_pyramidal': 1.}
+net_sync.add_evoked_drive(
+    'evprox2', mu=137.12, sigma=0, numspikes=1, weights_ampa=weights_ampa,
+    weights_nmda=weights_nmda, location='proximal', seedcore=2,
+    space_constant=3., dispersion_time=dispersion_time)
 
 ###############################################################################
 # Next, let's simulate a single trial using the MPI backend. This will
