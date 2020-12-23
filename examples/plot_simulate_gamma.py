@@ -74,8 +74,19 @@ plt.show()
 
 ###############################################################################
 # As a final exercise, let us try to re-run the simulation with tonic inputs
-# to the L5 Pyramidal cells.
+# to the L5 Pyramidal cells. Notice that the oscillation waveform is now more
+# regular with less noise due to the fact that the tonic drive is strong and
+# outweighs the influence of the Poisson drive
 net.add_tonic_input(cell_type='L5Pyr', amplitude=6., t0=0, T=params['tstop'])
 dpls = simulate_dipole(net, n_trials=1)
 
 dpls[0].plot()
+
+###############################################################################
+# Notice that the Layer 5 pyramidal neurons are now firing nearly
+# synchronously. They in turn synchronously activate the inhibitory basket
+# neurons, which then inhibit the pyramidal neurons for ~20 ms, when the
+# tonic drive outweighs the inhibition and the pyramidal neurons firing again
+# creating a ~50 Hz PING rhythm. This type of synchronous rhythm is sometimes
+# referred to as “strong” PING.
+net.cell_response.plot_spikes_raster()
