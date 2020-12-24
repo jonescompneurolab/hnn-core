@@ -352,7 +352,7 @@ class NetworkBuilder(object):
         for drive in self.net.external_drives.values():
             for conn in drive['conn'].values():  # all cell types
                 for src_gid, target_gid in zip(conn['src_gids'],
-                                            conn['target_gids']):
+                                               conn['target_gids']):
                     if (target_gid in self._gid_list and
                             src_gid not in self._gid_list):
                         _PC.set_gid2node(src_gid, rank)
