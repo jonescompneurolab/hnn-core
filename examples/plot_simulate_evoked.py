@@ -67,22 +67,22 @@ net.add_evoked_drive(
 # First proximal evoked drive
 weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                    'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
-weights_nmda_prox = {}  # all weights zero: pass an empty dict to add-method
 dispersion_time_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                         'L5_basket': 1., 'L5_pyramidal': 1.}
+# all NMDA weights are zero; pass None
 net.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
-    weights_nmda=weights_nmda_prox, location='proximal', seedcore=2,
+    weights_nmda=None, location='proximal', seedcore=2,
     space_constant=3., dispersion_time=dispersion_time_prox)
 
 # Second proximal evoked drive. NB: only AMPA weights differ from first
 weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
                    'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+# all NMDA weights are zero; omit weights_nmda (defaults to None)
 net.add_evoked_drive(
     'evprox2', mu=137.12, sigma=8.33, numspikes=1,
-    weights_ampa=weights_ampa_p2, weights_nmda=weights_nmda_prox,
-    location='proximal', seedcore=2, space_constant=3.,
-    dispersion_time=dispersion_time_prox)
+    weights_ampa=weights_ampa_p2, location='proximal',
+    seedcore=2, space_constant=3., dispersion_time=dispersion_time_prox)
 
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
@@ -140,14 +140,14 @@ net_sync.add_evoked_drive(
 # First proximal evoked drive
 net_sync.add_evoked_drive(
     'evprox1', mu=26.61, sigma=0, numspikes=1, weights_ampa=weights_ampa_p1,
-    weights_nmda=weights_nmda_prox, location='proximal', seedcore=2,
-    space_constant=3., dispersion_time=dispersion_time_prox)
+    location='proximal', seedcore=2, space_constant=3.,
+    dispersion_time=dispersion_time_prox)
 
 # Second proximal evoked drive
 net_sync.add_evoked_drive(
     'evprox2', mu=137.12, sigma=0, numspikes=1, weights_ampa=weights_ampa_p2,
-    weights_nmda=weights_nmda_prox, location='proximal', seedcore=2,
-    space_constant=3., dispersion_time=dispersion_time_prox)
+    location='proximal', seedcore=2, space_constant=3.,
+    dispersion_time=dispersion_time_prox)
 
 ###############################################################################
 # Next, let's simulate a single trial using the MPI backend. This will
