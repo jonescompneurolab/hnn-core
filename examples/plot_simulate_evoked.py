@@ -1,13 +1,13 @@
 """
-====================================
-Simulate dipole using new drives-API
-====================================
+=================================
+Simulate dipole for evoked inputs
+=================================
 
 This example demonstrates how to simulate a dipole for evoked-like
 waveforms using HNN-core.
 
 Note that the output will be slightly different from HNN-GUI due to different
-"seeds" being used when creating the random exogeneous input spikes to the
+random "seeds" being used when creating the exogeneous input spikes to the
 network. The results should match qualitatively, however.
 """
 
