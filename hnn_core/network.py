@@ -234,41 +234,48 @@ class Network(object):
                 specs = drive_specs[drive_name]
                 if specs['type'] == 'evoked':
                     self.add_evoked_drive(
-                        drive_name, specs['dynamics']['mu'],
-                        specs['dynamics']['sigma'],
-                        specs['dynamics']['numspikes'],
-                        specs['weights_ampa'], specs['weights_nmda'],
-                        specs['location'], seedcore=specs['seedcore'],
+                        drive_name, mu=specs['dynamics']['mu'],
+                        sigma=specs['dynamics']['sigma'],
+                        numspikes=specs['dynamics']['numspikes'],
+                        weights_ampa=specs['weights_ampa'],
+                        weights_nmda=specs['weights_nmda'],
+                        location=specs['location'], seedcore=specs['seedcore'],
                         dispersion_time=specs['dispersion_time'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'poisson':
                     self.add_poisson_drive(
-                        drive_name, specs['dynamics']['t0'],
-                        specs['dynamics']['T'],
-                        specs['dynamics']['rate_constants'],
-                        specs['weights_ampa'], specs['weights_nmda'],
-                        specs['location'], seedcore=specs['seedcore'],
+                        drive_name, t0=specs['dynamics']['t0'],
+                        T=specs['dynamics']['T'],
+                        rate_constants=specs['dynamics']['rate_constants'],
+                        weights_ampa=specs['weights_ampa'],
+                        weights_nmda=specs['weights_nmda'],
+                        location=specs['location'], seedcore=specs['seedcore'],
                         dispersion_time=specs['dispersion_time'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'gaussian':
                     self.add_gaussian_drive(
-                        drive_name, specs['dynamics']['mu'],
-                        specs['dynamics']['sigma'],
-                        specs['dynamics']['numspikes'],
-                        specs['weights_ampa'], specs['weights_nmda'],
-                        specs['location'], seedcore=specs['seedcore'],
+                        drive_name, mu=specs['dynamics']['mu'],
+                        sigma=specs['dynamics']['sigma'],
+                        numspikes=specs['dynamics']['numspikes'],
+                        weights_ampa=specs['weights_ampa'],
+                        weights_nmda=specs['weights_nmda'],
+                        location=specs['location'], seedcore=specs['seedcore'],
                         dispersion_time=specs['dispersion_time'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'bursty':
                     self.add_bursty_drive(
-                        drive_name, specs['dynamics']['distribution'],
-                        specs['dynamics']['t0'], specs['dynamics']['sigma_t0'],
-                        specs['dynamics']['T'], specs['dynamics']['burst_f'],
-                        specs['dynamics']['burst_sigma_f'],
-                        specs['dynamics']['numspikes'],
-                        specs['dynamics']['repeats'],
-                        specs['weights_ampa'], specs['weights_nmda'],
-                        specs['location'],
+                        drive_name,
+                        distribution=specs['dynamics']['distribution'],
+                        t0=specs['dynamics']['t0'],
+                        sigma_t0=specs['dynamics']['sigma_t0'],
+                        T=specs['dynamics']['T'],
+                        burst_f=specs['dynamics']['burst_f'],
+                        burst_sigma_f=specs['dynamics']['burst_sigma_f'],
+                        numspikes=specs['dynamics']['numspikes'],
+                        repeats=specs['dynamics']['repeats'],
+                        weights_ampa=specs['weights_ampa'],
+                        weights_nmda=specs['weights_nmda'],
+                        location=specs['location'],
                         space_constant=specs['space_constant'],
                         dispersion_time=specs['dispersion_time'],
                         seedcore=specs['seedcore'])
@@ -292,9 +299,10 @@ class Network(object):
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
 
-    def add_evoked_drive(self, name, mu, sigma, numspikes, weights_ampa,
-                         weights_nmda, location, space_constant=3.,
-                         dispersion_time=0.1, seedcore=42):
+    def add_evoked_drive(self, name, *,
+                         mu=None, sigma=None, numspikes=None,
+                         weights_ampa=None, weights_nmda=None, location=None,
+                         space_constant=3., dispersion_time=0.1, seedcore=42):
         """Add an 'evoked' external drive to the network
 
         Parameters
@@ -308,10 +316,10 @@ class Network(object):
             Set to zero for "synchronous" evoked drive.
         numspikes : int
             Number of spikes at each target cell
-        weights_ampa : dict
+        weights_ampa : dict or None
             Synaptic weights of AMPA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
-        weights_nmda : dict
+        weights_nmda : dict or None
             Synaptic weights of NMDA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
         location : str
@@ -332,8 +340,10 @@ class Network(object):
             location, space_constant=space_constant,
             dispersion_time=dispersion_time, seedcore=seedcore)
 
-    def add_gaussian_drive(self, name, mu, sigma, numspikes, weights_ampa,
-                           weights_nmda, location, space_constant=100.,
+    def add_gaussian_drive(self, name, *,
+                           mu=None, sigma=None, numspikes=None,
+                           weights_ampa=None, weights_nmda=None,
+                           location=None, space_constant=100.,
                            dispersion_time=0.1, seedcore=42):
         """Add an 'evoked' external drive to the network
 
@@ -347,10 +357,10 @@ class Network(object):
             Standard deviation of event time distribution (across target cells)
         numspikes : int
             Number of spikes at each target cell
-        weights_ampa : dict
+        weights_ampa : dict or None
             Synaptic weights of AMPA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
-        weights_nmda : dict
+        weights_nmda : dict or None
             Synaptic weights of NMDA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
         location : str
@@ -376,6 +386,9 @@ class Network(object):
             location, space_constant, dispersion_time, seedcore):
         """Utility function for gaussian-type drives
         """
+        if (mu is None or sigma is None or numspikes is None):
+            raise ValueError('mu, sigma and numspikes must all be defined'
+                             f', got {mu}, {sigma}, {numspikes}')
         if sigma < 0.:
             raise ValueError('Standard deviation cannot be negative')
         if not numspikes > 0:
@@ -392,9 +405,11 @@ class Network(object):
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, dispersion_time)
 
-    def add_poisson_drive(self, name, t0, T, rate_constants, weights_ampa,
-                          weights_nmda, location, space_constant=100.,
-                          dispersion_time=0.1, seedcore=42):
+    def add_poisson_drive(self, name, *,
+                          t0=None, T=None, rate_constants=None,
+                          weights_ampa=None, weights_nmda=None, location=None,
+                          space_constant=100., dispersion_time=0.1,
+                          seedcore=42):
         """Add a Poisson-distributed external drive to the network
 
         Parameters
@@ -408,10 +423,10 @@ class Network(object):
         rate_constants : dict of floats
             Rate constant (lambda) of renewal-process generating the samples.
             Dict keys are the cell names targeted.
-        weights_ampa : dict
+        weights_ampa : dict or None
             Synaptic weights of AMPA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
-        weights_nmda : dict
+        weights_nmda : dict or None
             Synaptic weights of NMDA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
         location : str
@@ -427,6 +442,9 @@ class Network(object):
             Optional initial seed for random number generator (default: 42).
             Each artificial drive cell has seed = seedcore + gid
         """
+        if (t0 is None or T is None or rate_constants is None):
+            raise ValueError('t0, T and rate_constants must all be defined'
+                             f', got {t0}, {T}, {rate_constants}')
         if T < 0.:
             raise ValueError('End time of Poisson input cannot be negative')
         tstop = self.cell_response.times[-1]
@@ -454,9 +472,11 @@ class Network(object):
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, dispersion_time)
 
-    def add_bursty_drive(self, name, distribution, t0, sigma_t0, T, burst_f,
-                         burst_sigma_f, numspikes, repeats, weights_ampa,
-                         weights_nmda, location, dispersion_time=0.1,
+    def add_bursty_drive(self, name, *,
+                         distribution=None, t0=None, sigma_t0=None, T=None,
+                         burst_f=None, burst_sigma_f=None, numspikes=None,
+                         repeats=None, weights_ampa=None, weights_nmda=None,
+                         location=None, dispersion_time=0.1,
                          space_constant=100., seedcore=42):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
@@ -484,10 +504,10 @@ class Network(object):
             parameter in GUI.
         repeats : int
             The number of repeats.
-        weights_ampa : dict
+        weights_ampa : dict or None
             Synaptic weights of AMPA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
-        weights_nmda : dict
+        weights_nmda : dict or None
             Synaptic weights of NMDA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
         location : str
@@ -503,7 +523,12 @@ class Network(object):
             Optional initial seed for random number generator (default: 42).
             Each artificial drive cell has seed = seedcore + gid
         """
-
+        if (distribution is None or t0 is None or sigma_t0 is None or
+                T is None or burst_f is None or burst_sigma_f is None or
+                numspikes is None or repeats is None):
+            raise ValueError('distribution, t0, sigma_t0, T, burst_f, '
+                             'burst_sigma_f, numspikes and repeats must all '
+                             'be defined')
         drive = NetworkDrive()
         drive['type'] = 'bursty'
         drive['cell_specific'] = False
@@ -530,10 +555,10 @@ class Network(object):
             Name of drive (must be unique)
         drive : instance of NetworkDrive
             Collection of parameters defining the dynamics of the drive
-        weights_ampa : dict
+        weights_ampa : dict or None
             Synaptic weights of AMPA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
-        weights_nmda : dict
+        weights_nmda : dict or None
             Synaptic weights of NMDA receptors on each targeted cell type
             (keys). Weights can be zero or left omitted.
         location : str
@@ -553,8 +578,21 @@ class Network(object):
         """
         if name in self.external_drives:
             raise ValueError(f"Drive {name} already defined")
+        if location not in ['distal', 'proximal']:
+            raise ValueError("Allowed drive target locations are: 'distal', "
+                             f"and 'proximal', got {location}")
+        # allow passing weights as None, but make iterable here
+        if weights_ampa is None:
+            weights_ampa = {}
+        if weights_nmda is None:
+            weights_nmda = {}
+        # weights must correspond to cells in the network
         target_populations = (set(weights_ampa.keys()) |
                               set(weights_nmda.keys()))
+        if len(target_populations) == 0:
+            # raise ValueError('At least one AMPA or NMDA weights must be >0')
+            # XXX this is temporarily disabled to allow bogus drives for tests
+            pass
         if not target_populations.issubset(set(self.cellname_list)):
             raise ValueError('Allowed target cell types are: ',
                              f'{self.cellname_list}')
@@ -735,7 +773,8 @@ class Network(object):
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def add_tonic_bias(self, cell_type, amplitude, t0, T):
+    def add_tonic_bias(self, *, cell_type=None, amplitude=None,
+                       t0=None, T=None):
         """Attach parameters of tonic biasing input for a given cell type.
 
         Parameters
@@ -750,6 +789,9 @@ class Network(object):
         T : float
             The end time of tonic input (in ms).
         """
+        if (cell_type is None or amplitude is None or t0 is None or T is None):
+            raise ValueError('cell_type, amplitude, t0, and T must be defined'
+                             f', got {cell_type}, {amplitude}, {t0}, {T}')
         if T < 0.:
             raise ValueError('End time of tonic input cannot be negative')
         tstop = self.cell_response.times[-1]
