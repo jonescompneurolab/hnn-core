@@ -868,10 +868,46 @@ class Network(object):
 
 class NetworkDrive(dict):
     """A class for containing the parameters of external drives
-    """
-    # XXX description of all possible (allowed) keys missing for NetworkDrive
 
-    # add methods for plotting and statistics
+    Class instances are essentially dictionaries, with keys described below
+    as 'attributes'. For example, drive['events'] contains the spike times of
+    exogeneous inputs.
+
+    Attributes
+    ----------
+    name : str
+        Name of drive (must be unique)
+    type : str
+        Examples: 'evoked', 'gaussian', 'poisson', 'bursty'
+    events : list of lists
+        List of spike time lists. First index is of length n_trials. Second
+        index is over the 'artificial' cells associated with this drive.
+    cell_specific : bool
+        Whether each cell has unique connection parameters (default: True)
+        or all cells have common connections to a global (single) drive.
+    seedcore : int
+        Optional initial seed for random number generator (default: 42).
+        Each artificial drive cell has seed = seedcore + gid
+    target_types : set or list of str
+        Names of cell types targeted by this drive (must be subset of
+        net.cellname_list).
+    dynamics : dict
+        Parameters describing how the temporal dynamics of spike trains in the
+        drive. The keys are specific to the type of drive ('evoked', 'bursty',
+        etc.). See the drive add-methods in Network for details.
+    conn : dict
+        Parameters describing how the drive connects to the network. Keys are:
+        'target_gids': range of target cell GIDs;
+        'target_type': target cell type (e.g. 'L2_basket');
+        'src_gids': range of source (artificial) cell GIDs;
+        'location': 'distal' or 'proximal';
+    conn['ampa'] and conn['nmda']: dict
+        Sub-dicts specifying the synaptic weights:
+        'A_weight': synaptic weight;
+        'A_delay': synaptic delay at d=0 (used with space constant);
+        'lamtha': space constant
+    """
+    # TODO add methods for plotting and statistics
     def __repr__(self):
         entr = '<NetworkDrive'
         if 'type' in self.keys():
