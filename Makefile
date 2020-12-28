@@ -5,9 +5,9 @@
 all: modl
 
 modl:
-	cd $(PWD)/mod/ && nrnivmodl
+	cd hnn_core/mod/ && nrnivmodl
 
 # clean
 .PHONY: clean
 clean :
-	rm -f hnn_core/mod/x86_64/*
+	rm -rf hnn_core/mod/x86_64/*
