@@ -84,6 +84,8 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p2, location='proximal',
     seedcore=2, space_constant=3., dispersion_time=dispersion_time_prox)
 
+# verify that three drives added
+print(net.external_drives)
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
 # To run them in parallel we could set n_jobs to equal the number of trials.
