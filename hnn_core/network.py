@@ -35,9 +35,9 @@ def read_spikes(fname, gid_ranges=None):
         An instance of the CellResponse object.
     """
 
-    spike_times = []
-    spike_gids = []
-    spike_types = []
+    spike_times = list()
+    spike_gids = list()
+    spike_types = list()
     for file in sorted(glob(str(fname))):
         spike_trial = np.loadtxt(file, dtype=str)
         if spike_trial.shape[0] > 0:
@@ -395,7 +395,7 @@ class Network(object):
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
-        drive['events'] = []
+        drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, dispersion_time)
@@ -459,7 +459,7 @@ class Network(object):
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(t0=t0, T=T, rate_constants=rate_constants)
-        drive['events'] = []
+        drive['events'] = list()
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, dispersion_time)
 
@@ -523,7 +523,7 @@ class Network(object):
                                  burst_sigma_f=burst_sigma_f,
                                  numspikes=numspikes, repeats=repeats
                                  )
-        drive['events'] = []
+        drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, dispersion_time,
@@ -567,9 +567,9 @@ class Network(object):
                              f"and 'proximal', got {location}")
         # allow passing weights as None, but make iterable here
         if weights_ampa is None:
-            weights_ampa = {}
+            weights_ampa = dict()
         if weights_nmda is None:
-            weights_nmda = {}
+            weights_nmda = dict()
         # weights must correspond to cells in the network
         target_populations = (set(weights_ampa.keys()) |
                               set(weights_nmda.keys()))
@@ -698,7 +698,7 @@ class Network(object):
             self._n_gids += 1
             drive_conn['location'] = location
 
-            drive_conn['target_gids'] = []  # fill in below
+            drive_conn['target_gids'] = list()  # fill in below
             for cellname in target_populations:
                 drive_conn['target_gids'].extend(self.gid_ranges[cellname])
                 drive_conn['target_type'] = cellname
@@ -733,7 +733,7 @@ class Network(object):
         """
         # reset every time called again, e.g., from dipole.py
         for drive_name in self.external_drives.keys():
-            self.external_drives[drive_name]['events'] = []
+            self.external_drives[drive_name]['events'] = list()
 
         # each trial needs unique event time vectors
         for trial_idx in range(n_trials):
@@ -1046,11 +1046,11 @@ class CellResponse(object):
                             f"not {gid_item.dtype.name}")
 
         n_trials = len(self._spike_times)
-        times_slice = []
-        gids_slice = []
-        types_slice = []
-        vsoma_slice = []
-        isoma_slice = []
+        times_slice = list()
+        gids_slice = list()
+        types_slice = list()
+        vsoma_slice = list()
+        isoma_slice = list()
         for trial_idx in range(n_trials):
             gid_mask = np.in1d(self._spike_gids[trial_idx], gid_item)
             times_trial = np.array(
