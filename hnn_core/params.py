@@ -123,8 +123,7 @@ def _short_name(short_name):
 
 
 def _extract_bias_specs_from_hnn_params(params, cellname_list):
-    """Create 'bias specification' dicts from saved parameters
-    """
+    """Create 'bias specification' dicts from saved parameters"""
     bias_specs = {'tonic': {}}  # currently only 'tonic' biases known
     for cellname in cellname_list:
         short_name = _short_name(cellname)
@@ -146,8 +145,7 @@ def _extract_bias_specs_from_hnn_params(params, cellname_list):
 
 
 def _extract_drive_specs_from_hnn_params(params, cellname_list):
-    """Create 'drive specification' dicts from saved parameters
-    """
+    """Create 'drive specification' dicts from saved parameters"""
     # convert legacy params-dict to legacy "feeds" dicts
     p_common, p_unique = create_pext(params, params['tstop'])
 

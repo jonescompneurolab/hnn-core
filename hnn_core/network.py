@@ -376,8 +376,7 @@ class Network(object):
     def _add_evoked_or_gaussian_drive(
         self, dtype, name, mu, sigma, numspikes, weights_ampa, weights_nmda,
             location, space_constant, dispersion_time, seedcore):
-        """Utility function for gaussian-type drives
-        """
+        """Utility function for gaussian-type drives"""
         if sigma < 0.:
             raise ValueError('Standard deviation cannot be negative')
         if not numspikes > 0:
