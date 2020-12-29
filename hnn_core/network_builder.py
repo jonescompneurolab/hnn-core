@@ -566,10 +566,6 @@ class NetworkBuilder(object):
                 receptors = ['ampa']
             # conn-parameters are for each target cell type
             for target_cell_type, drive_conn in drive['conn'].items():
-                # XXX: hack for distal connection XXX: Why?!
-                if (target_cell_type == 'L5_basket' and
-                        drive_conn['location'] == 'distal'):
-                    continue
                 for receptor in receptors:
                     if len(drive_conn[receptor]) > 0:
                         nc_dict['lamtha'] = drive_conn[
