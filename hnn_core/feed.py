@@ -121,6 +121,7 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
             stdev=dynamics['burst_sigma_f'],
             repeats=dynamics['repeats'],
             events_per_cycle=dynamics['numspikes'],
+            cycle_event_isi=dynamics['spike_isi'],
             prng=prng,
             prng2=prng2)
 
@@ -231,6 +232,7 @@ def feed_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
             stdev=params['stdev'],
             repeats=params['repeats'],
             events_per_cycle=params['events_per_cycle'],
+            cycle_event_isi=10,
             prng=prng,
             prng2=prng2)
 
@@ -245,7 +247,7 @@ def feed_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
     return event_times
 
 
-def _create_extpois(t0, T, lamtha, prng):
+def _create_extpois(*, t0, T, lamtha, prng):
     """Create poisson inputs.
 
     Parameters
@@ -284,7 +286,7 @@ def _create_extpois(t0, T, lamtha, prng):
     return np.array(event_times)
 
 
-def _create_gauss(mu, sigma, numspikes, prng):
+def _create_gauss(*, mu, sigma, numspikes, prng):
     """Create gaussian inputs (used by extgauss and evoked).
 
     Parameters
@@ -306,8 +308,9 @@ def _create_gauss(mu, sigma, numspikes, prng):
     return prng.normal(mu, sigma, numspikes)
 
 
-def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
-                         stdev, repeats, events_per_cycle, prng, prng2):
+def _create_common_input(*, distribution, t0, t0_stdev, tstop, f_input,
+                         stdev, repeats, events_per_cycle=2,
+                         cycle_event_isi=10, prng, prng2):
     """Creates the common ongoing external inputs.
 
     Used for, e.g., for rhythmic inputs in alpha/beta generation.
@@ -331,10 +334,11 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
         The standard deviation. Only for 'normal' distribution.
     repeats : int
         The number of repeats.
-    events_per_cycle : float
-        The events per cycle. Must be 1 or 2. If it is 2, then
-        return doublets 10 ms apart. This is the spikes/burst
-        parameter in GUI.
+    events_per_cycle : int
+        The events per cycle. This is the spikes/burst parameter in the GUI.
+        Default: 2 (doublet)
+    cycle_event_isi : float
+        Time between spike events within a cycle (ISI). Default: 10 ms
     prng : instance of RandomState
         The random state.
     prng2 : instance of RandomState
@@ -355,10 +359,6 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
     elif t0_stdev > 0.0:
         t0 = prng2.normal(t0, t0_stdev)
 
-    if events_per_cycle != 1 and events_per_cycle != 2:
-        raise ValueError(f'events_per_cycle should be either 1 or 2. '
-                         f'Got {events_per_cycle}')
-
     if distribution == 'normal':
         # array of mean stimulus times, starts at t0
         isi_array = np.arange(t0, tstop, 1000. / f_input)
@@ -368,6 +368,11 @@ def _create_common_input(distribution, t0, t0_stdev, tstop, f_input,
         n_inputs = repeats * f_input * (tstop - t0) / 1000.
         t_array = prng.uniform(t0, tstop, n_inputs)
 
-    if events_per_cycle == 2:
-        return np.append(t_array - 5, t_array + 5)
+    if events_per_cycle > 1:
+        cycle = (np.arange(events_per_cycle) - (events_per_cycle - 1) / 2)
+        all_times = np.empty((len(cycle), len(t_array)))
+        for idx, cur_cycle in enumerate(cycle):
+            all_times[idx] = t_array + cur_cycle
+        t_array = all_times.ravel()
+
     return t_array

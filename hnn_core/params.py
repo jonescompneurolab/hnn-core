@@ -163,7 +163,8 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                              'burst_f': par['f_input'],
                              'burst_sigma_f': par['stdev'],
                              'numspikes': par['events_per_cycle'],
-                             'repeats': par['repeats']}
+                             'repeats': par['repeats'],
+                             'spike_isi': 10}  # not exposed in params-files
         drive['location'] = par['loc']
         drive['space_constant'] = par['lamtha']
         drive['seedcore'] = par['prng_seedcore']
