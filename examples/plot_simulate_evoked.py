@@ -62,7 +62,7 @@ dispersion_time_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal', seedcore=2,
-    space_constant=3., dispersion_time=dispersion_time_d1)
+    dispersion_time=dispersion_time_d1)
 
 # First proximal evoked drive
 weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
@@ -73,7 +73,7 @@ dispersion_time_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal', seedcore=2,
-    space_constant=3., dispersion_time=dispersion_time_prox)
+    dispersion_time=dispersion_time_prox)
 
 # Second proximal evoked drive. NB: only AMPA weights differ from first
 weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
@@ -82,7 +82,7 @@ weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
 net.add_evoked_drive(
     'evprox2', mu=137.12, sigma=8.33, numspikes=1,
     weights_ampa=weights_ampa_p2, location='proximal',
-    seedcore=2, space_constant=3., dispersion_time=dispersion_time_prox)
+    seedcore=2, dispersion_time=dispersion_time_prox)
 
 # verify that three drives added
 print(net.external_drives)
@@ -137,19 +137,17 @@ net_sync = Network(params, initialise_hnn_drives=False)
 net_sync.add_evoked_drive(
     'evdist1', mu=63.53, sigma=0, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal', seedcore=2,
-    space_constant=3., dispersion_time=dispersion_time_d1)
+    dispersion_time=dispersion_time_d1)
 
 # First proximal evoked drive
 net_sync.add_evoked_drive(
     'evprox1', mu=26.61, sigma=0, numspikes=1, weights_ampa=weights_ampa_p1,
-    location='proximal', seedcore=2, space_constant=3.,
-    dispersion_time=dispersion_time_prox)
+    location='proximal', seedcore=2, dispersion_time=dispersion_time_prox)
 
 # Second proximal evoked drive
 net_sync.add_evoked_drive(
     'evprox2', mu=137.12, sigma=0, numspikes=1, weights_ampa=weights_ampa_p2,
-    location='proximal', seedcore=2, space_constant=3.,
-    dispersion_time=dispersion_time_prox)
+    location='proximal', seedcore=2, dispersion_time=dispersion_time_prox)
 
 ###############################################################################
 # Next, let's simulate a single trial using the MPI backend. This will
