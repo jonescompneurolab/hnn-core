@@ -295,7 +295,7 @@ class Network(object):
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
                          weights_ampa=None, weights_nmda=None,
-                         space_constant=3., dispersion_time=0.1, seedcore=42):
+                         space_constant=3., dispersion_time=0.1, seedcore=2):
         """Add an 'evoked' external drive to the network
 
         Parameters
@@ -325,7 +325,7 @@ class Network(object):
             function of the space_constant. If float, applies to all target
             cell types. Use dict, to create dispersion->cell mapping.
         seedcore : int
-            Optional initial seed for random number generator (default: 42).
+            Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
         """
         self._add_evoked_or_gaussian_drive(
@@ -336,7 +336,7 @@ class Network(object):
     def add_gaussian_drive(self, name, *, mu, sigma, numspikes, location,
                            weights_ampa=None, weights_nmda=None,
                            space_constant=100., dispersion_time=0.1,
-                           seedcore=42):
+                           seedcore=2):
         """Add an 'evoked' external drive to the network
 
         Parameters
@@ -365,7 +365,7 @@ class Network(object):
             function of the space_constant. If float, applies to all target
             cell types. Use dict, to create dispersion->cell mapping.
         seedcore : int
-            Optional initial seed for random number generator (default: 42).
+            Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
         """
         self._add_evoked_or_gaussian_drive(
@@ -396,7 +396,7 @@ class Network(object):
     def add_poisson_drive(self, name, *, t0, T, rate_constants, location,
                           weights_ampa=None, weights_nmda=None,
                           space_constant=100., dispersion_time=0.1,
-                          seedcore=42):
+                          seedcore=2):
         """Add a Poisson-distributed external drive to the network
 
         Parameters
@@ -426,7 +426,7 @@ class Network(object):
             function of the space_constant. If float, applies to all target
             cell types. Use dict, to create dispersion->cell mapping.
         seedcore : int
-            Optional initial seed for random number generator (default: 42).
+            Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
         """
         if T < 0.:
@@ -460,7 +460,7 @@ class Network(object):
                          burst_f, burst_sigma_f, numspikes, repeats, location,
                          weights_ampa=None, weights_nmda=None,
                          dispersion_time=0.1, space_constant=100.,
-                         seedcore=42):
+                         seedcore=2):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
         Parameters
@@ -503,7 +503,7 @@ class Network(object):
             function of the space_constant. If float, applies to all target
             cell types. Use dict, to create dispersion->cell mapping.
         seedcore : int
-            Optional initial seed for random number generator (default: 42).
+            Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
         """
         drive = NetworkDrive()
@@ -863,7 +863,7 @@ class NetworkDrive(dict):
         Whether each cell has unique connection parameters (default: True)
         or all cells have common connections to a global (single) drive.
     seedcore : int
-        Optional initial seed for random number generator (default: 42).
+        Optional initial seed for random number generator
         Each artificial drive cell has seed = seedcore + gid
     target_types : set or list of str
         Names of cell types targeted by this drive (must be subset of
