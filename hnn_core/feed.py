@@ -372,7 +372,7 @@ def _create_common_input(*, distribution, t0, t0_stdev, tstop, f_input,
         cycle = (np.arange(events_per_cycle) - (events_per_cycle - 1) / 2)
         all_times = np.empty((len(cycle), len(t_array)))
         for idx, cur_cycle in enumerate(cycle):
-            all_times[idx] = t_array + cur_cycle
+            all_times[idx] = t_array + cur_cycle * cycle_event_isi
         t_array = all_times.ravel()
 
     return t_array
