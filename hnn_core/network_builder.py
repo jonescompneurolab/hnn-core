@@ -257,19 +257,19 @@ class NetworkBuilder(object):
         # assigns each node, identified by its unique GID, to one of the
         # possible hosts/threads for computations. _gid_list here contains
         # the GIDs of all the nodes assigned to the current host/thread.
-        self._gid_list = []
+        self._gid_list = list()
         # Note that GIDs are already defined in Network.gid_ranges
         # All that's left for NetworkBuilder is then to:
         # - _PC.set_gid2node(gid, rank)
         # - _PC.cell(gid, nrn_netcon) (or _PC.cell(feed_cell.gid, nrn_netcon))
 
         # create cells (and create self.origin in create_cells_pyr())
-        self.cells = []
+        self.cells = list()
 
         # artificial cells must be appended to a list in order to preserve
         # the NEURON hoc objects and the corresonding python references
         # initialized by _ArtificialCell()
-        self._drive_cells = []
+        self._drive_cells = list()
 
         self.ncs = dict()
 
@@ -657,17 +657,17 @@ class NetworkBuilder(object):
                                 del cell_obj2
                             del nc
 
-        self._gid_list = []
-        self.cells = []
+        self._gid_list = list()
+        self.cells = list()
 
     def get_data_from_neuron(self):
         """Get copies of spike data that are pickleable"""
 
-        vsoma_py = {}
+        vsoma_py = dict()
         for gid, rec_v in self._vsoma.items():
             vsoma_py[gid] = rec_v.to_python()
 
-        isoma_py = {}
+        isoma_py = dict()
         for gid, rec_i in self._isoma.items():
             isoma_py[gid] = {key: rec_i.to_python()
                              for key, rec_i in rec_i.items()}

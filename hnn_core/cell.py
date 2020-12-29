@@ -112,7 +112,7 @@ class _Cell(ABC):
         self.rec_v = h.Vector()
         self.rec_i = dict()
         self._gid = None
-        self.tonic_biases = []
+        self.tonic_biases = list()
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 

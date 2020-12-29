@@ -56,7 +56,7 @@ def _read_legacy_params(fname):
         Dictionary of parameters
     """
 
-    params_input = {}
+    params_input = dict()
     with open(fname, 'r') as fp:
         for line in fp.readlines():
             split_line = line.lstrip().split(':')
@@ -152,7 +152,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
     p_common, p_unique = create_pext(params, params['tstop'])
 
     # Using 'feed' for legacy compatibility, 'drives' for new API
-    drive_specs = {}
+    drive_specs = dict()
     for ic, par in enumerate(p_common):
         feed_name = f'bursty{ic + 1}'
         drive = dict()
@@ -169,9 +169,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
         drive['location'] = par['loc']
         drive['space_constant'] = par['lamtha']
         drive['seedcore'] = par['prng_seedcore']
-        drive['weights_ampa'] = {}
-        drive['weights_nmda'] = {}
-        drive['dispersion_time'] = {}
+        drive['weights_ampa'] = dict()
+        drive['weights_nmda'] = dict()
+        drive['dispersion_time'] = dict()
 
         for cellname in cellname_list:
             cname_ampa = _short_name(cellname) + '_ampa'
@@ -195,9 +195,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
     for feed_name, par in p_unique.items():
         drive = dict()
         drive['cell_specific'] = True
-        drive['weights_ampa'] = {}
-        drive['weights_nmda'] = {}
-        drive['dispersion_time'] = {}
+        drive['weights_ampa'] = dict()
+        drive['weights_nmda'] = dict()
+        drive['dispersion_time'] = dict()
 
         if (feed_name.startswith('evprox') or
                 feed_name.startswith('evdist')):
@@ -248,14 +248,14 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                         drive['weights_ampa'][cellname] = ampa_w
                     drive['dispersion_time'][cellname] = dispersion_time
 
-            drive['weights_nmda'] = {}  # no NMDA weights for Gaussians
+            drive['weights_nmda'] = dict()  # no NMDA weights for Gaussians
         elif feed_name.startswith('extpois'):
             drive['type'] = 'poisson'
             drive['location'] = par['loc']
             drive['space_constant'] = par['lamtha']
             drive['seedcore'] = par['prng_seedcore']
 
-            rate_params = {}
+            rate_params = dict()
             for cellname in cellname_list:
                 if cellname in par:
                     rate_params[cellname] = par[cellname][3]
@@ -289,7 +289,7 @@ class Params(dict):
     def __init__(self, params_input=None):
 
         if params_input is None:
-            params_input = {}
+            params_input = dict()
 
         if isinstance(params_input, dict):
             nprox, ndist = _count_evoked_inputs(params_input)
@@ -448,11 +448,11 @@ def create_pext(p, tstop):
     p : dict
         The parameters returned by ExpParams(f_psim).return_pdict()
     """
-    p_common = []
+    p_common = list()
 
     # p_unique is a dict of input param types that end up going to each cell
     # uniquely
-    p_unique = {}
+    p_unique = dict()
 
     # default params for common proximal inputs
     feed_prox = {
