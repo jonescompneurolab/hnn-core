@@ -186,7 +186,7 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
             cell_type_ypos.append(np.repeat(ypos, len(gid_time)))
             ypos = ypos - 1
 
-        if any(cell_type_times):
+        if cell_type_times:
             cell_type_times = np.concatenate(cell_type_times)
             cell_type_ypos = np.concatenate(cell_type_ypos)
         else:
