@@ -74,7 +74,7 @@ def test_dipole_simulation():
                    't_evprox_1': 5,
                    't_evdist_1': 10,
                    't_evprox_2': 20})
-    net = Network(params)
+    net = Network(params, init_drives_from_params=True)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, n_trials=0)
     with pytest.raises(TypeError, match="record_vsoma must be bool, got int"):

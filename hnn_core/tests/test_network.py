@@ -24,7 +24,7 @@ def test_network():
                    'input_prox_A_weight_L2Pyr_ampa': 5.4e-5,
                    'input_prox_A_weight_L5Pyr_ampa': 5.4e-5,
                    't0_input_prox': 50})
-    net = Network(deepcopy(params))
+    net = Network(deepcopy(params), init_drives_from_params=True)
     network_builder = NetworkBuilder(net)  # needed to populate net.cells
 
     # Assert that params are conserved across Network initialization

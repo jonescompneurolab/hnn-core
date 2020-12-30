@@ -105,7 +105,7 @@ def test_tonic_inputs():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    net = hnn_core.Network(params)
+    net = hnn_core.Network(params, init_drives_from_params=True)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
                            t0=0.0, T=4.0)
@@ -122,7 +122,7 @@ def test_tonic_inputs():
 
     with pytest.raises(ValueError, match='parameter may be missing'):
         params['Itonic_T_L2Pyr_soma'] = 5.0
-        net = hnn_core.Network(params)
+        net = hnn_core.Network(params, init_drives_from_params=True)
 
     params.update({
         'N_pyr_x': 3, 'N_pyr_y': 3,
@@ -135,7 +135,7 @@ def test_tonic_inputs():
         'Itonic_t0_L2Pyr_soma': 5.0,
         'Itonic_T_L2Pyr_soma': 15.0
     })
-    net = hnn_core.Network(params)
+    net = hnn_core.Network(params, init_drives_from_params=True)
     # smoke test for tonic inputs
     hnn_core.simulate_dipole(net)
     assert 'tonic' in net.feed_times
