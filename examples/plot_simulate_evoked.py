@@ -44,7 +44,7 @@ print(params['L2Pyr_soma*'])
 # inside it. The default behaviour of Network is to add and instantiate six
 # 'default' drives, but we will suppress that by setting the
 # `initialise_hnn_drives`-argument to `False`.
-net = Network(params, initialise_hnn_drives=False)
+net = Network(params)
 net.plot_cells()
 
 ###############################################################################
@@ -84,8 +84,6 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p2, location='proximal',
     dispersion_time=dispersion_time_prox)
 
-# verify that three drives added
-print(net.external_drives)
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
 # To run them in parallel we could set n_jobs to equal the number of trials.
@@ -131,7 +129,7 @@ print(trial_rates)
 # Now, let us try to make the exogenous driving inputs to the cells
 # synchronous and see what happens. This is achieved by setting sigma=0.
 
-net_sync = Network(params, initialise_hnn_drives=False)
+net_sync = Network(params)
 
 # Distal evoked drive, use same weigths as above
 net_sync.add_evoked_drive(
