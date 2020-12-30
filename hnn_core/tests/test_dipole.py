@@ -82,6 +82,12 @@ def test_dipole_simulation():
     with pytest.raises(TypeError, match="record_isoma must be bool, got int"):
         simulate_dipole(net, n_trials=1, record_vsoma=False, record_isoma=0)
 
+    # Test raster plot with no spikes
+    params['tstop'] = 0.1
+    net = Network(params)
+    simulate_dipole(net, n_trials=1)
+    net.cell_response.plot_spikes_raster()
+
 
 @requires_mpi4py
 def test_cell_response_backends(run_hnn_core_fixture):
