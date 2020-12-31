@@ -100,29 +100,27 @@ def test_cell_response_backends(run_hnn_core_fixture):
                                          record_vsoma=True)
     _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
                                       record_isoma=True, record_vsoma=True)
-    n_times = len(joblib_net.cell_response.times)
+    n_times = len(joblib_net.times)
 
-    assert len(joblib_net.cell_response.vsoma) == n_trials
-    assert len(joblib_net.cell_response.isoma) == n_trials
-    assert len(joblib_net.cell_response.vsoma[trial_idx][gid]) == n_times
-    assert len(joblib_net.cell_response.isoma[
-               trial_idx][gid]['soma_gabaa']) == n_times
+    assert len(joblib_net.cell_response[gid].vsoma) == n_trials
+    assert len(joblib_net.cell_response[gid].isoma) == n_trials
+    assert len(joblib_net.cell_response[gid].vsoma[trial_idx]) == n_times
+    assert len(joblib_net.cell_response[gid].isoma[
+               trial_idx]['soma_gabaa']) == n_times
 
-    assert len(mpi_net.cell_response.vsoma) == n_trials
-    assert len(mpi_net.cell_response.isoma) == n_trials
-    assert len(mpi_net.cell_response.vsoma[trial_idx][gid]) == n_times
-    assert len(mpi_net.cell_response.isoma[
-               trial_idx][gid]['soma_gabaa']) == n_times
-    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
-    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
+    assert len(mpi_net.cell_response[gid].vsoma) == n_trials
+    assert len(mpi_net.cell_response[gid].isoma) == n_trials
+    assert len(mpi_net.cell_response[gid].vsoma[trial_idx]) == n_times
+    assert len(mpi_net.cell_response[gid].isoma[
+               trial_idx]['soma_gabaa']) == n_times
+    assert mpi_net.cell_response == joblib_net.cell_response
 
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
-    times = np.array(joblib_net.cell_response.times)
-    spike_times = np.array(joblib_net.cell_response.spike_times[trial_idx])
-    spike_gids = np.array(joblib_net.cell_response.spike_gids[trial_idx])
-    vsoma = np.array(joblib_net.cell_response.vsoma[trial_idx][gid])
+    times = np.array(joblib_net.times)
+    spike_times = np.array(joblib_net.cell_response[gid].spike_times[trial_idx])
+    vsoma = np.array(joblib_net.cell_response[gid].vsoma[trial_idx])
 
     v_mask = vsoma > v_thresh
-    assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
-                   spike_times[spike_gids == gid] < times[v_mask][-1]])
+    assert np.all([spike_times > times[v_mask][0],
+                   spike_times < times[v_mask][-1]])
