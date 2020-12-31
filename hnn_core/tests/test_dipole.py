@@ -86,7 +86,7 @@ def test_dipole_simulation():
     params['tstop'] = 0.1
     net = Network(params)
     simulate_dipole(net, n_trials=1)
-    net.cell_response.plot_spikes_raster()
+    net.plot_spikes_raster()
 
 
 @requires_mpi4py
