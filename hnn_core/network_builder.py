@@ -416,8 +416,6 @@ class NetworkBuilder(object):
                     cell.add_tonic_input(
                         **self.net.feed_times['tonic'][_short_name(src_type)])
                 cell.record_soma(record_vsoma, record_isoma)
-                self.net.cell_response.append(CellResponse(
-                    gid=gid, cell_type=src_type, times=self.net.times))
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)

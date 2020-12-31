@@ -260,6 +260,12 @@ class Network(object):
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
+        for cell_type, gid_range in self.gid_ranges.items():
+            if cell_type in self.cellname_list:
+                for gid in gid_range:
+                    self.cell_response.append(
+                        CellResponse(gid=gid, cell_type=cell_type))
+
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cellname_list)
