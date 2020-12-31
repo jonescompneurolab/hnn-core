@@ -118,7 +118,8 @@ def test_cell_response_backends(run_hnn_core_fixture):
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
     times = np.array(joblib_net.times)
-    spike_times = np.array(joblib_net.cell_response[gid].spike_times[trial_idx])
+    spike_times = np.array(
+        joblib_net.cell_response[gid].spike_times[trial_idx])
     vsoma = np.array(joblib_net.cell_response[gid].vsoma[trial_idx])
 
     v_mask = vsoma > v_thresh

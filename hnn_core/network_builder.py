@@ -10,7 +10,6 @@ from neuron import h
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
-from .network import CellResponse
 
 # a few globals
 _PC = None
