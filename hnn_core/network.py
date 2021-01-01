@@ -54,7 +54,7 @@ def read_spikes(fname, gid_ranges=None):
 
     all_spike_gids = np.array(sum(spike_gids, []))
     all_spike_types = np.array(sum(spike_types, []))
-    gid_list = np.unique(all_spike_gids)
+    gid_list = np.arange(np.max(all_spike_gids))
 
     if gid_ranges is not None:
         validate_gid_ranges(gid_ranges)
@@ -67,17 +67,20 @@ def read_spikes(fname, gid_ranges=None):
                                                       cell_type=cell_type))
 
     else:
-        cell_response = [CellResponse(gid=gid) for
-                         gid in range(np.max(gid_list))]
+        cell_response = []
         for gid in gid_list:
-            cell_type_idx = np.where(all_spike_gids == gid)[0]
-            cell_response[gid].cell_type = all_spike_types[cell_type_idx]
+            cell_type_idx = np.where(all_spike_gids == gid)
+            if cell_type_idx:
+                cell_type = all_spike_types[cell_type_idx[0]]
+            else:
+                cell_type = None
+            cell_response.append(CellResponse(gid=gid, cell_type=cell_type))
 
     for trial in range(len(spike_times)):
         for cell_resp in cell_response:
             gid = cell_resp.gid
             gid_mask = np.array(spike_gids[trial]) == gid
-            gid_spike_times = np.array(spike_times)[trial][gid_mask].tolist()
+            gid_spike_times = np.array(spike_times[trial])[gid_mask].tolist()
             cell_response[gid].spike_times.append(gid_spike_times)
 
     return cell_response
