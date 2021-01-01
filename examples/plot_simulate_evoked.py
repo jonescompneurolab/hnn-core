@@ -53,8 +53,7 @@ with JoblibBackend(n_jobs=1):
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
-net.plot_spikes_hist(ax=axes[1],
-                                   spike_types=['evprox', 'evdist'])
+net.plot_spikes_hist(ax=axes[1], spike_types=['evprox', 'evdist'])
 
 ###############################################################################
 # Also, we can plot the spikes and write them to txt files.
@@ -69,12 +68,10 @@ print(cell_response[0])
 ###############################################################################
 # We can additionally calculate the mean spike rates for each cell class by
 # specifying a time window with tstart and tstop.
-all_rates = net.mean_rates(tstart=0, tstop=170,
-                                     gid_ranges=net.gid_ranges,
-                                     mean_type='all')
-trial_rates = net.mean_rates(tstart=0, tstop=170,
-                                       gid_ranges=net.gid_ranges,
-                                       mean_type='trial')
+all_rates = net.mean_rates(
+    tstart=0, tstop=170, gid_ranges=net.gid_ranges, mean_type='all')
+trial_rates = net.mean_rates(
+    tstart=0, tstop=170, gid_ranges=net.gid_ranges, mean_type='trial')
 print('Mean spike rates across trials:')
 print(all_rates)
 print('Mean spike rates for individual trials:')
