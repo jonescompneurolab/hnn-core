@@ -395,8 +395,8 @@ class Network(object):
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, dispersion_time)
 
-    def add_poisson_drive(self, name, *, t0, T, rate_constants, location,
-                          weights_ampa=None, weights_nmda=None,
+    def add_poisson_drive(self, name, *, t0=0, T=None, rate_constants,
+                          location, weights_ampa=None, weights_nmda=None,
                           space_constant=100., dispersion_time=0.1,
                           seedcore=2):
         """Add a Poisson-distributed external drive to the network
@@ -406,9 +406,9 @@ class Network(object):
         name : str
             Unique name for drive
         t0 : float
-            Start time of Poisson-distributed spike train
+            Start time of Poisson-distributed spike train (default: 0)
         T : float
-            End time of spike train
+            End time of spike train (defaults to None: T is end of simulation)
         rate_constants : dict of floats
             Rate constant (lambda) of renewal-process generating the samples.
             Dict keys are the cell names targeted.
@@ -431,9 +431,11 @@ class Network(object):
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
         """
-        if T < 0.:
-            raise ValueError('End time of Poisson input cannot be negative')
         tstop = self.cell_response.times[-1]
+        if T is None:
+            T = tstop
+        elif T < 0.:
+            raise ValueError('End time of Poisson input cannot be negative')
         if T > tstop:
             raise ValueError(f'End time of Poisson drive cannot exceed '
                              f'simulation end time {tstop}. Got {T}.')
