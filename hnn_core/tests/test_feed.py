@@ -9,7 +9,7 @@ import numpy as np
 import hnn_core
 from hnn_core import Params, read_params
 from hnn_core.feed import (feed_event_times, _get_prng, _create_extpois,
-                           _create_common_input)
+                           _create_bursty_input)
 from hnn_core.params import create_pext
 
 
@@ -89,10 +89,10 @@ def test_extfeed():
     repeats = 2
     prng, prng2 = _get_prng(seed=0, gid=5, sync_evinput=False)
     with pytest.raises(ValueError, match='distribution not recognized'):
-        _create_common_input(distribution='blah', t0=t0, t0_stdev=t0_stdev,
+        _create_bursty_input(distribution='blah', t0=t0, t0_stdev=t0_stdev,
                              tstop=tstop, f_input=f_input, stdev=stdev,
                              repeats=repeats, prng=prng, prng2=prng2)
-    event_times = _create_common_input(
+    event_times = _create_bursty_input(
         distribution='normal', t0=t0, t0_stdev=t0_stdev, tstop=tstop,
         f_input=f_input, stdev=stdev, repeats=repeats, prng=prng, prng2=prng2)
 
