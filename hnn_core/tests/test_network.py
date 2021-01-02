@@ -99,16 +99,16 @@ def test_network():
                     drive_name]['conn'][cellname]['ampa']['A_weight'],
                 target_weights[drive_name][cellname], rtol=1e-12)
 
-    # check select dispersion times
-    target_dispersions = {'evdist1': {'L2_basket': 0.1, 'L5_pyramidal': 0.1},
-                          'evprox1': {'L2_basket': 0.1, 'L5_pyramidal': 1.},
-                          'evprox2': {'L2_basket': 0.1, 'L5_pyramidal': 1.}}
-    for drive_name in target_dispersions:
-        for cellname in target_dispersions[drive_name]:
+    # check select synaptic delays
+    target_delays = {'evdist1': {'L2_basket': 0.1, 'L5_pyramidal': 0.1},
+                     'evprox1': {'L2_basket': 0.1, 'L5_pyramidal': 1.},
+                     'evprox2': {'L2_basket': 0.1, 'L5_pyramidal': 1.}}
+    for drive_name in target_delays:
+        for cellname in target_delays[drive_name]:
             assert_allclose(
                 net.external_drives[
                     drive_name]['conn'][cellname]['ampa']['A_delay'],
-                target_dispersions[drive_name][cellname], rtol=1e-12)
+                target_delays[drive_name][cellname], rtol=1e-12)
 
     # Assert that an empty CellResponse object is created as an attribute
     assert net.cell_response == CellResponse()

@@ -83,32 +83,32 @@ weights_ampa_d = {'L2_basket': 0.003, 'L2_pyramidal': 0.0045,
                   'L5_pyramidal': 0.001}
 weights_nmda_d = {'L2_basket': 0.003, 'L2_pyramidal': 0.0045,
                   'L5_pyramidal': 0.001}
-dispersion_time_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 # early distal input
 prng_initial_seed = 4 + 2  # XXX to match online docs
 net.add_evoked_drive(
     'evdist1', mu=32., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
     weights_nmda=weights_nmda_d, location='distal',
-    dispersion_time=dispersion_time_d, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_d, seedcore=prng_initial_seed)
 # late distal input
 prng_initial_seed = 0 + 2  # XXX to match online docs
 net.add_evoked_drive(
     'evdist2', mu=82., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
     weights_nmda=weights_nmda_d, location='distal',
-    dispersion_time=dispersion_time_d, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_d, seedcore=prng_initial_seed)
 
 # proximal input occurs before distals
 weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0025,
                   'L5_basket': 0.004, 'L5_pyramidal': 0.001}
 weights_nmda_p = {'L2_basket': 0.003, 'L5_basket': 0.004}
-dispersion_time_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 prng_initial_seed = 4 + 2  # XXX to match online docs
 net.add_evoked_drive(
     'evprox1', mu=20.0, sigma=0., numspikes=1, weights_ampa=weights_ampa_p,
     weights_nmda=weights_nmda_p, location='proximal',
-    dispersion_time=dispersion_time_p, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_p, seedcore=prng_initial_seed)
 
 dpl = simulate_dipole(net, n_trials=1)
 
