@@ -39,7 +39,7 @@ rate_constants = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
 # XXX online docs had a seed of -3 (!). This worked because extpois was added
 # last, the first artificial cell having gid=1352, leading to seeds >= 1349
 # With the new API, seeds begin from 270, so init_seed = 1352 - 3 - 270
-prng_initial_seed = 1079  # XXX fubar, but will work because gids are >> 0
+prng_initial_seed = 1079
 net.add_poisson_drive(
     'poisson', rate_constants=rate_constants, weights_ampa=weights_ampa,
     location='proximal', dispersion_time=dispersion_time,
