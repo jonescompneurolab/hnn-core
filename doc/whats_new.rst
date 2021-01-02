@@ -43,6 +43,8 @@ Changelog
 
 - Modify :func:`hnn_core.viz.plot_spikes_raster` to display individual cells, by `Nick Tolley`_ in `#231 <https://github.com/jonescompneurolab/hnn-core/pull/231>`_
 
+- Add methods for creating input drives and biases to network: :func:`hnn_core.Network.add_evoked_drive`, :func:`hnn_core.Network.add_gaussian_drive`, :func:`hnn_core.Network.add_poisson_drive`, :func:`hnn_core.Network.add_bursty_drive` and :func:`hnn_core.Network.add_tonic_bias`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+
 Bug
 ~~~
 
@@ -73,7 +75,7 @@ API
 
 - Add average_dipoles function to `hnn_core.dipole`, by `Blake Caldwell`_ in `#156 <https://github.com/jonescompneurolab/hnn-core/pull/156>`_
 
-- Create a new API for defining external drives and biases to network, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+- New API for defining external drives and biases to network, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Blake Caldwell: https://github.com/blakecaldwell
