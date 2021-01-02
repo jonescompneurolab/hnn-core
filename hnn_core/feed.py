@@ -25,7 +25,7 @@ def _get_prng(seed, gid, sync_evinput=False):
         The seed for events assuming a given start time.
     prng2 : instance of RandomState
         The seed for generating randomized start times.
-        Used in _create_common_input
+        Used in _create_bursty_input
     """
     # XXX: some param files use seed < 0 but numpy
     # does not allow this.
@@ -112,7 +112,7 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
             numspikes=dynamics['numspikes'],
             prng=prng)
     elif drive_type == 'bursty' and not target_syn_weights_zero:
-        event_times = _create_common_input(
+        event_times = _create_bursty_input(
             distribution=dynamics['distribution'],
             t0=dynamics['t0'],
             t0_stdev=dynamics['sigma_t0'],
@@ -223,7 +223,7 @@ def feed_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
             numspikes=50,
             prng=prng)
     elif feed_type == 'common' and not all_syn_weights_zero:
-        event_times = _create_common_input(
+        event_times = _create_bursty_input(
             distribution=params['distribution'],
             t0=params['t0'],
             t0_stdev=params['t0_stdev'],
@@ -308,10 +308,10 @@ def _create_gauss(*, mu, sigma, numspikes, prng):
     return prng.normal(mu, sigma, numspikes)
 
 
-def _create_common_input(*, distribution, t0, t0_stdev, tstop, f_input,
+def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
                          stdev, repeats, events_per_cycle=2,
-                         cycle_event_isi=10, prng, prng2):
-    """Creates the common ongoing external inputs.
+                         cycle_events_isi=10, prng, prng2):
+    """Creates the bursty ongoing external inputs.
 
     Used for, e.g., for rhythmic inputs in alpha/beta generation.
 
@@ -337,7 +337,7 @@ def _create_common_input(*, distribution, t0, t0_stdev, tstop, f_input,
     events_per_cycle : int
         The events per cycle. This is the spikes/burst parameter in the GUI.
         Default: 2 (doublet)
-    cycle_event_isi : float
+    cycle_events_isi : float
         Time between spike events within a cycle (ISI). Default: 10 ms
     prng : instance of RandomState
         The random state.
@@ -370,9 +370,6 @@ def _create_common_input(*, distribution, t0, t0_stdev, tstop, f_input,
 
     if events_per_cycle > 1:
         cycle = (np.arange(events_per_cycle) - (events_per_cycle - 1) / 2)
-        all_times = np.empty((len(cycle), len(t_array)))
-        for idx, cur_cycle in enumerate(cycle):
-            all_times[idx] = t_array + cur_cycle * cycle_event_isi
-        t_array = all_times.ravel()
+        t_array = np.ravel([t_array + cycle_events_isi * cyc for cyc in cycle])
 
     return t_array
