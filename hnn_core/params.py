@@ -161,7 +161,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                              'sigma_t0': par['t0_stdev'],
                              'T': par['tstop'],
                              'burst_f': par['f_input'],
-                             'burst_sigma_f': par['stdev'],
+                             'spike_jitter_std': par['stdev'],
                              'numspikes': par['events_per_cycle'],
                              'repeats': par['repeats'],
                              'spike_isi': 10}  # not exposed in params-files
