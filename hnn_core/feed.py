@@ -30,6 +30,7 @@ def _get_prng(seed, gid, sync_evinput=False):
     # XXX: some param files use seed < 0 but numpy
     # does not allow this.
     if seed >= 0:
+        # only used for randomisation of t0 of bursty drives
         prng2 = np.random.RandomState(seed)
     else:
         prng2 = None
@@ -77,6 +78,10 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     if drive_type == 'evoked':
         if dynamics['sigma'] == 0.:
             sync_evinput = True
+    # XXX comment out to reproduce online docs! affects seed of prng
+    # elif drive_type == 'bursty':
+    #     if dynamics['sigma_t0'] == 0.:
+    #         sync_evinput = True
     prng, prng2 = _get_prng(seed=seedcore + trial_idx,
                             gid=drive_cell_gid,
                             sync_evinput=sync_evinput)
@@ -118,10 +123,10 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
             t0_stdev=dynamics['sigma_t0'],
             tstop=dynamics['T'],
             f_input=dynamics['burst_f'],
-            stdev=dynamics['burst_sigma_f'],
+            events_jitter_std=dynamics['spike_jitter_std'],
             repeats=dynamics['repeats'],
             events_per_cycle=dynamics['numspikes'],
-            cycle_event_isi=dynamics['spike_isi'],
+            cycle_events_isi=dynamics['spike_isi'],
             prng=prng,
             prng2=prng2)
 
@@ -229,10 +234,10 @@ def feed_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
             t0_stdev=params['t0_stdev'],
             tstop=params['tstop'],
             f_input=params['f_input'],
-            stdev=params['stdev'],
+            events_jitter_std=params['stdev'],
             repeats=params['repeats'],
             events_per_cycle=params['events_per_cycle'],
-            cycle_event_isi=10,
+            cycle_events_isi=10,
             prng=prng,
             prng2=prng2)
 
@@ -309,7 +314,7 @@ def _create_gauss(*, mu, sigma, numspikes, prng):
 
 
 def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
-                         stdev, repeats, events_per_cycle=2,
+                         events_jitter_std, repeats, events_per_cycle=2,
                          cycle_events_isi=10, prng, prng2):
     """Creates the bursty ongoing external inputs.
 
@@ -330,10 +335,11 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
         The stop time.
     f_input : float
         The frequency of input bursts.
-    stdev : float
-        The standard deviation. Only for 'normal' distribution.
+    events_jitter_std : float
+        The standard deviation (in ms) of each burst event. Only applied when
+        for 'normal' distribution.
     repeats : int
-        The number of repeats.
+        The number of (jittered) repeats for each burst cycle.
     events_per_cycle : int
         The events per cycle. This is the spikes/burst parameter in the GUI.
         Default: 2 (doublet)
@@ -363,7 +369,7 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
         # array of mean stimulus times, starts at t0
         isi_array = np.arange(t0, tstop, 1000. / f_input)
         # array of single stimulus times -- no doublets
-        t_array = prng.normal(np.repeat(isi_array, repeats), stdev)
+        t_array = prng.normal(np.repeat(isi_array, repeats), events_jitter_std)
     elif distribution == 'uniform':
         n_inputs = repeats * f_input * (tstop - t0) / 1000.
         t_array = prng.uniform(t0, tstop, n_inputs)

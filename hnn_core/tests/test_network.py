@@ -66,7 +66,7 @@ def test_network():
 
         elif drive['type'] == 'bursty':
             for kw in ['distribution', 't0', 'sigma_t0', 'T', 'burst_f',
-                       'burst_sigma_f', 'numspikes', 'repeats']:
+                       'spike_jitter_std', 'numspikes', 'repeats']:
                 assert kw in drive['dynamics'].keys()
             assert len(drive['events'][0]) == 1
             n_events = (

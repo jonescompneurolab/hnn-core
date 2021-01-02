@@ -270,7 +270,8 @@ class Network(object):
                         sigma_t0=specs['dynamics']['sigma_t0'],
                         T=specs['dynamics']['T'],
                         burst_f=specs['dynamics']['burst_f'],
-                        burst_sigma_f=specs['dynamics']['burst_sigma_f'],
+                        spike_jitter_std=specs[
+                            'dynamics']['spike_jitter_std'],
                         numspikes=specs['dynamics']['numspikes'],
                         spike_isi=specs['dynamics']['spike_isi'],
                         repeats=specs['dynamics']['repeats'],
@@ -464,7 +465,7 @@ class Network(object):
                            space_constant, dispersion_time)
 
     def add_bursty_drive(self, name, *, distribution, t0, sigma_t0, T,
-                         burst_f, burst_sigma_f, numspikes, spike_isi,
+                         burst_f, spike_jitter_std, numspikes, spike_isi,
                          repeats, location, weights_ampa=None,
                          weights_nmda=None, dispersion_time=0.1,
                          space_constant=100., seedcore=2):
@@ -485,16 +486,16 @@ class Network(object):
             End of burst trains
         burst_f : float
             The frequency of input bursts.
-        burst_sigma_f : float
-            The standard deviation of spike times within burst. Only applied
-            to 'normal' distribution.
+        spike_jitter_std : float
+            The standard deviation (in ms) of each spike in a burst event.
+            Only applied when for 'normal' distribution.
         numspikes : int
             The events per cycle. This is the spikes/burst parameter in the
             GUI. Default: 2 (doublet)
         spike_isi : float
             Time between spike events within a cycle (ISI). Default: 10 ms
         repeats : int
-            The number of repeats.
+            The number of (jittered) repeats for each burst cycle.
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -521,7 +522,7 @@ class Network(object):
 
         drive['dynamics'] = dict(distribution=distribution, t0=t0,
                                  sigma_t0=sigma_t0, T=T, burst_f=burst_f,
-                                 burst_sigma_f=burst_sigma_f,
+                                 spike_jitter_std=spike_jitter_std,
                                  numspikes=numspikes, spike_isi=spike_isi,
                                  repeats=repeats
                                  )
