@@ -85,16 +85,18 @@ def test_extfeed():
     t0_stdev = 5
     tstop = 100
     f_input = 100.
-    stdev = 5.
+    events_jitter_std = 5.
     repeats = 2
     prng, prng2 = _get_prng(seed=0, gid=5, sync_evinput=False)
     with pytest.raises(ValueError, match='distribution not recognized'):
         _create_bursty_input(distribution='blah', t0=t0, t0_stdev=t0_stdev,
-                             tstop=tstop, f_input=f_input, stdev=stdev,
+                             tstop=tstop, f_input=f_input,
+                             events_jitter_std=events_jitter_std,
                              repeats=repeats, prng=prng, prng2=prng2)
     event_times = _create_bursty_input(
         distribution='normal', t0=t0, t0_stdev=t0_stdev, tstop=tstop,
-        f_input=f_input, stdev=stdev, repeats=repeats, prng=prng, prng2=prng2)
+        f_input=f_input, events_jitter_std=events_jitter_std,
+        repeats=repeats, prng=prng, prng2=prng2)
 
 
 def test_tonic_inputs():
