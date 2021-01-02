@@ -170,7 +170,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
         drive['seedcore'] = par['prng_seedcore']
         drive['weights_ampa'] = dict()
         drive['weights_nmda'] = dict()
-        drive['dispersion_time'] = dict()
+        drive['synaptic_delays'] = dict()
 
         for cellname in cellname_list:
             cname_ampa = _short_name(cellname) + '_ampa'
@@ -181,8 +181,8 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                 if ampa_w > 0.:
                     drive['weights_ampa'][cellname] = ampa_w
 
-                # NB dispersion time same for NMDA, read only for AMPA
-                drive['dispersion_time'][cellname] = ampa_d
+                # NB synaptic delay same for NMDA, read only for AMPA
+                drive['synaptic_delays'][cellname] = ampa_d
 
             if cname_nmda in par:
                 nmda_w = par[cname_nmda][0]
@@ -196,7 +196,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
         drive['cell_specific'] = True
         drive['weights_ampa'] = dict()
         drive['weights_nmda'] = dict()
-        drive['dispersion_time'] = dict()
+        drive['synaptic_delays'] = dict()
 
         if (feed_name.startswith('evprox') or
                 feed_name.startswith('evdist')):
@@ -222,12 +222,12 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                 if cellname in par:
                     ampa_w = par[cellname][0]
                     nmda_w = par[cellname][1]
-                    dispersion_time = par[cellname][2]
+                    synaptic_delays = par[cellname][2]
                     if ampa_w > 0.:
                         drive['weights_ampa'][cellname] = ampa_w
                     if nmda_w > 0.:
                         drive['weights_nmda'][cellname] = nmda_w
-                    drive['dispersion_time'][cellname] = dispersion_time
+                    drive['synaptic_delays'][cellname] = synaptic_delays
 
         elif feed_name.startswith('extgauss'):
             drive['type'] = 'gaussian'
@@ -242,10 +242,10 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             for cellname in cellname_list:
                 if cellname in par:
                     ampa_w = par[cellname][0]
-                    dispersion_time = par[cellname][3]
+                    synaptic_delays = par[cellname][3]
                     if ampa_w > 0.:
                         drive['weights_ampa'][cellname] = ampa_w
-                    drive['dispersion_time'][cellname] = dispersion_time
+                    drive['synaptic_delays'][cellname] = synaptic_delays
 
             drive['weights_nmda'] = dict()  # no NMDA weights for Gaussians
         elif feed_name.startswith('extpois'):
@@ -260,12 +260,12 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                     rate_params[cellname] = par[cellname][3]
                     ampa_w = par[cellname][0]
                     nmda_w = par[cellname][1]
-                    dispersion_time = par[cellname][2]
+                    synaptic_delays = par[cellname][2]
                     if ampa_w > 0.:
                         drive['weights_ampa'][cellname] = ampa_w
                     if nmda_w > 0.:
                         drive['weights_nmda'][cellname] = nmda_w
-                    drive['dispersion_time'][cellname] = dispersion_time
+                    drive['synaptic_delays'][cellname] = synaptic_delays
 
             # do NOT allow negative times
             drive['dynamics'] = {'t0': max(0, par['t_interval'][0]),

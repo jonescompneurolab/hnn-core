@@ -234,7 +234,7 @@ class Network(object):
                         weights_ampa=specs['weights_ampa'],
                         weights_nmda=specs['weights_nmda'],
                         location=specs['location'], seedcore=specs['seedcore'],
-                        dispersion_time=specs['dispersion_time'],
+                        synaptic_delays=specs['synaptic_delays'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'poisson':
                     self.add_poisson_drive(
@@ -244,7 +244,7 @@ class Network(object):
                         weights_ampa=specs['weights_ampa'],
                         weights_nmda=specs['weights_nmda'],
                         location=specs['location'], seedcore=specs['seedcore'],
-                        dispersion_time=specs['dispersion_time'],
+                        synaptic_delays=specs['synaptic_delays'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'gaussian':
                     self.add_gaussian_drive(
@@ -254,7 +254,7 @@ class Network(object):
                         weights_ampa=specs['weights_ampa'],
                         weights_nmda=specs['weights_nmda'],
                         location=specs['location'], seedcore=specs['seedcore'],
-                        dispersion_time=specs['dispersion_time'],
+                        synaptic_delays=specs['synaptic_delays'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'bursty':
                     self.add_bursty_drive(
@@ -273,7 +273,7 @@ class Network(object):
                         weights_nmda=specs['weights_nmda'],
                         location=specs['location'],
                         space_constant=specs['space_constant'],
-                        dispersion_time=specs['dispersion_time'],
+                        synaptic_delays=specs['synaptic_delays'],
                         seedcore=specs['seedcore'])
 
             # add tonic biases if present in params
@@ -297,7 +297,7 @@ class Network(object):
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
                          weights_ampa=None, weights_nmda=None,
-                         space_constant=3., dispersion_time=0.1, seedcore=2):
+                         space_constant=3., synaptic_delays=0.1, seedcore=2):
         """Add an 'evoked' external drive to the network
 
         Parameters
@@ -321,11 +321,11 @@ class Network(object):
             (keys). Weights can be zero or left omitted.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
-            delays within the simulated column
-        dispersion_time : float or dict
+            weights and delays within the simulated column
+        synaptic_delays : float or dict
             Synaptic delay at the column origin, dispersed laterally as a
             function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create dispersion->cell mapping.
+            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -333,11 +333,11 @@ class Network(object):
         self._add_evoked_or_gaussian_drive(
             'evoked', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
             location, space_constant=space_constant,
-            dispersion_time=dispersion_time, seedcore=seedcore)
+            synaptic_delays=synaptic_delays, seedcore=seedcore)
 
     def add_gaussian_drive(self, name, *, mu, sigma, numspikes, location,
                            weights_ampa=None, weights_nmda=None,
-                           space_constant=100., dispersion_time=0.1,
+                           space_constant=100., synaptic_delays=0.1,
                            seedcore=2):
         """Add an 'evoked' external drive to the network
 
@@ -361,11 +361,11 @@ class Network(object):
             (keys). Weights can be zero or left omitted.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
-            delays within the simulated column
-        dispersion_time : float or dict
+            weights and delays within the simulated column
+        synaptic_delays : float or dict
             Synaptic delay at the column origin, dispersed laterally as a
             function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create dispersion->cell mapping.
+            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -373,11 +373,11 @@ class Network(object):
         self._add_evoked_or_gaussian_drive(
             'gaussian', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
             location, space_constant=space_constant,
-            dispersion_time=dispersion_time, seedcore=seedcore)
+            synaptic_delays=synaptic_delays, seedcore=seedcore)
 
     def _add_evoked_or_gaussian_drive(
         self, dtype, name, mu, sigma, numspikes, weights_ampa, weights_nmda,
-            location, space_constant, dispersion_time, seedcore):
+            location, space_constant, synaptic_delays, seedcore):
         """Utility function for gaussian-type drives"""
         if sigma < 0.:
             raise ValueError('Standard deviation cannot be negative')
@@ -393,11 +393,11 @@ class Network(object):
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant, dispersion_time)
+                           space_constant, synaptic_delays)
 
     def add_poisson_drive(self, name, *, t0=0, T=None, rate_constants,
                           location, weights_ampa=None, weights_nmda=None,
-                          space_constant=100., dispersion_time=0.1,
+                          space_constant=100., synaptic_delays=0.1,
                           seedcore=2):
         """Add a Poisson-distributed external drive to the network
 
@@ -422,11 +422,11 @@ class Network(object):
             (keys). Weights can be zero or left omitted.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
-            delays within the simulated column
-        dispersion_time : float or dict
+            weigths and delays within the simulated column
+        synaptic_delays : float or dict
             Synaptic delay at the column origin, dispersed laterally as a
             function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create dispersion->cell mapping.
+            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -458,12 +458,12 @@ class Network(object):
         drive['dynamics'] = dict(t0=t0, T=T, rate_constants=rate_constants)
         drive['events'] = list()
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant, dispersion_time)
+                           space_constant, synaptic_delays)
 
     def add_bursty_drive(self, name, *, distribution, t0, sigma_t0, T,
                          burst_f, spike_jitter_std, numspikes, spike_isi,
                          repeats, location, weights_ampa=None,
-                         weights_nmda=None, dispersion_time=0.1,
+                         weights_nmda=None, synaptic_delays=0.1,
                          space_constant=100., seedcore=2):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
@@ -502,11 +502,11 @@ class Network(object):
             (keys). Weights can be zero or left omitted.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
-            delays within the simulated column
-        dispersion_time : float or dict
+            weights and delays within the simulated column
+        synaptic_delays : float or dict
             Synaptic delay at the column origin, dispersed laterally as a
             function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create dispersion->cell mapping.
+            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -525,11 +525,11 @@ class Network(object):
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant, dispersion_time,
+                           space_constant, synaptic_delays,
                            cell_specific=False)
 
     def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
-                      space_constant, dispersion_time, cell_specific=True):
+                      space_constant, synaptic_delays, cell_specific=True):
         """Attach a drive to network based on connectivity information
 
         Parameters
@@ -548,8 +548,8 @@ class Network(object):
             Target location of synapses ('distal' or 'proximal')
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
-            delays within the simulated column
-        dispersion_time : dict
+            weights and delays within the simulated column
+        synaptic_delays : dict
             Synaptic delay at the column origin, dispersed laterally as a
             function of the space_constant
         cell_specific : bool
@@ -593,7 +593,7 @@ class Network(object):
 
         drive['conn'], src_gid_ran = self._create_drive_conns(
             target_populations, weights_by_receptor, location,
-            space_constant, dispersion_time, cell_specific=cell_specific)
+            space_constant, synaptic_delays, cell_specific=cell_specific)
 
         # Must remember to update the GID ranges based on pos_dict!
         self.pos_dict[name] = [self.pos_dict['origin'] for
@@ -605,7 +605,7 @@ class Network(object):
         self._update_gid_ranges()
 
     def _create_drive_conns(self, target_populations, weights_by_receptor,
-                            location, space_constant, dispersion_time,
+                            location, space_constant, synaptic_delays,
                             cell_specific=True):
         """Create parameter dictionary defining how drive connects to network
 
@@ -619,8 +619,8 @@ class Network(object):
             Target location of synapses ('distal' or 'proximal')
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
-            delays within the simulated column
-        dispersion_time : dict
+            weights and delays within the simulated column
+        synaptic_delays : dict
             Synaptic delay at the column origin, dispersed laterally as a
             function of the space_constant
         cell_specific : bool
@@ -645,16 +645,16 @@ class Network(object):
             'location': 'distal' or 'proximal'
             'ampa' and 'nmda': dict
                 'A_weight': synaptic weight
-                'A_delay': dispersion time (used with space constant)
+                'A_delay':  synaptic delay (used with space constant)
                 'lamtha': space constant
         """
-        if isinstance(dispersion_time, dict):
+        if isinstance(synaptic_delays, dict):
             for receptor in ['ampa', 'nmda']:
                 if not (
                     set(list(weights_by_receptor[receptor].keys())).issubset(
-                        set(list(dispersion_time.keys())))):
+                        set(list(synaptic_delays.keys())))):
                     raise ValueError(
-                        'dispersion_time is either common (float), or needs '
+                        'synaptic_delays is either common (float), or needs '
                         'to be specified for each cell type')
 
         drive_conn_by_cell = dict()
@@ -680,11 +680,11 @@ class Network(object):
                     drive_conn[receptor] = dict()
                     if cellname in weights:
                         drive_conn[receptor]['lamtha'] = space_constant
-                        if isinstance(dispersion_time, float):
-                            drive_conn[receptor]['A_delay'] = dispersion_time
+                        if isinstance(synaptic_delays, float):
+                            drive_conn[receptor]['A_delay'] = synaptic_delays
                         else:
                             drive_conn[receptor][
-                                'A_delay'] = dispersion_time[cellname]
+                                'A_delay'] = synaptic_delays[cellname]
                         drive_conn[receptor][
                             'A_weight'] = weights[cellname]
 
@@ -706,11 +706,11 @@ class Network(object):
                     drive_conn[receptor] = dict()
                     if cellname in weights:
                         drive_conn[receptor]['lamtha'] = space_constant
-                        if isinstance(dispersion_time, float):
-                            drive_conn[receptor]['A_delay'] = dispersion_time
+                        if isinstance(synaptic_delays, float):
+                            drive_conn[receptor]['A_delay'] = synaptic_delays
                         else:
                             drive_conn[receptor][
-                                'A_delay'] = dispersion_time[cellname]
+                                'A_delay'] = synaptic_delays[cellname]
                         drive_conn[receptor][
                             'A_weight'] = weights[cellname]
                 drive_conn_by_cell[cellname] = drive_conn
