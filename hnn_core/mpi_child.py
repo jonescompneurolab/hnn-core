@@ -100,7 +100,7 @@ class MPISimulation(object):
         from hnn_core import Network
         from hnn_core.parallel_backends import _clone_and_simulate
 
-        net = Network(params)
+        net = Network(params, init_drives_from_params=True)
         sim_data = []
         for trial_idx in range(params['N_trials']):
             single_sim_data = _clone_and_simulate(net, trial_idx)
