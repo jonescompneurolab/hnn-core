@@ -384,7 +384,7 @@ class MPIBackend(object):
 
         cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
 
-        pickled_params = base64.b64encode(pickle.dumps(net.params))
+        pickled_net = base64.b64encode(pickle.dumps(net))
 
         # set some MPI environment variables
         my_env = os.environ.copy()
@@ -406,7 +406,7 @@ class MPIBackend(object):
                      universal_newlines=True)
 
         # process will read stdin on startup for params
-        os.write(pipe_stdin_w, pickled_params)
+        os.write(pipe_stdin_w, pickled_net)
 
         # signal that we are done writing params
         os.close(pipe_stdin_w)
