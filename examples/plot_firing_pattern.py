@@ -63,8 +63,7 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p2, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 
-# XXX n_trials=1 instantiates drive!
-dpls = simulate_dipole(net, n_trials=1, record_vsoma=True)
+dpls = simulate_dipole(net, record_vsoma=True)
 
 ###############################################################################
 # The cell IDs (gids) are stored in the network object as a dictionary

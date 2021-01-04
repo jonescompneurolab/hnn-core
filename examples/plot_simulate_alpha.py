@@ -47,7 +47,7 @@ net.add_bursty_drive(
     weights_ampa=weights_ampa, weights_nmda=None, location='distal',
     seedcore=4, space_constant=100.)
 
-dpl = simulate_dipole(net, n_trials=1)  # XXX n_trials=1 instantiates drive!
+dpl = simulate_dipole(net)
 dpl[0].plot()
 
 ###############################################################################

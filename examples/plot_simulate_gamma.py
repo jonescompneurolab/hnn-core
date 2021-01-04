@@ -40,7 +40,7 @@ net.add_poisson_drive(
     'poisson', rate_constants=rate_constants, weights_ampa=weights_ampa,
     location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
 
-dpls = simulate_dipole(net, n_trials=1)  # XXX n_trials=1 instantiates drive!
+dpls = simulate_dipole(net)
 
 ###############################################################################
 # The network requires some time to reach steady state. Hence, we omit the

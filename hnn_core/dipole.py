@@ -28,7 +28,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         connected.
     n_trials : int | None
         The number of trials to simulate. If None the value in
-        net.params['N_trials'] will be used
+        net.params['N_trials'] is used (value must be >0)
     record_vsoma : bool
         Option to record somatic voltages from cells
     record_isoma : bool
@@ -47,15 +47,14 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
 
-    if n_trials is not None:
-        net.params['N_trials'] = n_trials
-        # need to redo these if n_trials changed after net.__init__()!
-        net._instantiate_drives(n_trials=n_trials)
-    else:
+    if n_trials is None:
         n_trials = net.params['N_trials']
-
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
+
+    # XXX needed in mpi_child.py:run()#L103; include fix in #211 or later PR
+    net.params['N_trials'] = n_trials
+    net._instantiate_drives(n_trials=n_trials)
 
     if isinstance(record_vsoma, bool):
         net.params['record_vsoma'] = record_vsoma
@@ -69,7 +68,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         raise TypeError("record_isoma must be bool, got %s"
                         % type(record_isoma).__name__)
 
-    dpls = _BACKEND.simulate(net, postproc)
+    dpls = _BACKEND.simulate(net, n_trials, postproc)
 
     return dpls
 
