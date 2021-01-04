@@ -627,7 +627,7 @@ class Network(object):
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weights and delays within the simulated column
-        synaptic_delays : dict
+        synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
         cell_specific : bool
@@ -657,9 +657,10 @@ class Network(object):
         """
         if isinstance(synaptic_delays, dict):
             for receptor in ['ampa', 'nmda']:
-                if not (
-                    set(list(weights_by_receptor[receptor].keys())).issubset(
-                        set(list(synaptic_delays.keys())))):
+                # synaptic_delays must be defined for all cell types for which
+                # either AMPA or NMDA weights are non-zero
+                if not (set(weights_by_receptor[receptor].keys()).issubset(
+                        set(synaptic_delays.keys()))):
                     raise ValueError(
                         'synaptic_delays is either common (float), or needs '
                         'to be specified for each cell type')
