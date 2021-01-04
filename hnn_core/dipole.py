@@ -27,8 +27,8 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         The Network object specifying how cells are
         connected.
     n_trials : int | None
-        The number of trials to simulate. If None the value in
-        net.params['N_trials'] is used (value must be >0)
+        The number of trials to simulate. If None, the value in
+        net.params['N_trials'] is used (must be >0)
     record_vsoma : bool
         Option to record somatic voltages from cells
     record_isoma : bool

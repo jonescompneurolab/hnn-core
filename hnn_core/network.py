@@ -770,16 +770,26 @@ class Network(object):
         amplitude : float
             The amplitude of the input.
         t0 : float
-            The start time of tonic input (in ms).
+            The start time of tonic input (in ms). Default: 0 (beginning of
+            simulation).
         T : float
-            The end time of tonic input (in ms).
+            The end time of tonic input (in ms). Default: end of simulation.
         """
-        if (cell_type is None or amplitude is None or t0 is None or T is None):
-            raise ValueError('cell_type, amplitude, t0, and T must be defined'
-                             f', got {cell_type}, {amplitude}, {t0}, {T}')
+        if (cell_type is None or amplitude is None):
+            raise ValueError('cell_type and amplitude must be defined'
+                             f', got {cell_type}, {amplitude}')
+        if 'tonic' not in self.external_biases:
+            self.external_biases['tonic'] = dict()
+        if cell_type in self.external_biases['tonic']:
+            raise ValueError(f'Tonic bias already defined for {cell_type}')
+
+        if t0 is None:
+            t0 = 0
+        tstop = self.cell_response.times[-1]
+        if T is None:
+            T = tstop
         if T < 0.:
             raise ValueError('End time of tonic input cannot be negative')
-        tstop = self.cell_response.times[-1]
         if T > tstop:
             raise ValueError(f'End time of tonic input cannot exceed '
                              f'simulation end time {tstop}. Got {T}.')
@@ -790,8 +800,6 @@ class Network(object):
         if duration < 0.:
             raise ValueError('Duration of tonic input cannot be negative')
 
-        if 'tonic' not in self.external_biases:
-            self.external_biases['tonic'] = dict()
         self.external_biases['tonic'][cell_type] = {
             'amplitude': amplitude,
             't0': t0,
