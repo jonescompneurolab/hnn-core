@@ -162,6 +162,61 @@ def test_network():
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
 
+def test_tonic_biases():
+    """Test tonic biases."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+
+    # default params
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+    net = hnn_core.Network(params, add_drives_from_params=True)
+    with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
+        net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
+                           t0=0.0, T=4.0)
+
+    with pytest.raises(ValueError, match='Duration of tonic input cannot be'
+                       ' negative'):
+        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+                           t0=5.0, T=4.0)
+
+    with pytest.raises(ValueError, match='End time of tonic input cannot be'
+                       ' negative'):
+        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+                           t0=5.0, T=-1.)
+
+    with pytest.raises(ValueError, match='parameter may be missing'):
+        params['Itonic_T_L2Pyr_soma'] = 5.0
+        net = hnn_core.Network(params, add_drives_from_params=True)
+
+    params.update({
+        'N_pyr_x': 3, 'N_pyr_y': 3,
+        'tstop': 25, 'N_trials': 1,
+        't_evprox_1': 5,
+        't_evdist_1': 10,
+        't_evprox_2': 20,
+        # tonic inputs
+        'Itonic_A_L2Pyr_soma': 1.0,
+        'Itonic_t0_L2Pyr_soma': 5.0,
+        'Itonic_T_L2Pyr_soma': 15.0
+    })
+    # old API
+    net = hnn_core.Network(params, add_drives_from_params=True)
+    assert 'tonic' in net.external_biases
+    assert 'L2_pyramidal' in net.external_biases['tonic']
+
+    # new API
+    net = hnn_core.Network(params)
+    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+    assert 'tonic' in net.external_biases
+    assert 'L5_pyramidal' not in net.external_biases['tonic']
+    assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
+    assert net.external_biases[
+        'tonic']['L2_pyramidal']['T'] == net.params['tstop']
+    with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
+        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+
+
 def test_cell_response(tmpdir):
     """Test CellResponse object."""
 
