@@ -142,7 +142,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, postproc=True):
+    def simulate(self, net, n_trials, postproc=True):
         """Simulate the HNN model
 
         Parameters
@@ -150,6 +150,8 @@ class JoblibBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
+        n_trials : int
+            Number of trials to simulate.
         postproc : bool
             If False, no postprocessing applied to the dipole
 
@@ -159,7 +161,6 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
 
-        n_trials = net.params['N_trials']
         dpls = []
 
         parallel, myfunc = self._parallel_func(_clone_and_simulate)
@@ -351,7 +352,7 @@ class MPIBackend(object):
         # unpickle the data
         return pickle.loads(data_pickled)
 
-    def simulate(self, net, postproc=True):
+    def simulate(self, net, n_trials, postproc=True):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -359,6 +360,8 @@ class MPIBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
+        n_trials : int
+            Number of trials to simulate.
         postproc: bool
             If False, no postprocessing applied to the dipole
 
@@ -372,7 +375,6 @@ class MPIBackend(object):
         if self.n_procs == 1:
             return JoblibBackend(n_jobs=1).simulate(net, postproc)
 
-        n_trials = net.params['N_trials']
         print("Running %d trials..." % (n_trials))
         dpls = []
 

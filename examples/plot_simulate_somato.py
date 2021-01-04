@@ -107,7 +107,7 @@ net.add_evoked_drive(
     weights_nmda=weights_nmda_p, location='proximal',
     synaptic_delays=synaptic_delays_p, seedcore=6)
 
-dpl = simulate_dipole(net, n_trials=1)  # XXX n_trials=1 instantiates drive!
+dpl = simulate_dipole(net, n_trials=1)
 
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
