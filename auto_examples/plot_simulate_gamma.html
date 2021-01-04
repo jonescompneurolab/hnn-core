@@ -408,41 +408,106 @@ Simulation time: 230.0 ms...
 Simulation time: 240.0 ms...
 </pre></div>
 </div>
+<p>The network requires some time to reach steady state. Hence, we omit the
+first 50 ms in our time-frequency analysis.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tstart</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">trial_idx</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># pick first trial</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">times</span> <span class="o">&gt;</span> <span class="n">tstart</span>
+<span class="n">times</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span>
+</pre></div>
+</div>
 <p>We can plot the time-frequency response using MNE</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">mne.time_frequency</span> <span class="kn">import</span> <span class="n">tfr_array_multitaper</span>
+<span class="kn">from</span> <span class="nn">mne.time_frequency</span> <span class="kn">import</span> <span class="n">tfr_array_morlet</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
 <span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
-<span class="n">time_bandwidth</span> <span class="o">=</span> <span class="mf">4.0</span>
 <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">20.</span><span class="p">,</span> <span class="mf">100.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
-<span class="n">n_cycles</span> <span class="o">=</span> <span class="n">freqs</span> <span class="o">/</span> <span class="mf">4.</span>
+<span class="n">n_cycles</span> <span class="o">=</span> <span class="n">freqs</span> <span class="o">/</span> <span class="mf">8.</span>
 
 <span class="c1"># MNE expects an array of shape (n_trials, n_channels, n_times)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
-<span class="n">power</span> <span class="o">=</span> <span class="n">tfr_array_multitaper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
-                             <span class="n">n_cycles</span><span class="o">=</span><span class="n">n_cycles</span><span class="p">,</span>
-                             <span class="n">time_bandwidth</span><span class="o">=</span><span class="n">time_bandwidth</span><span class="p">,</span>
-                             <span class="n">output</span><span class="o">=</span><span class="s1">&#39;power&#39;</span><span class="p">)</span>
-<span class="c1"># stop = params[&#39;tstop&#39;] + params[&#39;dt&#39;] so last point is included</span>
-<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdBu_r&#39;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">power</span> <span class="o">=</span> <span class="n">tfr_array_morlet</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
+                         <span class="n">n_cycles</span><span class="o">=</span><span class="n">n_cycles</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;power&#39;</span><span class="p">)</span>
+
+<span class="n">im</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdBu_r&#39;</span><span class="p">,</span>
+                        <span class="n">shading</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]))</span>
+
+<span class="c1"># Add colorbar</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">right</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">cbar_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cbar_ax</span><span class="p">)</span>
+
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="agg" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_gamma_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/plot_simulate_gamma.py:58: MatplotlibDeprecationWarning: shading=&#39;flat&#39; when X and Y have the same dimensions as C is deprecated since 3.3.  Either specify the corners of the quadrilaterals with X and Y, or pass shading=&#39;auto&#39;, &#39;nearest&#39; or &#39;gouraud&#39;, or set rcParams[&#39;pcolor.shading&#39;].  This will become an error two minor releases later.
-  axes[1].pcolormesh(times, freqs, power[0, 0, ...], cmap=&#39;RdBu_r&#39;)
+<img alt="plot simulate gamma" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_gamma_001.png" />
+<p>As a final exercise, let us try to re-run the simulation with tonic inputs
+to the L5 Pyramidal cells. Notice that the oscillation waveform is now more
+regular with less noise due to the fact that the tonic drive is strong and
+outweighs the influence of the Poisson drive</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.add_tonic_input" title="hnn_core.Network.add_tonic_input" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_tonic_input</span></a><span class="p">(</span><span class="n">cell_type</span><span class="o">=</span><span class="s1">&#39;L5Pyr&#39;</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mf">6.</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">])</span>
+<span class="n">dpls</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  32.840 seconds)</p>
+<img alt="agg" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_gamma_002.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
+Building the NEURON model
+[Done]
+running trial 1 on 1 cores
+Simulation time: 0.03 ms...
+Simulation time: 10.0 ms...
+Simulation time: 20.0 ms...
+Simulation time: 30.0 ms...
+Simulation time: 40.0 ms...
+Simulation time: 50.0 ms...
+Simulation time: 60.0 ms...
+Simulation time: 70.0 ms...
+Simulation time: 80.0 ms...
+Simulation time: 90.0 ms...
+Simulation time: 100.0 ms...
+Simulation time: 110.0 ms...
+Simulation time: 120.0 ms...
+Simulation time: 130.0 ms...
+Simulation time: 140.0 ms...
+Simulation time: 150.0 ms...
+Simulation time: 160.0 ms...
+Simulation time: 170.0 ms...
+Simulation time: 180.0 ms...
+Simulation time: 190.0 ms...
+Simulation time: 200.0 ms...
+Simulation time: 210.0 ms...
+Simulation time: 220.0 ms...
+Simulation time: 230.0 ms...
+Simulation time: 240.0 ms...
+
+&lt;Figure size 640x480 with 1 Axes&gt;
+</pre></div>
+</div>
+<p>Notice that the Layer 5 pyramidal neurons are now firing nearly
+synchronously. They in turn synchronously activate the inhibitory basket
+neurons, which then inhibit the pyramidal neurons for ~20 ms. Once the
+tonic drive outweighs the inhibition and the pyramidal neurons firing again
+creating a ~50 Hz PING rhythm. This type of synchronous rhythm is sometimes
+referred to as “strong” PING.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="plot simulate gamma" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_gamma_003.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 1 Axes&gt;
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  35.429 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-gamma-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_gamma.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
