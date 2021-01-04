@@ -137,8 +137,18 @@ def test_tonic_inputs():
         'Itonic_t0_L2Pyr_soma': 5.0,
         'Itonic_T_L2Pyr_soma': 15.0
     })
+    # old API
     net = hnn_core.Network(params, add_drives_from_params=True)
-    # smoke test for tonic inputs
-    hnn_core.simulate_dipole(net)
-    assert 'tonic' in net.feed_times
-    assert 'L2Pyr' in net.feed_times['tonic']
+    assert 'tonic' in net.external_biases
+    assert 'L2_pyramidal' in net.external_biases['tonic']
+
+    # new API
+    net = hnn_core.Network(params)
+    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+    assert 'tonic' in net.external_biases
+    assert 'L5_pyramidal' not in net.external_biases['tonic']
+    assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
+    assert net.external_biases[
+        'tonic']['L2_pyramidal']['T'] == net.params['tstop']
+    with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
+        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
