@@ -320,18 +320,18 @@ class Network(object):
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
-            Synaptic weights of AMPA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of AMPA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         weights_nmda : dict or None
-            Synaptic weights of NMDA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        synaptic_delays : float or dict
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weights and delays within the simulated column
-        synaptic_delays : float or dict
-            Synaptic delay at the column origin, dispersed laterally as a
-            function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -360,18 +360,18 @@ class Network(object):
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
-            Synaptic weights of AMPA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of AMPA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         weights_nmda : dict or None
-            Synaptic weights of NMDA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        synaptic_delays : float or dict
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weights and delays within the simulated column
-        synaptic_delays : float or dict
-            Synaptic delay at the column origin, dispersed laterally as a
-            function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -421,18 +421,18 @@ class Network(object):
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
-            Synaptic weights of AMPA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of AMPA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         weights_nmda : dict or None
-            Synaptic weights of NMDA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        synaptic_delays : float or dict
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weigths and delays within the simulated column
-        synaptic_delays : float or dict
-            Synaptic delay at the column origin, dispersed laterally as a
-            function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -501,18 +501,18 @@ class Network(object):
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
-            Synaptic weights of AMPA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of AMPA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         weights_nmda : dict or None
-            Synaptic weights of NMDA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        synaptic_delays : float or dict
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weights and delays within the simulated column
-        synaptic_delays : float or dict
-            Synaptic delay at the column origin, dispersed laterally as a
-            function of the space_constant. If float, applies to all target
-            cell types. Use dict, to create delay->cell mapping.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
             Each artificial drive cell has seed = seedcore + gid
@@ -545,19 +545,19 @@ class Network(object):
         drive : instance of NetworkDrive
             Collection of parameters defining the dynamics of the drive
         weights_ampa : dict or None
-            Synaptic weights of AMPA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of AMPA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         weights_nmda : dict or None
-            Synaptic weights of NMDA receptors on each targeted cell type
-            (keys). Weights can be zero or left omitted.
+            Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         location : str
             Target location of synapses ('distal' or 'proximal')
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weights and delays within the simulated column
         synaptic_delays : dict
-            Synaptic delay at the column origin, dispersed laterally as a
-            function of the space_constant
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant
         cell_specific : bool
             Whether each cell has unique connection parameters (default: True)
             or all cells have common connections to a global (single) drive.
@@ -620,15 +620,15 @@ class Network(object):
         target_populations : list
             Cell names/types to attach the drive to
         weights_by_receptor : dict (keys: 'ampa' and 'nmda')
-            Synaptic weights for each receptor type
+            Synaptic weights (in uS) for each receptor type
         location : str
             Target location of synapses ('distal' or 'proximal')
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weights and delays within the simulated column
         synaptic_delays : dict
-            Synaptic delay at the column origin, dispersed laterally as a
-            function of the space_constant
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant
         cell_specific : bool
             Whether each cell has unique connection parameters (default: True)
             or all cells have common connections to a global (single) drive.
