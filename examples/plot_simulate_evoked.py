@@ -38,16 +38,20 @@ print(params['L2Pyr_soma*'])
 
 ###############################################################################
 # Let us first create our network from the params file and visualize the cells
-# inside it. The default behaviour of Network is to add and instantiate six
-# 'default' drives, but we will suppress that by setting the
-# `initialise_hnn_drives`-argument to `False`.
+# inside it.
 net = Network(params)
 net.plot_cells()
 
 ###############################################################################
 # The network of cells is now defined, to which we add external drives as
 # required. Weights are prescribed separately for AMPA and NMDA receptors
-# (receptors that are not used can be omitted or set to zero)
+# (receptors that are not used can be omitted or set to zero). The possible
+# drive types include the following (click on the links for documentation):
+#
+# - :meth:`hnn_core.Network.add_evoked_drive`
+# - :meth:`hnn_core.Network.add_gaussian_drive`
+# - :meth:`hnn_core.Network.add_poisson_drive`
+# - :meth:`hnn_core.Network.add_bursty_drive`
 
 # Distal evoked drive
 weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,

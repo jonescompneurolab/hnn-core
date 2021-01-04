@@ -336,7 +336,6 @@ class Network(object):
             weights and delays within the simulated column
         seedcore : int
             Optional initial seed for random number generator (default: 2).
-            Each artificial drive cell has seed = seedcore + gid
         """
         self._add_evoked_or_gaussian_drive(
             'evoked', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
@@ -376,7 +375,6 @@ class Network(object):
             weights and delays within the simulated column
         seedcore : int
             Optional initial seed for random number generator (default: 2).
-            Each artificial drive cell has seed = seedcore + gid
         """
         self._add_evoked_or_gaussian_drive(
             'gaussian', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
@@ -437,7 +435,6 @@ class Network(object):
             weigths and delays within the simulated column
         seedcore : int
             Optional initial seed for random number generator (default: 2).
-            Each artificial drive cell has seed = seedcore + gid
         """
         tstop = self.cell_response.times[-1]
         if T is None:
@@ -517,7 +514,6 @@ class Network(object):
             weights and delays within the simulated column
         seedcore : int
             Optional initial seed for random number generator (default: 2).
-            Each artificial drive cell has seed = seedcore + gid
         """
         drive = NetworkDrive()
         drive['type'] = 'bursty'
