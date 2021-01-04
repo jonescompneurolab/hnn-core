@@ -77,7 +77,7 @@ API
 
 - Add average_dipoles function to `hnn_core.dipole`, by `Blake Caldwell`_ in `#156 <https://github.com/jonescompneurolab/hnn-core/pull/156>`_
 
-- New API for defining external drives and biases to network. By default (controlled by the argument `add_drives_from_params`), a :class:`hnn_core.Network` is created without drives. These are added using class methods, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+- New API for defining external drives and biases to network. By default, a :class:`hnn_core.Network` is created without drives, which are added using class methods. The argument ``add_drives_from_params`` controls this behaviour, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
 - Examples apply random state seeds that reproduce the output of HNN GUI documentation, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 

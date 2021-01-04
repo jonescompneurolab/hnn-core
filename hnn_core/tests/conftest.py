@@ -89,7 +89,7 @@ def run_hnn_core_fixture():
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
-        net = Network(params, init_drives_from_params=True)
+        net = Network(params, add_drives_from_params=True)
 
         # number of trials simulated
         for drive in net.external_drives.values():
