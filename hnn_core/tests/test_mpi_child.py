@@ -96,7 +96,7 @@ def test_child_run():
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
-    net_reduced = Network(params_reduced, init_drives_from_params=True)
+    net_reduced = Network(params_reduced, add_drives_from_params=True)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):

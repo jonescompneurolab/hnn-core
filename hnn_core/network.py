@@ -142,7 +142,7 @@ class Network(object):
     ----------
     params : dict
         The parameters to use for constructing the network.
-    init_drives_from_params : bool
+    add_drives_from_params : bool
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
@@ -175,7 +175,7 @@ class Network(object):
         The parameters of bias inputs to cell somata, e.g., tonic current clamp
     """
 
-    def __init__(self, params, init_drives_from_params=False):
+    def __init__(self, params, add_drives_from_params=False):
         # Save the parameters used to create the Network
         self.params = params
         # Initialise a dictionary of cell ID's, which get used when the
@@ -220,7 +220,7 @@ class Network(object):
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cellname_list)
 
-        if init_drives_from_params:
+        if add_drives_from_params:
             drive_specs = _extract_drive_specs_from_hnn_params(
                 self.params, self.cellname_list)
             bias_specs = _extract_bias_specs_from_hnn_params(
