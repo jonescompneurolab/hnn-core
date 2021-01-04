@@ -36,16 +36,11 @@ net = Network(params)
 weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
 synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
 rate_constants = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
-# XXX online docs had a seed of -3 (!). This worked because extpois was added
-# last, the first artificial cell having gid=1352, leading to seeds >= 1349
-# With the new API, seeds begin from 270, so init_seed = 1352 - 3 - 270
-prng_initial_seed = 1079
 net.add_poisson_drive(
     'poisson', rate_constants=rate_constants, weights_ampa=weights_ampa,
-    location='proximal', synaptic_delays=synaptic_delays,
-    seedcore=prng_initial_seed)
+    location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
 
-dpls = simulate_dipole(net, n_trials=1)
+dpls = simulate_dipole(net, n_trials=1)  # XXX n_trials=1 instantiates drive!
 
 ###############################################################################
 # The network requires some time to reach steady state. Hence, we omit the
