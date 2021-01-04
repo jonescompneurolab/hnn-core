@@ -2,7 +2,7 @@
     "tstop": 250.0,
     "dt": 0.025,
     "celsius": 37.0,
-    "N_trials": 0,
+    "N_trials": 1,
     "threshold": 0.0,
     "save_figs": 0,
     "save_spec_data": 1,
