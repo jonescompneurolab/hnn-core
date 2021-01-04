@@ -38,9 +38,10 @@ dpls = simulate_dipole(net, n_trials=1)
 # first 50 ms in our time-frequency analysis.
 
 tstart = 50
-mask = dpls[0].times > tstart
-times = dpls[0].times[mask]
-data = dpls[0].data['agg'][mask]
+trial_idx = 0  # pick first trial
+mask = dpls[trial_idx].times > tstart
+times = dpls[trial_idx].times[mask]
+data = dpls[trial_idx].data['agg'][mask]
 
 ###############################################################################
 # We can plot the time-frequency response using MNE
@@ -85,7 +86,7 @@ dpls[0].plot()
 ###############################################################################
 # Notice that the Layer 5 pyramidal neurons are now firing nearly
 # synchronously. They in turn synchronously activate the inhibitory basket
-# neurons, which then inhibit the pyramidal neurons for ~20 ms, when the
+# neurons, which then inhibit the pyramidal neurons for ~20 ms. Once the
 # tonic drive outweighs the inhibition and the pyramidal neurons firing again
 # creating a ~50 Hz PING rhythm. This type of synchronous rhythm is sometimes
 # referred to as “strong” PING.
