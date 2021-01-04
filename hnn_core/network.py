@@ -192,6 +192,8 @@ class Network(object):
         # place to keep this information
         self.gid_ranges = dict()
         self._n_gids = 0  # utility: keep track of last GID
+
+        # XXX this can be removed once tests are made independent of HNN GUI
         self._legacy_mode = True  # creates nc_dict-entries for ALL cell types
 
         # Create array of equally sampled time points for simulating currents
@@ -579,9 +581,8 @@ class Network(object):
         target_populations = (set(weights_ampa.keys()) |
                               set(weights_nmda.keys()))
         if len(target_populations) == 0:
-            # raise ValueError('At least one AMPA or NMDA weights must be >0')
-            # XXX this is temporarily disabled to allow bogus drives for tests
-            pass
+            if not self._legacy_mode:  # XXX tests much match HNN GUI output
+                raise ValueError('At least one AMPA or NMDA weight must be >0')
         if not target_populations.issubset(set(self.cellname_list)):
             raise ValueError('Allowed target cell types are: ',
                              f'{self.cellname_list}')
