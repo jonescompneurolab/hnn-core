@@ -86,17 +86,15 @@ weights_nmda_d = {'L2_basket': 0.003, 'L2_pyramidal': 0.0045,
 synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 # early distal input
-prng_initial_seed = 4 + 2  # XXX to match online docs
 net.add_evoked_drive(
     'evdist1', mu=32., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
     weights_nmda=weights_nmda_d, location='distal',
-    synaptic_delays=synaptic_delays_d, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_d, seedcore=6)
 # late distal input
-prng_initial_seed = 0 + 2  # XXX to match online docs
 net.add_evoked_drive(
     'evdist2', mu=82., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
     weights_nmda=weights_nmda_d, location='distal',
-    synaptic_delays=synaptic_delays_d, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_d, seedcore=2)
 
 # proximal input occurs before distals
 weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0025,
@@ -104,13 +102,12 @@ weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0025,
 weights_nmda_p = {'L2_basket': 0.003, 'L5_basket': 0.004}
 synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
-prng_initial_seed = 4 + 2  # XXX to match online docs
 net.add_evoked_drive(
     'evprox1', mu=20.0, sigma=0., numspikes=1, weights_ampa=weights_ampa_p,
     weights_nmda=weights_nmda_p, location='proximal',
-    synaptic_delays=synaptic_delays_p, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_p, seedcore=6)
 
-dpl = simulate_dipole(net, n_trials=1)
+dpl = simulate_dipole(net, n_trials=1)  # XXX n_trials=1 instantiates drive!
 
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))

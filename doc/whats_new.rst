@@ -77,6 +77,8 @@ API
 
 - New API for defining external drives and biases to network. By default (controlled by the argument `add_drives_from_params`), a :class:`hnn_core.Network` is created without drives. These are added using class methods, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
+- Examples apply random state seeds that reproduce the output of HNN GUI documentation, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Blake Caldwell: https://github.com/blakecaldwell
 .. _Ryan Thorpe: https://github.com/rythorpe

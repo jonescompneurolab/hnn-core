@@ -49,8 +49,6 @@ net.plot_cells()
 # required. Weights are prescribed separately for AMPA and NMDA receptors
 # (receptors that are not used can be omitted or set to zero)
 
-prng_initial_seed = 2 + 2  # XXX to match online docs
-
 # Distal evoked drive
 weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
                    'L5_pyramidal': 0.142300}
@@ -61,7 +59,7 @@ synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal',
-    synaptic_delays=synaptic_delays_d1, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_d1, seedcore=4)
 
 # First proximal evoked drive
 weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
@@ -72,7 +70,7 @@ synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal',
-    synaptic_delays=synaptic_delays_prox, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_prox, seedcore=4)
 
 # Second proximal evoked drive. NB: only AMPA weights differ from first
 weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
@@ -81,7 +79,7 @@ weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
 net.add_evoked_drive(
     'evprox2', mu=137.12, sigma=8.33, numspikes=1,
     weights_ampa=weights_ampa_p2, location='proximal',
-    synaptic_delays=synaptic_delays_prox, seedcore=prng_initial_seed)
+    synaptic_delays=synaptic_delays_prox, seedcore=4)
 
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
@@ -134,17 +132,17 @@ net_sync = Network(params)
 net_sync.add_evoked_drive(
     'evdist1', mu=63.53, sigma=0, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal',
-    synaptic_delays=synaptic_delays_d1)
+    synaptic_delays=synaptic_delays_d1, seedcore=4)
 
 # First proximal evoked drive
 net_sync.add_evoked_drive(
     'evprox1', mu=26.61, sigma=0, numspikes=1, weights_ampa=weights_ampa_p1,
-    location='proximal',synaptic_delays=synaptic_delays_prox)
+    location='proximal',synaptic_delays=synaptic_delays_prox, seedcore=4)
 
 # Second proximal evoked drive
 net_sync.add_evoked_drive(
     'evprox2', mu=137.12, sigma=0, numspikes=1, weights_ampa=weights_ampa_p2,
-    location='proximal', synaptic_delays=synaptic_delays_prox)
+    location='proximal', synaptic_delays=synaptic_delays_prox, seedcore=4)
 
 ###############################################################################
 # Next, let's simulate a single trial using the MPI backend. This will

@@ -33,7 +33,6 @@ print(params)
 params.update({
     'dipole_scalefctr': 150000.0,
     'dipole_smooth_win': 0,
-    'sync_evinput': 1,  # XXX not applied (seed hack, see feed.py:_get_prng)
     'tstop': 310.0,
 })
 
@@ -41,14 +40,12 @@ params.update({
 # Now let's simulate the dipole and plot it
 net = Network(params)
 
-prng_initial_seed = 3 + 1  # XXX to match online docs
-
 weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 net.add_bursty_drive(
     'bursty', distribution='normal', t0=50., sigma_t0=0., T=params['tstop'],
     burst_f=10, spike_jitter_std=20., numspikes=2, spike_isi=10, repeats=10,
     weights_ampa=weights_ampa, weights_nmda=None, location='distal',
-    seedcore=prng_initial_seed, space_constant=100.)
+    seedcore=4, space_constant=100.)
 
 dpl = simulate_dipole(net, n_trials=1)  # XXX n_trials=1 instantiates drive!
 dpl[0].plot()
