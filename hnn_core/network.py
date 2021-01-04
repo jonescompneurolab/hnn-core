@@ -8,6 +8,7 @@
 import itertools as it
 import numpy as np
 from glob import glob
+from copy import deepcopy
 
 from .feed import _drive_cell_event_times
 from .params import _extract_bias_specs_from_hnn_params
@@ -302,6 +303,16 @@ class Network(object):
               % (len(self.pos_dict['L2_basket']),
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
+
+    def copy(self):
+        """Return a copy of the Network instance.
+
+        Returns
+        -------
+        inst : instance of Network
+            A copy of the instance.
+        """
+        return deepcopy(self)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
                          weights_ampa=None, weights_nmda=None,
