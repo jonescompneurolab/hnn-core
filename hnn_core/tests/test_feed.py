@@ -1,13 +1,11 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
-import os.path as op
 import pytest
 
 import numpy as np
 
-import hnn_core
-from hnn_core import Params, read_params
+from hnn_core import Params
 from hnn_core.feed import (feed_event_times, _get_prng, _create_extpois,
                            _create_bursty_input)
 from hnn_core.params import create_pext
