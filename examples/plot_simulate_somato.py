@@ -64,7 +64,9 @@ plt.axhline(0)
 plt.show()
 
 ###############################################################################
-# Now, let us try to simulate the same with hnn-core
+# Now, let us try to simulate the same with hnn-core. We read in the network
+# parameters from ``N20.json`` and explicitly create two distal and one
+# proximal evoked drive.
 
 import os.path as op
 
@@ -109,8 +111,9 @@ net.add_evoked_drive(
 
 dpl = simulate_dipole(net, n_trials=1)
 
+trial_idx = 0
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-dpl[0].plot(ax=axes[0], show=False)
+dpl[trial_idx].plot(ax=axes[0], show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1])
 net.cell_response.plot_spikes_raster()

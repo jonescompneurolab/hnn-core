@@ -37,7 +37,13 @@ params.update({
 })
 
 ###############################################################################
-# Now let's simulate the dipole and plot it
+# Now let's simulate the dipole and plot it. To excite the network, we add a
+# ~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
+# simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
+# The occurrence of each burst is jittered by a random, normally distributed
+# amount (20 ms standard deviation). We repeat the burst train 10 times, each
+# time with unique randomization. The drive is only connected to the distal
+# (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 net = Network(params)
 
 weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
@@ -45,10 +51,12 @@ net.add_bursty_drive(
     'bursty', distribution='normal', t0=50., sigma_t0=0., T=params['tstop'],
     burst_f=10, spike_jitter_std=20., numspikes=2, spike_isi=10, repeats=10,
     weights_ampa=weights_ampa, weights_nmda=None, location='distal',
-    seedcore=4, space_constant=100.)
+    seedcore=4)
 
 dpl = simulate_dipole(net)
-dpl[0].plot()
+
+trial_idx = 0  # single trial simulated
+dpl[trial_idx].plot()
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity.
