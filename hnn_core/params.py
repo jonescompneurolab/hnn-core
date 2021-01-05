@@ -206,16 +206,14 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             else:
                 drive['location'] = 'distal'
 
-            if par['sync_evinput']:
-                sigma = 0.
-            else:
-                cell_keys_present = [key for key in par if
-                                     key in cellname_list]
-                sigma = par[cell_keys_present[0]][3]  # IID for all cells!
+            cell_keys_present = [key for key in par if
+                                 key in cellname_list]
+            sigma = par[cell_keys_present[0]][3]  # IID for all cells!
 
             drive['dynamics'] = {'mu': par['t0'],
                                  'sigma': sigma,
-                                 'numspikes': par['numspikes']}
+                                 'numspikes': par['numspikes'],
+                                 'sync_within_trial': par['sync_evinput']}
             drive['space_constant'] = par['lamtha']
             drive['seedcore'] = par['prng_seedcore']
             for cellname in cellname_list:
@@ -235,7 +233,8 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
 
             drive['dynamics'] = {'mu': par['L2_basket'][3],  # NB IID
                                  'sigma': par['L2_basket'][4],
-                                 'numspikes': 50}  # NB hard-coded in GUI!
+                                 'numspikes': 50,  # NB hard-coded in GUI!
+                                 'sync_within_trial': False}
             drive['space_constant'] = par['lamtha']
             drive['seedcore'] = par['prng_seedcore']
 

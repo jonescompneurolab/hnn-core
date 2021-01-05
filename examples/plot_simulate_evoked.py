@@ -128,14 +128,15 @@ print(trial_rates)
 
 ###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
-# synchronous and see what happens. This is achieved by setting ``sigma=0``.
-# Using the ``copy``-method, we can create a clone of the network defined
-# above. Then modify the drive dynamics for each drive.
+# synchronous and see what happens. This is achieved by setting the parameter
+# ``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
+# a clone of the network defined above, and then modify the drive dynamics for
+# each drive.
 
 net_sync = net.copy()
-net_sync.external_drives['evdist1']['dynamics']['sigma'] = 0
-net_sync.external_drives['evprox1']['dynamics']['sigma'] = 0
-net_sync.external_drives['evprox2']['dynamics']['sigma'] = 0
+net_sync.external_drives['evdist1']['dynamics']['sync_within_trial'] = True
+net_sync.external_drives['evprox1']['dynamics']['sync_within_trial'] = True
+net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
 
 ###############################################################################
 # You may interrogate current values defining the spike event time dynamics by

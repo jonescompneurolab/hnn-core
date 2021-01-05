@@ -74,13 +74,9 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
         The event times at which spikes occur.
     """
     sync_evinput = False
-    if drive_type == 'evoked':
-        if dynamics['sigma'] == 0.:
-            sync_evinput = True
-    # XXX comment out to reproduce online docs! affects seed of prng
-    # elif drive_type == 'bursty':
-    #     if dynamics['sigma_t0'] == 0.:
-    #         sync_evinput = True
+    if 'sync_within_trial' in dynamics:
+        sync_evinput = dynamics['sync_within_trial']
+
     prng, prng2 = _get_prng(seed=seedcore + trial_idx,
                             gid=drive_cell_gid,
                             sync_evinput=sync_evinput)
