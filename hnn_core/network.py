@@ -311,7 +311,8 @@ class Network(object):
         net_copy._reset_drives()
         return net_copy
 
-    def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
+    def add_evoked_drive(self, name, *, mu, sigma, numspikes,
+                         sync_within_trial=False, location,
                          weights_ampa=None, weights_nmda=None,
                          space_constant=3., synaptic_delays=0.1, seedcore=2):
         """Add an 'evoked' external drive to the network
@@ -321,12 +322,15 @@ class Network(object):
         name : str
             Unique name for drive
         mu : float
-            Mean of Gaussian event time distribution (across target cells)
+            Mean of Gaussian event time distribution
         sigma : float
-            Standard deviation of event time distribution (across target cells)
-            Set to zero for "synchronous" evoked drive.
+            Standard deviation of event time distribution
         numspikes : int
             Number of spikes at each target cell
+        sync_within_trial : bool
+            If True, the target cells receive each numspike synchronously. By
+            default (False), spike times arriving at each target cell are
+            sampled independently using the Gaussian parameteres (mu, sigma).
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -357,7 +361,8 @@ class Network(object):
         drive['cell_specific'] = True
         drive['seedcore'] = seedcore
 
-        drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
+        drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes,
+                                 sync_within_trial=sync_within_trial)
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
