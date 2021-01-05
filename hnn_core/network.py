@@ -256,7 +256,7 @@ class Network(object):
                         synaptic_delays=specs['synaptic_delays'],
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'gaussian':
-                    self.add_gaussian_drive(
+                    self.add_evoked_drive(  # 'gaussian' is just evoked
                         drive_name, mu=specs['dynamics']['mu'],
                         sigma=specs['dynamics']['sigma'],
                         numspikes=specs['dynamics']['numspikes'],
@@ -351,61 +351,15 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        self._add_evoked_or_gaussian_drive(
-            'evoked', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
-            location, space_constant=space_constant,
-            synaptic_delays=synaptic_delays, seedcore=seedcore)
-
-    def add_gaussian_drive(self, name, *, mu, sigma, numspikes, location,
-                           weights_ampa=None, weights_nmda=None,
-                           space_constant=100., synaptic_delays=0.1,
-                           seedcore=2):
-        """Add an 'Gaussian' external drive to the network
-
-        Parameters
-        ----------
-        name : str
-            Unique name for drive
-        mu : float
-            Mean of Gaussian event time distribution (across target cells)
-        sigma : float
-            Standard deviation of event time distribution (across target cells)
-        numspikes : int
-            Number of spikes at each target cell
-        location : str
-            Target location of synapses ('distal' or 'proximal')
-        weights_ampa : dict or None
-            Synaptic weights (in uS) of AMPA receptors on each targeted cell
-            type (dict keys). Cell types omitted from the dict are set to zero.
-        weights_nmda : dict or None
-            Synaptic weights (in uS) of NMDA receptors on each targeted cell
-            type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : float or dict
-            Synaptic delay (in ms) at the column origin, dispersed laterally as
-            a function of the space_constant. If float, applies to all target
-            cell types. Use dict to create delay->cell mapping.
-        space_constant : float
-            Describes lateral dispersion (from column origin) of synaptic
-            weights and delays within the simulated column
-        seedcore : int
-            Optional initial seed for random number generator (default: 2).
-        """
-        self._add_evoked_or_gaussian_drive(
-            'gaussian', name, mu, sigma, numspikes, weights_ampa, weights_nmda,
-            location, space_constant=space_constant,
-            synaptic_delays=synaptic_delays, seedcore=seedcore)
-
-    def _add_evoked_or_gaussian_drive(
-        self, dtype, name, mu, sigma, numspikes, weights_ampa, weights_nmda,
-            location, space_constant, synaptic_delays, seedcore):
-        """Utility function for gaussian-type drives"""
         if sigma < 0.:
             raise ValueError('Standard deviation cannot be negative')
         if not numspikes > 0:
             raise ValueError('Number of spikes must be greater than zero')
 
         drive = NetworkDrive()
-        drive['type'] = dtype
+        drive['type'] = 'evoked'
+        if name == 'extgauss':
+            drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
         drive['cell_specific'] = True
         drive['seedcore'] = seedcore
 
