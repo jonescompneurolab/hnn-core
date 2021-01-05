@@ -43,7 +43,7 @@ Changelog
 
 - Modify :func:`hnn_core.viz.plot_spikes_raster` to display individual cells, by `Nick Tolley`_ in `#231 <https://github.com/jonescompneurolab/hnn-core/pull/231>`_
 
-- Add methods for creating input drives and biases to network: :meth:`hnn_core.Network.add_evoked_drive`, :meth:`hnn_core.Network.add_gaussian_drive`, :meth:`hnn_core.Network.add_poisson_drive`, :meth:`hnn_core.Network.add_bursty_drive` and :meth:`hnn_core.Network.add_tonic_bias`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+- Add methods for creating input drives and biases to network: :meth:`hnn_core.Network.add_evoked_drive`, :meth:`hnn_core.Network.add_poisson_drive`, :meth:`hnn_core.Network.add_bursty_drive` and :meth:`hnn_core.Network.add_tonic_bias`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
 Bug
 ~~~
