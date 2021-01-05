@@ -305,14 +305,17 @@ class Network(object):
         return '<%s | %s>' % (class_name, s)
 
     def copy(self):
-        """Return a copy of the Network instance.
+        """Return a copy of the Network instance without simulation results
 
         Returns
         -------
         inst : instance of Network
-            A copy of the instance.
+            A copy of the instance with previous simulation results removed.
         """
-        return deepcopy(self)
+        net_copy = deepcopy(self)
+        net_copy.cell_response = CellResponse(times=self.cell_response._times)
+        net_copy._reset_drives()
+        return net_copy
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
                          weights_ampa=None, weights_nmda=None,
@@ -357,7 +360,7 @@ class Network(object):
                            weights_ampa=None, weights_nmda=None,
                            space_constant=100., synaptic_delays=0.1,
                            seedcore=2):
-        """Add an 'evoked' external drive to the network
+        """Add an 'Gaussian' external drive to the network
 
         Parameters
         ----------
@@ -732,6 +735,11 @@ class Network(object):
 
         return drive_conn_by_cell, range(src_gid_ran_begin, self._n_gids)
 
+    def _reset_drives(self):
+        # reset every time called again, e.g., from dipole.py or in self.copy()
+        for drive_name in self.external_drives.keys():
+            self.external_drives[drive_name]['events'] = list()
+
     def _instantiate_drives(self, n_trials=1):
         """Creates drive_event_times vectors for all drives and all trials
 
@@ -745,9 +753,7 @@ class Network(object):
         used at intialisation time. The good news is that only the event_times
         need to be recalculated, all the GIDs etc remain the same.
         """
-        # reset every time called again, e.g., from dipole.py
-        for drive_name in self.external_drives.keys():
-            self.external_drives[drive_name]['events'] = list()
+        self._reset_drives()
 
         # each trial needs unique event time vectors
         for trial_idx in range(n_trials):
