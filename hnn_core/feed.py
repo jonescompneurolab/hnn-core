@@ -53,7 +53,6 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
         'poisson' : Poisson-distributed dynamics from t0 to T
         'gaussian' : Gaussian-distributed dynamics from t0 to T
         'evoked' : Spikes occur at specified time (mu) with dispersion (sigma)
-
         'bursty' : As opposed to other drive types, these have timing that is
         identical (synchronous) for all real cells in the network.
     drive_conn : dict
@@ -336,8 +335,8 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
     f_input : float
         The frequency of input bursts.
     events_jitter_std : float
-        The standard deviation (in ms) of each burst event. Only applied when
-        for 'normal' distribution.
+        The standard deviation (in ms) of each burst event. Only applied for
+        'normal' distribution.
     repeats : int
         The number of (jittered) repeats for each burst cycle.
     events_per_cycle : int
@@ -359,15 +358,16 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
         raise ValueError("Indicated distribution not recognized. "
                          "Not making any common feeds.")
 
-    # store f_input as self variable for later use if it exists in p
-    if t0 == -1:
-        t0 = prng.uniform(25., 125.)
-    elif t0_stdev > 0.0:
+    if t0_stdev > 0.0:
         t0 = prng2.normal(t0, t0_stdev)
 
     if distribution == 'normal':
+        burst_period = 1000. / f_input
+        if (events_per_cycle - 1) * cycle_events_isi > burst_period:
+            raise ValueError('Burst duration cannot be greater than period')
+
         # array of mean stimulus times, starts at t0
-        isi_array = np.arange(t0, tstop, 1000. / f_input)
+        isi_array = np.arange(t0, tstop, burst_period)
         # array of single stimulus times -- no doublets
         t_array = prng.normal(np.repeat(isi_array, repeats), events_jitter_std)
     elif distribution == 'uniform':
