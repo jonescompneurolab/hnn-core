@@ -49,7 +49,6 @@ net.plot_cells()
 # drive types include the following (click on the links for documentation):
 #
 # - :meth:`hnn_core.Network.add_evoked_drive`
-# - :meth:`hnn_core.Network.add_gaussian_drive`
 # - :meth:`hnn_core.Network.add_poisson_drive`
 # - :meth:`hnn_core.Network.add_bursty_drive`
 
@@ -70,7 +69,7 @@ weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                    'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
 synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                         'L5_basket': 1., 'L5_pyramidal': 1.}
-# all NMDA weights are zero; pass None
+# all NMDA weights are zero; pass None explicitly
 net.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal',
@@ -87,7 +86,7 @@ net.add_evoked_drive(
 
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
-# To run them in parallel we could set ``n_jobs``` to equal the number of
+# To run them in parallel we could set ``n_jobs`` to equal the number of
 # trials.
 from hnn_core import JoblibBackend
 
@@ -129,7 +128,7 @@ print(trial_rates)
 
 ###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
-# synchronous and see what happens. This is achieved by setting ``sigma=0```.
+# synchronous and see what happens. This is achieved by setting ``sigma=0``.
 # Using the ``copy``-method, we can create a clone of the network defined
 # above. Then modify the drive dynamics for each drive.
 
@@ -152,5 +151,6 @@ from hnn_core import MPIBackend
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
     dpls_sync = simulate_dipole(net_sync, n_trials=1)
 
-dpls_sync[0].plot()
+trial_idx = 0
+dpls_sync[trial_idx].plot()
 net_sync.cell_response.plot_spikes_hist()
