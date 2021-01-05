@@ -92,7 +92,7 @@ plt.show()
 net.add_tonic_bias(cell_type='L5_pyramidal', amplitude=6.)
 dpls = simulate_dipole(net, n_trials=1)
 
-dpls[0].plot()
+dpls[trial_idx].plot()
 
 ###############################################################################
 # Notice that the Layer 5 pyramidal neurons now fire nearly synchronously,

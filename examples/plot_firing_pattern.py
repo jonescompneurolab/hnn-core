@@ -26,7 +26,8 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 
 ###############################################################################
-# Now let's build the network with somatic voltage recordings enabled
+# Now let's build the network and simulate its dynamics with somatic voltage
+# recordings enabled
 import matplotlib.pyplot as plt
 
 net = Network(params)
@@ -48,7 +49,7 @@ weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                    'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
 synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                         'L5_basket': 1., 'L5_pyramidal': 1.}
-# all NMDA weights are zero; pass None
+# all NMDA weights are zero; pass None explicitly
 net.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal',
