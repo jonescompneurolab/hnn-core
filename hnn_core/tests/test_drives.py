@@ -14,7 +14,7 @@ def test_add_drives():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    net = Network(params)
+    net = Network(params, legacy_mode=False)
     net.add_evoked_drive('early_distal', mu=10, sigma=1, numspikes=1,
                          location='distal')
 

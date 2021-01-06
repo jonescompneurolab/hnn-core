@@ -148,6 +148,9 @@ class Network(object):
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
+    legacy_mode : bool
+        Set to True by default to enable matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
 
     Attributes
     ----------
@@ -177,7 +180,8 @@ class Network(object):
         The parameters of bias inputs to cell somata, e.g., tonic current clamp
     """
 
-    def __init__(self, params, add_drives_from_params=False):
+    def __init__(self, params, add_drives_from_params=False,
+                 legacy_mode=True):
         # Save the parameters used to create the Network
         self.params = params
         # Initialise a dictionary of cell ID's, which get used when the
@@ -190,7 +194,8 @@ class Network(object):
         self._n_gids = 0  # utility: keep track of last GID
 
         # XXX this can be removed once tests are made independent of HNN GUI
-        self._legacy_mode = True  # creates nc_dict-entries for ALL cell types
+        # creates nc_dict-entries for ALL cell types
+        self._legacy_mode = legacy_mode
 
         # Create array of equally sampled time points for simulating currents
         # NB (only) used to initialise self.cell_response._times
@@ -350,8 +355,9 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        _check_drive_parameter_values('evoked', sigma=sigma,
-                                      numspikes=numspikes)
+        if not self._legacy_mode:
+            _check_drive_parameter_values('evoked', sigma=sigma,
+                                          numspikes=numspikes)
 
         drive = NetworkDrive()
         drive['type'] = 'evoked'
@@ -405,7 +411,8 @@ class Network(object):
         tstop = self.cell_response.times[-1]
         if T is None:
             T = tstop
-        _check_drive_parameter_values('Poisson', t0=t0, T=T, tstop=tstop)
+        if not self._legacy_mode:
+            _check_drive_parameter_values('Poisson', t0=t0, T=T, tstop=tstop)
 
         if not isinstance(rate_constants, dict):
             raise ValueError('rate_constants must be a dict of floats')
@@ -477,12 +484,14 @@ class Network(object):
         tstop = self.cell_response.times[-1]
         if T is None:
             T = tstop
-        _check_drive_parameter_values('bursty', t0=t0, T=T, tstop=tstop,
-                                      sigma=sigma_t0, location=location)
-        _check_drive_parameter_values('bursty', sigma=spike_jitter_std,
-                                      distribution=distribution,
-                                      numspikes=numspikes, spike_isi=spike_isi,
-                                      burst_f=burst_f)
+        if not self._legacy_mode:
+            _check_drive_parameter_values('bursty', t0=t0, T=T, tstop=tstop,
+                                          sigma=sigma_t0, location=location)
+            _check_drive_parameter_values('bursty', sigma=spike_jitter_std,
+                                          distribution=distribution,
+                                          numspikes=numspikes,
+                                          spike_isi=spike_isi,
+                                          burst_f=burst_f)
 
         drive = NetworkDrive()
         drive['type'] = 'bursty'
@@ -545,9 +554,12 @@ class Network(object):
         # weights must correspond to cells in the network
         target_populations = (set(weights_ampa.keys()) |
                               set(weights_nmda.keys()))
+
+        # XXX tests must match HNN GUI output
         if len(target_populations) == 0:
-            if not self._legacy_mode:  # XXX tests much match HNN GUI output
-                raise ValueError('At least one AMPA or NMDA weight must be >0')
+            # if not self._legacy_mode:
+            # raise ValueError('No AMPA or NMDA weights > 0')
+            print('WARNING: No AMPA or NMDA weights > 0')
         if not target_populations.issubset(set(self.cellname_list)):
             raise ValueError('Allowed target cell types are: ',
                              f'{self.cellname_list}')
