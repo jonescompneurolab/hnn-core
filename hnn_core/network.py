@@ -11,6 +11,7 @@ from glob import glob
 from copy import deepcopy
 
 from .feed import _drive_cell_event_times
+from .drives import _check_drive_parameter_values
 from .params import _extract_bias_specs_from_hnn_params
 from .params import _extract_drive_specs_from_hnn_params
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
@@ -349,10 +350,8 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        if sigma < 0.:
-            raise ValueError('Standard deviation cannot be negative')
-        if not numspikes > 0:
-            raise ValueError('Number of spikes must be greater than zero')
+        _check_drive_parameter_values('evoked', sigma=sigma,
+                                      numspikes=numspikes)
 
         drive = NetworkDrive()
         drive['type'] = 'evoked'
@@ -406,14 +405,7 @@ class Network(object):
         tstop = self.cell_response.times[-1]
         if T is None:
             T = tstop
-        elif T < 0.:
-            raise ValueError('End time of Poisson input cannot be negative')
-        if T > tstop:
-            raise ValueError(f'End time of Poisson drive cannot exceed '
-                             f'simulation end time {tstop}. Got {T}.')
-        duration = T - t0
-        if duration < 0.:
-            raise ValueError('Duration of Poisson drive cannot be negative')
+        _check_drive_parameter_values('Poisson', t0=t0, T=T, tstop=tstop)
 
         if not isinstance(rate_constants, dict):
             raise ValueError('rate_constants must be a dict of floats')
@@ -432,7 +424,7 @@ class Network(object):
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays)
 
-    def add_bursty_drive(self, name, *, distribution, t0, sigma_t0, T,
+    def add_bursty_drive(self, name, *, distribution, t0=0, sigma_t0=0, T=None,
                          burst_f, spike_jitter_std, numspikes, spike_isi,
                          repeats, location, weights_ampa=None,
                          weights_nmda=None, synaptic_delays=0.1,
@@ -482,6 +474,16 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
+        tstop = self.cell_response.times[-1]
+        if T is None:
+            T = tstop
+        _check_drive_parameter_values('bursty', t0=t0, T=T, tstop=tstop,
+                                      sigma=sigma_t0, location=location)
+        _check_drive_parameter_values('bursty', sigma=spike_jitter_std,
+                                      distribution=distribution,
+                                      numspikes=numspikes, spike_isi=spike_isi,
+                                      burst_f=burst_f)
+
         drive = NetworkDrive()
         drive['type'] = 'bursty'
         drive['cell_specific'] = False
