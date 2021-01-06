@@ -127,12 +127,12 @@ def test_cell_response(tmpdir):
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
     # Test recovery of empty spike files
-    empty_spike = Spikes(spike_times=[[], []], spike_gids=[[], []], 
+    empty_spike = CellResponse(spike_times=[[], []], spike_gids=[[], []], 
                          spike_types=[[], []])
     empty_spike.write(tmpdir.join('empty_spk_%d.txt'))
     assert empty_spike == read_spikes(tmpdir.join('empty_spk_*.txt'))
 
-    assert ("Spikes | 2 simulation trials" in repr(empty_spike))
+    assert ("CellResponse | 2 simulation trials" in repr(empty_spike))
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
