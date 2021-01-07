@@ -157,11 +157,11 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
         drive['type'] = 'bursty'
         drive['cell_specific'] = False
         drive['dynamics'] = {'distribution': par['distribution'],
-                             't0': par['t0'],
-                             'sigma_t0': par['t0_stdev'],
-                             'T': par['tstop'],
-                             'burst_f': par['f_input'],
-                             'spike_jitter_std': par['stdev'],
+                             'tstart': par['t0'],
+                             'tstart_std': par['t0_stdev'],
+                             'tstop': par['tstop'],
+                             'burst_rate': par['f_input'],
+                             'burst_std': par['stdev'],
                              'numspikes': par['events_per_cycle'],
                              'repeats': par['repeats'],
                              'spike_isi': 10}  # not exposed in params-files
@@ -266,10 +266,10 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                         drive['weights_nmda'][cellname] = nmda_w
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
-            # do NOT allow negative times
-            drive['dynamics'] = {'t0': max(0, par['t_interval'][0]),
-                                 'T': max(0, par['t_interval'][1]),
-                                 'rate_constants': rate_params}
+            # do NOT allow negative times sometimes used in param-files
+            drive['dynamics'] = {'tstart': max(0, par['t_interval'][0]),
+                                 'tstop': max(0, par['t_interval'][1]),
+                                 'rate_constant': rate_params}
 
         drive_specs[feed_name] = drive
     return drive_specs

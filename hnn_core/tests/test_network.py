@@ -60,20 +60,21 @@ def test_network():
                 assert kw in drive['dynamics'].keys()
             assert len(drive['events'][0]) == net.n_cells
         elif drive['type'] == 'poisson':
-            for kw in ['t0', 'T', 'rate_constants']:
+            for kw in ['tstart', 'tstop', 'rate_constant']:
                 assert kw in drive['dynamics'].keys()
             assert len(drive['events'][0]) == net.n_cells
 
         elif drive['type'] == 'bursty':
-            for kw in ['distribution', 't0', 'sigma_t0', 'T', 'burst_f',
-                       'spike_jitter_std', 'numspikes', 'repeats']:
+            for kw in ['distribution', 'tstart', 'tstart_std', 'tstop',
+                       'burst_rate', 'burst_std', 'numspikes', 'repeats']:
                 assert kw in drive['dynamics'].keys()
             assert len(drive['events'][0]) == 1
             n_events = (
                 drive['dynamics']['numspikes'] *  # 2
                 drive['dynamics']['repeats'] *  # 10
-                (1 + (drive['dynamics']['T'] - drive['dynamics']['t0'] - 1) //
-                    (1000. / drive['dynamics']['burst_f'])))
+                (1 + (drive['dynamics']['tstop'] -
+                      drive['dynamics']['tstart'] - 1) //
+                    (1000. / drive['dynamics']['burst_rate'])))
             assert len(drive['events'][0][0]) == n_events  # 40
 
     # make sure the PRNGs are consistent.

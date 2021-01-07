@@ -36,9 +36,9 @@ net = Network(params)
 
 weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
 synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
-rate_constants = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
+rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
 net.add_poisson_drive(
-    'poisson', rate_constants=rate_constants, weights_ampa=weights_ampa,
+    'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
     location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
 
 dpls = simulate_dipole(net)

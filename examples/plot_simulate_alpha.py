@@ -48,9 +48,8 @@ net = Network(params)
 
 weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 net.add_bursty_drive(
-    'bursty', distribution='normal', t0=50., sigma_t0=0., T=params['tstop'],
-    burst_f=10, spike_jitter_std=20., numspikes=2, spike_isi=10, repeats=10,
-    weights_ampa=weights_ampa, weights_nmda=None, location='distal',
+    'bursty', tstart=50., burst_rate=10, burst_std=20., numspikes=2,
+    spike_isi=10, repeats=10, location='distal', weights_ampa=weights_ampa,
     seedcore=4)
 
 dpl = simulate_dipole(net)
