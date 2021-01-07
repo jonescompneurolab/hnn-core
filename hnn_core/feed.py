@@ -100,9 +100,9 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     event_times = list()
     if drive_type == 'poisson' and not target_syn_weights_zero:
         event_times = _create_extpois(
-            t0=dynamics['t0'],
-            T=dynamics['T'],
-            lamtha=dynamics['rate_constants'][drive_conn['target_type']],
+            t0=dynamics['tstart'],
+            T=dynamics['tstop'],
+            lamtha=dynamics['rate_constant'][drive_conn['target_type']],
             prng=prng)
     elif not target_syn_weights_zero and (drive_type == 'evoked' or
                                           drive_type == 'gaussian'):
@@ -114,11 +114,11 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     elif drive_type == 'bursty' and not target_syn_weights_zero:
         event_times = _create_bursty_input(
             distribution=dynamics['distribution'],
-            t0=dynamics['t0'],
-            t0_stdev=dynamics['sigma_t0'],
-            tstop=dynamics['T'],
-            f_input=dynamics['burst_f'],
-            events_jitter_std=dynamics['spike_jitter_std'],
+            t0=dynamics['tstart'],
+            t0_stdev=dynamics['tstart_std'],
+            tstop=dynamics['tstop'],
+            f_input=dynamics['burst_rate'],
+            events_jitter_std=dynamics['burst_std'],
             repeats=dynamics['repeats'],
             events_per_cycle=dynamics['numspikes'],
             cycle_events_isi=dynamics['spike_isi'],
@@ -366,7 +366,7 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
         isi_array = np.arange(t0, tstop, burst_period)
         # array of single stimulus times -- no doublets
         t_array = prng.normal(np.repeat(isi_array, repeats), events_jitter_std)
-    elif distribution == 'uniform':
+    elif distribution == 'uniform':  # XXX deprecated in #211
         n_inputs = repeats * f_input * (tstop - t0) / 1000.
         t_array = prng.uniform(t0, tstop, n_inputs)
 

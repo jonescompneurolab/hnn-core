@@ -11,7 +11,8 @@ from glob import glob
 from copy import deepcopy
 
 from .feed import _drive_cell_event_times
-from .drives import _check_drive_parameter_values
+from .drives import _get_drive_target_populations
+from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .params import _extract_bias_specs_from_hnn_params
 from .params import _extract_drive_specs_from_hnn_params
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
@@ -247,9 +248,9 @@ class Network(object):
                         space_constant=specs['space_constant'])
                 elif specs['type'] == 'poisson':
                     self.add_poisson_drive(
-                        drive_name, t0=specs['dynamics']['t0'],
-                        T=specs['dynamics']['T'],
-                        rate_constants=specs['dynamics']['rate_constants'],
+                        drive_name, tstart=specs['dynamics']['tstart'],
+                        tstop=specs['dynamics']['tstop'],
+                        rate_constant=specs['dynamics']['rate_constant'],
                         weights_ampa=specs['weights_ampa'],
                         weights_nmda=specs['weights_nmda'],
                         location=specs['location'], seedcore=specs['seedcore'],
@@ -269,12 +270,11 @@ class Network(object):
                     self.add_bursty_drive(
                         drive_name,
                         distribution=specs['dynamics']['distribution'],
-                        t0=specs['dynamics']['t0'],
-                        sigma_t0=specs['dynamics']['sigma_t0'],
-                        T=specs['dynamics']['T'],
-                        burst_f=specs['dynamics']['burst_f'],
-                        spike_jitter_std=specs[
-                            'dynamics']['spike_jitter_std'],
+                        tstart=specs['dynamics']['tstart'],
+                        tstart_std=specs['dynamics']['tstart_std'],
+                        tstop=specs['dynamics']['tstop'],
+                        burst_rate=specs['dynamics']['burst_rate'],
+                        burst_std=specs['dynamics']['burst_std'],
                         numspikes=specs['dynamics']['numspikes'],
                         spike_isi=specs['dynamics']['spike_isi'],
                         repeats=specs['dynamics']['repeats'],
@@ -326,7 +326,7 @@ class Network(object):
         Parameters
         ----------
         name : str
-            Unique name for drive
+            Unique name for the drive
         mu : float
             Mean of Gaussian event time distribution
         sigma : float
@@ -373,7 +373,7 @@ class Network(object):
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays)
 
-    def add_poisson_drive(self, name, *, t0=0, T=None, rate_constants,
+    def add_poisson_drive(self, name, *, tstart=0, tstop=None, rate_constant,
                           location, weights_ampa=None, weights_nmda=None,
                           space_constant=100., synaptic_delays=0.1,
                           seedcore=2):
@@ -382,14 +382,18 @@ class Network(object):
         Parameters
         ----------
         name : str
-            Unique name for drive
-        t0 : float
+            Unique name for the drive
+        tstart : float
             Start time of Poisson-distributed spike train (default: 0)
-        T : float
-            End time of spike train (defaults to None: T is end of simulation)
-        rate_constants : dict of floats
-            Rate constant (lambda) of renewal-process generating the samples.
-            Dict keys are the cell names targeted.
+        tstop : float
+            End time of the spike train (defaults to None: tstop is set to the
+            end of the simulation)
+        rate_constant : float or dict of floats
+            Rate constant (lambda) of the renewal-process generating the
+            samples. If a float is provided, the same rate constant is applied
+            to each target cell type. Cell type-specific values may be
+            provided as a dictionary, in which a key must be present for each
+            cell type with non-zero AMPA or NMDA weights.
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -408,61 +412,63 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        tstop = self.cell_response.times[-1]
-        if T is None:
-            T = tstop
-        if not self._legacy_mode:
-            _check_drive_parameter_values('Poisson', t0=t0, T=T, tstop=tstop)
+        sim_end_time = self.cell_response.times[-1]
+        if tstop is None:
+            tstop = sim_end_time
 
-        if not isinstance(rate_constants, dict):
-            raise ValueError('rate_constants must be a dict of floats')
-        if not set(rate_constants.keys()).issubset(self.cellname_list):
-            raise ValueError(
-                f"Rate constants should be defined for {self.cellname_list}. "
-                f"Got {list(rate_constants.keys())}")
+        if not self._legacy_mode:
+            _check_drive_parameter_values('Poisson', tstart=tstart,
+                                          tstop=tstop,
+                                          sim_end_time=sim_end_time)
+            target_populations = _get_drive_target_populations(weights_ampa,
+                                                               weights_nmda)[0]
+            _check_poisson_rates(rate_constant, target_populations,
+                                 self.cellname_list)
 
         drive = NetworkDrive()
         drive['type'] = 'poisson'
         drive['cell_specific'] = True
         drive['seedcore'] = seedcore
 
-        drive['dynamics'] = dict(t0=t0, T=T, rate_constants=rate_constants)
+        drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
+                                 rate_constant=rate_constant)
         drive['events'] = list()
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays)
 
-    def add_bursty_drive(self, name, *, distribution, t0=0, sigma_t0=0, T=None,
-                         burst_f, spike_jitter_std, numspikes, spike_isi,
-                         repeats, location, weights_ampa=None,
+    def add_bursty_drive(self, name, *, tstart=0, tstart_std=0, tstop=None,
+                         location, burst_rate, burst_std=0, numspikes=2,
+                         spike_isi=10, repeats=1, weights_ampa=None,
                          weights_nmda=None, synaptic_delays=0.1,
-                         space_constant=100., seedcore=2):
+                         space_constant=100., seedcore=2,
+                         distribution='normal'):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
         Parameters
         ----------
         name : str
-            Unique name for drive
-        distribution : str
-            The distribution for each burst. Either 'normal' or 'uniform'.
-        t0 : float
-            Start time of the burst trains
-        sigma_t0 : float
-            If greater than 0 randomize start times with standard deviation
-            sigma_t0.
-        T : float
-            End of burst trains
-        burst_f : float
-            The frequency of input bursts.
-        spike_jitter_std : float
-            The standard deviation (in ms) of each spike in a burst event.
-            Only applied when for 'normal' distribution.
+            Unique name for the drive
+        tstart : float
+            Start time of the burst trains (default: 0)
+        tstart_std : float
+            If greater than 0, randomize start time with standard deviation
+            tstart_std (unit: ms). Effectively jitters start time across
+            multiple trials.
+        tstop : float
+            End time of burst trains (defaults to None: tstop is set to the
+            end of the simulation)
+        burst_rate : float
+            The mean rate at which cyclic bursts occur (unit: Hz)
+        burst_std : float
+            The standard deviation of the burst occurrence on each cycle
+            (unit: ms). Default: 0 ms
         numspikes : int
-            The events per cycle. This is the spikes/burst parameter in the
-            GUI. Default: 2 (doublet)
+            The number of spikes in a burst. This is the spikes/burst parameter
+            in the GUI. Default: 2 (doublet)
         spike_isi : float
             Time between spike events within a cycle (ISI). Default: 10 ms
         repeats : int
-            The number of (jittered) repeats for each burst cycle.
+            The number of bursts per cycle. Default: 1
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -480,30 +486,33 @@ class Network(object):
             weights and delays within the simulated column
         seedcore : int
             Optional initial seed for random number generator (default: 2).
+        distribution : str
+            Must be 'normal' (will be deprecated in a future release).
         """
-        tstop = self.cell_response.times[-1]
-        if T is None:
-            T = tstop
+        sim_end_time = self.cell_response.times[-1]
+        if tstop is None:
+            tstop = sim_end_time
         if not self._legacy_mode:
-            _check_drive_parameter_values('bursty', t0=t0, T=T, tstop=tstop,
-                                          sigma=sigma_t0, location=location)
-            _check_drive_parameter_values('bursty', sigma=spike_jitter_std,
-                                          distribution=distribution,
+            _check_drive_parameter_values('bursty', tstart=tstart, tstop=tstop,
+                                          sim_end_time=sim_end_time,
+                                          sigma=tstart_std, location=location)
+            _check_drive_parameter_values('bursty', sigma=burst_std,
                                           numspikes=numspikes,
                                           spike_isi=spike_isi,
-                                          burst_f=burst_f)
+                                          burst_rate=burst_rate)
 
         drive = NetworkDrive()
         drive['type'] = 'bursty'
         drive['cell_specific'] = False
         drive['seedcore'] = seedcore
 
-        drive['dynamics'] = dict(distribution=distribution, t0=t0,
-                                 sigma_t0=sigma_t0, T=T, burst_f=burst_f,
-                                 spike_jitter_std=spike_jitter_std,
+        # XXX distribution='uniform' should be deprecated as it is used nowhere
+        # alternatively, create a new drive-type for it
+        drive['dynamics'] = dict(distribution=distribution, tstart=tstart,
+                                 tstart_std=tstart_std, tstop=tstop,
+                                 burst_rate=burst_rate, burst_std=burst_std,
                                  numspikes=numspikes, spike_isi=spike_isi,
-                                 repeats=repeats
-                                 )
+                                 repeats=repeats)
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
@@ -546,29 +555,25 @@ class Network(object):
         if location not in ['distal', 'proximal']:
             raise ValueError("Allowed drive target locations are: 'distal', "
                              f"and 'proximal', got {location}")
-        # allow passing weights as None, but make iterable here
-        if weights_ampa is None:
-            weights_ampa = dict()
-        if weights_nmda is None:
-            weights_nmda = dict()
-        # weights must correspond to cells in the network
-        target_populations = (set(weights_ampa.keys()) |
-                              set(weights_nmda.keys()))
+        # allow passing weights as None, convert to dict here
+        target_populations, weights_ampa, weights_nmda = \
+            _get_drive_target_populations(weights_ampa, weights_nmda)
 
-        # XXX tests must match HNN GUI output
-        if len(target_populations) == 0:
-            # if not self._legacy_mode:
-            # raise ValueError('No AMPA or NMDA weights > 0')
-            print('WARNING: No AMPA or NMDA weights > 0')
+        # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cellname_list)):
-            raise ValueError('Allowed target cell types are: ',
+            raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cellname_list}')
+
         # this is needed to keep the drive GIDs identical to those in HNN,
         # e.g., 'evdist1': range(272, 542), even when no L5_basket cells
         # are targeted (event times lists are empty). The logic in
         # _connect_celltypes is hard-coded to use these implict gid ranges
         if self._legacy_mode:
+            # XXX tests must match HNN GUI output
             target_populations = self.cellname_list
+        else:
+            if len(target_populations) == 0:
+                print('WARNING: No AMPA or NMDA weights > 0')
 
         drive['name'] = name  # for easier for-looping later
         drive['target_types'] = target_populations  # for _connect_celltypes
@@ -639,7 +644,7 @@ class Network(object):
                 if not (set(weights_by_receptor[receptor].keys()).issubset(
                         set(synaptic_delays.keys()))):
                     raise ValueError(
-                        'synaptic_delays is either common (float), or needs '
+                        'synaptic_delays is either a common float or needs '
                         'to be specified for each cell type')
 
         drive_conn_by_cell = dict()
