@@ -9,6 +9,7 @@ import itertools as it
 import numpy as np
 from glob import glob
 from copy import deepcopy
+from warnings import warn
 
 from .feed import _drive_cell_event_times
 from .drives import _get_target_populations
@@ -582,9 +583,8 @@ class Network(object):
         if self._legacy_mode:
             # XXX tests must match HNN GUI output
             target_populations = self.cellname_list
-        else:
-            if len(target_populations) == 0:
-                print('WARNING: No AMPA or NMDA weights > 0')
+        elif len(target_populations) == 0:
+            warn('No AMPA or NMDA weights > 0')
 
         drive['name'] = name  # for easier for-looping later
         drive['target_types'] = target_populations  # for _connect_celltypes
@@ -631,7 +631,7 @@ class Network(object):
             relevant to how the drive connects to the rest of the network.
         src_gid_ran : range
             For convenience, return back the range of GIDs associated with
-            all the driving units (they become _ArtificialCell's later)
+            all the driving units (they become _ArtificialCells later)
 
         Note
         ----
