@@ -11,7 +11,7 @@ from glob import glob
 from copy import deepcopy
 
 from .feed import _drive_cell_event_times
-from .drives import _get_drive_target_populations
+from .drives import _get_target_populations
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .params import _extract_bias_specs_from_hnn_params
 from .params import _extract_drive_specs_from_hnn_params
@@ -420,8 +420,8 @@ class Network(object):
             _check_drive_parameter_values('Poisson', tstart=tstart,
                                           tstop=tstop,
                                           sim_end_time=sim_end_time)
-            target_populations = _get_drive_target_populations(weights_ampa,
-                                                               weights_nmda)[0]
+            target_populations = _get_target_populations(weights_ampa,
+                                                         weights_nmda)[0]
             _check_poisson_rates(rate_constant, target_populations,
                                  self.cellname_list)
 
@@ -557,12 +557,23 @@ class Network(object):
                              f"and 'proximal', got {location}")
         # allow passing weights as None, convert to dict here
         target_populations, weights_ampa, weights_nmda = \
-            _get_drive_target_populations(weights_ampa, weights_nmda)
+            _get_target_populations(weights_ampa, weights_nmda)
 
         # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cellname_list)):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cellname_list}')
+
+        weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
+        if isinstance(synaptic_delays, dict):
+            for receptor in ['ampa', 'nmda']:
+                # synaptic_delays must be defined for all cell types for which
+                # either AMPA or NMDA weights are non-zero
+                if not (set(weights_by_receptor[receptor].keys()).issubset(
+                        set(synaptic_delays.keys()))):
+                    raise ValueError(
+                        'synaptic_delays is either a common float or needs '
+                        'to be specified for each cell type')
 
         # this is needed to keep the drive GIDs identical to those in HNN,
         # e.g., 'evdist1': range(272, 542), even when no L5_basket cells
@@ -578,15 +589,12 @@ class Network(object):
         drive['name'] = name  # for easier for-looping later
         drive['target_types'] = target_populations  # for _connect_celltypes
 
-        weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
-
         drive['conn'], src_gid_ran = self._create_drive_conns(
             target_populations, weights_by_receptor, location,
             space_constant, synaptic_delays, cell_specific=cell_specific)
 
         # Must remember to update the GID ranges based on pos_dict!
-        self.pos_dict[name] = [self.pos_dict['origin'] for
-                               dg in src_gid_ran]
+        self.pos_dict[name] = [self.pos_dict['origin'] for _ in src_gid_ran]
 
         # NB _update_gid_ranges checks external_drives[name] for drives!
         self.external_drives[name] = drive
@@ -637,16 +645,6 @@ class Network(object):
                 'A_delay':  synaptic delay (used with space constant)
                 'lamtha': space constant
         """
-        if isinstance(synaptic_delays, dict):
-            for receptor in ['ampa', 'nmda']:
-                # synaptic_delays must be defined for all cell types for which
-                # either AMPA or NMDA weights are non-zero
-                if not (set(weights_by_receptor[receptor].keys()).issubset(
-                        set(synaptic_delays.keys()))):
-                    raise ValueError(
-                        'synaptic_delays is either a common float or needs '
-                        'to be specified for each cell type')
-
         drive_conn_by_cell = dict()
         src_gid_ran_begin = self._n_gids
 

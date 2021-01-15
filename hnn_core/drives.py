@@ -3,7 +3,7 @@
 # Authors: Christopher Bailey <bailey.cj@gmail.com>
 
 
-def _get_drive_target_populations(weights_ampa, weights_nmda):
+def _get_target_populations(weights_ampa, weights_nmda):
     # allow passing weights as None, but make iterable here
     if weights_ampa is None:
         weights_ampa = dict()
