@@ -650,13 +650,11 @@ class Network(object):
         drive_conn_by_cell = dict()
         src_gid_ran_begin = self._n_gids
 
-        # Here be Dragons! It's tempting to try to refactor this to remove the
-        # duplication of the innermost for-loop, but a drive_conn must be
-        # created for every target population separately (cell_specific) or
-        # (global drive) a single drive_conn contains all target populations
         if cell_specific:
             for cellname in target_populations:
                 drive_conn = dict()  # NB created inside target_pop-loop
+                drive_conn['location'] = location
+
                 drive_conn['target_gids'] = self.gid_ranges[cellname]
                 # NB list! This is used later in _parnet_connect
                 drive_conn['target_type'] = cellname
@@ -664,46 +662,35 @@ class Network(object):
                     self._n_gids,
                     self._n_gids + len(drive_conn['target_gids']))
                 self._n_gids += len(drive_conn['target_gids'])
-                drive_conn['location'] = location
-
-                for receptor, weights in weights_by_receptor.items():
-                    drive_conn[receptor] = dict()
-                    if cellname in weights:
-                        drive_conn[receptor]['lamtha'] = space_constant
-                        if isinstance(synaptic_delays, float):
-                            drive_conn[receptor]['A_delay'] = synaptic_delays
-                        else:
-                            drive_conn[receptor][
-                                'A_delay'] = synaptic_delays[cellname]
-                        drive_conn[receptor][
-                            'A_weight'] = weights[cellname]
-
                 drive_conn_by_cell[cellname] = drive_conn
         else:
             drive_conn = dict()
+            drive_conn['location'] = location
 
             # NB list! This is used later in _parnet_connect
             drive_conn['src_gids'] = [self._n_gids]
             self._n_gids += 1
-            drive_conn['location'] = location
 
             drive_conn['target_gids'] = list()  # fill in below
             for cellname in target_populations:
                 drive_conn['target_gids'].extend(self.gid_ranges[cellname])
                 drive_conn['target_type'] = cellname
-
-                for receptor, weights in weights_by_receptor.items():
-                    drive_conn[receptor] = dict()
-                    if cellname in weights:
-                        drive_conn[receptor]['lamtha'] = space_constant
-                        if isinstance(synaptic_delays, float):
-                            drive_conn[receptor]['A_delay'] = synaptic_delays
-                        else:
-                            drive_conn[receptor][
-                                'A_delay'] = synaptic_delays[cellname]
-                        drive_conn[receptor][
-                            'A_weight'] = weights[cellname]
                 drive_conn_by_cell[cellname] = drive_conn
+
+        for cellname in target_populations:
+            for receptor, weights in weights_by_receptor.items():
+                drive_conn_by_cell[cellname][receptor] = dict()
+                if cellname in weights:
+                    drive_conn_by_cell[cellname][receptor][
+                        'lamtha'] = space_constant
+                    if isinstance(synaptic_delays, float):
+                        drive_conn_by_cell[cellname][receptor][
+                            'A_delay'] = synaptic_delays
+                    else:
+                        drive_conn_by_cell[cellname][receptor][
+                            'A_delay'] = synaptic_delays[cellname]
+                    drive_conn_by_cell[cellname][receptor][
+                        'A_weight'] = weights[cellname]
 
         return drive_conn_by_cell, range(src_gid_ran_begin, self._n_gids)
 
