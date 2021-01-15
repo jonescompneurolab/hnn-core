@@ -60,6 +60,8 @@ Bug
 
 - Fix bug in Poisson input where the first spike was being missed after the start time, by `Mainak Jas`_ in `#204 <https://github.com/jonescompneurolab/hnn-core/pull/204/>`_
 
+- Fix bug in network to add empty spike when empty file is read in, by `Samika Kanekar`_ and `Ryan Thorpe`_ in `#207 <https://github.com/jonescompneurolab/hnn-core/pull/207>`_
+
 API
 ~~~
 
@@ -79,3 +81,4 @@ API
 .. _Christopher Bailey: https://github.com/cjayb
 .. _Nick Tolley: https://github.com/ntolley
 .. _Carmen Kohl: https://github.com/kohl-carmen
+.. _Samika Kanekar: https://github.com/samikane
