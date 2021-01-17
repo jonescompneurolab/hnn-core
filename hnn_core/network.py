@@ -172,11 +172,11 @@ class Network(object):
         or any external drive name
     cell_response : CellResponse
         An instance of the CellResponse object.
-    external_drives : dict of NetworkDrive
+    external_drives : dict (keys: drive names) of dict (keys: parameters)
         The external driving inputs to the network. Drives are added by
         defining their spike-time dynamics, and their connectivity to the real
         cells of the network. Event times are instantiated before simulation,
-        and are stored in each NetworkDrive['events'] (list of list; first
+        and are stored under the ``'events'``-key (list of list; first
         index for trials, second for event time lists for each drive cell).
     external_biases : dict of dict (bias parameters for each cell type)
         The parameters of bias inputs to cell somata, e.g., tonic current clamp
@@ -368,7 +368,7 @@ class Network(object):
             _check_drive_parameter_values('evoked', sigma=sigma,
                                           numspikes=numspikes)
 
-        drive = NetworkDrive()
+        drive = _NetworkDrive()
         drive['type'] = 'evoked'
         if name == 'extgauss':
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
@@ -434,7 +434,7 @@ class Network(object):
             _check_poisson_rates(rate_constant, target_populations,
                                  self.cellname_list)
 
-        drive = NetworkDrive()
+        drive = _NetworkDrive()
         drive['type'] = 'poisson'
         drive['cell_specific'] = True
         drive['seedcore'] = seedcore
@@ -510,7 +510,7 @@ class Network(object):
                                           spike_isi=spike_isi,
                                           burst_rate=burst_rate)
 
-        drive = NetworkDrive()
+        drive = _NetworkDrive()
         drive['type'] = 'bursty'
         drive['cell_specific'] = False
         drive['seedcore'] = seedcore
@@ -536,7 +536,7 @@ class Network(object):
         ----------
         name : str
             Name of drive (must be unique)
-        drive : instance of NetworkDrive
+        drive : instance of _NetworkDrive
             Collection of parameters defining the dynamics of the drive
         weights_ampa : dict or None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
@@ -843,7 +843,7 @@ class Network(object):
         return plot_cells(net=self, ax=ax, show=show)
 
 
-class NetworkDrive(dict):
+class _NetworkDrive(dict):
     """A class for containing the parameters of external drives
 
     Class instances are essentially dictionaries, with keys described below
@@ -884,11 +884,19 @@ class NetworkDrive(dict):
         'A_delay': synaptic delay at d=0 (used with space constant);
         'lamtha': space constant
     """
-    # TODO add methods for plotting and statistics
     def __repr__(self):
-        entr = '<NetworkDrive'
+        entr = f"<External drive '{self['name']}'"
         if 'type' in self.keys():
-            entr += f" of type {self['type']}"
+            entr += f"\ndrive class: {self['type']}"
+            entr += f"\ntarget cell types: {self['target_types']}"
+            entr += f"\ncell-specific: {self['cell_specific']}"
+            entr += "\ndynamic parameters:"
+            for key, val in self['dynamics'].items():
+                entr += f"\n\t{key}: {val}"
+        if len(self['events']) > 0:
+            plurl = 's' if len(self['events']) > 1 else ''
+            entr += ("\nevent times instantiated for "
+                     f"{len(self['events'])} trial{plurl}")
         entr += '>'
         return entr
 

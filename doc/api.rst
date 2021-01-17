@@ -20,7 +20,6 @@ Simulation (:py:mod:`hnn_core`):
    L5Basket
    simulate_dipole
    Network
-   NetworkDrive
    CellResponse
 
 Dipole (:py:mod:`hnn_core.dipole`):

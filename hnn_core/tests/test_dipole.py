@@ -94,6 +94,7 @@ def test_dipole_simulation():
     simulate_dipole(net, n_trials=1)
     net.cell_response.plot_spikes_raster()
 
+
 @requires_mpi4py
 def test_cell_response_backends(run_hnn_core_fixture):
     """Test cell_response outputs across backends."""
