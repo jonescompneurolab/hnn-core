@@ -306,12 +306,20 @@ class Network(object):
         return '<%s | %s>' % (class_name, s)
 
     def copy(self):
-        """Return a copy of the Network instance without simulation results
+        """Return a copy of the Network instance
+
+        The returned copy retains the intrinsic connectivity between cells, as
+        well as those of any external drives or biases added to the network.
+        The parameters of drive dynamics are also retained, but the
+        instantiated ``events`` of the drives are cleared. This allows
+        iterating over the values defining drive dynamics, without the need to
+        re-define connectivity.
 
         Returns
         -------
         inst : instance of Network
-            A copy of the instance with previous simulation results removed.
+            A copy of the instance with previous simulation results and
+            ``events`` of external drives removed.
         """
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
