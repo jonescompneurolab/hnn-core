@@ -338,31 +338,9 @@ Then we read the default parameters file
 
 .. GENERATED FROM PYTHON SOURCE LINES 32-33
 
-Remove all evoked proximal feed parameters
+Update a few of the default parameters related to visualisation
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-40
-
-.. code-block:: default
-
-    for key in params['*evprox*']:
-        del params[key]
-
-    # Remove all evoked distal feed parameters
-    for key in params['*evdist*']:
-        del params[key]
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 41-42
-
-Now, we update a few rhythmic feed parameters
-
-.. GENERATED FROM PYTHON SOURCE LINES 42-54
+.. GENERATED FROM PYTHON SOURCE LINES 33-39
 
 .. code-block:: default
 
@@ -370,12 +348,6 @@ Now, we update a few rhythmic feed parameters
         'dipole_scalefctr': 150000.0,
         'dipole_smooth_win': 0,
         'tstop': 310.0,
-        't0_input_dist': 50.0,
-        'tstop_input_dist': 1001.0,
-        'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
-        'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
-        'sync_evinput': 1,
-        "prng_seedcore_input_dist": 3
     })
 
 
@@ -385,17 +357,32 @@ Now, we update a few rhythmic feed parameters
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-56
+.. GENERATED FROM PYTHON SOURCE LINES 40-47
 
-Now let's simulate the dipole and plot it
+Now let's simulate the dipole and plot it. To excite the network, we add a
+~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
+simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
+The occurrence of each burst is jittered by a random, normally distributed
+amount (20 ms standard deviation). We repeat the burst train 10 times, each
+time with unique randomization. The drive is only connected to the distal
+(dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-60
+.. GENERATED FROM PYTHON SOURCE LINES 47-60
 
 .. code-block:: default
 
     net = Network(params)
+
+    weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
+    net.add_bursty_drive(
+        'bursty', tstart=50., burst_rate=10, burst_std=20., numspikes=2,
+        spike_isi=10, repeats=10, location='distal', weights_ampa=weights_ampa,
+        seedcore=4)
+
     dpl = simulate_dipole(net)
-    dpl[0].plot()
+
+    trial_idx = 0  # single trial simulated
+    dpl[trial_idx].plot()
 
 
 
@@ -488,7 +475,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  57.779 seconds)
+   **Total running time of the script:** ( 1 minutes  30.355 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

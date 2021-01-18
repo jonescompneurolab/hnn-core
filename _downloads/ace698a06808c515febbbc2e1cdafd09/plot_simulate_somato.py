@@ -64,7 +64,9 @@ plt.axhline(0)
 plt.show()
 
 ###############################################################################
-# Now, let us try to simulate the same with MNE-neuron
+# Now, let us try to simulate the same with hnn-core. We read in the network
+# parameters from ``N20.json`` and explicitly create two distal and one
+# proximal evoked drive.
 
 import os.path as op
 
@@ -77,10 +79,41 @@ params_fname = op.join(hnn_core_root, 'param', 'N20.json')
 params = read_params(params_fname)
 
 net = Network(params)
+
+# Distal evoked drives share connection parameters
+weights_ampa_d = {'L2_basket': 0.003, 'L2_pyramidal': 0.0045,
+                  'L5_pyramidal': 0.001}
+weights_nmda_d = {'L2_basket': 0.003, 'L2_pyramidal': 0.0045,
+                  'L5_pyramidal': 0.001}
+synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                     'L5_pyramidal': 0.1}
+# early distal input
+net.add_evoked_drive(
+    'evdist1', mu=32., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
+    weights_nmda=weights_nmda_d, location='distal',
+    synaptic_delays=synaptic_delays_d, seedcore=6)
+# late distal input
+net.add_evoked_drive(
+    'evdist2', mu=82., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
+    weights_nmda=weights_nmda_d, location='distal',
+    synaptic_delays=synaptic_delays_d, seedcore=2)
+
+# proximal input occurs before distals
+weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0025,
+                  'L5_basket': 0.004, 'L5_pyramidal': 0.001}
+weights_nmda_p = {'L2_basket': 0.003, 'L5_basket': 0.004}
+synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                     'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+net.add_evoked_drive(
+    'evprox1', mu=20.0, sigma=0., numspikes=1, weights_ampa=weights_ampa_p,
+    weights_nmda=weights_nmda_p, location='proximal',
+    synaptic_delays=synaptic_delays_p, seedcore=6)
+
 dpl = simulate_dipole(net, n_trials=1)
 
+trial_idx = 0
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-dpl[0].plot(ax=axes[0], show=False)
+dpl[trial_idx].plot(ax=axes[0], show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1])
 net.cell_response.plot_spikes_raster()

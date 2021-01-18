@@ -131,13 +131,15 @@ started without parallelism</p>
 </dl>
 <dl class="py method">
 <dt id="hnn_core.parallel_backends.JoblibBackend.simulate">
-<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span></em>, <em class="sig-param"><span class="n">postproc</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.JoblibBackend.simulate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span></em>, <em class="sig-param"><span class="n">n_trials</span></em>, <em class="sig-param"><span class="n">postproc</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.JoblibBackend.simulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simulate the HNN model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>net</strong><span class="classifier">Network object</span></dt><dd><p>The Network object specifying how cells are
 connected.</p>
+</dd>
+<dt><strong>n_trials</strong><span class="classifier">int</span></dt><dd><p>Number of trials to simulate.</p>
 </dd>
 <dt><strong>postproc</strong><span class="classifier">bool</span></dt><dd><p>If False, no postprocessing applied to the dipole</p>
 </dd>

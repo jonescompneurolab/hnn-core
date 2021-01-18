@@ -28,10 +28,20 @@ params = read_params(params_fname)
 print(params)
 
 ###############################################################################
-# Now let's simulate the dipole
+# We'll add a tonic Poisson-distributed excitation to pyramidal cells and
+# simulate the dipole moment in a single trial (the default value used by
+# ``simulate_dipole`` is ``n_trials=params['N_trials']``).
 
 net = Network(params)
-dpls = simulate_dipole(net, n_trials=1)
+
+weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
+synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
+rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
+net.add_poisson_drive(
+    'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
+    location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
+
+dpls = simulate_dipole(net)
 
 ###############################################################################
 # The network requires some time to reach steady state. Hence, we omit the
@@ -74,20 +84,22 @@ fig.colorbar(im, cax=cbar_ax)
 plt.show()
 
 ###############################################################################
-# As a final exercise, let us try to re-run the simulation with tonic inputs
-# to the L5 Pyramidal cells. Notice that the oscillation waveform is now more
-# regular with less noise due to the fact that the tonic drive is strong and
-# outweighs the influence of the Poisson drive
-net.add_tonic_input(cell_type='L5Pyr', amplitude=6., t0=0, T=params['tstop'])
+# As a final exercise, let us try to re-run the simulation with a tonic bias
+# applied to the L5 Pyramidal cells. Notice that the oscillation waveform is
+# more regular, with less noise due to the fact that the tonic depolarization
+# dominates over the influence of the Poisson drive. By default, a tonic bias
+# is applied to the entire duration of the simulation.
+net.add_tonic_bias(cell_type='L5_pyramidal', amplitude=6.)
 dpls = simulate_dipole(net, n_trials=1)
 
-dpls[0].plot()
+dpls[trial_idx].plot()
 
 ###############################################################################
-# Notice that the Layer 5 pyramidal neurons are now firing nearly
-# synchronously. They in turn synchronously activate the inhibitory basket
-# neurons, which then inhibit the pyramidal neurons for ~20 ms. Once the
-# tonic drive outweighs the inhibition and the pyramidal neurons firing again
+# Notice that the Layer 5 pyramidal neurons now fire nearly synchronously,
+# leading to a synchronous activation of the inhibitory basket neurons. The
+# resulting in a low-latency IPSP back onto the pyramidal cells. The duration
+# of the IPSP is ~20 ms, after which the combined effect of the tonic bias and
+# Poisson drive is to bring the pyramidal cells back to firing threshold,
 # creating a ~50 Hz PING rhythm. This type of synchronous rhythm is sometimes
 # referred to as “strong” PING.
 net.cell_response.plot_spikes_raster()

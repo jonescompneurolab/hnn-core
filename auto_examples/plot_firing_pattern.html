@@ -135,11 +135,45 @@ pattern of cells in the HNN model.</p>
 <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now let’s build the network with somatic voltage recordings enabled</p>
+<p>Now let’s build the network and simulate its dynamics with somatic voltage
+recordings enabled</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<span class="n">dpls</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">record_vsoma</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Distal evoked drive</span>
+<span class="n">weights_ampa_d1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.006562</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="o">.</span><span class="mi">000007</span><span class="p">,</span>
+                   <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.142300</span><span class="p">}</span>
+<span class="n">weights_nmda_d1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.019482</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.004317</span><span class="p">,</span>
+                   <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.080074</span><span class="p">}</span>
+<span class="n">synaptic_delays_d1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                      <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+    <span class="s1">&#39;evdist1&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">63.53</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">3.85</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_d1</span><span class="p">,</span>
+    <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda_d1</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span>
+    <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_d1</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># First proximal evoked drive</span>
+<span class="n">weights_ampa_p1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.08831</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.01525</span><span class="p">,</span>
+                   <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">0.19934</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.00865</span><span class="p">}</span>
+<span class="n">synaptic_delays_prox</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                        <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">}</span>
+<span class="c1"># all NMDA weights are zero; pass None explicitly</span>
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+    <span class="s1">&#39;evprox1&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">26.61</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">2.47</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_p1</span><span class="p">,</span>
+    <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span>
+    <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_prox</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># Second proximal evoked drive. NB: only AMPA weights differ from first</span>
+<span class="n">weights_ampa_p2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.000003</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">1.438840</span><span class="p">,</span>
+                   <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">0.008958</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.684013</span><span class="p">}</span>
+<span class="c1"># all NMDA weights are zero; omit weights_nmda (defaults to None)</span>
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+    <span class="s1">&#39;evprox2&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">137.12</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">8.33</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_p2</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span>
+    <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays_prox</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">dpls</span> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <span class="n">record_vsoma</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -172,7 +206,7 @@ Simulation time: 160.0 ms...
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;L2_basket&#39;: range(0, 35), &#39;L2_pyramidal&#39;: range(35, 135), &#39;L5_basket&#39;: range(135, 170), &#39;L5_pyramidal&#39;: range(170, 270), &#39;common&#39;: range(270, 272), &#39;evdist1&#39;: range(272, 542), &#39;evprox1&#39;: range(542, 812), &#39;evprox2&#39;: range(812, 1082), &#39;extgauss&#39;: range(1082, 1352), &#39;extpois&#39;: range(1352, 1622)}
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;L2_basket&#39;: range(0, 35), &#39;L2_pyramidal&#39;: range(35, 135), &#39;L5_basket&#39;: range(135, 170), &#39;L5_pyramidal&#39;: range(170, 270), &#39;evdist1&#39;: range(270, 540), &#39;evprox1&#39;: range(540, 810), &#39;evprox2&#39;: range(810, 1080)}
 </pre></div>
 </div>
 <p>Simulated voltage in the soma is stored in CellResponse as a dictionary.
@@ -218,7 +252,7 @@ plots and histograms for the Pyramidal cells.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 500x700 with 3 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  42.818 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  47.912 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-firing-pattern-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_firing_pattern.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>

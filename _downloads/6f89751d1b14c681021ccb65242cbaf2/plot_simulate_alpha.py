@@ -29,33 +29,33 @@ params = read_params(params_fname)
 print(params)
 
 ###############################################################################
-# Remove all evoked proximal feed parameters
-for key in params['*evprox*']:
-    del params[key]
-
-# Remove all evoked distal feed parameters
-for key in params['*evdist*']:
-    del params[key]
-
-###############################################################################
-# Now, we update a few rhythmic feed parameters
+# Update a few of the default parameters related to visualisation
 params.update({
     'dipole_scalefctr': 150000.0,
     'dipole_smooth_win': 0,
     'tstop': 310.0,
-    't0_input_dist': 50.0,
-    'tstop_input_dist': 1001.0,
-    'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
-    'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
-    'sync_evinput': 1,
-    "prng_seedcore_input_dist": 3
 })
 
 ###############################################################################
-# Now let's simulate the dipole and plot it
+# Now let's simulate the dipole and plot it. To excite the network, we add a
+# ~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
+# simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
+# The occurrence of each burst is jittered by a random, normally distributed
+# amount (20 ms standard deviation). We repeat the burst train 10 times, each
+# time with unique randomization. The drive is only connected to the distal
+# (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 net = Network(params)
+
+weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
+net.add_bursty_drive(
+    'bursty', tstart=50., burst_rate=10, burst_std=20., numspikes=2,
+    spike_isi=10, repeats=10, location='distal', weights_ampa=weights_ampa,
+    seedcore=4)
+
 dpl = simulate_dipole(net)
-dpl[0].plot()
+
+trial_idx = 0  # single trial simulated
+dpl[trial_idx].plot()
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity.

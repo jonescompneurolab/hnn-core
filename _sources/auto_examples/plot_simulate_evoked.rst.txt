@@ -18,14 +18,15 @@
 .. _sphx_glr_auto_examples_plot_simulate_evoked.py:
 
 
-===============
-Simulate dipole
-===============
+=================================
+Simulate dipole for evoked inputs
+=================================
 
 This example demonstrates how to simulate a dipole for evoked-like
 waveforms using HNN-core.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-17
+
+.. GENERATED FROM PYTHON SOURCE LINES 10-19
 
 .. code-block:: default
 
@@ -33,6 +34,7 @@ waveforms using HNN-core.
     # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
     #          Sam Neymotin <samnemo@gmail.com>
     #          Blake Caldwell <blake_caldwell@brown.edu>
+    #          Christopher Bailey <cjb@cfin.au.dk>
 
     import os.path as op
     import tempfile
@@ -44,11 +46,11 @@ waveforms using HNN-core.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-19
+.. GENERATED FROM PYTHON SOURCE LINES 20-21
 
 Let us import hnn_core
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-26
+.. GENERATED FROM PYTHON SOURCE LINES 21-28
 
 .. code-block:: default
 
@@ -66,11 +68,11 @@ Let us import hnn_core
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-28
+.. GENERATED FROM PYTHON SOURCE LINES 29-30
 
 Then we read the parameters file
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-32
+.. GENERATED FROM PYTHON SOURCE LINES 30-34
 
 .. code-block:: default
 
@@ -324,12 +326,12 @@ Then we read the parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-35
+.. GENERATED FROM PYTHON SOURCE LINES 35-37
 
 This is a lot of parameters! We can also filter the
 parameters using unix-style wildcard characters
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-37
+.. GENERATED FROM PYTHON SOURCE LINES 37-39
 
 .. code-block:: default
 
@@ -360,12 +362,12 @@ parameters using unix-style wildcard characters
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-40
+.. GENERATED FROM PYTHON SOURCE LINES 40-42
 
 Let us first create our network from the params file and visualize the cells
 inside it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-43
+.. GENERATED FROM PYTHON SOURCE LINES 42-45
 
 .. code-block:: default
 
@@ -391,12 +393,68 @@ inside it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-46
+.. GENERATED FROM PYTHON SOURCE LINES 46-54
+
+The network of cells is now defined, to which we add external drives as
+required. Weights are prescribed separately for AMPA and NMDA receptors
+(receptors that are not used can be omitted or set to zero). The possible
+drive types include the following (click on the links for documentation):
+
+- :meth:`hnn_core.Network.add_evoked_drive`
+- :meth:`hnn_core.Network.add_poisson_drive`
+- :meth:`hnn_core.Network.add_bursty_drive`
+
+.. GENERATED FROM PYTHON SOURCE LINES 54-87
+
+.. code-block:: default
+
+
+    # Distal evoked drive
+    weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
+                       'L5_pyramidal': 0.142300}
+    weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
+                       'L5_pyramidal': 0.080074}
+    synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                          'L5_pyramidal': 0.1}
+    net.add_evoked_drive(
+        'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
+        weights_nmda=weights_nmda_d1, location='distal',
+        synaptic_delays=synaptic_delays_d1, seedcore=4)
+
+    # First proximal evoked drive
+    weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
+                       'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+    synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                            'L5_basket': 1., 'L5_pyramidal': 1.}
+    # all NMDA weights are zero; pass None explicitly
+    net.add_evoked_drive(
+        'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
+        weights_nmda=None, location='proximal',
+        synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+    # Second proximal evoked drive. NB: only AMPA weights differ from first
+    weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                       'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+    # all NMDA weights are zero; omit weights_nmda (defaults to None)
+    net.add_evoked_drive(
+        'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa_p2, location='proximal',
+        synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 88-91
 
 Now let's simulate the dipole, running 2 trials with the Joblib backend.
-To run them in parallel we could set n_jobs to equal the number of trials.
+To run them in parallel we could set ``n_jobs`` to equal the number of
+trials.
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-51
+.. GENERATED FROM PYTHON SOURCE LINES 91-96
 
 .. code-block:: default
 
@@ -460,11 +518,11 @@ To run them in parallel we could set n_jobs to equal the number of trials.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-53
+.. GENERATED FROM PYTHON SOURCE LINES 97-98
 
 and then plot it
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-59
+.. GENERATED FROM PYTHON SOURCE LINES 98-104
 
 .. code-block:: default
 
@@ -493,14 +551,14 @@ and then plot it
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-64
+.. GENERATED FROM PYTHON SOURCE LINES 105-109
 
-Also, we can plot the spikes and write them to txt files.
+Also, we can plot the spikes and write them to text files.
 Note that we can use formatting syntax to specify the filename pattern
 with which each trial will be written. To read spikes back in, we can use
 wildcard expressions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-70
+.. GENERATED FROM PYTHON SOURCE LINES 109-115
 
 .. code-block:: default
 
@@ -540,12 +598,12 @@ wildcard expressions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-73
+.. GENERATED FROM PYTHON SOURCE LINES 116-118
 
 We can additionally calculate the mean spike rates for each cell class by
 specifying a time window with tstart and tstop.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-85
+.. GENERATED FROM PYTHON SOURCE LINES 118-129
 
 .. code-block:: default
 
@@ -559,7 +617,6 @@ specifying a time window with tstart and tstop.
     print(all_rates)
     print('Mean spike rates for individual trials:')
     print(trial_rates)
-
 
 
 
@@ -579,18 +636,23 @@ specifying a time window with tstart and tstop.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-88
+.. GENERATED FROM PYTHON SOURCE LINES 130-135
 
 Now, let us try to make the exogenous driving inputs to the cells
-synchronous and see what happens
+synchronous and see what happens. This is achieved by setting the parameter
+``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
+a clone of the network defined above, and then modify the drive dynamics for
+each drive.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-92
+.. GENERATED FROM PYTHON SOURCE LINES 135-141
 
 .. code-block:: default
 
 
-    params.update({'sync_evinput': True})
-    net_sync = Network(params)
+    net_sync = net.copy()
+    net_sync.external_drives['evdist1']['dynamics']['sync_within_trial'] = True
+    net_sync.external_drives['evprox1']['dynamics']['sync_within_trial'] = True
+    net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
 
 
 
@@ -599,14 +661,39 @@ synchronous and see what happens
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-97
+.. GENERATED FROM PYTHON SOURCE LINES 142-143
 
-Next, let's simulate a single trial using the MPI backend. This will
-start the simulation trial across the number of processors (cores)
-specified by n_procs using MPI. The 'mpiexec' launcher is for
+You may interrogate current values defining the spike event time dynamics by
+
+.. GENERATED FROM PYTHON SOURCE LINES 143-145
+
+.. code-block:: default
+
+    print(net_sync.external_drives['evdist1']['dynamics'])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    {'mu': 63.53, 'sigma': 3.85, 'numspikes': 1, 'sync_within_trial': True}
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 146-150
+
+Finally, let's simulate a single trial using the MPI backend. This will
+start the simulation across the number of processors (cores) specified by
+``n_procs``` using MPI. The ``'mpiexec'`` launcher is used from
 openmpi, which must be installed on the system
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-104
+.. GENERATED FROM PYTHON SOURCE LINES 150-158
 
 .. code-block:: default
 
@@ -615,7 +702,8 @@ openmpi, which must be installed on the system
     with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
         dpls_sync = simulate_dipole(net_sync, n_trials=1)
 
-    dpls_sync[0].plot()
+    trial_idx = 0
+    dpls_sync[trial_idx].plot()
     net_sync.cell_response.plot_spikes_hist()
 
 
@@ -645,6 +733,7 @@ openmpi, which must be installed on the system
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
+    [73d164d9b48b:01502] Read -1, expected 45174, errno = 1
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -667,17 +756,17 @@ openmpi, which must be installed on the system
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
-    [803faa06dd04:01494] Read -1, expected 27200, errno = 1
-    [803faa06dd04:01495] Read -1, expected 27208, errno = 1
-    [803faa06dd04:01494] Read -1, expected 27208, errno = 1
-    [803faa06dd04:01495] Read -1, expected 27200, errno = 1
-    [803faa06dd04:01494] Read -1, expected 27200, errno = 1
-    [803faa06dd04:01495] Read -1, expected 27208, errno = 1
-    [803faa06dd04:01495] Read -1, expected 27200, errno = 1
-    [803faa06dd04:01494] Read -1, expected 27208, errno = 1
-    [803faa06dd04:01494] Read -1, expected 5616, errno = 1
-    [803faa06dd04:01494] Read -1, expected 5703, errno = 1
-    [803faa06dd04:01494] Read -1, expected 5703, errno = 1
+    [73d164d9b48b:01502] Read -1, expected 27208, errno = 1
+    [73d164d9b48b:01501] Read -1, expected 27200, errno = 1
+    [73d164d9b48b:01502] Read -1, expected 27200, errno = 1
+    [73d164d9b48b:01501] Read -1, expected 27208, errno = 1
+    [73d164d9b48b:01502] Read -1, expected 27208, errno = 1
+    [73d164d9b48b:01501] Read -1, expected 27200, errno = 1
+    [73d164d9b48b:01502] Read -1, expected 27200, errno = 1
+    [73d164d9b48b:01501] Read -1, expected 27208, errno = 1
+    [73d164d9b48b:01501] Read -1, expected 5616, errno = 1
+    [73d164d9b48b:01501] Read -1, expected 5687, errno = 1
+    [73d164d9b48b:01501] Read -1, expected 5687, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -686,7 +775,7 @@ openmpi, which must be installed on the system
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  46.132 seconds)
+   **Total running time of the script:** ( 4 minutes  31.505 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

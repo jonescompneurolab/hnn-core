@@ -148,9 +148,21 @@ and the value is an instance of h.Section.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L5Pyr.add_tonic_input">
-<code class="sig-name descname">add_tonic_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amplitude</span></em>, <em class="sig-param"><span class="n">t0</span></em>, <em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">loc</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.add_tonic_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create tonic feed at the soma.</p>
+<dt id="hnn_core.L5Pyr.create_dends">
+<code class="sig-name descname">create_dends</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_dend_props</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.create_dends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create dendrites.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Pyr.create_soma">
+<code class="sig-name descname">create_soma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.create_soma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create soma and set geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.L5Pyr.create_tonic_bias">
+<code class="sig-name descname">create_tonic_bias</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amplitude</span></em>, <em class="sig-param"><span class="n">t0</span></em>, <em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">loc</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.create_tonic_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create tonic bias at the soma.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -165,18 +177,6 @@ and the value is an instance of h.Section.</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L5Pyr.create_dends">
-<code class="sig-name descname">create_dends</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_dend_props</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.create_dends" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create dendrites.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.L5Pyr.create_soma">
-<code class="sig-name descname">create_soma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L5Pyr.create_soma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create soma and set geometry.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -241,8 +241,7 @@ Defines the connection parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>record_vsoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic voltages from cells
-net.params[‘N_trials’] will be used</p>
+<dt><strong>record_vsoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic voltages from cells</p>
 </dd>
 <dt><strong>record_isoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic currents from cells</p>
 </dd>

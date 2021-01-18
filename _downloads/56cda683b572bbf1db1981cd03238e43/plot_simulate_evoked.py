@@ -1,15 +1,17 @@
 """
-===============
-Simulate dipole
-===============
+=================================
+Simulate dipole for evoked inputs
+=================================
 
 This example demonstrates how to simulate a dipole for evoked-like
 waveforms using HNN-core.
+
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
+#          Christopher Bailey <cjb@cfin.au.dk>
 
 import os.path as op
 import tempfile
@@ -41,8 +43,51 @@ net = Network(params)
 net.plot_cells()
 
 ###############################################################################
+# The network of cells is now defined, to which we add external drives as
+# required. Weights are prescribed separately for AMPA and NMDA receptors
+# (receptors that are not used can be omitted or set to zero). The possible
+# drive types include the following (click on the links for documentation):
+#
+# - :meth:`hnn_core.Network.add_evoked_drive`
+# - :meth:`hnn_core.Network.add_poisson_drive`
+# - :meth:`hnn_core.Network.add_bursty_drive`
+
+# Distal evoked drive
+weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
+                   'L5_pyramidal': 0.142300}
+weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
+                   'L5_pyramidal': 0.080074}
+synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                      'L5_pyramidal': 0.1}
+net.add_evoked_drive(
+    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
+    weights_nmda=weights_nmda_d1, location='distal',
+    synaptic_delays=synaptic_delays_d1, seedcore=4)
+
+# First proximal evoked drive
+weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
+                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                        'L5_basket': 1., 'L5_pyramidal': 1.}
+# all NMDA weights are zero; pass None explicitly
+net.add_evoked_drive(
+    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
+    weights_nmda=None, location='proximal',
+    synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+# Second proximal evoked drive. NB: only AMPA weights differ from first
+weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+# all NMDA weights are zero; omit weights_nmda (defaults to None)
+net.add_evoked_drive(
+    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+    weights_ampa=weights_ampa_p2, location='proximal',
+    synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+###############################################################################
 # Now let's simulate the dipole, running 2 trials with the Joblib backend.
-# To run them in parallel we could set n_jobs to equal the number of trials.
+# To run them in parallel we could set ``n_jobs`` to equal the number of
+# trials.
 from hnn_core import JoblibBackend
 
 with JoblibBackend(n_jobs=1):
@@ -57,7 +102,7 @@ net.cell_response.plot_spikes_hist(ax=axes[1],
                                    spike_types=['evprox', 'evdist'])
 
 ###############################################################################
-# Also, we can plot the spikes and write them to txt files.
+# Also, we can plot the spikes and write them to text files.
 # Note that we can use formatting syntax to specify the filename pattern
 # with which each trial will be written. To read spikes back in, we can use
 # wildcard expressions.
@@ -81,23 +126,32 @@ print(all_rates)
 print('Mean spike rates for individual trials:')
 print(trial_rates)
 
-
 ###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
-# synchronous and see what happens
+# synchronous and see what happens. This is achieved by setting the parameter
+# ``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
+# a clone of the network defined above, and then modify the drive dynamics for
+# each drive.
 
-params.update({'sync_evinput': True})
-net_sync = Network(params)
+net_sync = net.copy()
+net_sync.external_drives['evdist1']['dynamics']['sync_within_trial'] = True
+net_sync.external_drives['evprox1']['dynamics']['sync_within_trial'] = True
+net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
 
 ###############################################################################
-# Next, let's simulate a single trial using the MPI backend. This will
-# start the simulation trial across the number of processors (cores)
-# specified by n_procs using MPI. The 'mpiexec' launcher is for
+# You may interrogate current values defining the spike event time dynamics by
+print(net_sync.external_drives['evdist1']['dynamics'])
+
+###############################################################################
+# Finally, let's simulate a single trial using the MPI backend. This will
+# start the simulation across the number of processors (cores) specified by
+# ``n_procs``` using MPI. The ``'mpiexec'`` launcher is used from
 # openmpi, which must be installed on the system
 from hnn_core import MPIBackend
 
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
     dpls_sync = simulate_dipole(net_sync, n_trials=1)
 
-dpls_sync[0].plot()
+trial_idx = 0
+dpls_sync[trial_idx].plot()
 net_sync.cell_response.plot_spikes_hist()

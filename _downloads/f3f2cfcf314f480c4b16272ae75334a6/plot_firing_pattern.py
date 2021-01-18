@@ -26,11 +26,45 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 
 ###############################################################################
-# Now let's build the network with somatic voltage recordings enabled
+# Now let's build the network and simulate its dynamics with somatic voltage
+# recordings enabled
 import matplotlib.pyplot as plt
 
 net = Network(params)
-dpls = simulate_dipole(net, n_trials=1, record_vsoma=True)
+
+# Distal evoked drive
+weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
+                   'L5_pyramidal': 0.142300}
+weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
+                   'L5_pyramidal': 0.080074}
+synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                      'L5_pyramidal': 0.1}
+net.add_evoked_drive(
+    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
+    weights_nmda=weights_nmda_d1, location='distal',
+    synaptic_delays=synaptic_delays_d1, seedcore=4)
+
+# First proximal evoked drive
+weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
+                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                        'L5_basket': 1., 'L5_pyramidal': 1.}
+# all NMDA weights are zero; pass None explicitly
+net.add_evoked_drive(
+    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
+    weights_nmda=None, location='proximal',
+    synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+# Second proximal evoked drive. NB: only AMPA weights differ from first
+weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+# all NMDA weights are zero; omit weights_nmda (defaults to None)
+net.add_evoked_drive(
+    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+    weights_ampa=weights_ampa_p2, location='proximal',
+    synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+dpls = simulate_dipole(net, record_vsoma=True)
 
 ###############################################################################
 # The cell IDs (gids) are stored in the network object as a dictionary

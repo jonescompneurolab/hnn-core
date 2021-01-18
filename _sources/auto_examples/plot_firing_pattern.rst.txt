@@ -81,18 +81,52 @@ Then we read the parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-30
+.. GENERATED FROM PYTHON SOURCE LINES 29-31
 
-Now let's build the network with somatic voltage recordings enabled
+Now let's build the network and simulate its dynamics with somatic voltage
+recordings enabled
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-35
+.. GENERATED FROM PYTHON SOURCE LINES 31-69
 
 .. code-block:: default
 
     import matplotlib.pyplot as plt
 
     net = Network(params)
-    dpls = simulate_dipole(net, n_trials=1, record_vsoma=True)
+
+    # Distal evoked drive
+    weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
+                       'L5_pyramidal': 0.142300}
+    weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
+                       'L5_pyramidal': 0.080074}
+    synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                          'L5_pyramidal': 0.1}
+    net.add_evoked_drive(
+        'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
+        weights_nmda=weights_nmda_d1, location='distal',
+        synaptic_delays=synaptic_delays_d1, seedcore=4)
+
+    # First proximal evoked drive
+    weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
+                       'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+    synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                            'L5_basket': 1., 'L5_pyramidal': 1.}
+    # all NMDA weights are zero; pass None explicitly
+    net.add_evoked_drive(
+        'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
+        weights_nmda=None, location='proximal',
+        synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+    # Second proximal evoked drive. NB: only AMPA weights differ from first
+    weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                       'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+    # all NMDA weights are zero; omit weights_nmda (defaults to None)
+    net.add_evoked_drive(
+        'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa_p2, location='proximal',
+        synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+    dpls = simulate_dipole(net, record_vsoma=True)
 
 
 
@@ -129,11 +163,11 @@ Now let's build the network with somatic voltage recordings enabled
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-37
+.. GENERATED FROM PYTHON SOURCE LINES 70-71
 
 The cell IDs (gids) are stored in the network object as a dictionary
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-40
+.. GENERATED FROM PYTHON SOURCE LINES 71-74
 
 .. code-block:: default
 
@@ -150,18 +184,18 @@ The cell IDs (gids) are stored in the network object as a dictionary
 
  .. code-block:: none
 
-    {'L2_basket': range(0, 35), 'L2_pyramidal': range(35, 135), 'L5_basket': range(135, 170), 'L5_pyramidal': range(170, 270), 'common': range(270, 272), 'evdist1': range(272, 542), 'evprox1': range(542, 812), 'evprox2': range(812, 1082), 'extgauss': range(1082, 1352), 'extpois': range(1352, 1622)}
+    {'L2_basket': range(0, 35), 'L2_pyramidal': range(35, 135), 'L5_basket': range(135, 170), 'L5_pyramidal': range(170, 270), 'evdist1': range(270, 540), 'evprox1': range(540, 810), 'evprox2': range(810, 1080)}
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-44
+.. GENERATED FROM PYTHON SOURCE LINES 75-78
 
 Simulated voltage in the soma is stored in CellResponse as a dictionary.
 The CellResponse object stores data produced by individual cells including
 spikes, somatic voltages and currents.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-48
+.. GENERATED FROM PYTHON SOURCE LINES 78-82
 
 .. code-block:: default
 
@@ -184,11 +218,11 @@ spikes, somatic voltages and currents.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-50
+.. GENERATED FROM PYTHON SOURCE LINES 83-84
 
 We can plot the firing pattern of individual cells by indexing with the gid
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-58
+.. GENERATED FROM PYTHON SOURCE LINES 84-92
 
 .. code-block:: default
 
@@ -211,12 +245,12 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 93-95
 
 Let's plot the soma voltage along with the spiking activity with raster
 plots and histograms for the Pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-73
+.. GENERATED FROM PYTHON SOURCE LINES 95-107
 
 .. code-block:: default
 
@@ -254,7 +288,7 @@ plots and histograms for the Pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  42.818 seconds)
+   **Total running time of the script:** ( 1 minutes  47.912 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:
