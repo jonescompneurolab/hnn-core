@@ -409,9 +409,9 @@ class NetworkBuilder(object):
             # how such 'common' spikes influence them
             else:
                 gid_idx = gid - self.net.gid_ranges[src_type][0]
-                et = self.net.external_drives[
+                event_times = self.net.external_drives[
                     src_type]['events'][self.trial_idx][gid_idx]
-                drive_cell = _ArtificialCell(et, threshold, gid=gid)
+                drive_cell = _ArtificialCell(event_times, threshold, gid=gid)
                 _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
                 self._drive_cells.append(drive_cell)
 

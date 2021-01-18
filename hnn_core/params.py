@@ -176,18 +176,18 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             cname_ampa = _short_name(cellname) + '_ampa'
             cname_nmda = _short_name(cellname) + '_nmda'
             if cname_ampa in par:
-                ampa_w = par[cname_ampa][0]
-                ampa_d = par[cname_ampa][1]
-                if ampa_w > 0.:
-                    drive['weights_ampa'][cellname] = ampa_w
+                ampa_weight = par[cname_ampa][0]
+                ampa_delay = par[cname_ampa][1]
+                if ampa_weight > 0.:
+                    drive['weights_ampa'][cellname] = ampa_weight
 
                 # NB synaptic delay same for NMDA, read only for AMPA
-                drive['synaptic_delays'][cellname] = ampa_d
+                drive['synaptic_delays'][cellname] = ampa_delay
 
             if cname_nmda in par:
-                nmda_w = par[cname_nmda][0]
-                if nmda_w > 0.:
-                    drive['weights_nmda'][cellname] = nmda_w
+                nmda_weight = par[cname_nmda][0]
+                if nmda_weight > 0.:
+                    drive['weights_nmda'][cellname] = nmda_weight
 
         drive_specs[feed_name] = drive
 
@@ -218,13 +218,13 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             drive['seedcore'] = par['prng_seedcore']
             for cellname in cellname_list:
                 if cellname in par:
-                    ampa_w = par[cellname][0]
-                    nmda_w = par[cellname][1]
+                    ampa_weight = par[cellname][0]
+                    nmda_weight = par[cellname][1]
                     synaptic_delays = par[cellname][2]
-                    if ampa_w > 0.:
-                        drive['weights_ampa'][cellname] = ampa_w
-                    if nmda_w > 0.:
-                        drive['weights_nmda'][cellname] = nmda_w
+                    if ampa_weight > 0.:
+                        drive['weights_ampa'][cellname] = ampa_weight
+                    if nmda_weight > 0.:
+                        drive['weights_nmda'][cellname] = nmda_weight
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
         elif feed_name.startswith('extgauss'):
@@ -240,10 +240,10 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
 
             for cellname in cellname_list:
                 if cellname in par:
-                    ampa_w = par[cellname][0]
+                    ampa_weight = par[cellname][0]
                     synaptic_delays = par[cellname][3]
-                    if ampa_w > 0.:
-                        drive['weights_ampa'][cellname] = ampa_w
+                    if ampa_weight > 0.:
+                        drive['weights_ampa'][cellname] = ampa_weight
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
             drive['weights_nmda'] = dict()  # no NMDA weights for Gaussians
@@ -257,13 +257,13 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             for cellname in cellname_list:
                 if cellname in par:
                     rate_params[cellname] = par[cellname][3]
-                    ampa_w = par[cellname][0]
-                    nmda_w = par[cellname][1]
+                    ampa_weight = par[cellname][0]
+                    nmda_weight = par[cellname][1]
                     synaptic_delays = par[cellname][2]
-                    if ampa_w > 0.:
-                        drive['weights_ampa'][cellname] = ampa_w
-                    if nmda_w > 0.:
-                        drive['weights_nmda'][cellname] = nmda_w
+                    if ampa_weight > 0.:
+                        drive['weights_ampa'][cellname] = ampa_weight
+                    if nmda_weight > 0.:
+                        drive['weights_nmda'][cellname] = nmda_weight
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
             # do NOT allow negative times sometimes used in param-files

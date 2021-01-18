@@ -323,7 +323,7 @@ class Network(object):
 
         Returns
         -------
-        inst : instance of Network
+        net_copy : instance of Network
             A copy of the instance with previous simulation results and
             ``events`` of external drives removed.
         """
@@ -588,7 +588,7 @@ class Network(object):
                         set(synaptic_delays.keys()))):
                     raise ValueError(
                         'synaptic_delays is either a common float or needs '
-                        'to be specified for each cell type')
+                        'to be specified as a dict for each cell type')
 
         # this is needed to keep the drive GIDs identical to those in HNN,
         # e.g., 'evdist1': range(272, 542), even when no L5_basket cells
@@ -698,7 +698,7 @@ class Network(object):
                     if isinstance(synaptic_delays, float):
                         drive_conn_by_cell[cellname][receptor][
                             'A_delay'] = synaptic_delays
-                    else:
+                    elif isinstance(synaptic_delays, dict):
                         drive_conn_by_cell[cellname][receptor][
                             'A_delay'] = synaptic_delays[cellname]
                     drive_conn_by_cell[cellname][receptor][

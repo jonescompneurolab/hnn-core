@@ -110,7 +110,7 @@ def test_add_drives():
                               weights_ampa={'CA1_pyramidal': 1.})
     with pytest.raises(ValueError,
                        match='synaptic_delays is either a common float or '
-                             'needs to be specified for each cell type'):
+                             'needs to be specified as a dict for each cell'):
         net.add_poisson_drive('cell_unknown', location='proximal',
                               rate_constant=10.,
                               weights_ampa={'L2_pyramidal': 1.},
