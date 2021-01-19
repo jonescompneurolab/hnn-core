@@ -12,7 +12,11 @@ somatosensory dataset.
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 
 ###############################################################################
-# First, we will import the packages and define the paths
+# First, we will import the packages and define the paths. For this example,
+# we will need `MNE`_ installed. For most practical purposes, you can simply
+# do:
+#
+#   $ pip install mne
 import os.path as op
 import numpy as np
 import matplotlib.pyplot as plt
@@ -127,3 +131,8 @@ fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 dpl[trial_idx].plot(ax=axes[0], show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1])
 net.cell_response.plot_spikes_raster()
+
+###############################################################################
+# .. LINKS
+#
+# .. _MNE: https://mne.tools/
