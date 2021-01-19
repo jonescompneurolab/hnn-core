@@ -46,6 +46,7 @@ extensions = [
     'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'numpydoc'
 ]
 
@@ -178,6 +179,15 @@ texinfo_documents = [
      author, 'hnn-core', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'mne': ('https://mne.tools/dev', None),
+    'numpy': ('https://numpy.org/devdocs', None),
+    'scipy': ('https://scipy.github.io/devdocs', None),
+    'matplotlib': ('https://matplotlib.org', None)
+}
+intersphinx_timeout = 5
 
 sphinx_gallery_conf = {
     # path to your examples scripts
