@@ -13,6 +13,8 @@ waveforms using HNN-core.
 #          Blake Caldwell <blake_caldwell@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
+# sphinx_gallery_thumbnail_number = 2
+
 import os.path as op
 import tempfile
 
