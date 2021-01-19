@@ -16,6 +16,8 @@ import os
 import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_gallery
+from sphinx_gallery.sorting import ExplicitOrder
+
 import sphinx_bootstrap_theme
 
 
@@ -186,6 +188,12 @@ sphinx_gallery_conf = {
     'reference_url': {
         'hnn_core': 'https://jonescompneurolab.github.io/hnn-core/'
     },
+    'subsection_order': ExplicitOrder(
+        ['../examples/plot_simulate_evoked.py',
+         '../examples/plot_simulate_alpha.py',
+         '../examples/plot_simulate_gamma.py',
+         '../examples/plot_firing_pattern.py',
+         '../examples/plot_simulate_somato.py']),
     'binder': {'org': 'jonescompneurolab',
                'repo': 'hnn-core',
                'branch': 'gh-pages',
