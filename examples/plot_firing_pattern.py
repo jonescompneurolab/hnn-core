@@ -1,7 +1,7 @@
 """
-===================
-Plot firing pattern
-===================
+=======================
+04. Plot firing pattern
+=======================
 
 This example demonstrates how to inspect the firing
 pattern of cells in the HNN model.

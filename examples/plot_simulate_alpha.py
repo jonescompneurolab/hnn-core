@@ -1,7 +1,7 @@
 """
-====================
-Simulate alpha waves
-====================
+========================
+02. Simulate alpha waves
+========================
 
 This example demonstrates how to simulate alpha waves using
 HNN-core.
