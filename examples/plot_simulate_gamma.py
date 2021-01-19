@@ -1,7 +1,7 @@
 """
-======================
-Simulate gamma rhythms
-======================
+==========================
+03. Simulate gamma rhythms
+==========================
 
 This example demonstrates how to simulate gamma rhythms using hnn-core.
 

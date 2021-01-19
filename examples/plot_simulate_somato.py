@@ -1,7 +1,7 @@
 """
-====================
-Simulate somato data
-====================
+=================================
+05. Source reconstruction and HNN
+=================================
 
 This example demonstrates how to simulate the source time
 courses obtained during median nerve stimulation in the MNE
@@ -46,6 +46,16 @@ evoked = epochs.average()
 fwd = mne.read_forward_solution(fwd_fname)
 cov = mne.compute_covariance(epochs)
 inv = make_inverse_operator(epochs.info, fwd, cov)
+
+###############################################################################
+# There are several methods to do source reconstruction. Some of the methods
+# such as MNE are distributed source methods whereas dipole fitting will
+# estimate the location and amplitude of a single current dipole. At the
+# moment, we do not offer explicit recommendations on which source
+# reconstruction technique is best for HNN. However, we do want our users
+# to note that the dipole currents simulate with HNN are assumed to be normal
+# to the cortical surface. Hence, using the option ``pick_ori='normal'``
+# seems to make most sense.
 
 method = "MNE"
 snr = 3.
