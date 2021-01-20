@@ -18,9 +18,9 @@
 .. _sphx_glr_auto_examples_plot_firing_pattern.py:
 
 
-===================
-Plot firing pattern
-===================
+=======================
+04. Plot firing pattern
+=======================
 
 This example demonstrates how to inspect the firing
 pattern of cells in the HNN model.
@@ -44,7 +44,7 @@ pattern of cells in the HNN model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 16-17
 
-Let us import hnn_core
+Let us import ``hnn_core``.
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-23
 
@@ -83,10 +83,10 @@ Then we read the parameters file
 
 .. GENERATED FROM PYTHON SOURCE LINES 29-31
 
-Now let's build the network and simulate its dynamics with somatic voltage
-recordings enabled
+Now let's build the network. We have used the same weights as in the
+:ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` example.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-69
+.. GENERATED FROM PYTHON SOURCE LINES 31-35
 
 .. code-block:: default
 
@@ -94,8 +94,27 @@ recordings enabled
 
     net = Network(params)
 
-    # Distal evoked drive
-    weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 36-41
+
+``net`` does not have any driving inputs and only defines the local network
+connectivity. Let us go ahead and first add a distal evoked drive.
+We need to define the AMPA and NMDA weights for the connections. An
+"evoked drive" defines inputs that are normally distributed with a certain
+mean and standard deviation.
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-53
+
+.. code-block:: default
+
+
+    weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': 7e-6,
                        'L5_pyramidal': 0.142300}
     weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
                        'L5_pyramidal': 0.080074}
@@ -106,18 +125,52 @@ recordings enabled
         weights_nmda=weights_nmda_d1, location='distal',
         synaptic_delays=synaptic_delays_d1, seedcore=4)
 
-    # First proximal evoked drive
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 54-58
+
+The reason it is called an "evoked drive" is it can be used to simulate
+waveforms resembling evoked responses. Here, we show how to do it with two
+proximal drives which drive current up the dendrite and one distal drive
+which drives current down the dendrite producing the negative deflection.
+
+.. GENERATED FROM PYTHON SOURCE LINES 58-69
+
+.. code-block:: default
+
     weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                        'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
     synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                             'L5_basket': 1., 'L5_pyramidal': 1.}
+
     # all NMDA weights are zero; pass None explicitly
     net.add_evoked_drive(
         'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
         weights_nmda=None, location='proximal',
         synaptic_delays=synaptic_delays_prox, seedcore=4)
 
-    # Second proximal evoked drive. NB: only AMPA weights differ from first
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 70-73
+
+Now we add the second proximal evoked drive and simulate the network
+dynamics with somatic voltage recordings enabled. Note: only AMPA weights
+differ from first.
+
+.. GENERATED FROM PYTHON SOURCE LINES 73-83
+
+.. code-block:: default
+
     weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
                        'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
     # all NMDA weights are zero; omit weights_nmda (defaults to None)
@@ -163,11 +216,14 @@ recordings enabled
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-71
+.. GENERATED FROM PYTHON SOURCE LINES 84-88
 
-The cell IDs (gids) are stored in the network object as a dictionary
+Here, we explain more details about the data structures and how they can
+be used to better interpret the data. The cell IDs (gids) uniquely define
+neurons in the network and are stored in the :class:`~hnn_core.Network` 
+object as a dictionary
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-74
+.. GENERATED FROM PYTHON SOURCE LINES 88-91
 
 .. code-block:: default
 
@@ -189,13 +245,13 @@ The cell IDs (gids) are stored in the network object as a dictionary
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-78
+.. GENERATED FROM PYTHON SOURCE LINES 92-95
 
-Simulated voltage in the soma is stored in CellResponse as a dictionary.
-The CellResponse object stores data produced by individual cells including
-spikes, somatic voltages and currents.
+Simulated voltage in the soma is stored in :class:`~hnn_core.CellResponse`
+as a dictionary. The CellResponse object stores data produced by individual
+cells including spikes, somatic voltages and currents.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-82
+.. GENERATED FROM PYTHON SOURCE LINES 95-99
 
 .. code-block:: default
 
@@ -218,11 +274,11 @@ spikes, somatic voltages and currents.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-84
+.. GENERATED FROM PYTHON SOURCE LINES 100-101
 
 We can plot the firing pattern of individual cells by indexing with the gid
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-92
+.. GENERATED FROM PYTHON SOURCE LINES 101-109
 
 .. code-block:: default
 
@@ -245,12 +301,12 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-95
+.. GENERATED FROM PYTHON SOURCE LINES 110-112
 
-Let's plot the soma voltage along with the spiking activity with raster
-plots and histograms for the Pyramidal cells.
+Finally, we can plot the soma voltage along with the spiking activity with
+raster plots and histograms for the pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-107
+.. GENERATED FROM PYTHON SOURCE LINES 112-124
 
 .. code-block:: default
 
@@ -288,7 +344,7 @@ plots and histograms for the Pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  47.912 seconds)
+   **Total running time of the script:** ( 0 minutes  40.136 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

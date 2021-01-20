@@ -18,9 +18,9 @@
 .. _sphx_glr_auto_examples_plot_simulate_alpha.py:
 
 
-====================
-Simulate alpha waves
-====================
+========================
+02. Simulate alpha waves
+========================
 
 This example demonstrates how to simulate alpha waves using
 HNN-core.
@@ -399,7 +399,6 @@ time with unique randomization. The drive is only connected to the distal
  .. code-block:: none
 
     joblib will run over 1 jobs
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     [Done]
     running trial 1 on 1 cores
@@ -475,7 +474,7 @@ We can confirm that what we simulate is indeed 10 Hz activity.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  30.355 seconds)
+   **Total running time of the script:** ( 1 minutes  1.687 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

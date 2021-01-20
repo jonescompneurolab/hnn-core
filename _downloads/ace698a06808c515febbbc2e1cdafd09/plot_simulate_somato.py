@@ -1,7 +1,7 @@
 """
-====================
-Simulate somato data
-====================
+=================================
+05. Source reconstruction and HNN
+=================================
 
 This example demonstrates how to simulate the source time
 courses obtained during median nerve stimulation in the MNE
@@ -12,7 +12,11 @@ somatosensory dataset.
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 
 ###############################################################################
-# First, we will import the packages and define the paths
+# First, we will import the packages and define the paths. For this example,
+# we will need `MNE`_ installed. For most practical purposes, you can simply
+# do:
+#
+#   $ pip install mne
 import os.path as op
 import numpy as np
 import matplotlib.pyplot as plt
@@ -46,6 +50,16 @@ evoked = epochs.average()
 fwd = mne.read_forward_solution(fwd_fname)
 cov = mne.compute_covariance(epochs)
 inv = make_inverse_operator(epochs.info, fwd, cov)
+
+###############################################################################
+# There are several methods to do source reconstruction. Some of the methods
+# such as MNE are distributed source methods whereas dipole fitting will
+# estimate the location and amplitude of a single current dipole. At the
+# moment, we do not offer explicit recommendations on which source
+# reconstruction technique is best for HNN. However, we do want our users
+# to note that the dipole currents simulate with HNN are assumed to be normal
+# to the cortical surface. Hence, using the option ``pick_ori='normal'``
+# seems to make most sense.
 
 method = "MNE"
 snr = 3.
@@ -117,3 +131,8 @@ fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 dpl[trial_idx].plot(ax=axes[0], show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1])
 net.cell_response.plot_spikes_raster()
+
+###############################################################################
+# .. LINKS
+#
+# .. _MNE: https://mne.tools/

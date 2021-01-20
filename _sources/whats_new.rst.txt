@@ -25,9 +25,9 @@ Changelog
 
 - Add ability to simulate a single trial in parallel across cores using MPI, by `Blake Caldwell`_ in `#79 <https://github.com/jonescompneurolab/hnn-core/pull/79>`_
 
-- Modify plot_dipole() to accept both lists and individual instances of Dipole object, by `Nick Tolley`_ in `#145 <https://github.com/jonescompneurolab/hnn-core/pull/145>`_
+- Modify :func:`~hnn_core.viz.plot_dipole` to accept both lists and individual instances of Dipole object, by `Nick Tolley`_ in `#145 <https://github.com/jonescompneurolab/hnn-core/pull/145>`_
 
-- Update plot_hist_input() to plot_spikes_hist() which can plot histogram of spikes for any cell type, by `Nick Tolley`_ in `#157 <https://github.com/jonescompneurolab/hnn-core/pull/157>`_
+- Update ``plot_hist_input`` to :func:`~hnn_core.viz.plot_spikes_hist` which can plot histogram of spikes for any cell type, by `Nick Tolley`_ in `#157 <https://github.com/jonescompneurolab/hnn-core/pull/157>`_
 
 - Add function to compute mean spike rates with user specified calculation type, by `Nick Tolley`_ and `Mainak Jas`_ in `#155 <https://github.com/jonescompneurolab/hnn-core/pull/155>`_
 
@@ -39,13 +39,13 @@ Changelog
 
 - Add option to turn off dipole postprocessing, by `Carmen Kohl`_ in `#188 <https://github.com/jonescompneurolab/hnn-core/pull/188>`_
 
-- Add ability to add tonic inputs to cell types with :func:`hnn_core.Network.add_tonic_input`, by `Mainak Jas`_ in `#209 <https://github.com/jonescompneurolab/hnn-core/pull/209>`_
+- Add ability to add tonic inputs to cell types with :func:`~hnn_core.Network.add_tonic_bias`, by `Mainak Jas`_ in `#209 <https://github.com/jonescompneurolab/hnn-core/pull/209>`_
 
-- Modify :func:`hnn_core.viz.plot_spikes_raster` to display individual cells, by `Nick Tolley`_ in `#231 <https://github.com/jonescompneurolab/hnn-core/pull/231>`_
+- Modify :func:`~hnn_core.viz.plot_spikes_raster` to display individual cells, by `Nick Tolley`_ in `#231 <https://github.com/jonescompneurolab/hnn-core/pull/231>`_
 
-- Add method for making a copy of a network instance: :meth:`hnn_core.Network.copy`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+- Add :meth:`~hnn_core.Network.copy` method for cloning a ``Network`` instance, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
-- Add methods for creating input drives and biases to network: :meth:`hnn_core.Network.add_evoked_drive`, :meth:`hnn_core.Network.add_poisson_drive`, :meth:`hnn_core.Network.add_bursty_drive` and :meth:`hnn_core.Network.add_tonic_bias`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+- Add methods for creating input drives and biases to network: :meth:`~hnn_core.Network.add_evoked_drive`, :meth:`~hnn_core.Network.add_poisson_drive`, :meth:`~hnn_core.Network.add_bursty_drive` and :meth:`~hnn_core.Network.add_tonic_bias`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
 Bug
 ~~~
@@ -77,9 +77,9 @@ API
 
 - Make a context manager for parallel backends (JoblibBackend, MPIBackend), by `Blake Caldwell`_ in `#79 <https://github.com/jonescompneurolab/hnn-core/pull/79>`_
 
-- Add average_dipoles function to `hnn_core.dipole`, by `Blake Caldwell`_ in `#156 <https://github.com/jonescompneurolab/hnn-core/pull/156>`_
+- Add :func:`~hnn_core.dipole.average_dipoles` function, by `Blake Caldwell`_ in `#156 <https://github.com/jonescompneurolab/hnn-core/pull/156>`_
 
-- New API for defining external drives and biases to network. By default, a :class:`hnn_core.Network` is created without drives, which are added using class methods. The argument ``add_drives_from_params`` controls this behaviour, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+- New API for defining external drives and biases to network. By default, a :class:`~hnn_core.Network` is created without drives, which are added using class methods. The argument ``add_drives_from_params`` controls this behaviour, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
 - Examples apply random state seeds that reproduce the output of HNN GUI documentation, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 

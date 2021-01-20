@@ -14,12 +14,33 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+     :alt: 01. Simulate dipole for evoked inputs
+
+     :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_simulate_evoked
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using HNN-core. ">
 
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
-     :alt: Simulate alpha waves
+     :alt: 02. Simulate alpha waves
 
      :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`
 
@@ -40,7 +61,7 @@ Some introductory examples to get started with hnn-core
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
-     :alt: Simulate gamma rhythms
+     :alt: 03. Simulate gamma rhythms
 
      :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py`
 
@@ -61,7 +82,7 @@ Some introductory examples to get started with hnn-core
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
-     :alt: Plot firing pattern
+     :alt: 04. Plot firing pattern
 
      :ref:`sphx_glr_auto_examples_plot_firing_pattern.py`
 
@@ -82,7 +103,7 @@ Some introductory examples to get started with hnn-core
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
-     :alt: Simulate somato data
+     :alt: 05. Source reconstruction and HNN
 
      :ref:`sphx_glr_auto_examples_plot_simulate_somato.py`
 
@@ -95,27 +116,6 @@ Some introductory examples to get started with hnn-core
    :hidden:
 
    /auto_examples/plot_simulate_somato
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core.">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
-     :alt: Simulate dipole for evoked inputs
-
-     :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_simulate_evoked
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
