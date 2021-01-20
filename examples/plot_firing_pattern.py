@@ -108,7 +108,7 @@ plt.show()
 
 ###############################################################################
 # Finally, we can plot the soma voltage along with the spiking activity with
-# raster plots and histograms for the Pyramidal cells.
+# raster plots and histograms for the pyramidal cells.
 
 fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
 
