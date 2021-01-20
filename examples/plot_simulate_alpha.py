@@ -19,17 +19,15 @@ import hnn_core
 from hnn_core import simulate_dipole, read_params, Network
 
 ###############################################################################
-# Then we setup the directories and Neuron
-hnn_core_root = op.dirname(hnn_core.__file__)
-
-###############################################################################
-# Then we read the default parameters file
+# Then we setup the directories and read the default parameters file
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 print(params)
 
 ###############################################################################
-# Update a few of the default parameters related to visualisation
+# Next we update a few of the default parameters related to visualisation. The
+# dipole_scalefctr relates to the amount of cortical tissue necessary to
+# observe the electric current dipole outside the head with M/EEG.
 params.update({
     'dipole_scalefctr': 150000.0,
     'dipole_smooth_win': 0,
@@ -58,8 +56,32 @@ trial_idx = 0  # single trial simulated
 dpl[trial_idx].plot()
 
 ###############################################################################
-# We can confirm that what we simulate is indeed 10 Hz activity.
+# We can confirm that what we simulate is indeed 10 Hz activity by plotting the
+# power spectral density. First we'll import the spectrogram class from scipy.
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_spectrogram
 tmin = 20  # exclude initial burn-in period
 plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin)
+from scipy.signal import spectrogram
+import numpy as np
+
+###############################################################################
+# Next we define sfreq, the sampling frequency of the simulation. This can be
+# calculated from the step size defined used for the differential equation
+# solver. We additionally  define n_fft, the length of the fast fourier
+# transform.
+sfreq = 1000. / params['dt']
+n_fft = 1024 * 8
+freqs, _, psds = spectrogram(
+    dpl[0].data['agg'], sfreq, window='hamming', nfft=n_fft,
+    nperseg=n_fft, noverlap=0)
+
+###############################################################################
+# Finally we plot the PSD and confirm the presence of alpha activity from the
+# sharp peak centered at 10 Hz.
+plt.figure()
+plt.plot(freqs, np.mean(psds, axis=-1))
+plt.xlim((0, 40))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('PSD')
+plt.show()
