@@ -141,7 +141,7 @@ class Dipole(object):
     Parameters
     ----------
     times : array (n_times,)
-        The time vector
+        The time vector (in ms)
     data : array (n_times x 3)
         The data. The first column represents 'agg',
         the second 'L2' and the last one 'L5'
@@ -153,6 +153,8 @@ class Dipole(object):
     ----------
     times : array
         The time vector
+    sfreq : float
+        The sampling frequency (in Hz)
     data : dict of array
         The dipole with keys 'agg', 'L2' and 'L5'
     nave : int
@@ -165,6 +167,7 @@ class Dipole(object):
         self.times = times
         self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
         self.nave = nave
+        self.sfreq = 1000. / (times[1] - times[0])  # NB assumes len > 1
 
     def post_proc(self, N_pyr_x, N_pyr_y, winsz, fctr):
         """ Apply baseline, unit conversion, scaling and smoothing
@@ -205,16 +208,22 @@ class Dipole(object):
         for key in self.data.keys():
             self.data[key] = _hammfilt(self.data[key], winsz)
 
-    def plot(self, ax=None, layer='agg', show=True):
+    def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
+             show=True):
         """Simple layer-specific plot function.
 
         Parameters
         ----------
+        tmin : float or None
+            Start time of plot (in ms). If None, plot entire simulation.
+        tmax : float or None
+            End time of plot (in ms). If None, plot entire simulation.
+        layer : str
+            The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+        decimate : int
+            Factor by which to decimate the raw dipole traces (optional)
         ax : instance of matplotlib figure | None
             The matplotlib axis
-        layer : str
-            The layer to plot. Can be one of
-            'agg', 'L2', and 'L5'
         show : bool
             If True, show the figure
 
@@ -223,7 +232,8 @@ class Dipole(object):
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        return plot_dipole(dpl=self, ax=ax, layer=layer, show=show)
+        return plot_dipole(dpl=self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
+                           decim=decim, show=show)
 
     def baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.

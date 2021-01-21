@@ -7,18 +7,47 @@ import numpy as np
 from itertools import cycle
 
 
-def plot_dipole(dpl, ax=None, layer='agg', show=True):
+def _get_plot_data(dpl, layer, tmin, tmax):
+    plot_tmin = dpl.times[0]
+    if tmin is not None:
+        plot_tmin = max(tmin, plot_tmin)
+    plot_tmax = dpl.times[-1]
+    if tmax is not None:
+        plot_tmax = min(tmax, plot_tmax)
+
+    mask = np.logical_and(dpl.times >= plot_tmin, dpl.times < plot_tmax)
+    times = dpl.times[mask]
+    data = dpl.data[layer][mask]
+
+    return data, times
+
+
+def _decimate_plot_data(decim, data, times):
+    from scipy.signal import decimate
+    data = decimate(data, decim)
+    times = times[::decim]
+    return data, times
+
+
+def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
+                show=True):
     """Simple layer-specific plot function.
 
     Parameters
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
+    tmin : float or None
+        Start time of plot in milliseconds. If None, plot entire simulation.
+    tmax : float or None
+        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     layer : str
         The layer to plot. Can be one of
         'agg', 'L2', and 'L5'
+    decimate : int
+        Factor by which to decimate the raw dipole traces (optional)
     show : bool
         If True, show the figure
 
@@ -38,10 +67,21 @@ def plot_dipole(dpl, ax=None, layer='agg', show=True):
 
     for dpl_trial in dpl:
         if layer in dpl_trial.data.keys():
-            ax.plot(dpl_trial.times, dpl_trial.data[layer])
 
+            data, times = _get_plot_data(dpl_trial, layer, tmin, tmax)
+            if decim is not None:
+                data, times = _decimate_plot_data(decim, data, times)
+
+            ax.plot(times, data)
+
+    ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
-    ax.set_title(layer)
+    ax.set_ylabel('Dipole moment')
+    if layer == 'agg':
+        title_str = 'Aggregate (L2 + L5)'
+    else:
+        title_str = layer
+    ax.set_title(title_str)
 
     if show:
         plt.show()
@@ -60,15 +100,15 @@ def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
         a new figure is created.
     spike_types: string | list | dictionary | None
         String input of a valid spike type is plotted individually.
-            Ex: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
+            Ex: 'poisson', 'evdist', 'evprox', ...
         List of valid string inputs will plot each spike type individually.
-            Ex: ['common', 'evdist']
+            Ex: ['poisson', 'evdist']
         Dictionary of valid lists will plot list elements as a group.
-            Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
+            Ex: {'Evoked': ['evdist', 'evprox'], 'Tonic': ['poisson']}
         If None, all input spike types are plotted individually if any
         are present. Otherwise spikes from all cells are plotted.
         Valid strings also include leading characters of spike types
-            Example: 'ext' is equivalent to ['extgauss', 'extpois']
+            Example: 'ev' is equivalent to ['evdist', 'evprox']
     show : bool
         If True, show the figure.
 
@@ -251,4 +291,140 @@ def plot_cells(net, ax=None, show=True):
     if show:
         plt.show()
 
+    return ax.get_figure()
+
+
+def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
+                    layer='agg', decim=False, ax=None,
+                    colorbar=True, show=True):
+    """Plot Morlet time-frequency representation of dipole time course
+
+    Parameters
+    ----------
+    dpl : instance of Dipole | list of Dipole instances
+        The Dipole object.
+    fregs : array
+        Frequency range of interest.
+    n_cycles : float | array of float, default 7.0
+        Number of cycles. Fixed number or one per frequency.
+    tmin : float or None
+        Start time of plot in milliseconds. If None, plot entire simulation.
+    tmax : float or None
+        End time of plot in milliseconds. If None, plot entire simulation.
+    layer : str, default 'agg'
+        The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+    decim : int or None
+        Factor by which to decimate the raw dipole traces (optional)
+    ax : instance of matplotlib figure | None
+        The matplotlib axis
+    colorbar : bool
+        If True (default), adjust figure to include colorbar.
+    show : bool
+        If True, show the figure
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+    """
+
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import ScalarFormatter
+    from mne.time_frequency import tfr_array_morlet
+
+    data, times = _get_plot_data(dpl, layer, tmin, tmax)
+
+    sfreq = dpl.sfreq
+    if decim is not None:
+        data, times = _decimate_plot_data(decim, data, times)
+        sfreq = sfreq / decim
+
+    # mirror padding!
+    data = np.r_[data[-1:0:-1], data, data[-2::-1]]
+
+    # MNE expects an array of shape (n_trials, n_channels, n_times)
+    data = data[None, None, :]
+    power = tfr_array_morlet(data, sfreq=sfreq, freqs=freqs,
+                             n_cycles=n_cycles, output='power')
+
+    # get the middle portion after mirroring
+    power = power[:, :, :, times.shape[0] - 1:2 * times.shape[0] - 1]
+
+    if ax is None:
+        fig, ax = plt.subplots(1, 1)
+
+    im = ax.pcolormesh(times, freqs, power[0, 0, ...], cmap='inferno',
+                       shading='auto')
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylabel('Frequency (Hz)')
+
+    if colorbar:
+        fig = ax.get_figure()
+        fig.subplots_adjust(right=0.8)
+        l, b, w, h = ax.get_position().bounds
+        cb_h = 0.8 * h
+        cb_b = b + (h - cb_h) / 2
+        cbar_ax = fig.add_axes([l + w + 0.05, cb_b, 0.03, cb_h])
+        xfmt = ScalarFormatter()
+        xfmt.set_powerlimits((-2, 2))
+        fig.colorbar(im, cax=cbar_ax, format=xfmt)
+
+    if show:
+        plt.show()
+    return ax.get_figure()
+
+
+def plot_spectrogram(dpl, *, fmin, fmax, winlen=200., tmin=None, tmax=None,
+                     layer='agg', ax=None, show=True):
+    """Plot Welch spectrogram (power spectrum) of dipole time course
+
+    Parameters
+    ----------
+    dpl : instance of Dipole | list of Dipole instances
+        The Dipole object.
+    fmin : float
+        Minimum frequency to plot (in Hz).
+    fmax : float
+        Maximum frequency to plot (in Hz).
+    winlen : float, default: 200.
+        Length of window (in ms) to average using Welch periodogram method.
+        The actual window size used depends on the sampling rate (closest
+        power of 2, rounded up).
+    tmin : float or None
+        Start time of data to include (in ms). If None, use entire simulation.
+    tmax : float or None
+        End time of data to include (in ms). If None, use entire simulation.
+    layer : str, default 'agg'
+        The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+    ax : instance of matplotlib figure | None
+        The matplotlib axis.
+    show : bool
+        If True, show the figure
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+    """
+    import matplotlib.pyplot as plt
+    from scipy.signal import spectrogram
+
+    sfreq = dpl.sfreq
+    data, _ = _get_plot_data(dpl, layer, tmin, tmax)
+
+    nfft = 1e-3 * winlen * sfreq
+    nperseg = 2 ** int(np.ceil(np.log2(nfft)))
+
+    freqs, _, psds = spectrogram(data, sfreq, window='hamming',
+                                 nperseg=nperseg, noverlap=0)
+    if ax is None:
+        fig, ax = plt.subplots(1, 1)
+
+    ax.plot(freqs, np.mean(psds, axis=-1))
+    ax.set_xlim((fmin, fmax))
+    ax.ticklabel_format(axis='both', scilimits=(-2, 3))
+    ax.set_xlabel('Frequency (Hz)')
+    ax.set_ylabel('PSD')
+    if show:
+        plt.show()
     return ax.get_figure()

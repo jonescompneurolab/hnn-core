@@ -22,6 +22,8 @@ laminar neocortical network. Frontiers in human neuroscience (2013)
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
+# sphinx_gallery_thumbnail_number = 3
+
 import os.path as op
 
 ###############################################################################
@@ -33,8 +35,9 @@ from hnn_core import simulate_dipole, read_params, Network
 hnn_core_root = op.dirname(hnn_core.__file__)
 
 ###############################################################################
-# Read the parameter file and print the between-cell connectivity parameters
-# (note that these are different compared with the 'default' parameter set).
+# Read the parameter file and print the between-cell connectivity parameters.
+# Note that these are different compared with the 'default' parameter set used
+# in, e.g., :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`.
 params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
 params = read_params(params_fname)
 print(params['gbar_L*'])
@@ -68,39 +71,23 @@ net.cell_response.plot_spikes_raster()
 # representation together with the signal. Note that the network requires some
 # time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
-tstart = 50
+tmin = 50
 trial_idx = 0  # pick first trial
-mask = dpls[trial_idx].times > tstart
-times = dpls[trial_idx].times[mask]
-data = dpls[trial_idx].data['agg'][mask]
+decim = 8  # decimate plots by a factor of 8 (from 40 to 5 kHz)
 
-import numpy as np
+# plot dipole time course and time-frequency representation in same figure
 import matplotlib.pyplot as plt
-from mne.time_frequency import tfr_array_morlet
+import numpy as np
+from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-axes[0].plot(times, data)
 
-sfreq = 1000. / params['dt']
+plot_dipole(dpls[trial_idx], tmin=tmin, ax=axes[0], decim=decim, show=False)
+
+# Create an fixed-step tiling of frequencies from 20 to 100 Hz in steps of 1 Hz
 freqs = np.arange(20., 100., 1.)
-n_cycles = freqs / 8.
-
-# MNE expects an array of shape (n_trials, n_channels, n_times)
-data = data[None, None, :]
-power = tfr_array_morlet(data, sfreq=sfreq, freqs=freqs,
-                         n_cycles=n_cycles, output='power')
-
-im = axes[1].pcolormesh(times, freqs, power[0, 0, ...], cmap='inferno',
-                        shading='auto')
-axes[1].set_xlabel('Time (ms)')
-axes[1].set_ylabel('Frequency (Hz)')
-
-# Add a colorbar
-fig.subplots_adjust(right=0.8)
-cbar_ax = fig.add_axes([0.85, 0.12, 0.03, 0.33])
-fig.colorbar(im, cax=cbar_ax)
-
-plt.show()
+plot_tfr_morlet(dpls[trial_idx], freqs=freqs, n_cycles=7, tmin=tmin,
+                decim=decim, ax=axes[1])
 
 ###############################################################################
 # As a final exercise, let us try to re-run the simulation with a tonic bias
@@ -126,17 +113,7 @@ net.cell_response.plot_spikes_raster()
 ###############################################################################
 # Although the simulated dipole signal demonstrates clear periodicity, its
 # frequency is lower compared with the "weak" PING simulation above.
-import matplotlib.pyplot as plt
-from scipy.signal import spectrogram
-import numpy as np
-sfreq = 1000. / params['dt']
-n_fft = 1024 * 8
-freqs, _, psds = spectrogram(
-    dpls[0].data['agg'], sfreq, window='hamming', nfft=n_fft,
-    nperseg=n_fft, noverlap=0)
-plt.figure()
-plt.plot(freqs, np.mean(psds, axis=-1))
-plt.xlim((20, 100))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('PSD')
-plt.show()
+from hnn_core.viz import plot_spectrogram
+winlen = 200  # Welch periodogram: averaging window length in ms
+plot_spectrogram(dpls[trial_idx], fmin=20., fmax=100., winlen=winlen,
+                 tmin=tmin)

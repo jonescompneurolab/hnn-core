@@ -57,6 +57,8 @@ Visualization (:py:mod:`hnn_core.viz`):
    plot_spikes_hist
    plot_spikes_raster
    plot_cells
+   plot_spectrogram
+   plot_tfr_morlet
 
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):
 ---------------------------------------------------------
