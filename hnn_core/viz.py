@@ -374,7 +374,7 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     return ax.get_figure()
 
 
-def plot_spectrogram(dpl, *, fmin, fmax, winlen=200., tmin=None, tmax=None,
+def plot_spectrogram(dpl, *, fmin, fmax, winlen=None, tmin=None, tmax=None,
                      layer='agg', ax=None, show=True):
     """Plot Welch spectrogram (power spectrum) of dipole time course
 
@@ -386,10 +386,10 @@ def plot_spectrogram(dpl, *, fmin, fmax, winlen=200., tmin=None, tmax=None,
         Minimum frequency to plot (in Hz).
     fmax : float
         Maximum frequency to plot (in Hz).
-    winlen : float, default: 200.
+    winlen : float | None
         Length of window (in ms) to average using Welch periodogram method.
         The actual window size used depends on the sampling rate (closest
-        power of 2, rounded up).
+        power of 2, rounded up). If None, entire window is used (no averaging).
     tmin : float or None
         Start time of data to include (in ms). If None, use entire simulation.
     tmax : float or None
@@ -410,8 +410,10 @@ def plot_spectrogram(dpl, *, fmin, fmax, winlen=200., tmin=None, tmax=None,
     from scipy.signal import spectrogram
 
     sfreq = dpl.sfreq
-    data, _ = _get_plot_data(dpl, layer, tmin, tmax)
+    data, times = _get_plot_data(dpl, layer, tmin, tmax)
 
+    if winlen is None:
+        winlen = times[-1] - times[0]
     nfft = 1e-3 * winlen * sfreq
     nperseg = 2 ** int(np.ceil(np.log2(nfft)))
 
@@ -424,7 +426,7 @@ def plot_spectrogram(dpl, *, fmin, fmax, winlen=200., tmin=None, tmax=None,
     ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
-    ax.set_ylabel('PSD')
+    ax.set_ylabel('Power spectral density')
     if show:
         plt.show()
     return ax.get_figure()
