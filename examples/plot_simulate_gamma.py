@@ -11,11 +11,6 @@ and inbitory (basket) cells until gamma rhythms could be observed. The network
 dynamics are driven by Poisson-distributed (noisy) spike trains to layer II/III
 and layer V pyramidal cell populations.
 
-[1] Lee, S. & Jones, S. R. Distinguishing mechanisms of gamma frequency
-oscillations in human current source signals using a computational model of a
-laminar neocortical network. Frontiers in human neuroscience (2013)
-
-[2] https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
@@ -117,3 +112,12 @@ from hnn_core.viz import plot_spectrogram
 winlen = 200  # Welch periodogram: averaging window length in ms
 plot_spectrogram(dpls[trial_idx], fmin=20., fmax=100., winlen=winlen,
                  tmin=tmin)
+
+###############################################################################
+# References
+# ----------
+# [1] Lee, S. & Jones, S. R. Distinguishing mechanisms of gamma frequency
+# oscillations in human current source signals using a computational model of a
+# laminar neocortical network. Frontiers in human neuroscience (2013)
+#
+# [2] https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma
