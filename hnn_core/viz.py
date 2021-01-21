@@ -295,7 +295,7 @@ def plot_cells(net, ax=None, show=True):
 
 
 def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
-                    layer='agg', decim=False, ax=None,
+                    layer='agg', decim=None, padding='zeros', ax=None,
                     colorbar=True, show=True):
     """Plot Morlet time-frequency representation of dipole time course
 
@@ -303,9 +303,9 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
-    fregs : array
+    freqs : array
         Frequency range of interest.
-    n_cycles : float | array of float, default 7.0
+    n_cycles : float or array of float, default 7.0
         Number of cycles. Fixed number or one per frequency.
     tmin : float or None
         Start time of plot in milliseconds. If None, plot entire simulation.
@@ -314,7 +314,11 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     layer : str, default 'agg'
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
     decim : int or None
-        Factor by which to decimate the raw dipole traces (optional)
+        Optional factor by which to decimate the raw dipole traces
+    padding : str or None
+        Optional padding of the dipole time course beyond the plotting limits.
+        Possible values are: 'zeros' for padding with 0's (default), 'mirror'
+        for mirror-image padding.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     colorbar : bool
@@ -339,16 +343,23 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
         data, times = _decimate_plot_data(decim, data, times)
         sfreq = sfreq / decim
 
-    # mirror padding!
-    data = np.r_[data[-1:0:-1], data, data[-2::-1]]
+    if padding is not None:
+        if not isinstance(padding, str):
+            raise ValueError('padding must be a string (or None)')
+        if padding == 'zeros':
+            data = np.r_[np.zeros((len(data) - 1,)), data.ravel(),
+                         np.zeros((len(data) - 1,))]
+        elif padding == 'mirror':
+            data = np.r_[data[-1:0:-1], data, data[-2::-1]]
 
     # MNE expects an array of shape (n_trials, n_channels, n_times)
     data = data[None, None, :]
     power = tfr_array_morlet(data, sfreq=sfreq, freqs=freqs,
                              n_cycles=n_cycles, output='power')
 
-    # get the middle portion after mirroring
-    power = power[:, :, :, times.shape[0] - 1:2 * times.shape[0] - 1]
+    if padding is not None:
+        # get the middle portion after padding
+        power = power[:, :, :, times.shape[0] - 1:2 * times.shape[0] - 1]
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
