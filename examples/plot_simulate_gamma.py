@@ -22,7 +22,7 @@ laminar neocortical network. Frontiers in human neuroscience (2013)
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
-# sphinx_gallery_thumbnail_number = 3
+# sphinx_gallery_thumbnail_number = 2
 
 import os.path as op
 
