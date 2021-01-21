@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 from distutils.command.build_py import build_py
 from distutils.cmd import Command
 
-descr = """Experimental code for simulating evoked using Neuron"""
+descr = """Code for biophysical simulation of a cortical column using Neuron"""
 
 DISTNAME = 'hnn-core'
 DESCRIPTION = descr
