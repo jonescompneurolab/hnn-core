@@ -60,16 +60,6 @@ dpl[trial_idx].plot()
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity.
 import matplotlib.pyplot as plt
-from scipy.signal import spectrogram
-import numpy as np
-sfreq = 1000. / params['dt']
-n_fft = 1024 * 8
-freqs, _, psds = spectrogram(
-    dpl[0].data['agg'], sfreq, window='hamming', nfft=n_fft,
-    nperseg=n_fft, noverlap=0)
-plt.figure()
-plt.plot(freqs, np.mean(psds, axis=-1))
-plt.xlim((0, 40))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('PSD')
-plt.show()
+from hnn_core.viz import plot_spectrogram
+tmin = 20  # exclude initial burn-in period
+plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin)
