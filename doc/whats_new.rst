@@ -47,6 +47,8 @@ Changelog
 
 - Add methods for creating input drives and biases to network: :meth:`~hnn_core.Network.add_evoked_drive`, :meth:`~hnn_core.Network.add_poisson_drive`, :meth:`~hnn_core.Network.add_bursty_drive` and :meth:`~hnn_core.Network.add_tonic_bias`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
+- Add functions for plotting spectrograms (:meth:`~hnn_core.viz.plot_spectrogram`) and Morlet time-frequency representations (:meth:`~hnn_core.viz.plot_tfr_morlet`), by `Christopher Bailey`_ in `#250 <https://github.com/jonescompneurolab/hnn-core/pull/250>`_
+
 Bug
 ~~~
 
