@@ -3,20 +3,21 @@
 05. Source reconstruction and HNN
 =================================
 
-This example demonstrates how to simulate the source time
-courses obtained during median nerve stimulation in the MNE
-somatosensory dataset.
+This example demonstrates how to calculate the inverse solution of the median
+nerve evoked response in the MNE somatosensory dataset, and then simulate a
+matching inverse solution with HNN.
 """
 
 # Authors: Mainak Jas <mainakjas@gmail.com>
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 
+# sphinx_gallery_thumbnail_number = 2
+
 ###############################################################################
-# First, we will import the packages and define the paths. For this example,
-# we will need `MNE`_ installed. For most practical purposes, you can simply
-# do:
-#
-#   $ pip install mne
+# First, we will import the packages needed for computing the inverse solution
+# from the MNE somatosensory dataset. `MNE`_ can be installed with
+# ``pip install mne``, and the somatosensory dataset can be downloaded by
+# importing ``somato`` from ``mne.datasets``.
 import os.path as op
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,6 +26,8 @@ import mne
 from mne.datasets import somato
 from mne.minimum_norm import apply_inverse, make_inverse_operator
 
+###############################################################################
+# Now we set the the path for the 1st subject of the ``somato`` dataset.
 data_path = somato.data_path()
 subject = '01'
 task = 'somato'
@@ -35,7 +38,7 @@ fwd_fname = op.join(data_path, 'derivatives', 'sub-{}'.format(subject),
 subjects_dir = op.join(data_path, 'derivatives', 'freesurfer', 'subjects')
 
 ###############################################################################
-# Then, we get the raw data and estimate the source time course
+# Then, we get the raw data and estimate the inverse operator.
 
 raw = mne.io.read_raw_fif(raw_fname, preload=True)
 raw.filter(1, 40)
@@ -67,6 +70,11 @@ lambda2 = 1. / snr ** 2
 stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
                     return_residual=False, verbose=True)
 
+###############################################################################
+# We isolate the single most active vertex in the distributed minimum norm
+# estimate by calculating the L2 norm of the time course emerging from each
+# vertex. The time course from the vertex with the greatest L2 norm represents
+# the location of cortex with greatest response to stimulus.
 pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
 
 plt.figure()
@@ -101,12 +109,12 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 # early distal input
 net.add_evoked_drive(
-    'evdist1', mu=32., sigma=3., numspikes=1, sync_within_trial=False,
+    'evdist1', mu=32., sigma=3., numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=6)
 # late distal input
 net.add_evoked_drive(
-    'evdist2', mu=82., sigma=3., numspikes=1, sync_within_trial=False,
+    'evdist2', mu=82., sigma=3., numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=2)
 
@@ -117,14 +125,20 @@ weights_nmda_p = {'L2_basket': 0.003, 'L5_basket': 0.004}
 synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 net.add_evoked_drive(
-    'evprox1', mu=20.0, sigma=3., numspikes=1, sync_within_trial=False,
+    'evprox1', mu=20.0, sigma=3., numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
     location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
 
-n_trials = 25
-# n_trials = 1
+# n_trials = 25
+n_trials = 1
 with MPIBackend(n_procs=6, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, n_trials=25)
+
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6))
+axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r-')
+net.cell_response.plot_spikes_hist(ax=axes[0], show=False)
+average_dipoles(dpls).plot(ax=axes[1], show=False)
+net.cell_response.plot_spikes_raster(ax=axes[2])
 
 ###############################################################################
 # .. LINKS
