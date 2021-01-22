@@ -35,7 +35,8 @@ print(params)
 
 ###############################################################################
 # This is a lot of parameters! We can also filter the
-# parameters using unix-style wildcard characters
+# parameters using unix-style wildcard characters. Most of the parameters
+# relate to within-network connections and the cell geometry.
 print(params['L2Pyr_soma*'])
 
 ###############################################################################
@@ -54,7 +55,8 @@ net.plot_cells()
 # - :meth:`hnn_core.Network.add_poisson_drive`
 # - :meth:`hnn_core.Network.add_bursty_drive`
 
-# Distal evoked drive
+###############################################################################
+# First, we add a distal evoked drive
 weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
                    'L5_pyramidal': 0.142300}
 weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
@@ -66,7 +68,8 @@ net.add_evoked_drive(
     weights_nmda=weights_nmda_d1, location='distal',
     synaptic_delays=synaptic_delays_d1, seedcore=4)
 
-# First proximal evoked drive
+###############################################################################
+# Then, we add two proximal drives
 weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                    'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
 synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
@@ -87,16 +90,18 @@ net.add_evoked_drive(
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 
 ###############################################################################
-# Now let's simulate the dipole, running 2 trials with the Joblib backend.
+# Now let's simulate the dipole, running 2 trials with the
+# :class:`~hnn_core.parallel_backends.Joblib` backend.
 # To run them in parallel we could set ``n_jobs`` to equal the number of
-# trials.
+# trials. The ``Joblibs`` backend allows running the simulations in parallel
+# across trials.
 from hnn_core import JoblibBackend
 
 with JoblibBackend(n_jobs=1):
     dpls = simulate_dipole(net, n_trials=2, postproc=True)
 
 ###############################################################################
-# and then plot it
+# and then plot the simulated dipoles
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
@@ -104,7 +109,7 @@ net.cell_response.plot_spikes_hist(ax=axes[1],
                                    spike_types=['evprox', 'evdist'])
 
 ###############################################################################
-# Also, we can plot the spikes and write them to text files.
+# Also, we can plot the spikes in the network and write them to text files.
 # Note that we can use formatting syntax to specify the filename pattern
 # with which each trial will be written. To read spikes back in, we can use
 # wildcard expressions.
@@ -133,7 +138,8 @@ print(trial_rates)
 # synchronous and see what happens. This is achieved by setting the parameter
 # ``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
 # a clone of the network defined above, and then modify the drive dynamics for
-# each drive.
+# each drive. Making a clone removes any existing outputs from the network
+# such as spiking information and voltages at the soma.
 
 net_sync = net.copy()
 net_sync.external_drives['evdist1']['dynamics']['sync_within_trial'] = True
@@ -143,17 +149,3 @@ net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
 ###############################################################################
 # You may interrogate current values defining the spike event time dynamics by
 print(net_sync.external_drives['evdist1']['dynamics'])
-
-###############################################################################
-# Finally, let's simulate a single trial using the MPI backend. This will
-# start the simulation across the number of processors (cores) specified by
-# ``n_procs``` using MPI. The ``'mpiexec'`` launcher is used from
-# openmpi, which must be installed on the system
-from hnn_core import MPIBackend
-
-with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-    dpls_sync = simulate_dipole(net_sync, n_trials=1)
-
-trial_idx = 0
-dpls_sync[trial_idx].plot()
-net_sync.cell_response.plot_spikes_hist()

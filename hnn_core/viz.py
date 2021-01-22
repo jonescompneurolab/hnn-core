@@ -110,7 +110,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
-    ax.set_ylabel('Dipole moment')
+    ax.set_ylabel('Dipole moment (nAm)')
     if layer == 'agg':
         title_str = 'Aggregate (L2 + L5)'
     else:
