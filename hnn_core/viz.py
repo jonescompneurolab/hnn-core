@@ -79,9 +79,9 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         'agg', 'L2', and 'L5'
     decim : int or list of int or None (default)
         Optional (integer) factor by which to decimate the raw dipole traces.
-        :func:`~scipy.signal.decimate` is used, which recommends values <13.
-        To achieve higher decimation factors, a list of ints can be provided,
-        which are applied successively.)
+        The SciPy function :func:`~scipy.signal.decimate` is used, which
+        recommends values <13. To achieve higher decimation factors, a list of
+        ints can be provided. These are applied successively.
     show : bool
         If True, show the figure
 
@@ -328,6 +328,9 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
                     colorbar=True, show=True):
     """Plot Morlet time-frequency representation of dipole time course
 
+    NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be
+    installed.
+
     Parameters
     ----------
     dpl : instance of Dipole | list of Dipole instances
@@ -344,9 +347,9 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
     decim : int or list of int or None (default)
         Optional (integer) factor by which to decimate the raw dipole traces.
-        :func:`~scipy.signal.decimate` is used, which recommends values <13.
-        To achieve higher decimation factors, a list of ints can be provided,
-        which are applied successively.
+        The SciPy function :func:`~scipy.signal.decimate` is used, which
+        recommends values <13. To achieve higher decimation factors, a list of
+        ints can be provided. These are applied successively.
     padding : str or None
         Optional padding of the dipole time course beyond the plotting limits.
         Possible values are: 'zeros' for padding with 0's (default), 'mirror'
