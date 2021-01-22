@@ -410,7 +410,7 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
         l, b, w, h = ax.get_position().bounds
         cb_h = 0.8 * h
         cb_b = b + (h - cb_h) / 2
-        cbar_ax = fig.add_axes([l + w + 0.05, cb_b, 0.03, cb_h])
+        cbar_ax = fig.add_axes([l + w + 0.05, cb_b, 0.03, cb_h], label='cbax')
         xfmt = ScalarFormatter()
         xfmt.set_powerlimits((-2, 2))
         fig.colorbar(im, cax=cbar_ax, format=xfmt)
