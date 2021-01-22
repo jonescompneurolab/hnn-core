@@ -24,11 +24,11 @@ import sphinx_bootstrap_theme
 # -- Project information -----------------------------------------------------
 
 project = 'hnn-core'
-copyright = '2019, Mainak Jas'
-author = 'Mainak Jas'
+copyright = '2020, HNN Developers'
+author = 'HNN Developers'
 
 # The short X.Y version
-version = ''
+version = '0.1'
 # The full version, including alpha/beta/rc tags
 release = ''
 
