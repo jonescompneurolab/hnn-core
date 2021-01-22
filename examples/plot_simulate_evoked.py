@@ -109,31 +109,6 @@ net.cell_response.plot_spikes_hist(ax=axes[1],
                                    spike_types=['evprox', 'evdist'])
 
 ###############################################################################
-# Also, we can plot the spikes in the network and write them to text files.
-# Note that we can use formatting syntax to specify the filename pattern
-# with which each trial will be written. To read spikes back in, we can use
-# wildcard expressions.
-net.cell_response.plot_spikes_raster()
-with tempfile.TemporaryDirectory() as tmp_dir_name:
-    net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-    cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
-cell_response.plot_spikes_raster()
-
-###############################################################################
-# We can additionally calculate the mean spike rates for each cell class by
-# specifying a time window with tstart and tstop.
-all_rates = cell_response.mean_rates(tstart=0, tstop=170,
-                                     gid_ranges=net.gid_ranges,
-                                     mean_type='all')
-trial_rates = cell_response.mean_rates(tstart=0, tstop=170,
-                                       gid_ranges=net.gid_ranges,
-                                       mean_type='trial')
-print('Mean spike rates across trials:')
-print(all_rates)
-print('Mean spike rates for individual trials:')
-print(trial_rates)
-
-###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
 # synchronous and see what happens. This is achieved by setting the parameter
 # ``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
