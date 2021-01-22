@@ -35,13 +35,13 @@ fwd_fname = op.join(data_path, 'derivatives', 'sub-{}'.format(subject),
 subjects_dir = op.join(data_path, 'derivatives', 'freesurfer', 'subjects')
 
 ###############################################################################
-# Then, we get the raw data and estimage the source time course
+# Then, we get the raw data and estimate the source time course
 
 raw = mne.io.read_raw_fif(raw_fname, preload=True)
 raw.filter(1, 40)
 
 events = mne.find_events(raw, stim_channel='STI 014')
-event_id, tmin, tmax = 1, -.2, .15
+event_id, tmin, tmax = 1, -.2, .17
 baseline = None
 epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline=baseline,
                     reject=dict(grad=4000e-13, eog=350e-6), preload=True)
@@ -73,7 +73,7 @@ plt.figure()
 plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'ro-')
 plt.xlabel('time (ms)')
 plt.ylabel('%s value (nAM)' % method)
-plt.xlim((0, 150))
+plt.xlim((0, 170))
 plt.axhline(0)
 plt.show()
 
@@ -82,10 +82,8 @@ plt.show()
 # parameters from ``N20.json`` and explicitly create two distal and one
 # proximal evoked drive.
 
-import os.path as op
-
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network
+from hnn_core import simulate_dipole, read_params, Network, MPIBackend, average_dipoles
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -103,14 +101,14 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 # early distal input
 net.add_evoked_drive(
-    'evdist1', mu=32., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
-    weights_nmda=weights_nmda_d, location='distal',
-    synaptic_delays=synaptic_delays_d, seedcore=6)
+    'evdist1', mu=32., sigma=3., numspikes=1, sync_within_trial=False,
+    weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
+    location='distal', synaptic_delays=synaptic_delays_d, seedcore=6)
 # late distal input
 net.add_evoked_drive(
-    'evdist2', mu=82., sigma=0., numspikes=1, weights_ampa=weights_ampa_d,
-    weights_nmda=weights_nmda_d, location='distal',
-    synaptic_delays=synaptic_delays_d, seedcore=2)
+    'evdist2', mu=82., sigma=3., numspikes=1, sync_within_trial=False,
+    weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
+    location='distal', synaptic_delays=synaptic_delays_d, seedcore=2)
 
 # proximal input occurs before distals
 weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0025,
@@ -119,18 +117,14 @@ weights_nmda_p = {'L2_basket': 0.003, 'L5_basket': 0.004}
 synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 net.add_evoked_drive(
-    'evprox1', mu=20.0, sigma=0., numspikes=1, weights_ampa=weights_ampa_p,
-    weights_nmda=weights_nmda_p, location='proximal',
-    synaptic_delays=synaptic_delays_p, seedcore=6)
+    'evprox1', mu=20.0, sigma=3., numspikes=1, sync_within_trial=False,
+    weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
+    location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
 
-dpl = simulate_dipole(net, n_trials=1)
-
-trial_idx = 0
-import matplotlib.pyplot as plt
-fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-dpl[trial_idx].plot(ax=axes[0], show=False)
-net.cell_response.plot_spikes_hist(ax=axes[1])
-net.cell_response.plot_spikes_raster()
+n_trials = 25
+# n_trials = 1
+with MPIBackend(n_procs=6, mpi_cmd='mpiexec'):
+    dpls = simulate_dipole(net, n_trials=25)
 
 ###############################################################################
 # .. LINKS
