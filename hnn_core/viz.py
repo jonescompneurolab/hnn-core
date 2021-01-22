@@ -22,11 +22,42 @@ def _get_plot_data(dpl, layer, tmin, tmax):
     return data, times
 
 
-def _decimate_plot_data(decim, data, times):
+def _decimate_plot_data(decim, data, times, sfreq=None):
     from scipy.signal import decimate
-    data = decimate(data, decim)
-    times = times[::decim]
-    return data, times
+    if isinstance(decim, int):
+        decim = [decim]
+    if not isinstance(decim, list):
+        raise ValueError('the decimation factor must be a int or list'
+                         f'of ints; got {type(decim)}')
+    for dec in decim:
+        data = decimate(data, dec)
+        times = times[::dec]
+
+    if sfreq is None:
+        return data, times
+    else:
+        sfreq /= np.prod(decim)
+        return data, times, sfreq
+
+
+def plt_show(show=True, fig=None, **kwargs):
+    """Show a figure while suppressing warnings.
+
+    NB copied from :func:`mne.viz.utils.plt_show`.
+
+    Parameters
+    ----------
+    show : bool
+        Show the figure.
+    fig : instance of Figure | None
+        If non-None, use fig.show().
+    **kwargs : dict
+        Extra arguments for :func:`matplotlib.pyplot.show`.
+    """
+    from matplotlib import get_backend
+    import matplotlib.pyplot as plt
+    if show and get_backend() != 'agg':
+        (fig or plt).show(**kwargs)
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
@@ -46,8 +77,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     layer : str
         The layer to plot. Can be one of
         'agg', 'L2', and 'L5'
-    decimate : int
-        Factor by which to decimate the raw dipole traces (optional)
+    decim : int or list of int or None (default)
+        Optional (integer) factor by which to decimate the raw dipole traces.
+        :func:`~scipy.signal.decimate` is used, which recommends values <13.
+        To achieve higher decimation factors, a list of ints can be provided,
+        which are applied successively.)
     show : bool
         If True, show the figure
 
@@ -83,8 +117,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         title_str = layer
     ax.set_title(title_str)
 
-    if show:
-        plt.show()
+    plt_show(show)
     return ax.get_figure()
 
 
@@ -181,8 +214,7 @@ def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
                 label=label, color=color)
     plt.legend()
 
-    if show:
-        plt.show()
+    plt_show(show)
     return ax.get_figure()
 
 
@@ -242,8 +274,7 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
     ax.get_yaxis().set_visible(False)
     ax.set_xlim(left=0)
 
-    if show:
-        plt.show()
+    plt_show(show)
     return ax.get_figure()
 
 
@@ -288,9 +319,7 @@ def plot_cells(net, ax=None, show=True):
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
 
-    if show:
-        plt.show()
-
+    plt_show(show)
     return ax.get_figure()
 
 
@@ -313,8 +342,11 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
         End time of plot in milliseconds. If None, plot entire simulation.
     layer : str, default 'agg'
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
-    decim : int or None
-        Optional factor by which to decimate the raw dipole traces
+    decim : int or list of int or None (default)
+        Optional (integer) factor by which to decimate the raw dipole traces.
+        :func:`~scipy.signal.decimate` is used, which recommends values <13.
+        To achieve higher decimation factors, a list of ints can be provided,
+        which are applied successively.
     padding : str or None
         Optional padding of the dipole time course beyond the plotting limits.
         Possible values are: 'zeros' for padding with 0's (default), 'mirror'
@@ -340,8 +372,8 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
 
     sfreq = dpl.sfreq
     if decim is not None:
-        data, times = _decimate_plot_data(decim, data, times)
-        sfreq = sfreq / decim
+        data, times, sfreq = _decimate_plot_data(decim, data, times,
+                                                 sfreq=sfreq)
 
     if padding is not None:
         if not isinstance(padding, str):
@@ -380,8 +412,7 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
         xfmt.set_powerlimits((-2, 2))
         fig.colorbar(im, cax=cbar_ax, format=xfmt)
 
-    if show:
-        plt.show()
+    plt_show(show)
     return ax.get_figure()
 
 
@@ -427,8 +458,9 @@ def plot_spectrogram(dpl, *, fmin, fmax, winlen=None, tmin=None, tmax=None,
         winlen = times[-1] - times[0]
     nfft = 1e-3 * winlen * sfreq
     nperseg = 2 ** int(np.ceil(np.log2(nfft)))
+    nperseg = min(nperseg, len(data))
 
-    freqs, _, psds = spectrogram(data, sfreq, window='hamming',
+    freqs, _, psds = spectrogram(data, sfreq, window='hamming', nfft=nperseg,
                                  nperseg=nperseg, noverlap=0)
     if ax is None:
         fig, ax = plt.subplots(1, 1)
@@ -438,6 +470,6 @@ def plot_spectrogram(dpl, *, fmin, fmax, winlen=None, tmin=None, tmax=None,
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power spectral density')
-    if show:
-        plt.show()
+
+    plt_show(show)
     return ax.get_figure()
