@@ -388,7 +388,7 @@ time with unique randomization. The drive is only connected to the distal
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_simulate_alpha_001.png
-    :alt: agg
+    :alt: Aggregate (L2 + L5)
     :class: sphx-glr-single-img
 
 
@@ -442,24 +442,14 @@ time with unique randomization. The drive is only connected to the distal
 
 We can confirm that what we simulate is indeed 10 Hz activity.
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-76
+.. GENERATED FROM PYTHON SOURCE LINES 62-66
 
 .. code-block:: default
 
     import matplotlib.pyplot as plt
-    from scipy.signal import spectrogram
-    import numpy as np
-    sfreq = 1000. / params['dt']
-    n_fft = 1024 * 8
-    freqs, _, psds = spectrogram(
-        dpl[0].data['agg'], sfreq, window='hamming', nfft=n_fft,
-        nperseg=n_fft, noverlap=0)
-    plt.figure()
-    plt.plot(freqs, np.mean(psds, axis=-1))
-    plt.xlim((0, 40))
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('PSD')
-    plt.show()
+    from hnn_core.viz import plot_spectrogram
+    tmin = 20  # exclude initial burn-in period
+    plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin)
 
 
 
@@ -468,13 +458,21 @@ We can confirm that what we simulate is indeed 10 Hz activity.
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <Figure size 640x480 with 1 Axes>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  51.354 seconds)
+   **Total running time of the script:** ( 1 minutes  20.934 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

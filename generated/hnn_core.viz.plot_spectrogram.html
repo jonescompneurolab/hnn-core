@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Computation times &#8212; hnn-core  documentation</title>
+    <title>hnn_core.viz.plot_spectrogram &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -45,7 +45,7 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="index.html">Examples</a></li>
+                <li><a href="../auto_examples/index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
@@ -72,7 +72,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Computation times</a></li>
+<li><a class="reference internal" href="#">hnn_core.viz.plot_spectrogram</a></li>
 </ul>
 </ul>
 </li>
@@ -84,7 +84,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/auto_examples/sg_execution_times.rst.txt"
+  <a href="../_sources/generated/hnn_core.viz.plot_spectrogram.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -108,38 +108,46 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>06:43.809</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 82%" />
-<col style="width: 11%" />
-<col style="width: 8%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_simulate_gamma.html#sphx-glr-auto-examples-plot-simulate-gamma-py"><span class="std std-ref">03. Simulate gamma rhythms</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_gamma.py</span></code>)</p></td>
-<td><p>01:59.772</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_simulate_evoked.html#sphx-glr-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">01. Simulate dipole for evoked inputs</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_evoked.py</span></code>)</p></td>
-<td><p>01:38.325</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_simulate_alpha.html#sphx-glr-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">02. Simulate alpha waves</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_alpha.py</span></code>)</p></td>
-<td><p>01:20.934</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_simulate_somato.html#sphx-glr-auto-examples-plot-simulate-somato-py"><span class="std std-ref">05. Source reconstruction and HNN</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_somato.py</span></code>)</p></td>
-<td><p>01:01.275</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_firing_pattern.html#sphx-glr-auto-examples-plot-firing-pattern-py"><span class="std std-ref">04. Plot firing pattern</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_firing_pattern.py</span></code>)</p></td>
-<td><p>00:43.503</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="hnn-core-viz-plot-spectrogram">
+<h1>hnn_core.viz.plot_spectrogram<a class="headerlink" href="#hnn-core-viz-plot-spectrogram" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="hnn_core.viz.plot_spectrogram">
+<code class="sig-prename descclassname">hnn_core.viz.</code><code class="sig-name descname">plot_spectrogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dpl</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">fmin</span></em>, <em class="sig-param"><span class="n">fmax</span></em>, <em class="sig-param"><span class="n">winlen</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tmin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tmax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">layer</span><span class="o">=</span><span class="default_value">'agg'</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot Welch spectrogram (power spectrum) of dipole time course</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole instances</span></dt><dd><p>The Dipole object.</p>
+</dd>
+<dt><strong>fmin</strong><span class="classifier">float</span></dt><dd><p>Minimum frequency to plot (in Hz).</p>
+</dd>
+<dt><strong>fmax</strong><span class="classifier">float</span></dt><dd><p>Maximum frequency to plot (in Hz).</p>
+</dd>
+<dt><strong>winlen</strong><span class="classifier">float | None</span></dt><dd><p>Length of window (in ms) to average using Welch periodogram method.
+The actual window size used depends on the sampling rate (closest
+power of 2, rounded up). If None, entire window is used (no averaging).</p>
+</dd>
+<dt><strong>tmin</strong><span class="classifier">float or None</span></dt><dd><p>Start time of data to include (in ms). If None, use entire simulation.</p>
+</dd>
+<dt><strong>tmax</strong><span class="classifier">float or None</span></dt><dd><p>End time of data to include (in ms). If None, use entire simulation.</p>
+</dd>
+<dt><strong>layer</strong><span class="classifier">str, default ‘agg’</span></dt><dd><p>The layer to plot. Can be one of ‘agg’, ‘L2’, and ‘L5’</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

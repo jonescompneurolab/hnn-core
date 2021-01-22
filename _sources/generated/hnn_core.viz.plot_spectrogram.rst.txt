@@ -1,0 +1,6 @@
+﻿hnn\_core.viz.plot\_spectrogram
+===============================
+
+.. currentmodule:: hnn_core.viz
+
+.. autofunction:: plot_spectrogram
