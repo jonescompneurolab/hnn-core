@@ -12,6 +12,7 @@ recursive-include hnn_core *.py
 
 ### Exclude
 
-exclude Makefile
+exclude Makefile pytest.ini .circleci
 exclude CONTRIBUTING.rst
 recursive-exclude hnn_core *.pyc
+recursive-exclude doc *
