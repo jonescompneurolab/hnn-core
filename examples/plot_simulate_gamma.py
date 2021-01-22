@@ -12,7 +12,7 @@ dynamics are driven by Poisson-distributed (noisy) spike trains to layer II/III
 and layer V pyramidal cell populations.
 
 Note that for plotting time-frequency representations, the code below calls
-the ``mne` function :func:`~mne.time_frequency.tfr_array_morlet`. To install
+the ``mne`` function :func:`~mne.time_frequency.tfr_array_morlet`. To install
 ``mne``, simply ``pip install mne`` inside your python environment.
 """
 
@@ -71,7 +71,6 @@ net.cell_response.plot_spikes_raster()
 
 tmin = 50
 trial_idx = 0  # pick first trial
-decim = 8  # decimate plots by a factor of 8 (from 40 to 5 kHz)
 
 # plot dipole time course and time-frequency representation in same figure
 import matplotlib.pyplot as plt
@@ -80,12 +79,12 @@ from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
-plot_dipole(dpls[trial_idx], tmin=tmin, ax=axes[0], decim=decim, show=False)
+plot_dipole(dpls[trial_idx], tmin=tmin, ax=axes[0], show=False)
 
 # Create an fixed-step tiling of frequencies from 20 to 100 Hz in steps of 1 Hz
 freqs = np.arange(20., 100., 1.)
 plot_tfr_morlet(dpls[trial_idx], freqs=freqs, n_cycles=7, tmin=tmin,
-                decim=decim, ax=axes[1])
+                ax=axes[1])
 
 ###############################################################################
 # As a final exercise, let us try to re-run the simulation with a tonic bias
