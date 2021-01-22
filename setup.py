@@ -98,6 +98,11 @@ if __name__ == "__main__":
               'Operating System :: MacOS',
           ],
           platforms='any',
+          install_requires=[
+              'numpy >=1.14',
+              'NEURON >=7.7',
+              'matplotlib'
+          ],
           packages=find_packages(),
           package_data={'hnn_core': 
             ['param/*.json',
