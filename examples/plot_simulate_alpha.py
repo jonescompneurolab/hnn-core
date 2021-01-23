@@ -21,6 +21,7 @@ from hnn_core import simulate_dipole, read_params, Network
 
 ###############################################################################
 # Then we setup the directories and read the default parameters file
+hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 print(params)
@@ -67,29 +68,6 @@ import matplotlib.pyplot as plt
 from hnn_core.viz import plot_spectrogram
 tmin = 20  # exclude initial burn-in period
 plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin)
-from scipy.signal import spectrogram
-import numpy as np
-
-###############################################################################
-# Next we define sfreq, the sampling frequency of the simulation. This can be
-# calculated from the step size defined used for the differential equation
-# solver. We additionally  define n_fft, the length of the fast fourier
-# transform.
-sfreq = 1000. / params['dt']
-n_fft = 1024 * 8
-freqs, _, psds = spectrogram(
-    dpl[0].data['agg'], sfreq, window='hamming', nfft=n_fft,
-    nperseg=n_fft, noverlap=0)
-
-###############################################################################
-# We can plot the PSD and confirm the presence of alpha activity from the
-# sharp peak centered at 10 Hz.
-plt.figure()
-plt.plot(freqs, np.mean(psds, axis=-1))
-plt.xlim((0, 40))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('PSD')
-plt.show()
 
 ###############################################################################
 # The next step is to add a simultaneous 10 Hz proximal drive. Due to the
@@ -114,10 +92,11 @@ dpl = simulate_dipole(net)
 # directly. One useful tool is to plot the time frequency spectrogram.
 # Create an fixed-step tiling of frequencies from 20 to 100 Hz in steps of 1 Hz
 from hnn_core.viz import plot_dipole, plot_tfr_morlet
+import numpy as np
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
-plot_dipole(dpls[trial_idx], ax=axes[0], show=False)
+plot_dipole(dpl[trial_idx], ax=axes[0], show=False)
 
 
 freqs = np.arange(2., 50., 1.)
-plot_tfr_morlet(dpls[trial_idx], freqs=freqs, n_cycles=7, ax=axes[1])
+plot_tfr_morlet(dpl[trial_idx], freqs=freqs, n_cycles=7, ax=axes[1])
