@@ -105,7 +105,6 @@ fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
 plot_dipole(dpl[trial_idx], ax=axes[0], show=False)
 
-
 freqs = np.arange(5., 50., 1.)
 plot_tfr_morlet(dpl[trial_idx], freqs=freqs, n_cycles=freqs / 2, ax=axes[1])
 
