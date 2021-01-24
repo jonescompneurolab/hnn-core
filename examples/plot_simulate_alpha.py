@@ -70,7 +70,8 @@ dpl[trial_idx].plot()
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity by plotting the
-# power spectral density. First we'll import the spectrogram class from scipy.
+# power spectral density. Note that the SciPy-function `~scipy.signal.spectrogram` is
+# used to create the plot.
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_spectrogram
 tmin = 20  # exclude initial burn-in period
