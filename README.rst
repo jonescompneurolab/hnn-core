@@ -61,6 +61,21 @@ To check if everything worked fine, you can do::
 
 and it should not give any error messages.
 
+Documentation and examples
+==========================
+
+Once you have tested that ``hnn_core`` and its dependencies were installed, we recommend downloading and executing the `example scripts <https://jonescompneurolab.github.io/hnn-core/auto_examples/index.html>`_ provided on the `documentation pages <https://jonescompneurolab.github.io/hnn-core/>`_ (as well as in the `GitHub repository <https://github.com/jonescompneurolab/hnn-core>`_).
+
+Note that ``python`` plots are by default non-interactive (blocking): each plot must thus be closed before the code execution continues. We recommend using and 'interactive' python interpreter such as ``ipython``::
+
+   $ ipython --matplotlib
+
+and executing the scripts using the ``%run``-magic::
+
+   %run plot_simulate_evoked.py
+
+When executed in this manner, the scripts will execute entirely, after which all plots will be shown. For an even more interactive experience, in which you execute code and interrogate plots in sequential blocks, we recommend editors such as `VS Code <https://code.visualstudio.com>`_ and `Spyder <https://docs.spyder-ide.org/current/index.html>`_.
+
 Parallel backends
 =================
 
