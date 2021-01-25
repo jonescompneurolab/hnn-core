@@ -41,11 +41,16 @@ Optional dependencies
 Installation
 ============
 
-We recommend the `Anaconda Python distribution <https://www.continuum.io/downloads>`_. To install ``hnn-core``, you first need to install its dependencies::
+We recommend the `Anaconda Python distribution <https://www.anaconda.com/products/individual>`_.
+To install ``hnn-core``, you first need to install its dependencies::
 
 	$ conda install numpy matplotlib scipy
 
-Additionally, you would need Neuron which is available here: `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_. It can also be installed via pip now::
+Additionally, you would need Neuron which is available here:
+`https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
+Note installing Neuron using the traditional installer may make it hard to manage
+within virtual environments such as Anaconda. For this reason, we recommend the
+pip installer:
 
 	$ pip install NEURON
 
