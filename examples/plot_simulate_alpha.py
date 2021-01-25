@@ -37,6 +37,8 @@ print(params)
 # Next we update a few of the default parameters related to visualisation. The
 # ``dipole_scalefctr`` relates to the amount of cortical tissue necessary to
 # observe the electric current dipole outside the head with M/EEG.
+# The ``dipole_smooth_win``-parameter determines the length (in ms) of
+# a smoothing window optionally applied to the dipole waveform after simulation.
 params.update({
     'dipole_scalefctr': 150000.0,
     'dipole_smooth_win': 0,
