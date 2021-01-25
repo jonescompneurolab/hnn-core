@@ -27,7 +27,7 @@ from mne.datasets import somato
 from mne.minimum_norm import apply_inverse, make_inverse_operator
 
 ###############################################################################
-# Now we set the the path for the 1st subject of the ``somato`` dataset.
+# Now we set the the path of the ``somato`` dataset for subject ``01``.
 data_path = somato.data_path()
 subject = '01'
 task = 'somato'
@@ -38,18 +38,24 @@ fwd_fname = op.join(data_path, 'derivatives', 'sub-{}'.format(subject),
 subjects_dir = op.join(data_path, 'derivatives', 'freesurfer', 'subjects')
 
 ###############################################################################
-# Then, we get the raw data and estimate the inverse operator.
-
+# Then, we get the raw data and estimate the inverse operator. This includes
+# reading and band-pass filtering the raw data,
 raw = mne.io.read_raw_fif(raw_fname, preload=True)
 raw.filter(1, 40)
 
+###############################################################################
+# isolating events associated with each MEG time series in the dataset,
 events = mne.find_events(raw, stim_channel='STI 014')
+
+###############################################################################
+# defining epochs within the time series,
 event_id, tmin, tmax = 1, -.2, .17
 baseline = None
 epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline=baseline,
                     reject=dict(grad=4000e-13, eog=350e-6), preload=True)
-evoked = epochs.average()
 
+###############################################################################
+# and finally computing the inverse operator.
 fwd = mne.read_forward_solution(fwd_fname)
 cov = mne.compute_covariance(epochs)
 inv = make_inverse_operator(epochs.info, fwd, cov)
@@ -60,23 +66,23 @@ inv = make_inverse_operator(epochs.info, fwd, cov)
 # estimate the location and amplitude of a single current dipole. At the
 # moment, we do not offer explicit recommendations on which source
 # reconstruction technique is best for HNN. However, we do want our users
-# to note that the dipole currents simulate with HNN are assumed to be normal
+# to note that the dipole currents simulated with HNN are assumed to be normal
 # to the cortical surface. Hence, using the option ``pick_ori='normal'``
 # seems to make most sense.
 
 method = "MNE"
 snr = 3.
 lambda2 = 1. / snr ** 2
+evoked = epochs.average()
 stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
                     return_residual=False, verbose=True)
 
 ###############################################################################
-# We isolate the single most active vertex in the distributed minimum norm
-# estimate by calculating the L2 norm of the time course emerging from each
-# vertex. The time course from the vertex with the greatest L2 norm represents
-# the location of cortex with greatest response to stimulus.
+# We isolate and plot the single most active vertex in the distributed minimum
+# norm estimate by calculating the L2 norm of the time course emerging from
+# each vertex. The time course from the vertex with the greatest L2 norm
+# represents the location of cortex with greatest response to stimulus.
 pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
-
 plt.figure()
 plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'ro-')
 plt.xlabel('time (ms)')
