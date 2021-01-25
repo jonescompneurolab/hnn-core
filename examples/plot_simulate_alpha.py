@@ -35,7 +35,7 @@ print(params)
 
 ###############################################################################
 # Next we update a few of the default parameters related to visualisation. The
-# dipole_scalefctr relates to the amount of cortical tissue necessary to
+# ``dipole_scalefctr`` relates to the amount of cortical tissue necessary to
 # observe the electric current dipole outside the head with M/EEG.
 params.update({
     'dipole_scalefctr': 150000.0,
