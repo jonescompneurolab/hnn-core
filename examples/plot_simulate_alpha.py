@@ -112,8 +112,8 @@ plot_tfr_morlet(dpl[trial_idx], freqs=freqs, n_cycles=freqs / 2, ax=axes[1])
 ###############################################################################
 # References
 # ----------
-# [1] Lee, S. & Jones, S. R. Distinguishing mechanisms of gamma frequency
+# .. [1] Lee, S. & Jones, S. R. Distinguishing mechanisms of gamma frequency
 # oscillations in human current source signals using a computational model of a
 # laminar neocortical network. Frontiers in human neuroscience (2013)
 #
-# [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta
+# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta
