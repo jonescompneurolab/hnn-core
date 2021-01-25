@@ -78,6 +78,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#documentation-and-examples">Documentation and examples</a></li>
 <li><a class="reference internal" href="#parallel-backends">Parallel backends</a></li>
 <li><a class="reference internal" href="#bug-reports">Bug reports</a></li>
 <li><a class="reference internal" href="#interested-in-contributing">Interested in Contributing?</a></li>
@@ -166,6 +167,19 @@
 </pre></div>
 </div>
 <p>and it should not give any error messages.</p>
+</div>
+<div class="section" id="documentation-and-examples">
+<h1>Documentation and examples<a class="headerlink" href="#documentation-and-examples" title="Permalink to this headline">¶</a></h1>
+<p>Once you have tested that <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and its dependencies were installed, we recommend downloading and executing the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/auto_examples/index.html">example scripts</a> provided on the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/">documentation pages</a> (as well as in the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">GitHub repository</a>).</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">python</span></code> plots are by default non-interactive (blocking): each plot must thus be closed before the code execution continues. We recommend using and ‘interactive’ python interpreter such as <code class="docutils literal notranslate"><span class="pre">ipython</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ipython --matplotlib
+</pre></div>
+</div>
+<p>and executing the scripts using the <code class="docutils literal notranslate"><span class="pre">%run</span></code>-magic:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">run</span> <span class="n">plot_simulate_evoked</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>When executed in this manner, the scripts will execute entirely, after which all plots will be shown. For an even more interactive experience, in which you execute code and interrogate plots in sequential blocks, we recommend editors such as <a class="reference external" href="https://code.visualstudio.com">VS Code</a> and <a class="reference external" href="https://docs.spyder-ide.org/current/index.html">Spyder</a>.</p>
 </div>
 <div class="section" id="parallel-backends">
 <h1>Parallel backends<a class="headerlink" href="#parallel-backends" title="Permalink to this headline">¶</a></h1>
