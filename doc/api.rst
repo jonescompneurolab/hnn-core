@@ -30,6 +30,7 @@ Dipole (:py:mod:`hnn_core.dipole`):
 .. autosummary::
    :toctree: generated/
 
+   Dipole
    simulate_dipole
    read_dipole
    average_dipoles
