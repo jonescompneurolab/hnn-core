@@ -34,18 +34,6 @@ params = read_params(params_fname)
 print(params)
 
 ###############################################################################
-# Next we update a few of the default parameters related to visualisation. The
-# ``dipole_scalefctr`` relates to the amount of cortical tissue necessary to
-# observe the electric current dipole outside the head with M/EEG.
-# The ``dipole_smooth_win``-parameter determines the length (in ms) of
-# a smoothing window optionally applied to the dipole waveform after simulation.
-params.update({
-    'dipole_scalefctr': 150000.0,
-    'dipole_smooth_win': 0,
-    'tstop': 710.0,
-})
-
-###############################################################################
 # Now let's simulate the dipole and plot it. To excite the network, we add a
 # ~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
 # simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
@@ -53,6 +41,7 @@ params.update({
 # amount (20 ms standard deviation). We repeat the burst train 10 times, each
 # time with unique randomization. The drive is only connected to the proximal
 # (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
+params['tstop'] = 310
 net = Network(params)
 
 location = 'proximal'
@@ -64,27 +53,30 @@ syn_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_bursty_drive(
     'alpha_prox', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
     spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_p,
-    synaptic_delays=syn_delays_p, seedcore=13)
+    synaptic_delays=syn_delays_p, seedcore=14)
 
-dpl = simulate_dipole(net)
-
-trial_idx = 0  # single trial simulated
-dpl[trial_idx].plot()
+dpl = simulate_dipole(net, postproc=False)
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity by plotting the
-# power spectral density. Note that the SciPy-function `~scipy.signal.spectrogram` is
-# used to create the plot.
+# power spectral density. Note that the SciPy-function
+# `~scipy.signal.spectrogram` is used to create the plot. The
+# ``dpl[0].scale()`` call relates to the amount of cortical tissue necessary to
+# observe the electric current dipole outside the head with M/EEG.
 import matplotlib.pyplot as plt
-from hnn_core.viz import plot_spectrogram
+from hnn_core.viz import plot_dipole, plot_spectrogram
+trial_idx = 0  # single trial simulated
+dpl[trial_idx].scale(150000)
+fig, axes = plt.subplots(2, 1)
 tmin = 20  # exclude initial burn-in period
-plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin)
-
+plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
+plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 ###############################################################################
 # The next step is to add a simultaneous 10 Hz distal drive. Due to the
 # stochasticity of input spike timing, the proximal and distal spikes
 # occasionally arrive at the same time which will result in a beta frequency
-# (15-30 Hz) event.
+# (15-30 Hz) event. The higher frequency activity arises from biophysical
+# properties intrinsic to the cortical circuit.
 location = 'distal'
 burst_std = 20
 weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
@@ -93,29 +85,32 @@ syn_delays_d = {'L2_basket': 5., 'L2_pyramidal': 5.,
 net.add_bursty_drive(
     'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
     spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_d,
-    synaptic_delays=syn_delays_d, seedcore=14)
+    synaptic_delays=syn_delays_d, seedcore=16)
 
-dpl = simulate_dipole(net)
+dpl = simulate_dipole(net,postproc=False)
 
 ###############################################################################
 # It can be difficult to identify beta activity by inspecting the dipole
 # directly. One useful tool is to plot the time frequency spectrogram.
-# This requires creating a fixed-step tiling of frequencies from 5 to 50 Hz 
+# This requires creating a fixed-step tiling of frequencies from 5 to 50 Hz
 # in steps of 1 Hz
-from hnn_core.viz import plot_dipole, plot_tfr_morlet
 import numpy as np
+from hnn_core.viz import plot_tfr_morlet
+trial_idx = 0  # single trial simulated
+dpl[trial_idx].scale(150000)
+tmin = 20
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-
-plot_dipole(dpl[trial_idx], ax=axes[0], show=False)
-
+plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
 freqs = np.arange(5., 50., 1.)
-plot_tfr_morlet(dpl[trial_idx], freqs=freqs, n_cycles=freqs / 2, ax=axes[1])
+plot_tfr_morlet(dpl[trial_idx], freqs=freqs, n_cycles=freqs / 3,
+                tmin=tmin, ax=axes[1])
 
 ###############################################################################
 # References
 # ----------
-# .. [1] Lee, S. & Jones, S. R. Distinguishing mechanisms of gamma frequency
-# oscillations in human current source signals using a computational model of a
-# laminar neocortical network. Frontiers in human neuroscience (2013)
+# .. [1] Jones, S. R. et al.Quantitative analysis and biophysically realistic
+# neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
+# sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 #
-# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta
+# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/
+# alpha_and_beta
