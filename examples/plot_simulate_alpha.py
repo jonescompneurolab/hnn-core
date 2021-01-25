@@ -8,10 +8,6 @@ HNN-core. Alpha activity can be produced with 10 Hz excitatory drive to the
 proximal or distal dendrites of pyramidal neurons. Providing proximal and
 distal drive simultaneously results in higher frequency beta activity [1]_,
 [2]_.
-
-Note that for plotting time-frequency representations, the code below calls
-the ``mne`` function :func:`~mne.time_frequency.tfr_array_morlet`. To install
-``mne``, simply ``pip install mne`` inside your python environment.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
@@ -76,7 +72,7 @@ plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 # stochasticity of input spike timing, the proximal and distal spikes
 # occasionally arrive at the same time which will result in a beta frequency
 # (15-30 Hz) event. The higher frequency activity arises from biophysical
-# properties intrinsic to the cortical circuit.
+# properties intrinsic to the cortical neurons.
 location = 'distal'
 burst_std = 20
 weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
@@ -87,23 +83,19 @@ net.add_bursty_drive(
     spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_d,
     synaptic_delays=syn_delays_d, seedcore=16)
 
-dpl = simulate_dipole(net,postproc=False)
+dpl = simulate_dipole(net, postproc=False)
 
 ###############################################################################
-# It can be difficult to identify beta activity by inspecting the dipole
-# directly. One useful tool is to plot the time frequency spectrogram.
-# This requires creating a fixed-step tiling of frequencies from 5 to 50 Hz
-# in steps of 1 Hz
-import numpy as np
-from hnn_core.viz import plot_tfr_morlet
+# We can verify that beta frequency activity was produced by inspecting the PSD 
+# of the most recent simulation. While the 10 Hz alpha peak is still present, a 
+# much more prominent 20 Hz peak has appeared with the addition of rhythmic
+# distal inputs.
 trial_idx = 0  # single trial simulated
 dpl[trial_idx].scale(150000)
-tmin = 20
-fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
+fig, axes = plt.subplots(2, 1)
+tmin = 20  # exclude initial burn-in period
 plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
-freqs = np.arange(5., 50., 1.)
-plot_tfr_morlet(dpl[trial_idx], freqs=freqs, n_cycles=freqs / 3,
-                tmin=tmin, ax=axes[1])
+plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 
 ###############################################################################
 # References
