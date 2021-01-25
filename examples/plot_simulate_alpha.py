@@ -4,9 +4,10 @@
 =================================
 
 This example demonstrates how to simulate alpha and beta waves using
-HNN-core. Alpha activity can be produced with 10 Hz excitatory drive to the 
-proximal or distal dendrites of pyramidal neurons. Providing proximal and 
-distal drive simultaneously results in higher frequency beta activity [1,2]
+HNN-core. Alpha activity can be produced with 10 Hz excitatory drive to the
+proximal or distal dendrites of pyramidal neurons. Providing proximal and
+distal drive simultaneously results in higher frequency beta activity [1]_,
+[2]_.
 
 Note that for plotting time-frequency representations, the code below calls
 the ``mne`` function :func:`~mne.time_frequency.tfr_array_morlet`. To install
