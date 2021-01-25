@@ -57,8 +57,8 @@ dpl = simulate_dipole(net, postproc=False)
 # We can confirm that what we simulate is indeed 10 Hz activity by plotting the
 # power spectral density. Note that the SciPy-function
 # `~scipy.signal.spectrogram` is used to create the plot. The
-# ``dpl[0].scale()`` call relates to the amount of cortical tissue necessary to
-# observe the electric current dipole outside the head with M/EEG.
+# ``dpl[trial_idx].scale()`` call relates to the amount of cortical tissue 
+# necessary to observe the electric current dipole outside the head with M/EEG.
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole, plot_spectrogram
 trial_idx = 0  # single trial simulated
@@ -67,6 +67,7 @@ fig, axes = plt.subplots(2, 1)
 tmin = 20  # exclude initial burn-in period
 plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
 plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+plt.tight_layout()
 ###############################################################################
 # The next step is to add a simultaneous 10 Hz distal drive. Due to the
 # stochasticity of input spike timing, the proximal and distal spikes
@@ -86,8 +87,8 @@ net.add_bursty_drive(
 dpl = simulate_dipole(net, postproc=False)
 
 ###############################################################################
-# We can verify that beta frequency activity was produced by inspecting the PSD 
-# of the most recent simulation. While the 10 Hz alpha peak is still present, a 
+# We can verify that beta frequency activity was produced by inspecting the PSD
+# of the most recent simulation. While the 10 Hz alpha peak is still present, a
 # much more prominent 20 Hz peak has appeared with the addition of rhythmic
 # distal inputs.
 trial_idx = 0  # single trial simulated
@@ -96,13 +97,13 @@ fig, axes = plt.subplots(2, 1)
 tmin = 20  # exclude initial burn-in period
 plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
 plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+plt.tight_layout()
 
 ###############################################################################
 # References
 # ----------
 # .. [1] Jones, S. R. et al.Quantitative analysis and biophysically realistic
-# neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
-# sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
+#    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
+#    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 #
-# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/
-# alpha_and_beta
+# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta
