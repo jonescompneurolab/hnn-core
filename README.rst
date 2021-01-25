@@ -48,13 +48,11 @@ To install ``hnn-core``, you first need to install its dependencies::
 
 Additionally, you would need Neuron which is available here:
 `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
-We recommend that you install it via pip::
+Note installing Neuron using the traditional installer may make it hard to manage
+within virtual environments such as Anaconda. For this reason, we recommend the
+pip installer:
 
 	$ pip install NEURON
-
-Note that if you choose to install Neuron using the traditional installer, it may be hard
-to manage it with virtual environments in Anaconda. For this reason, we recommend the
-pip installer.
 
 Since ``hnn-core`` does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.
 
