@@ -149,14 +149,19 @@
 </div>
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>We recommend the <a class="reference external" href="https://www.continuum.io/downloads">Anaconda Python distribution</a>. To install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you first need to install its dependencies:</p>
+<p>We recommend the <a class="reference external" href="https://www.anaconda.com/products/individual">Anaconda Python distribution</a>.
+To install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you first need to install its dependencies:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install numpy matplotlib scipy
 </pre></div>
 </div>
-<p>Additionally, you would need Neuron which is available here: <a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a>. It can also be installed via pip now:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install NEURON
-</pre></div>
-</div>
+<p>Additionally, you would need Neuron which is available here:
+<a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a>.
+Note installing Neuron using the traditional installer may make it hard to manage
+within virtual environments such as Anaconda. For this reason, we recommend the
+pip installer:</p>
+<blockquote>
+<div><p>$ pip install NEURON</p>
+</div></blockquote>
 <p>Since <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.</p>
 <p>To install the latest version of the code (nightly) do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
