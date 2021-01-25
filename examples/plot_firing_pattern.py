@@ -11,12 +11,13 @@ pattern of cells in the HNN model.
 #          Nick Tolley <nick nicholas_tolley@brown.edu>
 
 import os.path as op
+import tempfile
 
 ###############################################################################
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, Network, simulate_dipole
+from hnn_core import read_params, read_spikes, Network, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -27,7 +28,7 @@ params = read_params(params_fname)
 
 ###############################################################################
 # Now let's build the network. We have used the same weights as in the
-# :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` example.
+# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 import matplotlib.pyplot as plt
 
 net = Network(params)

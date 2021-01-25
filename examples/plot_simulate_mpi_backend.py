@@ -42,8 +42,8 @@ params.update({
 })
 
 ###############################################################################
-# Following :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`, we simulate
-# an alpha rhythm. To do so, we add a
+# Following :ref:`the alpha example
+# <sphx_glr_auto_examples_plot_simulate_alpha.py>`, we add a
 # ~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
 # simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
 # The occurrence of each burst is jittered by a random, normally distributed
@@ -61,7 +61,7 @@ net.add_bursty_drive(
 # Finally, to simulate we use the
 # :class:`~hnn_core.parallel_backends.MPIBackend` class. This will
 # start the simulation across the number of processors (cores) specified by
-# ``n_procs``` using MPI. The ``'mpiexec'`` launcher is used from
+# ``n_procs`` using MPI. The ``'mpiexec'`` launcher is used from
 # openmpi, which must be installed on the system
 from hnn_core import MPIBackend
 
@@ -70,4 +70,3 @@ with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
 
 trial_idx = 0
 dpls[trial_idx].plot()
-net.cell_response.plot_spikes_hist()
