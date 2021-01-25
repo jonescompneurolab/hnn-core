@@ -57,7 +57,7 @@ dpl = simulate_dipole(net, postproc=False)
 # We can confirm that what we simulate is indeed 10 Hz activity by plotting the
 # power spectral density. Note that the SciPy-function
 # `~scipy.signal.spectrogram` is used to create the plot. The
-# ``dpl[trial_idx].scale()`` call relates to the amount of cortical tissue 
+# ``dpl[trial_idx].scale()`` call relates to the amount of cortical tissue
 # necessary to observe the electric current dipole outside the head with M/EEG.
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole, plot_spectrogram
