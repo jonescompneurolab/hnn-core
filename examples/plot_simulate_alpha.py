@@ -55,25 +55,24 @@ dpl = simulate_dipole(net, postproc=False)
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity by plotting the
-# power spectral density. Note that the SciPy-function
+# power spectral density (PSD). Note that the SciPy-function
 # `~scipy.signal.spectrogram` is used to create the plot. The
 # ``dpl[trial_idx].scale()`` call relates to the amount of cortical tissue
 # necessary to observe the electric current dipole outside the head with M/EEG.
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole, plot_spectrogram
 trial_idx = 0  # single trial simulated
-dpl[trial_idx].scale(150000)
 fig, axes = plt.subplots(2, 1)
 tmin = 20  # exclude initial burn-in period
 plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
 plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 plt.tight_layout()
 ###############################################################################
-# The next step is to add a simultaneous 10 Hz distal drive. Due to the
-# stochasticity of input spike timing, the proximal and distal spikes
-# occasionally arrive at the same time which will result in a beta frequency
-# (15-30 Hz) event. The higher frequency activity arises from biophysical
-# properties intrinsic to the cortical neurons.
+# The next step is to add a simultaneous 10 Hz distal drive with a lower
+# within-burst spread of spike times (``burst_std``) compared with the
+# proximal one. The different arrival times of spikes at opposite ends of
+# the pyramidal cells will tend to produce bursts of 15-30 Hz power known
+# as beta frequency events.
 location = 'distal'
 burst_std = 20
 weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
@@ -92,7 +91,6 @@ dpl = simulate_dipole(net, postproc=False)
 # much more prominent 20 Hz peak has appeared with the addition of rhythmic
 # distal inputs.
 trial_idx = 0  # single trial simulated
-dpl[trial_idx].scale(150000)
 fig, axes = plt.subplots(2, 1)
 tmin = 20  # exclude initial burn-in period
 plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
