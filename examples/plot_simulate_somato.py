@@ -82,11 +82,11 @@ stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
 pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
 
 plt.figure()
-plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'ro-')
-plt.xlabel('time (ms)')
-plt.ylabel('%s value (nAM)' % method)
+plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'ro--')
+plt.xlabel('Time (ms)')
+plt.ylabel('Current Dipole (nAm)')
 plt.xlim((0, 170))
-plt.axhline(0)
+plt.axhline(0, c='k', ls=':')
 plt.show()
 
 ###############################################################################
@@ -104,7 +104,7 @@ params = read_params(params_fname)
 net = Network(params)
 
 ###############################################################################
-# To simulate the source of the median nerve evoked response, we create a
+# To simulate the source of the median nerve evoked response, we add a
 # sequence of synchronous evoked drives: 1 proximal, 2 distal, and 1 final
 # proximal drive. Note that setting ``sync_within_trial=True`` creates drives
 # with synchronous input (arriving to and transmitted by hypothetical granular
@@ -112,9 +112,10 @@ net = Network(params)
 # receive distal drive.
 
 # Proximal drives share connection parameters
-weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0025,
-                  'L5_basket': 0.004, 'L5_pyramidal': 0.001}
-weights_nmda_p = {'L2_basket': 0.003, 'L5_basket': 0.004}
+weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0039,
+                  'L5_basket': 0.004, 'L5_pyramidal': 0.0020}
+weights_nmda_p = {'L2_basket': 0.001, 'L2_pyramidal': 0.0005,
+                  'L5_basket': 0.002, 'L5_pyramidal': 0.0020}
 synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
@@ -131,33 +132,47 @@ net.add_evoked_drive(
     location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
 
 # Early distal drive
-weights_ampa_d = {'L2_basket': 0.003, 'L2_pyramidal': 0.0045,
+weights_ampa_d = {'L2_basket': 0.0043, 'L2_pyramidal': 0.0032,
                   'L5_pyramidal': 0.001}
-weights_nmda_d = {'L2_basket': 0.003, 'L2_pyramidal': 0.0045,
+weights_nmda_d = {'L2_basket': 0.0029, 'L2_pyramidal': 0.0051,
                   'L5_pyramidal': 0.001}
 synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 
-# Late distal drive
 net.add_evoked_drive(
     'evdist1', mu=32., sigma=3., numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=6)
 
 # Late distal input
+weights_ampa_d = {'L2_basket': 0.0041, 'L2_pyramidal': 0.0019,
+                  'L5_pyramidal': 0.0018}
+weights_nmda_d = {'L2_basket': 0.0032, 'L2_pyramidal': 0.0018,
+                  'L5_pyramidal': 0.0017}
+synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                     'L5_pyramidal': 0.1}
+
 net.add_evoked_drive(
     'evdist2', mu=82., sigma=3., numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=2)
 
-# n_trials = 25
-n_trials = 2
+###############################################################################
+# Run simulation. Optional: for a better match to the empirical waveform, run
+# simulation with ``n_trials=50``.
+n_trials = 20
+# n_trials = 2
 with MPIBackend(n_procs=6, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
+###############################################################################
+# Finally, we plot driving spike histogram, empirical and simulated median
+# nerve evoked response waveforms, and output spike histogram.
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6))
-axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r-')
 net.cell_response.plot_spikes_hist(ax=axes[0], show=False)
+axes[0].legend(['evdist_1', 'evdist_2', 'evprox_1', 'evprox_2'])
+axes[1].axhline(0, c='k', ls=':')
+axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r--')
 average_dipoles(dpls).plot(ax=axes[1], show=False)
 net.cell_response.plot_spikes_raster(ax=axes[2])
 
