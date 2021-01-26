@@ -9,8 +9,8 @@ simulating dipoles using HNN-core.
 The MPI backend allows running the simulation in parallel across neurons in the
 network even with a single trial. For this, you will
 need the :ref:`MPI related software <parallel>` installed. Note that if you
-want to simulate in parallel across trials, the Joblibs backend allows this
-already.
+want to simulate in parallel across trials, the Joblib backend allows this
+without the need to install and configure MPI.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
@@ -62,7 +62,7 @@ net.add_bursty_drive(
 # :class:`~hnn_core.parallel_backends.MPIBackend` class. This will
 # start the simulation across the number of processors (cores) specified by
 # ``n_procs`` using MPI. The ``'mpiexec'`` launcher is used from
-# openmpi, which must be installed on the system
+# ``openmpi``, which must be installed on the system
 from hnn_core import MPIBackend
 
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):

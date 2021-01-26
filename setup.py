@@ -22,7 +22,7 @@ DOWNLOAD_URL = 'http://github.com/jonescompneurolab/hnn-core'
 
 # get the version
 version = None
-with open(os.path.join('mne_bids', '__init__.py'), 'r') as fid:
+with open(os.path.join('hnn_core', '__init__.py'), 'r') as fid:
     for line in (line.strip() for line in fid):
         if line.startswith('__version__'):
             version = line.split('=')[1].strip().strip('\'')
