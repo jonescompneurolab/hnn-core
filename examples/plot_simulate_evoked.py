@@ -93,7 +93,7 @@ net.add_evoked_drive(
 # Now let's simulate the dipole, running 2 trials with the
 # :class:`~hnn_core.parallel_backends.Joblib` backend.
 # To run them in parallel we could set ``n_jobs`` to equal the number of
-# trials. The ``Joblibs`` backend allows running the simulations in parallel
+# trials. The ``Joblib`` backend allows running the simulations in parallel
 # across trials.
 from hnn_core import JoblibBackend
 
@@ -101,7 +101,7 @@ with JoblibBackend(n_jobs=1):
     dpls = simulate_dipole(net, n_trials=2, postproc=True)
 
 ###############################################################################
-# and then plot the simulated dipoles
+# and then plot the amplitudes of the simulated aggregate dipole moments over time
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
@@ -113,7 +113,7 @@ net.cell_response.plot_spikes_hist(ax=axes[1],
 # synchronous and see what happens. This is achieved by setting the parameter
 # ``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
 # a clone of the network defined above, and then modify the drive dynamics for
-# each drive. Making a clone removes any existing outputs from the network
+# each drive. Making a copy removes any existing outputs from the network
 # such as spiking information and voltages at the soma.
 
 net_sync = net.copy()

@@ -110,7 +110,7 @@ plt.show()
 ###############################################################################
 # Also, we can plot the spikes in the network and write them to text files.
 # Note that we can use formatting syntax to specify the filename pattern
-# with which each trial will be written. To read spikes back in, we can use
+# with which each trial will be written ('spk_1.txt', 'spk_2.txt, ...). To read spikes back in, we can use
 # wildcard expressions.
 net.cell_response.plot_spikes_raster()
 with tempfile.TemporaryDirectory() as tmp_dir_name:
@@ -120,7 +120,7 @@ cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can additionally calculate the mean spike rates for each cell class by
-# specifying a time window with tstart and tstop.
+# specifying a time window with ``tstart`` and ``tstop``.
 all_rates = cell_response.mean_rates(tstart=0, tstop=170,
                                      gid_ranges=net.gid_ranges,
                                      mean_type='all')
