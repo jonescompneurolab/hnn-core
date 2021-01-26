@@ -1,0 +1,14 @@
+name: hnn
+channels:
+- default
+dependencies:
+- python>=3.7,<3.9
+- pip
+- numpy
+- scipy
+- matplotlib
+- openmpi
+- mpi4py
+pip:
+  - NEURON
+  - mne
