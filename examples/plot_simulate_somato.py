@@ -1,11 +1,11 @@
 """
 =================================
-05. Source reconstruction and HNN
+05. From MEG sensor-space data to HNN simulation
 =================================
 
 This example demonstrates how to calculate the inverse solution of the median
 nerve evoked response in the MNE somatosensory dataset, and then simulate a
-matching inverse solution with HNN.
+biophysical model network that reproduces the observed dynamics.
 """
 
 # Authors: Mainak Jas <mainakjas@gmail.com>
@@ -65,8 +65,8 @@ inv = make_inverse_operator(epochs.info, fwd, cov)
 # moment, we do not offer explicit recommendations on which source
 # reconstruction technique is best for HNN. However, we do want our users
 # to note that the dipole currents simulated with HNN are assumed to be normal
-# to the cortical surface. Hence, using the option ``pick_ori='normal'``
-# seems to make most sense.
+# to the cortical surface. Hence, using the option ``pick_ori='normal'`` is
+# appropriate.
 method = "MNE"
 snr = 3.
 lambda2 = 1. / snr ** 2
@@ -76,9 +76,9 @@ stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
 
 ###############################################################################
 # We isolate and plot the single most active vertex in the distributed minimum
-# norm estimate by calculating the L2 norm of the time course emerging from
-# each vertex. The time course from the vertex with the greatest L2 norm
-# represents the location of cortex with greatest response to stimulus.
+# norm estimate by calculating the L2 norm of the time course emerging at each
+# vertex. The time course from the vertex with the greatest L2 norm represents
+# the location of cortex with greatest response to stimulus.
 pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
 
 plt.figure()
@@ -94,7 +94,8 @@ plt.show()
 # parameters from ``N20.json`` and instantiate the network.
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network, MPIBackend, average_dipoles
+from hnn_core import simulate_dipole, read_params, Network, MPIBackend
+from hnn_core import average_dipoles
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -172,7 +173,7 @@ net.add_evoked_drive(
 # match to the empirical waveform, set ``n_trials`` to be >=25.
 n_trials = 2
 # n_trials = 25
-with MPIBackend(n_procs=6, mpi_cmd='mpiexec'):
+with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
 ###############################################################################
