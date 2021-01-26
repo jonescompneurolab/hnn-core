@@ -74,7 +74,7 @@ plt.tight_layout()
 # the pyramidal cells will tend to produce bursts of 15-30 Hz power known
 # as beta frequency events.
 location = 'distal'
-burst_std = 20
+burst_std = 15
 weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 syn_delays_d = {'L2_basket': 5., 'L2_pyramidal': 5.,
                 'L5_basket': 5., 'L5_pyramidal': 5.}
