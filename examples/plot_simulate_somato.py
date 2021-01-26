@@ -27,7 +27,7 @@ from mne.datasets import somato
 from mne.minimum_norm import apply_inverse, make_inverse_operator
 
 ###############################################################################
-# Now we set the the path of the ``somato`` dataset for subject ``01``.
+# Now we set the the path of the ``somato`` dataset for subject ``'01'``.
 data_path = somato.data_path()
 subject = '01'
 task = 'somato'
@@ -38,7 +38,7 @@ fwd_fname = op.join(data_path, 'derivatives', 'sub-{}'.format(subject),
 subjects_dir = op.join(data_path, 'derivatives', 'freesurfer', 'subjects')
 
 ###############################################################################
-# Then, we get the raw data and estimate the inverse operator.
+# Then, we load the raw data and estimate the inverse operator.
 
 # Read and band-pass filter the raw data
 raw = mne.io.read_raw_fif(raw_fname, preload=True)
@@ -111,7 +111,20 @@ net = Network(params)
 # cells at the center of the network) to all pyramidal and basket cells that
 # receive distal drive.
 
-# Proximal drives share connection parameters
+# Early proximal drive
+weights_ampa_p = {'L2_basket': 0.0036, 'L2_pyramidal': 0.0039,
+                  'L5_basket': 0.0019, 'L5_pyramidal': 0.0020}
+weights_nmda_p = {'L2_basket': 0.0029, 'L2_pyramidal': 0.0005,
+                  'L5_basket': 0.0030, 'L5_pyramidal': 0.0019}
+synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                     'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+
+net.add_evoked_drive(
+    'evprox1', mu=20.0, sigma=3., numspikes=1, sync_within_trial=True,
+    weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
+    location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
+
+# Late proximal drive
 weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0039,
                   'L5_basket': 0.004, 'L5_pyramidal': 0.0020}
 weights_nmda_p = {'L2_basket': 0.001, 'L2_pyramidal': 0.0005,
@@ -119,13 +132,6 @@ weights_nmda_p = {'L2_basket': 0.001, 'L2_pyramidal': 0.0005,
 synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
-# Early proximal drive
-net.add_evoked_drive(
-    'evprox1', mu=20.0, sigma=3., numspikes=1, sync_within_trial=True,
-    weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
-    location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
-
-# Late proximal drive
 net.add_evoked_drive(
     'evprox2', mu=130.0, sigma=3., numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
@@ -133,9 +139,9 @@ net.add_evoked_drive(
 
 # Early distal drive
 weights_ampa_d = {'L2_basket': 0.0043, 'L2_pyramidal': 0.0032,
-                  'L5_pyramidal': 0.001}
+                  'L5_pyramidal': 0.0009}
 weights_nmda_d = {'L2_basket': 0.0029, 'L2_pyramidal': 0.0051,
-                  'L5_pyramidal': 0.001}
+                  'L5_pyramidal': 0.0010}
 synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 
@@ -158,21 +164,25 @@ net.add_evoked_drive(
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=2)
 
 ###############################################################################
-# Run simulation. Optional: for a better match to the empirical waveform, run
-# simulation with ``n_trials=50``.
+# Now we run the simulation over 2 trials so that we can plot the average
+# aggregate dipole. Note that we can use ``MPIBackend`` to reduce the
+# simulation time, however, no parallel backend is necessary. For a better
+# match to the empirical waveform, run simulation with >=25 trials.
 n_trials = 2
-# n_trials = 50
+# n_trials = 25
 with MPIBackend(n_procs=6, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
 ###############################################################################
-# Finally, we plot driving spike histogram, empirical and simulated median
+# Finally, we plot the driving spike histogram, empirical and simulated median
 # nerve evoked response waveforms, and output spike histogram.
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6))
 net.cell_response.plot_spikes_hist(ax=axes[0], show=False)
 axes[0].legend(['evdist_1', 'evdist_2', 'evprox_1', 'evprox_2'])
+axes[0].set_ylabel('Counts')
 axes[1].axhline(0, c='k', ls=':')
 axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r--')
+axes[1].set_ylabel('Current Dipole (nAm)')
 average_dipoles(dpls).plot(ax=axes[1], show=False)
 net.cell_response.plot_spikes_raster(ax=axes[2])
 
