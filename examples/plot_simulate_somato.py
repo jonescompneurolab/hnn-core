@@ -160,8 +160,8 @@ net.add_evoked_drive(
 ###############################################################################
 # Run simulation. Optional: for a better match to the empirical waveform, run
 # simulation with ``n_trials=50``.
-n_trials = 20
-# n_trials = 2
+n_trials = 2
+# n_trials = 50
 with MPIBackend(n_procs=6, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
