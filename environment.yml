@@ -9,6 +9,6 @@ dependencies:
 - matplotlib
 - openmpi
 - mpi4py
-pip:
+- pip:
   - NEURON
   - mne
