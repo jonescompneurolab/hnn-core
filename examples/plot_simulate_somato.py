@@ -165,9 +165,11 @@ net.add_evoked_drive(
 
 ###############################################################################
 # Now we run the simulation over 2 trials so that we can plot the average
-# aggregate dipole. Note that we can use ``MPIBackend`` to reduce the
-# simulation time, however, no parallel backend is necessary. For a better
-# match to the empirical waveform, run simulation with >=25 trials.
+# aggregate dipole. As in :ref:`the MPIBackend example
+# <sphx_glr_auto_examples_plot_simulate_mpi_backend.py>`, we can use
+# ``MPIBackend`` to reduce the simulation time by parallizing across cells in
+# the network. However, no parallel backend is necessary. For a better
+# match to the empirical waveform, set ``n_trials`` to be >=25.
 n_trials = 2
 # n_trials = 25
 with MPIBackend(n_procs=6, mpi_cmd='mpiexec'):
