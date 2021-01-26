@@ -241,7 +241,7 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
     spike_times = np.array(sum(cell_response._spike_times, []))
     spike_types = np.array(sum(cell_response._spike_types, []))
     spike_gids = np.array(sum(cell_response._spike_gids, []))
-    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
     cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
                         'L2_pyramidal': 'g', 'L2_basket': 'w'}
 
