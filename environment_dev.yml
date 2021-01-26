@@ -1,4 +1,4 @@
-name: hnn
+name: hnn_dev
 channels:
 - default
 dependencies:
@@ -13,3 +13,8 @@ dependencies:
 - pip:
   - NEURON
   - mne
+  - numpydoc
+  - sphinx-gallery
+  - sphinx_bootstrap_theme
+  - pillow
+  - psutil
