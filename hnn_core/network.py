@@ -248,6 +248,8 @@ class Network(object):
                         drive_name, mu=specs['dynamics']['mu'],
                         sigma=specs['dynamics']['sigma'],
                         numspikes=specs['dynamics']['numspikes'],
+                        sync_within_trial=specs['dynamics']
+                                               ['sync_within_trial'],
                         weights_ampa=specs['weights_ampa'],
                         weights_nmda=specs['weights_nmda'],
                         location=specs['location'], seedcore=specs['seedcore'],
