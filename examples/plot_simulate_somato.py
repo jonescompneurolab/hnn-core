@@ -90,7 +90,7 @@ plt.axhline(0, c='k', ls=':')
 plt.show()
 
 ###############################################################################
-# Now, let us try to simulate the same with hnn-core. We read in the network
+# Now, let us try to simulate the same with ``hnn-core``. We read in the network
 # parameters from ``N20.json`` and instantiate the network.
 
 import hnn_core
@@ -181,8 +181,7 @@ with MPIBackend(n_procs=2):
 # nerve evoked response waveforms, and output spike histogram.
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6))
 net.cell_response.plot_spikes_hist(ax=axes[0],
-                                   spike_types=['evprox1', 'evdist1',
-                                                'evdist2', 'evprox2'],
+                                   spike_types=['evprox', 'evdist']
                                    show=False)
 axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
 axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r--')
