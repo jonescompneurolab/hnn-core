@@ -180,13 +180,16 @@ with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
 # Finally, we plot the driving spike histogram, empirical and simulated median
 # nerve evoked response waveforms, and output spike histogram.
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6))
-net.cell_response.plot_spikes_hist(ax=axes[0], show=False)
-axes[0].legend(['evdist_1', 'evdist_2', 'evprox_1', 'evprox_2'])
-axes[0].set_ylabel('Counts')
-axes[1].axhline(0, c='k', ls=':')
+net.cell_response.plot_spikes_hist(ax=axes[0],
+                                   spike_types=['evprox1', 'evdist1',
+                                                'evdist2', 'evprox2'],
+                                   show=False)
+axes[0].legend()
+axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
 axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r--')
-axes[1].set_ylabel('Current Dipole (nAm)')
 average_dipoles(dpls).plot(ax=axes[1], show=False)
+axes[1].legend(['MNE vertex', 'HNN simulation'])
+axes[1].set_ylabel('Current Dipole (nAm)')
 net.cell_response.plot_spikes_raster(ax=axes[2])
 
 ###############################################################################
