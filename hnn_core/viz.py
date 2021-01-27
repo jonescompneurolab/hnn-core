@@ -110,7 +110,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
-    ax.set_ylabel('Dipole moment')
+    ax.set_ylabel(f'Dipole moment ({dpl[0].units})')
     if layer == 'agg':
         title_str = 'Aggregate (L2 + L5)'
     else:
@@ -420,22 +420,22 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     return ax.get_figure()
 
 
-def plot_spectrogram(dpl, *, fmin, fmax, winlen=None, tmin=None, tmax=None,
-                     layer='agg', ax=None, show=True):
-    """Plot Welch spectrogram (power spectrum) of dipole time course
+def plot_periodogram(dpl, *, fmin, fmax, tmin=None, tmax=None, layer='agg',
+                     ax=None, show=True):
+    """Plot periodogram (power spectral density, PSD) of dipole time course
+
+    Applies `~scipy.signal.periodogram` with ``window='hamming'``. Note that
+    no spectral averaging is applied, as most ``hnn_core`` simulations are
+    short-duration.
 
     Parameters
     ----------
-    dpl : instance of Dipole | list of Dipole instances
+    dpl : instance of Dipole
         The Dipole object.
     fmin : float
         Minimum frequency to plot (in Hz).
     fmax : float
         Maximum frequency to plot (in Hz).
-    winlen : float | None
-        Length of window (in ms) to average using Welch periodogram method.
-        The actual window size used depends on the sampling rate (closest
-        power of 2, rounded up). If None, entire window is used (no averaging).
     tmin : float or None
         Start time of data to include (in ms). If None, use entire simulation.
     tmax : float or None
@@ -453,27 +453,22 @@ def plot_spectrogram(dpl, *, fmin, fmax, winlen=None, tmin=None, tmax=None,
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    from scipy.signal import spectrogram
+    from scipy.signal import periodogram
 
     sfreq = dpl.sfreq
     data, times = _get_plot_data(dpl, layer, tmin, tmax)
 
-    if winlen is None:
-        winlen = times[-1] - times[0]
-    nfft = 1e-3 * winlen * sfreq
-    nperseg = 2 ** int(np.ceil(np.log2(nfft)))
-    nperseg = min(nperseg, len(data))
-
-    freqs, _, psds = spectrogram(data, sfreq, window='hamming', nfft=nperseg,
-                                 nperseg=nperseg, noverlap=0)
+    freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    ax.plot(freqs, np.mean(psds, axis=-1))
+    # ax.plot(freqs, np.sqrt(Pxx))
+    ax.plot(freqs, Pxx)
     ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
-    ax.set_ylabel('Power spectral density')
+    # ax.set_ylabel(f'Power ({dpl.units} / ' + r'$\sqrt{Hz}$' + ')')
+    ax.set_ylabel(f'Power ({dpl.units}' + r'$^2 \ Hz^{-1}$)')
 
     plt_show(show)
     return ax.get_figure()
