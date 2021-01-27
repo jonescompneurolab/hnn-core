@@ -1,7 +1,7 @@
 """
-=================================
+================================================
 05. From MEG sensor-space data to HNN simulation
-=================================
+================================================
 
 This example demonstrates how to calculate the inverse solution of the median
 nerve evoked response in the MNE somatosensory dataset, and then simulate a
@@ -181,7 +181,7 @@ with MPIBackend(n_procs=2):
 # nerve evoked response waveforms, and output spike histogram.
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6))
 net.cell_response.plot_spikes_hist(ax=axes[0],
-                                   spike_types=['evprox', 'evdist']
+                                   spike_types=['evprox', 'evdist'],
                                    show=False)
 axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
 axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r--')
