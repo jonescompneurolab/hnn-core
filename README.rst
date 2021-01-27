@@ -27,7 +27,7 @@ Dependencies
 * numpy
 * scipy
 * matplotlib
-* Neuron: installation instructions here: https://neuron.yale.edu/neuron/ (>=7.7)
+* Neuron (>=7.7)
 
 Optional dependencies
 ---------------------
@@ -69,7 +69,9 @@ For further instructions on installation and usage of parallel backends for usin
 Bug reports
 ===========
 
-Use the `github issue tracker <https://github.com/jonescompneurolab/hnn-core/issues>`_ to report bugs.
+Use the `github issue tracker <https://github.com/jonescompneurolab/hnn-core/issues>`_ to
+report bugs. For user questions and scientific discussions, please join the
+`HNN Google group <https://groups.google.com/g/hnnsolver>`_.
 
 Interested in Contributing?
 ===========================
