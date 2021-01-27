@@ -27,7 +27,6 @@ from hnn_core import simulate_dipole, read_params, Network
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
-print(params)
 
 ###############################################################################
 # Now let's simulate the dipole and plot it. To excite the network, we add a
@@ -43,8 +42,7 @@ net = Network(params)
 location = 'proximal'
 burst_std = 20
 weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-syn_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                'L5_basket': 1., 'L5_pyramidal': 1.}
+syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 
 net.add_bursty_drive(
     'alpha_prox', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
@@ -76,8 +74,7 @@ plt.tight_layout()
 location = 'distal'
 burst_std = 15
 weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-syn_delays_d = {'L2_basket': 5., 'L2_pyramidal': 5.,
-                'L5_basket': 5., 'L5_pyramidal': 5.}
+syn_delays_d = {'L2_pyramidal': 5., 'L5_pyramidal': 5.}
 net.add_bursty_drive(
     'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
     spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_d,
@@ -100,7 +97,7 @@ plt.tight_layout()
 ###############################################################################
 # References
 # ----------
-# .. [1] Jones, S. R. et al.Quantitative analysis and biophysically realistic
+# .. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
 #    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
 #    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 #
