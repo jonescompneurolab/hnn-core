@@ -110,8 +110,8 @@ plt.show()
 ###############################################################################
 # Also, we can plot the spikes in the network and write them to text files.
 # Note that we can use formatting syntax to specify the filename pattern
-# with which each trial will be written ('spk_1.txt', 'spk_2.txt, ...). To read spikes back in, we can use
-# wildcard expressions.
+# with which each trial will be written ('spk_1.txt', 'spk_2.txt, ...). To
+# read spikes back in, we can use wildcard expressions.
 net.cell_response.plot_spikes_raster()
 with tempfile.TemporaryDirectory() as tmp_dir_name:
     net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))

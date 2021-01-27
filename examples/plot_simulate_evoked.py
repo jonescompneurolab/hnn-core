@@ -101,7 +101,8 @@ with JoblibBackend(n_jobs=1):
     dpls = simulate_dipole(net, n_trials=2, postproc=True)
 
 ###############################################################################
-# and then plot the amplitudes of the simulated aggregate dipole moments over time
+# and then plot the amplitudes of the simulated aggregate dipole moments over
+# time
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)

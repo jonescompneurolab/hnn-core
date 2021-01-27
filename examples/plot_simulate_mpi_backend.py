@@ -36,8 +36,6 @@ print(params)
 ###############################################################################
 # Update a few of the default parameters related to visualisation
 params.update({
-    'dipole_scalefctr': 150000.0,
-    'dipole_smooth_win': 0,
     'tstop': 310.0,
 })
 
@@ -66,7 +64,7 @@ net.add_bursty_drive(
 from hnn_core import MPIBackend
 
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-    dpls = simulate_dipole(net, n_trials=1)
+    dpls = simulate_dipole(net, n_trials=1, postproc=False)
 
 trial_idx = 0
 dpls[trial_idx].plot()
