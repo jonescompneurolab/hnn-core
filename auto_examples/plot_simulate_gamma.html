@@ -146,7 +146,7 @@ the <code class="docutils literal notranslate"><span class="pre">mne</span></cod
 </div>
 <p>Read the parameter file and print the between-cell connectivity parameters.
 Note that these are different compared with the ‘default’ parameter set used
-in, e.g., <a class="reference internal" href="plot_simulate_alpha.html#sphx-glr-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">02. Simulate alpha waves</span></a>.</p>
+in, e.g., <a class="reference internal" href="plot_simulate_alpha.html#sphx-glr-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">02. Simulate alpha and beta waves</span></a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params_fname</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hnn_core_root</span></a><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma_L5weak_L2weak.json&#39;</span><span class="p">)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params_fname</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;gbar_L*&#39;</span><span class="p">])</span>
@@ -338,7 +338,7 @@ frequency is lower compared with the “weak” PING simulation above.</p>
 oscillations in human current source signals using a computational model of a
 laminar neocortical network. Frontiers in human neuroscience (2013)</p>
 <p>[2] <a class="reference external" href="https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma">https://jonescompneurolab.github.io/hnn-tutorials/gamma/gamma</a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 8 minutes  37.917 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  33.025 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-gamma-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_gamma.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>

@@ -35,12 +35,12 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha waves using HNN-core. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha and beta waves using HNN-core. Alpha activity c...">
 
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
-     :alt: 02. Simulate alpha waves
+     :alt: 02. Simulate alpha and beta waves
 
      :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`
 
