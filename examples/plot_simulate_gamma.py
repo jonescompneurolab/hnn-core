@@ -111,10 +111,8 @@ net.cell_response.plot_spikes_raster()
 ###############################################################################
 # Although the simulated dipole signal demonstrates clear periodicity, its
 # frequency is lower compared with the "weak" PING simulation above.
-from hnn_core.viz import plot_spectrogram
-winlen = 200  # Welch periodogram: averaging window length in ms
-plot_spectrogram(dpls[trial_idx], fmin=20., fmax=100., winlen=winlen,
-                 tmin=tmin)
+from hnn_core.viz import plot_periodogram
+plot_periodogram(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
 
 ###############################################################################
 # References

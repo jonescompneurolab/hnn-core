@@ -13,6 +13,7 @@ distal drive simultaneously results in higher frequency beta activity [1]_,
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Nick Tolley <nicholas_tolley@brown.edu>
+#          Christopher Bailey <bailey.cj@gmail.com>
 
 import os.path as op
 
@@ -54,16 +55,26 @@ dpl = simulate_dipole(net, postproc=False)
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity by plotting the
 # power spectral density (PSD). Note that the SciPy-function
-# `~scipy.signal.spectrogram` is used to create the plot. The
-# ``dpl[trial_idx].scale()`` call relates to the amount of cortical tissue
-# necessary to observe the electric current dipole outside the head with M/EEG.
+# `~scipy.signal.periodogram` is used to create the plot. Prior to
+# plotting, we smooth the dipole waveform with a _Satizky-Golay_ filter from
+# SciPy (`~scipy.signal.savgol_filter`). The filter takes a single argument:
+# the approximate low-pass cut-off frequency in Hz. Note that the purpose of
+# the filter is here to simulate the physiological scenario in which a larger
+# number and greater volume of neurons generate extra-cranially measured
+# signals. Try running the code without smoothing to compare with the raw
+# simulation output!
 import matplotlib.pyplot as plt
-from hnn_core.viz import plot_dipole, plot_spectrogram
+from hnn_core.viz import plot_dipole, plot_periodogram
 trial_idx = 0  # single trial simulated
 fig, axes = plt.subplots(2, 1)
 tmin = 20  # exclude initial burn-in period
-plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
-plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+h_freq = 30  # highest frequency (in Hz) to retain after smoothing (approx.)
+
+# We'll make a copy of the dipole before smoothing
+smooth_dpl = dpl[trial_idx].copy().savgol_filter(h_freq)
+plot_dipole(smooth_dpl, tmin=tmin, ax=axes[0], show=False)
+
+plot_periodogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 plt.tight_layout()
 ###############################################################################
 # The next step is to add a simultaneous 10 Hz distal drive with a lower
@@ -84,14 +95,17 @@ dpl = simulate_dipole(net, postproc=False)
 
 ###############################################################################
 # We can verify that beta frequency activity was produced by inspecting the PSD
-# of the most recent simulation. While the 10 Hz alpha peak is still present, a
-# much more prominent 20 Hz peak has appeared with the addition of rhythmic
-# distal inputs.
-trial_idx = 0  # single trial simulated
+# of the most recent simulation. The dominant power in the signal is shifted
+# from alpha (~10 Hz) to beta (15-25 Hz) frequency range.
+trial_idx, tmin, h_freq = 0, 20, 30  # same as above
 fig, axes = plt.subplots(2, 1)
-tmin = 20  # exclude initial burn-in period
-plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
-plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+# We'll again make a copy of the dipole before smoothing
+smooth_dpl = dpl[trial_idx].copy().savgol_filter(h_freq)
+
+# Note that using the plot_dipole-function is equivalent to:
+smooth_dpl.plot(tmin=tmin, ax=axes[0], show=False)
+
+plot_periodogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 plt.tight_layout()
 
 ###############################################################################
