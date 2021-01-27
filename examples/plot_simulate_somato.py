@@ -184,7 +184,6 @@ net.cell_response.plot_spikes_hist(ax=axes[0],
                                    spike_types=['evprox1', 'evdist1',
                                                 'evdist2', 'evprox2'],
                                    show=False)
-axes[0].legend()
 axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
 axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r--')
 average_dipoles(dpls).plot(ax=axes[1], show=False)

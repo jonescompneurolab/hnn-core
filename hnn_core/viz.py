@@ -212,7 +212,8 @@ def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
         color = spike_color[spike_label]
         ax.hist(spike_times[spike_types_mask[spike_type]], bins,
                 label=label, color=color)
-    plt.legend()
+    ax.set_ylabel("Counts")
+    ax.legend()
 
     plt_show(show)
     return ax.get_figure()
