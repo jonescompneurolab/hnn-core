@@ -173,7 +173,7 @@ net.add_evoked_drive(
 # match to the empirical waveform, set ``n_trials`` to be >=25.
 n_trials = 2
 # n_trials = 25
-with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
+with MPIBackend(n_procs=2):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
 ###############################################################################
