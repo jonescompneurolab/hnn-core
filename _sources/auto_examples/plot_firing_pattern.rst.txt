@@ -25,7 +25,7 @@
 This example demonstrates how to inspect the firing
 pattern of cells in the HNN model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-15
+.. GENERATED FROM PYTHON SOURCE LINES 9-16
 
 .. code-block:: default
 
@@ -34,6 +34,7 @@ pattern of cells in the HNN model.
     #          Nick Tolley <nick nicholas_tolley@brown.edu>
 
     import os.path as op
+    import tempfile
 
 
 
@@ -42,17 +43,17 @@ pattern of cells in the HNN model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-17
+.. GENERATED FROM PYTHON SOURCE LINES 17-18
 
 Let us import ``hnn_core``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-23
+.. GENERATED FROM PYTHON SOURCE LINES 18-24
 
 .. code-block:: default
 
 
     import hnn_core
-    from hnn_core import read_params, Network, simulate_dipole
+    from hnn_core import read_params, read_spikes, Network, simulate_dipole
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -63,11 +64,11 @@ Let us import ``hnn_core``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-25
+.. GENERATED FROM PYTHON SOURCE LINES 25-26
 
 Then we read the parameters file
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-28
+.. GENERATED FROM PYTHON SOURCE LINES 26-29
 
 .. code-block:: default
 
@@ -81,12 +82,12 @@ Then we read the parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-31
+.. GENERATED FROM PYTHON SOURCE LINES 30-32
 
 Now let's build the network. We have used the same weights as in the
-:ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` example.
+:ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-35
+.. GENERATED FROM PYTHON SOURCE LINES 32-36
 
 .. code-block:: default
 
@@ -101,7 +102,7 @@ Now let's build the network. We have used the same weights as in the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-41
+.. GENERATED FROM PYTHON SOURCE LINES 37-42
 
 ``net`` does not have any driving inputs and only defines the local network
 connectivity. Let us go ahead and first add a distal evoked drive.
@@ -109,7 +110,7 @@ We need to define the AMPA and NMDA weights for the connections. An
 "evoked drive" defines inputs that are normally distributed with a certain
 mean and standard deviation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-53
+.. GENERATED FROM PYTHON SOURCE LINES 42-54
 
 .. code-block:: default
 
@@ -132,14 +133,14 @@ mean and standard deviation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-58
+.. GENERATED FROM PYTHON SOURCE LINES 55-59
 
 The reason it is called an "evoked drive" is it can be used to simulate
 waveforms resembling evoked responses. Here, we show how to do it with two
 proximal drives which drive current up the dendrite and one distal drive
 which drives current down the dendrite producing the negative deflection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-70
 
 .. code-block:: default
 
@@ -161,13 +162,13 @@ which drives current down the dendrite producing the negative deflection.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-73
+.. GENERATED FROM PYTHON SOURCE LINES 71-74
 
 Now we add the second proximal evoked drive and simulate the network
 dynamics with somatic voltage recordings enabled. Note: only AMPA weights
 differ from first.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-83
+.. GENERATED FROM PYTHON SOURCE LINES 74-84
 
 .. code-block:: default
 
@@ -216,14 +217,14 @@ differ from first.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-88
+.. GENERATED FROM PYTHON SOURCE LINES 85-89
 
 Here, we explain more details about the data structures and how they can
 be used to better interpret the data. The cell IDs (gids) uniquely define
 neurons in the network and are stored in the :class:`~hnn_core.Network` 
 object as a dictionary
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-91
+.. GENERATED FROM PYTHON SOURCE LINES 89-92
 
 .. code-block:: default
 
@@ -245,13 +246,13 @@ object as a dictionary
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-95
+.. GENERATED FROM PYTHON SOURCE LINES 93-96
 
 Simulated voltage in the soma is stored in :class:`~hnn_core.CellResponse`
 as a dictionary. The CellResponse object stores data produced by individual
 cells including spikes, somatic voltages and currents.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-99
+.. GENERATED FROM PYTHON SOURCE LINES 96-100
 
 .. code-block:: default
 
@@ -274,11 +275,11 @@ cells including spikes, somatic voltages and currents.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-101
+.. GENERATED FROM PYTHON SOURCE LINES 101-102
 
 We can plot the firing pattern of individual cells by indexing with the gid
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-109
+.. GENERATED FROM PYTHON SOURCE LINES 102-110
 
 .. code-block:: default
 
@@ -301,12 +302,97 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-112
+.. GENERATED FROM PYTHON SOURCE LINES 111-115
+
+Also, we can plot the spikes in the network and write them to text files.
+Note that we can use formatting syntax to specify the filename pattern
+with which each trial will be written ('spk_1.txt', 'spk_2.txt, ...). To
+read spikes back in, we can use wildcard expressions.
+
+.. GENERATED FROM PYTHON SOURCE LINES 115-121
+
+.. code-block:: default
+
+    net.cell_response.plot_spikes_raster()
+    with tempfile.TemporaryDirectory() as tmp_dir_name:
+        net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
+        cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
+    cell_response.plot_spikes_raster()
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_002.png
+          :alt: plot firing pattern
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_003.png
+          :alt: plot firing pattern
+          :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <Figure size 640x480 with 1 Axes>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 122-124
+
+We can additionally calculate the mean spike rates for each cell class by
+specifying a time window with ``tstart`` and ``tstop``.
+
+.. GENERATED FROM PYTHON SOURCE LINES 124-135
+
+.. code-block:: default
+
+    all_rates = cell_response.mean_rates(tstart=0, tstop=170,
+                                         gid_ranges=net.gid_ranges,
+                                         mean_type='all')
+    trial_rates = cell_response.mean_rates(tstart=0, tstop=170,
+                                           gid_ranges=net.gid_ranges,
+                                           mean_type='trial')
+    print('Mean spike rates across trials:')
+    print(all_rates)
+    print('Mean spike rates for individual trials:')
+    print(trial_rates)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Mean spike rates across trials:
+    {'L5_pyramidal': 23.29411764705883, 'L5_basket': 14.453781512605042, 'L2_pyramidal': 6.705882352941176, 'L2_basket': 9.243697478991596}
+    Mean spike rates for individual trials:
+    {'L5_pyramidal': [23.29411764705883], 'L5_basket': [14.453781512605042], 'L2_pyramidal': [6.705882352941176], 'L2_basket': [9.243697478991596]}
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 136-138
 
 Finally, we can plot the soma voltage along with the spiking activity with
 raster plots and histograms for the pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-124
+.. GENERATED FROM PYTHON SOURCE LINES 138-150
 
 .. code-block:: default
 
@@ -325,7 +411,7 @@ raster plots and histograms for the pyramidal cells.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_002.png
+.. image:: /auto_examples/images/sphx_glr_plot_firing_pattern_004.png
     :alt: plot firing pattern
     :class: sphx-glr-single-img
 
@@ -344,7 +430,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  18.618 seconds)
+   **Total running time of the script:** ( 0 minutes  47.113 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

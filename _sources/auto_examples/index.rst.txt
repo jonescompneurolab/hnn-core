@@ -116,6 +116,27 @@ Some introductory examples to get started with hnn-core
    :hidden:
 
    /auto_examples/plot_simulate_somato
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_mpi_backend_thumb.png
+     :alt: 06. Use MPI backend for parallelization
+
+     :ref:`sphx_glr_auto_examples_plot_simulate_mpi_backend.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_simulate_mpi_backend
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

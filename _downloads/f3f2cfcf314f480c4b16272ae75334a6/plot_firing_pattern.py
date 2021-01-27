@@ -11,12 +11,13 @@ pattern of cells in the HNN model.
 #          Nick Tolley <nick nicholas_tolley@brown.edu>
 
 import os.path as op
+import tempfile
 
 ###############################################################################
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, Network, simulate_dipole
+from hnn_core import read_params, read_spikes, Network, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -27,7 +28,7 @@ params = read_params(params_fname)
 
 ###############################################################################
 # Now let's build the network. We have used the same weights as in the
-# :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` example.
+# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 import matplotlib.pyplot as plt
 
 net = Network(params)
@@ -105,6 +106,31 @@ plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
 plt.xlabel('Time (ms)')
 plt.ylabel('Voltage (mV)')
 plt.show()
+
+###############################################################################
+# Also, we can plot the spikes in the network and write them to text files.
+# Note that we can use formatting syntax to specify the filename pattern
+# with which each trial will be written ('spk_1.txt', 'spk_2.txt, ...). To
+# read spikes back in, we can use wildcard expressions.
+net.cell_response.plot_spikes_raster()
+with tempfile.TemporaryDirectory() as tmp_dir_name:
+    net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
+    cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
+cell_response.plot_spikes_raster()
+
+###############################################################################
+# We can additionally calculate the mean spike rates for each cell class by
+# specifying a time window with ``tstart`` and ``tstop``.
+all_rates = cell_response.mean_rates(tstart=0, tstop=170,
+                                     gid_ranges=net.gid_ranges,
+                                     mean_type='all')
+trial_rates = cell_response.mean_rates(tstart=0, tstop=170,
+                                       gid_ranges=net.gid_ranges,
+                                       mean_type='trial')
+print('Mean spike rates across trials:')
+print(all_rates)
+print('Mean spike rates for individual trials:')
+print(trial_rates)
 
 ###############################################################################
 # Finally, we can plot the soma voltage along with the spiking activity with

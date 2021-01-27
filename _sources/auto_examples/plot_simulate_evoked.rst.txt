@@ -328,12 +328,13 @@ Then we read the parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-39
+.. GENERATED FROM PYTHON SOURCE LINES 37-40
 
 This is a lot of parameters! We can also filter the
-parameters using unix-style wildcard characters
+parameters using unix-style wildcard characters. Most of the parameters
+relate to within-network connections and the cell geometry.
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-41
+.. GENERATED FROM PYTHON SOURCE LINES 40-42
 
 .. code-block:: default
 
@@ -364,12 +365,12 @@ parameters using unix-style wildcard characters
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-44
+.. GENERATED FROM PYTHON SOURCE LINES 43-45
 
 Let us first create our network from the params file and visualize the cells
 inside it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-47
+.. GENERATED FROM PYTHON SOURCE LINES 45-48
 
 .. code-block:: default
 
@@ -395,7 +396,7 @@ inside it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-56
+.. GENERATED FROM PYTHON SOURCE LINES 49-57
 
 The network of cells is now defined, to which we add external drives as
 required. Weights are prescribed separately for AMPA and NMDA receptors
@@ -406,12 +407,14 @@ drive types include the following (click on the links for documentation):
 - :meth:`hnn_core.Network.add_poisson_drive`
 - :meth:`hnn_core.Network.add_bursty_drive`
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-89
+.. GENERATED FROM PYTHON SOURCE LINES 59-60
+
+First, we add a distal evoked drive
+
+.. GENERATED FROM PYTHON SOURCE LINES 60-71
 
 .. code-block:: default
 
-
-    # Distal evoked drive
     weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
                        'L5_pyramidal': 0.142300}
     weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
@@ -423,7 +426,21 @@ drive types include the following (click on the links for documentation):
         weights_nmda=weights_nmda_d1, location='distal',
         synaptic_delays=synaptic_delays_d1, seedcore=4)
 
-    # First proximal evoked drive
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 72-73
+
+Then, we add two proximal drives
+
+.. GENERATED FROM PYTHON SOURCE LINES 73-92
+
+.. code-block:: default
+
     weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                        'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
     synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
@@ -450,13 +467,15 @@ drive types include the following (click on the links for documentation):
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-93
-
-Now let's simulate the dipole, running 2 trials with the Joblib backend.
-To run them in parallel we could set ``n_jobs`` to equal the number of
-trials.
-
 .. GENERATED FROM PYTHON SOURCE LINES 93-98
+
+Now let's simulate the dipole, running 2 trials with the
+:class:`~hnn_core.parallel_backends.Joblib` backend.
+To run them in parallel we could set ``n_jobs`` to equal the number of
+trials. The ``Joblib`` backend allows running the simulations in parallel
+across trials.
+
+.. GENERATED FROM PYTHON SOURCE LINES 98-103
 
 .. code-block:: default
 
@@ -521,11 +540,12 @@ trials.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-100
+.. GENERATED FROM PYTHON SOURCE LINES 104-106
 
-and then plot it
+and then plot the amplitudes of the simulated aggregate dipole moments over
+time
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-106
+.. GENERATED FROM PYTHON SOURCE LINES 106-112
 
 .. code-block:: default
 
@@ -554,100 +574,16 @@ and then plot it
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
-
-Also, we can plot the spikes and write them to text files.
-Note that we can use formatting syntax to specify the filename pattern
-with which each trial will be written. To read spikes back in, we can use
-wildcard expressions.
-
-.. GENERATED FROM PYTHON SOURCE LINES 111-117
-
-.. code-block:: default
-
-    net.cell_response.plot_spikes_raster()
-    with tempfile.TemporaryDirectory() as tmp_dir_name:
-        net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-        cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
-    cell_response.plot_spikes_raster()
-
-
-
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_003.png
-          :alt: plot simulate evoked
-          :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_004.png
-          :alt: plot simulate evoked
-          :class: sphx-glr-multi-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-
-    <Figure size 640x480 with 1 Axes>
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 118-120
-
-We can additionally calculate the mean spike rates for each cell class by
-specifying a time window with tstart and tstop.
-
-.. GENERATED FROM PYTHON SOURCE LINES 120-131
-
-.. code-block:: default
-
-    all_rates = cell_response.mean_rates(tstart=0, tstop=170,
-                                         gid_ranges=net.gid_ranges,
-                                         mean_type='all')
-    trial_rates = cell_response.mean_rates(tstart=0, tstop=170,
-                                           gid_ranges=net.gid_ranges,
-                                           mean_type='trial')
-    print('Mean spike rates across trials:')
-    print(all_rates)
-    print('Mean spike rates for individual trials:')
-    print(trial_rates)
-
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    Mean spike rates across trials:
-    {'L5_pyramidal': 23.20588235294118, 'L5_basket': 13.52941176470588, 'L2_pyramidal': 5.1764705882352935, 'L2_basket': 9.411764705882351}
-    Mean spike rates for individual trials:
-    {'L5_pyramidal': [23.29411764705883, 23.117647058823533], 'L5_basket': [14.453781512605042, 12.60504201680672], 'L2_pyramidal': [6.705882352941176, 3.6470588235294117], 'L2_basket': [9.243697478991596, 9.579831932773109]}
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 132-137
+.. GENERATED FROM PYTHON SOURCE LINES 113-119
 
 Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens. This is achieved by setting the parameter
 ``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
 a clone of the network defined above, and then modify the drive dynamics for
-each drive.
+each drive. Making a copy removes any existing outputs from the network
+such as spiking information and voltages at the soma.
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-143
+.. GENERATED FROM PYTHON SOURCE LINES 119-125
 
 .. code-block:: default
 
@@ -664,16 +600,15 @@ each drive.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-145
+.. GENERATED FROM PYTHON SOURCE LINES 126-127
 
 You may interrogate current values defining the spike event time dynamics by
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-147
+.. GENERATED FROM PYTHON SOURCE LINES 127-128
 
 .. code-block:: default
 
     print(net_sync.external_drives['evdist1']['dynamics'])
-
 
 
 
@@ -689,96 +624,10 @@ You may interrogate current values defining the spike event time dynamics by
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-152
-
-Finally, let's simulate a single trial using the MPI backend. This will
-start the simulation across the number of processors (cores) specified by
-``n_procs``` using MPI. The ``'mpiexec'`` launcher is used from
-openmpi, which must be installed on the system
-
-.. GENERATED FROM PYTHON SOURCE LINES 152-160
-
-.. code-block:: default
-
-    from hnn_core import MPIBackend
-
-    with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-        dpls_sync = simulate_dipole(net_sync, n_trials=1)
-
-    trial_idx = 0
-    dpls_sync[trial_idx].plot()
-    net_sync.cell_response.plot_spikes_hist()
-
-
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_005.png
-          :alt: Aggregate (L2 + L5)
-          :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_006.png
-          :alt: plot simulate evoked
-          :class: sphx-glr-multi-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    MPI will run over 2 processes
-    Running 1 trials...
-    numprocs=2
-    [921a64dd93e2:01465] Read -1, expected 45174, errno = 1
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
-    Building the NEURON model
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
-    [Done]
-    running trial 1 on 2 cores
-    Simulation time: 0.03 ms...
-    Simulation time: 10.0 ms...
-    Simulation time: 20.0 ms...
-    Simulation time: 30.0 ms...
-    Simulation time: 40.0 ms...
-    Simulation time: 50.0 ms...
-    Simulation time: 60.0 ms...
-    Simulation time: 70.0 ms...
-    Simulation time: 80.0 ms...
-    Simulation time: 90.0 ms...
-    Simulation time: 100.0 ms...
-    Simulation time: 110.0 ms...
-    Simulation time: 120.0 ms...
-    Simulation time: 130.0 ms...
-    Simulation time: 140.0 ms...
-    Simulation time: 150.0 ms...
-    Simulation time: 160.0 ms...
-    [921a64dd93e2:01465] Read -1, expected 27208, errno = 1
-    [921a64dd93e2:01464] Read -1, expected 27200, errno = 1
-    [921a64dd93e2:01465] Read -1, expected 27200, errno = 1
-    [921a64dd93e2:01464] Read -1, expected 27208, errno = 1
-    [921a64dd93e2:01464] Read -1, expected 27200, errno = 1
-    [921a64dd93e2:01465] Read -1, expected 27208, errno = 1
-    [921a64dd93e2:01464] Read -1, expected 27208, errno = 1
-    [921a64dd93e2:01465] Read -1, expected 27200, errno = 1
-    [921a64dd93e2:01464] Read -1, expected 5616, errno = 1
-    [921a64dd93e2:01464] Read -1, expected 5687, errno = 1
-    [921a64dd93e2:01464] Read -1, expected 5687, errno = 1
-
-    <Figure size 640x480 with 1 Axes>
-
-
-
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  7.307 seconds)
+   **Total running time of the script:** ( 1 minutes  58.979 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:
