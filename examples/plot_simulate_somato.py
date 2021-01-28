@@ -60,8 +60,8 @@ inv = make_inverse_operator(epochs.info, fwd, cov)
 
 ###############################################################################
 # There are several methods to do source reconstruction. Some of the methods
-# such as dSPM and MNE are distributed source methods whereas dipole fitting
-# will estimate the location and amplitude of a single current dipole. At the
+# such as MNE are distributed source methods whereas dipole fitting will
+# estimate the location and amplitude of a single current dipole. At the
 # moment, we do not offer explicit recommendations on which source
 # reconstruction technique is best for HNN. However, we do want our users
 # to note that the dipole currents simulated with HNN are assumed to be normal
@@ -74,32 +74,37 @@ stc = apply_inverse(evoked, inv, lambda2, method='MNE',
                     pick_ori="normal", return_residual=False,
                     verbose=True)
 
-# create label for the postcentral gyrus (S1) in source-space
+###############################################################################
+# To extract the primary response in primary somatosensory cortex (S1), we
+# create a label for the postcentral gyrus (S1) in source-space
 hemi = 'rh'
 label_tag = 'G_postcentral'
 label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
                                       regexp=label_tag,
                                       subjects_dir=subjects_dir)[0]
-stc_label = stc.in_label(label_s1)
 
 ###############################################################################
-# We isolate the single most active vertex in the noise-corrected minimum norm
-# estimate (dSPM) by calculating the L2 norm of the time course emerging at
-# each vertex beginning at t=0.
-
-# The time course from the minimum norm estimate (MNE) vertex with the greatest
-# L2 norm represents the current dipole at a location of cortex with greatest
-# response to stimulus. Let's now apply the MNE inverse solution and plot the
-# time course of our selected vertex.
-
+# Visualizing the distributed S1 activation in reference to the geometric
+# structure of the cortex (i.e., plotted on a structural MRI) can help us
+# figure out how to orient the dipole. Note that in the HNN framework,
+# positive and negative deflections of a current dipole source correspond to
+# upwards (from deep to superficial) and downwards (from superficial to deep)
+# current flow, respectively.
+stc_label = stc.in_label(label_s1)
 brain = stc_label.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
                        smoothing_steps='nearest', view_layout='horizontal',
                        initial_time=0.04, backend='matplotlib')
-# note that adding a border to the rendered 3D object may not work with the
-# matplotlib backend
+
+# Uncomment the line below to render a border around the selected label for S1.
+# Note that this requires that you set `backend='pyvista'` above.
 # brain.add_label(label_s1, borders=True)
 
-# extract pca-flipped time course from S1
+###############################################################################
+# Now we extract the pca-flipped time course from S1. Note that the most
+# prominent component of the median nerve response occurs in the posterior wall
+# of the central sulcus at ~0.040 sec. Since the dipolar activity here is
+# negative, we orient the extracted waveform so that the deflection at ~0.040
+# sec is pointed downwards.
 flip_data = stc.extract_label_time_course(label_s1, inv['src'],
                                           mode='pca_flip')
 dipole_tc = -flip_data[0] * 1e9
@@ -111,21 +116,6 @@ plt.ylabel('Current Dipole (nAm)')
 plt.xlim((0, 170))
 plt.axhline(0, c='k', ls=':')
 plt.show()
-
-###############################################################################
-# If you wish to visualize the location and time course of the selected vertex
-# in reference to the geometric structure of the cortex (i.e., plotted on a
-# structural MRI), uncomment the code below. Note that in the HNN framework,
-# positive and negative deflections of a current dipole source correspond to
-# upwards (from deep to superficial) and downwards (from superficial to deep)
-# current flow, respectively.
-'''
-brain = stc_mne.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
-                     smoothing_steps='nearest', view_layout='horizontal')
-vert_id = stc_mne.vertices[1][pick_vertex - len(stc_mne.vertices[0])]
-brain.add_foci(vert_id, coords_as_verts=True, hemi='rh', color='green',
-               scale_factor = 0.6, alpha=0.5)
-'''
 
 ###############################################################################
 # Now, let us try to simulate the same with ``hnn-core``. We read in the
@@ -209,9 +199,9 @@ net.add_evoked_drive(
 # ``MPIBackend`` to reduce the simulation time by parallizing across cells in
 # the network. However, no parallel backend is necessary. For a better
 # match to the empirical waveform, set ``n_trials`` to be >=25.
-n_trials = 10
+n_trials = 2
 # n_trials = 25
-with MPIBackend(n_procs=6):
+with MPIBackend(n_procs=2):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
 ###############################################################################
