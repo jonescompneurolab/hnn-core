@@ -70,25 +70,42 @@ inv = make_inverse_operator(epochs.info, fwd, cov)
 snr = 3.
 lambda2 = 1. / snr ** 2
 evoked = epochs.average()
-stc_dspm = apply_inverse(evoked, inv, lambda2, method='dSPM',
-                         pick_ori="normal", return_residual=False,
-                         verbose=True)
+stc = apply_inverse(evoked, inv, lambda2, method='MNE',
+                    pick_ori="normal", return_residual=False,
+                    verbose=True)
+
+# create label for the postcentral gyrus (S1) in source-space
+hemi = 'rh'
+label_tag = 'G_postcentral'
+label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
+                                      regexp=label_tag,
+                                      subjects_dir=subjects_dir)[0]
+stc_label = stc.in_label(label_s1)
 
 ###############################################################################
 # We isolate the single most active vertex in the noise-corrected minimum norm
 # estimate (dSPM) by calculating the L2 norm of the time course emerging at
 # each vertex beginning at t=0.
-t_indices = np.nonzero(stc_dspm.times >= 0)[0]
-pick_vertex = np.argmax(np.linalg.norm(stc_dspm.data[:, t_indices], axis=1))
 
 # The time course from the minimum norm estimate (MNE) vertex with the greatest
 # L2 norm represents the current dipole at a location of cortex with greatest
 # response to stimulus. Let's now apply the MNE inverse solution and plot the
 # time course of our selected vertex.
-stc_mne = apply_inverse(evoked, inv, lambda2, method='MNE', pick_ori="normal",
-                        return_residual=False, verbose=True)
+
+brain = stc_label.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
+                       smoothing_steps='nearest', view_layout='horizontal',
+                       backend='pyvista')
+# note that adding a border to the rendered 3D object may not work with the
+# matplotlib backend
+brain.add_label(label_s1, borders=True)
+
+# extract pca-flipped time course from S1
+flip_data = stc.extract_label_time_course(label_s1, inv['src'],
+                                          mode='pca_flip')
+dipole_tc = -flip_data[0] * 1e9
+
 plt.figure()
-plt.plot(1e3 * stc_mne.times, stc_mne.data[pick_vertex, :].T * 1e9, 'ro--')
+plt.plot(1e3 * stc.times, dipole_tc, 'ro--')
 plt.xlabel('Time (ms)')
 plt.ylabel('Current Dipole (nAm)')
 plt.xlim((0, 170))
@@ -205,7 +222,7 @@ net.cell_response.plot_spikes_hist(ax=axes[0],
                                    spike_types=['evprox', 'evdist'],
                                    show=False)
 axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
-axes[1].plot(1e3 * stc_mne.times, stc_mne.data[pick_vertex, :].T * 1e9, 'r--')
+axes[1].plot(1e3 * stc_mne.times, dipole_tc, 'r--')
 average_dipoles(dpls).plot(ax=axes[1], show=False)
 axes[1].legend(['MNE vertex', 'HNN simulation'])
 axes[1].set_ylabel('Current Dipole (nAm)')
