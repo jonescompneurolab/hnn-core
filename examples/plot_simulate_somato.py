@@ -94,10 +94,10 @@ stc_label = stc.in_label(label_s1)
 
 brain = stc_label.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
                        smoothing_steps='nearest', view_layout='horizontal',
-                       backend='pyvista')
+                       initial_time=0.04, backend='matplotlib')
 # note that adding a border to the rendered 3D object may not work with the
 # matplotlib backend
-brain.add_label(label_s1, borders=True)
+# brain.add_label(label_s1, borders=True)
 
 # extract pca-flipped time course from S1
 flip_data = stc.extract_label_time_course(label_s1, inv['src'],
@@ -209,9 +209,9 @@ net.add_evoked_drive(
 # ``MPIBackend`` to reduce the simulation time by parallizing across cells in
 # the network. However, no parallel backend is necessary. For a better
 # match to the empirical waveform, set ``n_trials`` to be >=25.
-n_trials = 2
+n_trials = 10
 # n_trials = 25
-with MPIBackend(n_procs=2):
+with MPIBackend(n_procs=6):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
 ###############################################################################
