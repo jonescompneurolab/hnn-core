@@ -4,8 +4,8 @@
 ================================================
 
 This example demonstrates how to calculate the inverse solution of the median
-nerve evoked response in the MNE somatosensory dataset, and then simulate a
-biophysical model network that reproduces the observed dynamics.
+nerve evoked response in S1 from the MNE somatosensory dataset, and then
+simulate a biophysical model network that reproduces the observed dynamics.
 """
 
 # Authors: Mainak Jas <mainakjas@gmail.com>
@@ -149,7 +149,7 @@ synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
 net.add_evoked_drive(
-    'evprox1', mu=20.0, sigma=3., numspikes=1, sync_within_trial=True,
+    'evprox1', mu=21., sigma=4., numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
     location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
 
@@ -162,7 +162,7 @@ synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
 net.add_evoked_drive(
-    'evprox2', mu=130.0, sigma=3., numspikes=1, sync_within_trial=True,
+    'evprox2', mu=134., sigma=4.5, numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
     location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
 
@@ -175,7 +175,7 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 
 net.add_evoked_drive(
-    'evdist1', mu=32., sigma=3., numspikes=1, sync_within_trial=True,
+    'evdist1', mu=32., sigma=2.5, numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=6)
 
@@ -188,7 +188,7 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 
 net.add_evoked_drive(
-    'evdist2', mu=82., sigma=3., numspikes=1, sync_within_trial=True,
+    'evdist2', mu=84., sigma=4.5, numspikes=1, sync_within_trial=True,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=2)
 
