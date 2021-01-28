@@ -60,29 +60,35 @@ inv = make_inverse_operator(epochs.info, fwd, cov)
 
 ###############################################################################
 # There are several methods to do source reconstruction. Some of the methods
-# such as MNE are distributed source methods whereas dipole fitting will
-# estimate the location and amplitude of a single current dipole. At the
+# such as dSPM and MNE are distributed source methods whereas dipole fitting
+# will estimate the location and amplitude of a single current dipole. At the
 # moment, we do not offer explicit recommendations on which source
 # reconstruction technique is best for HNN. However, we do want our users
 # to note that the dipole currents simulated with HNN are assumed to be normal
 # to the cortical surface. Hence, using the option ``pick_ori='normal'`` is
 # appropriate.
-method = "MNE"
 snr = 3.
 lambda2 = 1. / snr ** 2
 evoked = epochs.average()
-stc = apply_inverse(evoked, inv, lambda2, method=method, pick_ori="normal",
-                    return_residual=False, verbose=True)
+stc_dspm = apply_inverse(evoked, inv, lambda2, method='dSPM',
+                         pick_ori="normal", return_residual=False,
+                         verbose=True)
 
 ###############################################################################
-# We isolate and plot the single most active vertex in the distributed minimum
-# norm estimate by calculating the L2 norm of the time course emerging at each
-# vertex. The time course from the vertex with the greatest L2 norm represents
-# the location of cortex with greatest response to stimulus.
-pick_vertex = np.argmax(np.linalg.norm(stc.data, axis=1))
+# We isolate the single most active vertex in the noise-corrected minimum norm
+# estimate (dSPM) by calculating the L2 norm of the time course emerging at
+# each vertex beginning at t=0.
+t_indices = np.nonzero(stc_dspm.times >= 0)[0]
+pick_vertex = np.argmax(np.linalg.norm(stc_dspm.data[:, t_indices], axis=1))
 
+# The time course from the minimum norm estimate (MNE) vertex with the greatest
+# L2 norm represents the current dipole at a location of cortex with greatest
+# response to stimulus. Let's now apply the MNE inverse solution and plot the
+# time course of our selected vertex.
+stc_mne = apply_inverse(evoked, inv, lambda2, method='MNE', pick_ori="normal",
+                        return_residual=False, verbose=True)
 plt.figure()
-plt.plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'ro--')
+plt.plot(1e3 * stc_mne.times, stc_mne.data[pick_vertex, :].T * 1e9, 'ro--')
 plt.xlabel('Time (ms)')
 plt.ylabel('Current Dipole (nAm)')
 plt.xlim((0, 170))
@@ -90,8 +96,23 @@ plt.axhline(0, c='k', ls=':')
 plt.show()
 
 ###############################################################################
-# Now, let us try to simulate the same with ``hnn-core``. We read in the network
-# parameters from ``N20.json`` and instantiate the network.
+# If you wish to visualize the location and time course of the selected vertex
+# in reference to the geometric structure of the cortex (i.e., plotted on a
+# structural MRI), uncomment the code below. Note that in the HNN framework,
+# positive and negative deflections of a current dipole source correspond to
+# upwards (from deep to superficial) and downwards (from superficial to deep)
+# current flow, respectively.
+'''
+brain = stc_mne.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
+                     smoothing_steps='nearest', view_layout='horizontal')
+vert_id = stc_mne.vertices[1][pick_vertex - len(stc_mne.vertices[0])]
+brain.add_foci(vert_id, coords_as_verts=True, hemi='rh', color='green',
+               scale_factor = 0.6, alpha=0.5)
+'''
+
+###############################################################################
+# Now, let us try to simulate the same with ``hnn-core``. We read in the
+# network parameters from ``N20.json`` and instantiate the network.
 
 import hnn_core
 from hnn_core import simulate_dipole, read_params, Network, MPIBackend
@@ -184,7 +205,7 @@ net.cell_response.plot_spikes_hist(ax=axes[0],
                                    spike_types=['evprox', 'evdist'],
                                    show=False)
 axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
-axes[1].plot(1e3 * stc.times, stc.data[pick_vertex, :].T * 1e9, 'r--')
+axes[1].plot(1e3 * stc_mne.times, stc_mne.data[pick_vertex, :].T * 1e9, 'r--')
 average_dipoles(dpls).plot(ax=axes[1], show=False)
 axes[1].legend(['MNE vertex', 'HNN simulation'])
 axes[1].set_ylabel('Current Dipole (nAm)')
