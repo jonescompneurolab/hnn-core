@@ -15,11 +15,11 @@ simulate a biophysical model network that reproduces the observed dynamics.
 
 ###############################################################################
 # First, we will import the packages needed for computing the inverse solution
-# from the MNE somatosensory dataset. `MNE`_ can be installed with
-# ``pip install mne``, and the somatosensory dataset can be downloaded by
-# importing ``somato`` from ``mne.datasets``.
+# from the MNE somatosensory dataset. `MNE`_ along with one of its 3D rendering
+# dependencies, `pyvista`, can be installed with ``pip install mne pyvista``,
+# and the somatosensory dataset can be downloaded by importing ``somato`` from
+# ``mne.datasets``.
 import os.path as op
-import numpy as np
 import matplotlib.pyplot as plt
 
 import mne
@@ -93,11 +93,8 @@ label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
 stc_label = stc.in_label(label_s1)
 brain = stc_label.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
                        smoothing_steps='nearest', view_layout='horizontal',
-                       initial_time=0.04, backend='matplotlib')
-
-# Uncomment the line below to render a border around the selected label for S1.
-# Note that this requires that you set `backend='pyvista'` above.
-# brain.add_label(label_s1, borders=True)
+                       initial_time=0.04, backend='pyvista')
+brain.add_label(label_s1, borders=True)
 
 ###############################################################################
 # Now we extract the pca-flipped time course from S1. Note that the most
