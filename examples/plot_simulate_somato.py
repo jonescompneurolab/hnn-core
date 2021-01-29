@@ -218,7 +218,7 @@ net.cell_response.plot_spikes_hist(ax=axes[0],
 axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
 axes[1].plot(1e3 * stc.times, dipole_tc, 'r--')
 average_dipoles(dpls).plot(ax=axes[1], show=False)
-axes[1].legend(['MNE vertex', 'HNN simulation'])
+axes[1].legend(['MNE label average', 'HNN simulation'])
 axes[1].set_ylabel('Current Dipole (nAm)')
 net.cell_response.plot_spikes_raster(ax=axes[2])
 
