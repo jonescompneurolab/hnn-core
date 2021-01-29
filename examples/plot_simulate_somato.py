@@ -97,11 +97,14 @@ brain = stc_label.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
 brain.add_label(label_s1, borders=True)
 
 ###############################################################################
-# Now we extract the pca-flipped time course from S1. Note that the most
-# prominent component of the median nerve response occurs in the posterior wall
-# of the central sulcus at ~0.040 sec. Since the dipolar activity here is
-# negative, we orient the extracted waveform so that the deflection at ~0.040
-# sec is pointed downwards.
+# Now we extract the representative time course of dipole activation in our
+# labeled brain region using ``mode='pca_flip'`` (see 'this MNE-python
+# example`_ for more details). Note that the most prominent component of the
+# median nerve response occurs in the posterior wall of the central sulcus at
+# ~0.040 sec. Since the dipolar activity here is negative, we orient the
+# extracted waveform so that the deflection at ~0.040 sec is pointed downwards.
+# Thus, the ~0.040 sec deflection corresponds to current flow traveling from
+# superficial to deep layers of cortex.
 flip_data = stc.extract_label_time_course(label_s1, inv['src'],
                                           mode='pca_flip')
 dipole_tc = -flip_data[0] * 1e9
@@ -219,3 +222,4 @@ net.cell_response.plot_spikes_raster(ax=axes[2])
 # .. LINKS
 #
 # .. _MNE: https://mne.tools/
+# .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py
