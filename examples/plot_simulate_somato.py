@@ -41,7 +41,8 @@ subjects_dir = op.join(data_path, 'derivatives', 'freesurfer', 'subjects')
 
 # Read and band-pass filter the raw data
 raw = mne.io.read_raw_fif(raw_fname, preload=True)
-raw.filter(1, 40)
+l_freq, h_freq = 1, 40
+raw.filter(l_freq, h_freq)
 
 # Identify stimulus events associated with MEG time series in the dataset
 events = mne.find_events(raw, stim_channel='STI 014')
@@ -141,7 +142,7 @@ net = Network(params)
 # proximal drive. Note that setting ``sync_within_trial=True`` creates drives
 # with synchronous input (arriving to and transmitted by hypothetical granular
 # cells at the center of the network) to all pyramidal and basket cells that
-# receive distal drive.
+# receive distal drive. Note that granule cells are not explicitly modelled within HNN. 
 
 # Early proximal drive
 weights_ampa_p = {'L2_basket': 0.0036, 'L2_pyramidal': 0.0039,
@@ -182,7 +183,7 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=6)
 
-# Late distal input
+# Late distal drive
 weights_ampa_d = {'L2_basket': 0.0041, 'L2_pyramidal': 0.0019,
                   'L5_pyramidal': 0.0018}
 weights_nmda_d = {'L2_basket': 0.0032, 'L2_pyramidal': 0.0018,
