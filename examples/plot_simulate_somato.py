@@ -142,7 +142,8 @@ net = Network(params)
 # proximal drive. Note that setting ``sync_within_trial=True`` creates drives
 # with synchronous input (arriving to and transmitted by hypothetical granular
 # cells at the center of the network) to all pyramidal and basket cells that
-# receive distal drive. Note that granule cells are not explicitly modelled within HNN. 
+# receive distal drive. Note that granule cells are not explicitly modelled
+# within HNN.
 
 # Early proximal drive
 weights_ampa_p = {'L2_basket': 0.0036, 'L2_pyramidal': 0.0039,
@@ -226,4 +227,4 @@ net.cell_response.plot_spikes_raster(ax=axes[2])
 # .. LINKS
 #
 # .. _MNE: https://mne.tools/
-# .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py
+# .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py # noqa
