@@ -1,4 +1,4 @@
-name: hnn
+name: hnn_core
 channels:
 - default
 dependencies:
