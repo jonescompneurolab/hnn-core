@@ -91,15 +91,20 @@ label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
 # upwards (from deep to superficial) and downwards (from superficial to deep)
 # current flow, respectively. Uncomment the following code to open an
 # interactive 3D render of the brain and its surface activation (requires the
-# ``pyvista`` python library). You should get something like this that shows
-# the MNE activation at 0.040 sec around the post-central gyrus (outlined in
-# orange): |mne_example_fig|
+# ``pyvista`` python library). You should get 2 plots, the first showing the
+# post-central gyrus label from which the dipole time course was extracted and
+# the second showing MNE activation at 0.040 sec that resemble the following
+# images:
+# |mne_label_fig|
+# |mne_activity_fig|
 '''
+Brain = mne.viz.get_brain_class()
+brain_label = Brain(subject, hemi, 'white', subjects_dir=subjects_dir)
+brain_label.add_label(label_s1, color='green', alpha=0.9)
 stc_label = stc.in_label(label_s1)
-brain = stc_label.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
-                       smoothing_steps='nearest', view_layout='horizontal',
-                       initial_time=0.04, backend='pyvista')
-brain.add_label(label_s1, borders=True)
+brain = stc_label.plot(subjects_dir=subjects_dir, hemi=hemi, surface='white',
+                       view_layout='horizontal', initial_time=0.04,
+                       backend='pyvista')
 '''
 
 ###############################################################################
@@ -230,4 +235,7 @@ net.cell_response.plot_spikes_raster(ax=axes[2])
 #
 # .. _MNE: https://mne.tools/
 # .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py # noqa
-# .. |mne_example_fig| image:: https://user-images.githubusercontent.com/5610076/106361333-ac3fdd00-631d-11eb-8817-9d95db44a554.png # noqa
+# .. |mne_label_fig| image:: https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png # noqa
+#   :width: 400
+# .. |mne_activity_fig| image:: https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png # noqa
+#   :width: 400
