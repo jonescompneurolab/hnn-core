@@ -18,6 +18,43 @@ def _hammfilt(x, winsz):
     return convolve(x, win, 'same')
 
 
+# Savitzky-Golay filtering, lifted and adapted from mne-python (0.22)
+def _savgol_filter(data, h_freq, sfreq):
+    """Filter the data using Savitzky-Golay polynomial method.
+
+    Parameters
+    ----------
+    data : array-like
+        The data to filter (1D)
+    h_freq : float
+        Approximate high cutoff frequency in Hz. Note that this
+        is not an exact cutoff, since Savitzky-Golay filtering
+        is done using polynomial fits
+        instead of FIR/IIR filtering. This parameter is thus used to
+        determine the length of the window over which a 5th-order
+        polynomial smoothing is applied.
+    sfreq : float
+        Sampling rate
+
+    Returns
+    -------
+    filt_data : array-like
+        The filtered data
+    """  # noqa: E501
+    from scipy.signal import savgol_filter
+
+    h_freq = float(h_freq)
+    if h_freq >= sfreq / 2.:
+        raise ValueError('h_freq must be less than half the sample rate')
+
+    # savitzky-golay filtering
+    window_length = (int(np.round(sfreq / h_freq)) // 2) * 2 + 1
+    # loop over 'agg', 'L2', and 'L5'
+    filt_data = savgol_filter(data, axis=-1, polyorder=5,
+                              window_length=window_length)
+    return filt_data
+
+
 def simulate_dipole(net, n_trials=None, record_vsoma=False,
                     record_isoma=False, postproc=True):
     """Simulate a dipole given the experiment parameters.
@@ -197,7 +234,10 @@ class Dipole(object):
         self.baseline_renormalize(N_pyr_x, N_pyr_y)
         self.convert_fAm_to_nAm()
         self.scale(fctr)
-        self.smooth(winsz)
+        # XXX window_len given in samples in HNN GUI, but smooth expects
+        # milliseconds
+        window_len = winsz / (1e-3 * self.sfreq)
+        self.smooth(window_len=window_len)
 
     def convert_fAm_to_nAm(self):
         """ must be run after baseline_renormalization()
@@ -211,13 +251,65 @@ class Dipole(object):
             self.data[key] *= fctr
         return self
 
-    def smooth(self, winsz):
-        # XXX: add check to make sure self.times is
-        # not smaller than winsz
-        if winsz <= 1:
-            return
-        for key in self.data.keys():
-            self.data[key] = _hammfilt(self.data[key], winsz)
+    def smooth(self, *, window_len=None, h_freq=None):
+        """Smooth the dipole waveform using one of two methods
+        
+        Pass the window length-argument to convolve the data with a Hamming
+        window of the desired length. Alternatively, pass the high frequency
+        argument to apply a Savitzky-Golay filter, which will remove frequency
+        components above this cutoff value (see `~scipy.signal.savgol_filter).
+
+        Note that this method operates in-place, i.e., it will alter the data.
+        If you prefer a filtered copy, consider using the
+        `~hnn_core.dipole.copy`-method.
+
+        Parameters
+        ----------
+        window_len : float or None
+            The length (in ms) of a `~numpy.hamming` window to convolve the
+            data with.
+        h_freq : float or None
+            Approximate high cutoff frequency in Hz. Note that this
+            is not an exact cutoff, since Savitzky-Golay filtering
+            is done using polynomial fits
+            instead of FIR/IIR filtering. This parameter is thus used to
+            determine the length of the window over which a 5th-order
+            polynomial smoothing is applied.
+
+        Returns
+        -------
+        dpl_copy : instance of Dipole
+            A copy of the modified Dipole instance.        
+        """
+        if window_len is None and h_freq is None:
+            raise ValueError('either window_len or h_freq must be defined')
+        elif window_len is not None and h_freq is not None:
+            raise ValueError('set window_len or h_freq, not both')
+            
+        if window_len is not None:
+            winsz = 1e-3 * window_len * self.sfreq
+            if winsz > len(self.times):
+                raise ValueError(
+                    f'Window length too long: {winsz} samples; data length is '
+                    f'{len(self.times)} samples')
+            elif winsz <= 1:
+                # XXX this is to allow param-files with len==0
+                return
+
+            for key in self.data.keys():
+                self.data[key] = _hammfilt(self.data[key], winsz)
+
+        elif h_freq is not None:
+            if h_freq < 0:
+                raise ValueError('h_freq cannot be negative')
+            elif h_freq > 0.5 * self.sfreq:
+                raise ValueError(
+                    'h_freq must be less than half the sample rate')
+            for key in self.data.keys():
+                self.data[key] = _savgol_filter(self.data[key],
+                                                h_freq,
+                                                self.sfreq)
+        return self
 
     def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
              show=True):
@@ -329,38 +421,3 @@ class Dipole(object):
                    self.data['L5']]].T
         np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
                    delimiter='\t')
-
-    # Savitzky-Golay filtering, lifted and adapted from mne-python (0.22)
-    def savgol_filter(self, h_freq):
-        """Filter the data using Savitzky-Golay polynomial method.
-
-        Parameters
-        ----------
-        h_freq : float
-            Approximate high cut-off frequency in Hz. Note that this
-            is not an exact cutoff, since Savitzky-Golay filtering
-            is done using polynomial fits
-            instead of FIR/IIR filtering. This parameter is thus used to
-            determine the length of the window over which a 5th-order
-            polynomial smoothing is used.
-
-        Returns
-        -------
-        inst : instance of Epochs or Evoked
-            The object with the filtering applied.
-        """  # noqa: E501
-        from scipy.signal import savgol_filter
-
-        h_freq = float(h_freq)
-        if h_freq >= self.sfreq / 2.:
-            raise ValueError('h_freq must be less than half the sample rate')
-
-        # savitzky-golay filtering
-        window_length = (int(np.round(self.sfreq /
-                                      h_freq)) // 2) * 2 + 1
-        # loop over 'agg', 'L2', and 'L5'
-        for key in self.data.keys():
-            self.data[key] = savgol_filter(self.data[key], axis=-1,
-                                           polyorder=5,
-                                           window_length=window_length)
-        return self
