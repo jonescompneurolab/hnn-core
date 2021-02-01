@@ -420,8 +420,8 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     return ax.get_figure()
 
 
-def plot_periodogram(dpl, *, fmin, fmax, tmin=None, tmax=None, layer='agg',
-                     ax=None, show=True):
+def plot_periodogram(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None,
+                     layer='agg', ax=None, show=True):
     """Plot periodogram (power spectral density, PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` with ``window='hamming'``. Note that
@@ -433,9 +433,9 @@ def plot_periodogram(dpl, *, fmin, fmax, tmin=None, tmax=None, layer='agg',
     dpl : instance of Dipole
         The Dipole object.
     fmin : float
-        Minimum frequency to plot (in Hz).
+        Minimum frequency to plot (in Hz). Default: 0 Hz
     fmax : float
-        Maximum frequency to plot (in Hz).
+        Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)
     tmin : float or None
         Start time of data to include (in ms). If None, use entire simulation.
     tmax : float or None
@@ -464,7 +464,92 @@ def plot_periodogram(dpl, *, fmin, fmax, tmin=None, tmax=None, layer='agg',
 
     # ax.plot(freqs, np.sqrt(Pxx))
     ax.plot(freqs, Pxx)
-    ax.set_xlim((fmin, fmax))
+    if fmax is not None:
+        ax.set_xlim((fmin, fmax))
+    ax.ticklabel_format(axis='both', scilimits=(-2, 3))
+    ax.set_xlabel('Frequency (Hz)')
+    # ax.set_ylabel(f'Power ({dpl.units} / ' + r'$\sqrt{Hz}$' + ')')
+    ax.set_ylabel(f'Power ({dpl.units}' + r'$^2 \ Hz^{-1}$)')
+
+    plt_show(show)
+    return ax.get_figure()
+
+
+# from mne-python, v/0.23dev0
+def _check_nfft(n, n_fft, n_per_seg, n_overlap):
+    """Ensure n_fft, n_per_seg and n_overlap make sense."""
+    if n_per_seg is None and n_fft > n:
+        raise ValueError(('If n_per_seg is None n_fft is not allowed to be > '
+                          'n_times. If you want zero-padding, you have to set '
+                          'n_per_seg to relevant length. Got n_fft of %d while'
+                          ' signal length is %d.') % (n_fft, n))
+    n_per_seg = n_fft if n_per_seg is None or n_per_seg > n_fft else n_per_seg
+    n_per_seg = n if n_per_seg > n else n_per_seg
+    if n_overlap >= n_per_seg:
+        raise ValueError(('n_overlap cannot be greater than n_per_seg (or '
+                          'n_fft). Got n_overlap of %d while n_per_seg is '
+                          '%d.') % (n_overlap, n_per_seg))
+    return n_fft, n_per_seg, n_overlap
+
+
+# inspired by mne-python (time_frequency.psd_array_welch), v/0.23dev0
+def plot_psd(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
+             n_per_seg=2**12, tmin=None, tmax=None, layer='agg',
+             ax=None, show=True):
+    """Plot Power Spectral Density of dipole time course using Welch's method
+
+    Applies `~scipy.signal.welch` with ``window='hamming'``.
+
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        The Dipole object.
+    fmin : float
+        Minimum frequency to plot (in Hz). Default: 0 Hz
+    fmax : float
+        Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)
+    n_fft : int
+        The length of FFT used, must be ``>= n_per_seg`` (default: 2**14).
+        The segments will be zero-padded if ``n_fft > n_per_seg``.
+    n_overlap : int
+        The number of points of overlap between segments. Will be adjusted
+        to be <= n_per_seg. The default value is 0.
+    n_per_seg : int | None
+        Length of each Welch segment (windowed with a Hamming window). Defaults
+        to None, which sets n_per_seg equal to n_fft.
+    tmin : float or None
+        Start time of data to include (in ms). If None, use entire simulation.
+    tmax : float or None
+        End time of data to include (in ms). If None, use entire simulation.
+    layer : str, default 'agg'
+        The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+    ax : instance of matplotlib figure | None
+        The matplotlib axis.
+    show : bool
+        If True, show the figure
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+    """
+    import matplotlib.pyplot as plt
+    from scipy.signal import welch
+
+    sfreq = dpl.sfreq
+    data, times = _get_plot_data(dpl, layer, tmin, tmax)
+    n_fft, n_per_seg, n_overlap = _check_nfft(len(times), n_fft, n_per_seg,
+                                              n_overlap)    
+
+    freqs, Pxx = welch(data, sfreq, nfft=n_fft, noverlap=n_overlap,
+                       nperseg=n_per_seg, window='hamming')
+    if ax is None:
+        fig, ax = plt.subplots(1, 1)
+
+    # ax.plot(freqs, np.sqrt(Pxx))
+    ax.plot(freqs, Pxx)
+    if fmax is not None:
+        ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
     # ax.set_ylabel(f'Power ({dpl.units} / ' + r'$\sqrt{Hz}$' + ')')
