@@ -128,7 +128,7 @@ plt.show()
 # network parameters from ``N20.json`` and instantiate the network.
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network, MPIBackend
+from hnn_core import simulate_dipole, read_params, Network, JoblibBackend
 from hnn_core import average_dipoles
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -208,7 +208,7 @@ net.add_evoked_drive(
 # match to the empirical waveform, set ``n_trials`` to be >=25.
 n_trials = 2
 # n_trials = 25
-with MPIBackend(n_procs=2):
+with JoblibBackend(n_jobs=2):
     dpls = simulate_dipole(net, n_trials=n_trials)
 
 ###############################################################################
