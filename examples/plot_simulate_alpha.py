@@ -65,16 +65,33 @@ dpl = simulate_dipole(net, postproc=False)
 # simulation output!
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole, plot_periodogram
+from hnn_core.viz import plot_psd
 trial_idx = 0  # single trial simulated
 fig, axes = plt.subplots(2, 1)
 tmin = 20  # exclude initial burn-in period
-h_freq = 30  # highest frequency (in Hz) to retain after smoothing (approx.)
+
+# We will investigate the effect of two smoothing methods:
+window_len = 20  # 1. convolve with a 20 ms-long Hamming window, or
+h_freq = 30  # 2. define highest frequency (in Hz) to retain (approximate)
 
 # We'll make a copy of the dipole before smoothing
-smooth_dpl = dpl[trial_idx].copy().savgol_filter(h_freq)
-plot_dipole(smooth_dpl, tmin=tmin, ax=axes[0], show=False)
+dpl_win = dpl[trial_idx].copy().smooth(window_len=window_len)
+dpl_hfreq = dpl[trial_idx].copy().smooth(h_freq=h_freq)
 
-plot_periodogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+# Overlay the three traces for comparison. Note the large edge-artefact when
+# applying the convolutional smoothing method (``window_len``).
+plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
+plot_dipole(dpl_win, tmin=tmin, ax=axes[0], show=False)
+plot_dipole(dpl_hfreq, tmin=tmin, ax=axes[0], show=False)
+axes[0].set_xlim((1, 399))
+axes[0].legend(['orig', 'window', 'hfreq'])
+
+plot_periodogram(dpl[trial_idx], fmin=1., tmin=tmin, ax=axes[1],
+                 show=False)
+plot_psd(dpl[trial_idx], fmin=1., tmin=tmin, ax=axes[1],
+         show=False)
+axes[1].legend(['periodogram', 'Welch'])
+axes[1].set_xscale('log')
 plt.tight_layout()
 ###############################################################################
 # The next step is to add a simultaneous 10 Hz distal drive with a lower
@@ -100,10 +117,12 @@ dpl = simulate_dipole(net, postproc=False)
 trial_idx, tmin, h_freq = 0, 20, 30  # same as above
 fig, axes = plt.subplots(2, 1)
 # We'll again make a copy of the dipole before smoothing
-smooth_dpl = dpl[trial_idx].copy().savgol_filter(h_freq)
+smooth_dpl = dpl[trial_idx].copy().smooth(h_freq=h_freq)
 
-# Note that using the plot_dipole-function is equivalent to:
+# Note that using the ``plot_dipole``-function is equivalent to:
+dpl[trial_idx].plot(tmin=tmin, ax=axes[0], show=False)
 smooth_dpl.plot(tmin=tmin, ax=axes[0], show=False)
+axes[0].legend(['orig', 'smoothed'])
 
 plot_periodogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 plt.tight_layout()
