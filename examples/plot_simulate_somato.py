@@ -91,7 +91,9 @@ label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
 # upwards (from deep to superficial) and downwards (from superficial to deep)
 # current flow, respectively. Uncomment the following code to open an
 # interactive 3D render of the brain and its surface activation (requires the
-# ``pyvista`` python library).
+# ``pyvista`` python library). You should get something like this that shows
+# the MNE activation at 0.040 sec around the post-central gyrus (outlined in
+# orange): |mne_example_fig|
 '''
 stc_label = stc.in_label(label_s1)
 brain = stc_label.plot(subjects_dir=subjects_dir, hemi='rh', surface='white',
@@ -228,3 +230,4 @@ net.cell_response.plot_spikes_raster(ax=axes[2])
 #
 # .. _MNE: https://mne.tools/
 # .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py # noqa
+# .. |mne_example_fig| image:: https://user-images.githubusercontent.com/5610076/106361333-ac3fdd00-631d-11eb-8817-9d95db44a554.png # noqa
