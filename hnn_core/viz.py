@@ -539,7 +539,7 @@ def plot_psd(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
     sfreq = dpl.sfreq
     data, times = _get_plot_data(dpl, layer, tmin, tmax)
     n_fft, n_per_seg, n_overlap = _check_nfft(len(times), n_fft, n_per_seg,
-                                              n_overlap)    
+                                              n_overlap)
 
     freqs, Pxx = welch(data, sfreq, nfft=n_fft, noverlap=n_overlap,
                        nperseg=n_per_seg, window='hamming')
