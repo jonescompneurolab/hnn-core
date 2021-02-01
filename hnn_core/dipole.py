@@ -253,7 +253,7 @@ class Dipole(object):
 
     def smooth(self, *, window_len=None, h_freq=None):
         """Smooth the dipole waveform using one of two methods
-        
+
         Pass the window length-argument to convolve the data with a Hamming
         window of the desired length. Alternatively, pass the high frequency
         argument to apply a Savitzky-Golay filter, which will remove frequency
@@ -279,13 +279,13 @@ class Dipole(object):
         Returns
         -------
         dpl_copy : instance of Dipole
-            A copy of the modified Dipole instance.        
+            A copy of the modified Dipole instance.
         """
         if window_len is None and h_freq is None:
             raise ValueError('either window_len or h_freq must be defined')
         elif window_len is not None and h_freq is not None:
             raise ValueError('set window_len or h_freq, not both')
-            
+
         if window_len is not None:
             winsz = 1e-3 * window_len * self.sfreq
             if winsz > len(self.times):
