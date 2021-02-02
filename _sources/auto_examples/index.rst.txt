@@ -98,12 +98,12 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate the source time courses obtained during median nerve ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate the inverse solution of the median nerve evoked resp...">
 
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
-     :alt: 05. Source reconstruction and HNN
+     :alt: 05. From MEG sensor-space data to HNN simulation
 
      :ref:`sphx_glr_auto_examples_plot_simulate_somato.py`
 
