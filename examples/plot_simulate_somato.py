@@ -94,9 +94,7 @@ label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
 # ``pyvista`` python library). You should get 2 plots, the first showing the
 # post-central gyrus label from which the dipole time course was extracted and
 # the second showing MNE activation at 0.040 sec that resemble the following
-# images:
-# |mne_label_fig|
-# |mne_activity_fig|
+# images.
 '''
 Brain = mne.viz.get_brain_class()
 brain_label = Brain(subject, hemi, 'white', subjects_dir=subjects_dir)
@@ -106,6 +104,11 @@ brain = stc_label.plot(subjects_dir=subjects_dir, hemi=hemi, surface='white',
                        view_layout='horizontal', initial_time=0.04,
                        backend='pyvista')
 '''
+
+###############################################################################
+# |mne_label_fig|
+#
+# |mne_activity_fig|
 
 ###############################################################################
 # Now we extract the representative time course of dipole activation in our
@@ -206,11 +209,8 @@ net.add_evoked_drive(
 
 ###############################################################################
 # Now we run the simulation over 2 trials so that we can plot the average
-# aggregate dipole. As in :ref:`the MPIBackend example
-# <sphx_glr_auto_examples_plot_simulate_mpi_backend.py>`, we can use
-# ``MPIBackend`` to reduce the simulation time by parallizing across cells in
-# the network. However, no parallel backend is necessary. For a better
-# match to the empirical waveform, set ``n_trials`` to be >=25.
+# aggregate dipole. For a better match to the empirical waveform, set
+# ``n_trials`` to be >=25.
 n_trials = 2
 # n_trials = 25
 with JoblibBackend(n_jobs=2):
