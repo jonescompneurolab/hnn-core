@@ -312,7 +312,7 @@ class Dipole(object):
         return self
 
     def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             show=True):
+             units='nAm', scaling=None, show=True):
         """Simple layer-specific plot function.
 
         Parameters
@@ -327,6 +327,15 @@ class Dipole(object):
             Factor by which to decimate the raw dipole traces (optional)
         ax : instance of matplotlib figure | None
             The matplotlib axis
+        units : str | None
+            The physical units of the data, used for axis label. Defaults to
+            ``units='nAm'``. Passing ``None`` results in units being omitted
+            from plot.
+        scaling : float | None
+            The scaling to apply to the dipole data in order to achieve the
+            specified ``units`` when plotting. Defaults to None, which applies
+            unit scaling (1x). For example, use``scaling=1e-6`` to scale fAm to
+            nAm.
         show : bool
             If True, show the figure
 
@@ -336,7 +345,8 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         return plot_dipole(dpl=self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
-                           decim=decim, show=show)
+                           decim=decim, units=units, scaling=scaling,
+                           show=show)
 
     def baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.

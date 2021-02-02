@@ -7,7 +7,21 @@ import numpy as np
 from itertools import cycle
 
 
-def _get_plot_data(dpl, layer, tmin, tmax):
+def _check_scaling_units(scaling, units):
+    if not isinstance(scaling, float):
+        if scaling is None:
+            scaling = 1  # allow implicitly asking for no scaling
+        else:
+            raise ValueError(f'scaling must be a float, got {type(scaling)}')
+    if not isinstance(units, str):
+        if units is None:
+            units = ''  # allow implicitly asking for no scaling
+        else:
+            raise ValueError(f'units must be a string, got {type(units)}')
+    return scaling, units
+
+
+def _get_plot_data(dpl, layer, tmin, tmax, scaling=1):
     plot_tmin = dpl.times[0]
     if tmin is not None:
         plot_tmin = max(tmin, plot_tmin)
@@ -17,7 +31,7 @@ def _get_plot_data(dpl, layer, tmin, tmax):
 
     mask = np.logical_and(dpl.times >= plot_tmin, dpl.times < plot_tmax)
     times = dpl.times[mask]
-    data = dpl.data[layer][mask]
+    data = scaling * dpl.data[layer][mask]
 
     return data, times
 
@@ -61,7 +75,7 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                show=True):
+                units='nAm', scaling=None, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -82,6 +96,15 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
+    units : str | None
+        The physical units of the data, used for axis label. Defaults to
+        ``units='nAm'``. Passing ``None`` results in units being omitted from
+        plot.
+    scaling : float | None
+        The scaling to apply to the dipole data in order to achieve the
+        specified ``units`` when plotting. Defaults to None, which applies
+        unit scaling (1x). For example, use``scaling=1e-6`` to scale fAm to
+        nAm.
     show : bool
         If True, show the figure
 
@@ -93,6 +116,9 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     import matplotlib.pyplot as plt
     from .dipole import Dipole
 
+    # NB units_str is applied to the label, includes parentheses: ' (nAm)'
+    scaling, units = _check_scaling_units(scaling, units)
+
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
@@ -102,7 +128,9 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     for dpl_trial in dpl:
         if layer in dpl_trial.data.keys():
 
-            data, times = _get_plot_data(dpl_trial, layer, tmin, tmax)
+            # extract scaled data and times
+            data, times = _get_plot_data(dpl_trial, layer, tmin, tmax,
+                                         scaling=scaling)
             if decim is not None:
                 data, times = _decimate_plot_data(decim, data, times)
 
@@ -110,7 +138,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
-    ax.set_ylabel(f'Dipole moment ({dpl[0].units})')
+    ylabel = f'Dipole moment ({units})' if len(units) > 0 else 'Dipole moment'
+    ax.set_ylabel(ylabel)
     if layer == 'agg':
         title_str = 'Aggregate (L2 + L5)'
     else:
@@ -420,9 +449,9 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     return ax.get_figure()
 
 
-def plot_periodogram(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None,
-                     layer='agg', ax=None, show=True):
-    """Plot periodogram (power spectral density, PSD) of dipole time course
+def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
+             ax=None, units='nAm', scaling=None, show=True):
+    """Plot power spectral density (PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` with ``window='hamming'``. Note that
     no spectral averaging is applied, as most ``hnn_core`` simulations are
@@ -444,6 +473,15 @@ def plot_periodogram(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None,
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
     ax : instance of matplotlib figure | None
         The matplotlib axis.
+    units : str | None
+        The physical units of the data, used for axis label. Defaults to
+        ``units='nAm'``. Passing ``None`` results in units being omitted from
+        the plot.
+    scaling : float | None
+        The scaling to apply to the dipole data in order to achieve the
+        specified ``units`` when plotting. Defaults to None, which applies
+        unit scaling (1x). For example, use``scaling=1e-6`` to scale fAm to
+        nAm.
     show : bool
         If True, show the figure
 
@@ -454,6 +492,9 @@ def plot_periodogram(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None,
     """
     import matplotlib.pyplot as plt
     from scipy.signal import periodogram
+
+    # NB units_str is applied to the label, includes parentheses: ' (nAm)'
+    scaling, units = _check_scaling_units(scaling, units)
 
     sfreq = dpl.sfreq
     data, times = _get_plot_data(dpl, layer, tmin, tmax)
@@ -468,8 +509,7 @@ def plot_periodogram(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None,
         ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
-    # ax.set_ylabel(f'Power ({dpl.units} / ' + r'$\sqrt{Hz}$' + ')')
-    ax.set_ylabel(f'Power ({dpl.units}' + r'$^2 \ Hz^{-1}$)')
+    ax.set_ylabel(f'Power ({units}' + r'$^2 \ Hz^{-1}$)')
 
     plt_show(show)
     return ax.get_figure()
@@ -493,9 +533,9 @@ def _check_nfft(n, n_fft, n_per_seg, n_overlap):
 
 
 # inspired by mne-python (time_frequency.psd_array_welch), v/0.23dev0
-def plot_psd(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
-             n_per_seg=2**12, tmin=None, tmax=None, layer='agg',
-             ax=None, show=True):
+def plot_psd_welch(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
+                   n_per_seg=2**12, tmin=None, tmax=None, layer='agg',
+                   ax=None, show=True):
     """Plot Power Spectral Density of dipole time course using Welch's method
 
     Applies `~scipy.signal.welch` with ``window='hamming'``.
