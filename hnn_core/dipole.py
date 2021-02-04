@@ -237,7 +237,8 @@ class Dipole(object):
         # XXX window_len given in samples in HNN GUI, but smooth expects
         # milliseconds
         window_len = winsz / (1e-3 * self.sfreq)
-        self.smooth(window_len=window_len)
+        if window_len > 1:  # this is to allow param-files with len==0
+            self.smooth(window_len)
 
     def convert_fAm_to_nAm(self):
         """ must be run after baseline_renormalization()
@@ -251,13 +252,8 @@ class Dipole(object):
             self.data[key] *= fctr
         return self
 
-    def smooth(self, *, window_len=None, h_freq=None):
-        """Smooth the dipole waveform using one of two methods
-
-        Pass the window length-argument to convolve the data with a Hamming
-        window of the desired length. Alternatively, pass the high frequency
-        argument to apply a Savitzky-Golay filter, which will remove frequency
-        components above this cutoff value (see `~scipy.signal.savgol_filter).
+    def smooth(self, window_len):
+        """Smooth the dipole waveform using Hamming-windowed convolution
 
         Note that this method operates in-place, i.e., it will alter the data.
         If you prefer a filtered copy, consider using the
@@ -268,6 +264,36 @@ class Dipole(object):
         window_len : float or None
             The length (in ms) of a `~numpy.hamming` window to convolve the
             data with.
+
+        Returns
+        -------
+        dpl_copy : instance of Dipole
+            A copy of the modified Dipole instance.
+        """
+        winsz = 1e-3 * window_len * self.sfreq
+        if winsz > len(self.times):
+            raise ValueError(
+                f'Window length too long: {winsz} samples; data length is '
+                f'{len(self.times)} samples')
+        elif winsz > 0 and winsz < 1:
+            raise ValueError('Window length less than 1 ms is not supported')
+        elif winsz < 0:
+            raise ValueError('Window length cannot be negative')
+
+        for key in self.data.keys():
+            self.data[key] = _hammfilt(self.data[key], winsz)
+
+        return self
+
+    def savgol_filter(self, h_freq):
+        """Smooth the dipole waveform using Savitzky-Golay filtering
+
+        Note that this method operates in-place, i.e., it will alter the data.
+        If you prefer a filtered copy, consider using the
+        `~hnn_core.dipole.copy`-method. The high-frequency cutoff value of a
+        Savitzky-Golay filter is approximate; see `~scipy.signal.savgol_filter.
+        Parameters
+        ----------
         h_freq : float or None
             Approximate high cutoff frequency in Hz. Note that this
             is not an exact cutoff, since Savitzky-Golay filtering
@@ -281,38 +307,19 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        if window_len is None and h_freq is None:
-            raise ValueError('either window_len or h_freq must be defined')
-        elif window_len is not None and h_freq is not None:
-            raise ValueError('set window_len or h_freq, not both')
-
-        if window_len is not None:
-            winsz = 1e-3 * window_len * self.sfreq
-            if winsz > len(self.times):
-                raise ValueError(
-                    f'Window length too long: {winsz} samples; data length is '
-                    f'{len(self.times)} samples')
-            elif winsz <= 1:
-                # XXX this is to allow param-files with len==0
-                return
-
-            for key in self.data.keys():
-                self.data[key] = _hammfilt(self.data[key], winsz)
-
-        elif h_freq is not None:
-            if h_freq < 0:
-                raise ValueError('h_freq cannot be negative')
-            elif h_freq > 0.5 * self.sfreq:
-                raise ValueError(
-                    'h_freq must be less than half the sample rate')
-            for key in self.data.keys():
-                self.data[key] = _savgol_filter(self.data[key],
-                                                h_freq,
-                                                self.sfreq)
+        if h_freq < 0:
+            raise ValueError('h_freq cannot be negative')
+        elif h_freq > 0.5 * self.sfreq:
+            raise ValueError(
+                'h_freq must be less than half the sample rate')
+        for key in self.data.keys():
+            self.data[key] = _savgol_filter(self.data[key],
+                                            h_freq,
+                                            self.sfreq)
         return self
 
     def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             units='nAm', scaling=None, show=True):
+             units='nAm', show=True):
         """Simple layer-specific plot function.
 
         Parameters
@@ -331,11 +338,6 @@ class Dipole(object):
             The physical units of the data, used for axis label. Defaults to
             ``units='nAm'``. Passing ``None`` results in units being omitted
             from plot.
-        scaling : float | None
-            The scaling to apply to the dipole data in order to achieve the
-            specified ``units`` when plotting. Defaults to None, which applies
-            unit scaling (1x). For example, use``scaling=1e-6`` to scale fAm to
-            nAm.
         show : bool
             If True, show the figure
 
@@ -345,8 +347,7 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         return plot_dipole(dpl=self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
-                           decim=decim, units=units, scaling=scaling,
-                           show=show)
+                           decim=decim, units=units, show=show)
 
     def baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
