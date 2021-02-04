@@ -57,41 +57,37 @@ dpl = simulate_dipole(net, postproc=False)
 # :meth:`~hnn_core.dipole.smooth`-method operates in-place, *i.e.*, it alters
 # the data inside the ``Dipole`` object). Smoothing approximates the effect of
 # signal summation from a larger number and greater volume of neurons than are
-# included in our biophysical model; extra-cranially measured fields are always
-# a mixture of many sources. Note also that the `simulate_dipole`-function was
-# called with the option to *not* apply unit conversion scaling, which leaves
-# the data in the native units of fAm. We can confirm that what we simulate is
-# indeed 10 Hz activity by plotting the power spectral density (PSD).
+# included in our biophysical model. Note also that the native units of the
+# simulated dipole is nAm. We can confirm that what we simulate is indeed
+# 10 Hz activity by plotting the power spectral density (PSD).
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole, plot_psd
-trial_idx = 0  # single trial simulated
-scaling = 1e-6  # conversion factor from fAm to nAm
-units = 'nAm'
 
 fig, axes = plt.subplots(2, 1)
-tmin = 20  # exclude the initial burn-in period from the plots
+tmin, tmax = 10, 300  # exclude the initial burn-in period from the plots
+trial_idx = 0  # single trial simulated
 
-# We will investigate the effect of two smoothing methods:
-window_len = 20  # 1. convolve with a 20 ms-long Hamming window, or
-h_freq = 30  # 2. define highest frequency (in Hz) to retain (approximate)
+dpl[trial_idx].convert_fAm_to_nAm()
+dpl[trial_idx].scale(3000)  # XXX from params['dipole_scalefctr'], can be omitted  # noqa
 
-# We'll make a copy of the dipole before smoothing
-dpl_win = dpl[trial_idx].copy().smooth(window_len=window_len)  # 1.
-dpl_hfreq = dpl[trial_idx].copy().smooth(h_freq=h_freq)  # 2.
+# We'll make a copy of the dipole before smoothing in order to compare
+window_len = 20  # convolve with a 20 ms-long Hamming window
+# XXX params['dipole_smooth_win']==30 seems excessive
+dpl_smooth = dpl[trial_idx].copy().smooth(window_len)
+
+# XXX REMOVE, here just for illustration
+h_freq = 30
+dpl_savgol = dpl[trial_idx].copy().savgol_filter(h_freq)
 
 # Overlay the three traces for comparison. Note the large edge-artefact when
-# applying the convolutional smoothing method (``window_len``).
-plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False,
-            units=units, scaling=scaling)
-plot_dipole(dpl_win, tmin=tmin, ax=axes[0], show=False,
-            units=units, scaling=scaling)
-plot_dipole(dpl_hfreq, tmin=tmin, ax=axes[0], show=False,
-            units=units, scaling=scaling)
+# applying the convolutional smoothing method (``window_len``). The function
+# plot_dipole can plot a list of dipoles at once
+dpl_list = [dpl[trial_idx], dpl_smooth, dpl_savgol]
+plot_dipole(dpl_list, tmin=tmin, tmax=tmax, ax=axes[0], show=False)
 axes[0].set_xlim((1, 399))
 axes[0].legend(['orig', 'window', 'hfreq'])
 
-plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False,
-         units=units, scaling=scaling)
+plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False)
 axes[1].set_xscale('log')
 plt.tight_layout()
 ###############################################################################
@@ -119,16 +115,13 @@ dpl = simulate_dipole(net, postproc=False)
 fig, axes = plt.subplots(2, 1)
 
 # We'll again make a copy of the dipole before smoothing
-smooth_dpl = dpl[trial_idx].copy().smooth(h_freq=h_freq)
+smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 
 # Note that using the ``plot_dipole``-function is equivalent to:
-dpl[trial_idx].plot(tmin=tmin, ax=axes[0], show=False,
-                    units=units, scaling=scaling)
-smooth_dpl.plot(tmin=tmin, ax=axes[0], show=False,
-                units=units, scaling=scaling)
+dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
+smooth_dpl.plot(tmin=tmin, ax=axes[0], show=False)
 
-plot_psd(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1],
-         units=units, scaling=scaling)
+plot_psd(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 plt.tight_layout()
 
 ###############################################################################

@@ -7,21 +7,7 @@ import numpy as np
 from itertools import cycle
 
 
-def _check_scaling_units(scaling, units):
-    if not isinstance(scaling, float):
-        if scaling is None:
-            scaling = 1  # allow implicitly asking for no scaling
-        else:
-            raise ValueError(f'scaling must be a float, got {type(scaling)}')
-    if not isinstance(units, str):
-        if units is None:
-            units = ''  # allow implicitly asking for no scaling
-        else:
-            raise ValueError(f'units must be a string, got {type(units)}')
-    return scaling, units
-
-
-def _get_plot_data(dpl, layer, tmin, tmax, scaling=1):
+def _get_plot_data(dpl, layer, tmin, tmax):
     plot_tmin = dpl.times[0]
     if tmin is not None:
         plot_tmin = max(tmin, plot_tmin)
@@ -31,7 +17,7 @@ def _get_plot_data(dpl, layer, tmin, tmax, scaling=1):
 
     mask = np.logical_and(dpl.times >= plot_tmin, dpl.times < plot_tmax)
     times = dpl.times[mask]
-    data = scaling * dpl.data[layer][mask]
+    data = dpl.data[layer][mask]
 
     return data, times
 
@@ -75,7 +61,7 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                units='nAm', scaling=None, show=True):
+                units='nAm', show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -100,11 +86,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The physical units of the data, used for axis label. Defaults to
         ``units='nAm'``. Passing ``None`` results in units being omitted from
         plot.
-    scaling : float | None
-        The scaling to apply to the dipole data in order to achieve the
-        specified ``units`` when plotting. Defaults to None, which applies
-        unit scaling (1x). For example, use``scaling=1e-6`` to scale fAm to
-        nAm.
     show : bool
         If True, show the figure
 
@@ -116,9 +97,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     import matplotlib.pyplot as plt
     from .dipole import Dipole
 
-    # NB units_str is applied to the label, includes parentheses: ' (nAm)'
-    scaling, units = _check_scaling_units(scaling, units)
-
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
@@ -129,8 +107,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         if layer in dpl_trial.data.keys():
 
             # extract scaled data and times
-            data, times = _get_plot_data(dpl_trial, layer, tmin, tmax,
-                                         scaling=scaling)
+            data, times = _get_plot_data(dpl_trial, layer, tmin, tmax)
             if decim is not None:
                 data, times = _decimate_plot_data(decim, data, times)
 
@@ -450,7 +427,7 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
 
 
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-             ax=None, units='nAm', scaling=None, show=True):
+             ax=None, units='nAm', show=True):
     """Plot power spectral density (PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` with ``window='hamming'``. Note that
@@ -477,11 +454,6 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         The physical units of the data, used for axis label. Defaults to
         ``units='nAm'``. Passing ``None`` results in units being omitted from
         the plot.
-    scaling : float | None
-        The scaling to apply to the dipole data in order to achieve the
-        specified ``units`` when plotting. Defaults to None, which applies
-        unit scaling (1x). For example, use``scaling=1e-6`` to scale fAm to
-        nAm.
     show : bool
         If True, show the figure
 
@@ -492,9 +464,6 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
     """
     import matplotlib.pyplot as plt
     from scipy.signal import periodogram
-
-    # NB units_str is applied to the label, includes parentheses: ' (nAm)'
-    scaling, units = _check_scaling_units(scaling, units)
 
     sfreq = dpl.sfreq
     data, times = _get_plot_data(dpl, layer, tmin, tmax)
