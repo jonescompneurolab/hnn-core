@@ -98,7 +98,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     from .dipole import Dipole
 
     if ax is None:
-        fig, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1)
 
     if isinstance(dpl, Dipole):
         dpl = [dpl]
@@ -206,7 +206,7 @@ def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
                 raise ValueError(f'No input types found for {spike_type}')
 
     if ax is None:
-        fig, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1)
 
     color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
 
@@ -256,7 +256,7 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
                         'L2_pyramidal': 'g', 'L2_basket': 'w'}
 
     if ax is None:
-        fig, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1)
 
     ypos = 0
     for cell_type in cell_types:
@@ -560,7 +560,7 @@ def plot_psd_welch(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
     freqs, Pxx = welch(data, sfreq, nfft=n_fft, noverlap=n_overlap,
                        nperseg=n_per_seg, window='hamming')
     if ax is None:
-        fig, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1)
 
     # ax.plot(freqs, np.sqrt(Pxx))
     ax.plot(freqs, Pxx)
