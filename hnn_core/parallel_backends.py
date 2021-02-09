@@ -59,9 +59,9 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         if postproc:
             N_pyr_x = net.params['N_pyr_x']
             N_pyr_y = net.params['N_pyr_y']
-            winsz = net.params['dipole_smooth_win'] / net.params['dt']
+            window_len = net.params['dipole_smooth_win']  # specified in ms
             fctr = net.params['dipole_scalefctr']
-            dpls[-1].post_proc(N_pyr_x, N_pyr_y, winsz, fctr)
+            dpls[-1].post_proc(N_pyr_x, N_pyr_y, window_len, fctr)
 
     return dpls
 

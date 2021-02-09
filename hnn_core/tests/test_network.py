@@ -193,6 +193,7 @@ def test_tonic_biases():
     params.update({
         'N_pyr_x': 3, 'N_pyr_y': 3,
         'tstop': 25, 'N_trials': 1,
+        'dipole_smooth_win': 5,
         't_evprox_1': 5,
         't_evdist_1': 10,
         't_evprox_2': 20,

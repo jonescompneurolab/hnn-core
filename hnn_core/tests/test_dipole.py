@@ -20,13 +20,13 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     dpl_out_fname = tmpdir.join('dpl1.txt')
     params = read_params(params_fname)
-    times = np.random.random(6000)
+    times = np.arange(0, 6000 * params['dt'], params['dt'])
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
     dipole.baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
     dipole.convert_fAm_to_nAm()
     dipole.scale(params['dipole_scalefctr'])
-    dipole.smooth(params['dipole_smooth_win'] / params['dt'])
+    dipole.smooth(window_len=params['dipole_smooth_win'])
     dipole.plot(show=False)
     plot_dipole([dipole, dipole], show=False)
     dipole.write(dpl_out_fname)
@@ -57,8 +57,7 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
 
     dpls_raw[0].post_proc(net.params['N_pyr_x'], net.params['N_pyr_y'],
-                          net.params['dipole_smooth_win'] /
-                          net.params['dt'],
+                          net.params['dipole_smooth_win'],
                           net.params['dipole_scalefctr'])
     assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
 
@@ -71,6 +70,7 @@ def test_dipole_simulation():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    'tstop': 25,
+                   'dipole_smooth_win': 5,
                    't_evprox_1': 5,
                    't_evdist_1': 10,
                    't_evprox_2': 20})
@@ -91,7 +91,7 @@ def test_dipole_simulation():
     # Test raster plot with no spikes
     params['tstop'] = 0.1
     net = Network(params)
-    simulate_dipole(net, n_trials=1)
+    simulate_dipole(net, n_trials=1, postproc=False)
     net.cell_response.plot_spikes_raster()
 
 
