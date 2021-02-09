@@ -111,7 +111,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     return dpls
 
 
-def read_dipole(fname, units='nAm'):
+def read_dipole(fname):
     """Read dipole values from a file and create a Dipole instance.
 
     Parameters
@@ -126,8 +126,6 @@ def read_dipole(fname, units='nAm'):
     """
     dpl_data = np.loadtxt(fname, dtype=float)
     dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:4])
-    if units == 'nAm':
-        dpl.units = units
     return dpl
 
 
@@ -176,6 +174,12 @@ def average_dipoles(dpls):
 class Dipole(object):
     """Dipole class.
 
+    An instance of the ``Dipole``-class contains the simulated dipole moment
+    timecourses for L2 and L5 pyramidal cells, as well as their aggregate
+    (``'agg'``). When a ``Dipole`` is created by a call to
+    :func:`~hnn_core.simulate_dipole`, the units of the dipole moment are
+    converted to ``nAm`` (1e-9 Ampere-meters).
+
     Parameters
     ----------
     times : array (n_times,)
@@ -190,18 +194,16 @@ class Dipole(object):
     Attributes
     ----------
     times : array
-        The time vector
+        The time vector (in ms)
     sfreq : float
         The sampling frequency (in Hz)
     data : dict of array
-        The dipole with keys 'agg', 'L2' and 'L5'
+        Dipole moment timecourse arrays with keys 'agg', 'L2' and 'L5'
     nave : int
         Number of trials that were averaged to produce this Dipole
     """
 
     def __init__(self, times, data, nave=1):  # noqa: D102
-        self.units = 'fAm'
-        self.N = data.shape[0]
         self.times = times
         self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
         self.nave = nave
@@ -217,7 +219,7 @@ class Dipole(object):
         """
         return deepcopy(self)
 
-    def post_proc(self, N_pyr_x, N_pyr_y, winsz, fctr):
+    def post_proc(self, N_pyr_x, N_pyr_y, window_len, fctr):
         """ Apply baseline, unit conversion, scaling and smoothing
 
        Parameters
@@ -226,18 +228,16 @@ class Dipole(object):
             Number of Pyramidal cells in x direction
         N_pyr_y : int
             Number of Pyramidal cells in y direction
-        winsz : int
-            Smoothing window
+        window_len : int
+            Smoothing window in ms
         fctr : int
             Scaling factor
         """
         self.baseline_renormalize(N_pyr_x, N_pyr_y)
         self.convert_fAm_to_nAm()
         self.scale(fctr)
-        # XXX window_len given in samples in HNN GUI, but smooth expects
-        # milliseconds
-        window_len = winsz / (1e-3 * self.sfreq)
-        if window_len > 1:  # this is to allow param-files with len==0
+
+        if window_len > 0:  # this is to allow param-files with len==0
             self.smooth(window_len)
 
     def convert_fAm_to_nAm(self):
@@ -245,7 +245,6 @@ class Dipole(object):
         """
         for key in self.data.keys():
             self.data[key] *= 1e-6
-        self.units = 'nAm'
 
     def scale(self, fctr):
         for key in self.data.keys():
@@ -270,7 +269,8 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        winsz = 1e-3 * window_len * self.sfreq
+        # convolutional filter length is given in samples
+        winsz = np.round(1e-3 * window_len * self.sfreq)
         if winsz > len(self.times):
             raise ValueError(
                 f'Window length too long: {winsz} samples; data length is '
@@ -292,6 +292,7 @@ class Dipole(object):
         If you prefer a filtered copy, consider using the
         `~hnn_core.dipole.copy`-method. The high-frequency cutoff value of a
         Savitzky-Golay filter is approximate; see `~scipy.signal.savgol_filter.
+
         Parameters
         ----------
         h_freq : float or None
@@ -359,11 +360,6 @@ class Dipole(object):
         N_pyr_y : int
             Nr of cells (y)
         """
-        if self.units != 'fAm':
-            print("Warning, no dipole renormalization done because units"
-                  " were in %s" % (self.units))
-            return
-
         # N_pyr cells in grid. This is PER LAYER
         N_pyr = N_pyr_x * N_pyr_y
         # dipole offset calculation: increasing number of pyr
