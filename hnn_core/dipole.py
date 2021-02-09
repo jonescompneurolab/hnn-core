@@ -222,7 +222,7 @@ class Dipole(object):
     def post_proc(self, N_pyr_x, N_pyr_y, window_len, fctr):
         """ Apply baseline, unit conversion, scaling and smoothing
 
-       Parameters
+        Parameters
         ----------
         N_pyr_x : int
             Number of Pyramidal cells in x direction

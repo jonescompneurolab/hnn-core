@@ -61,7 +61,7 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                units='nAm', show=True):
+                units=None, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -84,8 +84,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         ints can be provided. These are applied successively.
     units : str | None
         The physical units of the data, used for axis label. Defaults to
-        ``units='nAm'``. Passing ``None`` results in units being omitted from
-        plot.
+        ``None``, which results in units being omitted from the plot. When
+        provided, the user must ensure the correctness of the units.
     show : bool
         If True, show the figure
 
@@ -115,8 +115,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
-    ylabel = f'Dipole moment ({units})' if len(units) > 0 else 'Dipole moment'
-    ax.set_ylabel(ylabel)
+    if units is None:
+        ylab = 'Dipole moment'
+    else:
+        ylab = f'Dipole moment ({units})'
+    ax.set_ylabel(ylab)
     if layer == 'agg':
         title_str = 'Aggregate (L2 + L5)'
     else:
@@ -427,7 +430,7 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
 
 
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-             ax=None, units='nAm', show=True):
+             ax=None, units=None, show=True):
     """Plot power spectral density (PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` with ``window='hamming'``. Note that
@@ -452,8 +455,8 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         The matplotlib axis.
     units : str | None
         The physical units of the data, used for axis label. Defaults to
-        ``units='nAm'``. Passing ``None`` results in units being omitted from
-        the plot.
+        ``None``, which results in units being omitted from the plot. When
+        provided, the user must ensure the correctness of the units.
     show : bool
         If True, show the figure
 
@@ -466,11 +469,11 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
     from scipy.signal import periodogram
 
     sfreq = dpl.sfreq
-    data, times = _get_plot_data(dpl, layer, tmin, tmax)
+    data, _ = _get_plot_data(dpl, layer, tmin, tmax)
 
     freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
     if ax is None:
-        fig, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1)
 
     # ax.plot(freqs, np.sqrt(Pxx))
     ax.plot(freqs, Pxx)
@@ -478,7 +481,11 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
-    ax.set_ylabel(f'Power ({units}' + r'$^2 \ Hz^{-1}$)')
+    if units is None:
+        ylab = 'Power spectral density'
+    else:
+        ylab = f'Power ({units}' + r'$^2 \ Hz^{-1}$)'
+    ax.set_ylabel(ylab)
 
     plt_show(show)
     return ax.get_figure()
@@ -504,7 +511,7 @@ def _check_nfft(n, n_fft, n_per_seg, n_overlap):
 # inspired by mne-python (time_frequency.psd_array_welch), v/0.23dev0
 def plot_psd_welch(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
                    n_per_seg=2**12, tmin=None, tmax=None, layer='agg',
-                   ax=None, show=True):
+                   units=None, ax=None, show=True):
     """Plot Power Spectral Density of dipole time course using Welch's method
 
     Applies `~scipy.signal.welch` with ``window='hamming'``.
@@ -562,7 +569,7 @@ def plot_psd_welch(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
     # ax.set_ylabel(f'Power ({dpl.units} / ' + r'$\sqrt{Hz}$' + ')')
-    ax.set_ylabel(f'Power ({dpl.units}' + r'$^2 \ Hz^{-1}$)')
+    ax.set_ylabel(f'Power ({units}' + r'$^2 \ Hz^{-1}$)')
 
     plt_show(show)
     return ax.get_figure()
