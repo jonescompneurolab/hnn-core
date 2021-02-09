@@ -119,9 +119,10 @@ smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 
 # Note that using the ``plot_dipole``-function is equivalent to:
 dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
-smooth_dpl.plot(tmin=tmin, ax=axes[0], show=False)
+# If you know the units of the data, you can pass them as a string
+smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False, units='nAm')
 
-plot_psd(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+plot_psd(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1], units='nAm')
 plt.tight_layout()
 
 ###############################################################################
