@@ -249,45 +249,13 @@ class Dipole(object):
             print("Warning, no dipole renormalization done because units"
                   " were in %s" % (self.units))
             return
+        # L5: -3.6498e+00 * np.exp(1.9647e-03 * t) + -4.8023e+01
+        # L2: 2.8063e-03 * np.exp(1.1149e-02 * t) + 4.4301e-02
+        L5_exp = -3.6498e+00 * np.exp(1.9647e-03 * self.times) - 4.8023e+01
+        L2_exp = 2.8063e-03 * np.exp(1.1149e-02 * self.times) + 4.4301e-02
 
-        # N_pyr cells in grid. This is PER LAYER
-        N_pyr = N_pyr_x * N_pyr_y
-        # dipole offset calculation: increasing number of pyr
-        # cells (L2 and L5, simultaneously)
-        # with no inputs resulted in an aggregate dipole over the
-        # interval [50., 1000.] ms that
-        # eventually plateaus at -48 fAm. The range over this interval
-        # is something like 3 fAm
-        # so the resultant correction is here, per dipole
-        # dpl_offset = N_pyr * 50.207
-        dpl_offset = {
-            # these values will be subtracted
-            'L2': N_pyr * 0.0443,
-            'L5': N_pyr * -49.0502
-            # 'L5': N_pyr * -48.3642,
-            # will be calculated next, this is a placeholder
-            # 'agg': None,
-        }
-        # L2 dipole offset can be roughly baseline shifted over
-        # the entire range of t
-        self.data['L2'] -= dpl_offset['L2']
-        # L5 dipole offset should be different for interval [50., 500.]
-        # and then it can be offset
-        # slope (m) and intercept (b) params for L5 dipole offset
-        # uncorrected for N_cells
-        # these values were fit over the range [37., 750.)
-        m = 3.4770508e-3
-        b = -51.231085
-        # these values were fit over the range [750., 5000]
-        t1 = 750.
-        m1 = 1.01e-4
-        b1 = -48.412078
-        # piecewise normalization
-        self.data['L5'][self.times <= 37.] -= dpl_offset['L5']
-        self.data['L5'][(self.times > 37.) & (self.times < t1)] -= N_pyr * \
-            (m * self.times[(self.times > 37.) & (self.times < t1)] + b)
-        self.data['L5'][self.times >= t1] -= N_pyr * \
-            (m1 * self.times[self.times >= t1] + b1)
+        self.data['L5'] -= L5_exp * N_pyr_x * N_pyr_y
+        self.data['L2'] -= L2_exp * N_pyr_x * N_pyr_y
         # recalculate the aggregate dipole based on the baseline
         # normalized ones
         self.data['agg'] = self.data['L2'] + self.data['L5']
