@@ -249,11 +249,16 @@ class Dipole(object):
             print("Warning, no dipole renormalization done because units"
                   " were in %s" % (self.units))
             return
+        # These are with old section/segment initialisation
         # L5: -3.6498e+00 * np.exp(1.9647e-03 * t) + -4.8023e+01
         # L2: 2.8063e-03 * np.exp(1.1149e-02 * t) + 4.4301e-02
-        L5_exp = -3.6498e+00 * np.exp(1.9647e-03 * self.times) - 4.8023e+01
-        L2_exp = 2.8063e-03 * np.exp(1.1149e-02 * self.times) + 4.4301e-02
+        # L5_exp = -3.6498e+00 * np.exp(1.9647e-03 * self.times) - 4.8023e+01
+        # L2_exp = 2.8063e-03 * np.exp(1.1149e-02 * self.times) + 4.4301e-02
 
+        # These are with more detailed segment-level initialisation of Vm
+        # -4.60641e+00 * np.exp(2.51721e-03 * t) + -4.80496e+01
+        L5_exp = -4.60641e+00 * np.exp(2.51721e-03 * self.times) - 4.80496e+01
+        L2_exp = 4.43005e-02
         self.data['L5'] -= L5_exp * N_pyr_x * N_pyr_y
         self.data['L2'] -= L2_exp * N_pyr_x * N_pyr_y
         # recalculate the aggregate dipole based on the baseline
