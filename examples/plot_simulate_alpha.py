@@ -52,6 +52,8 @@ net.add_bursty_drive(
     synaptic_delays=syn_delays_p, seedcore=14)
 
 dpl = simulate_dipole(net, postproc=False)
+dpl[0].baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
+
 
 ###############################################################################
 # We can confirm that what we simulate is indeed 10 Hz activity by plotting the
@@ -84,6 +86,7 @@ net.add_bursty_drive(
     synaptic_delays=syn_delays_d, seedcore=16)
 
 dpl = simulate_dipole(net, postproc=False)
+dpl[0].baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
 
 ###############################################################################
 # We can verify that beta frequency activity was produced by inspecting the PSD
