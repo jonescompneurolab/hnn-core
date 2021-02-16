@@ -36,7 +36,7 @@ class Pyr(_Cell):
     Attributes
     ----------
     name : str
-        The name of the cell, 'L5Pyr' or 'L2Pyr'
+        The name of the cell, 'L5Pyr', 'CustomL5Pyr', or 'L2Pyr'
     list_dend : list of str
         List of dendrites.
     sect_loc : dict of list
@@ -53,12 +53,23 @@ class Pyr(_Cell):
 
     def __init__(self, pos, celltype, override_params=None, gid=None):
 
-        if celltype == 'L5_pyramidal':
+        if self.__name__ == 'L5_pyramidal':
             p_all_default = get_L5Pyr_params_default()
         elif celltype == 'L2_pyramidal':
             p_all_default = get_L2Pyr_params_default()
+        elif self.__name__ == 'CustomL5Pyr':           
+            p_all_default = get_L5Pyr_params_default()
+            p_all_default['L5Pyr_soma_gkbar_hh2'] = 0.06
+            p_all_default['L5Pyr_soma_gnabar_hh2'] = 0.32
+            p_all_default['L5Pyr_soma_gbar_ca'] = 10.
+            p_all_default['L5Pyr_dend_gkbar_hh2'] = 1e-4
+            p_all_default['L5Pyr_dend_gnabar_hh2'] = 28e-4
+            p_all_default['L5Pyr_dend_gbar_ca'] = 40.
         else:
             raise ValueError(f'Unknown pyramidal cell type: {celltype}')
+
+        
+            # update params in dictionary here
 
         p_all = p_all_default
         if override_params is not None:
@@ -223,7 +234,7 @@ class Pyr(_Cell):
                 'Ra': p_all['%s_dend_Ra' % self.name],
             },
         }
-        if self.name == 'L5Pyr':
+        if self.name == ('L5Pyr' or 'CustomL5Pyr') : #update for custom
             props.update({
                 'apical_2': {
                     'L': p_all['L5Pyr_apical2_L'],
@@ -287,7 +298,7 @@ class Pyr(_Cell):
         self.synapses['apicaltuft_nmda'] = self.syn_create(
             self.dends['apical_tuft'](0.5), **p_syn['nmda'])
 
-        if self.name == 'L5Pyr':
+        if self.name == ('L5Pyr' or 'CustomL5Pyr'): #update for custom
             self.synapses['apicaltuft_gabaa'] = self.syn_create(
                 self.dends['apical_tuft'](0.5), **p_syn['gabaa'])
 
@@ -621,4 +632,57 @@ class L5Pyr(Pyr):
             for seg in self.dends[key]:
                 seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
 
+            h.pop_section()
+
+# The custom cell object we want to create is one with distance-dependent
+# ionic dynamics. To do so, first let's create a function for computing
+# distance-dependent ionic conductance *g*. It computes a piecewise linear
+# function where the conductance at distance ``x`` from soma is linear from
+# ``gsoma`` at x=0 (base of soma) to ``gdend`` at distance ``xkink``
+# from base of soma and constant thereafter.
+
+
+
+###############################################################################
+# Next, we need to create a subclass of the original HNN class and override
+# any methods that we would like to override. The new cell class contains
+# two new methods:
+#
+# * ``set_conductance``: sets the conductance of a particular
+#   dendritic segment of the neuron, and
+# * ``set_dends_biophys``: which loops over the segments in a cell and sets
+#   their conductance.
+
+
+class CustomL5Pyr(L5Pyr):
+    def get_g_at_dist(self, x, gsoma, gdend, xkink):
+        """Compute distance-dependent ionic conductance."""
+        if x > xkink:
+            return gdend
+        g = gsoma + x * (gdend - gsoma) / xkink
+        return g
+
+    def set_conductance(self, seg, gsoma, gdend):
+        """Insert distance dependent ionic dynamics."""
+        from neuron import h
+
+        dist_soma = abs(h.distance(seg.x))
+        seg.gbar_ca = get_g_at_dist(
+            x=dist_soma,
+            gsoma=gsoma,
+            gdend=gdend,
+            xkink=1501)  # beginning of tuft
+
+    def set_biophysics(self, p_all):
+        """Set custom dendritic biophysics"""
+        from neuron import h
+
+        L5Pyr.set_biophysics(self)
+        # iterate over dendritic segments, compute
+        # conductance and set it
+        for key in self.dends:
+            self.dends[key].push()
+            for seg in self.dends[key]:
+                self.set_conductance(seg, gsoma=p_all['L5Pyr_soma_gbar_ca'], 
+                gdend=p_all['L5Pyr_dend_gbar_ca'])
             h.pop_section()

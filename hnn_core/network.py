@@ -159,6 +159,7 @@ class Network(object):
     legacy_mode : bool
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
+    model : string | None
 
     Attributes
     ----------
@@ -188,7 +189,7 @@ class Network(object):
         The parameters of bias inputs to cell somata, e.g., tonic current clamp
     """
 
-    def __init__(self, params, add_drives_from_params=False,
+    def __init__(self, params, model=None, add_drives_from_params=False,
                  legacy_mode=True):
         # Save the parameters used to create the Network
         self.params = params
@@ -235,6 +236,12 @@ class Network(object):
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cellname_list)
 
+        # 
+        if model is not None:
+            self.model = model
+        else:
+            self.model = 'default'
+        
         if add_drives_from_params:
             drive_specs = _extract_drive_specs_from_hnn_params(
                 self.params, self.cellname_list)
@@ -311,7 +318,7 @@ class Network(object):
         s += ("\n%d L2 basket cells\n%d L5 basket cells"
               % (len(self.pos_dict['L2_basket']),
                  len(self.pos_dict['L5_basket'])))
-        return '<%s | %s>' % (class_name, s)
+        return '<%s (%s) | %s>' % (class_name, self.model, s)
 
     def copy(self):
         """Return a copy of the Network instance

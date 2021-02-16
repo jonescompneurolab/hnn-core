@@ -8,7 +8,7 @@ import numpy as np
 from neuron import h
 
 from .cell import _ArtificialCell
-from .pyramidal import L2Pyr, L5Pyr
+from .pyramidal import L2Pyr, L5Pyr, CustomL5Pyr
 from .basket import L2Basket, L5Basket
 from .params import _long_name
 
@@ -376,7 +376,9 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
-
+        if self.net.model == 'calcium-dynamics':
+            type2class['L5_pyramidal'] = CustomL5Pyr
+    
         for gid in self._gid_list:
             src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
 
