@@ -335,7 +335,7 @@ def plot_cells(net, ax=None, show=True):
 
 def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
                     layer='agg', decim=None, padding='zeros', ax=None,
-                    colorbar=True, show=True):
+                    colormap='inferno', colorbar=True, show=True):
     """Plot Morlet time-frequency representation of dipole time course
 
     NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be
@@ -344,7 +344,8 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     Parameters
     ----------
     dpl : instance of Dipole | list of Dipole instances
-        The Dipole object.
+        The Dipole object. If a list of dipoles is given, the power is
+        calculated separately for each trial, then averaged.
     freqs : array
         Frequency range of interest.
     n_cycles : float or array of float, default 7.0
@@ -366,6 +367,8 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
         for mirror-image padding.
     ax : instance of matplotlib figure | None
         The matplotlib axis
+    colormap : str
+        The name of a matplotlib colormap, e.g., 'viridis'. Default: 'inferno'
     colorbar : bool
         If True (default), adjust figure to include colorbar.
     show : bool
@@ -376,40 +379,47 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
     import matplotlib.pyplot as plt
     from matplotlib.ticker import ScalarFormatter
     from mne.time_frequency import tfr_array_morlet
+    from .dipole import Dipole
 
-    data, times = _get_plot_data(dpl, layer, tmin, tmax)
-
-    sfreq = dpl.sfreq
-    if decim is not None:
-        data, times, sfreq = _decimate_plot_data(decim, data, times,
-                                                 sfreq=sfreq)
-
-    if padding is not None:
-        if not isinstance(padding, str):
-            raise ValueError('padding must be a string (or None)')
-        if padding == 'zeros':
-            data = np.r_[np.zeros((len(data) - 1,)), data.ravel(),
-                         np.zeros((len(data) - 1,))]
-        elif padding == 'mirror':
-            data = np.r_[data[-1:0:-1], data, data[-2::-1]]
-
-    # MNE expects an array of shape (n_trials, n_channels, n_times)
-    data = data[None, None, :]
-    power = tfr_array_morlet(data, sfreq=sfreq, freqs=freqs,
-                             n_cycles=n_cycles, output='power')
-
-    if padding is not None:
-        # get the middle portion after padding
-        power = power[:, :, :, times.shape[0] - 1:2 * times.shape[0] - 1]
+    if isinstance(dpl, Dipole):
+        dpl = [dpl]
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
 
-    im = ax.pcolormesh(times, freqs, power[0, 0, ...], cmap='inferno',
+    trial_power = []
+    for dpl_trial in dpl:
+        data, times = _get_plot_data(dpl_trial, layer, tmin, tmax)
+
+        sfreq = dpl_trial.sfreq
+        if decim is not None:
+            data, times, sfreq = _decimate_plot_data(decim, data, times,
+                                                     sfreq=sfreq)
+
+        if padding is not None:
+            if not isinstance(padding, str):
+                raise ValueError('padding must be a string (or None)')
+            if padding == 'zeros':
+                data = np.r_[np.zeros((len(data) - 1,)), data.ravel(),
+                             np.zeros((len(data) - 1,))]
+            elif padding == 'mirror':
+                data = np.r_[data[-1:0:-1], data, data[-2::-1]]
+
+        # MNE expects an array of shape (n_trials, n_channels, n_times)
+        data = data[None, None, :]
+        power = tfr_array_morlet(data, sfreq=sfreq, freqs=freqs,
+                                 n_cycles=n_cycles, output='power')
+
+        if padding is not None:
+            # get the middle portion after padding
+            power = power[:, :, :, times.shape[0] - 1:2 * times.shape[0] - 1]
+        trial_power.append(power)
+
+    power = np.mean(trial_power, axis=0)
+    im = ax.pcolormesh(times, freqs, power[0, 0, ...], cmap=colormap,
                        shading='auto')
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Frequency (Hz)')
