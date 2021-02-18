@@ -56,12 +56,15 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         net.cell_response._vsoma.append(spikedata[3])
         net.cell_response._isoma.append(spikedata[4])
 
+        N_pyr_x = net.params['N_pyr_x']
+        N_pyr_y = net.params['N_pyr_y']
+        dpls[-1].baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+        dpls[-1].convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:
-            N_pyr_x = net.params['N_pyr_x']
-            N_pyr_y = net.params['N_pyr_y']
             window_len = net.params['dipole_smooth_win']  # specified in ms
             fctr = net.params['dipole_scalefctr']
-            dpls[-1].post_proc(N_pyr_x, N_pyr_y, window_len, fctr)
+            dpls[-1].smooth(window_len=window_len)
+            dpls[-1].scale(fctr)
 
     return dpls
 
@@ -371,6 +374,7 @@ class MPIBackend(object):
         """
 
         # just use the joblib backend for a single core
+        # XXX this does not work: if n_procs==1, empty dipole list returned
         if self.n_procs == 1:
             return JoblibBackend(n_jobs=1).simulate(net, postproc)
 
