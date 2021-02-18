@@ -64,7 +64,10 @@ net.add_bursty_drive(
 from hnn_core import MPIBackend
 
 n_procs = 1  # change this to match the number of CPUs on your system
-with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
+if n_procs > 1:
+    with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
+        dpls = simulate_dipole(net, n_trials=1, postproc=False)
+else:  # use default Joblib backend by default
     dpls = simulate_dipole(net, n_trials=1, postproc=False)
 
 trial_idx = 0
