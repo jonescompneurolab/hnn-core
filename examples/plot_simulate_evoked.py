@@ -104,7 +104,8 @@ with JoblibBackend(n_jobs=1):
 # and then plot the amplitudes of the simulated aggregate dipole moments over
 # time
 import matplotlib.pyplot as plt
-fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
+fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
+                         constrained_layout=True)
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1],
                                    spike_types=['evprox', 'evdist'])

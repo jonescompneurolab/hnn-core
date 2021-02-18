@@ -8,7 +8,7 @@ import numpy as np
 from copy import deepcopy
 from numpy import convolve, hamming
 
-from .viz import plot_dipole
+from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
 def _hammfilt(x, winsz):
@@ -34,7 +34,7 @@ def _savgol_filter(data, h_freq, sfreq):
         determine the length of the window over which a 5th-order
         polynomial smoothing is applied.
     sfreq : float
-        Sampling rate
+        The sampling frequency (in Hz)
 
     Returns
     -------
@@ -201,6 +201,9 @@ class Dipole(object):
         Dipole moment timecourse arrays with keys 'agg', 'L2' and 'L5'
     nave : int
         Number of trials that were averaged to produce this Dipole
+    scale_applied : int or float
+        The total factor by which the dipole has been scaled (using
+        :meth:`~hnn_core.dipole.Dipole.scale`).
     """
 
     def __init__(self, times, data, nave=1):  # noqa: D102
@@ -240,7 +243,9 @@ class Dipole(object):
             self.smooth(window_len)
 
     def convert_fAm_to_nAm(self):
-        """ must be run after baseline_renormalization()
+        """The NEURON simulator output is in fAm, convert to nAm
+
+        NB! Must be run `after` :meth:`Dipole.baseline_renormalization`
         """
         for key in self.data.keys():
             self.data[key] *= 1e-6
@@ -248,7 +253,7 @@ class Dipole(object):
     def scale(self, factor):
         """Scale (multiply) the dipole moment by a fixed factor
 
-        The attribute `Dipole.scale_applied` is updated to reflect factors
+        The attribute ``Dipole.scale_applied`` is updated to reflect factors
         applied and displayed in plots.
 
         Parameters
@@ -266,11 +271,11 @@ class Dipole(object):
 
         Note that this method operates in-place, i.e., it will alter the data.
         If you prefer a filtered copy, consider using the
-        `~hnn_core.dipole.copy`-method.
+        :meth:`~hnn_core.dipole.Dipole.copy`-method.
 
         Parameters
         ----------
-        window_len : float or None
+        window_len : float
             The length (in ms) of a `~numpy.hamming` window to convolve the
             data with.
 
@@ -279,16 +284,17 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
+        if not isinstance(window_len, (float, int)) or window_len < 0:
+            raise ValueError('Window length must be a non-negative number')
+        elif 0 < window_len < 1:
+            raise ValueError('Window length less than 1 ms is not supported')
+
         # convolutional filter length is given in samples
         winsz = np.round(1e-3 * window_len * self.sfreq)
         if winsz > len(self.times):
             raise ValueError(
                 f'Window length too long: {winsz} samples; data length is '
                 f'{len(self.times)} samples')
-        elif winsz > 0 and winsz < 1:
-            raise ValueError('Window length less than 1 ms is not supported')
-        elif winsz < 0:
-            raise ValueError('Window length cannot be negative')
 
         for key in self.data.keys():
             self.data[key] = _hammfilt(self.data[key], winsz)
@@ -300,9 +306,9 @@ class Dipole(object):
 
         Note that this method operates in-place, i.e., it will alter the data.
         If you prefer a filtered copy, consider using the
-        `~hnn_core.dipole.copy`-method. The high-frequency cutoff value of a
-        Savitzky-Golay filter is approximate; see
-        `~scipy.signal.savgol_filter`.
+        :meth:`~hnn_core.dipole.Dipole.copy`-method. The high-frequency cutoff
+        value of a Savitzky-Golay filter is approximate; see the SciPy
+        reference: :func:`~scipy.signal.savgol_filter`.
 
         Parameters
         ----------
@@ -354,8 +360,102 @@ class Dipole(object):
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        return plot_dipole(dpl=self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
+        return plot_dipole(self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
                            decim=decim, show=show)
+
+    def plot_psd(self, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
+                 ax=None, show=True):
+        """Plot power spectral density (PSD) of dipole time course
+
+        Applies `~scipy.signal.periodogram` from SciPy with
+        ``window='hamming'``.
+        Note that no spectral averaging is applied across time, as most
+        ``hnn_core`` simulations are short-duration. However, passing a list of
+        `Dipole` instances will plot their average (Hamming-windowed) power,
+        which resembles the `Welch`-method applied over time.
+
+        Parameters
+        ----------
+        dpl : instance of Dipole | list of Dipole instances
+            The Dipole object.
+        fmin : float
+            Minimum frequency to plot (in Hz). Default: 0 Hz
+        fmax : float
+            Maximum frequency to plot (in Hz). Default: None (plot up to
+            Nyquist)
+        tmin : float or None
+            Start time of data to include (in ms). If None, use entire
+            simulation.
+        tmax : float or None
+            End time of data to include (in ms). If None, use entire
+            simulation.
+        layer : str, default 'agg'
+            The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+        ax : instance of matplotlib figure | None
+            The matplotlib axis.
+        show : bool
+            If True, show the figure
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+        return plot_psd(self, fmin=fmin, fmax=fmax, tmin=tmin, tmax=tmax,
+                        layer=layer, ax=ax, show=show)
+
+    def plot_tfr_morlet(self, freqs, n_cycles=7., tmin=None, tmax=None,
+                        layer='agg', decim=None, padding='zeros', ax=None,
+                        colormap='inferno', colorbar=True, show=True):
+        """Plot Morlet time-frequency representation of dipole time course
+
+        NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be
+        installed.
+
+        Parameters
+        ----------
+        dpl : instance of Dipole | list of Dipole instances
+            The Dipole object. If a list of dipoles is given, the power is
+            calculated separately for each trial, then averaged.
+        freqs : array
+            Frequency range of interest.
+        n_cycles : float or array of float, default 7.0
+            Number of cycles. Fixed number or one per frequency.
+        tmin : float or None
+            Start time of plot in milliseconds. If None, plot entire
+            simulation.
+        tmax : float or None
+            End time of plot in milliseconds. If None, plot entire simulation.
+        layer : str, default 'agg'
+            The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+        decim : int or list of int or None (default)
+            Optional (integer) factor by which to decimate the raw dipole
+            traces. The SciPy function :func:`~scipy.signal.decimate` is used,
+            which recommends values <13. To achieve higher decimation factors,
+            a list of ints can be provided. These are applied successively.
+        padding : str or None
+            Optional padding of the dipole time course beyond the plotting
+            limits. Possible values are: 'zeros' for padding with 0's
+            (default), 'mirror' for mirror-image padding.
+        ax : instance of matplotlib figure | None
+            The matplotlib axis
+        colormap : str
+            The name of a matplotlib colormap, e.g., 'viridis'. Default:
+            'inferno'
+        colorbar : bool
+            If True (default), adjust figure to include colorbar.
+        show : bool
+            If True, show the figure
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+        return plot_tfr_morlet(
+            self, freqs, n_cycles=n_cycles, tmin=tmin, tmax=tmax,
+            layer=layer, decim=decim, padding=padding, ax=ax,
+            colormap=colormap, colorbar=colorbar, show=show)
 
     def baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.

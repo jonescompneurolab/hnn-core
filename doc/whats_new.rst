@@ -47,7 +47,11 @@ Changelog
 
 - Add methods for creating input drives and biases to network: :meth:`~hnn_core.Network.add_evoked_drive`, :meth:`~hnn_core.Network.add_poisson_drive`, :meth:`~hnn_core.Network.add_bursty_drive` and :meth:`~hnn_core.Network.add_tonic_bias`, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
-- Add functions for plotting spectrograms (:meth:`~hnn_core.viz.plot_spectrogram`) and Morlet time-frequency representations (:meth:`~hnn_core.viz.plot_tfr_morlet`), by `Christopher Bailey`_ in `#250 <https://github.com/jonescompneurolab/hnn-core/pull/250>`_
+- Add functions for plotting power spectral density (:func:`~hnn_core.viz.plot_psd`) and Morlet time-frequency representations (:func:`~hnn_core.viz.plot_tfr_morlet`), by `Christopher Bailey`_ in `#264 <https://github.com/jonescompneurolab/hnn-core/pull/264>`_
+
+- Add y-label units (nAm) to all visualisation functions involving dipole moments, by `Christopher Bailey`_ in `#264 <https://github.com/jonescompneurolab/hnn-core/pull/264>`_ 
+
+- Add Savitzky-Golay filtering method :meth:`~hnn_core.dipole.Dipole.savgol_filter` to ``Dipole``; copied from ``mne-python`` :meth:`~mne.Evoked.savgol_filter`, by `Christopher Bailey`_ in `#264 <https://github.com/jonescompneurolab/hnn-core/pull/264>`_ 
 
 Bug
 ~~~
@@ -84,6 +88,8 @@ API
 - New API for defining external drives and biases to network. By default, a :class:`~hnn_core.Network` is created without drives, which are added using class methods. The argument ``add_drives_from_params`` controls this behaviour, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
 
 - Examples apply random state seeds that reproduce the output of HNN GUI documentation, by `Christopher Bailey`_ in `#221 <https://github.com/jonescompneurolab/hnn-core/pull/221>`_
+
+- Force conversion to nAm (from fAm) for output of :func:`~hnn_core.dipole.simulate_dipole` regardless of ``postproc``-argument, which now only controls parameter file-based smoothing and scaling, by `Christopher Bailey`_ in `#264 <https://github.com/jonescompneurolab/hnn-core/pull/264>`_
 
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Blake Caldwell: https://github.com/blakecaldwell
