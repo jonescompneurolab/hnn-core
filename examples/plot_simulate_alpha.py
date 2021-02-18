@@ -68,7 +68,7 @@ dpl[trial_idx].scale(3000)
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole, plot_psd
 
-fig, axes = plt.subplots(2, 1)
+fig, axes = plt.subplots(2, 1, constrained_layout=True)
 tmin, tmax = 10, 300  # exclude the initial burn-in period from the plots
 
 # We'll make a copy of the dipole before smoothing in order to compare
@@ -108,16 +108,16 @@ dpl = simulate_dipole(net, n_trials=1, postproc=False)
 # from alpha (~10 Hz) to beta (15-25 Hz) frequency range. All plotting and
 # smoothing parameters are as above, but here no scaling is applied, leading to
 # smaller absolute values in the plots.
-fig, axes = plt.subplots(2, 1)
+fig, axes = plt.subplots(2, 1, constrained_layout=True)
 
 # We'll again make a copy of the dipole before smoothing
 smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 
-# Note that using the ``plot_dipole``-function is equivalent to:
+# Note that using the ``plot_*``-functions are available as methods of Dipoles:
 dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
 smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
 
-plot_psd(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+dpl[trial_idx].plot_psd(fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 plt.tight_layout()
 
 ###############################################################################

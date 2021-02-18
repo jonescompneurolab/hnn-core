@@ -94,7 +94,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     from .dipole import Dipole
 
     if ax is None:
-        _, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     if isinstance(dpl, Dipole):
         dpl = [dpl]
@@ -116,11 +116,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
     if scale_applied == 1:
-        ylab = 'Dipole moment (nAm)'
+        ylabel = 'Dipole moment (nAm)'
     else:
-        ylab = 'Dipole moment\n(nAm ' +\
+        ylabel = 'Dipole moment\n(nAm ' +\
             r'$\times$ {:.0f})'.format(scale_applied)
-    ax.set_ylabel(ylab, multialignment='center')
+    ax.set_ylabel(ylabel, multialignment='center')
     if layer == 'agg':
         title_str = 'Aggregate (L2 + L5)'
     else:
@@ -207,7 +207,7 @@ def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
                 raise ValueError(f'No input types found for {spike_type}')
 
     if ax is None:
-        _, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
 
@@ -257,7 +257,7 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
                         'L2_pyramidal': 'g', 'L2_basket': 'w'}
 
     if ax is None:
-        _, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     ypos = 0
     for cell_type in cell_types:
@@ -334,7 +334,7 @@ def plot_cells(net, ax=None, show=True):
     return ax.get_figure()
 
 
-def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
+def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
                     layer='agg', decim=None, padding='zeros', ax=None,
                     colormap='inferno', colorbar=True, show=True):
     """Plot Morlet time-frequency representation of dipole time course
@@ -389,10 +389,17 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
         dpl = [dpl]
 
     if ax is None:
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots(1, 1, constrained_layout=True)
 
+    scale_applied = dpl[0].scale_applied
+    sfreq = dpl[0].sfreq
     trial_power = []
     for dpl_trial in dpl:
+        if dpl_trial.scale_applied != scale_applied:
+            raise RuntimeError('All dipoles must be scaled equally!')
+        if dpl_trial.sfreq != sfreq:
+            raise RuntimeError('All dipoles must be sampled equally!')
+
         data, times = _get_plot_data(dpl_trial, layer, tmin, tmax)
 
         sfreq = dpl_trial.sfreq
@@ -427,14 +434,12 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
 
     if colorbar:
         fig = ax.get_figure()
-        fig.subplots_adjust(right=0.8)
-        l, b, w, h = ax.get_position().bounds
-        cb_h = 0.8 * h
-        cb_b = b + (h - cb_h) / 2
-        cbar_ax = fig.add_axes([l + w + 0.05, cb_b, 0.03, cb_h], label='cbax')
         xfmt = ScalarFormatter()
         xfmt.set_powerlimits((-2, 2))
-        fig.colorbar(im, cax=cbar_ax, format=xfmt)
+        cbar = fig.colorbar(im, ax=ax, format=xfmt, shrink=0.8, pad=0)
+        cbar.ax.yaxis.set_ticks_position('left')
+        cbar.ax.set_ylabel(r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(
+            scale_applied), rotation=-90, va="bottom")
 
     plt_show(show)
     return ax.get_figure()
@@ -444,11 +449,11 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
              ax=None, show=True):
     """Plot power spectral density (PSD) of dipole time course
 
-    Applies `~scipy.signal.periodogram` with ``window='hamming'``. Note that
-    no spectral averaging is applied across time, as most ``hnn_core``
-    simulations are short-duration. However, passing a list of `Dipole`
-    instances will plot their average (Hamming-windowed) power, which
-    resembles the common "Welch" method.
+    Applies `~scipy.signal.periodogram` from SciPy with ``window='hamming'``.
+    Note that no spectral averaging is applied across time, as most
+    ``hnn_core`` simulations are short-duration. However, passing a list of
+    `Dipole` instances will plot their average (Hamming-windowed) power, which
+    resembles the `Welch`-method applied over time.
 
     Parameters
     ----------
@@ -479,7 +484,7 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
     from .dipole import Dipole
 
     if ax is None:
-        _, ax = plt.subplots(1, 1)
+        _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     if isinstance(dpl, Dipole):
         dpl = [dpl]
@@ -504,12 +509,12 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
     if scale_applied == 1:
-        ylab = 'Power spectral density\n(nAm' + r'$^2 \ Hz^{-1}$)'
+        ylabel = 'Power spectral density\n(nAm' + r'$^2 \ Hz^{-1}$)'
     else:
-        ylab = 'Power spectral density\n' +\
+        ylabel = 'Power spectral density\n' +\
             r'([nAm$\times$ {:.0f}]'.format(scale_applied) +\
             r'$^2 \ Hz^{-1}$)'
-    ax.set_ylabel(ylab, multialignment='center')
+    ax.set_ylabel(ylabel, multialignment='center')
 
     plt_show(show)
     return ax.get_figure()

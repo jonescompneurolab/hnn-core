@@ -76,16 +76,14 @@ trial_idx = 0  # pick first trial
 import numpy as np
 import matplotlib.pyplot as plt
 
-from hnn_core.viz import plot_dipole, plot_tfr_morlet
+fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
+                         constrained_layout=True)
 
-fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-
-plot_dipole(dpls[trial_idx], tmin=tmin, ax=axes[0], show=False)
+dpls[trial_idx].plot(tmin=tmin, ax=axes[0], show=False)
 
 # Create an fixed-step tiling of frequencies from 20 to 100 Hz in steps of 1 Hz
 freqs = np.arange(20., 100., 1.)
-plot_tfr_morlet(dpls[trial_idx], freqs=freqs, n_cycles=7, tmin=tmin,
-                ax=axes[1])
+dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[1])
 
 ###############################################################################
 # As a final exercise, let us try to re-run the simulation with a tonic bias
