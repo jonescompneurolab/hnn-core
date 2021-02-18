@@ -100,7 +100,7 @@ print(vsoma.keys())
 ###############################################################################
 # We can plot the firing pattern of individual cells by indexing with the gid
 gid = 170
-plt.figure(figsize=(4, 4))
+plt.figure(figsize=(4, 4), constrained_layout=True)
 plt.plot(net.cell_response.times, vsoma[gid])
 plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
 plt.xlabel('Time (ms)')
