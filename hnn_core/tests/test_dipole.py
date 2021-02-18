@@ -23,10 +23,24 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     times = np.arange(0, 6000 * params['dt'], params['dt'])
     data = np.random.random((6000, 3))
     dipole = Dipole(times, data)
-    dipole.baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
-    dipole.convert_fAm_to_nAm()
+    dipole._baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
+    dipole._convert_fAm_to_nAm()
     dipole.scale(params['dipole_scalefctr'])
+
+    # test smoothing logic
+    with pytest.raises(ValueError,
+                       match='Window length must be a non-negative number'):
+        dipole.smooth(window_len=None)
+    with pytest.raises(ValueError,
+                       match='Window length must be a non-negative number'):
+        dipole.smooth(window_len=-1)
+
+    with pytest.raises(ValueError, match='Window length too long:'):
+        dipole.smooth(window_len=1e6)
+    with pytest.raises(ValueError, match='Window length less than 1 ms'):
+        dipole.smooth(window_len=1e-1)
     dipole.smooth(window_len=params['dipole_smooth_win'])
+
     dipole.plot(show=False)
     plot_dipole([dipole, dipole], show=False)
     dipole.write(dpl_out_fname)
@@ -56,9 +70,8 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
 
-    dpls_raw[0].post_proc(net.params['N_pyr_x'], net.params['N_pyr_y'],
-                          net.params['dipole_smooth_win'],
-                          net.params['dipole_scalefctr'])
+    dpls_raw[0]._post_proc(net.params['dipole_smooth_win'],
+                           net.params['dipole_scalefctr'])
     assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
 
 

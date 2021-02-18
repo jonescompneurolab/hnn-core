@@ -62,9 +62,8 @@ dpl[trial_idx].scale(3000)
 # :meth:`~hnn_core.dipole.smooth`-method operates in-place, *i.e.*, it alters
 # the data inside the ``Dipole`` object). Smoothing approximates the effect of
 # signal summation from a larger number and greater volume of neurons than are
-# included in our biophysical model. Note also that the native units of the
-# simulated dipole is nAm. We can confirm that what we simulate is indeed
-# 10 Hz activity by plotting the power spectral density (PSD).
+# included in our biophysical model. We can confirm that what we simulate is
+# indeed 10 Hz activity by plotting the power spectral density (PSD).
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole, plot_psd
 
@@ -113,7 +112,7 @@ fig, axes = plt.subplots(2, 1, constrained_layout=True)
 # We'll again make a copy of the dipole before smoothing
 smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 
-# Note that using the ``plot_*``-functions are available as methods of Dipoles:
+# Note that using the ``plot_*``-functions are available as ``Dipole``-methods:
 dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
 smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
 
