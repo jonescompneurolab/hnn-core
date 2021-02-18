@@ -61,7 +61,7 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                units=None, show=True):
+                show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -82,10 +82,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
-    units : str | None
-        The physical units of the data, used for axis label. Defaults to
-        ``None``, which results in units being omitted from the plot. When
-        provided, the user must ensure the correctness of the units.
     show : bool
         If True, show the figure
 
@@ -103,7 +99,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     if isinstance(dpl, Dipole):
         dpl = [dpl]
 
+    scale_applied = dpl[0].scale_applied
     for dpl_trial in dpl:
+        if dpl_trial.scale_applied != scale_applied:
+            raise RuntimeError('All dipoles must be scaled equally!')
+
         if layer in dpl_trial.data.keys():
 
             # extract scaled data and times
@@ -115,11 +115,12 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
-    if units is None:
-        ylab = 'Dipole moment'
+    if scale_applied == 1:
+        ylab = 'Dipole moment (nAm)'
     else:
-        ylab = f'Dipole moment ({units})'
-    ax.set_ylabel(ylab)
+        ylab = 'Dipole moment\n(nAm ' +\
+            r'$\times$ {:.0f})'.format(scale_applied)
+    ax.set_ylabel(ylab, multialignment='center')
     if layer == 'agg':
         title_str = 'Aggregate (L2 + L5)'
     else:
@@ -440,16 +441,18 @@ def plot_tfr_morlet(dpl, *, freqs, n_cycles=7., tmin=None, tmax=None,
 
 
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-             ax=None, units=None, show=True):
+             ax=None, show=True):
     """Plot power spectral density (PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` with ``window='hamming'``. Note that
-    no spectral averaging is applied, as most ``hnn_core`` simulations are
-    short-duration.
+    no spectral averaging is applied across time, as most ``hnn_core``
+    simulations are short-duration. However, passing a list of `Dipole`
+    instances will plot their average (Hamming-windowed) power, which
+    resembles the common "Welch" method.
 
     Parameters
     ----------
-    dpl : instance of Dipole
+    dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
     fmin : float
         Minimum frequency to plot (in Hz). Default: 0 Hz
@@ -463,10 +466,6 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
     ax : instance of matplotlib figure | None
         The matplotlib axis.
-    units : str | None
-        The physical units of the data, used for axis label. Defaults to
-        ``None``, which results in units being omitted from the plot. When
-        provided, the user must ensure the correctness of the units.
     show : bool
         If True, show the figure
 
@@ -477,109 +476,40 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
     """
     import matplotlib.pyplot as plt
     from scipy.signal import periodogram
+    from .dipole import Dipole
 
-    sfreq = dpl.sfreq
-    data, _ = _get_plot_data(dpl, layer, tmin, tmax)
-
-    freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
     if ax is None:
         _, ax = plt.subplots(1, 1)
 
-    # ax.plot(freqs, np.sqrt(Pxx))
-    ax.plot(freqs, Pxx)
+    if isinstance(dpl, Dipole):
+        dpl = [dpl]
+
+    scale_applied = dpl[0].scale_applied
+    sfreq = dpl[0].sfreq
+    trial_power = []
+    for dpl_trial in dpl:
+        if dpl_trial.scale_applied != scale_applied:
+            raise RuntimeError('All dipoles must be scaled equally!')
+        if dpl_trial.sfreq != sfreq:
+            raise RuntimeError('All dipoles must be sampled equally!')
+
+        data, _ = _get_plot_data(dpl_trial, layer, tmin, tmax)
+
+        freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
+        trial_power.append(Pxx)
+
+    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0))
     if fmax is not None:
         ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Frequency (Hz)')
-    if units is None:
-        ylab = 'Power spectral density'
+    if scale_applied == 1:
+        ylab = 'Power spectral density\n(nAm' + r'$^2 \ Hz^{-1}$)'
     else:
-        ylab = f'Power ({units}' + r'$^2 \ Hz^{-1}$)'
-    ax.set_ylabel(ylab)
-
-    plt_show(show)
-    return ax.get_figure()
-
-
-# from mne-python, v/0.23dev0
-def _check_nfft(n, n_fft, n_per_seg, n_overlap):
-    """Ensure n_fft, n_per_seg and n_overlap make sense."""
-    if n_per_seg is None and n_fft > n:
-        raise ValueError(('If n_per_seg is None n_fft is not allowed to be > '
-                          'n_times. If you want zero-padding, you have to set '
-                          'n_per_seg to relevant length. Got n_fft of %d while'
-                          ' signal length is %d.') % (n_fft, n))
-    n_per_seg = n_fft if n_per_seg is None or n_per_seg > n_fft else n_per_seg
-    n_per_seg = n if n_per_seg > n else n_per_seg
-    if n_overlap >= n_per_seg:
-        raise ValueError(('n_overlap cannot be greater than n_per_seg (or '
-                          'n_fft). Got n_overlap of %d while n_per_seg is '
-                          '%d.') % (n_overlap, n_per_seg))
-    return n_fft, n_per_seg, n_overlap
-
-
-# inspired by mne-python (time_frequency.psd_array_welch), v/0.23dev0
-def plot_psd_welch(dpl, *, fmin=0, fmax=None, n_fft=2**14, n_overlap=0,
-                   n_per_seg=2**12, tmin=None, tmax=None, layer='agg',
-                   units=None, ax=None, show=True):
-    """Plot Power Spectral Density of dipole time course using Welch's method
-
-    Applies `~scipy.signal.welch` with ``window='hamming'``.
-
-    Parameters
-    ----------
-    dpl : instance of Dipole
-        The Dipole object.
-    fmin : float
-        Minimum frequency to plot (in Hz). Default: 0 Hz
-    fmax : float
-        Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)
-    n_fft : int
-        The length of FFT used, must be ``>= n_per_seg`` (default: 2**14).
-        The segments will be zero-padded if ``n_fft > n_per_seg``.
-    n_overlap : int
-        The number of points of overlap between segments. Will be adjusted
-        to be <= n_per_seg. The default value is 0.
-    n_per_seg : int | None
-        Length of each Welch segment (windowed with a Hamming window). Defaults
-        to None, which sets n_per_seg equal to n_fft.
-    tmin : float or None
-        Start time of data to include (in ms). If None, use entire simulation.
-    tmax : float or None
-        End time of data to include (in ms). If None, use entire simulation.
-    layer : str, default 'agg'
-        The layer to plot. Can be one of 'agg', 'L2', and 'L5'
-    ax : instance of matplotlib figure | None
-        The matplotlib axis.
-    show : bool
-        If True, show the figure
-
-    Returns
-    -------
-    fig : instance of matplotlib Figure
-        The matplotlib figure handle.
-    """
-    import matplotlib.pyplot as plt
-    from scipy.signal import welch
-
-    sfreq = dpl.sfreq
-    data, times = _get_plot_data(dpl, layer, tmin, tmax)
-    n_fft, n_per_seg, n_overlap = _check_nfft(len(times), n_fft, n_per_seg,
-                                              n_overlap)
-
-    freqs, Pxx = welch(data, sfreq, nfft=n_fft, noverlap=n_overlap,
-                       nperseg=n_per_seg, window='hamming')
-    if ax is None:
-        _, ax = plt.subplots(1, 1)
-
-    # ax.plot(freqs, np.sqrt(Pxx))
-    ax.plot(freqs, Pxx)
-    if fmax is not None:
-        ax.set_xlim((fmin, fmax))
-    ax.ticklabel_format(axis='both', scilimits=(-2, 3))
-    ax.set_xlabel('Frequency (Hz)')
-    # ax.set_ylabel(f'Power ({dpl.units} / ' + r'$\sqrt{Hz}$' + ')')
-    ax.set_ylabel(f'Power ({units}' + r'$^2 \ Hz^{-1}$)')
+        ylab = 'Power spectral density\n' +\
+            r'([nAm$\times$ {:.0f}]'.format(scale_applied) +\
+            r'$^2 \ Hz^{-1}$)'
+    ax.set_ylabel(ylab, multialignment='center')
 
     plt_show(show)
     return ax.get_figure()

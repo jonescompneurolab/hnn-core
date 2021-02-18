@@ -50,7 +50,12 @@ net.add_bursty_drive(
     spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_p,
     synaptic_delays=syn_delays_p, seedcore=14)
 
-dpl = simulate_dipole(net, postproc=False)
+# simulate the dipole, but do not automatically scale or smooth the result
+dpl = simulate_dipole(net, n_trials=1, postproc=False)
+
+trial_idx = 0  # single trial simulated, choose the first index
+# to emulate a larger patch of cortex, we can apply a simple scaling factor
+dpl[trial_idx].scale(3000)
 
 ###############################################################################
 # Prior to plotting, we can choose to smooth the dipole waveform (note that the
@@ -65,27 +70,17 @@ from hnn_core.viz import plot_dipole, plot_psd
 
 fig, axes = plt.subplots(2, 1)
 tmin, tmax = 10, 300  # exclude the initial burn-in period from the plots
-trial_idx = 0  # single trial simulated
-
-dpl[trial_idx].convert_fAm_to_nAm()
-dpl[trial_idx].scale(3000)  # XXX from params['dipole_scalefctr'], can be omitted  # noqa
 
 # We'll make a copy of the dipole before smoothing in order to compare
 window_len = 20  # convolve with a 20 ms-long Hamming window
-# XXX params['dipole_smooth_win']==30 seems excessive
 dpl_smooth = dpl[trial_idx].copy().smooth(window_len)
 
-# XXX REMOVE, here just for illustration
-h_freq = 30
-dpl_savgol = dpl[trial_idx].copy().savgol_filter(h_freq)
-
-# Overlay the three traces for comparison. Note the large edge-artefact when
-# applying the convolutional smoothing method (``window_len``). The function
-# plot_dipole can plot a list of dipoles at once
-dpl_list = [dpl[trial_idx], dpl_smooth, dpl_savgol]
+# Overlay the traces for comparison. The function plot_dipole can plot a list
+# of dipoles at once
+dpl_list = [dpl[trial_idx], dpl_smooth]
 plot_dipole(dpl_list, tmin=tmin, tmax=tmax, ax=axes[0], show=False)
 axes[0].set_xlim((1, 399))
-axes[0].legend(['orig', 'window', 'hfreq'])
+axes[0].legend(['orig', 'smooth'])
 
 plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False)
 axes[1].set_xscale('log')
@@ -105,13 +100,14 @@ net.add_bursty_drive(
     spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_d,
     synaptic_delays=syn_delays_d, seedcore=16)
 
-dpl = simulate_dipole(net, postproc=False)
+dpl = simulate_dipole(net, n_trials=1, postproc=False)
 
 ###############################################################################
 # We can verify that beta frequency activity was produced by inspecting the PSD
 # of the most recent simulation. The dominant power in the signal is shifted
 # from alpha (~10 Hz) to beta (15-25 Hz) frequency range. All plotting and
-# smoothing parameters are as above.
+# smoothing parameters are as above, but here no scaling is applied, leading to
+# smaller absolute values in the plots.
 fig, axes = plt.subplots(2, 1)
 
 # We'll again make a copy of the dipole before smoothing
@@ -119,10 +115,9 @@ smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 
 # Note that using the ``plot_dipole``-function is equivalent to:
 dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
-# If you know the units of the data, you can pass them as a string
-smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False, units='nAm')
+smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
 
-plot_psd(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1], units='nAm')
+plot_psd(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
 plt.tight_layout()
 
 ###############################################################################
@@ -132,4 +127,4 @@ plt.tight_layout()
 #    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
 #    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 #
-# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta  # noqa
+# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta
