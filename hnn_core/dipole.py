@@ -223,15 +223,11 @@ class Dipole(object):
         """
         return deepcopy(self)
 
-    def post_proc(self, N_pyr_x, N_pyr_y, window_len, fctr):
-        """ Apply baseline, unit conversion, scaling and smoothing
+    def _post_proc(self, window_len, fctr):
+        """Apply scaling and smoothing from param-files (DEPRECATE)
 
         Parameters
         ----------
-        N_pyr_x : int
-            Number of Pyramidal cells in x direction
-        N_pyr_y : int
-            Number of Pyramidal cells in y direction
         window_len : int
             Smoothing window in ms
         fctr : int
@@ -242,7 +238,7 @@ class Dipole(object):
         if window_len > 0:  # this is to allow param-files with len==0
             self.smooth(window_len)
 
-    def convert_fAm_to_nAm(self):
+    def _convert_fAm_to_nAm(self):
         """The NEURON simulator output is in fAm, convert to nAm
 
         NB! Must be run `after` :meth:`Dipole.baseline_renormalization`
@@ -457,7 +453,7 @@ class Dipole(object):
             layer=layer, decim=decim, padding=padding, ax=ax,
             colormap=colormap, colorbar=colorbar, show=show)
 
-    def baseline_renormalize(self, N_pyr_x, N_pyr_y):
+    def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
 
         Parameters
