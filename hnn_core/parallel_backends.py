@@ -63,8 +63,10 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         if postproc:
             window_len = net.params['dipole_smooth_win']  # specified in ms
             fctr = net.params['dipole_scalefctr']
-            dpls[-1].smooth(window_len=window_len)
-            dpls[-1].scale(fctr)
+            if window_len > 0:  # param files set to zero for no smoothing
+                dpls[-1].smooth(window_len=window_len)
+            if fctr > 0:
+                dpls[-1].scale(fctr)
 
     return dpls
 
