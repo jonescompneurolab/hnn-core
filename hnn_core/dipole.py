@@ -208,6 +208,7 @@ class Dipole(object):
         self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
         self.nave = nave
         self.sfreq = 1000. / (times[1] - times[0])  # NB assumes len > 1
+        self.scale_applied = 1  # for visualisation
 
     def copy(self):
         """Return a copy of the Dipole instance
@@ -233,8 +234,6 @@ class Dipole(object):
         fctr : int
             Scaling factor
         """
-        self.baseline_renormalize(N_pyr_x, N_pyr_y)
-        self.convert_fAm_to_nAm()
         self.scale(fctr)
 
         if window_len > 0:  # this is to allow param-files with len==0
@@ -246,9 +245,20 @@ class Dipole(object):
         for key in self.data.keys():
             self.data[key] *= 1e-6
 
-    def scale(self, fctr):
+    def scale(self, factor):
+        """Scale (multiply) the dipole moment by a fixed factor
+
+        The attribute `Dipole.scale_applied` is updated to reflect factors
+        applied and displayed in plots.
+
+        Parameters
+        ----------
+        factor : int
+            Scaling factor, applied to the data in-place.
+        """
         for key in self.data.keys():
-            self.data[key] *= fctr
+            self.data[key] *= factor
+        self.scale_applied *= factor
         return self
 
     def smooth(self, window_len):
@@ -291,7 +301,8 @@ class Dipole(object):
         Note that this method operates in-place, i.e., it will alter the data.
         If you prefer a filtered copy, consider using the
         `~hnn_core.dipole.copy`-method. The high-frequency cutoff value of a
-        Savitzky-Golay filter is approximate; see `~scipy.signal.savgol_filter.
+        Savitzky-Golay filter is approximate; see
+        `~scipy.signal.savgol_filter`.
 
         Parameters
         ----------
@@ -320,7 +331,7 @@ class Dipole(object):
         return self
 
     def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             units='nAm', show=True):
+             show=True):
         """Simple layer-specific plot function.
 
         Parameters
@@ -335,10 +346,6 @@ class Dipole(object):
             Factor by which to decimate the raw dipole traces (optional)
         ax : instance of matplotlib figure | None
             The matplotlib axis
-        units : str | None
-            The physical units of the data, used for axis label. Defaults to
-            ``units='nAm'``. Passing ``None`` results in units being omitted
-            from plot.
         show : bool
             If True, show the figure
 
@@ -348,7 +355,7 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         return plot_dipole(dpl=self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
-                           decim=decim, units=units, show=show)
+                           decim=decim, show=show)
 
     def baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
