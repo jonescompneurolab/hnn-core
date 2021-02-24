@@ -164,13 +164,11 @@ class JoblibBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-
-        dpls = []
-
         parallel, myfunc = self._parallel_func(_clone_and_simulate)
         sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
 
-        dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
+        dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
+                                  postproc=postproc)
 
         return dpls
 
@@ -378,7 +376,8 @@ class MPIBackend(object):
         # just use the joblib backend for a single core
         # XXX this does not work: if n_procs==1, empty dipole list returned
         if self.n_procs == 1:
-            return JoblibBackend(n_jobs=1).simulate(net, postproc)
+            return JoblibBackend(n_jobs=1).simulate(net, n_trials=n_trials,
+                                                    postproc=postproc)
 
         print("Running %d trials..." % (n_trials))
         dpls = []

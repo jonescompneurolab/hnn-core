@@ -176,9 +176,8 @@ class Dipole(object):
 
     An instance of the ``Dipole``-class contains the simulated dipole moment
     timecourses for L2 and L5 pyramidal cells, as well as their aggregate
-    (``'agg'``). When a ``Dipole`` is created by a call to
-    :func:`~hnn_core.simulate_dipole`, the units of the dipole moment are
-    converted to ``nAm`` (1e-9 Ampere-meters).
+    (``'agg'``). The units of the dipole moment are in ``nAm``
+    (1e-9 Ampere-meters).
 
     Parameters
     ----------
