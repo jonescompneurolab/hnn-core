@@ -545,12 +545,13 @@ across trials.
 and then plot the amplitudes of the simulated aggregate dipole moments over
 time
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-112
+.. GENERATED FROM PYTHON SOURCE LINES 106-113
 
 .. code-block:: default
 
     import matplotlib.pyplot as plt
-    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
+                             constrained_layout=True)
     plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
     net.cell_response.plot_spikes_hist(ax=axes[1],
                                        spike_types=['evprox', 'evdist'])
@@ -574,7 +575,7 @@ time
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-119
+.. GENERATED FROM PYTHON SOURCE LINES 114-120
 
 Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens. This is achieved by setting the parameter
@@ -583,7 +584,7 @@ a clone of the network defined above, and then modify the drive dynamics for
 each drive. Making a copy removes any existing outputs from the network
 such as spiking information and voltages at the soma.
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-125
+.. GENERATED FROM PYTHON SOURCE LINES 120-126
 
 .. code-block:: default
 
@@ -600,11 +601,11 @@ such as spiking information and voltages at the soma.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-127
+.. GENERATED FROM PYTHON SOURCE LINES 127-128
 
 You may interrogate current values defining the spike event time dynamics by
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-128
+.. GENERATED FROM PYTHON SOURCE LINES 128-129
 
 .. code-block:: default
 
@@ -627,7 +628,7 @@ You may interrogate current values defining the spike event time dynamics by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  41.435 seconds)
+   **Total running time of the script:** ( 2 minutes  2.798 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

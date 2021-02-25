@@ -164,7 +164,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.dipole.simulate_dipole.html#hnn_core.dipole.simulate_dipole" title="hnn_core.dipole.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, …])</p></td>
 <td><p>Simulate a dipole given the experiment parameters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.read_dipole.html#hnn_core.dipole.read_dipole" title="hnn_core.dipole.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname[, units])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.read_dipole.html#hnn_core.dipole.read_dipole" title="hnn_core.dipole.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname)</p></td>
 <td><p>Read dipole values from a file and create a Dipole instance.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.dipole.average_dipoles.html#hnn_core.dipole.average_dipoles" title="hnn_core.dipole.average_dipoles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">average_dipoles</span></code></a>(dpls)</p></td>
@@ -210,10 +210,10 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_cells.html#hnn_core.viz.plot_cells" title="hnn_core.viz.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>(net[, ax, show])</p></td>
 <td><p>Plot the cells using Network.pos_dict.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spectrogram.html#hnn_core.viz.plot_spectrogram" title="hnn_core.viz.plot_spectrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spectrogram</span></code></a>(dpl, *, fmin, fmax[, …])</p></td>
-<td><p>Plot Welch spectrogram (power spectrum) of dipole time course</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_psd.html#hnn_core.viz.plot_psd" title="hnn_core.viz.plot_psd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_psd</span></code></a>(dpl, *[, fmin, fmax, tmin, tmax, …])</p></td>
+<td><p>Plot power spectral density (PSD) of dipole time course</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_tfr_morlet.html#hnn_core.viz.plot_tfr_morlet" title="hnn_core.viz.plot_tfr_morlet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tfr_morlet</span></code></a>(dpl, *, freqs[, n_cycles, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_tfr_morlet.html#hnn_core.viz.plot_tfr_morlet" title="hnn_core.viz.plot_tfr_morlet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tfr_morlet</span></code></a>(dpl, freqs, *[, n_cycles, …])</p></td>
 <td><p>Plot Morlet time-frequency representation of dipole time course</p></td>
 </tr>
 </tbody>
@@ -244,7 +244,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname[, units])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname)</p></td>
 <td><p>Read dipole values from a file and create a Dipole instance.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spikes</span></code></a>(fname[, gid_ranges])</p></td>
@@ -268,7 +268,7 @@
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

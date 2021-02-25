@@ -112,8 +112,12 @@
 <h1>hnn_core.dipole.Dipole<a class="headerlink" href="#hnn-core-dipole-dipole" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="hnn_core.dipole.Dipole">
-<em class="property">class </em><code class="sig-prename descclassname">hnn_core.dipole.</code><code class="sig-name descname">Dipole</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">nave</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">hnn_core.dipole.</span></code><code class="sig-name descname"><span class="pre">Dipole</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nave</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dipole class.</p>
+<p>An instance of the <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>-class contains the simulated dipole moment
+timecourses for L2 and L5 pyramidal cells, as well as their aggregate
+(<code class="docutils literal notranslate"><span class="pre">'agg'</span></code>). The units of the dipole moment are in <code class="docutils literal notranslate"><span class="pre">nAm</span></code>
+(1e-9 Ampere-meters).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -129,42 +133,37 @@ to 1</p>
 </dd>
 <dt class="field-even">Attributes</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>times</strong><span class="classifier">array</span></dt><dd><p>The time vector</p>
+<dt><strong>times</strong><span class="classifier">array</span></dt><dd><p>The time vector (in ms)</p>
 </dd>
 <dt><strong>sfreq</strong><span class="classifier">float</span></dt><dd><p>The sampling frequency (in Hz)</p>
 </dd>
-<dt><strong>data</strong><span class="classifier">dict of array</span></dt><dd><p>The dipole with keys ‘agg’, ‘L2’ and ‘L5’</p>
+<dt><strong>data</strong><span class="classifier">dict of array</span></dt><dd><p>Dipole moment timecourse arrays with keys ‘agg’, ‘L2’ and ‘L5’</p>
 </dd>
 <dt><strong>nave</strong><span class="classifier">int</span></dt><dd><p>Number of trials that were averaged to produce this Dipole</p>
 </dd>
+<dt><strong>scale_applied</strong><span class="classifier">int or float</span></dt><dd><p>The total factor by which the dipole has been scaled (using
+<a class="reference internal" href="#hnn_core.dipole.Dipole.scale" title="hnn_core.dipole.Dipole.scale"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scale()</span></code></a>).</p>
+</dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="hnn_core.dipole.Dipole.baseline_renormalize">
-<code class="sig-name descname">baseline_renormalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">N_pyr_x</span></em>, <em class="sig-param"><span class="n">N_pyr_y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.baseline_renormalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Only baseline renormalize if the units are fAm.</p>
+<dt id="hnn_core.dipole.Dipole.copy">
+<code class="sig-name descname"><span class="pre">copy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of the Dipole instance</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>N_pyr_x</strong><span class="classifier">int</span></dt><dd><p>Nr of cells (x)</p>
-</dd>
-<dt><strong>N_pyr_y</strong><span class="classifier">int</span></dt><dd><p>Nr of cells (y)</p>
+<dt><strong>dpl_copy</strong><span class="classifier">instance of Dipole</span></dt><dd><p>A copy of the Dipole instance.</p>
 </dd>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="hnn_core.dipole.Dipole.convert_fAm_to_nAm">
-<code class="sig-name descname">convert_fAm_to_nAm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.convert_fAm_to_nAm" title="Permalink to this definition">¶</a></dt>
-<dd><p>must be run after baseline_renormalization()</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="hnn_core.dipole.Dipole.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tmin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tmax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">layer</span><span class="o">=</span><span class="default_value">'agg'</span></em>, <em class="sig-param"><span class="n">decim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">plot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple layer-specific plot function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -193,23 +192,164 @@ to 1</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.dipole.Dipole.post_proc">
-<code class="sig-name descname">post_proc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">N_pyr_x</span></em>, <em class="sig-param"><span class="n">N_pyr_y</span></em>, <em class="sig-param"><span class="n">winsz</span></em>, <em class="sig-param"><span class="n">fctr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.post_proc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply baseline, unit conversion, scaling and smoothing</p>
-<dl class="field-list">
+<dt id="hnn_core.dipole.Dipole.plot_psd">
+<code class="sig-name descname"><span class="pre">plot_psd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.plot_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot power spectral density (PSD) of dipole time course</p>
+<p>Applies <a class="reference external" href="https://scipy.github.io/devdocs/generated/scipy.signal.periodogram.html#scipy.signal.periodogram" title="(in SciPy v1.7.0.dev0+fc77ea1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">periodogram</span></code></a> from SciPy with
+<code class="docutils literal notranslate"><span class="pre">window='hamming'</span></code>.
+Note that no spectral averaging is applied across time, as most
+<code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> simulations are short-duration. However, passing a list of
+<a class="reference internal" href="#hnn_core.dipole.Dipole" title="hnn_core.dipole.Dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dipole</span></code></a> instances will plot their average (Hamming-windowed) power,
+which resembles the <em class="xref py py-obj">Welch</em>-method applied over time.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>N_pyr_x</strong><span class="classifier">int</span></dt><dd><blockquote>
-<div><p>Number of Pyramidal cells in x direction</p>
-</div></blockquote>
-<dl class="simple">
-<dt>N_pyr_y<span class="classifier">int</span></dt><dd><p>Number of Pyramidal cells in y direction</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole instances</span></dt><dd><p>The Dipole object.</p>
 </dd>
-<dt>winsz<span class="classifier">int</span></dt><dd><p>Smoothing window</p>
+<dt><strong>fmin</strong><span class="classifier">float</span></dt><dd><p>Minimum frequency to plot (in Hz). Default: 0 Hz</p>
 </dd>
-<dt>fctr<span class="classifier">int</span></dt><dd><p>Scaling factor</p>
+<dt><strong>fmax</strong><span class="classifier">float</span></dt><dd><p>Maximum frequency to plot (in Hz). Default: None (plot up to
+Nyquist)</p>
+</dd>
+<dt><strong>tmin</strong><span class="classifier">float or None</span></dt><dd><p>Start time of data to include (in ms). If None, use entire
+simulation.</p>
+</dd>
+<dt><strong>tmax</strong><span class="classifier">float or None</span></dt><dd><p>End time of data to include (in ms). If None, use entire
+simulation.</p>
+</dd>
+<dt><strong>layer</strong><span class="classifier">str, default ‘agg’</span></dt><dd><p>The layer to plot. Can be one of ‘agg’, ‘L2’, and ‘L5’</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.dipole.Dipole.plot_tfr_morlet">
+<code class="sig-name descname"><span class="pre">plot_tfr_morlet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cycles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zeros'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.plot_tfr_morlet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot Morlet time-frequency representation of dipole time course</p>
+<p>NB: Calls <a class="reference external" href="https://mne.tools/dev/generated/mne.time_frequency.tfr_array_morlet.html#mne.time_frequency.tfr_array_morlet" title="(in MNE v0.23.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tfr_array_morlet</span></code></a>, so <code class="docutils literal notranslate"><span class="pre">mne</span></code> must be
+installed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole instances</span></dt><dd><p>The Dipole object. If a list of dipoles is given, the power is
+calculated separately for each trial, then averaged.</p>
+</dd>
+<dt><strong>freqs</strong><span class="classifier">array</span></dt><dd><p>Frequency range of interest.</p>
+</dd>
+<dt><strong>n_cycles</strong><span class="classifier">float or array of float, default 7.0</span></dt><dd><p>Number of cycles. Fixed number or one per frequency.</p>
+</dd>
+<dt><strong>tmin</strong><span class="classifier">float or None</span></dt><dd><p>Start time of plot in milliseconds. If None, plot entire
+simulation.</p>
+</dd>
+<dt><strong>tmax</strong><span class="classifier">float or None</span></dt><dd><p>End time of plot in milliseconds. If None, plot entire simulation.</p>
+</dd>
+<dt><strong>layer</strong><span class="classifier">str, default ‘agg’</span></dt><dd><p>The layer to plot. Can be one of ‘agg’, ‘L2’, and ‘L5’</p>
+</dd>
+<dt><strong>decim</strong><span class="classifier">int or list of int or None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole
+traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.7.0.dev0+fc77ea1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
+which recommends values &lt;13. To achieve higher decimation factors,
+a list of ints can be provided. These are applied successively.</p>
+</dd>
+<dt><strong>padding</strong><span class="classifier">str or None</span></dt><dd><p>Optional padding of the dipole time course beyond the plotting
+limits. Possible values are: ‘zeros’ for padding with 0’s
+(default), ‘mirror’ for mirror-image padding.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis</p>
+</dd>
+<dt><strong>colormap</strong><span class="classifier">str</span></dt><dd><p>The name of a matplotlib colormap, e.g., ‘viridis’. Default:
+‘inferno’</p>
+</dd>
+<dt><strong>colorbar</strong><span class="classifier">bool</span></dt><dd><p>If True (default), adjust figure to include colorbar.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.dipole.Dipole.savgol_filter">
+<code class="sig-name descname"><span class="pre">savgol_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h_freq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.savgol_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth the dipole waveform using Savitzky-Golay filtering</p>
+<p>Note that this method operates in-place, i.e., it will alter the data.
+If you prefer a filtered copy, consider using the
+<a class="reference internal" href="#hnn_core.dipole.Dipole.copy" title="hnn_core.dipole.Dipole.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a>-method. The high-frequency cutoff
+value of a Savitzky-Golay filter is approximate; see the SciPy
+reference: <a class="reference external" href="https://scipy.github.io/devdocs/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.7.0.dev0+fc77ea1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>h_freq</strong><span class="classifier">float or None</span></dt><dd><p>Approximate high cutoff frequency in Hz. Note that this
+is not an exact cutoff, since Savitzky-Golay filtering
+is done using polynomial fits
+instead of FIR/IIR filtering. This parameter is thus used to
+determine the length of the window over which a 5th-order
+polynomial smoothing is applied.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>dpl_copy</strong><span class="classifier">instance of Dipole</span></dt><dd><p>A copy of the modified Dipole instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.dipole.Dipole.scale">
+<code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale (multiply) the dipole moment by a fixed factor</p>
+<p>The attribute <code class="docutils literal notranslate"><span class="pre">Dipole.scale_applied</span></code> is updated to reflect factors
+applied and displayed in plots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>factor</strong><span class="classifier">int</span></dt><dd><p>Scaling factor, applied to the data in-place.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.dipole.Dipole.smooth">
+<code class="sig-name descname"><span class="pre">smooth</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.smooth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth the dipole waveform using Hamming-windowed convolution</p>
+<p>Note that this method operates in-place, i.e., it will alter the data.
+If you prefer a filtered copy, consider using the
+<a class="reference internal" href="#hnn_core.dipole.Dipole.copy" title="hnn_core.dipole.Dipole.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a>-method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.21.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
+data with.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>dpl_copy</strong><span class="classifier">instance of Dipole</span></dt><dd><p>A copy of the modified Dipole instance.</p>
 </dd>
 </dl>
 </dd>
@@ -218,7 +358,7 @@ to 1</p>
 
 <dl class="py method">
 <dt id="hnn_core.dipole.Dipole.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">write</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write dipole values to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -247,7 +387,7 @@ to 1</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

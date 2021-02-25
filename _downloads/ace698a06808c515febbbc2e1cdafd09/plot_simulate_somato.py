@@ -219,7 +219,8 @@ with JoblibBackend(n_jobs=2):
 ###############################################################################
 # Finally, we plot the driving spike histogram, empirical and simulated median
 # nerve evoked response waveforms, and output spike histogram.
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6))
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
+                         constrained_layout=True)
 net.cell_response.plot_spikes_hist(ax=axes[0],
                                    spike_types=['evprox', 'evdist'],
                                    show=False)

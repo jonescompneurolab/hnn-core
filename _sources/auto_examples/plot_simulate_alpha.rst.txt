@@ -28,7 +28,7 @@ proximal or distal dendrites of pyramidal neurons. Providing proximal and
 distal drive simultaneously results in higher frequency beta activity [1]_,
 [2]_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-19
+.. GENERATED FROM PYTHON SOURCE LINES 12-20
 
 .. code-block:: default
 
@@ -36,6 +36,7 @@ distal drive simultaneously results in higher frequency beta activity [1]_,
     # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
     #          Sam Neymotin <samnemo@gmail.com>
     #          Nick Tolley <nicholas_tolley@brown.edu>
+    #          Christopher Bailey <bailey.cj@gmail.com>
 
     import os.path as op
 
@@ -46,11 +47,11 @@ distal drive simultaneously results in higher frequency beta activity [1]_,
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-21
+.. GENERATED FROM PYTHON SOURCE LINES 21-22
 
 Let us import hnn_core
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-25
+.. GENERATED FROM PYTHON SOURCE LINES 22-26
 
 .. code-block:: default
 
@@ -65,261 +66,21 @@ Let us import hnn_core
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-27
+.. GENERATED FROM PYTHON SOURCE LINES 27-28
 
 Then we setup the directories and read the default parameters file
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-32
+.. GENERATED FROM PYTHON SOURCE LINES 28-32
 
 .. code-block:: default
 
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    print(params)
 
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    {
-        "L2Basket_Gauss_A_weight": 0.0,
-        "L2Basket_Gauss_mu": 2000.0,
-        "L2Basket_Gauss_sigma": 3.6,
-        "L2Basket_Pois_A_weight_ampa": 0.0,
-        "L2Basket_Pois_A_weight_nmda": 0.0,
-        "L2Basket_Pois_lamtha": 0.0,
-        "L2Pyr_Gauss_A_weight": 0.0,
-        "L2Pyr_Gauss_mu": 2000.0,
-        "L2Pyr_Gauss_sigma": 3.6,
-        "L2Pyr_Pois_A_weight_ampa": 0.0,
-        "L2Pyr_Pois_A_weight_nmda": 0.0,
-        "L2Pyr_Pois_lamtha": 0.0,
-        "L2Pyr_ampa_e": 0.0,
-        "L2Pyr_ampa_tau1": 0.5,
-        "L2Pyr_ampa_tau2": 5.0,
-        "L2Pyr_apical1_L": 306.0,
-        "L2Pyr_apical1_diam": 4.08,
-        "L2Pyr_apicaloblique_L": 340.0,
-        "L2Pyr_apicaloblique_diam": 3.91,
-        "L2Pyr_apicaltrunk_L": 59.5,
-        "L2Pyr_apicaltrunk_diam": 4.25,
-        "L2Pyr_apicaltuft_L": 238.0,
-        "L2Pyr_apicaltuft_diam": 3.4,
-        "L2Pyr_basal1_L": 85.0,
-        "L2Pyr_basal1_diam": 4.25,
-        "L2Pyr_basal2_L": 255.0,
-        "L2Pyr_basal2_diam": 2.72,
-        "L2Pyr_basal3_L": 255.0,
-        "L2Pyr_basal3_diam": 2.72,
-        "L2Pyr_dend_Ra": 200.0,
-        "L2Pyr_dend_cm": 0.6195,
-        "L2Pyr_dend_el_hh2": -65.0,
-        "L2Pyr_dend_gbar_km": 250.0,
-        "L2Pyr_dend_gkbar_hh2": 0.01,
-        "L2Pyr_dend_gl_hh2": 4.26e-05,
-        "L2Pyr_dend_gnabar_hh2": 0.15,
-        "L2Pyr_gabaa_e": -80.0,
-        "L2Pyr_gabaa_tau1": 0.5,
-        "L2Pyr_gabaa_tau2": 5.0,
-        "L2Pyr_gabab_e": -80.0,
-        "L2Pyr_gabab_tau1": 1.0,
-        "L2Pyr_gabab_tau2": 20.0,
-        "L2Pyr_nmda_e": 0.0,
-        "L2Pyr_nmda_tau1": 1.0,
-        "L2Pyr_nmda_tau2": 20.0,
-        "L2Pyr_soma_L": 22.1,
-        "L2Pyr_soma_Ra": 200.0,
-        "L2Pyr_soma_cm": 0.6195,
-        "L2Pyr_soma_diam": 23.4,
-        "L2Pyr_soma_el_hh2": -65.0,
-        "L2Pyr_soma_gbar_km": 250.0,
-        "L2Pyr_soma_gkbar_hh2": 0.01,
-        "L2Pyr_soma_gl_hh2": 4.26e-05,
-        "L2Pyr_soma_gnabar_hh2": 0.18,
-        "L5Basket_Gauss_A_weight": 0.0,
-        "L5Basket_Gauss_mu": 2000.0,
-        "L5Basket_Gauss_sigma": 2.0,
-        "L5Basket_Pois_A_weight_ampa": 0.0,
-        "L5Basket_Pois_A_weight_nmda": 0.0,
-        "L5Basket_Pois_lamtha": 0.0,
-        "L5Pyr_Gauss_A_weight": 0.0,
-        "L5Pyr_Gauss_mu": 2000.0,
-        "L5Pyr_Gauss_sigma": 4.8,
-        "L5Pyr_Pois_A_weight_ampa": 0.0,
-        "L5Pyr_Pois_A_weight_nmda": 0.0,
-        "L5Pyr_Pois_lamtha": 0.0,
-        "L5Pyr_ampa_e": 0.0,
-        "L5Pyr_ampa_tau1": 0.5,
-        "L5Pyr_ampa_tau2": 5.0,
-        "L5Pyr_apical1_L": 680.0,
-        "L5Pyr_apical1_diam": 7.48,
-        "L5Pyr_apical2_L": 680.0,
-        "L5Pyr_apical2_diam": 4.93,
-        "L5Pyr_apicaloblique_L": 255.0,
-        "L5Pyr_apicaloblique_diam": 5.1,
-        "L5Pyr_apicaltrunk_L": 102.0,
-        "L5Pyr_apicaltrunk_diam": 10.2,
-        "L5Pyr_apicaltuft_L": 425.0,
-        "L5Pyr_apicaltuft_diam": 3.4,
-        "L5Pyr_basal1_L": 85.0,
-        "L5Pyr_basal1_diam": 6.8,
-        "L5Pyr_basal2_L": 255.0,
-        "L5Pyr_basal2_diam": 8.5,
-        "L5Pyr_basal3_L": 255.0,
-        "L5Pyr_basal3_diam": 8.5,
-        "L5Pyr_dend_Ra": 200.0,
-        "L5Pyr_dend_cm": 0.85,
-        "L5Pyr_dend_el_hh2": -71.0,
-        "L5Pyr_dend_gbar_ar": 1e-06,
-        "L5Pyr_dend_gbar_ca": 60.0,
-        "L5Pyr_dend_gbar_cat": 0.0002,
-        "L5Pyr_dend_gbar_kca": 0.0002,
-        "L5Pyr_dend_gbar_km": 200.0,
-        "L5Pyr_dend_gkbar_hh2": 0.01,
-        "L5Pyr_dend_gl_hh2": 4.26e-05,
-        "L5Pyr_dend_gnabar_hh2": 0.14,
-        "L5Pyr_dend_taur_cad": 20.0,
-        "L5Pyr_gabaa_e": -80.0,
-        "L5Pyr_gabaa_tau1": 0.5,
-        "L5Pyr_gabaa_tau2": 5.0,
-        "L5Pyr_gabab_e": -80.0,
-        "L5Pyr_gabab_tau1": 1.0,
-        "L5Pyr_gabab_tau2": 20.0,
-        "L5Pyr_nmda_e": 0.0,
-        "L5Pyr_nmda_tau1": 1.0,
-        "L5Pyr_nmda_tau2": 20.0,
-        "L5Pyr_soma_L": 39.0,
-        "L5Pyr_soma_Ra": 200.0,
-        "L5Pyr_soma_cm": 0.85,
-        "L5Pyr_soma_diam": 28.9,
-        "L5Pyr_soma_el_hh2": -65.0,
-        "L5Pyr_soma_gbar_ar": 1e-06,
-        "L5Pyr_soma_gbar_ca": 60.0,
-        "L5Pyr_soma_gbar_cat": 0.0002,
-        "L5Pyr_soma_gbar_kca": 0.0002,
-        "L5Pyr_soma_gbar_km": 200.0,
-        "L5Pyr_soma_gkbar_hh2": 0.01,
-        "L5Pyr_soma_gl_hh2": 4.26e-05,
-        "L5Pyr_soma_gnabar_hh2": 0.16,
-        "L5Pyr_soma_taur_cad": 20.0,
-        "N_pyr_x": 10,
-        "N_pyr_y": 10,
-        "N_trials": 1,
-        "T_pois": -1,
-        "celsius": 37.0,
-        "dipole_scalefctr": 3000,
-        "dipole_smooth_win": 30,
-        "distribution_dist": "normal",
-        "distribution_prox": "normal",
-        "dt": 0.025,
-        "dt_evprox0_evdist": -1,
-        "dt_evprox0_evprox1": -1,
-        "events_per_cycle_dist": 2,
-        "events_per_cycle_prox": 2,
-        "f_input_dist": 10.0,
-        "f_input_prox": 10.0,
-        "f_max_spec": 100,
-        "f_stdev_dist": 20.0,
-        "f_stdev_prox": 20.0,
-        "gbar_L2Basket_L2Basket": 0.02,
-        "gbar_L2Basket_L2Pyr_gabaa": 0.05,
-        "gbar_L2Basket_L2Pyr_gabab": 0.05,
-        "gbar_L2Basket_L5Pyr": 0.001,
-        "gbar_L2Pyr_L2Basket": 0.0005,
-        "gbar_L2Pyr_L2Pyr_ampa": 0.0005,
-        "gbar_L2Pyr_L2Pyr_nmda": 0.0005,
-        "gbar_L2Pyr_L5Basket": 0.00025,
-        "gbar_L2Pyr_L5Pyr": 0.00025,
-        "gbar_L5Basket_L5Basket": 0.02,
-        "gbar_L5Basket_L5Pyr_gabaa": 0.025,
-        "gbar_L5Basket_L5Pyr_gabab": 0.025,
-        "gbar_L5Pyr_L5Basket": 0.0005,
-        "gbar_L5Pyr_L5Pyr_ampa": 0.0005,
-        "gbar_L5Pyr_L5Pyr_nmda": 0.0005,
-        "gbar_evdist_1_L2Basket_ampa": 0.006562,
-        "gbar_evdist_1_L2Basket_nmda": 0.019482,
-        "gbar_evdist_1_L2Pyr_ampa": 7e-06,
-        "gbar_evdist_1_L2Pyr_nmda": 0.004317,
-        "gbar_evdist_1_L5Pyr_ampa": 0.1423,
-        "gbar_evdist_1_L5Pyr_nmda": 0.080074,
-        "gbar_evprox_1_L2Basket_ampa": 0.08831,
-        "gbar_evprox_1_L2Basket_nmda": 0.0,
-        "gbar_evprox_1_L2Pyr_ampa": 0.01525,
-        "gbar_evprox_1_L2Pyr_nmda": 0.0,
-        "gbar_evprox_1_L5Basket_ampa": 0.19934,
-        "gbar_evprox_1_L5Basket_nmda": 0.0,
-        "gbar_evprox_1_L5Pyr_ampa": 0.00865,
-        "gbar_evprox_1_L5Pyr_nmda": 0.0,
-        "gbar_evprox_2_L2Basket_ampa": 3e-06,
-        "gbar_evprox_2_L2Basket_nmda": 0.0,
-        "gbar_evprox_2_L2Pyr_ampa": 1.43884,
-        "gbar_evprox_2_L2Pyr_nmda": 0.0,
-        "gbar_evprox_2_L5Basket_ampa": 0.008958,
-        "gbar_evprox_2_L5Basket_nmda": 0.0,
-        "gbar_evprox_2_L5Pyr_ampa": 0.684013,
-        "gbar_evprox_2_L5Pyr_nmda": 0.0,
-        "inc_evinput": 0.0,
-        "input_dist_A_delay_L2": 5.0,
-        "input_dist_A_delay_L5": 5.0,
-        "input_dist_A_weight_L2Basket_ampa": 0.0,
-        "input_dist_A_weight_L2Basket_nmda": 0.0,
-        "input_dist_A_weight_L2Pyr_ampa": 0.0,
-        "input_dist_A_weight_L2Pyr_nmda": 0.0,
-        "input_dist_A_weight_L5Pyr_ampa": 0.0,
-        "input_dist_A_weight_L5Pyr_nmda": 0.0,
-        "input_prox_A_delay_L2": 0.1,
-        "input_prox_A_delay_L5": 1.0,
-        "input_prox_A_weight_L2Basket_ampa": 0.0,
-        "input_prox_A_weight_L2Basket_nmda": 0.0,
-        "input_prox_A_weight_L2Pyr_ampa": 0.0,
-        "input_prox_A_weight_L2Pyr_nmda": 0.0,
-        "input_prox_A_weight_L5Basket_ampa": 0.0,
-        "input_prox_A_weight_L5Basket_nmda": 0.0,
-        "input_prox_A_weight_L5Pyr_ampa": 0.0,
-        "input_prox_A_weight_L5Pyr_nmda": 0.0,
-        "numspikes_evdist_1": 1,
-        "numspikes_evprox_1": 1,
-        "numspikes_evprox_2": 1,
-        "prng_seedcore_evdist_1": 2,
-        "prng_seedcore_evprox_1": 2,
-        "prng_seedcore_evprox_2": 2,
-        "prng_seedcore_extgauss": 2,
-        "prng_seedcore_extpois": 2,
-        "prng_seedcore_input_dist": 2,
-        "prng_seedcore_input_prox": 2,
-        "record_isoma": 0,
-        "record_vsoma": 0,
-        "repeats_dist": 10,
-        "repeats_prox": 10,
-        "save_dpl": 0,
-        "save_figs": 0,
-        "save_spec_data": 0,
-        "sigma_t_evdist_1": 3.85,
-        "sigma_t_evprox_1": 2.47,
-        "sigma_t_evprox_2": 8.33,
-        "sim_prefix": "default",
-        "spec_cmap": "jet",
-        "sync_evinput": false,
-        "t0_input_dist": 1000,
-        "t0_input_prox": 1000.0,
-        "t0_input_stdev_dist": 0.0,
-        "t0_input_stdev_prox": 0.0,
-        "t0_pois": 0.0,
-        "t_evdist_1": 63.53,
-        "t_evprox_1": 26.61,
-        "t_evprox_2": 137.12,
-        "threshold": 0.0,
-        "tstop": 170,
-        "tstop_input_dist": 1001,
-        "tstop_input_prox": 1001
-    }
 
 
 
@@ -334,7 +95,7 @@ amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization. The drive is only connected to the proximal
 (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-56
+.. GENERATED FROM PYTHON SOURCE LINES 40-60
 
 .. code-block:: default
 
@@ -344,15 +105,19 @@ time with unique randomization. The drive is only connected to the proximal
     location = 'proximal'
     burst_std = 20
     weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-    syn_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                    'L5_basket': 1., 'L5_pyramidal': 1.}
+    syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 
     net.add_bursty_drive(
         'alpha_prox', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
         spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_p,
         synaptic_delays=syn_delays_p, seedcore=14)
 
-    dpl = simulate_dipole(net, postproc=False)
+    # simulate the dipole, but do not automatically scale or smooth the result
+    dpl = simulate_dipole(net, n_trials=1, postproc=False)
+
+    trial_idx = 0  # single trial simulated, choose the first index
+    # to emulate a larger patch of cortex, we can apply a simple scaling factor
+    dpl[trial_idx].scale(3000)
 
 
 
@@ -400,28 +165,42 @@ time with unique randomization. The drive is only connected to the proximal
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
+    <hnn_core.dipole.Dipole object at 0x7f984575a400>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-62
+.. GENERATED FROM PYTHON SOURCE LINES 61-67
 
-We can confirm that what we simulate is indeed 10 Hz activity by plotting the
-power spectral density (PSD). Note that the SciPy-function
-`~scipy.signal.spectrogram` is used to create the plot. The
-``dpl[trial_idx].scale()`` call relates to the amount of cortical tissue
-necessary to observe the electric current dipole outside the head with M/EEG.
+Prior to plotting, we can choose to smooth the dipole waveform (note that the
+:meth:`~hnn_core.dipole.smooth`-method operates in-place, *i.e.*, it alters
+the data inside the ``Dipole`` object). Smoothing approximates the effect of
+signal summation from a larger number and greater volume of neurons than are
+included in our biophysical model. We can confirm that what we simulate is
+indeed 10 Hz activity by plotting the power spectral density (PSD).
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-70
+.. GENERATED FROM PYTHON SOURCE LINES 67-87
 
 .. code-block:: default
 
     import matplotlib.pyplot as plt
-    from hnn_core.viz import plot_dipole, plot_spectrogram
-    trial_idx = 0  # single trial simulated
-    fig, axes = plt.subplots(2, 1)
-    tmin = 20  # exclude initial burn-in period
-    plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
-    plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+    from hnn_core.viz import plot_dipole, plot_psd
+
+    fig, axes = plt.subplots(2, 1, constrained_layout=True)
+    tmin, tmax = 10, 300  # exclude the initial burn-in period from the plots
+
+    # We'll make a copy of the dipole before smoothing in order to compare
+    window_len = 20  # convolve with a 20 ms-long Hamming window
+    dpl_smooth = dpl[trial_idx].copy().smooth(window_len)
+
+    # Overlay the traces for comparison. The function plot_dipole can plot a list
+    # of dipoles at once
+    dpl_list = [dpl[trial_idx], dpl_smooth]
+    plot_dipole(dpl_list, tmin=tmin, tmax=tmax, ax=axes[0], show=False)
+    axes[0].set_xlim((1, 399))
+    axes[0].legend(['orig', 'smooth'])
+
+    plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False)
+    axes[1].set_xscale('log')
     plt.tight_layout()
 
 
@@ -431,10 +210,19 @@ necessary to observe the electric current dipole outside the head with M/EEG.
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/circleci/project/examples/plot_simulate_alpha.py:86: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+      plt.tight_layout()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-76
+
+.. GENERATED FROM PYTHON SOURCE LINES 88-93
 
 The next step is to add a simultaneous 10 Hz distal drive with a lower
 within-burst spread of spike times (``burst_std``) compared with the
@@ -442,21 +230,20 @@ proximal one. The different arrival times of spikes at opposite ends of
 the pyramidal cells will tend to produce bursts of 15-30 Hz power known
 as beta frequency events.
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-88
+.. GENERATED FROM PYTHON SOURCE LINES 93-104
 
 .. code-block:: default
 
     location = 'distal'
     burst_std = 15
     weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-    syn_delays_d = {'L2_basket': 5., 'L2_pyramidal': 5.,
-                    'L5_basket': 5., 'L5_pyramidal': 5.}
+    syn_delays_d = {'L2_pyramidal': 5., 'L5_pyramidal': 5.}
     net.add_bursty_drive(
         'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
         spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_d,
         synaptic_delays=syn_delays_d, seedcore=16)
 
-    dpl = simulate_dipole(net, postproc=False)
+    dpl = simulate_dipole(net, n_trials=1, postproc=False)
 
 
 
@@ -507,22 +294,28 @@ as beta frequency events.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-93
+.. GENERATED FROM PYTHON SOURCE LINES 105-110
 
 We can verify that beta frequency activity was produced by inspecting the PSD
-of the most recent simulation. While the 10 Hz alpha peak is still present, a
-much more prominent 20 Hz peak has appeared with the addition of rhythmic
-distal inputs.
+of the most recent simulation. The dominant power in the signal is shifted
+from alpha (~10 Hz) to beta (15-25 Hz) frequency range. All plotting and
+smoothing parameters are as above, but here no scaling is applied, leading to
+smaller absolute values in the plots.
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-100
+.. GENERATED FROM PYTHON SOURCE LINES 110-122
 
 .. code-block:: default
 
-    trial_idx = 0  # single trial simulated
-    fig, axes = plt.subplots(2, 1)
-    tmin = 20  # exclude initial burn-in period
-    plot_dipole(dpl[trial_idx], tmin=tmin, ax=axes[0], show=False)
-    plot_spectrogram(dpl[trial_idx], fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+    fig, axes = plt.subplots(2, 1, constrained_layout=True)
+
+    # We'll again make a copy of the dipole before smoothing
+    smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
+
+    # Note that using the ``plot_*``-functions are available as ``Dipole``-methods:
+    dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
+    smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
+
+    dpl[trial_idx].plot_psd(fmin=0., fmax=40., tmin=tmin, ax=axes[1])
     plt.tight_layout()
 
 
@@ -533,14 +326,23 @@ distal inputs.
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/circleci/project/examples/plot_simulate_alpha.py:120: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+      plt.tight_layout()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-108
+
+.. GENERATED FROM PYTHON SOURCE LINES 123-130
 
 References
 ----------
-.. [1] Jones, S. R. et al.Quantitative analysis and biophysically realistic
+.. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 
@@ -549,7 +351,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  51.239 seconds)
+   **Total running time of the script:** ( 3 minutes  30.064 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_alpha.py:

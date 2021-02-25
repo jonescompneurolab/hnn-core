@@ -284,7 +284,7 @@ We can plot the firing pattern of individual cells by indexing with the gid
 .. code-block:: default
 
     gid = 170
-    plt.figure(figsize=(4, 4))
+    plt.figure(figsize=(4, 4), constrained_layout=True)
     plt.plot(net.cell_response.times, vsoma[gid])
     plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
     plt.xlabel('Time (ms)')
@@ -430,7 +430,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  52.460 seconds)
+   **Total running time of the script:** ( 0 minutes  54.542 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

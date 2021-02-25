@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hnn_core.viz.plot_spectrogram &#8212; hnn-core  documentation</title>
+    <title>hnn_core.viz.plot_psd &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -72,7 +72,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">hnn_core.viz.plot_spectrogram</a></li>
+<li><a class="reference internal" href="#">hnn_core.viz.plot_psd</a></li>
 </ul>
 </ul>
 </li>
@@ -84,7 +84,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/generated/hnn_core.viz.plot_spectrogram.rst.txt"
+  <a href="../_sources/generated/hnn_core.viz.plot_psd.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -108,24 +108,25 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="hnn-core-viz-plot-spectrogram">
-<h1>hnn_core.viz.plot_spectrogram<a class="headerlink" href="#hnn-core-viz-plot-spectrogram" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="hnn-core-viz-plot-psd">
+<h1>hnn_core.viz.plot_psd<a class="headerlink" href="#hnn-core-viz-plot-psd" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="hnn_core.viz.plot_spectrogram">
-<code class="sig-prename descclassname">hnn_core.viz.</code><code class="sig-name descname">plot_spectrogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dpl</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">fmin</span></em>, <em class="sig-param"><span class="n">fmax</span></em>, <em class="sig-param"><span class="n">winlen</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tmin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tmax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">layer</span><span class="o">=</span><span class="default_value">'agg'</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_spectrogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot Welch spectrogram (power spectrum) of dipole time course</p>
+<dt id="hnn_core.viz.plot_psd">
+<code class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></code><code class="sig-name descname"><span class="pre">plot_psd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpl</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot power spectral density (PSD) of dipole time course</p>
+<p>Applies <a class="reference external" href="https://scipy.github.io/devdocs/generated/scipy.signal.periodogram.html#scipy.signal.periodogram" title="(in SciPy v1.7.0.dev0+fc77ea1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">periodogram</span></code></a> from SciPy with <code class="docutils literal notranslate"><span class="pre">window='hamming'</span></code>.
+Note that no spectral averaging is applied across time, as most
+<code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> simulations are short-duration. However, passing a list of
+<em class="xref py py-obj">Dipole</em> instances will plot their average (Hamming-windowed) power, which
+resembles the <em class="xref py py-obj">Welch</em>-method applied over time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole instances</span></dt><dd><p>The Dipole object.</p>
 </dd>
-<dt><strong>fmin</strong><span class="classifier">float</span></dt><dd><p>Minimum frequency to plot (in Hz).</p>
+<dt><strong>fmin</strong><span class="classifier">float</span></dt><dd><p>Minimum frequency to plot (in Hz). Default: 0 Hz</p>
 </dd>
-<dt><strong>fmax</strong><span class="classifier">float</span></dt><dd><p>Maximum frequency to plot (in Hz).</p>
-</dd>
-<dt><strong>winlen</strong><span class="classifier">float | None</span></dt><dd><p>Length of window (in ms) to average using Welch periodogram method.
-The actual window size used depends on the sampling rate (closest
-power of 2, rounded up). If None, entire window is used (no averaging).</p>
+<dt><strong>fmax</strong><span class="classifier">float</span></dt><dd><p>Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)</p>
 </dd>
 <dt><strong>tmin</strong><span class="classifier">float or None</span></dt><dd><p>Start time of data to include (in ms). If None, use entire simulation.</p>
 </dd>
@@ -163,7 +164,7 @@ power of 2, rounded up). If None, entire window is used (no averaging).</p>
     </p>
     <p>
         &copy; Copyright 2019, Mainak Jas.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

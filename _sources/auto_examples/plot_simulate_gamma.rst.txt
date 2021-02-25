@@ -224,7 +224,7 @@ a population oscillation in the gamma-range, we can plot the time-frequency
 representation together with the signal. Note that the network requires some
 time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-90
+.. GENERATED FROM PYTHON SOURCE LINES 71-88
 
 .. code-block:: default
 
@@ -236,16 +236,14 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
     import numpy as np
     import matplotlib.pyplot as plt
 
-    from hnn_core.viz import plot_dipole, plot_tfr_morlet
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
+                             constrained_layout=True)
 
-    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
-
-    plot_dipole(dpls[trial_idx], tmin=tmin, ax=axes[0], show=False)
+    dpls[trial_idx].plot(tmin=tmin, ax=axes[0], show=False)
 
     # Create an fixed-step tiling of frequencies from 20 to 100 Hz in steps of 1 Hz
     freqs = np.arange(20., 100., 1.)
-    plot_tfr_morlet(dpls[trial_idx], freqs=freqs, n_cycles=7, tmin=tmin,
-                    ax=axes[1])
+    dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[1])
 
 
 
@@ -266,7 +264,7 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-96
+.. GENERATED FROM PYTHON SOURCE LINES 89-94
 
 As a final exercise, let us try to re-run the simulation with a tonic bias
 applied to the L5 Pyramidal cells. Notice that the oscillation waveform is
@@ -274,7 +272,7 @@ more regular, with less noise due to the fact that the tonic depolarization
 dominates over the influence of the Poisson drive. By default, a tonic bias
 is applied to the entire duration of the simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-101
+.. GENERATED FROM PYTHON SOURCE LINES 94-99
 
 .. code-block:: default
 
@@ -331,7 +329,7 @@ is applied to the entire duration of the simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-109
+.. GENERATED FROM PYTHON SOURCE LINES 100-107
 
 Notice that the Layer 5 pyramidal neurons now fire nearly synchronously,
 leading to a synchronous activation of the inhibitory basket neurons,
@@ -341,7 +339,7 @@ Poisson drive is to bring the pyramidal cells back to firing threshold,
 creating a ~50 Hz PING rhythm. This type of synchronous rhythm is sometimes
 referred to as “strong” PING.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-111
+.. GENERATED FROM PYTHON SOURCE LINES 107-109
 
 .. code-block:: default
 
@@ -366,19 +364,17 @@ referred to as “strong” PING.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-114
+.. GENERATED FROM PYTHON SOURCE LINES 110-112
 
 Although the simulated dipole signal demonstrates clear periodicity, its
 frequency is lower compared with the "weak" PING simulation above.
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-119
+.. GENERATED FROM PYTHON SOURCE LINES 112-115
 
 .. code-block:: default
 
-    from hnn_core.viz import plot_spectrogram
-    winlen = 200  # Welch periodogram: averaging window length in ms
-    plot_spectrogram(dpls[trial_idx], fmin=20., fmax=100., winlen=winlen,
-                     tmin=tmin)
+    from hnn_core.viz import plot_psd
+    plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
 
 
 
@@ -399,7 +395,7 @@ frequency is lower compared with the "weak" PING simulation above.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-128
+.. GENERATED FROM PYTHON SOURCE LINES 116-124
 
 References
 ----------
@@ -413,7 +409,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  35.522 seconds)
+   **Total running time of the script:** ( 2 minutes  34.823 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_gamma.py:
