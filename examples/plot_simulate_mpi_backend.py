@@ -63,8 +63,7 @@ net.add_bursty_drive(
 # ``openmpi``, which must be installed on the system
 from hnn_core import MPIBackend
 
-n_procs = 1
-with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
+with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
     dpls = simulate_dipole(net, n_trials=1, postproc=False)
 
 trial_idx = 0
