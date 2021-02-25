@@ -374,7 +374,6 @@ class MPIBackend(object):
         """
 
         # just use the joblib backend for a single core
-        # XXX this does not work: if n_procs==1, empty dipole list returned
         if self.n_procs == 1:
             return JoblibBackend(n_jobs=1).simulate(net, n_trials=n_trials,
                                                     postproc=postproc)
