@@ -126,3 +126,11 @@ net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
 ###############################################################################
 # You may interrogate current values defining the spike event time dynamics by
 print(net_sync.external_drives['evdist1']['dynamics'])
+
+###############################################################################
+# Finally, let's simulate this network.
+dpls_sync = simulate_dipole(net_sync, n_trials=1)
+
+trial_idx = 0
+dpls_sync[trial_idx].plot()
+net_sync.cell_response.plot_spikes_hist()
