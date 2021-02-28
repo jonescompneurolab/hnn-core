@@ -382,7 +382,7 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
     """
     import matplotlib.pyplot as plt
     from matplotlib.ticker import ScalarFormatter
-    from mne.time_frequency import tfr_array_morlet
+    from .externals.mne import tfr_array_morlet
     from .dipole import Dipole
 
     if isinstance(dpl, Dipole):

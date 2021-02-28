@@ -10,10 +10,6 @@ tuned in [1]_ by adjusting the synaptic weights between excitatory (pyramidal)
 and inbitory (basket) cells until gamma rhythms could be observed. The network
 dynamics are driven by Poisson-distributed (noisy) spike trains to layer II/III
 and layer V pyramidal cell populations.
-
-Note that for plotting time-frequency representations, the code below calls
-the ``mne`` function :func:`~mne.time_frequency.tfr_array_morlet`. To install
-``mne``, simply ``pip install mne`` inside your python environment.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
