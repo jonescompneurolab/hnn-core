@@ -101,7 +101,8 @@ if __name__ == "__main__":
           install_requires=[
               'numpy >=1.14',
               'NEURON >=7.7',
-              'matplotlib'
+              'matplotlib',
+              'scipy'
           ],
           packages=find_packages(),
           package_data={'hnn_core': 
