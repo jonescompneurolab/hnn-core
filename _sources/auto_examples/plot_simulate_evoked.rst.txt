@@ -605,11 +605,12 @@ such as spiking information and voltages at the soma.
 
 You may interrogate current values defining the spike event time dynamics by
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-129
+.. GENERATED FROM PYTHON SOURCE LINES 128-130
 
 .. code-block:: default
 
     print(net_sync.external_drives['evdist1']['dynamics'])
+
 
 
 
@@ -625,10 +626,74 @@ You may interrogate current values defining the spike event time dynamics by
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 131-132
+
+Finally, let's simulate this network.
+
+.. GENERATED FROM PYTHON SOURCE LINES 132-137
+
+.. code-block:: default
+
+    dpls_sync = simulate_dipole(net_sync, n_trials=1)
+
+    trial_idx = 0
+    dpls_sync[trial_idx].plot()
+    net_sync.cell_response.plot_spikes_hist()
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_003.png
+          :alt: Aggregate (L2 + L5)
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_004.png
+          :alt: plot simulate evoked
+          :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    joblib will run over 1 jobs
+    Building the NEURON model
+    [Done]
+    running trial 1 on 1 cores
+    Simulation time: 0.03 ms...
+    Simulation time: 10.0 ms...
+    Simulation time: 20.0 ms...
+    Simulation time: 30.0 ms...
+    Simulation time: 40.0 ms...
+    Simulation time: 50.0 ms...
+    Simulation time: 60.0 ms...
+    Simulation time: 70.0 ms...
+    Simulation time: 80.0 ms...
+    Simulation time: 90.0 ms...
+    Simulation time: 100.0 ms...
+    Simulation time: 110.0 ms...
+    Simulation time: 120.0 ms...
+    Simulation time: 130.0 ms...
+    Simulation time: 140.0 ms...
+    Simulation time: 150.0 ms...
+    Simulation time: 160.0 ms...
+
+    <Figure size 640x480 with 1 Axes>
+
+
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  2.798 seconds)
+   **Total running time of the script:** ( 2 minutes  14.067 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:
