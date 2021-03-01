@@ -52,7 +52,7 @@ Note that if you installed Neuron using the traditional installer package, it is
 to remove it first and unset ``PYTHONPATH`` and ``PYTHONHOME`` if they were set. This is
 because the pip installer works better with virtual environments such as Anaconda.
 
-Instead if you want to install the latest version of the code (nightly) do::
+If you want to track the latest developments of ``hnn-core``, you can install the current version of the code (nightly) with::
 
 	$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 
@@ -65,7 +65,7 @@ and it should not give any error messages.
 **Parallel backends**
 
 For further instructions on installation and usage of parallel backends for using more
-than one core, refer to `parallel_backends`_
+than one CPU core, refer to `parallel_backends`_
 
 **Note for Windows users**
 
