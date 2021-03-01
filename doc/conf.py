@@ -24,7 +24,7 @@ import sphinx_bootstrap_theme
 # -- Project information -----------------------------------------------------
 
 project = 'hnn-core'
-copyright = '2020, HNN Developers'
+copyright = '2021, HNN Developers'
 author = 'HNN Developers'
 
 # The short X.Y version

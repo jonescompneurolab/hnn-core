@@ -50,7 +50,7 @@ and it will install ``hnn-core`` along with the dependencies which are not alrea
 
 Note that if you installed Neuron using the traditional installer package, it is recommended
 to remove it first and unset ``PYTHONPATH`` and ``PYTHONHOME`` if they were set. This is
-because the pip installer works better with virtual environments such as Anaconda.
+because the pip installer works better with virtual environments such as the ones provided by ``conda``.
 
 If you want to track the latest developments of ``hnn-core``, you can install the current version of the code (nightly) with::
 
