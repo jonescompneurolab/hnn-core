@@ -339,9 +339,6 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
                     colormap='inferno', colorbar=True, show=True):
     """Plot Morlet time-frequency representation of dipole time course
 
-    NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be
-    installed.
-
     Parameters
     ----------
     dpl : instance of Dipole | list of Dipole instances
