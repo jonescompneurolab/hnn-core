@@ -30,11 +30,7 @@ and inbitory (basket) cells until gamma rhythms could be observed. The network
 dynamics are driven by Poisson-distributed (noisy) spike trains to layer II/III
 and layer V pyramidal cell populations.
 
-Note that for plotting time-frequency representations, the code below calls
-the ``mne`` function :func:`~mne.time_frequency.tfr_array_morlet`. To install
-``mne``, simply ``pip install mne`` inside your python environment.
-
-.. GENERATED FROM PYTHON SOURCE LINES 18-27
+.. GENERATED FROM PYTHON SOURCE LINES 14-23
 
 .. code-block:: default
 
@@ -54,11 +50,11 @@ the ``mne`` function :func:`~mne.time_frequency.tfr_array_morlet`. To install
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-29
+.. GENERATED FROM PYTHON SOURCE LINES 24-25
 
 Let us import hnn_core
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-35
+.. GENERATED FROM PYTHON SOURCE LINES 25-31
 
 .. code-block:: default
 
@@ -75,13 +71,13 @@ Let us import hnn_core
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-39
+.. GENERATED FROM PYTHON SOURCE LINES 32-35
 
 Read the parameter file and print the between-cell connectivity parameters.
 Note that these are different compared with the 'default' parameter set used
 in, e.g., :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-43
+.. GENERATED FROM PYTHON SOURCE LINES 35-39
 
 .. code-block:: default
 
@@ -120,13 +116,13 @@ in, e.g., :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-47
+.. GENERATED FROM PYTHON SOURCE LINES 40-43
 
 We'll add a tonic Poisson-distributed excitation to pyramidal cells and
 simulate the dipole moment in a single trial (the default value used by
 ``simulate_dipole`` is ``n_trials=params['N_trials']``).
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-59
+.. GENERATED FROM PYTHON SOURCE LINES 43-55
 
 .. code-block:: default
 
@@ -185,14 +181,14 @@ simulate the dipole moment in a single trial (the default value used by
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-64
+.. GENERATED FROM PYTHON SOURCE LINES 56-60
 
 Take a look at how different cell types respond to the exogenous drive. Note
 the periodic firing pattern of all cell types. While the basket cells fire
 relatively synchronously, the pyramidal cell populations display a more
 varied pattern, in which only a fraction of cells reach firing threshold.
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-66
+.. GENERATED FROM PYTHON SOURCE LINES 60-62
 
 .. code-block:: default
 
@@ -217,14 +213,14 @@ varied pattern, in which only a fraction of cells reach firing threshold.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-71
+.. GENERATED FROM PYTHON SOURCE LINES 63-67
 
 To confirm that the periodicity observed in the firing patterns correspond to
 a population oscillation in the gamma-range, we can plot the time-frequency
 representation together with the signal. Note that the network requires some
 time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-88
+.. GENERATED FROM PYTHON SOURCE LINES 67-84
 
 .. code-block:: default
 
@@ -264,7 +260,7 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-94
+.. GENERATED FROM PYTHON SOURCE LINES 85-90
 
 As a final exercise, let us try to re-run the simulation with a tonic bias
 applied to the L5 Pyramidal cells. Notice that the oscillation waveform is
@@ -272,7 +268,7 @@ more regular, with less noise due to the fact that the tonic depolarization
 dominates over the influence of the Poisson drive. By default, a tonic bias
 is applied to the entire duration of the simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-99
+.. GENERATED FROM PYTHON SOURCE LINES 90-95
 
 .. code-block:: default
 
@@ -329,7 +325,7 @@ is applied to the entire duration of the simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-107
+.. GENERATED FROM PYTHON SOURCE LINES 96-103
 
 Notice that the Layer 5 pyramidal neurons now fire nearly synchronously,
 leading to a synchronous activation of the inhibitory basket neurons,
@@ -339,7 +335,7 @@ Poisson drive is to bring the pyramidal cells back to firing threshold,
 creating a ~50 Hz PING rhythm. This type of synchronous rhythm is sometimes
 referred to as “strong” PING.
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-109
+.. GENERATED FROM PYTHON SOURCE LINES 103-105
 
 .. code-block:: default
 
@@ -364,12 +360,12 @@ referred to as “strong” PING.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-112
+.. GENERATED FROM PYTHON SOURCE LINES 106-108
 
 Although the simulated dipole signal demonstrates clear periodicity, its
 frequency is lower compared with the "weak" PING simulation above.
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-115
+.. GENERATED FROM PYTHON SOURCE LINES 108-111
 
 .. code-block:: default
 
@@ -395,7 +391,7 @@ frequency is lower compared with the "weak" PING simulation above.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-124
+.. GENERATED FROM PYTHON SOURCE LINES 112-120
 
 References
 ----------
@@ -409,7 +405,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 5 minutes  33.209 seconds)
+   **Total running time of the script:** ( 4 minutes  0.591 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_gamma.py:
