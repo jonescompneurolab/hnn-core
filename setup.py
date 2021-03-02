@@ -106,10 +106,10 @@ if __name__ == "__main__":
               'scipy'
           ],
           packages=find_packages(),
-          package_data={'hnn_core': 
-            ['param/*.json',
-             'mod/*', 
-             'mod/x86_64/*',
-             'mod/x86_64/.lib/*']},
+          package_data={'hnn_core': [
+              'param/*.json',
+              'mod/*',
+              'mod/x86_64/*',
+              'mod/x86_64/.lib/*']},
           cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod}
           )
