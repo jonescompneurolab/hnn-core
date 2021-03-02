@@ -50,11 +50,12 @@ class BuildMod(Command):
 
     def run(self):
         print("=> Building mod files ...")
-        mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
 
         if platform.system() == 'Windows':
+            mod_path = op.join(op.dirname(__file__), 'mod')
             shell = True
         else:
+            mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
             shell = False
 
         process = subprocess.Popen(['nrnivmodl'], cwd=mod_path,
