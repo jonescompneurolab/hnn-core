@@ -39,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="#">
           hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -79,7 +79,6 @@
 </li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#documentation-and-examples">Documentation and examples</a></li>
-<li><a class="reference internal" href="#parallel-backends">Parallel backends</a></li>
 <li><a class="reference internal" href="#bug-reports">Bug reports</a></li>
 <li><a class="reference internal" href="#interested-in-contributing">Interested in Contributing?</a></li>
 </ul>
@@ -150,20 +149,15 @@
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>We recommend the <a class="reference external" href="https://www.anaconda.com/products/individual">Anaconda Python distribution</a>.
-To install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you first need to install its dependencies:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install numpy matplotlib scipy
+To install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, simply do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core
 </pre></div>
 </div>
-<p>Additionally, you would need Neuron which is available here:
-<a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a>.
-Note installing Neuron using the traditional installer may make it hard to manage
-within virtual environments such as Anaconda. For this reason, we recommend the
-pip installer:</p>
-<blockquote>
-<div><p>$ pip install NEURON</p>
-</div></blockquote>
-<p>Since <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.</p>
-<p>To install the latest version of the code (nightly) do:</p>
+<p>and it will install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> along with the dependencies which are not already installed.</p>
+<p>Note that if you installed Neuron using the traditional installer package, it is recommended
+to remove it first and unset <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> and <code class="docutils literal notranslate"><span class="pre">PYTHONHOME</span></code> if they were set. This is
+because the pip installer works better with virtual environments such as the ones provided by <code class="docutils literal notranslate"><span class="pre">conda</span></code>.</p>
+<p>If you want to track the latest developments of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you can install the current version of the code (nightly) with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 </pre></div>
 </div>
@@ -172,6 +166,21 @@ pip installer:</p>
 </pre></div>
 </div>
 <p>and it should not give any error messages.</p>
+<p><strong>Parallel backends</strong></p>
+<p>For further instructions on installation and usage of parallel backends for using more
+than one CPU core, refer to <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/parallel.html">parallel_backends</a></p>
+<p><strong>Note for Windows users</strong></p>
+<p>The pip installer for Neuron does not yet work for Windows. In this case, it is better to
+install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> without the dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core --no-deps
+</pre></div>
+</div>
+<p>and then install the dependencies separately:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install scipy numpy matplotlib
+</pre></div>
+</div>
+<p>and install Neuron using the traditional package installer available here
+<a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a>.</p>
 </div>
 <div class="section" id="documentation-and-examples">
 <h1>Documentation and examples<a class="headerlink" href="#documentation-and-examples" title="Permalink to this headline">¶</a></h1>
@@ -185,10 +194,6 @@ pip installer:</p>
 </pre></div>
 </div>
 <p>When executed in this manner, the scripts will execute entirely, after which all plots will be shown. For an even more interactive experience, in which you execute code and interrogate plots in sequential blocks, we recommend editors such as <a class="reference external" href="https://code.visualstudio.com">VS Code</a> and <a class="reference external" href="https://docs.spyder-ide.org/current/index.html">Spyder</a>.</p>
-</div>
-<div class="section" id="parallel-backends">
-<h1>Parallel backends<a class="headerlink" href="#parallel-backends" title="Permalink to this headline">¶</a></h1>
-<p>For further instructions on installation and usage of parallel backends for using more than one core, refer to <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/parallel.html">parallel_backends</a></p>
 </div>
 <div class="section" id="bug-reports">
 <h1>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h1>
@@ -213,7 +218,7 @@ report bugs. For user questions and scientific discussions, please join the
       
     </p>
     <p>
-        &copy; Copyright 2019, Mainak Jas.<br/>
+        &copy; Copyright 2021, HNN Developers.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
