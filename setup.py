@@ -50,11 +50,12 @@ class BuildMod(Command):
 
     def run(self):
         print("=> Building mod files ...")
-        mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
 
         if platform.system() == 'Windows':
+            mod_path = op.join(op.dirname(__file__), 'mod')
             shell = True
         else:
+            mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
             shell = False
 
         process = subprocess.Popen(['nrnivmodl'], cwd=mod_path,
@@ -98,11 +99,17 @@ if __name__ == "__main__":
               'Operating System :: MacOS',
           ],
           platforms='any',
+          install_requires=[
+              'numpy >=1.14',
+              'NEURON >=7.7',
+              'matplotlib',
+              'scipy'
+          ],
           packages=find_packages(),
-          package_data={'hnn_core': 
-            ['param/*.json',
-             'mod/*', 
-             'mod/x86_64/*',
-             'mod/x86_64/.lib/*']},
+          package_data={'hnn_core': [
+              'param/*.json',
+              'mod/*',
+              'mod/x86_64/*',
+              'mod/x86_64/.lib/*']},
           cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod}
           )

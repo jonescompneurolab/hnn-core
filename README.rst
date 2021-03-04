@@ -42,21 +42,17 @@ Installation
 ============
 
 We recommend the `Anaconda Python distribution <https://www.anaconda.com/products/individual>`_.
-To install ``hnn-core``, you first need to install its dependencies::
+To install ``hnn-core``, simply do::
 
-	$ conda install numpy matplotlib scipy
+   $ pip install hnn_core
 
-Additionally, you would need Neuron which is available here:
-`https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
-Note installing Neuron using the traditional installer may make it hard to manage
-within virtual environments such as Anaconda. For this reason, we recommend the
-pip installer:
+and it will install ``hnn-core`` along with the dependencies which are not already installed.
 
-	$ pip install NEURON
+Note that if you installed Neuron using the traditional installer package, it is recommended
+to remove it first and unset ``PYTHONPATH`` and ``PYTHONHOME`` if they were set. This is
+because the pip installer works better with virtual environments such as the ones provided by ``conda``.
 
-Since ``hnn-core`` does not yet have a stable release, we recommend installing the nightly version. This may change in the future if more users start using it.
-
-To install the latest version of the code (nightly) do::
+If you want to track the latest developments of ``hnn-core``, you can install the current version of the code (nightly) with::
 
 	$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 
@@ -65,6 +61,25 @@ To check if everything worked fine, you can do::
 	$ python -c 'import hnn_core'
 
 and it should not give any error messages.
+
+**Parallel backends**
+
+For further instructions on installation and usage of parallel backends for using more
+than one CPU core, refer to `parallel_backends`_
+
+**Note for Windows users**
+
+The pip installer for Neuron does not yet work for Windows. In this case, it is better to
+install ``hnn_core`` without the dependencies::
+
+   $ pip install hnn_core --no-deps
+
+and then install the dependencies separately::
+
+   $ pip install scipy numpy matplotlib
+
+and install Neuron using the traditional package installer available here
+`https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
 
 Documentation and examples
 ==========================
@@ -80,11 +95,6 @@ and executing the scripts using the ``%run``-magic::
    %run plot_simulate_evoked.py
 
 When executed in this manner, the scripts will execute entirely, after which all plots will be shown. For an even more interactive experience, in which you execute code and interrogate plots in sequential blocks, we recommend editors such as `VS Code <https://code.visualstudio.com>`_ and `Spyder <https://docs.spyder-ide.org/current/index.html>`_.
-
-Parallel backends
-=================
-
-For further instructions on installation and usage of parallel backends for using more than one core, refer to `parallel_backends`_
 
 Bug reports
 ===========
