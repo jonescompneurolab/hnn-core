@@ -94,6 +94,15 @@ API
 People who contributed to this release (in alphabetical order):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- `Blake Caldwell`_
+- `Christopher Bailey`_
+- `Carmen Kohl`_
+- `Mainak Jas`_
+- `Nick Tolley`_
+- `Ryan Thorpe`_
+- `Samika Kanekar`_
+- `Stephanie Jones`_
+
 .. _Blake Caldwell: https://github.com/blakecaldwell
 .. _Christopher Bailey: https://github.com/cjayb
 .. _Carmen Kohl: https://github.com/kohl-carmen
