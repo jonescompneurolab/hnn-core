@@ -682,6 +682,33 @@ class Network(object):
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
+    def connect_cells(self, src_gids, target_gids, weight, receptor, location,
+                      delay, space_constant):
+        """Pass connectivity matrix defining cell-cell connections.
+
+        Parameters
+        ----------
+        src_gids: list of int
+            List of gid sources where axon originates.
+        target_gids: list of int
+            List of gid targets where axon terminates.
+        weight: np.array (n_src_gids, n_target_gids) of float
+            Array defining synaptic weights.
+        receptor: np.array (n_src_gids, n_target_gids) of str
+            Array defining recptors on target cell. Must be one of
+            'ampa', 'nmda', 'gabaa', or 'gabab'.
+        location: np.array (n_src_gids, n_target_gids) of str
+            Array defining location of synapse on target cell. Must be one of
+            'proximal' or 'distal'.
+        delay: np.array (n_src_gids, n_target_gids) of float
+            Array defining synaptic delays.
+        space_constant: np.array (n_src_gids, n_target_gids) of float
+            Array defining space constants.
+        """
+
+    def remove_connections(self):
+        """Remove all cell-cell connections."""
+
     def add_tonic_bias(self, *, cell_type=None, amplitude=None,
                        t0=None, T=None):
         """Attach parameters of tonic biasing input for a given cell type.
