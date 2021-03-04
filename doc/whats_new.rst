@@ -9,8 +9,8 @@ What's new?
 
 .. _current
 
-Current
--------
+0.1
+---
 
 Changelog
 ~~~~~~~~~
