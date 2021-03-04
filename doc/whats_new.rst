@@ -7,20 +7,6 @@ What's new?
 
 .. currentmodule:: hnn_core
 
-.. _current
-
-0.1
----
-
-Changelog
-~~~~~~~~~
-
-Bug
-~~~
-
-API
-~~~
-
 .. _0.1:
 
 0.1
