@@ -28,7 +28,7 @@ copyright = '2021, HNN Developers'
 author = 'HNN Developers'
 
 # The short X.Y version
-version = '0.1'
+version = '0.2.dev0'
 # The full version, including alpha/beta/rc tags
 release = ''
 
@@ -189,6 +189,17 @@ intersphinx_mapping = {
 }
 intersphinx_timeout = 5
 
+# Resolve binder filepath_prefix. From the docs:
+# "A prefix to append to the filepath in the Binder links. You should use this
+# if you will store your built documentation in a sub-folder of a repository,
+# instead of in the root."
+# we will store dev docs in a `dev` subdirectory and all other docs in a
+# directory "v" + version_str. E.g., "v0.3"
+if 'dev' in version:
+    filepath_prefix = 'dev'
+else:
+    filepath_prefix = 'v{}'.format(version)
+
 sphinx_gallery_conf = {
     # path to your examples scripts
     'examples_dirs': '../examples',
@@ -203,7 +214,7 @@ sphinx_gallery_conf = {
                'repo': 'hnn-core',
                'branch': 'gh-pages',
                'binderhub_url': 'https://mybinder.org',
-               'notebooks_dir': 'stable/notebooks',
+               'notebooks_dir': f'{filepath_prefix}/notebooks',
                'dependencies': 'Dockerfile'
                }
 }
