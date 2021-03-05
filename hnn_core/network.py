@@ -221,6 +221,9 @@ class Network(object):
         self.external_drives = dict()
         self.external_biases = dict()
 
+        # network connectivity
+        self.connectivity = dict()
+
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self.pos_dict = _create_cell_coords(n_pyr_x=self.params['N_pyr_x'],
@@ -705,6 +708,13 @@ class Network(object):
         space_constant: np.array (n_src_gids, n_target_gids) of float
             Array defining space constants.
         """
+        self.connectivity['src_gids'] = src_gids
+        self.connectivity['target_gids'] = target_gids
+        self.connectivity['weight'] = weight
+        self.connectivity['receptor'] = receptor
+        self.connectivity['location'] = location
+        self.connectivity['delay'] = delay
+        self.connectivity['space_constant'] = space_constant
 
     def remove_connections(self):
         """Remove all cell-cell connections."""
