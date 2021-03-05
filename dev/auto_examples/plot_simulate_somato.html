@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>05. From MEG sensor-space data to HNN simulation &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">05. From MEG sensor-space data to HNN simulation</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/auto_examples/plot_simulate_somato.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-somato-py"><span class="std std-ref">here</span></a>
+to download the full example code or to run this example in your browser via Binder</p>
+</div>
+<div class="sphx-glr-example-title section" id="from-meg-sensor-space-data-to-hnn-simulation">
+<span id="sphx-glr-auto-examples-plot-simulate-somato-py"></span><h1>05. From MEG sensor-space data to HNN simulation<a class="headerlink" href="#from-meg-sensor-space-data-to-hnn-simulation" title="Permalink to this headline">¶</a></h1>
+<p>This example demonstrates how to calculate the inverse solution of the median
+nerve evoked response in S1 from the MNE somatosensory dataset, and then
+simulate a biophysical model network that reproduces the observed dynamics.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Mainak Jas &lt;mainakjas@gmail.com&gt;</span>
+<span class="c1">#          Ryan Thorpe &lt;ryan_thorpe@brown.edu&gt;</span>
+
+<span class="c1"># sphinx_gallery_thumbnail_number = 2</span>
+</pre></div>
+</div>
+<p>First, we will import the packages needed for computing the inverse solution
+from the MNE somatosensory dataset. <a class="reference external" href="https://mne.tools/">MNE</a> can be installed with
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mne</span></code>, and the somatosensory dataset can be downloaded by
+importing <code class="docutils literal notranslate"><span class="pre">somato</span></code> from <code class="docutils literal notranslate"><span class="pre">mne.datasets</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">mne</span>
+<span class="kn">from</span> <span class="nn">mne.datasets</span> <span class="kn">import</span> <span class="n">somato</span>
+<span class="kn">from</span> <span class="nn">mne.minimum_norm</span> <span class="kn">import</span> <a href="https://mne.tools/dev/generated/mne.minimum_norm.apply_inverse.html#mne.minimum_norm.apply_inverse" title="mne.minimum_norm.apply_inverse" class="sphx-glr-backref-module-mne-minimum_norm sphx-glr-backref-type-py-function"><span class="n">apply_inverse</span></a><span class="p">,</span> <a href="https://mne.tools/dev/generated/mne.minimum_norm.make_inverse_operator.html#mne.minimum_norm.make_inverse_operator" title="mne.minimum_norm.make_inverse_operator" class="sphx-glr-backref-module-mne-minimum_norm sphx-glr-backref-type-py-function"><span class="n">make_inverse_operator</span></a>
+</pre></div>
+</div>
+<p>Now we set the the path of the <code class="docutils literal notranslate"><span class="pre">somato</span></code> dataset for subject <code class="docutils literal notranslate"><span class="pre">'01'</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_path</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.datasets.somato.data_path.html#mne.datasets.somato.data_path" title="mne.datasets.somato.data_path" class="sphx-glr-backref-module-mne-datasets-somato sphx-glr-backref-type-py-function"><span class="n">somato</span><span class="o">.</span><span class="n">data_path</span></a><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subject</span></a> <span class="o">=</span> <span class="s1">&#39;01&#39;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">task</span></a> <span class="o">=</span> <span class="s1">&#39;somato&#39;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">raw_fname</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_path</span></a><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subject</span></a><span class="p">),</span> <span class="s1">&#39;meg&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">_task-</span><span class="si">{}</span><span class="s1">_meg.fif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subject</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">task</span></a><span class="p">))</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fwd_fname</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_path</span></a><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subject</span></a><span class="p">),</span>
+                    <span class="s1">&#39;sub-</span><span class="si">{}</span><span class="s1">_task-</span><span class="si">{}</span><span class="s1">-fwd.fif&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subject</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">task</span></a><span class="p">))</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subjects_dir</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_path</span></a><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;freesurfer&#39;</span><span class="p">,</span> <span class="s1">&#39;subjects&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Using default location ~/mne_data for somato...
+Creating ~/mne_data
+Downloading archive MNE-somato-data.tar.gz to /home/circleci/mne_data
+Downloading https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e2849ad5a1025d4b7346?version=7&amp;action=download&amp;direct (582.2 MB)
+
+  0%|          | Downloading : 0.00/582M [00:00&lt;?,        ?B/s]
+  0%|          | Downloading : 248k/582M [00:00&lt;00:43,    14.0MB/s]
+  0%|          | Downloading : 760k/582M [00:00&lt;00:42,    14.3MB/s]
+  0%|          | Downloading : 1.74M/582M [00:00&lt;00:40,    14.9MB/s]
+  0%|          | Downloading : 2.74M/582M [00:00&lt;00:39,    15.5MB/s]
+  1%|          | Downloading : 3.74M/582M [00:00&lt;00:37,    16.1MB/s]
+  1%|          | Downloading : 5.74M/582M [00:00&lt;00:36,    16.8MB/s]
+  1%|1         | Downloading : 7.74M/582M [00:00&lt;00:34,    17.4MB/s]
+  2%|1         | Downloading : 9.74M/582M [00:00&lt;00:33,    18.1MB/s]
+  2%|2         | Downloading : 11.7M/582M [00:00&lt;00:31,    18.9MB/s]
+  2%|2         | Downloading : 13.7M/582M [00:00&lt;00:30,    19.7MB/s]
+  3%|2         | Downloading : 15.7M/582M [00:00&lt;00:29,    20.5MB/s]
+  3%|3         | Downloading : 17.7M/582M [00:00&lt;00:27,    21.2MB/s]
+  3%|3         | Downloading : 19.7M/582M [00:00&lt;00:26,    22.1MB/s]
+  4%|3         | Downloading : 21.7M/582M [00:00&lt;00:25,    23.0MB/s]
+  4%|4         | Downloading : 23.7M/582M [00:00&lt;00:24,    23.9MB/s]
+  4%|4         | Downloading : 25.7M/582M [00:00&lt;00:23,    24.9MB/s]
+  5%|4         | Downloading : 27.7M/582M [00:00&lt;00:22,    25.9MB/s]
+  5%|5         | Downloading : 29.7M/582M [00:00&lt;00:21,    26.8MB/s]
+  5%|5         | Downloading : 31.7M/582M [00:00&lt;00:20,    27.8MB/s]
+  6%|5         | Downloading : 33.7M/582M [00:00&lt;00:19,    28.8MB/s]
+  6%|6         | Downloading : 37.7M/582M [00:00&lt;00:19,    29.8MB/s]
+  7%|6         | Downloading : 39.7M/582M [00:00&lt;00:18,    30.9MB/s]
+  7%|7         | Downloading : 41.7M/582M [00:00&lt;00:17,    31.6MB/s]
+  8%|7         | Downloading : 43.7M/582M [00:00&lt;00:17,    32.6MB/s]
+  8%|7         | Downloading : 45.7M/582M [00:00&lt;00:17,    33.0MB/s]
+  9%|8         | Downloading : 49.7M/582M [00:00&lt;00:16,    34.3MB/s]
+  9%|9         | Downloading : 53.7M/582M [00:00&lt;00:15,    35.6MB/s]
+ 10%|9         | Downloading : 55.7M/582M [00:00&lt;00:15,    36.8MB/s]
+ 10%|9         | Downloading : 57.7M/582M [00:00&lt;00:14,    37.8MB/s]
+ 10%|#         | Downloading : 59.7M/582M [00:00&lt;00:14,    38.2MB/s]
+ 11%|#         | Downloading : 61.7M/582M [00:00&lt;00:14,    38.6MB/s]
+ 11%|#         | Downloading : 63.7M/582M [00:00&lt;00:13,    39.7MB/s]
+ 11%|#1        | Downloading : 65.7M/582M [00:00&lt;00:13,    40.5MB/s]
+ 12%|#1        | Downloading : 67.7M/582M [00:00&lt;00:12,    41.6MB/s]
+ 12%|#1        | Downloading : 69.7M/582M [00:01&lt;00:14,    36.8MB/s]
+ 12%|#2        | Downloading : 70.7M/582M [00:01&lt;00:14,    37.2MB/s]
+ 12%|#2        | Downloading : 71.7M/582M [00:01&lt;00:14,    37.1MB/s]
+ 12%|#2        | Downloading : 72.7M/582M [00:01&lt;00:14,    37.7MB/s]
+ 13%|#3        | Downloading : 75.7M/582M [00:01&lt;00:13,    38.9MB/s]
+ 13%|#3        | Downloading : 77.7M/582M [00:01&lt;00:13,    40.1MB/s]
+ 14%|#3        | Downloading : 79.7M/582M [00:01&lt;00:12,    40.8MB/s]
+ 14%|#4        | Downloading : 81.7M/582M [00:01&lt;00:12,    41.6MB/s]
+ 14%|#4        | Downloading : 83.7M/582M [00:01&lt;00:12,    42.5MB/s]
+ 15%|#4        | Downloading : 85.7M/582M [00:01&lt;00:11,    43.4MB/s]
+ 15%|#5        | Downloading : 87.7M/582M [00:01&lt;00:11,    44.5MB/s]
+ 15%|#5        | Downloading : 89.7M/582M [00:01&lt;00:11,    45.6MB/s]
+ 16%|#5        | Downloading : 91.7M/582M [00:01&lt;00:11,    46.6MB/s]
+ 16%|#6        | Downloading : 93.7M/582M [00:01&lt;00:10,    48.0MB/s]
+ 16%|#6        | Downloading : 95.7M/582M [00:01&lt;00:10,    49.5MB/s]
+ 17%|#6        | Downloading : 97.7M/582M [00:01&lt;00:10,    50.3MB/s]
+ 17%|#7        | Downloading : 99.7M/582M [00:01&lt;00:09,    51.9MB/s]
+ 17%|#7        | Downloading : 102M/582M [00:01&lt;00:09,    52.8MB/s]
+ 18%|#7        | Downloading : 104M/582M [00:01&lt;00:09,    54.2MB/s]
+ 19%|#8        | Downloading : 108M/582M [00:01&lt;00:08,    55.4MB/s]
+ 19%|#8        | Downloading : 110M/582M [00:01&lt;00:08,    56.7MB/s]
+ 20%|#9        | Downloading : 116M/582M [00:01&lt;00:08,    58.4MB/s]
+ 21%|##        | Downloading : 120M/582M [00:01&lt;00:08,    59.0MB/s]
+ 21%|##1       | Downloading : 124M/582M [00:01&lt;00:08,    60.0MB/s]
+ 22%|##1       | Downloading : 128M/582M [00:01&lt;00:07,    60.6MB/s]
+ 23%|##2       | Downloading : 132M/582M [00:01&lt;00:07,    61.0MB/s]
+ 23%|##3       | Downloading : 136M/582M [00:01&lt;00:07,    62.5MB/s]
+ 24%|##4       | Downloading : 140M/582M [00:01&lt;00:07,    63.3MB/s]
+ 25%|##4       | Downloading : 144M/582M [00:01&lt;00:07,    64.3MB/s]
+ 25%|##5       | Downloading : 148M/582M [00:02&lt;00:06,    65.8MB/s]
+ 26%|##6       | Downloading : 152M/582M [00:02&lt;00:06,    66.9MB/s]
+ 27%|##6       | Downloading : 156M/582M [00:02&lt;00:06,    68.5MB/s]
+ 27%|##7       | Downloading : 160M/582M [00:02&lt;00:06,    70.2MB/s]
+ 28%|##8       | Downloading : 164M/582M [00:02&lt;00:06,    69.7MB/s]
+ 29%|##8       | Downloading : 168M/582M [00:02&lt;00:06,    71.8MB/s]
+ 29%|##9       | Downloading : 172M/582M [00:02&lt;00:06,    71.2MB/s]
+ 30%|###       | Downloading : 176M/582M [00:02&lt;00:05,    71.3MB/s]
+ 31%|###       | Downloading : 180M/582M [00:02&lt;00:05,    71.9MB/s]
+ 32%|###1      | Downloading : 184M/582M [00:02&lt;00:05,    72.6MB/s]
+ 32%|###2      | Downloading : 188M/582M [00:02&lt;00:05,    69.9MB/s]
+ 33%|###2      | Downloading : 192M/582M [00:02&lt;00:05,    69.8MB/s]
+ 34%|###3      | Downloading : 196M/582M [00:02&lt;00:06,    66.6MB/s]
+ 34%|###3      | Downloading : 198M/582M [00:02&lt;00:06,    64.1MB/s]
+ 34%|###4      | Downloading : 200M/582M [00:02&lt;00:06,    64.9MB/s]
+ 35%|###4      | Downloading : 202M/582M [00:02&lt;00:06,    64.5MB/s]
+ 35%|###4      | Downloading : 204M/582M [00:02&lt;00:06,    65.0MB/s]
+ 35%|###5      | Downloading : 206M/582M [00:02&lt;00:06,    63.4MB/s]
+ 36%|###5      | Downloading : 208M/582M [00:02&lt;00:06,    62.2MB/s]
+ 36%|###6      | Downloading : 210M/582M [00:03&lt;00:06,    61.6MB/s]
+ 36%|###6      | Downloading : 212M/582M [00:03&lt;00:06,    61.2MB/s]
+ 37%|###6      | Downloading : 214M/582M [00:03&lt;00:06,    60.9MB/s]
+ 37%|###7      | Downloading : 216M/582M [00:03&lt;00:06,    61.1MB/s]
+ 37%|###7      | Downloading : 218M/582M [00:03&lt;00:06,    61.9MB/s]
+ 38%|###7      | Downloading : 220M/582M [00:03&lt;00:06,    62.6MB/s]
+ 38%|###8      | Downloading : 222M/582M [00:03&lt;00:05,    63.6MB/s]
+ 38%|###8      | Downloading : 224M/582M [00:03&lt;00:05,    64.3MB/s]
+ 39%|###8      | Downloading : 226M/582M [00:03&lt;00:05,    65.0MB/s]
+ 39%|###9      | Downloading : 228M/582M [00:03&lt;00:05,    65.6MB/s]
+ 39%|###9      | Downloading : 230M/582M [00:03&lt;00:05,    66.8MB/s]
+ 40%|###9      | Downloading : 232M/582M [00:03&lt;00:05,    67.4MB/s]
+ 40%|####      | Downloading : 234M/582M [00:03&lt;00:05,    68.1MB/s]
+ 40%|####      | Downloading : 236M/582M [00:03&lt;00:05,    68.6MB/s]
+ 41%|####      | Downloading : 238M/582M [00:03&lt;00:05,    69.4MB/s]
+ 41%|####1     | Downloading : 240M/582M [00:03&lt;00:05,    70.9MB/s]
+ 42%|####1     | Downloading : 244M/582M [00:03&lt;00:04,    72.9MB/s]
+ 43%|####2     | Downloading : 248M/582M [00:03&lt;00:04,    71.0MB/s]
+ 43%|####2     | Downloading : 250M/582M [00:03&lt;00:05,    69.0MB/s]
+ 43%|####3     | Downloading : 252M/582M [00:03&lt;00:05,    69.0MB/s]
+ 44%|####3     | Downloading : 254M/582M [00:03&lt;00:04,    69.7MB/s]
+ 44%|####3     | Downloading : 256M/582M [00:03&lt;00:04,    70.6MB/s]
+ 44%|####4     | Downloading : 258M/582M [00:03&lt;00:04,    69.9MB/s]
+ 45%|####4     | Downloading : 260M/582M [00:03&lt;00:04,    69.4MB/s]
+ 45%|####4     | Downloading : 262M/582M [00:03&lt;00:04,    69.1MB/s]
+ 45%|####5     | Downloading : 264M/582M [00:03&lt;00:04,    67.2MB/s]
+ 46%|####5     | Downloading : 266M/582M [00:03&lt;00:05,    65.4MB/s]
+ 46%|####5     | Downloading : 268M/582M [00:03&lt;00:05,    65.2MB/s]
+ 46%|####6     | Downloading : 270M/582M [00:03&lt;00:05,    64.2MB/s]
+ 47%|####6     | Downloading : 272M/582M [00:03&lt;00:05,    61.7MB/s]
+ 47%|####7     | Downloading : 274M/582M [00:04&lt;00:05,    62.6MB/s]
+ 47%|####7     | Downloading : 276M/582M [00:04&lt;00:05,    62.5MB/s]
+ 48%|####7     | Downloading : 278M/582M [00:04&lt;00:05,    63.5MB/s]
+ 48%|####8     | Downloading : 280M/582M [00:04&lt;00:04,    64.5MB/s]
+ 48%|####8     | Downloading : 282M/582M [00:04&lt;00:04,    65.9MB/s]
+ 49%|####9     | Downloading : 286M/582M [00:04&lt;00:04,    67.7MB/s]
+ 49%|####9     | Downloading : 288M/582M [00:04&lt;00:04,    68.5MB/s]
+ 50%|####9     | Downloading : 290M/582M [00:04&lt;00:04,    67.0MB/s]
+ 50%|#####     | Downloading : 292M/582M [00:04&lt;00:04,    67.6MB/s]
+ 50%|#####     | Downloading : 294M/582M [00:04&lt;00:04,    66.8MB/s]
+ 51%|#####     | Downloading : 296M/582M [00:04&lt;00:04,    68.1MB/s]
+ 51%|#####1    | Downloading : 300M/582M [00:04&lt;00:04,    69.3MB/s]
+ 52%|#####2    | Downloading : 304M/582M [00:04&lt;00:04,    69.1MB/s]
+ 53%|#####2    | Downloading : 308M/582M [00:04&lt;00:04,    67.3MB/s]
+ 54%|#####3    | Downloading : 312M/582M [00:04&lt;00:04,    62.9MB/s]
+ 54%|#####3    | Downloading : 314M/582M [00:04&lt;00:05,    51.0MB/s]
+ 54%|#####4    | Downloading : 316M/582M [00:04&lt;00:05,    51.9MB/s]
+ 55%|#####4    | Downloading : 318M/582M [00:04&lt;00:05,    52.2MB/s]
+ 55%|#####4    | Downloading : 319M/582M [00:04&lt;00:05,    50.3MB/s]
+ 55%|#####4    | Downloading : 320M/582M [00:04&lt;00:05,    49.8MB/s]
+ 55%|#####5    | Downloading : 321M/582M [00:05&lt;00:05,    46.8MB/s]
+ 55%|#####5    | Downloading : 322M/582M [00:05&lt;00:05,    46.5MB/s]
+ 55%|#####5    | Downloading : 323M/582M [00:05&lt;00:05,    45.6MB/s]
+ 56%|#####5    | Downloading : 324M/582M [00:05&lt;00:06,    44.3MB/s]
+ 56%|#####5    | Downloading : 326M/582M [00:05&lt;00:06,    44.5MB/s]
+ 56%|#####6    | Downloading : 327M/582M [00:05&lt;00:06,    40.6MB/s]
+ 56%|#####6    | Downloading : 329M/582M [00:05&lt;00:06,    41.6MB/s]
+ 57%|#####6    | Downloading : 331M/582M [00:05&lt;00:06,    42.2MB/s]
+ 57%|#####6    | Downloading : 332M/582M [00:05&lt;00:06,    41.8MB/s]
+ 57%|#####7    | Downloading : 333M/582M [00:05&lt;00:06,    41.8MB/s]
+ 57%|#####7    | Downloading : 335M/582M [00:05&lt;00:06,    42.8MB/s]
+ 58%|#####7    | Downloading : 336M/582M [00:05&lt;00:05,    43.4MB/s]
+ 58%|#####7    | Downloading : 337M/582M [00:05&lt;00:05,    44.1MB/s]
+ 59%|#####8    | Downloading : 343M/582M [00:05&lt;00:05,    45.5MB/s]
+ 60%|#####9    | Downloading : 347M/582M [00:05&lt;00:05,    46.6MB/s]
+ 60%|######    | Downloading : 351M/582M [00:05&lt;00:05,    48.5MB/s]
+ 61%|######    | Downloading : 355M/582M [00:05&lt;00:04,    49.9MB/s]
+ 62%|######1   | Downloading : 359M/582M [00:05&lt;00:04,    51.2MB/s]
+ 62%|######2   | Downloading : 363M/582M [00:05&lt;00:04,    52.6MB/s]
+ 63%|######2   | Downloading : 367M/582M [00:05&lt;00:04,    53.6MB/s]
+ 64%|######3   | Downloading : 371M/582M [00:06&lt;00:05,    41.5MB/s]
+ 64%|######4   | Downloading : 373M/582M [00:06&lt;00:05,    41.8MB/s]
+ 64%|######4   | Downloading : 375M/582M [00:06&lt;00:05,    42.3MB/s]
+ 65%|######4   | Downloading : 377M/582M [00:06&lt;00:05,    40.8MB/s]
+ 65%|######5   | Downloading : 379M/582M [00:06&lt;00:05,    40.0MB/s]
+ 65%|######5   | Downloading : 381M/582M [00:06&lt;00:05,    40.4MB/s]
+ 66%|######5   | Downloading : 383M/582M [00:06&lt;00:05,    41.2MB/s]
+ 66%|######6   | Downloading : 385M/582M [00:06&lt;00:05,    40.9MB/s]
+ 66%|######6   | Downloading : 387M/582M [00:06&lt;00:04,    42.3MB/s]
+ 67%|######7   | Downloading : 391M/582M [00:06&lt;00:04,    43.2MB/s]
+ 68%|######7   | Downloading : 395M/582M [00:06&lt;00:04,    44.3MB/s]
+ 68%|######8   | Downloading : 399M/582M [00:06&lt;00:04,    45.5MB/s]
+ 69%|######9   | Downloading : 403M/582M [00:06&lt;00:04,    46.6MB/s]
+ 70%|######9   | Downloading : 407M/582M [00:06&lt;00:03,    48.3MB/s]
+ 71%|#######   | Downloading : 411M/582M [00:06&lt;00:03,    49.5MB/s]
+ 71%|#######1  | Downloading : 415M/582M [00:06&lt;00:03,    50.9MB/s]
+ 72%|#######1  | Downloading : 419M/582M [00:06&lt;00:03,    52.2MB/s]
+ 73%|#######2  | Downloading : 423M/582M [00:07&lt;00:03,    53.1MB/s]
+ 73%|#######3  | Downloading : 427M/582M [00:07&lt;00:03,    54.3MB/s]
+ 74%|#######3  | Downloading : 431M/582M [00:07&lt;00:02,    55.2MB/s]
+ 75%|#######4  | Downloading : 435M/582M [00:07&lt;00:02,    53.1MB/s]
+ 75%|#######5  | Downloading : 437M/582M [00:07&lt;00:02,    52.2MB/s]
+ 75%|#######5  | Downloading : 439M/582M [00:07&lt;00:02,    52.6MB/s]
+ 76%|#######5  | Downloading : 441M/582M [00:07&lt;00:02,    53.1MB/s]
+ 76%|#######6  | Downloading : 443M/582M [00:07&lt;00:02,    53.4MB/s]
+ 76%|#######6  | Downloading : 445M/582M [00:07&lt;00:02,    54.3MB/s]
+ 77%|#######6  | Downloading : 447M/582M [00:07&lt;00:02,    55.8MB/s]
+ 77%|#######7  | Downloading : 449M/582M [00:07&lt;00:02,    57.0MB/s]
+ 78%|#######7  | Downloading : 453M/582M [00:07&lt;00:02,    58.6MB/s]
+ 79%|#######8  | Downloading : 459M/582M [00:07&lt;00:02,    60.1MB/s]
+ 79%|#######9  | Downloading : 463M/582M [00:07&lt;00:02,    61.4MB/s]
+ 80%|########  | Downloading : 467M/582M [00:07&lt;00:01,    62.8MB/s]
+ 81%|########  | Downloading : 471M/582M [00:07&lt;00:01,    63.5MB/s]
+ 82%|########1 | Downloading : 475M/582M [00:07&lt;00:01,    65.1MB/s]
+ 82%|########2 | Downloading : 479M/582M [00:07&lt;00:01,    66.4MB/s]
+ 83%|########2 | Downloading : 483M/582M [00:07&lt;00:01,    68.1MB/s]
+ 84%|########3 | Downloading : 487M/582M [00:07&lt;00:01,    68.1MB/s]
+ 84%|########4 | Downloading : 491M/582M [00:07&lt;00:01,    69.5MB/s]
+ 85%|########4 | Downloading : 495M/582M [00:07&lt;00:01,    69.4MB/s]
+ 86%|########5 | Downloading : 499M/582M [00:08&lt;00:01,    67.4MB/s]
+ 86%|########6 | Downloading : 503M/582M [00:08&lt;00:01,    67.7MB/s]
+ 87%|########7 | Downloading : 507M/582M [00:08&lt;00:01,    66.3MB/s]
+ 88%|########7 | Downloading : 511M/582M [00:08&lt;00:01,    67.4MB/s]
+ 88%|########8 | Downloading : 515M/582M [00:08&lt;00:01,    68.4MB/s]
+ 89%|########9 | Downloading : 519M/582M [00:08&lt;00:00,    69.6MB/s]
+ 90%|########9 | Downloading : 523M/582M [00:08&lt;00:00,    69.4MB/s]
+ 90%|######### | Downloading : 527M/582M [00:08&lt;00:00,    69.6MB/s]
+ 91%|#########1| Downloading : 531M/582M [00:08&lt;00:00,    69.9MB/s]
+ 92%|#########1| Downloading : 535M/582M [00:08&lt;00:00,    71.9MB/s]
+ 93%|#########2| Downloading : 539M/582M [00:08&lt;00:00,    70.8MB/s]
+ 93%|#########3| Downloading : 543M/582M [00:08&lt;00:00,    71.4MB/s]
+ 94%|#########3| Downloading : 547M/582M [00:08&lt;00:00,    72.1MB/s]
+ 95%|#########4| Downloading : 551M/582M [00:08&lt;00:00,    73.7MB/s]
+ 95%|#########5| Downloading : 555M/582M [00:08&lt;00:00,    75.4MB/s]
+ 96%|#########5| Downloading : 559M/582M [00:08&lt;00:00,    75.8MB/s]
+ 97%|#########6| Downloading : 563M/582M [00:08&lt;00:00,    73.0MB/s]
+ 97%|#########7| Downloading : 567M/582M [00:08&lt;00:00,    71.3MB/s]
+ 98%|#########8| Downloading : 571M/582M [00:09&lt;00:00,    71.5MB/s]
+ 99%|#########8| Downloading : 575M/582M [00:09&lt;00:00,    71.4MB/s]
+ 99%|#########9| Downloading : 579M/582M [00:09&lt;00:00,    73.0MB/s]
+100%|##########| Downloading : 582M/582M [00:09&lt;00:00,    73.7MB/s]
+100%|##########| Downloading : 582M/582M [00:09&lt;00:00,    66.6MB/s]
+Verifying hash 32fd2f6c8c7eb0784a1de6435273c48b.
+Decompressing the archive: /home/circleci/mne_data/MNE-somato-data.tar.gz
+(please be patient, this can take some time)
+Successfully extracted to: [&#39;/home/circleci/mne_data/MNE-somato-data&#39;]
+Attempting to create new mne-python configuration file:
+/home/circleci/.mne/mne-python.json
+</pre></div>
+</div>
+<p>Then, we load the raw data and estimate the inverse operator.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read and band-pass filter the raw data</span>
+<a href="https://mne.tools/dev/generated/mne.io.Raw.html#mne.io.Raw" title="mne.io.Raw" class="sphx-glr-backref-module-mne-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">raw</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.io.read_raw_fif.html#mne.io.read_raw_fif" title="mne.io.read_raw_fif" class="sphx-glr-backref-module-mne-io sphx-glr-backref-type-py-function"><span class="n">mne</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_raw_fif</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">raw_fname</span></a><span class="p">,</span> <span class="n">preload</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l_freq</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">h_freq</span></a> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">40</span>
+<a href="https://mne.tools/dev/generated/mne.io.Raw.html#mne.io.Raw.filter" title="mne.io.Raw.filter" class="sphx-glr-backref-module-mne-io sphx-glr-backref-type-py-method"><span class="n">raw</span><span class="o">.</span><span class="n">filter</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l_freq</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">h_freq</span></a><span class="p">)</span>
+
+<span class="c1"># Identify stimulus events associated with MEG time series in the dataset</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">events</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.find_events.html#mne.find_events" title="mne.find_events" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-function"><span class="n">mne</span><span class="o">.</span><span class="n">find_events</span></a><span class="p">(</span><a href="https://mne.tools/dev/generated/mne.io.Raw.html#mne.io.Raw" title="mne.io.Raw" class="sphx-glr-backref-module-mne-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">raw</span></a><span class="p">,</span> <span class="n">stim_channel</span><span class="o">=</span><span class="s1">&#39;STI 014&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define epochs within the time series</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">event_id</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmin</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmax</span></a> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">17</span>
+<span class="n">baseline</span> <span class="o">=</span> <span class="kc">None</span>
+<a href="https://mne.tools/dev/generated/mne.Epochs.html#mne.Epochs" title="mne.Epochs" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">epochs</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.Epochs.html#mne.Epochs" title="mne.Epochs" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class"><span class="n">mne</span><span class="o">.</span><span class="n">Epochs</span></a><span class="p">(</span><a href="https://mne.tools/dev/generated/mne.io.Raw.html#mne.io.Raw" title="mne.io.Raw" class="sphx-glr-backref-module-mne-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">raw</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">events</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">event_id</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmin</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmax</span></a><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span>
+                    <span class="n">reject</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">grad</span><span class="o">=</span><span class="mf">4000e-13</span><span class="p">,</span> <span class="n">eog</span><span class="o">=</span><span class="mf">350e-6</span><span class="p">),</span> <span class="n">preload</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Compute the inverse operator</span>
+<a href="https://mne.tools/dev/generated/mne.Forward.html#mne.Forward" title="mne.Forward" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fwd</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.read_forward_solution.html#mne.read_forward_solution" title="mne.read_forward_solution" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-function"><span class="n">mne</span><span class="o">.</span><span class="n">read_forward_solution</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fwd_fname</span></a><span class="p">)</span>
+<a href="https://mne.tools/dev/generated/mne.Covariance.html#mne.Covariance" title="mne.Covariance" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cov</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.compute_covariance.html#mne.compute_covariance" title="mne.compute_covariance" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-function"><span class="n">mne</span><span class="o">.</span><span class="n">compute_covariance</span></a><span class="p">(</span><a href="https://mne.tools/dev/generated/mne.Epochs.html#mne.Epochs" title="mne.Epochs" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">epochs</span></a><span class="p">)</span>
+<a href="https://mne.tools/dev/generated/mne.minimum_norm.InverseOperator.html#mne.minimum_norm.InverseOperator" title="mne.minimum_norm.InverseOperator" class="sphx-glr-backref-module-mne-minimum_norm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">inv</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.minimum_norm.make_inverse_operator.html#mne.minimum_norm.make_inverse_operator" title="mne.minimum_norm.make_inverse_operator" class="sphx-glr-backref-module-mne-minimum_norm sphx-glr-backref-type-py-function"><span class="n">make_inverse_operator</span></a><span class="p">(</span><a href="https://mne.tools/dev/generated/mne.Info.html#mne.Info" title="mne.Info" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">epochs</span><span class="o">.</span><span class="n">info</span></a><span class="p">,</span> <a href="https://mne.tools/dev/generated/mne.Forward.html#mne.Forward" title="mne.Forward" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fwd</span></a><span class="p">,</span> <a href="https://mne.tools/dev/generated/mne.Covariance.html#mne.Covariance" title="mne.Covariance" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cov</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Opening raw data file /home/circleci/mne_data/MNE-somato-data/sub-01/meg/sub-01_task-somato_meg.fif...
+    Range : 237600 ... 506999 =    791.189 ...  1688.266 secs
+Ready.
+Reading 0 ... 269399  =      0.000 ...   897.077 secs...
+Filtering raw data in 1 contiguous segment
+Setting up band-pass filter from 1 - 40 Hz
+
+FIR filter parameters
+---------------------
+Designing a one-pass, zero-phase, non-causal bandpass filter:
+- Windowed time-domain design (firwin) method
+- Hamming window with 0.0194 passband ripple and 53 dB stopband attenuation
+- Lower passband edge: 1.00
+- Lower transition bandwidth: 1.00 Hz (-6 dB cutoff frequency: 0.50 Hz)
+- Upper passband edge: 40.00 Hz
+- Upper transition bandwidth: 10.00 Hz (-6 dB cutoff frequency: 45.00 Hz)
+- Filter length: 993 samples (3.307 sec)
+
+111 events found
+Event IDs: [1]
+Not setting metadata
+Not setting metadata
+111 matching events found
+No baseline correction applied
+0 projection items activated
+Loading data for 111 events and 112 original time points ...
+0 bad epochs dropped
+Reading forward solution from /home/circleci/mne_data/MNE-somato-data/derivatives/sub-01/sub-01_task-somato-fwd.fif...
+    Reading a source space...
+    [done]
+    Reading a source space...
+    [done]
+    2 source spaces read
+    Desired named matrix (kind = 3523) not available
+    Read MEG forward solution (8155 sources, 306 channels, free orientations)
+    Source spaces transformed to the forward solution coordinate frame
+Computing rank from data with rank=None
+    Using tolerance 1.5e-08 (2.2e-16 eps * 306 dim * 2.2e+05  max singular value)
+    Estimated rank (mag + grad): 306
+    MEG: rank 306 computed from 306 data channels with 0 projectors
+/home/circleci/project/examples/plot_simulate_somato.py:58: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 &gt; 64). Consider setting rank to &quot;auto&quot; or setting it explicitly as an integer.
+  cov = mne.compute_covariance(epochs)
+Reducing data rank from 306 -&gt; 306
+Estimating covariance using EMPIRICAL
+Done.
+Number of samples used : 12432
+[done]
+Converting forward solution to surface orientation
+    No patch info available. The standard source space normals will be employed in the rotation to the local surface coordinates....
+    Converting to surface-based source orientations...
+    [done]
+Computing inverse operator with 306 channels.
+    306 out of 306 channels remain after picking
+Selected 306 channels
+Creating the depth weighting matrix...
+    204 planar channels
+    limit = 7615/8155 = 10.004172
+    scale = 5.17919e-08 exp = 0.8
+Applying loose dipole orientations to surface source spaces: 0.2
+Whitening the forward solution.
+Computing rank from covariance with rank=None
+    Using tolerance 2e-12 (2.2e-16 eps * 306 dim * 29  max singular value)
+    Estimated rank (mag + grad): 64
+    MEG: rank 64 computed from 306 data channels with 0 projectors
+    Setting small MEG eigenvalues to zero (without PCA)
+Creating the source covariance matrix
+Adjusting source covariance matrix.
+Computing SVD of whitened and weighted lead field matrix.
+    largest singular value = 2.42284
+    scaling factor to adjust the trace = 3.86104e+18
+</pre></div>
+</div>
+<p>There are several methods to do source reconstruction. Some of the methods
+such as MNE are distributed source methods whereas dipole fitting will
+estimate the location and amplitude of a single current dipole. At the
+moment, we do not offer explicit recommendations on which source
+reconstruction technique is best for HNN. However, we do want our users
+to note that the dipole currents simulated with HNN are assumed to be normal
+to the cortical surface. Hence, using the option <code class="docutils literal notranslate"><span class="pre">pick_ori='normal'</span></code> is
+appropriate.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr</span></a> <span class="o">=</span> <span class="mf">3.</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lambda2</span></a> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">snr</span></a> <span class="o">**</span> <span class="mi">2</span>
+<a href="https://mne.tools/dev/generated/mne.EvokedArray.html#mne.EvokedArray" title="mne.EvokedArray" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">evoked</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.Epochs.html#mne.Epochs.average" title="mne.Epochs.average" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-method"><span class="n">epochs</span><span class="o">.</span><span class="n">average</span></a><span class="p">()</span>
+<a href="https://mne.tools/dev/generated/mne.SourceEstimate.html#mne.SourceEstimate" title="mne.SourceEstimate" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">stc</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.minimum_norm.apply_inverse.html#mne.minimum_norm.apply_inverse" title="mne.minimum_norm.apply_inverse" class="sphx-glr-backref-module-mne-minimum_norm sphx-glr-backref-type-py-function"><span class="n">apply_inverse</span></a><span class="p">(</span><a href="https://mne.tools/dev/generated/mne.EvokedArray.html#mne.EvokedArray" title="mne.EvokedArray" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">evoked</span></a><span class="p">,</span> <a href="https://mne.tools/dev/generated/mne.minimum_norm.InverseOperator.html#mne.minimum_norm.InverseOperator" title="mne.minimum_norm.InverseOperator" class="sphx-glr-backref-module-mne-minimum_norm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">inv</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">lambda2</span></a><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;MNE&#39;</span><span class="p">,</span>
+                    <span class="n">pick_ori</span><span class="o">=</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="n">return_residual</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Preparing the inverse operator for use...
+    Scaled noise and source covariance from nave = 1 to nave = 111
+    Created the regularized inverter
+    The projection vectors do not apply to these channels.
+    Created the whitener using a noise covariance matrix with rank 64 (242 small eigenvalues omitted)
+Applying inverse operator to &quot;1&quot;...
+    Picked 306 channels from the data
+    Computing inverse...
+    Eigenleads need to be weighted ...
+    Computing residual...
+    Explained  86.1% variance
+[done]
+</pre></div>
+</div>
+<p>To extract the primary response in primary somatosensory cortex (S1), we
+create a label for the postcentral gyrus (S1) in source-space</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hemi</span></a> <span class="o">=</span> <span class="s1">&#39;rh&#39;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label_tag</span></a> <span class="o">=</span> <span class="s1">&#39;G_postcentral&#39;</span>
+<a href="https://mne.tools/dev/generated/mne.Label.html#mne.Label" title="mne.Label" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label_s1</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.read_labels_from_annot.html#mne.read_labels_from_annot" title="mne.read_labels_from_annot" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-function"><span class="n">mne</span><span class="o">.</span><span class="n">read_labels_from_annot</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subject</span></a><span class="p">,</span> <span class="n">parc</span><span class="o">=</span><span class="s1">&#39;aparc.a2009s&#39;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hemi</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hemi</span></a><span class="p">,</span>
+                                      <span class="n">regexp</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label_tag</span></a><span class="p">,</span>
+                                      <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subjects_dir</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">subjects_dir</span></a><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Reading labels from parcellation...
+   read 1 labels from /home/circleci/mne_data/MNE-somato-data/derivatives/freesurfer/subjects/01/label/rh.aparc.a2009s.annot
+</pre></div>
+</div>
+<p>Visualizing the distributed S1 activation in reference to the geometric
+structure of the cortex (i.e., plotted on a structural MRI) can help us
+figure out how to orient the dipole. Note that in the HNN framework,
+positive and negative deflections of a current dipole source correspond to
+upwards (from deep to superficial) and downwards (from superficial to deep)
+current flow, respectively. Uncomment the following code to open an
+interactive 3D render of the brain and its surface activation (requires the
+<code class="docutils literal notranslate"><span class="pre">pyvista</span></code> python library). You should get 2 plots, the first showing the
+post-central gyrus label from which the dipole time course was extracted and
+the second showing MNE activation at 0.040 sec that resemble the following
+images.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Brain = mne.viz.get_brain_class()</span>
+<span class="sd">brain_label = Brain(subject, hemi, &#39;white&#39;, subjects_dir=subjects_dir)</span>
+<span class="sd">brain_label.add_label(label_s1, color=&#39;green&#39;, alpha=0.9)</span>
+<span class="sd">stc_label = stc.in_label(label_s1)</span>
+<span class="sd">brain = stc_label.plot(subjects_dir=subjects_dir, hemi=hemi, surface=&#39;white&#39;,</span>
+<span class="sd">                       view_layout=&#39;horizontal&#39;, initial_time=0.04,</span>
+<span class="sd">                       backend=&#39;pyvista&#39;)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;\nBrain = mne.viz.get_brain_class()\nbrain_label = Brain(subject, hemi, &#39;white&#39;, subjects_dir=subjects_dir)\nbrain_label.add_label(label_s1, color=&#39;green&#39;, alpha=0.9)\nstc_label = stc.in_label(label_s1)\nbrain = stc_label.plot(subjects_dir=subjects_dir, hemi=hemi, surface=&#39;white&#39;,\n                       view_layout=&#39;horizontal&#39;, initial_time=0.04,\n                       backend=&#39;pyvista&#39;)\n&quot;
+</pre></div>
+</div>
+<p><a class="reference internal" href="https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png#noqa"><img alt="mne_label_fig" src="https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png#noqa" style="width: 400px;" /></a></p>
+<p><a class="reference internal" href="https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png#noqa"><img alt="mne_activity_fig" src="https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png#noqa" style="width: 400px;" /></a></p>
+<p>Now we extract the representative time course of dipole activation in our
+labeled brain region using <code class="docutils literal notranslate"><span class="pre">mode='pca_flip'</span></code> (see <a class="reference external" href="https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py#noqa">this MNE-python
+example</a> for more details). Note that the most prominent component of the
+median nerve response occurs in the posterior wall of the central sulcus at
+~0.040 sec. Since the dipolar activity here is negative, we orient the
+extracted waveform so that the deflection at ~0.040 sec is pointed downwards.
+Thus, the ~0.040 sec deflection corresponds to current flow traveling from
+superficial to deep layers of cortex.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">flip_data</span></a> <span class="o">=</span> <a href="https://mne.tools/dev/generated/mne.SourceEstimate.html#mne.SourceEstimate.extract_label_time_course" title="mne.SourceEstimate.extract_label_time_course" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-method"><span class="n">stc</span><span class="o">.</span><span class="n">extract_label_time_course</span></a><span class="p">(</span><a href="https://mne.tools/dev/generated/mne.Label.html#mne.Label" title="mne.Label" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label_s1</span></a><span class="p">,</span> <a href="https://mne.tools/dev/generated/mne.minimum_norm.InverseOperator.html#mne.minimum_norm.InverseOperator" title="mne.minimum_norm.InverseOperator" class="sphx-glr-backref-module-mne-minimum_norm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">inv</span></a><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">],</span>
+                                          <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;pca_flip&#39;</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dipole_tc</span></a> <span class="o">=</span> <span class="o">-</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">flip_data</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e9</span>
+
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">()</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="matplotlib.pyplot.plot" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><span class="mf">1e3</span> <span class="o">*</span> <a href="https://mne.tools/dev/generated/mne.SourceEstimate.html#mne.SourceEstimate.times" title="mne.SourceEstimate.times" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-method"><span class="n">stc</span><span class="o">.</span><span class="n">times</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dipole_tc</span></a><span class="p">,</span> <span class="s1">&#39;ro--&#39;</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.xlabel.html#matplotlib.pyplot.xlabel" title="matplotlib.pyplot.xlabel" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span></a><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.ylabel.html#matplotlib.pyplot.ylabel" title="matplotlib.pyplot.ylabel" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span></a><span class="p">(</span><span class="s1">&#39;Current Dipole (nAm)&#39;</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.xlim.html#matplotlib.pyplot.xlim" title="matplotlib.pyplot.xlim" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span></a><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">170</span><span class="p">))</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.axhline.html#matplotlib.pyplot.axhline" title="matplotlib.pyplot.axhline" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">axhline</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="plot simulate somato" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_somato_001.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Extracting time courses for 1 labels (mode: pca_flip)
+</pre></div>
+</div>
+<p>Now, let us try to simulate the same with <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>. We read in the
+network parameters from <code class="docutils literal notranslate"><span class="pre">N20.json</span></code> and instantiate the network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">,</span> <span class="n">JoblibBackend</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">average_dipoles</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hnn_core_root</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.dirname" title="os.path.dirname" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">dirname</span></a><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params_fname</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hnn_core_root</span></a><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;N20.json&#39;</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">params_fname</span></a><span class="p">)</span>
+
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To simulate the source of the median nerve evoked response, we add a
+sequence of synchronous evoked drives: 1 proximal, 2 distal, and 1 final
+proximal drive. Note that setting <code class="docutils literal notranslate"><span class="pre">sync_within_trial=True</span></code> creates drives
+with synchronous input (arriving to and transmitted by hypothetical granular
+cells at the center of the network) to all pyramidal and basket cells that
+receive distal drive. Note that granule cells are not explicitly modelled
+within HNN.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Early proximal drive</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_p</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.0036</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0039</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">0.0019</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0020</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_p</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.0029</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">0.0030</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0019</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_p</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                     <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>
+
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive" title="hnn_core.Network.add_evoked_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span></a><span class="p">(</span>
+    <span class="s1">&#39;evprox1&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">21.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">4.</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sync_within_trial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">weights_ampa</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_p</span></a><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_p</span></a><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_p</span></a><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># Late proximal drive</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_p</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.003</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0039</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">0.004</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0020</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_p</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">0.002</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0020</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_p</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                     <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>
+
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive" title="hnn_core.Network.add_evoked_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span></a><span class="p">(</span>
+    <span class="s1">&#39;evprox2&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">134.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">4.5</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sync_within_trial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">weights_ampa</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_p</span></a><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_p</span></a><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_p</span></a><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># Early distal drive</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_d</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.0043</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0032</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0009</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_d</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.0029</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0051</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0010</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_d</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                     <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive" title="hnn_core.Network.add_evoked_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span></a><span class="p">(</span>
+    <span class="s1">&#39;evdist1&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">32.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sync_within_trial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">weights_ampa</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_d</span></a><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_d</span></a><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_d</span></a><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># Late distal drive</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_d</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.0041</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0019</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0018</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_d</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.0032</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0018</span><span class="p">,</span>
+                  <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0017</span><span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_d</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                     <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive" title="hnn_core.Network.add_evoked_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span></a><span class="p">(</span>
+    <span class="s1">&#39;evdist2&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">84.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">4.5</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sync_within_trial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">weights_ampa</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_d</span></a><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_d</span></a><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">synaptic_delays_d</span></a><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we run the simulation over 2 trials so that we can plot the average
+aggregate dipole. For a better match to the empirical waveform, set
+<code class="docutils literal notranslate"><span class="pre">n_trials</span></code> to be &gt;=25.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_trials</span></a> <span class="o">=</span> <span class="mi">2</span>
+<span class="c1"># n_trials = 25</span>
+<span class="k">with</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a> <span class="o">=</span> <a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_trials</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_trials</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 2 jobs
+</pre></div>
+</div>
+<p>Finally, we plot the driving spike histogram, empirical and simulated median
+nerve evoked response waveforms, and output spike histogram.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a> <span class="o">=</span> <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+                         <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_hist" title="hnn_core.CellResponse.plot_spikes_hist" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_hist</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                   <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;evprox&#39;</span><span class="p">,</span> <span class="s1">&#39;evdist&#39;</span><span class="p">],</span>
+                                   <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;_nolegend_&#39;</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mf">1e3</span> <span class="o">*</span> <a href="https://mne.tools/dev/generated/mne.SourceEstimate.html#mne.SourceEstimate.times" title="mne.SourceEstimate.times" class="sphx-glr-backref-module-mne sphx-glr-backref-type-py-method"><span class="n">stc</span><span class="o">.</span><span class="n">times</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dipole_tc</span></a><span class="p">,</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+<span class="n">average_dipoles</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;MNE label average&#39;</span><span class="p">,</span> <span class="s1">&#39;HNN simulation&#39;</span><span class="p">])</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Current Dipole (nAm)&#39;</span><span class="p">)</span>
+<a href="https://jonescompneurolab.github.io/hnn-core/generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_somato_002.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 3 Axes&gt;
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  1.693 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-somato-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=stable/notebooks/auto_examples/plot_simulate_somato.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/ace698a06808c515febbbc2e1cdafd09/plot_simulate_somato.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_somato.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/dd6d9301e684dfd33feeb22df79d2ea2/plot_simulate_somato.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_somato.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The HNN Roadmap &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="auto_examples/index.html">Examples</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="#">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">The HNN Roadmap</a><ul>
+<li><a class="reference internal" href="#project-vision">Project Vision</a></li>
+<li><a class="reference internal" href="#timeline-overview">Timeline Overview</a></li>
+<li><a class="reference internal" href="#one-year-plan-through-2021">One Year Plan Through 2021</a></li>
+<li><a class="reference internal" href="#modularize-hnn-code-to-simplify-installation-development-and-maintenance">Modularize HNN code to simplify installation, development and maintenance</a></li>
+<li><a class="reference internal" href="#lfp-csd-simulation-visualization-and-data-comparison">LFP/CSD Simulation, Visualization and Data Comparison</a></li>
+<li><a class="reference internal" href="#parameter-estimation-expansion">Parameter Estimation Expansion</a></li>
+<li><a class="reference internal" href="#different-cortical-model-template-choices">Different Cortical Model Template Choices</a></li>
+<li><a class="reference internal" href="#api-and-tutorial-development">API and Tutorial development</a></li>
+<li><a class="reference internal" href="#five-year-plan-to-2025">Five-Year Plan to 2025</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/roadmap.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="the-hnn-roadmap">
+<h1>The HNN Roadmap<a class="headerlink" href="#the-hnn-roadmap" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="project-vision">
+<h2>Project Vision<a class="headerlink" href="#project-vision" title="Permalink to this headline">¶</a></h2>
+<p>HNN was created as a resource for the MEG/EEG community to develop and
+test hypotheses on the neural origin of their human data. The foundation of
+HNN is a detailed cortical column model containing generalizable features of
+cortical circuitry, including layer specific synaptic drive from exogenous thalamic
+and cortical sources, that simulates a primary current dipole from a single
+localized brain area. In addition to calculating the primary current source in
+units that are directly comparable to source localized data (Ampere-meters, Am),
+the details in
+HNN enable interpretation of multi-scale activity including layer specific and
+individual cell activity. HNN was designed based on workflows to simulate the most
+commonly measured signals including ERPs and low frequency brain rhythms based on
+<a class="reference external" href="https://hnn.brown.edu/index.php/publications/">prior studies</a>.</p>
+<p>A main goal of HNN is to create a user-friendly interactive interface and
+tutorials to teach to the MEG/EEG community how to interact with the model to
+study the neural origin of  these signals, without needing to access the
+underlying complex neural modeling code. An equal goal is to enable the neural
+modeling and coding community to participate in HNN development. We will prioritize
+best practices in open-source software design and the development of a documented API
+for interoperability and to facilitate integration with other relevant open-source
+platforms (e.g. MNE-Python, NetPyNE). Our vision is to create a unique
+transformational software specific to interpreting the neural origin of MEG/EEG.</p>
+</div>
+<div class="section" id="timeline-overview">
+<h2>Timeline Overview<a class="headerlink" href="#timeline-overview" title="Permalink to this headline">¶</a></h2>
+<p>This roadmap timeline outlines the major short-term (1-year) and longer-term (5-year)
+goals for HNNs. The 1-year goal will entail a substantial reorganization of the
+HNN code and creation of an API to facilitate HNN expansions, community contribution,
+and integration with other relevant open-source platforms (e.g. MNE-Python, NetPyNE).</p>
+<p>The HNN code will be reorganized into modules distinguishing parts of the code
+that require interaction with the differential equation solver software NEURON,
+code for post processing data analysis and plotting, and GUI components.
+Additionally, HNN will be expanded to include the ability to simulate and
+visualize LFP/CSD and updated with new parameter estimation procedures, with
+corresponding tutorials.</p>
+</div>
+<div class="section" id="one-year-plan-through-2021">
+<h2>One Year Plan Through 2021<a class="headerlink" href="#one-year-plan-through-2021" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="modularize-hnn-code-to-simplify-installation-development-and-maintenance">
+<h2>Modularize HNN code to simplify installation, development and maintenance<a class="headerlink" href="#modularize-hnn-code-to-simplify-installation-development-and-maintenance" title="Permalink to this headline">¶</a></h2>
+<p>Over the past year, we have been cleaning up and re-organizing the
+underlying code that defines the current distribution of HNN to facilitate
+expansion and community engagement in its use and development. To minimize the
+dependencies that are required to install before contributing to HNN development
+and maintenance, HNN’s code is being organized in two repositories, one that will
+contain only code necessary for the generation and maintenance of the
+HNN GUI (<a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN</a>), and one that will
+contain the code for the neural model simulation, post-processing data analysis
+and plotting (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">HNN-core</a>).</p>
+<p>The functionality in HNN-core will be imported into the HNN repository
+(to be renamed HNN-GUI)  and will be used by the interactive GUI.</p>
+<p>This modularization will begin with reorganization and improvements within
+the HNN-core repository and simplification of the HNN-GUI repository in the
+following steps:</p>
+<ul class="simple">
+<li><p>Creation of two modules in the HNN-core, one of which
+will contain parts of the code that interact directly with the NEURON simulator
+(<code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code>), while the other module will contain post-processing data
+analysis and plotting functions (<code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code>). Removal of all
+simulation code from the HNN repository, which will be replaced with by
+importing from <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module. HNN repository will then be
+renamed HNN-GUI.</p></li>
+<li><p>Parallelization of the simulation in the <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module via a
+combination of MPI and Joblib.</p></li>
+<li><p>All post-processing data analysis functions will be moved from the HNN repository
+into the <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code> module.</p></li>
+<li><p>Extending <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module to run batch simulations that enable parameter
+sweeps.</p></li>
+<li><p>Development of functions in HNN-GUI to enable parameter sweeps via the GUI.</p></li>
+<li><p>Reorganization of the Network class within the <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module
+to separate cortical column model from exogenous drive, and optimization routines.
+See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a>, <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/129">gh-124</a>, and <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/124">gh-129</a> for related discussions.</p></li>
+<li><p>Reorganization of Param.py file within <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module to multiple files that
+contain smaller dictionaries of parameters related to different modules of the code.
+See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a> for related discussions.</p></li>
+</ul>
+</div>
+<div class="section" id="lfp-csd-simulation-visualization-and-data-comparison">
+<h2>LFP/CSD Simulation, Visualization and Data Comparison<a class="headerlink" href="#lfp-csd-simulation-visualization-and-data-comparison" title="Permalink to this headline">¶</a></h2>
+<p>Essential to testing circuit-level predictions developed in HNN is the ability to
+test the predictions with invasive recordings in animals or humans.  The most fundamental
+domain over which the predictions will be tested is local field potential (LFP) recordings
+across the cortical layers and the associated current source density (CSD) profiles.
+We will develop a method to simulate and visualize LFP/CSD across the cortical layers
+and to statistically compare model simulations to recorded data. These components will
+be developed in HNN-core, and imported into the HNN-GUI repository, along with example
+tutorials, in the following steps:</p>
+<ul class="simple">
+<li><p>Develop code in <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code> to simulate and visualize LFP/CSD from cellular
+membrane potentials.</p></li>
+<li><p>Develop code in <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code> to statistically compare and visualize model
+LFP/CSD to invasive animal data.</p></li>
+<li><p>Develop functions in HNN-GUI to enable simulation, visualization and data comparison
+in the GUI.</p></li>
+</ul>
+</div>
+<div class="section" id="parameter-estimation-expansion">
+<h2>Parameter Estimation Expansion<a class="headerlink" href="#parameter-estimation-expansion" title="Permalink to this headline">¶</a></h2>
+<p>Parameter estimation is an inherent difficulty in neural model simulation.
+HNN currently enables some parameter estimation, focussing on parameters relevant
+to an ERP. New methods have been recently developed that apply a machine learning
+approach to parameter estimation, namely Sequential Neural Parameter Estimation (SNPE)
+(Gonçalves et al BioRxiv 2019:838383). We will adapt this method for parameter
+estimation to work with HNN-core, enabling estimation of a distribution of parameters
+that could account for empirical data, and then integrate it into the HNN-GUI with
+example tutorials for the following tasks:</p>
+<ul class="simple">
+<li><p>Move current ERP parameter estimation code from HNN into <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code> module.</p></li>
+<li><p>Develop code for SNPE parameter estimation and visualization in <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code>.</p></li>
+<li><p>Develop functions in HNN-GUI to enable SNPE estimation in the GUI.</p></li>
+</ul>
+</div>
+<div class="section" id="different-cortical-model-template-choices">
+<h2>Different Cortical Model Template Choices<a class="headerlink" href="#different-cortical-model-template-choices" title="Permalink to this headline">¶</a></h2>
+<p>HNN is distributed with a cortical column model template that represents
+generalizable features of cortical circuitry based on prior studies. Updates to
+this model are being made by the HNN team including a model with alternate pyramidal
+neuron calcium dynamics, and an updated inhibitory connectivity architecture. We will
+expand HNN to enable a choice of template models and updated tutorials, beginning
+with those developed by the HNN team and ultimately expanding to model development
+in other platforms (e.g. NetPyNE), see 5-year plan.</p>
+<ul class="simple">
+<li><p>Develop new cortical column template models with pyramidal neuron
+calcium dynamics, and with updated inhibitory connectivity,
+as part of the  <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module.</p></li>
+<li><p>Develop function in HNN-GUI to choose among different template models in the GUI</p></li>
+</ul>
+<p>See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/111">gh-111</a> for more discussions.</p>
+</div>
+<div class="section" id="api-and-tutorial-development">
+<h2>API and Tutorial development<a class="headerlink" href="#api-and-tutorial-development" title="Permalink to this headline">¶</a></h2>
+<p>The ability to interpret the neural origin of macroscale MEG/EEG signals in a
+complex high-dimensional non-linear computational neural model is challenging.
+A primary goal of HNN is to facilitate this interpretation with a clear API and
+tutorials of use via the interactive GUI. The documented API will also facilitate
+the integration of HNN with other relevant open source software (e.g. MNE-python,
+NetPyNE, see 5-year plan).</p>
+<p>The current <a class="reference external" href="https://hnn.brown.edu/index.php/tutorials/">GUI tutorials</a> are aimed at
+teaching users about the neural origin <a class="footnote-reference brackets" href="#f1" id="id1">1</a> of some of the most commonly measured signals,
+including ERPs and low frequency brain rhythms from a single brain area based on prior
+published studies (<a class="reference external" href="https://hnn.brown.edu/index.php/publications/">https://hnn.brown.edu/index.php/publications/</a>), without command
+line coding.  An interactive investigation of how parameter changes map onto
+changes in the simulated current dipole signal through the GUI provides the baseline intuition
+needed to examine the neural mechanisms contributing to the signal. As new
+components are developed in HNN-GUI, new tutorials will be developed to train
+the community on how to apply them in their studies.</p>
+<p>Some of the pending API documentation and GUI tutorials based on the above  HNN Roadmap
+include,</p>
+<ul class="simple">
+<li><p>Running parameter sweeps</p></li>
+<li><p>Simulating and visualizing LFP/CSD and comparison to invasive animal recordings</p></li>
+<li><p>Applying updated parameter estimation methods (SNPE)</p></li>
+<li><p>Choosing among different HNN cortical template models</p></li>
+</ul>
+</div>
+<div class="section" id="five-year-plan-to-2025">
+<h2>Five-Year Plan to 2025<a class="headerlink" href="#five-year-plan-to-2025" title="Permalink to this headline">¶</a></h2>
+<p><strong>Develop a framework to import cortical column models developed in NetPyNE or
+other modeling platforms into HNN:</strong>
+The core of HNN is a cortical column model
+that simulates macroscale current dipoles. Currently, HNN is distributed with
+a template cortical column model based on generalizable features of cortical
+circuitry and as applied in <a class="reference external" href="https://hnn.brown.edu/index.php/publications/">prior studies</a>.
+Essential to future expansion of HNN is the ability to use other cortical column
+models that include different cell types and or different network features.
+We have begun creation of a framework where models built in NetPyNE can be adapted
+to the HNN workflows of use. As a test bed, this currently entails integration of
+the HNN cortical column model and exogenous drives into the full NetPyNE
+platform (<a class="reference external" href="https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne">https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne</a>).
+To limit the scope of this effort to HNN-specific goals, i.e. neural modeling
+designed for interpretation of human EEG/MEG signals, we will work to adapt
+NetPyNE developed models into the HNN framework, and to make the adaptation
+flexible enough to include models developed in other neural modeling platforms.</p>
+<p><strong>Integrate HNN and MNE-Python tools:</strong> We will work to create a framework where
+source localization using MNE-Python is seamlessly integrated with HNN  for
+circuit-level interpretation of the signal. We will begin with median-nerve
+stimulation as a test-case example.</p>
+<p><strong>Convert HNN to web-based platform with dual GUI and Command Line Interface (CLI):</strong>
+We have begun working with MetaCell (metacell.org) to convert HNN to a web-based
+interactive GUI with updated graphics (<a class="reference external" href="https://github.com/MetaCell/HNN-UI">https://github.com/MetaCell/HNN-UI</a>).
+This conversion will eliminate the installation process and enhance computational
+efficiency.  Additionally, MetaCell is facilitating the transformation to a dual
+GUI and CLI interface enabled through Jupyter notebooks. There are advantages to
+both GUI and CLI in adapting HNN to user goals.  GUIs provide a framework for
+teaching the community the workflow to use such models to study the biophysical
+origin of MEG/EEG signals, like ERPs and brain rhythms. Once a meaningful
+parameter set is identified to account for the data of one subject, CLI scripts
+can be useful to investigate how well this parameter set accounts for the data
+from multiple subjects or how parameter changes impact the signal. CLIs can
+be used to generate sequences of processing steps that can then be applied
+to multiple data sets, ensuring rigor and reproducibility. Further,
+simultaneous viewing of GUI and CLI can help advanced users quickly adapt the
+code with scripting, and ultimately help create a community of HNN software
+developers. This framework will also facilitate the integration with other
+open-source platforms, including MNE-Python and NetPyNE.</p>
+<p><strong>Expand HNN to include study of multi-area interactions:</strong>
+HNN is designed for detailed multi-scale interpretation of the neural origin
+of macroscale current dipoles signals from a single brain area. A long term vision
+is to create a framework where multi-area interactions can be studied. We will
+begin with simulations of the interactions between sensory and motor cortices
+during median nerve stimulation.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>We do not claim all the neural mechanisms of these signals are completely understood,
+rather that there is a baseline of knowledge to build from and that HNN provides a
+framework for further investigation.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

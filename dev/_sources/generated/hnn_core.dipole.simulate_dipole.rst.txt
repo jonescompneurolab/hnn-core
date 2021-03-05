@@ -1,0 +1,6 @@
+﻿hnn\_core.dipole.simulate\_dipole
+=================================
+
+.. currentmodule:: hnn_core.dipole
+
+.. autofunction:: simulate_dipole

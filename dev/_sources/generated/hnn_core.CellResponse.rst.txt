@@ -1,0 +1,11 @@
+﻿hnn_core.CellResponse
+=====================
+
+.. currentmodule:: hnn_core
+
+.. autoclass:: CellResponse
+   :inherited-members:
+   :special-members: __getitem__, __repr__
+
+   
+   
