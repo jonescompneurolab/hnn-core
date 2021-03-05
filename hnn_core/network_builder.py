@@ -10,7 +10,7 @@ from neuron import h
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
-from .params import _long_name
+from .params import _long_name, _short_name
 
 # a few globals
 _PC = None
@@ -417,7 +417,7 @@ class NetworkBuilder(object):
 
     def _connect_celltypes(self, src_gids, target_gids, loc,
                            receptor, nc_dict, unique=False,
-                           allow_autapses=True):
+                           allow_autapses=True, drive_name=None):
         """Connect two cell types for a particular receptor.
 
         Parameters
@@ -452,21 +452,22 @@ class NetworkBuilder(object):
             is_target_gid = (gid_target in target_gids)
             if _PC.gid_exists(gid_target) and is_target_gid:
                 if unique:
-                    gid_srcs = [gid_target + net.gid_ranges[src_type][0]]
+                    src_gids = [src_gids[0] + gid_target]
+                    src_type = drive_name
                 for gid_src in src_gids:
-                    src_type = net.gid_to_type(gid_src)
+                    if not unique:
+                        src_type = net.gid_to_type(gid_src)
                     target_type = net.gid_to_type(gid_target)
-                    connection_name = f'{src_type}_{target_type}_{receptor}'
+                    connection_name = f'{_short_name(src_type)}_'\
+                        f'{_short_name(target_type)}_{receptor}'
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
 
                     if not allow_autapses and gid_src == gid_target:
                         continue
-
-                    pos_idx = gid_src - net.gid_ranges[_long_name(src_type)][0]
+                    pos_idx = gid_src - src_gids[0]
                     # NB pos_dict for this drive must include ALL cell types!
-                    nc_dict['pos_src'] = net.pos_dict[
-                        _long_name(src_type)][pos_idx]
+                    nc_dict['pos_src'] = net.pos_dict[src_type][pos_idx]
 
                     # get synapse locations
                     syn_keys = list()
@@ -586,12 +587,13 @@ class NetworkBuilder(object):
 
         # loop over _all_ drives, _connect_celltypes picks ones on this rank
         for drive in self.net.external_drives.values():
-
+            src_gids = self.net.gid_ranges[drive['name']]
             receptors = ['ampa', 'nmda']
             if drive['type'] == 'gaussian':
                 receptors = ['ampa']
             # conn-parameters are for each target cell type
-            for target_cell_type, drive_conn in drive['conn'].items():
+            for target_cell, drive_conn in drive['conn'].items():
+                target_gids = self.net.gid_ranges[_long_name(target_cell)]
                 for receptor in receptors:
                     if len(drive_conn[receptor]) > 0:
                         nc_dict['lamtha'] = drive_conn[
@@ -601,9 +603,10 @@ class NetworkBuilder(object):
                         nc_dict['A_weight'] = drive_conn[
                             receptor]['A_weight']
                         self._connect_celltypes(
-                            drive['name'], target_cell_type,
+                            src_gids, target_gids,
                             drive_conn['location'], receptor, nc_dict,
-                            unique=drive['cell_specific'])
+                            unique=drive['cell_specific'],
+                            drive_name=drive['name'])
 
     # setup spike recording for this node
     def _record_spikes(self):
