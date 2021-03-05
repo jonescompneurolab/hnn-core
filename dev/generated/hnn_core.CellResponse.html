@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn_core.CellResponse &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../auto_examples/index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hnn_core.CellResponse</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/generated/hnn_core.CellResponse.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="hnn-core-cellresponse">
+<h1>hnn_core.CellResponse<a class="headerlink" href="#hnn-core-cellresponse" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="hnn_core.CellResponse">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">hnn_core.</span></code><code class="sig-name descname"><span class="pre">CellResponse</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spike_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_gids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CellResponse class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+The inner list contains the time stamps of spikes.</p>
+</dd>
+<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+The inner list contains the cell IDs of neurons that
+spiked.</p>
+</dd>
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+The inner list contains the type of spike (e.g., evprox1
+or L2_pyramidal) that occured at the corresonding time stamp.
+Each gid corresponds to a type via Network().gid_ranges.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+The inner list contains the time stamps of spikes.</p>
+</dd>
+<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+The inner list contains the cell IDs of neurons that
+spiked.</p>
+</dd>
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+The inner list contains the type of spike (e.g., evprox1
+or L2_pyramidal) that occured at the corresonding time stamp.
+Each gid corresponds to a type via Network::gid_ranges.</p>
+</dd>
+<dt><strong>vsoma</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
+Dictionary indexed by gids containing somatic voltages.</p>
+</dd>
+<dt><strong>isoma</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
+Dictionary indexed by gids containing somatic currents.</p>
+</dd>
+<dt><strong>times</strong><span class="classifier">numpy array</span></dt><dd><p>Array of time points for samples in continuous data.
+This includes vsoma and isoma.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 66%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>update_types(gid_ranges)</strong></p></td>
+<td><p>Update spike types in the current instance of CellResponse.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>plot(ax=None, show=True)</strong></p></td>
+<td><p>Plot and return a matplotlib Figure object showing the aggregate network spiking activity according to cell type.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>mean_rates(tstart, tstop, gid_ranges, mean_type=’all’)</strong></p></td>
+<td><p>Calculate mean firing rate for each cell type. Specify averaging method with mean_type argument.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>write(fname)</strong></p></td>
+<td><p>Write spiking activity to a collection of spike trial files.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="hnn_core.CellResponse.__getitem__">
+<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a CellResponse object with a copied subset filtered by gid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gid_item</strong><span class="classifier">int | slice</span></dt><dd><p>Subset of gids .</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>cell_response</strong><span class="classifier">instance of CellResponse</span></dt><dd><p>See below for use cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.CellResponse.__repr__">
+<code class="sig-name descname"><span class="pre">__repr__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.CellResponse.mean_rates">
+<code class="sig-name descname"><span class="pre">mean_rates</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tstart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse.mean_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean spike rates (Hz) by cell type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tstart</strong><span class="classifier">int | float | None</span></dt><dd><p>Value defining the start time of all trials.</p>
+</dd>
+<dt><strong>tstop</strong><span class="classifier">int | float | None</span></dt><dd><p>Value defining the stop time of all trials.</p>
+</dd>
+<dt><strong>gid_ranges</strong><span class="classifier">dict of lists or range objects</span></dt><dd><p>Dictionary with keys ‘evprox1’, ‘evdist1’ etc.
+containing the range of Cell or input IDs of different
+cell or input types.</p>
+</dd>
+<dt><strong>mean_type</strong><span class="classifier">str</span></dt><dd><dl class="simple">
+<dt>‘all’<span class="classifier">Average over trials and cells</span></dt><dd><p>Returns mean rate for cell types</p>
+</dd>
+<dt>‘trial’<span class="classifier">Average over cell types</span></dt><dd><p>Returns trial mean rate for cell types</p>
+</dd>
+<dt>‘cell’<span class="classifier">Average over individual cells</span></dt><dd><p>Returns trial mean rate for individual cells</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>spike_rate</strong><span class="classifier">dict</span></dt><dd><p>Dictionary with keys ‘L5_pyramidal’, ‘L5_basket’, etc.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.CellResponse.plot_spikes_hist">
+<code class="sig-name descname"><span class="pre">plot_spikes_hist</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse.plot_spikes_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the histogram of spiking activity across trials.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None,
+a new figure is created.</p>
+</dd>
+<dt><strong>spike_types: string | list | dictionary | None</strong></dt><dd><dl class="simple">
+<dt>String input of a valid spike type is plotted individually.</dt><dd><p>Ex: ‘common’, ‘evdist’, ‘evprox’, ‘extgauss’, ‘extpois’</p>
+</dd>
+<dt>List of valid string inputs will plot each spike type individually.</dt><dd><p>Ex: [‘common’, ‘evdist’]</p>
+</dd>
+<dt>Dictionary of valid lists will plot list elements as a group.</dt><dd><p>Ex: {‘Evoked’: [‘evdist’, ‘evprox’], ‘External’: [‘extpois’]}</p>
+</dd>
+</dl>
+<p>If None, all input spike types are plotted individually if any
+are present. Otherwise spikes from all cells are plotted.
+Valid strings also include leading characters of spike types</p>
+<blockquote>
+<div><p>Example: ‘ext’ is equivalent to [‘extgauss’, ‘extpois’]</p>
+</div></blockquote>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.CellResponse.plot_spikes_raster">
+<code class="sig-name descname"><span class="pre">plot_spikes_raster</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse.plot_spikes_raster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the aggregate spiking activity according to cell type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None,
+a new figure is created.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.CellResponse.update_types">
+<code class="sig-name descname"><span class="pre">update_types</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse.update_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update spike types in the current instance of CellResponse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gid_ranges</strong><span class="classifier">dict of lists or range objects</span></dt><dd><p>Dictionary with keys ‘evprox1’, ‘evdist1’ etc.
+containing the range of Cell or input IDs of different
+cell or input types.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.CellResponse.write">
+<code class="sig-name descname"><span class="pre">write</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.CellResponse.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write spiking activity per trial to a collection of files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>String format (e.g., ‘&lt;pathname&gt;/spk_%d.txt’) of the
+path to the output spike file(s).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

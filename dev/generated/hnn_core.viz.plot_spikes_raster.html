@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Computation times &#8212; hnn-core  documentation</title>
+    <title>hnn_core.viz.plot_spikes_raster &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -45,7 +45,7 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="index.html">Examples</a></li>
+                <li><a href="../auto_examples/index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
@@ -72,7 +72,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Computation times</a></li>
+<li><a class="reference internal" href="#">hnn_core.viz.plot_spikes_raster</a></li>
 </ul>
 </ul>
 </li>
@@ -84,7 +84,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/auto_examples/sg_execution_times.rst.txt"
+  <a href="../_sources/generated/hnn_core.viz.plot_spikes_raster.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -122,42 +122,33 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>10:47.378</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 83%" />
-<col style="width: 10%" />
-<col style="width: 7%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_simulate_alpha.html#sphx-glr-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">02. Simulate alpha and beta waves</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_alpha.py</span></code>)</p></td>
-<td><p>02:53.598</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_simulate_gamma.html#sphx-glr-auto-examples-plot-simulate-gamma-py"><span class="std std-ref">03. Simulate gamma rhythms</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_gamma.py</span></code>)</p></td>
-<td><p>02:51.415</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_simulate_evoked.html#sphx-glr-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">01. Simulate dipole for evoked inputs</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_evoked.py</span></code>)</p></td>
-<td><p>02:15.708</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_simulate_somato.html#sphx-glr-auto-examples-plot-simulate-somato-py"><span class="std std-ref">05. From MEG sensor-space data to HNN simulation</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_somato.py</span></code>)</p></td>
-<td><p>01:20.325</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_firing_pattern.html#sphx-glr-auto-examples-plot-firing-pattern-py"><span class="std std-ref">04. Plot firing pattern</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_firing_pattern.py</span></code>)</p></td>
-<td><p>00:51.490</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_simulate_mpi_backend.html#sphx-glr-auto-examples-plot-simulate-mpi-backend-py"><span class="std std-ref">06. Use MPI backend for parallelization</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_mpi_backend.py</span></code>)</p></td>
-<td><p>00:34.843</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="hnn-core-viz-plot-spikes-raster">
+<h1>hnn_core.viz.plot_spikes_raster<a class="headerlink" href="#hnn-core-viz-plot-spikes-raster" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="hnn_core.viz.plot_spikes_raster">
+<code class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></code><code class="sig-name descname"><span class="pre">plot_spikes_raster</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_spikes_raster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the aggregate spiking activity according to cell type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cell_response</strong><span class="classifier">instance of CellResponse</span></dt><dd><p>The CellResponse object from net.cell_response</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None,
+a new figure is created.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
