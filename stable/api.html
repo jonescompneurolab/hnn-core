@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Documentation &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="auto_examples/index.html">Examples</a></li>
+                <li><a href="#">API</a></li>
+                <li><a href="whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">API Documentation</a><ul>
+<li><a class="reference internal" href="#simulation-hnn-core">Simulation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
+<li><a class="reference internal" href="#dipole-hnn-core-dipole">Dipole (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.dipole</span></code>):</a></li>
+<li><a class="reference internal" href="#params-hnn-core-params">Params (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.params</span></code>):</a></li>
+<li><a class="reference internal" href="#visualization-hnn-core-viz">Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):</a></li>
+<li><a class="reference internal" href="#parallel-backends-hnn-core-parallel-backends">Parallel backends (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.parallel_backends</span></code>):</a></li>
+<li><a class="reference internal" href="#input-and-output">Input and Output:</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/api.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="api-documentation">
+<span id="id1"></span><h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="simulation-hnn-core">
+<h2>Simulation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):<a class="headerlink" href="#simulation-hnn-core" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.L2Pyr.html#hnn_core.L2Pyr" title="hnn_core.L2Pyr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2Pyr</span></code></a>([pos, override_params, gid])</p></td>
+<td><p>Layer 2 pyramidal cell class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.L5Pyr.html#hnn_core.L5Pyr" title="hnn_core.L5Pyr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L5Pyr</span></code></a>([pos, override_params, gid])</p></td>
+<td><p>Layer 5 Pyramidal class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.L2Basket.html#hnn_core.L2Basket" title="hnn_core.L2Basket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2Basket</span></code></a>(pos[, gid])</p></td>
+<td><p>Class for layer 2 basket cells.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.L5Basket.html#hnn_core.L5Basket" title="hnn_core.L5Basket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L5Basket</span></code></a>(pos[, gid])</p></td>
+<td><p>Class for layer 5 basket cells.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, …])</p></td>
+<td><p>Simulate a dipole given the experiment parameters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a>(params[, add_drives_from_params, …])</p></td>
+<td><p>The Network class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CellResponse</span></code></a>([spike_times, spike_gids, …])</p></td>
+<td><p>The CellResponse class.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="dipole-hnn-core-dipole">
+<h2>Dipole (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.dipole</span></code>):<a class="headerlink" href="#dipole-hnn-core-dipole" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole" title="hnn_core.dipole.Dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dipole</span></code></a>(times, data[, nave])</p></td>
+<td><p>Dipole class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.dipole.simulate_dipole.html#hnn_core.dipole.simulate_dipole" title="hnn_core.dipole.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, …])</p></td>
+<td><p>Simulate a dipole given the experiment parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.read_dipole.html#hnn_core.dipole.read_dipole" title="hnn_core.dipole.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname)</p></td>
+<td><p>Read dipole values from a file and create a Dipole instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.dipole.average_dipoles.html#hnn_core.dipole.average_dipoles" title="hnn_core.dipole.average_dipoles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">average_dipoles</span></code></a>(dpls)</p></td>
+<td><p>Compute dipole averages over a list of Dipole objects.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="params-hnn-core-params">
+<h2>Params (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.params</span></code>):<a class="headerlink" href="#params-hnn-core-params" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.params.Params.html#hnn_core.params.Params" title="hnn_core.params.Params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Params</span></code></a>([params_input])</p></td>
+<td><p>Params object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.params.read_params.html#hnn_core.params.read_params" title="hnn_core.params.read_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_params</span></code></a>(params_fname)</p></td>
+<td><p>Read param values from a file (.json or .param).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="visualization-hnn-core-viz">
+<h2>Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):<a class="headerlink" href="#visualization-hnn-core-viz" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_dipole</span></code></a>(dpl[, tmin, tmax, ax, layer, …])</p></td>
+<td><p>Simple layer-specific plot function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist" title="hnn_core.viz.plot_spikes_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes_hist</span></code></a>(cell_response[, ax, …])</p></td>
+<td><p>Plot the histogram of spiking activity across trials.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster" title="hnn_core.viz.plot_spikes_raster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_spikes_raster</span></code></a>(cell_response[, ax, show])</p></td>
+<td><p>Plot the aggregate spiking activity according to cell type.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_cells.html#hnn_core.viz.plot_cells" title="hnn_core.viz.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>(net[, ax, show])</p></td>
+<td><p>Plot the cells using Network.pos_dict.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_psd.html#hnn_core.viz.plot_psd" title="hnn_core.viz.plot_psd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_psd</span></code></a>(dpl, *[, fmin, fmax, tmin, tmax, …])</p></td>
+<td><p>Plot power spectral density (PSD) of dipole time course</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.viz.plot_tfr_morlet.html#hnn_core.viz.plot_tfr_morlet" title="hnn_core.viz.plot_tfr_morlet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tfr_morlet</span></code></a>(dpl, freqs, *[, n_cycles, …])</p></td>
+<td><p>Plot Morlet time-frequency representation of dipole time course</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="parallel-backends-hnn-core-parallel-backends">
+<h2>Parallel backends (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.parallel_backends</span></code>):<a class="headerlink" href="#parallel-backends-hnn-core-parallel-backends" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend" title="hnn_core.parallel_backends.MPIBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MPIBackend</span></code></a>([n_procs, mpi_cmd])</p></td>
+<td><p>The MPIBackend class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.parallel_backends.JoblibBackend.html#hnn_core.parallel_backends.JoblibBackend" title="hnn_core.parallel_backends.JoblibBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JoblibBackend</span></code></a>([n_jobs])</p></td>
+<td><p>The JoblibBackend class.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="input-and-output">
+<h2>Input and Output:<a class="headerlink" href="#input-and-output" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname)</p></td>
+<td><p>Read dipole values from a file and create a Dipole instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spikes</span></code></a>(fname[, gid_ranges])</p></td>
+<td><p>Read spiking activity from a collection of spike trial files.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

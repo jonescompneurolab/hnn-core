@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn-core &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="auto_examples/index.html">Examples</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hnn-core</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#documentation-and-examples">Documentation and examples</a></li>
+<li><a class="reference internal" href="#bug-reports">Bug reports</a></li>
+<li><a class="reference internal" href="#interested-in-contributing">Interested in Contributing?</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/index.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="hnn-core">
+<h1>hnn-core<a class="headerlink" href="#hnn-core" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://gitter.im/hnn-core/hnn-core?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img alt="Gitter" src="https://badges.gitter.im/hnn-core/hnn-core.svg" /></a>
+<a class="reference external image-reference" href="https://circleci.com/gh/jonescompneurolab/hnn-core"><img alt="CircleCi" src="https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg" /></a>
+<a class="reference external image-reference" href="https://travis-ci.org/jonescompneurolab/hnn-core"><img alt="Build Status" src="https://api.travis-ci.org/jonescompneurolab/hnn-core.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/jonescompneurolab/hnn-core"><img alt="Test coverage" src="https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg" /></a>
+<p>This is a leaner and cleaner version of the code based off the <a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN repository</a>. However, a Graphical User Interface is not supported at the moment in this repository.</p>
+<p>It is early Work in Progress. Contributors are very welcome.</p>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>numpy</p></li>
+<li><p>scipy</p></li>
+<li><p>matplotlib</p></li>
+<li><p>Neuron (&gt;=7.7)</p></li>
+</ul>
+</div>
+<div class="section" id="optional-dependencies">
+<h2>Optional dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>joblib (for simulating trials simultaneously)</p></li>
+<li><p>mpi4py (for simulating the cells in parallel for a single trial). Also depends on:</p>
+<ul>
+<li><p>openmpi or other mpi platform installed on system</p></li>
+<li><p>psutil</p></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>We recommend the <a class="reference external" href="https://www.anaconda.com/products/individual">Anaconda Python distribution</a>.
+To install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, simply do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core
+</pre></div>
+</div>
+<p>and it will install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> along with the dependencies which are not already installed.</p>
+<p>Note that if you installed Neuron using the traditional installer package, it is recommended
+to remove it first and unset <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> and <code class="docutils literal notranslate"><span class="pre">PYTHONHOME</span></code> if they were set. This is
+because the pip installer works better with virtual environments such as the ones provided by <code class="docutils literal notranslate"><span class="pre">conda</span></code>.</p>
+<p>If you want to track the latest developments of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you can install the current version of the code (nightly) with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
+</pre></div>
+</div>
+<p>To check if everything worked fine, you can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -c &#39;import hnn_core&#39;
+</pre></div>
+</div>
+<p>and it should not give any error messages.</p>
+<p><strong>Parallel backends</strong></p>
+<p>For further instructions on installation and usage of parallel backends for using more
+than one CPU core, refer to <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/parallel.html">parallel_backends</a></p>
+<p><strong>Note for Windows users</strong></p>
+<p>The pip installer for Neuron does not yet work for Windows. In this case, it is better to
+install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> without the dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core --no-deps
+</pre></div>
+</div>
+<p>and then install the dependencies separately:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install scipy numpy matplotlib
+</pre></div>
+</div>
+<p>and install Neuron using the traditional package installer available here
+<a class="reference external" href="https://neuron.yale.edu/neuron/">https://neuron.yale.edu/neuron/</a>.</p>
+</div>
+<div class="section" id="documentation-and-examples">
+<h1>Documentation and examples<a class="headerlink" href="#documentation-and-examples" title="Permalink to this headline">¶</a></h1>
+<p>Once you have tested that <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and its dependencies were installed, we recommend downloading and executing the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/auto_examples/index.html">example scripts</a> provided on the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/">documentation pages</a> (as well as in the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">GitHub repository</a>).</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">python</span></code> plots are by default non-interactive (blocking): each plot must thus be closed before the code execution continues. We recommend using and ‘interactive’ python interpreter such as <code class="docutils literal notranslate"><span class="pre">ipython</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ipython --matplotlib
+</pre></div>
+</div>
+<p>and executing the scripts using the <code class="docutils literal notranslate"><span class="pre">%run</span></code>-magic:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">run</span> <span class="n">plot_simulate_evoked</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>When executed in this manner, the scripts will execute entirely, after which all plots will be shown. For an even more interactive experience, in which you execute code and interrogate plots in sequential blocks, we recommend editors such as <a class="reference external" href="https://code.visualstudio.com">VS Code</a> and <a class="reference external" href="https://docs.spyder-ide.org/current/index.html">Spyder</a>.</p>
+</div>
+<div class="section" id="bug-reports">
+<h1>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this headline">¶</a></h1>
+<p>Use the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues">github issue tracker</a> to
+report bugs. For user questions and scientific discussions, please join the
+<a class="reference external" href="https://groups.google.com/g/hnnsolver">HNN Google group</a>.</p>
+</div>
+<div class="section" id="interested-in-contributing">
+<h1>Interested in Contributing?<a class="headerlink" href="#interested-in-contributing" title="Permalink to this headline">¶</a></h1>
+<p>Read our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/CONTRIBUTING.rst">contributing guide</a>.</p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

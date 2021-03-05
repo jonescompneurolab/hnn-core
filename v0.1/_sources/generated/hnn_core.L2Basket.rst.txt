@@ -1,0 +1,11 @@
+﻿hnn_core.L2Basket
+=================
+
+.. currentmodule:: hnn_core
+
+.. autoclass:: L2Basket
+   :inherited-members:
+   :special-members: __getitem__, __repr__
+
+   
+   
