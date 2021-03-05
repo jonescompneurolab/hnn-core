@@ -415,7 +415,7 @@ class NetworkBuilder(object):
                 _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
                 self._drive_cells.append(drive_cell)
 
-    def _connect_celltypes(self, src_type, target_type, loc,
+    def _connect_celltypes(self, src_gids, target_gids, loc,
                            receptor, nc_dict, unique=False,
                            allow_autapses=True):
         """Connect two cell types for a particular receptor.
@@ -443,19 +443,22 @@ class NetworkBuilder(object):
             If True, allow connecting neuron to itself.
         """
         net = self.net
-        connection_name = f'{src_type}_{target_type}_{receptor}'
-        if connection_name not in self.ncs:
-            self.ncs[connection_name] = list()
+        # connection_name = f'{src_type}_{target_type}_{receptor}'
+        # if connection_name not in self.ncs:
+        #     self.ncs[connection_name] = list()
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
         # NB this assumes that REAL cells are first in the _gid_list
         for gid_target, target_cell in zip(self._gid_list, self.cells):
-            is_target_gid = (gid_target in
-                             self.net.gid_ranges[_long_name(target_type)])
+            is_target_gid = (gid_target in target_gids)
             if _PC.gid_exists(gid_target) and is_target_gid:
-                gid_srcs = net.gid_ranges[_long_name(src_type)]
                 if unique:
                     gid_srcs = [gid_target + net.gid_ranges[src_type][0]]
-                for gid_src in gid_srcs:
+                for gid_src in src_gids:
+                    src_type = net.gid_to_type(gid_src)
+                    target_type = net.gid_to_type(gid_target)
+                    connection_name = f'{src_type}_{target_type}_{receptor}'
+                    if connection_name not in self.ncs:
+                        self.ncs[connection_name] = list()
 
                     if not allow_autapses and gid_src == gid_target:
                         continue
