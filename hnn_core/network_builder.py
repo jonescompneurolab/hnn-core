@@ -415,17 +415,19 @@ class NetworkBuilder(object):
                 _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
                 self._drive_cells.append(drive_cell)
 
-    def _connect_celltypes(self, src_gids, target_gids, loc,
+    def _connect_celltypes(self, src, target, loc,
                            receptor, nc_dict, unique=False,
-                           allow_autapses=True, drive_name=None):
+                           allow_autapses=True):
         """Connect two cell types for a particular receptor.
 
         Parameters
         ----------
-        src_type : str
-            The source cell type
-        target_type : str
-            The target cell type
+        src : tuple of (list of str, list of int)
+            Tuple containing (src_types, src_gids) where src_type is a string
+            naming the gids listed in src_gids.
+        target : tuple of (list of str, list of int)
+            Tuple containing (target_types, target_gids) where target_type
+            is a string naming the gids listed in src_gids.
         loc : str
             If 'proximal' or 'distal', the corresponding
             dendritic sections from Cell.sect_loc['proximal']
@@ -443,44 +445,50 @@ class NetworkBuilder(object):
             If True, allow connecting neuron to itself.
         """
         net = self.net
-        # connection_name = f'{src_type}_{target_type}_{receptor}'
-        # if connection_name not in self.ncs:
-        #     self.ncs[connection_name] = list()
+        src_types, src_gids = src[0], src[1]
+        target_types, target_gids = target[0], target[1]
+        src_start = src[1][0]  # Nick: temporary workaround for drive gids
+
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
+        # Gather indeces of targets on current node
+        target_filter = [target_idx for target_idx in range(len(self.cells)) if
+                         _PC.gid_exists(self._gid_list[target_idx]) and
+                         self._gid_list[target_idx] in target_gids]
+
         # NB this assumes that REAL cells are first in the _gid_list
-        for gid_target, target_cell in zip(self._gid_list, self.cells):
-            is_target_gid = (gid_target in target_gids)
-            if _PC.gid_exists(gid_target) and is_target_gid:
-                if unique:
-                    src_gids = [src_gids[0] + gid_target]
-                    src_type = drive_name
-                for gid_src in src_gids:
-                    if not unique:
-                        src_type = net.gid_to_type(gid_src)
-                    target_type = net.gid_to_type(gid_target)
-                    connection_name = f'{_short_name(src_type)}_'\
-                        f'{_short_name(target_type)}_{receptor}'
-                    if connection_name not in self.ncs:
-                        self.ncs[connection_name] = list()
+        for target_idx in target_filter:
+            gid_target = self._gid_list[target_idx]
+            target_cell = self.cells[target_idx]
+            target_idx = np.where(gid_target == target_gids)
+            target_type = target_types[target_idx]
+            if unique:
+                src_gids = [src_start + gid_target]
+            for src_type, gid_src in zip(src_types, src_gids):
+                target_type = net.gid_to_type(gid_target)
+                connection_name = f'{_short_name(src_type)}_'\
+                    f'{_short_name(target_type)}_{receptor}'
+                if connection_name not in self.ncs:
+                    self.ncs[connection_name] = list()
 
-                    if not allow_autapses and gid_src == gid_target:
-                        continue
-                    pos_idx = gid_src - src_gids[0]
-                    # NB pos_dict for this drive must include ALL cell types!
-                    nc_dict['pos_src'] = net.pos_dict[src_type][pos_idx]
+                if not allow_autapses and gid_src == gid_target:
+                    continue
+                pos_idx = gid_src - src_gids[0]
+                # NB pos_dict for this drive must include ALL cell types!
+                nc_dict['pos_src'] = net.pos_dict[
+                    _long_name(src_type)][pos_idx]
 
-                    # get synapse locations
-                    syn_keys = list()
-                    if loc in ['proximal', 'distal']:
-                        for sect in target_cell.sect_loc[loc]:
-                            syn_keys.append(f'{sect}_{receptor}')
-                    else:
-                        syn_keys = [f'{loc}_{receptor}']
+                # get synapse locations
+                syn_keys = list()
+                if loc in ['proximal', 'distal']:
+                    for sect in target_cell.sect_loc[loc]:
+                        syn_keys.append(f'{sect}_{receptor}')
+                else:
+                    syn_keys = [f'{loc}_{receptor}']
 
-                    for syn_key in syn_keys:
-                        nc = target_cell.parconnect_from_src(
-                            gid_src, nc_dict, target_cell.synapses[syn_key])
-                        self.ncs[connection_name].append(nc)
+                for syn_key in syn_keys:
+                    nc = target_cell.parconnect_from_src(
+                        gid_src, nc_dict, target_cell.synapses[syn_key])
+                    self.ncs[connection_name].append(nc)
 
     # connections:
     # this NODE is aware of its cells as targets
@@ -502,98 +510,130 @@ class NetworkBuilder(object):
         nc_dict['lamtha'] = 3.
         for target_cell in ['L2Pyr', 'L5Pyr']:
             target_gids = self.net.gid_ranges[_long_name(target_cell)]
+            target_types = np.repeat(target_cell, len(target_gids))
+            target = (target_types, target_gids)
             for receptor in ['nmda', 'ampa']:
                 key = f'gbar_{target_cell}_{target_cell}_{receptor}'
                 nc_dict['A_weight'] = params[key]
-                self._connect_celltypes(target_gids, target_gids, 'proximal',
+                self._connect_celltypes(target, target, 'proximal',
                                         receptor, nc_dict,
                                         allow_autapses=False)
 
         # layer2 Basket -> layer2 Pyr
         src_cell = 'L2Basket'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         target_cell = 'L2Pyr'
         target_gids = self.net.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        target = (target_types, target_gids)
         nc_dict['lamtha'] = 50.
         for receptor in ['gabaa', 'gabab']:
             nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_{receptor}']
-            self._connect_celltypes(src_gids, target_gids, 'soma', receptor,
+            self._connect_celltypes(src, target, 'soma', receptor,
                                     nc_dict)
 
         # layer5 Basket -> layer5 Pyr
         src_cell = 'L5Basket'
         src_gids = src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         target_cell = 'L5Pyr'
         target_gids = self.net.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        target = (target_types, target_gids)
         nc_dict['lamtha'] = 70.
         for receptor in ['gabaa', 'gabab']:
             key = f'gbar_L5Basket_{target_cell}_{receptor}'
             nc_dict['A_weight'] = params[key]
-            self._connect_celltypes(src_gids, target_gids, 'soma', receptor,
+            self._connect_celltypes(src, target, 'soma', receptor,
                                     nc_dict)
 
         # layer2 Pyr -> layer5 Pyr
         src_cell = 'L2Pyr'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         nc_dict['lamtha'] = 3.
         for loc in ['proximal', 'distal']:
             nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
-            self._connect_celltypes(src_gids, target_gids, loc, 'ampa',
+            self._connect_celltypes(src, target, loc, 'ampa',
                                     nc_dict)
         # layer2 Basket -> layer5 Pyr
         src_cell = 'L2Basket'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         nc_dict['lamtha'] = 50.
         nc_dict['A_weight'] = params[f'gbar_L2Basket_{target_cell}']
-        self._connect_celltypes(src_gids, target_gids, 'distal', 'gabaa',
+        self._connect_celltypes(src, target, 'distal', 'gabaa',
                                 nc_dict)
 
         # xx -> layer2 Basket
         src_cell = 'L2Pyr'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         target_cell = 'L2Basket'
         target_gids = self.net.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        target = (target_types, target_gids)
         nc_dict['lamtha'] = 3.
         nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
-        self._connect_celltypes(src_gids, target_gids, 'soma', 'ampa',
+        self._connect_celltypes(src, target, 'soma', 'ampa',
                                 nc_dict)
         src_cell = 'L2Basket'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         nc_dict['lamtha'] = 20.
         nc_dict['A_weight'] = params[f'gbar_L2Basket_{target_cell}']
-        self._connect_celltypes(src_gids, target_gids, 'soma', 'gabaa',
+        self._connect_celltypes(src, target, 'soma', 'gabaa',
                                 nc_dict)
 
         # xx -> layer5 Basket
         src_cell = 'L5Basket'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         target_cell = 'L5Basket'
         target_gids = self.net.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        target = (target_types, target_gids)
         nc_dict['lamtha'] = 20.
         nc_dict['A_weight'] = params[f'gbar_L5Basket_{target_cell}']
-        self._connect_celltypes(src_gids, target_gids, 'soma', 'gabaa',
+        self._connect_celltypes(src, target, 'soma', 'gabaa',
                                 nc_dict, allow_autapses=False)
         src_cell = 'L5Pyr'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         nc_dict['lamtha'] = 3.
         nc_dict['A_weight'] = params[f'gbar_L5Pyr_{target_cell}']
-        self._connect_celltypes(src_gids, target_gids, 'soma', 'ampa',
+        self._connect_celltypes(src, target, 'soma', 'ampa',
                                 nc_dict)
         src_cell = 'L2Pyr'
         src_gids = self.net.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        src = (src_types, src_gids)
         nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
-        self._connect_celltypes(src_gids, target_gids, 'soma', 'ampa',
+        self._connect_celltypes(src, target, 'soma', 'ampa',
                                 nc_dict)
 
         # loop over _all_ drives, _connect_celltypes picks ones on this rank
         for drive in self.net.external_drives.values():
             src_gids = self.net.gid_ranges[drive['name']]
+            src_types = np.repeat(drive['name'], len(src_gids))
+            src = (src_types, src_gids)
             receptors = ['ampa', 'nmda']
             if drive['type'] == 'gaussian':
                 receptors = ['ampa']
             # conn-parameters are for each target cell type
             for target_cell, drive_conn in drive['conn'].items():
                 target_gids = self.net.gid_ranges[_long_name(target_cell)]
+                target_types = np.repeat(target_cell, len(target_gids)) 
+                target = (target_types, target_gids)
                 for receptor in receptors:
                     if len(drive_conn[receptor]) > 0:
                         nc_dict['lamtha'] = drive_conn[
@@ -603,10 +643,9 @@ class NetworkBuilder(object):
                         nc_dict['A_weight'] = drive_conn[
                             receptor]['A_weight']
                         self._connect_celltypes(
-                            src_gids, target_gids,
+                            src, target,
                             drive_conn['location'], receptor, nc_dict,
-                            unique=drive['cell_specific'],
-                            drive_name=drive['name'])
+                            unique=drive['cell_specific'])
 
     # setup spike recording for this node
     def _record_spikes(self):
