@@ -497,65 +497,88 @@ class NetworkBuilder(object):
         # layer5 Pyr -> layer5 Pyr
         nc_dict['lamtha'] = 3.
         for target_cell in ['L2Pyr', 'L5Pyr']:
+            target_gids = self.net.gid_ranges[_long_name(target_cell)]
             for receptor in ['nmda', 'ampa']:
                 key = f'gbar_{target_cell}_{target_cell}_{receptor}'
                 nc_dict['A_weight'] = params[key]
-                self._connect_celltypes(target_cell, target_cell, 'proximal',
+                self._connect_celltypes(target_gids, target_gids, 'proximal',
                                         receptor, nc_dict,
                                         allow_autapses=False)
 
         # layer2 Basket -> layer2 Pyr
+        src_cell = 'L2Basket'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         target_cell = 'L2Pyr'
+        target_gids = self.net.gid_ranges[_long_name(target_cell)]
         nc_dict['lamtha'] = 50.
         for receptor in ['gabaa', 'gabab']:
             nc_dict['A_weight'] = params[f'gbar_L2Basket_L2Pyr_{receptor}']
-            self._connect_celltypes('L2Basket', target_cell, 'soma', receptor,
+            self._connect_celltypes(src_gids, target_gids, 'soma', receptor,
                                     nc_dict)
 
         # layer5 Basket -> layer5 Pyr
+        src_cell = 'L5Basket'
+        src_gids = src_gids = self.net.gid_ranges[_long_name(src_cell)]
         target_cell = 'L5Pyr'
+        target_gids = self.net.gid_ranges[_long_name(target_cell)]
         nc_dict['lamtha'] = 70.
         for receptor in ['gabaa', 'gabab']:
             key = f'gbar_L5Basket_{target_cell}_{receptor}'
             nc_dict['A_weight'] = params[key]
-            self._connect_celltypes('L5Basket', target_cell, 'soma', receptor,
+            self._connect_celltypes(src_gids, target_gids, 'soma', receptor,
                                     nc_dict)
 
         # layer2 Pyr -> layer5 Pyr
+        src_cell = 'L2Pyr'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         nc_dict['lamtha'] = 3.
         for loc in ['proximal', 'distal']:
             nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
-            self._connect_celltypes('L2Pyr', target_cell, loc, 'ampa',
+            self._connect_celltypes(src_gids, target_gids, loc, 'ampa',
                                     nc_dict)
         # layer2 Basket -> layer5 Pyr
+        src_cell = 'L2Basket'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         nc_dict['lamtha'] = 50.
         nc_dict['A_weight'] = params[f'gbar_L2Basket_{target_cell}']
-        self._connect_celltypes('L2Basket', target_cell, 'distal', 'gabaa',
+        self._connect_celltypes(src_gids, target_gids, 'distal', 'gabaa',
                                 nc_dict)
 
         # xx -> layer2 Basket
+        src_cell = 'L2Pyr'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         target_cell = 'L2Basket'
+        target_gids = self.net.gid_ranges[_long_name(target_cell)]
         nc_dict['lamtha'] = 3.
         nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
-        self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
+        self._connect_celltypes(src_gids, target_gids, 'soma', 'ampa',
                                 nc_dict)
+        src_cell = 'L2Basket'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         nc_dict['lamtha'] = 20.
         nc_dict['A_weight'] = params[f'gbar_L2Basket_{target_cell}']
-        self._connect_celltypes('L2Basket', target_cell, 'soma', 'gabaa',
+        self._connect_celltypes(src_gids, target_gids, 'soma', 'gabaa',
                                 nc_dict)
 
         # xx -> layer5 Basket
+        src_cell = 'L5Basket'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         target_cell = 'L5Basket'
+        target_gids = self.net.gid_ranges[_long_name(target_cell)]
         nc_dict['lamtha'] = 20.
         nc_dict['A_weight'] = params[f'gbar_L5Basket_{target_cell}']
-        self._connect_celltypes('L5Basket', target_cell, 'soma', 'gabaa',
+        self._connect_celltypes(src_gids, target_gids, 'soma', 'gabaa',
                                 nc_dict, allow_autapses=False)
+        src_cell = 'L5Pyr'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         nc_dict['lamtha'] = 3.
         nc_dict['A_weight'] = params[f'gbar_L5Pyr_{target_cell}']
-        self._connect_celltypes('L5Pyr', target_cell, 'soma', 'ampa',
+        self._connect_celltypes(src_gids, target_gids, 'soma', 'ampa',
                                 nc_dict)
+        src_cell = 'L2Pyr'
+        src_gids = self.net.gid_ranges[_long_name(src_cell)]
         nc_dict['A_weight'] = params[f'gbar_L2Pyr_{target_cell}']
-        self._connect_celltypes('L2Pyr', target_cell, 'soma', 'ampa',
+        self._connect_celltypes(src_gids, target_gids, 'soma', 'ampa',
                                 nc_dict)
 
         # loop over _all_ drives, _connect_celltypes picks ones on this rank
