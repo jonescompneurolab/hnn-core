@@ -632,7 +632,7 @@ class NetworkBuilder(object):
             # conn-parameters are for each target cell type
             for target_cell, drive_conn in drive['conn'].items():
                 target_gids = self.net.gid_ranges[_long_name(target_cell)]
-                target_types = np.repeat(target_cell, len(target_gids)) 
+                target_types = np.repeat(target_cell, len(target_gids))
                 target = (target_types, target_gids)
                 for receptor in receptors:
                     if len(drive_conn[receptor]) > 0:
