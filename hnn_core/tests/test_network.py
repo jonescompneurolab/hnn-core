@@ -148,16 +148,16 @@ def test_network():
     # create a new connection between cell types
     src_gids = net.gid_ranges['bursty1']
     src_types = np.repeat('bursty1', len(src_gids))
-    src = (src_types, src_gids)
     target_gids = net.gid_ranges['L5_basket']
     target_types = np.repeat('L5_basket', len(target_gids))
-    target = (target_types, target_gids)
+    connectivity = network_builder._all_to_all_connect(
+        src_types, src_gids, target_types, target_gids,
+        unique=False)
 
     nc_dict = {'A_delay': 1, 'A_weight': 1e-5, 'lamtha': 20,
                'threshold': 0.5}
     network_builder._connect_celltypes(
-        src, target, 'soma', 'gabaa', nc_dict,
-        unique=False)
+        connectivity, 'soma', 'gabaa', nc_dict)
     assert 'bursty1_L5Basket_gabaa' in network_builder.ncs
     n_conn = len(net.gid_ranges['bursty1']) * len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['bursty1_L5Basket_gabaa']) == n_conn
@@ -165,10 +165,11 @@ def test_network():
     # try unique=True
     src_gids = net.gid_ranges['extgauss']
     src_types = np.repeat('extgauss', len(src_gids))
-    src = (src_types, src_gids)
-    network_builder._connect_celltypes(
-        src, target, 'soma', 'gabaa', nc_dict,
+    connectivity = network_builder._all_to_all_connect(
+        src_types, src_gids, target_types, target_gids,
         unique=True)
+    network_builder._connect_celltypes(
+        connectivity, 'soma', 'gabaa', nc_dict)
     n_conn = len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
