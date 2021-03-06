@@ -430,7 +430,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  57.860 seconds)
+   **Total running time of the script:** ( 0 minutes  44.214 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:
@@ -445,7 +445,7 @@ raster plots and histograms for the pyramidal cells.
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.1/notebooks/auto_examples/plot_firing_pattern.ipynb
+      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/plot_firing_pattern.ipynb
       :alt: Launch binder
       :width: 150 px
 
