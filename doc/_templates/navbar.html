@@ -3,7 +3,7 @@
 {% block navbarsearch %}
 <div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
   <button type="button" class="btn btn-{% if (build_dev_html|tobool) %}danger{% else %}primary{% endif %} navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v{{ release }}
+    v{{ version }}
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
