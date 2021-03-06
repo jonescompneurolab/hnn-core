@@ -650,7 +650,7 @@ class NetworkBuilder(object):
     def _all_to_all_connect(self, src_types, src_gids, target_types,
                             target_gids, allow_autapses=True,
                             unique=False):
-        """Generate connectivity list given of sources and targets.
+        """Generate connectivity list given lists of sources and targets.
 
         Parameters
         ----------
