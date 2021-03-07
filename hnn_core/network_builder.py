@@ -422,10 +422,10 @@ class NetworkBuilder(object):
 
         Parameters
         ----------
-        connectivity : list of list [[str, int, str, int], ...]
+        connectivity : list of dict
             Outer list contains an element for each connection. The inner
-            list specifies connections between cells with the form:
-            [src_type, src_gid, target_type, target_gid]
+            list specifies connections between cells with the keys:
+            'src_type', 'src_gid', 'target_type', 'target_gid'
         loc : str
             If 'proximal' or 'distal', the corresponding
             dendritic sections from Cell.sect_loc['proximal']
@@ -447,8 +447,8 @@ class NetworkBuilder(object):
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
         # Gather indeces of targets on current node
         connectivity = [conn for conn in connectivity if
-                        _PC.gid_exists(conn[3])]
-        target_gids = [conn[3] for conn in connectivity]
+                        _PC.gid_exists(conn['target_gid'])]
+        target_gids = [conn['target_gid'] for conn in connectivity]
         target_filter = {}
         for idx in range(len(self.cells)):
             gid = self._gid_list[idx]
@@ -456,8 +456,8 @@ class NetworkBuilder(object):
                 target_filter[gid] = idx
 
         for conn in connectivity:
-            src_type, src_gid = conn[0], conn[1]
-            target_type, target_gid = conn[2], conn[3]
+            src_type, src_gid = conn['src_type'], conn['src_gid']
+            target_type, target_gid = conn['target_type'], conn['target_gid']
             target_cell = self.cells[target_filter[target_gid]]
             connection_name = f'{_short_name(src_type)}_'\
                               f'{_short_name(target_type)}_{receptor}'
@@ -646,7 +646,6 @@ class NetworkBuilder(object):
                             drive_conn['location'], receptor, nc_dict,
                             unique=drive['cell_specific'])
 
-    # Generate connectivity list with all to all connections
     def _all_to_all_connect(self, src_types, src_gids, target_types,
                             target_gids, allow_autapses=True,
                             unique=False):
@@ -676,7 +675,8 @@ class NetworkBuilder(object):
                 src_gids = [target_gid + src_start]
                 src_types = [src_types[0]]  # Assumes that all src_types match
             for src_type, src_gid in zip(src_types, src_gids):
-                conn = [src_type, src_gid, target_type, target_gid]
+                conn = {'src_type': src_type, 'src_gid': src_gid,
+                        'target_type': target_type, 'target_gid': target_gid}
                 if not allow_autapses and src_gid == target_gid:
                     continue
 
