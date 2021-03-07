@@ -14,6 +14,9 @@ from warnings import warn
 from .feed import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
+from .params import _extract_bias_specs_from_hnn_params
+from .params import _extract_drive_specs_from_hnn_params
+from .params import _long_name
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
@@ -222,7 +225,7 @@ class Network(object):
         self.external_biases = dict()
 
         # network connectivity
-        self.connectivity = dict()
+        self.connectivity_list = list()
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -800,6 +803,236 @@ class Network(object):
         src_pos = self.pos_dict[src_type][type_pos_ind]
 
         return src_type, src_pos, src_type in self.cellname_list
+
+    def _default_connect(self):
+        nc_dict = {
+            'A_delay': 1.,
+            'threshold': self.params['threshold'],
+        }
+
+        # source of synapse is always at soma
+
+        # layer2 Pyr -> layer2 Pyr
+        # layer5 Pyr -> layer5 Pyr
+        nc_dict['lamtha'] = 3.
+        loc = 'proximal'
+        for target_cell in ['L2Pyr', 'L5Pyr']:
+            target_gids = self.gid_ranges[_long_name(target_cell)]
+            target_types = np.repeat(target_cell, len(target_gids))
+            for receptor in ['nmda', 'ampa']:
+                key = f'gbar_{target_cell}_{target_cell}_{receptor}'
+                nc_dict['A_weight'] = self.params[key]
+                connectivity = self._all_to_all_connect(
+                    target_types, target_gids, target_types, target_gids,
+                    loc, receptor, nc_dict, allow_autapses=False)
+                self.connectivity_list.extend(connectivity)
+
+        # layer2 Basket -> layer2 Pyr
+        src_cell = 'L2Basket'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        target_cell = 'L2Pyr'
+        target_gids = self.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        nc_dict['lamtha'] = 50.
+        loc = 'soma'
+        for receptor in ['gabaa', 'gabab']:
+            key = f'gbar_L2Basket_L2Pyr_{receptor}'
+            nc_dict['A_weight'] = self.params[key]
+            connectivity = self._all_to_all_connect(
+                src_types, src_gids, target_types, target_gids,
+                loc, receptor, nc_dict)
+            self.connectivity_list.extend(connectivity)
+
+        # layer5 Basket -> layer5 Pyr
+        src_cell = 'L5Basket'
+        src_gids = src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        target_cell = 'L5Pyr'
+        target_gids = self.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        nc_dict['lamtha'] = 70.
+        loc = 'soma'
+        for receptor in ['gabaa', 'gabab']:
+            key = f'gbar_L5Basket_{target_cell}_{receptor}'
+            nc_dict['A_weight'] = self.params[key]
+            connectivity = self._all_to_all_connect(
+                src_types, src_gids, target_types, target_gids,
+                loc, receptor, nc_dict)
+            self.connectivity_list.extend(connectivity)
+
+        # layer2 Pyr -> layer5 Pyr
+        src_cell = 'L2Pyr'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        nc_dict['lamtha'] = 3.
+        receptor = 'ampa'
+        for loc in ['proximal', 'distal']:
+            key = f'gbar_L2Pyr_{target_cell}'
+            nc_dict['A_weight'] = self.params[key]
+            connectivity = self._all_to_all_connect(
+                src_types, src_gids, target_types, target_gids,
+                loc, receptor, nc_dict)
+            self.connectivity_list.extend(connectivity)
+
+        # layer2 Basket -> layer5 Pyr
+        src_cell = 'L2Basket'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        nc_dict['lamtha'] = 50.
+        key = f'gbar_L2Basket_{target_cell}'
+        nc_dict['A_weight'] = self.params[key]
+        loc = 'distal'
+        receptor = 'gabaa'
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            loc, receptor, nc_dict)
+        self.connectivity_list.extend(connectivity)
+
+        # xx -> layer2 Basket
+        src_cell = 'L2Pyr'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        target_cell = 'L2Basket'
+        target_gids = self.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        nc_dict['lamtha'] = 3.
+        key = f'gbar_L2Pyr_{target_cell}'
+        nc_dict['A_weight'] = self.params[key]
+        loc = 'soma'
+        receptor = 'ampa'
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            loc, receptor, nc_dict)
+        self.connectivity_list.extend(connectivity)
+
+        src_cell = 'L2Basket'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        nc_dict['lamtha'] = 20.
+        key = f'gbar_L2Basket_{target_cell}'
+        nc_dict['A_weight'] = self.params[key]
+        loc = 'soma'
+        receptor = 'gabaa'
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            loc, receptor, nc_dict)
+        self.connectivity_list.extend(connectivity)
+
+        # xx -> layer5 Basket
+        src_cell = 'L5Basket'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        target_cell = 'L5Basket'
+        target_gids = self.gid_ranges[_long_name(target_cell)]
+        target_types = np.repeat(target_cell, len(target_gids))
+        nc_dict['lamtha'] = 20.
+        loc = 'soma'
+        receptor = 'gabaa'
+        key = f'gbar_L5Basket_{target_cell}'
+        nc_dict['A_weight'] = self.params[key]
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            loc, receptor, nc_dict, allow_autapses=False)
+        self.connectivity_list.extend(connectivity)
+
+        src_cell = 'L5Pyr'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        nc_dict['lamtha'] = 3.
+        key = f'gbar_L5Pyr_{target_cell}'
+        nc_dict['A_weight'] = self.params[key]
+        loc = 'soma'
+        receptor = 'ampa'
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            loc, receptor, nc_dict)
+        self.connectivity_list.extend(connectivity)
+
+        src_cell = 'L2Pyr'
+        src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_types = np.repeat(src_cell, len(src_gids))
+        key = f'gbar_L2Pyr_{target_cell}'
+        nc_dict['A_weight'] = self.params[key]
+        loc = 'soma'
+        receptor = 'ampa'
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            loc, receptor, nc_dict)
+        self.connectivity_list.extend(connectivity)
+
+        # loop over _all_ drives, _connect_celltypes picks ones on this rank
+        for drive in self.external_drives.values():
+            src_gids = self.gid_ranges[drive['name']]
+            src_types = np.repeat(drive['name'], len(src_gids))
+            receptors = ['ampa', 'nmda']
+            if drive['type'] == 'gaussian':
+                receptors = ['ampa']
+            # conn-parameters are for each target cell type
+            for target_cell, drive_conn in drive['conn'].items():
+                target_gids = self.gid_ranges[_long_name(target_cell)]
+                target_types = np.repeat(target_cell, len(target_gids))
+                for receptor in receptors:
+                    if len(drive_conn[receptor]) > 0:
+                        nc_dict['lamtha'] = drive_conn[
+                            receptor]['lamtha']
+                        nc_dict['A_delay'] = drive_conn[
+                            receptor]['A_delay']
+                        nc_dict['A_weight'] = drive_conn[
+                            receptor]['A_weight']
+                        loc = drive_conn['location']
+                        connectivity = self._all_to_all_connect(
+                            src_types, src_gids, target_types,
+                            target_gids, loc, receptor, nc_dict,
+                            unique=drive['cell_specific'])
+                        self.connectivity_list.extend(connectivity)
+
+    def _all_to_all_connect(self, src_types, src_gids, target_types,
+                            target_gids, loc, receptor, nc_dict,
+                            allow_autapses=True, unique=False):
+        """Generate connectivity list given lists of sources and targets.
+
+        Parameters
+        ----------
+        src_types : list of str
+            List of string names of sources.
+        src_gids : list on int
+            List of integer identifiers of sources.
+        target_types : list of str
+            List of string names of targets.
+        target_gids : list on int
+            List of integer identifiers of targets.
+        loc : str
+            If 'proximal' or 'distal', the corresponding
+            dendritic sections from Cell.sect_loc['proximal']
+            or Cell.Sect_loc['distal'] are used
+        receptor : str
+            The receptor.
+        nc_dict : dict
+            The connection dictionary containing keys
+            A_delay, A_weight, lamtha, and threshold.
+        allow_autapses : bool
+            If True, allow connecting neuron to itself.
+        unique : bool
+            If True, each target cell gets one "unique" feed.
+            If False, all src_type cells are connected to
+            all target_type cells.
+        """
+        connectivity = []
+        src_start = src_gids[0]  # Necessary for unique feeds
+        for target_type, target_gid in zip(target_types, target_gids):
+            if unique:
+                src_gids = [target_gid + src_start]
+                src_types = [src_types[0]]  # Assumes that all src_types match
+            for src_type, src_gid in zip(src_types, src_gids):
+                conn = {'src_type': src_type, 'src_gid': src_gid,
+                        'target_type': target_type, 'target_gid': target_gid,
+                        'loc': loc, 'receptor': receptor, 'nc_dict': nc_dict}
+                if not allow_autapses and src_gid == target_gid:
+                    continue
+
+                connectivity.append(conn)
+        return connectivity
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
