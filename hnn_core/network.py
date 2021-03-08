@@ -242,6 +242,8 @@ class Network(object):
         if add_drives_from_params:
             _add_drives_from_params(self)
 
+        self._default_connect()
+
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
@@ -555,6 +557,35 @@ class Network(object):
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
+        # Update connectivity_list
+        nc_dict = {
+            'A_delay': 1.,
+            'threshold': self.params['threshold'],
+        }
+        src_gids = self.gid_ranges[drive['name']]
+        src_types = np.repeat(drive['name'], len(src_gids))
+        receptors = ['ampa', 'nmda']
+        if drive['type'] == 'gaussian':
+            receptors = ['ampa']
+        # conn-parameters are for each target cell type
+        for target_cell, drive_conn in drive['conn'].items():
+            target_gids = self.gid_ranges[_long_name(target_cell)]
+            target_types = np.repeat(target_cell, len(target_gids))
+            for receptor in receptors:
+                if len(drive_conn[receptor]) > 0:
+                    nc_dict['lamtha'] = drive_conn[
+                        receptor]['lamtha']
+                    nc_dict['A_delay'] = drive_conn[
+                        receptor]['A_delay']
+                    nc_dict['A_weight'] = drive_conn[
+                        receptor]['A_weight']
+                    loc = drive_conn['location']
+                    connectivity = self._all_to_all_connect(
+                        src_types, src_gids, target_types,
+                        target_gids, loc, receptor, nc_dict,
+                        unique=drive['cell_specific'])
+                    self.connectivity_list.extend(connectivity)
+
     def _create_drive_conns(self, target_populations, weights_by_receptor,
                             location, space_constant, synaptic_delays,
                             cell_specific=True):
@@ -711,13 +742,15 @@ class Network(object):
         space_constant: np.array (n_src_gids, n_target_gids) of float
             Array defining space constants.
         """
-        self.connectivity['src_gids'] = src_gids
-        self.connectivity['target_gids'] = target_gids
-        self.connectivity['weight'] = weight
-        self.connectivity['receptor'] = receptor
-        self.connectivity['location'] = location
-        self.connectivity['delay'] = delay
-        self.connectivity['space_constant'] = space_constant
+        connectivity = dict()
+        connectivity['src_gids'] = src_gids
+        connectivity['target_gids'] = target_gids
+        connectivity['weight'] = weight
+        connectivity['receptor'] = receptor
+        connectivity['location'] = location
+        connectivity['delay'] = delay
+        connectivity['space_constant'] = space_constant
+        self.connectivity_list.extend(connectivity)
 
     def remove_connections(self):
         """Remove all cell-cell connections."""
@@ -846,7 +879,7 @@ class Network(object):
 
         # layer5 Basket -> layer5 Pyr
         src_cell = 'L5Basket'
-        src_gids = src_gids = self.gid_ranges[_long_name(src_cell)]
+        src_gids = self.gid_ranges[_long_name(src_cell)]
         src_types = np.repeat(src_cell, len(src_gids))
         target_cell = 'L5Pyr'
         target_gids = self.gid_ranges[_long_name(target_cell)]
@@ -961,32 +994,6 @@ class Network(object):
             loc, receptor, nc_dict)
         self.connectivity_list.extend(connectivity)
 
-        # loop over _all_ drives, _connect_celltypes picks ones on this rank
-        for drive in self.external_drives.values():
-            src_gids = self.gid_ranges[drive['name']]
-            src_types = np.repeat(drive['name'], len(src_gids))
-            receptors = ['ampa', 'nmda']
-            if drive['type'] == 'gaussian':
-                receptors = ['ampa']
-            # conn-parameters are for each target cell type
-            for target_cell, drive_conn in drive['conn'].items():
-                target_gids = self.gid_ranges[_long_name(target_cell)]
-                target_types = np.repeat(target_cell, len(target_gids))
-                for receptor in receptors:
-                    if len(drive_conn[receptor]) > 0:
-                        nc_dict['lamtha'] = drive_conn[
-                            receptor]['lamtha']
-                        nc_dict['A_delay'] = drive_conn[
-                            receptor]['A_delay']
-                        nc_dict['A_weight'] = drive_conn[
-                            receptor]['A_weight']
-                        loc = drive_conn['location']
-                        connectivity = self._all_to_all_connect(
-                            src_types, src_gids, target_types,
-                            target_gids, loc, receptor, nc_dict,
-                            unique=drive['cell_specific'])
-                        self.connectivity_list.extend(connectivity)
-
     def _all_to_all_connect(self, src_types, src_gids, target_types,
                             target_gids, loc, receptor, nc_dict,
                             allow_autapses=True, unique=False):
@@ -1018,7 +1025,7 @@ class Network(object):
             If False, all src_type cells are connected to
             all target_type cells.
         """
-        connectivity = []
+        connectivity = list()
         src_start = src_gids[0]  # Necessary for unique feeds
         for target_type, target_gid in zip(target_types, target_gids):
             if unique:
