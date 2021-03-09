@@ -303,7 +303,6 @@ class NetworkBuilder(object):
                                      record_isoma=record_isoma)
 
         self.state_init()
-        self._connect_celltypes()
 
         # set to record spikes and somatic voltages
         self._spike_times = h.Vector()
@@ -318,6 +317,7 @@ class NetworkBuilder(object):
         self._record_spikes()
 
         self.move_cells_to_pos()  # position cells in 2D grid
+        self._connect_celltypes()
 
         if _get_rank() == 0:
             print('[Done]')
@@ -420,36 +420,6 @@ class NetworkBuilder(object):
 
         net = self.net
         connectivity_list = self.net.connectivity_list
-
-        for drive in self.net.external_drives.values():
-            # Update connectivity_list
-            nc_dict = {
-                'A_delay': 1.,
-                'threshold': self.net.params['threshold'],
-            }
-            src_gids = self.net.gid_ranges[drive['name']]
-            src_types = np.repeat(drive['name'], len(src_gids))
-            receptors = ['ampa', 'nmda']
-            if drive['type'] == 'gaussian':
-                receptors = ['ampa']
-            # conn-parameters are for each target cell type
-            for target_cell, drive_conn in drive['conn'].items():
-                target_gids = self.net.gid_ranges[_long_name(target_cell)]
-                target_types = np.repeat(target_cell, len(target_gids))
-                for receptor in receptors:
-                    if len(drive_conn[receptor]) > 0:
-                        nc_dict['lamtha'] = drive_conn[
-                            receptor]['lamtha']
-                        nc_dict['A_delay'] = drive_conn[
-                            receptor]['A_delay']
-                        nc_dict['A_weight'] = drive_conn[
-                            receptor]['A_weight']
-                        loc = drive_conn['location']
-                        connectivity = self.net._all_to_all_connect(
-                            src_types, src_gids, target_types,
-                            target_gids, loc, receptor, nc_dict,
-                            unique=drive['cell_specific'])
-                        connectivity_list.extend(connectivity)
 
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
         # Gather indeces of targets on current node

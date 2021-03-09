@@ -865,9 +865,10 @@ class Network(object):
                 nc_dict['A_weight'] = self.params[key]
                 # self._connect_celltypes(connectivity, 'proximal',
                 #                         receptor, nc_dict)
-                self._all_to_all_connect(
+                connectivity = self._all_to_all_connect(
                     target_types, target_gids, target_types, target_gids,
                     'proximal', receptor, nc_dict, allow_autapses=False)
+                self.connectivity_list.extend(connectivity)
 
         # layer2 Basket -> layer2 Pyr
         src_cell = 'L2Basket'
@@ -883,6 +884,10 @@ class Network(object):
             nc_dict['A_weight'] = self.params[f'gbar_L2Basket_L2Pyr_{receptor}']
             # self._connect_celltypes(connectivity, 'soma', receptor,
             #                         nc_dict)
+            connectivity = self._all_to_all_connect(
+                src_types, src_gids, target_types, target_gids,
+                'soma', receptor, nc_dict)
+            self.connectivity_list.extend(connectivity)
 
         # layer5 Basket -> layer5 Pyr
         src_cell = 'L5Basket'
@@ -899,6 +904,10 @@ class Network(object):
             nc_dict['A_weight'] = self.params[key]
             # self._connect_celltypes(connectivity, 'soma', receptor,
             #                         nc_dict)
+            connectivity = self._all_to_all_connect(
+                src_types, src_gids, target_types, target_gids,
+                'soma', receptor, nc_dict)
+            self.connectivity_list.extend(connectivity)
 
         # layer2 Pyr -> layer5 Pyr
         src_cell = 'L2Pyr'
@@ -911,16 +920,25 @@ class Network(object):
             nc_dict['A_weight'] = self.params[f'gbar_L2Pyr_{target_cell}']
             # self._connect_celltypes(connectivity, loc, 'ampa',
             #                         nc_dict)
+            connectivity = self._all_to_all_connect(
+                src_types, src_gids, target_types, target_gids,
+                loc, 'ampa', nc_dict)
+            self.connectivity_list.extend(connectivity)
+
         # layer2 Basket -> layer5 Pyr
         src_cell = 'L2Basket'
         src_gids = self.gid_ranges[_long_name(src_cell)]
         src_types = np.repeat(src_cell, len(src_gids))
-        connectivity = self._all_to_all_connect(src_types, src_gids,
-                                                target_types, target_gids)
+        # connectivity = self._all_to_all_connect(src_types, src_gids,
+        #                                         target_types, target_gids)
         nc_dict['lamtha'] = 50.
         nc_dict['A_weight'] = self.params[f'gbar_L2Basket_{target_cell}']
-        self._connect_celltypes(connectivity, 'distal', 'gabaa',
-                                nc_dict)
+        # self._connect_celltypes(connectivity, 'distal', 'gabaa',
+        #                         nc_dict)
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            'distal', 'gabaa', nc_dict)
+        self.connectivity_list.extend(connectivity)
 
         # xx -> layer2 Basket
         src_cell = 'L2Pyr'
@@ -935,6 +953,11 @@ class Network(object):
         nc_dict['A_weight'] = self.params[f'gbar_L2Pyr_{target_cell}']
         # self._connect_celltypes(connectivity, 'soma', 'ampa',
         #                         nc_dict)
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            'soma', 'ampa', nc_dict)
+        self.connectivity_list.extend(connectivity)
+
         src_cell = 'L2Basket'
         src_gids = self.gid_ranges[_long_name(src_cell)]
         src_types = np.repeat(src_cell, len(src_gids))
@@ -944,6 +967,10 @@ class Network(object):
         nc_dict['A_weight'] = self.params[f'gbar_L2Basket_{target_cell}']
         # self._connect_celltypes(connectivity, 'soma', 'gabaa',
         #                         nc_dict)
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            'soma', 'gabaa', nc_dict)
+        self.connectivity_list.extend(connectivity)
 
         # xx -> layer5 Basket
         src_cell = 'L5Basket'
@@ -959,6 +986,11 @@ class Network(object):
         nc_dict['A_weight'] = self.params[f'gbar_L5Basket_{target_cell}']
         # self._connect_celltypes(connectivity, 'soma', 'gabaa',
         #                         nc_dict)
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            'soma', 'gabaa', nc_dict)
+        self.connectivity_list.extend(connectivity)
+
         src_cell = 'L5Pyr'
         src_gids = self.gid_ranges[_long_name(src_cell)]
         src_types = np.repeat(src_cell, len(src_gids))
@@ -968,6 +1000,11 @@ class Network(object):
         nc_dict['A_weight'] = self.params[f'gbar_L5Pyr_{target_cell}']
         # self._connect_celltypes(connectivity, 'soma', 'ampa',
         #                         nc_dict)
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            'soma', 'ampa', nc_dict)
+        self.connectivity_list.extend(connectivity)
+
         src_cell = 'L2Pyr'
         src_gids = self.gid_ranges[_long_name(src_cell)]
         src_types = np.repeat(src_cell, len(src_gids))
@@ -976,6 +1013,10 @@ class Network(object):
         nc_dict['A_weight'] = self.params[f'gbar_L2Pyr_{target_cell}']
         # self._connect_celltypes(connectivity, 'soma', 'ampa',
         #                         nc_dict)
+        connectivity = self._all_to_all_connect(
+            src_types, src_gids, target_types, target_gids,
+            'soma', 'ampa', nc_dict)
+        self.connectivity_list.extend(connectivity)
 
         # source of synapse is always at soma
 
