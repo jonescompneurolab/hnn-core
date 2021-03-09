@@ -1048,6 +1048,97 @@ class Network(object):
                 connectivity.append(conn)
         return connectivity
 
+    def add_connection(self, connectivity):
+        """Appends connections to connectivity list
+
+        Parameters
+        ----------
+        connectivity : dict | list of dict
+            Contains cell-cell connectivity information
+            in a dict, or list of dict with the following
+            items:
+
+            src_type : str
+                List of string names of sources.
+            src_gid : int
+                List of integer identifiers of sources.
+            target : str
+                List of string names of targets.
+            target_gid : int
+                List of integer identifiers of targets.
+            loc : str
+                If 'proximal' or 'distal', the corresponding
+                dendritic sections from Cell.sect_loc['proximal']
+                or Cell.Sect_loc['distal'] are used
+            receptor : str
+                The receptor.
+            nc_dict : dict
+                The connection dictionary containing keys
+                'A_delay', 'A_weight', 'lamtha', and 'threshold'.
+            allow_autapses : bool
+                If True, allow connecting neuron to itself.
+            unique : bool
+                If True, each target cell gets one "unique" feed.
+                If False, all src_type cells are connected to
+                all target_type cells.
+        """
+
+        if isinstance(dict):
+            connectivity = [connectivity]
+        if not isinstance(list()):
+            raise TypeError(
+                'connectivity must be one of dict or list of dict'
+                ', got {}'.format(type(connectivity)))
+
+        for conn in connectivity:
+            src_type, src_gid = conn['src_type'], conn['src_gid']
+            target_type, target_gid = conn['target_type'], conn['target_gid']
+            loc, receptor = conn['loc'], conn['receptor']
+            nc_dict = conn['nc_dict']
+
+            # Ensure gids in range of Network.gid_ranges
+            if not isinstance(src_gid, int):
+                raise TypeError(
+                    'src_gid must be of type int, '
+                    'got {}'.format(type(src_gid)))
+
+            if not isinstance(target_gid, int):
+                raise TypeError(
+                    'target_gid must be of type int, '
+                    'got {}'.format(type(target_gid)))
+
+            assert np.sum([src_gid in gid_range for
+                           gid_range in self.gid_ranges.values()]) == 1
+            assert np.sum([target_gid in gid_range for
+                           gid_range in self.gid_ranges.values()]) == 1
+
+            # Ensure string inputs
+            string_args = ['src_type', 'target_type', 'loc', 'receptor']
+            string_items = [src_type, target_type, loc, receptor]
+            for arg, item in zip(string_args, string_items):
+                if not isinstance(str):
+                    raise TypeError(
+                        '{} must be one of dict or list of dict'
+                        ', got {}'.format(arg, type(item)))
+
+            # Validate nc_dict
+            nc_keys = ['A_delay', 'A_weight', 'lamtha', 'threshold']
+            for key, item in nc_dict.items():
+                if key not in nc_keys:
+                    raise IndexError(
+                        'nc_dict item must be one of {}, '
+                        'got {}'.format(nc_keys, key))
+                if not isinstance(item, (int, float)):
+                    raise TypeError(
+                        "nc_dict['{}'] must be of type int or float, "
+                        "got {}".format(key, type(item)))
+
+        self.connectivity_list.extend(connectivity)
+
+    def clear_connectivity(self):
+        """Remove all connections defined in Network.connectivity_list"""
+        self.connectivity_list = list()
+
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
 
