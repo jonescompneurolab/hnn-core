@@ -1083,12 +1083,12 @@ class Network(object):
                 all target_type cells.
         """
 
-        if isinstance(dict):
+        if isinstance(connectivity, dict):
             connectivity = [connectivity]
-        if not isinstance(list()):
+        if not isinstance(connectivity, list):
             raise TypeError(
                 'connectivity must be one of dict or list of dict'
-                ', got {}'.format(type(connectivity)))
+                ', got {}'.format(type(connectivity).__name__))
 
         for conn in connectivity:
             src_type, src_gid = conn['src_type'], conn['src_gid']
@@ -1096,16 +1096,24 @@ class Network(object):
             loc, receptor = conn['loc'], conn['receptor']
             nc_dict = conn['nc_dict']
 
+            valid_keys = ['src_type', 'src_gid', 'target_type', 'target_gid',
+                          'loc', 'receptor', 'nc_dict']
+            for key in conn.keys():
+                if key not in valid_keys:
+                    raise IndexError(
+                        'connectivity key must be one of {}, '
+                        "got '{}'".format(valid_keys, key))
+
             # Ensure gids in range of Network.gid_ranges
             if not isinstance(src_gid, int):
                 raise TypeError(
-                    'src_gid must be of type int, '
-                    'got {}'.format(type(src_gid)))
+                    "connectivity['src_gid'] must be of type int, "
+                    'got {}'.format(type(src_gid).__name__))
 
             if not isinstance(target_gid, int):
                 raise TypeError(
-                    'target_gid must be of type int, '
-                    'got {}'.format(type(target_gid)))
+                    "connectivity['target_gid'] must be of type int, "
+                    'got {}'.format(type(target_gid).__name__))
 
             assert np.sum([src_gid in gid_range for
                            gid_range in self.gid_ranges.values()]) == 1
@@ -1116,22 +1124,26 @@ class Network(object):
             string_args = ['src_type', 'target_type', 'loc', 'receptor']
             string_items = [src_type, target_type, loc, receptor]
             for arg, item in zip(string_args, string_items):
-                if not isinstance(str):
+                if not isinstance(item, str):
                     raise TypeError(
-                        '{} must be one of dict or list of dict'
-                        ', got {}'.format(arg, type(item)))
+                        "connectivity['{}'] must be of type str"
+                        ', got {}'.format(arg, type(item).__name__))
 
             # Validate nc_dict
+            if not isinstance(nc_dict, dict):
+                raise TypeError(
+                    "connectivity['nc_dict'] must be of type dict"
+                    ', got {}'.format(type(nc_dict).__name__))
             nc_keys = ['A_delay', 'A_weight', 'lamtha', 'threshold']
             for key, item in nc_dict.items():
                 if key not in nc_keys:
                     raise IndexError(
-                        'nc_dict item must be one of {}, '
-                        'got {}'.format(nc_keys, key))
+                        'nc_dict key must be one of {}, '
+                        "got '{}'".format(nc_keys, key))
                 if not isinstance(item, (int, float)):
                     raise TypeError(
                         "nc_dict['{}'] must be of type int or float, "
-                        "got {}".format(key, type(item)))
+                        "got {}".format(key, type(item).__name__))
 
         self.connectivity_list.extend(connectivity)
 
