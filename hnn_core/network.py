@@ -1040,7 +1040,7 @@ class Network(object):
             for src_type, src_gid in zip(src_types, src_gids):
                 conn = {'src_type': src_type, 'src_gid': src_gid,
                         'target_type': target_type, 'target_gid': target_gid,
-                        'loc': loc, 'receptor': receptor, 
+                        'loc': loc, 'receptor': receptor,
                         'nc_dict': deepcopy(nc_dict)}
                 if not allow_autapses and src_gid == target_gid:
                     continue
