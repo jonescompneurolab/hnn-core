@@ -52,6 +52,6 @@ install:
 
 script:
     - flake8 --count hnn_core
-    - py.test --cov=hnn_core hnn_core/tests/
+    - py.test --cov=hnn_core --cov-report=xml hnn_core/tests/
 after_success:
-    - bash <(curl -s https://codecov.io/bash)
+    - bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
