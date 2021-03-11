@@ -44,7 +44,6 @@ install:
       fi
     - pip install flake8 pytest pytest-cov
     - pip install mne psutil joblib
-    - pip install coverage coveralls
     - pip install NEURON
     - |
       cd $TRAVIS_BUILD_DIR
