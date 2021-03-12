@@ -6,10 +6,21 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network
-from hnn_core.viz import plot_dipole, plot_psd, plot_tfr_morlet
+from hnn_core.viz import plot_cells, plot_dipole, plot_psd, plot_tfr_morlet
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
+
+
+def test_network_visualization():
+    """Test network visualisations."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3})
+    net = Network(params)
+    plot_cells(net)
 
 
 def test_dipole_visualization():
@@ -34,6 +45,13 @@ def test_dipole_visualization():
     axes = fig.get_axes()[0]
     dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
     dpls[0].copy().savgol_filter(h_freq=30).plot(ax=axes)  # on top
+
+    # test decimation options
+    plot_dipole(dpls[0], decim=2)
+    for dec in [-1, [2, 2.]]:
+        with pytest.raises(ValueError,
+                           match='each decimation factor must be a positive'):
+            plot_dipole(dpls[0], decim=dec)
 
     # test plotting multiple dipoles as overlay
     fig = plot_dipole(dpls)
