@@ -1011,9 +1011,9 @@ class Network(object):
             in a dict, or list of dict with the following
             items:
             src_gid : int
-                List of integer identifiers of sources.
+                Integer identifying source.
             target_gid : int
-                List of integer identifiers of targets.
+                Integer identifying target.
             loc : str
                 Location of synapse on target cell. Must be
                 'proximal' or 'distal'.
