@@ -24,12 +24,13 @@ def _get_plot_data(dpl, layer, tmin, tmax):
 
 def _decimate_plot_data(decim, data, times, sfreq=None):
     from scipy.signal import decimate
-    if isinstance(decim, int):
-        decim = [decim]
     if not isinstance(decim, list):
-        raise ValueError('the decimation factor must be a int or list'
-                         f'of ints; got {type(decim)}')
+        decim = [decim]
+
     for dec in decim:
+        if not isinstance(dec, int) or dec < 1:
+            raise ValueError('each decimation factor must be a positive int, '
+                             f'but {dec} is a {type(dec)}')
         data = decimate(data, dec)
         times = times[::dec]
 
