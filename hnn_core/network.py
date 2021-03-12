@@ -713,39 +713,6 @@ class Network(object):
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def connect_cells(self, src_gids, target_gids, weight, receptor, location,
-                      delay, space_constant):
-        """Pass connectivity matrix defining cell-cell connections.
-
-        Parameters
-        ----------
-        src_gids: list of int
-            List of gid sources where axon originates.
-        target_gids: list of int
-            List of gid targets where axon terminates.
-        weight: np.array (n_src_gids, n_target_gids) of float
-            Array defining synaptic weights.
-        receptor: np.array (n_src_gids, n_target_gids) of str
-            Array defining recptors on target cell. Must be one of
-            'ampa', 'nmda', 'gabaa', or 'gabab'.
-        location: np.array (n_src_gids, n_target_gids) of str
-            Array defining location of synapse on target cell. Must be one of
-            'proximal' or 'distal'.
-        delay: np.array (n_src_gids, n_target_gids) of float
-            Array defining synaptic delays.
-        space_constant: np.array (n_src_gids, n_target_gids) of float
-            Array defining space constants.
-        """
-        connectivity = dict()
-        connectivity['src_gids'] = src_gids
-        connectivity['target_gids'] = target_gids
-        connectivity['weight'] = weight
-        connectivity['receptor'] = receptor
-        connectivity['location'] = location
-        connectivity['delay'] = delay
-        connectivity['space_constant'] = space_constant
-        self.connectivity_list.extend(connectivity)
-
     def remove_connections(self):
         """Remove all cell-cell connections."""
 
