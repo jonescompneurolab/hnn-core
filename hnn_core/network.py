@@ -1021,12 +1021,14 @@ class Network(object):
                 Synaptic receptor of connection. Must be one of:
                 'ampa', 'nmda', 'gabaa', or 'gabab'.
             delay : float
-
+                Time (ms) between source crossing threshold and
+                delivery of event to target.
             weight : float
-
+                Synaptic weight on target cell.
             lamtha : float
-
+                Space constant.
             threshold : float
+                Source threshold.
         """
 
         if isinstance(connectivity, dict):
