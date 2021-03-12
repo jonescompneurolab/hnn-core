@@ -713,9 +713,6 @@ class Network(object):
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def remove_connections(self):
-        """Remove all cell-cell connections."""
-
     def add_tonic_bias(self, *, cell_type=None, amplitude=None,
                        t0=None, T=None):
         """Attach parameters of tonic biasing input for a given cell type.
