@@ -9,13 +9,12 @@ This example demonstrates how to modify the network the network connectivity.
 # Author: Nick Tolley <nick nicholas_tolley@brown.edu>
 
 import os.path as op
-import tempfile
 
 ###############################################################################
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, read_spikes, Network, simulate_dipole
+from hnn_core import read_params, Network, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -57,7 +56,7 @@ net.add_evoked_drive(
 print(net.connectivity_list[-1])
 
 ###############################################################################
-# Finally, we add two proximal drives and simuate the network.
+# Then we add two proximal drives and simuate the network.
 weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                    'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
 synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
@@ -77,8 +76,13 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p2, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 
-dpl = simulate_dipole(net, n_trials=1)
-net.cell_response.plot_spikes_raster()
+###############################################################################
+# Data recorded during simulations are stored under
+# :class:`~hnn_core.Cell_Response`. To test multiple network structures, we can
+# create a copy of the original network. The copied network is then simulated.
+net_ERP = net.copy()
+dpl = simulate_dipole(net_ERP, n_trials=1)
+net_ERP.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can modify the connectivity list to test the effect of different
@@ -88,8 +92,9 @@ new_connectivity = [conn for conn in net.connectivity_list
                     if conn['src_type'] != 'L2Basket']
 net.connectivity_list = new_connectivity
 
-dpl = simulate_dipole(net, n_trials=1)
-net.cell_response.plot_spikes_raster()
+net_remove = net.copy()
+dpl = simulate_dipole(net_remove, n_trials=1)
+net_remove.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # That's a lot of spiking! We can additionally add new connections using
@@ -104,12 +109,14 @@ location, receptor = 'distal', 'gabaa'
 for target_gid in target_gids:
     conn = {'src_gid': src_gid,
             'target_gid': target_gid,
-            'loc': 'distal',
-            'receptor': 'gabaa',
+            'loc': 'soma',
+            'receptor': 'gabab',
             'delay': 1.0,
-            'weight': 0.01,
+            'weight': 1.0,
             'threshold': 0.0,
             'lamtha': 70}
+    net.add_connection(conn)
 
-dpl = simulate_dipole(net, n_trials=1)
-net.cell_response.plot_spikes_raster()
+net_add = net.copy()
+dpl = simulate_dipole(net_add, n_trials=1)
+net_add.cell_response.plot_spikes_raster()
