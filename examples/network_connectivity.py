@@ -1,6 +1,6 @@
 """
 =======================
-06. Plot firing pattern
+07. Network Connectivity
 =======================
 
 This example demonstrates how to modify the network the network connectivity.
@@ -29,6 +29,7 @@ params = read_params(params_fname)
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`, and
 # explore how it changes with new connections. We first instantiate build
 # the network.
+import matplotlib.pyplot as plt
 net = Network(params)
 
 ###############################################################################
