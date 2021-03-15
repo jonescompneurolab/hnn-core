@@ -965,98 +965,79 @@ class Network(object):
                 connectivity.append(conn)
         connectivity_list.extend(connectivity)
 
-    def add_connection(self, connectivity):
+    def add_connection(self, src_gid, target_gid, loc, receptor, delay,
+                       weight, lamtha, threshold=0.0):
         """Appends connections to connectivity list
 
         Parameters
         ----------
-        connectivity : dict | list of dict
-            Contains cell-cell connectivity information
-            in a dict, or list of dict with the following
-            items:
-            src_gid : int
-                Integer identifying source.
-            target_gid : int
-                Integer identifying target.
-            loc : str
-                Location of synapse on target cell. Must be
-                'proximal' or 'distal'.
-            receptor : str
-                Synaptic receptor of connection. Must be one of:
-                'ampa', 'nmda', 'gabaa', or 'gabab'.
-            delay : float
-                Time (ms) between source crossing threshold and
-                delivery of event to target.
-            weight : float
-                Synaptic weight on target cell.
-            lamtha : float
-                Space constant.
-            threshold : float
-                Source threshold.
+        src_gid : int
+            Integer identifying source.
+        target_gid : int
+            Integer identifying target.
+        loc : str
+            Location of synapse on target cell. Must be
+            'proximal' or 'distal'.
+        receptor : str
+            Synaptic receptor of connection. Must be one of:
+            'ampa', 'nmda', 'gabaa', or 'gabab'.
+        delay : float
+            Time (ms) between source crossing threshold and
+            delivery of event to target.
+        weight : float
+            Synaptic weight on target cell.
+        lamtha : float
+            Space constant.
+        threshold : float
+            Source threshold.
         """
-
-        if isinstance(connectivity, dict):
-            connectivity = [connectivity]
-        if not isinstance(connectivity, list):
+        conn = dict()
+        # Ensure gids in range of Network.gid_ranges
+        if not isinstance(src_gid, int):
             raise TypeError(
-                'connectivity must be one of dict or list of dict'
-                ', got {}'.format(type(connectivity).__name__))
+                "src_gid must be of type int, "
+                'got {}'.format(type(src_gid).__name__))
 
-        for idx in range(len(connectivity)):
-            conn = deepcopy(connectivity[idx])
-            src_gid, target_gid = conn['src_gid'], conn['target_gid']
-            loc, receptor = conn['loc'], conn['receptor']
+        if not isinstance(target_gid, int):
+            raise TypeError(
+                "target_gid must be of type int, "
+                'got {}'.format(type(target_gid).__name__))
 
-            valid_keys = ['src_gid', 'target_gid', 'loc', 'receptor',
-                          'delay', 'weight', 'threshold', 'lamtha']
-            for key in conn.keys():
-                if key not in valid_keys:
-                    raise IndexError(
-                        'connectivity key must be one of {}, '
-                        "got '{}'".format(valid_keys, key))
+        assert np.sum([src_gid in gid_range for
+                       gid_range in self.gid_ranges.values()]) == 1
+        assert np.sum([target_gid in gid_range for
+                       gid_range in self.gid_ranges.values()]) == 1
 
-            # Ensure gids in range of Network.gid_ranges
-            if not isinstance(src_gid, int):
+        conn['src_gid'] = src_gid
+        conn['target_gid'] = target_gid
+        conn['src_type'] = self.gid_to_type(src_gid)
+        conn['target_type'] = self.gid_to_type(target_gid)
+
+        # Ensure string inputs
+        string_args = ['loc', 'receptor']
+        string_items = [loc, receptor]
+        for arg, item in zip(string_args, string_items):
+            if not isinstance(item, str):
                 raise TypeError(
-                    "connectivity['src_gid'] must be of type int, "
-                    'got {}'.format(type(src_gid).__name__))
+                    "{} must be of type str"
+                    ', got {}'.format(arg, type(item).__name__))
 
-            if not isinstance(target_gid, int):
+        conn['loc'] = loc
+        conn['receptor'] = receptor
+
+        # Create and validate nc_dict
+        conn['nc_dict'] = dict()
+        arg_names = ['delay', 'weight', 'lamtha', 'threshold']
+        nc_dict_keys = ['A_delay', 'A_weight', 'lamtha', 'threshold']
+        nc_conn_items = [delay, weight, lamtha, threshold]
+        for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
+            if not isinstance(item, (int, float)):
                 raise TypeError(
-                    "connectivity['target_gid'] must be of type int, "
-                    'got {}'.format(type(target_gid).__name__))
+                    "{} must be of type int or float, "
+                    "got {}".format(arg_name, type(item).__name__))
+            conn['nc_dict'][key] = item
 
-            assert np.sum([src_gid in gid_range for
-                           gid_range in self.gid_ranges.values()]) == 1
-            assert np.sum([target_gid in gid_range for
-                           gid_range in self.gid_ranges.values()]) == 1
-
-            conn['src_type'] = self.gid_to_type(src_gid)
-            conn['target_type'] = self.gid_to_type(target_gid)
-
-            # Ensure string inputs
-            string_args = ['loc', 'receptor']
-            string_items = [loc, receptor]
-            for arg, item in zip(string_args, string_items):
-                if not isinstance(item, str):
-                    raise TypeError(
-                        "connectivity['{}'] must be of type str"
-                        ', got {}'.format(arg, type(item).__name__))
-
-            # Create and validate nc_dict
-            conn['nc_dict'] = dict()
-            nc_dict_keys = ['A_delay', 'A_weight', 'lamtha', 'threshold']
-            nc_conn_keys = ['delay', 'weight', 'lamtha', 'threshold']
-            for dict_key, conn_key in zip(nc_dict_keys, nc_conn_keys):
-                item = conn[conn_key]
-                if not isinstance(item, (int, float)):
-                    raise TypeError(
-                        "connectivity['{}'] must be of type int or float, "
-                        "got {}".format(conn_key, type(item).__name__))
-                conn['nc_dict'][dict_key] = item
-                conn.pop(conn_key)
-
-            self.connectivity_list.append(conn)
+        self.connectivity_list.append(conn)
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity_list"""
