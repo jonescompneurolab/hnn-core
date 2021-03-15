@@ -80,9 +80,9 @@ net.add_evoked_drive(
 # Data recorded during simulations are stored under
 # :class:`~hnn_core.Cell_Response`. To test multiple network structures, we can
 # create a copy of the original network. The copied network is then simulated.
-net_ERP = net.copy()
-dpl = simulate_dipole(net_ERP, n_trials=1)
-net_ERP.cell_response.plot_spikes_raster()
+net_erp = net.copy()
+dpl = simulate_dipole(net_erp, n_trials=1)
+net_erp.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can modify the connectivity list to test the effect of different
@@ -104,7 +104,7 @@ net_remove.cell_response.plot_spikes_raster()
 print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
 target_gids = net.gid_ranges['L2_pyramidal']
-location, receptor = 'distal', 'gabaa'
+location, receptor = 'soma', 'gabaa'
 delay, weight, lamtha, threshold = 1.0, 1.0, 70, 0.0
 for target_gid in target_gids:
     net.add_connection(src_gid, target_gid, location, receptor, delay,
