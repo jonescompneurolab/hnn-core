@@ -167,91 +167,67 @@ def test_network():
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
     # Test inputs for connectivity API
-    connection = {
-        'src_gid': 36, 'target_gid': 35, 'loc': 'proximal',
-        'receptor': 'nmda', 'delay': 1.0, 'threshold': 0.0,
-        'lamtha': 3.0, 'weight': 0.0005}
-    net.add_connection(connection)
+    src_gid, target_gid = 36, 35
+    loc, receptor = 'proximal', 'nmda'
+    delay, lamtha, weight, threshold = 1.0, 3.0, 0.0005, 0.0
+    net.add_connection(src_gid, target_gid, loc, receptor, delay,
+                       weight, lamtha, threshold)
 
     with pytest.raises(
-            TypeError, match='connectivity must be one of dict '
-            'or list of dict, got float'):
-        net.add_connection(1.0)
-
-    test_connection = deepcopy(connection)
-    test_connection['src_gid'] = 1.0
-    with pytest.raises(
-            TypeError, match=r"connectivity\['src_gid'\] must be "
+            TypeError, match=r"src_gid must be "
             r"of type int, got float"):
-        net.add_connection(test_connection)
+        net.add_connection(1.0, target_gid, loc, receptor, delay,
+                           weight, lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['target_gid'] = 1.0
     with pytest.raises(
-            TypeError, match=r"connectivity\['target_gid'\] must be "
+            TypeError, match=r"target_gid must be "
             r"of type int, got float"):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, 1.0, loc, receptor, delay,
+                           weight, lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['loc'] = 1.0
     with pytest.raises(
-            TypeError, match=r"connectivity\['loc'\] must be "
+            TypeError, match=r"loc must be "
             r"of type str, got float"):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, target_gid, 1.0, receptor, delay,
+                           weight, lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['receptor'] = 1.0
     with pytest.raises(
-            TypeError, match=r"connectivity\['receptor'\] must be "
+            TypeError, match=r"receptor must be "
             r"of type str, got float"):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, target_gid, loc, 1.0, delay,
+                           weight, lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['src_gid'] = -1
     with pytest.raises(AssertionError):
-        net.add_connection(test_connection)
+        net.add_connection(-1, target_gid, loc, receptor, delay,
+                           weight, lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['target_gid'] = -1
     with pytest.raises(AssertionError):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, -1, loc, receptor, delay,
+                           weight, lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['delay'] = '1.0'
     with pytest.raises(
-            TypeError, match=r"connectivity\['delay'\] must be "
+            TypeError, match=r"delay must be "
             r"of type int or float, got str"):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, target_gid, loc, receptor, '1.0',
+                           weight, lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['weight'] = '1.0'
     with pytest.raises(
-            TypeError, match=r"connectivity\['weight'\] must be "
+            TypeError, match=r"weight must be "
             r"of type int or float, got str"):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, target_gid, loc, receptor, delay,
+                           '1.0', lamtha, threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['lamtha'] = '1.0'
     with pytest.raises(
-            TypeError, match=r"connectivity\['lamtha'\] must be "
+            TypeError, match=r"lamtha must be "
             r"of type int or float, got str"):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, target_gid, loc, receptor, delay,
+                           weight, '1.0', threshold)
 
-    test_connection = deepcopy(connection)
-    test_connection['threshold'] = '1.0'
     with pytest.raises(
-            TypeError, match=r"connectivity\['threshold'\] must be "
+            TypeError, match=r"threshold must be "
             r"of type int or float, got str"):
-        net.add_connection(test_connection)
-
-    test_connection = deepcopy(connection)
-    test_connection['error_index'] = 1.0
-    with pytest.raises(
-            IndexError, match=r"connectivity key must be one of "
-            r"\['src_gid', 'target_gid', 'loc', 'receptor', "
-            r"'delay', 'weight', 'threshold', 'lamtha'\], "
-            r"got 'error_index'"):
-        net.add_connection(test_connection)
+        net.add_connection(src_gid, target_gid, loc, receptor, delay,
+                           weight, lamtha, '1.0')
 
     net.clear_connectivity()
     assert len(net.connectivity_list) == 0
