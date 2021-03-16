@@ -12,10 +12,8 @@ from copy import deepcopy
 from warnings import warn
 
 from .feed import _drive_cell_event_times
-from .drives import _get_target_populations
+from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
-from .params import _extract_bias_specs_from_hnn_params
-from .params import _extract_drive_specs_from_hnn_params
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
 
@@ -236,73 +234,7 @@ class Network(object):
                            self.cellname_list)
 
         if add_drives_from_params:
-            drive_specs = _extract_drive_specs_from_hnn_params(
-                self.params, self.cellname_list)
-            bias_specs = _extract_bias_specs_from_hnn_params(
-                self.params, self.cellname_list)
-
-            for drive_name in sorted(drive_specs.keys()):  # order matters
-                specs = drive_specs[drive_name]
-                if specs['type'] == 'evoked':
-                    self.add_evoked_drive(
-                        drive_name, mu=specs['dynamics']['mu'],
-                        sigma=specs['dynamics']['sigma'],
-                        numspikes=specs['dynamics']['numspikes'],
-                        sync_within_trial=specs['dynamics']
-                                               ['sync_within_trial'],
-                        weights_ampa=specs['weights_ampa'],
-                        weights_nmda=specs['weights_nmda'],
-                        location=specs['location'], seedcore=specs['seedcore'],
-                        synaptic_delays=specs['synaptic_delays'],
-                        space_constant=specs['space_constant'])
-                elif specs['type'] == 'poisson':
-                    self.add_poisson_drive(
-                        drive_name, tstart=specs['dynamics']['tstart'],
-                        tstop=specs['dynamics']['tstop'],
-                        rate_constant=specs['dynamics']['rate_constant'],
-                        weights_ampa=specs['weights_ampa'],
-                        weights_nmda=specs['weights_nmda'],
-                        location=specs['location'], seedcore=specs['seedcore'],
-                        synaptic_delays=specs['synaptic_delays'],
-                        space_constant=specs['space_constant'])
-                elif specs['type'] == 'gaussian':
-                    self.add_evoked_drive(  # 'gaussian' is just evoked
-                        drive_name, mu=specs['dynamics']['mu'],
-                        sigma=specs['dynamics']['sigma'],
-                        numspikes=specs['dynamics']['numspikes'],
-                        weights_ampa=specs['weights_ampa'],
-                        weights_nmda=specs['weights_nmda'],
-                        location=specs['location'], seedcore=specs['seedcore'],
-                        synaptic_delays=specs['synaptic_delays'],
-                        space_constant=specs['space_constant'])
-                elif specs['type'] == 'bursty':
-                    self.add_bursty_drive(
-                        drive_name,
-                        distribution=specs['dynamics']['distribution'],
-                        tstart=specs['dynamics']['tstart'],
-                        tstart_std=specs['dynamics']['tstart_std'],
-                        tstop=specs['dynamics']['tstop'],
-                        burst_rate=specs['dynamics']['burst_rate'],
-                        burst_std=specs['dynamics']['burst_std'],
-                        numspikes=specs['dynamics']['numspikes'],
-                        spike_isi=specs['dynamics']['spike_isi'],
-                        repeats=specs['dynamics']['repeats'],
-                        weights_ampa=specs['weights_ampa'],
-                        weights_nmda=specs['weights_nmda'],
-                        location=specs['location'],
-                        space_constant=specs['space_constant'],
-                        synaptic_delays=specs['synaptic_delays'],
-                        seedcore=specs['seedcore'])
-
-            # add tonic biases if present in params
-            for cellname in bias_specs['tonic']:
-                self.add_tonic_bias(
-                    cell_type=cellname,
-                    amplitude=bias_specs['tonic'][cellname]['amplitude'],
-                    t0=bias_specs['tonic'][cellname]['t0'],
-                    T=bias_specs['tonic'][cellname]['T'])
-
-            self._instantiate_drives(n_trials=self.params['N_trials'])
+            _add_drives_from_params(self)
 
     def __repr__(self):
         class_name = self.__class__.__name__
