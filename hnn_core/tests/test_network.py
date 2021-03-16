@@ -167,67 +167,28 @@ def test_network():
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
     # Test inputs for connectivity API
-    src_gid, target_gid = 36, 35
-    loc, receptor = 'proximal', 'nmda'
-    delay, lamtha, weight, threshold = 1.0, 3.0, 0.0005, 0.0
-    net.add_connection(src_gid, target_gid, loc, receptor, delay,
-                       weight, lamtha, threshold)
+    kwargs_default = dict(src_gid=36, target_gid=35,
+                          loc='proximal', receptor='nmda', delay=1.0,
+                          weight=5e-4, lamtha=3.0, threshold=0.)
+    net.add_connection(**kwargs_default)  # smoke test
 
-    with pytest.raises(
-            TypeError, match=r"src_gid must be "
-            r"of type int, got float"):
-        net.add_connection(1.0, target_gid, loc, receptor, delay,
-                           weight, lamtha, threshold)
+    kwargs_bad = dict(src_gid=1.0, target_gid=1.0, loc=1.0, receptor=1.0,
+                      delay='1.0', weight='1.0', lamtha='1.0', threshold='1.0')
+    expected_type = dict(src_gid='int', target_gid='int', loc='str',
+                         receptor='str', delay='int or float')
+    for arg, arg_type in expected_type.items():
+        got_type = type(kwargs_bad[arg]).__name__
+        match = (f'{arg} must be of type {arg_type}, got {got_type}')
+        with pytest.raises(TypeError, match=match):
+            kwargs = kwargs_default.copy()
+            kwargs[arg] = kwargs_bad[arg]
+            net.add_connection(**kwargs)
 
-    with pytest.raises(
-            TypeError, match=r"target_gid must be "
-            r"of type int, got float"):
-        net.add_connection(src_gid, 1.0, loc, receptor, delay,
-                           weight, lamtha, threshold)
-
-    with pytest.raises(
-            TypeError, match=r"loc must be "
-            r"of type str, got float"):
-        net.add_connection(src_gid, target_gid, 1.0, receptor, delay,
-                           weight, lamtha, threshold)
-
-    with pytest.raises(
-            TypeError, match=r"receptor must be "
-            r"of type str, got float"):
-        net.add_connection(src_gid, target_gid, loc, 1.0, delay,
-                           weight, lamtha, threshold)
-
-    with pytest.raises(AssertionError):
-        net.add_connection(-1, target_gid, loc, receptor, delay,
-                           weight, lamtha, threshold)
-
-    with pytest.raises(AssertionError):
-        net.add_connection(src_gid, -1, loc, receptor, delay,
-                           weight, lamtha, threshold)
-
-    with pytest.raises(
-            TypeError, match=r"delay must be "
-            r"of type int or float, got str"):
-        net.add_connection(src_gid, target_gid, loc, receptor, '1.0',
-                           weight, lamtha, threshold)
-
-    with pytest.raises(
-            TypeError, match=r"weight must be "
-            r"of type int or float, got str"):
-        net.add_connection(src_gid, target_gid, loc, receptor, delay,
-                           '1.0', lamtha, threshold)
-
-    with pytest.raises(
-            TypeError, match=r"lamtha must be "
-            r"of type int or float, got str"):
-        net.add_connection(src_gid, target_gid, loc, receptor, delay,
-                           weight, '1.0', threshold)
-
-    with pytest.raises(
-            TypeError, match=r"threshold must be "
-            r"of type int or float, got str"):
-        net.add_connection(src_gid, target_gid, loc, receptor, delay,
-                           weight, lamtha, '1.0')
+    for arg in ['src_gid', 'target_gid']:
+        with pytest.raises(AssertionError):
+            kwargs = kwargs_default.copy()
+            kwargs[arg] = -1
+            net.add_connection(**kwargs)
 
     net.clear_connectivity()
     assert len(net.connectivity_list) == 0
