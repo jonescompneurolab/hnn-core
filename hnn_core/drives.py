@@ -84,7 +84,7 @@ def _add_drives_from_params(net):
                 sigma=specs['dynamics']['sigma'],
                 numspikes=specs['dynamics']['numspikes'],
                 sync_within_trial=specs['dynamics']
-                                        ['sync_within_trial'],
+                                       ['sync_within_trial'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
                 location=specs['location'], seedcore=specs['seedcore'],
