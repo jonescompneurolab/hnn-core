@@ -2,6 +2,9 @@
 
 # Authors: Christopher Bailey <bailey.cj@gmail.com>
 
+from .params import (_extract_bias_specs_from_hnn_params,
+                     _extract_drive_specs_from_hnn_params)
+
 
 def _get_target_populations(weights_ampa, weights_nmda):
     # allow passing weights as None, but make iterable here
@@ -65,3 +68,73 @@ def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
         if not val > 0.:
             raise ValueError(
                 f"Rate constant must be positive ({key}, {val})")
+
+
+def _add_drives_from_params(net):
+    drive_specs = _extract_drive_specs_from_hnn_params(
+        net.params, net.cellname_list)
+    bias_specs = _extract_bias_specs_from_hnn_params(
+        net.params, net.cellname_list)
+
+    for drive_name in sorted(drive_specs.keys()):  # order matters
+        specs = drive_specs[drive_name]
+        if specs['type'] == 'evoked':
+            net.add_evoked_drive(
+                drive_name, mu=specs['dynamics']['mu'],
+                sigma=specs['dynamics']['sigma'],
+                numspikes=specs['dynamics']['numspikes'],
+                sync_within_trial=specs['dynamics']
+                                       ['sync_within_trial'],
+                weights_ampa=specs['weights_ampa'],
+                weights_nmda=specs['weights_nmda'],
+                location=specs['location'], seedcore=specs['seedcore'],
+                synaptic_delays=specs['synaptic_delays'],
+                space_constant=specs['space_constant'])
+        elif specs['type'] == 'poisson':
+            net.add_poisson_drive(
+                drive_name, tstart=specs['dynamics']['tstart'],
+                tstop=specs['dynamics']['tstop'],
+                rate_constant=specs['dynamics']['rate_constant'],
+                weights_ampa=specs['weights_ampa'],
+                weights_nmda=specs['weights_nmda'],
+                location=specs['location'], seedcore=specs['seedcore'],
+                synaptic_delays=specs['synaptic_delays'],
+                space_constant=specs['space_constant'])
+        elif specs['type'] == 'gaussian':
+            net.add_evoked_drive(  # 'gaussian' is just evoked
+                drive_name, mu=specs['dynamics']['mu'],
+                sigma=specs['dynamics']['sigma'],
+                numspikes=specs['dynamics']['numspikes'],
+                weights_ampa=specs['weights_ampa'],
+                weights_nmda=specs['weights_nmda'],
+                location=specs['location'], seedcore=specs['seedcore'],
+                synaptic_delays=specs['synaptic_delays'],
+                space_constant=specs['space_constant'])
+        elif specs['type'] == 'bursty':
+            net.add_bursty_drive(
+                drive_name,
+                distribution=specs['dynamics']['distribution'],
+                tstart=specs['dynamics']['tstart'],
+                tstart_std=specs['dynamics']['tstart_std'],
+                tstop=specs['dynamics']['tstop'],
+                burst_rate=specs['dynamics']['burst_rate'],
+                burst_std=specs['dynamics']['burst_std'],
+                numspikes=specs['dynamics']['numspikes'],
+                spike_isi=specs['dynamics']['spike_isi'],
+                repeats=specs['dynamics']['repeats'],
+                weights_ampa=specs['weights_ampa'],
+                weights_nmda=specs['weights_nmda'],
+                location=specs['location'],
+                space_constant=specs['space_constant'],
+                synaptic_delays=specs['synaptic_delays'],
+                seedcore=specs['seedcore'])
+
+    # add tonic biases if present in params
+    for cellname in bias_specs['tonic']:
+        net.add_tonic_bias(
+            cell_type=cellname,
+            amplitude=bias_specs['tonic'][cellname]['amplitude'],
+            t0=bias_specs['tonic'][cellname]['t0'],
+            T=bias_specs['tonic'][cellname]['T'])
+
+    net._instantiate_drives(n_trials=net.params['N_trials'])
