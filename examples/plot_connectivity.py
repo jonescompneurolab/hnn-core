@@ -81,7 +81,7 @@ net.add_evoked_drive(
 # :class:`~hnn_core.Cell_Response`. To test multiple network structures, we can
 # create a copy of the original network. The copied network is then simulated.
 net_erp = net.copy()
-dpl = simulate_dipole(net_erp, n_trials=1)
+dpl_erp = simulate_dipole(net_erp, n_trials=1)
 net_erp.cell_response.plot_spikes_raster()
 
 ###############################################################################
@@ -93,13 +93,13 @@ new_connectivity = [conn for conn in net.connectivity_list
 net.connectivity_list = new_connectivity
 
 net_remove = net.copy()
-dpl = simulate_dipole(net_remove, n_trials=1)
+dpl_remove = simulate_dipole(net_remove, n_trials=1)
 net_remove.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # That's a lot of spiking! We can additionally add new connections using
 # ``net.add_connection()``. Let's try connecting a single layer 2 basket cell,
-# to every layer 2 pyramidal cell. ``We can utilize net.gid_ranges`` to help
+# to every layer 2 pyramidal cell. We can utilize ``net.gid_ranges`` to help
 # find the gids of interest.
 print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
@@ -111,5 +111,20 @@ for target_gid in target_gids:
                        weight, lamtha, threshold)
 
 net_add = net.copy()
-dpl = simulate_dipole(net_add, n_trials=1)
+dpl_add = simulate_dipole(net_add, n_trials=1)
 net_add.cell_response.plot_spikes_raster()
+
+###############################################################################
+# Adding more inhibitory connections did not completely restore the normal
+# spiking. L2 basket and pyramidal cells rhythymically fire in the gamma
+# range (30-80 Hz). As a final step, we can see how this change in spiking
+# activity impacts the aggregate current dipole.
+import matplotlib.pyplot as plt
+from viz import plot_dipole
+fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
+                         constrained_layout=True)
+dpls = [dpl_erp[0], dpl_remove[0], dpl_add[0]]
+plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
+axes[0].legend(['Normal', 'No L2 Basket', 'Single L2 Basket'])
+net_erp.cell_response.plot_spikes_hist(
+    ax=axes[1], spike_types=['evprox', 'evdist'])  
