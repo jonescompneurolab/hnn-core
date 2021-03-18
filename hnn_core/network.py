@@ -970,9 +970,9 @@ class Network(object):
         Parameters
         ----------
         src_gid : int
-            Integer identifying source.
+            Integer identifying source cell ID.
         target_gid : int
-            Integer identifying target.
+            Integer identifying target cell ID.
         loc : str
             Location of synapse on target cell. Must be
             'proximal' or 'distal'.
@@ -990,7 +990,6 @@ class Network(object):
             Source threshold.
         """
         conn = dict()
-        # Ensure gids in range of Network.gid_ranges
         if not isinstance(src_gid, int):
             raise TypeError(
                 "src_gid must be of type int, "
@@ -1001,6 +1000,7 @@ class Network(object):
                 "target_gid must be of type int, "
                 'got {}'.format(type(target_gid).__name__))
 
+        # Ensure gids in range of Network.gid_ranges
         assert np.sum([src_gid in gid_range for
                        gid_range in self.gid_ranges.values()]) == 1
         assert np.sum([target_gid in gid_range for
