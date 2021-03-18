@@ -1,7 +1,7 @@
 """
-=======================
+=====================
 07. Plot Connectivity
-=======================
+=====================
 
 This example demonstrates how to modify the network the network connectivity.
 """
