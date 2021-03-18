@@ -3,16 +3,16 @@
 05. From MEG sensor-space data to HNN simulation
 ================================================
 
-This example demonstrates how to calculate the inverse solution of the median
+This example demonstrates how to calculate an inverse solution of the median
 nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset,
 and then simulate a biophysical model network that reproduces the observed
 dynamics. Note that we do not expound on how we came up with the sequence of
-evoked drives added to the HNN model to simulate the median nerve evoked
-response, rather, this example demonstrates its implementation. For those who
-want more background on the HNN model and the process used to articulate the
-proximal and distal drives needed to simulate evoked responses, see the
-`HNN ERP tutorial`_ and prior studies that used HNN to elucidate the circuit
-mechanisms responsible for the tactile evoked response [1]_, [2]_.
+evoked drives used in this example, rather, we only demonstrate its
+implementation. For those who want more background on the HNN model and the
+process used to articulate the proximal and distal drives needed to simulate
+evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives
+presented here is not part of a current publication but is motivated by prior
+studies [1]_, [2]_.
 """
 
 # Authors: Mainak Jas <mainakjas@gmail.com>
