@@ -14,8 +14,6 @@ from warnings import warn
 from .feed import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
-from .params import _extract_bias_specs_from_hnn_params
-from .params import _extract_drive_specs_from_hnn_params
 from .params import _long_name
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
 
