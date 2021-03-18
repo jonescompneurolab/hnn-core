@@ -3,7 +3,7 @@
 07. Plot Connectivity
 =====================
 
-This example demonstrates how to modify the network the network connectivity.
+This example demonstrates how to modify the network connectivity.
 """
 
 # Author: Nick Tolley <nick nicholas_tolley@brown.edu>
@@ -97,9 +97,11 @@ dpl_remove = simulate_dipole(net_remove, n_trials=1)
 net_remove.cell_response.plot_spikes_raster()
 
 ###############################################################################
-# That's a lot of spiking! We can additionally add new connections using
-# ``net.add_connection()``. Let's try connecting a single layer 2 basket cell,
-# to every layer 2 pyramidal cell. We can utilize ``net.gid_ranges`` to help
+# That's a lot of spiking! Since basket cells are inhibitory, removing these
+# connections increases network wide excitability. We can additionally add
+# new connections using ``net.add_connection()``. Let's try connecting a
+# single layer 2 basket cell, to every layer 2 pyramidal cell. We can utilize
+# ``net.gid_ranges`` to help
 # find the gids of interest.
 print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
@@ -127,4 +129,4 @@ dpls = [dpl_erp[0], dpl_remove[0], dpl_add[0]]
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
 axes[0].legend(['Normal', 'No L2 Basket', 'Single L2 Basket'])
 net_erp.cell_response.plot_spikes_hist(
-    ax=axes[1], spike_types=['evprox', 'evdist'])  
+    ax=axes[1], spike_types=['evprox', 'evdist'])
