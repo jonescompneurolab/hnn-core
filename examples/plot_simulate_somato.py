@@ -224,7 +224,21 @@ net.add_evoked_drive(
 n_trials = 2
 # n_trials = 25
 with JoblibBackend(n_jobs=2):
-    dpls = simulate_dipole(net, n_trials=n_trials)
+    dpls = simulate_dipole(net, n_trials=n_trials, postproc=False)
+
+###############################################################################
+# Since the model is a reduced representation of the larger network
+# contributing to the response, the model response is noisier than it would be
+# in the net activity from a larger network where these effects are averaged
+# out, and the dipole amplitude is smaller than the recorded data. The
+# post-processing steps of smoothing and scaling the simulated dipole response
+# allow us to more accurately approximate the true signal responsible for the
+# recorded macroscopic evoked response [1]_, [2]_.
+dpl_smooth_win = 20
+dpl_scalefctr = 12
+for dpl in dpls:
+    dpl.smooth(dpl_smooth_win)
+    dpl.scale(dpl_scalefctr)
 
 ###############################################################################
 # Finally, we plot the driving spike histogram, empirical and simulated median
