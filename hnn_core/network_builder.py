@@ -419,20 +419,20 @@ class NetworkBuilder(object):
         """Connect two cell types for a particular receptor."""
 
         net = self.net
-        connectivity_list = self.net.connectivity_list
+        connectivity = self.net.connectivity
 
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
         # Gather indeces of targets on current node
-        connectivity_list = [conn for conn in connectivity_list if
-                             _PC.gid_exists(conn['target_gid'])]
-        target_gids = [conn['target_gid'] for conn in connectivity_list]
+        connectivity = [conn for conn in connectivity if
+                        _PC.gid_exists(conn['target_gid'])]
+        target_gids = [conn['target_gid'] for conn in connectivity]
         target_filter = {}
         for idx in range(len(self.cells)):
             gid = self._gid_list[idx]
             if gid in target_gids:
                 target_filter[gid] = idx
 
-        for conn in connectivity_list:
+        for conn in connectivity:
             src_type, src_gid = conn['src_type'], conn['src_gid']
             target_type, target_gid = conn['target_type'], conn['target_gid']
             loc, receptor = conn['loc'], conn['receptor']
