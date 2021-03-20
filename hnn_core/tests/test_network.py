@@ -188,6 +188,16 @@ def test_network():
             kwargs[arg] = -1
             net.add_connection(**kwargs)
 
+    valid_string = {'loc': "'proximal', 'distal', or 'soma'",
+                    'receptor': "'ampa', 'nmda', 'gabaa', or 'gabab'"}
+    for arg in ['loc', 'receptor']:
+        string_arg = 'invalid_string'
+        match = f'{arg} must be one of {valid_string[arg]}. got {string_arg}.'
+        with pytest.raises(ValueError, match=match):
+            kwargs = kwargs_default.copy()
+            kwargs[arg] = string_arg
+            net.add_connection(**kwargs)
+
     net.clear_connectivity()
     assert len(net.connectivity) == 0
 

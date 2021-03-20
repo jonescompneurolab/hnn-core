@@ -185,6 +185,9 @@ class Network(object):
         index for trials, second for event time lists for each drive cell).
     external_biases : dict of dict (bias parameters for each cell type)
         The parameters of bias inputs to cell somata, e.g., tonic current clamp
+    connectivity : list of dict
+        List of dictionaries specifying each cell-cell and drive-cell
+        connection
     """
 
     def __init__(self, params, add_drives_from_params=False,
@@ -1009,7 +1012,18 @@ class Network(object):
                     "{} must be of type str"
                     ', got {}'.format(arg, type(item).__name__))
 
+        valid_loc = ['proximal', 'distal', 'soma']
+        if loc not in valid_loc:
+            raise ValueError(
+                f"loc must be one of 'proximal', 'distal', or 'soma'."
+                f" got {loc}.")
         conn['loc'] = loc
+
+        valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
+        if receptor not in valid_receptor:
+            raise ValueError(
+                f"receptor must be one of 'ampa', 'nmda', 'gabaa', or 'gabab'."
+                f" got {receptor}.")
         conn['receptor'] = receptor
 
         # Create and validate nc_dict
