@@ -223,7 +223,7 @@ class Network(object):
         self.external_biases = dict()
 
         # network connectivity
-        self.connectivity_list = list()
+        self.connectivity = list()
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -237,7 +237,7 @@ class Network(object):
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cellname_list)
 
-        self._default_connect()
+        self._set_default_connections()
 
         if add_drives_from_params:
             _add_drives_from_params(self)
@@ -575,7 +575,7 @@ class Network(object):
                         receptor]['A_weight']
                     loc = drive_conn['location']
                     self._all_to_all_connect(
-                        self.connectivity_list, drive['name'], target_cell,
+                        drive['name'], target_cell,
                         loc, receptor, nc_dict, unique=drive['cell_specific'])
 
     def _create_drive_conns(self, target_populations, weights_by_receptor,
@@ -799,12 +799,11 @@ class Network(object):
     # for each item in the list, do a:
     # nc = pc.gid_connect(source_gid, target_syn), weight,delay
     # Both for synapses AND for external inputs
-    def _default_connect(self):
+    def _set_default_connections(self):
         nc_dict = {
             'A_delay': 1.,
             'threshold': self.params['threshold'],
         }
-        connectivity = self.connectivity_list
 
         # source of synapse is always at soma
 
@@ -817,7 +816,7 @@ class Network(object):
                 key = f'gbar_{target_cell}_{target_cell}_{receptor}'
                 nc_dict['A_weight'] = self.params[key]
                 self._all_to_all_connect(
-                    connectivity, target_cell, target_cell, loc, receptor,
+                    target_cell, target_cell, loc, receptor,
                     nc_dict, allow_autapses=False)
 
         # layer2 Basket -> layer2 Pyr
@@ -829,7 +828,7 @@ class Network(object):
             key = f'gbar_L2Basket_L2Pyr_{receptor}'
             nc_dict['A_weight'] = self.params[key]
             self._all_to_all_connect(
-                connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+                src_cell, target_cell, loc, receptor, nc_dict)
 
         # layer5 Basket -> layer5 Pyr
         src_cell = 'L5Basket'
@@ -840,7 +839,7 @@ class Network(object):
             key = f'gbar_L5Basket_{target_cell}_{receptor}'
             nc_dict['A_weight'] = self.params[key]
             self._all_to_all_connect(
-                connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+                src_cell, target_cell, loc, receptor, nc_dict)
 
         # layer2 Pyr -> layer5 Pyr
         src_cell = 'L2Pyr'
@@ -850,7 +849,7 @@ class Network(object):
             key = f'gbar_L2Pyr_{target_cell}'
             nc_dict['A_weight'] = self.params[key]
             self._all_to_all_connect(
-                connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+                src_cell, target_cell, loc, receptor, nc_dict)
 
         # layer2 Basket -> layer5 Pyr
         src_cell = 'L2Basket'
@@ -860,7 +859,7 @@ class Network(object):
         loc = 'distal'
         receptor = 'gabaa'
         self._all_to_all_connect(
-            connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+            src_cell, target_cell, loc, receptor, nc_dict)
 
         # xx -> layer2 Basket
         src_cell = 'L2Pyr'
@@ -871,7 +870,7 @@ class Network(object):
         loc = 'soma'
         receptor = 'ampa'
         self._all_to_all_connect(
-            connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+            src_cell, target_cell, loc, receptor, nc_dict)
 
         src_cell = 'L2Basket'
         nc_dict['lamtha'] = 20.
@@ -880,7 +879,7 @@ class Network(object):
         loc = 'soma'
         receptor = 'gabaa'
         self._all_to_all_connect(
-            connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+            src_cell, target_cell, loc, receptor, nc_dict)
 
         # xx -> layer5 Basket
         src_cell = 'L5Basket'
@@ -891,7 +890,7 @@ class Network(object):
         key = f'gbar_L5Basket_{target_cell}'
         nc_dict['A_weight'] = self.params[key]
         self._all_to_all_connect(
-            connectivity, src_cell, target_cell, loc, receptor, nc_dict,
+            src_cell, target_cell, loc, receptor, nc_dict,
             allow_autapses=False)
 
         src_cell = 'L5Pyr'
@@ -901,7 +900,7 @@ class Network(object):
         loc = 'soma'
         receptor = 'ampa'
         self._all_to_all_connect(
-            connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+            src_cell, target_cell, loc, receptor, nc_dict)
 
         src_cell = 'L2Pyr'
         key = f'gbar_L2Pyr_{target_cell}'
@@ -909,17 +908,15 @@ class Network(object):
         loc = 'soma'
         receptor = 'ampa'
         self._all_to_all_connect(
-            connectivity, src_cell, target_cell, loc, receptor, nc_dict)
+            src_cell, target_cell, loc, receptor, nc_dict)
 
-    def _all_to_all_connect(self, connectivity_list, src_cell, target_cell,
+    def _all_to_all_connect(self, src_cell, target_cell,
                             loc, receptor, nc_dict,
                             allow_autapses=True, unique=False):
         """Generate connectivity list given lists of sources and targets.
 
         Parameters
         ----------
-        connectivity_list : list of dict
-            The connectivity list to be updated
         src_cell : str
             Source cell type.
         target_cell : str
@@ -1027,11 +1024,11 @@ class Network(object):
                     "got {}".format(arg_name, type(item).__name__))
             conn['nc_dict'][key] = item
 
-        self.connectivity_list.append(conn)
+        self.connectivity.append(conn)
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity_list"""
-        self.connectivity_list = list()
+        self.connectivity = list()
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

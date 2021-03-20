@@ -149,8 +149,7 @@ def test_network():
     net = Network(deepcopy(params), add_drives_from_params=True)
     nc_dict = {'A_delay': 1, 'A_weight': 1e-5, 'lamtha': 20,
                'threshold': 0.5}
-    net._all_to_all_connect(net.connectivity_list,
-                            'bursty1', 'L5_basket',
+    net._all_to_all_connect('bursty1', 'L5_basket',
                             'soma', 'gabaa', nc_dict, unique=False)
     network_builder = NetworkBuilder(net)
     assert 'bursty1_L5Basket_gabaa' in network_builder.ncs
@@ -159,9 +158,8 @@ def test_network():
 
     # try unique=True
     net = Network(deepcopy(params), add_drives_from_params=True)
-    net._all_to_all_connect(
-        net.connectivity_list, 'extgauss', 'L5_basket',
-        'soma', 'gabaa', nc_dict, unique=True)
+    net._all_to_all_connect('extgauss', 'L5_basket',
+                            'soma', 'gabaa', nc_dict, unique=True)
     network_builder = NetworkBuilder(net)
     n_conn = len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
@@ -191,7 +189,7 @@ def test_network():
             net.add_connection(**kwargs)
 
     net.clear_connectivity()
-    assert len(net.connectivity_list) == 0
+    assert len(net.connectivity) == 0
 
 
 def test_tonic_biases():
