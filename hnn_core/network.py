@@ -940,28 +940,20 @@ class Network(object):
             If False, all src_type cells are connected to
             all target_type cells.
         """
-        connectivity = list()
-
         src_gids = self.gid_ranges[_long_name(src_cell)]
         target_gids = self.gid_ranges[_long_name(target_cell)]
-        src_types = np.repeat(src_cell, len(src_gids))
-        target_types = np.repeat(target_cell, len(target_gids))
 
         src_start = src_gids[0]  # Necessary for unique feeds
-        for target_type, target_gid in zip(target_types, target_gids):
+        for target_gid in target_gids:
             if unique:
                 src_gids = [target_gid + src_start]
-                src_types = [src_types[0]]  # Assumes that all src_types match
-            for src_type, src_gid in zip(src_types, src_gids):
-                conn = {'src_type': src_type, 'src_gid': src_gid,
-                        'target_type': target_type, 'target_gid': target_gid,
-                        'loc': loc, 'receptor': receptor,
-                        'nc_dict': deepcopy(nc_dict)}
+            for src_gid in src_gids:
                 if not allow_autapses and src_gid == target_gid:
                     continue
-
-                connectivity.append(conn)
-        connectivity_list.extend(connectivity)
+                self.add_connection(
+                    src_gid, target_gid, loc, receptor, nc_dict['A_delay'],
+                    nc_dict['A_weight'], nc_dict['lamtha'],
+                    nc_dict['threshold'])
 
     def add_connection(self, src_gid, target_gid, loc, receptor, delay,
                        weight, lamtha, threshold=0.0):
