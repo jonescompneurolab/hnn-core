@@ -84,7 +84,7 @@ dpls = simulate_dipole(net, record_vsoma=True)
 ###############################################################################
 # Here, we explain more details about the data structures and how they can
 # be used to better interpret the data. The cell IDs (gids) uniquely define
-# neurons in the network and are stored in the :class:`~hnn_core.Network` 
+# neurons in the network and are stored in the :class:`~hnn_core.Network`
 # object as a dictionary
 gid_ranges = net.gid_ranges
 print(net.gid_ranges)

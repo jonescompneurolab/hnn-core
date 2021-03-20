@@ -122,7 +122,7 @@ net_add.cell_response.plot_spikes_raster()
 # range (30-80 Hz). As a final step, we can see how this change in spiking
 # activity impacts the aggregate current dipole.
 import matplotlib.pyplot as plt
-from viz import plot_dipole
+from hnn_core.viz import plot_dipole
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
                          constrained_layout=True)
 dpls = [dpl_erp[0], dpl_remove[0], dpl_add[0]]
