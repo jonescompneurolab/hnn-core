@@ -33,15 +33,15 @@ net = Network(params)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that
-# reflect the canonical neocortical microcircuit. ``net.connectivity_list``
+# reflect the canonical neocortical microcircuit. ``net.connectivity``
 # is a list of dictionaries which detail every cell-cell, and drive-cell
 # connection.
-print(len(net.connectivity_list))
-print(net.connectivity_list[0])
+print(len(net.connectivity))
+print(net.connectivity[0])
 
 ###############################################################################
 # Next we add the distal drive. Note that adding drives creates new drive-cell
-# connections that are appended to ``net.connectivity_list``
+# connections that are appended to ``net.connectivity``
 weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
                    'L5_pyramidal': 0.142300}
 weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
@@ -53,7 +53,7 @@ net.add_evoked_drive(
     weights_nmda=weights_nmda_d1, location='distal',
     synaptic_delays=synaptic_delays_d1, seedcore=4)
 
-print(net.connectivity_list[-1])
+print(net.connectivity[-1])
 
 ###############################################################################
 # Then we add two proximal drives and simuate the network.
@@ -88,9 +88,9 @@ net_erp.cell_response.plot_spikes_raster()
 # We can modify the connectivity list to test the effect of different
 # connectivity patterns. For example, we can remove all layer 2 inhibitory
 # connections.
-new_connectivity = [conn for conn in net.connectivity_list
+new_connectivity = [conn for conn in net.connectivity
                     if conn['src_type'] != 'L2Basket']
-net.connectivity_list = new_connectivity
+net.connectivity = new_connectivity
 
 net_remove = net.copy()
 dpl_remove = simulate_dipole(net_remove, n_trials=1)
