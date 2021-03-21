@@ -6,7 +6,7 @@
 This example demonstrates how to modify the network connectivity.
 """
 
-# Author: Nick Tolley <nick nicholas_tolley@brown.edu>
+# Author: Nick Tolley <nicholas_tolley@brown.edu>
 
 import os.path as op
 
