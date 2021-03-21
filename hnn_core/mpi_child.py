@@ -7,6 +7,7 @@ This script is called directly from MPIBackend.simulate()
 import sys
 import pickle
 import base64
+from hnn_core import Network
 
 
 def _read_all_bytes(stream_in, chunk_size=4096):
@@ -128,7 +129,8 @@ if __name__ == '__main__':
 
     try:
         with MPISimulation() as mpi_sim:
-            net = mpi_sim._read_net()
+            params = mpi_sim._read_net()
+            net = Network(params, add_drives_from_params=True)
             sim_data = mpi_sim.run(net)
             mpi_sim._write_data_stderr(sim_data)
     except Exception:

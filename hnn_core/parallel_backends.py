@@ -389,7 +389,7 @@ class MPIBackend(object):
 
         cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
 
-        pickled_net = base64.b64encode(pickle.dumps(net))
+        pickled_net = base64.b64encode(pickle.dumps(net.params))
 
         # set some MPI environment variables
         my_env = os.environ.copy()
