@@ -169,6 +169,9 @@ def test_network():
                           loc='proximal', receptor='nmda',
                           weight=5e-4, lamtha=3.0)
     net.add_connection(**kwargs_default)  # smoke test
+    kwargs = kwargs_default.copy()
+    kwargs['target_gid'] = [35, 36]
+    net.add_connection(**kwargs)
 
     kwargs_bad = dict(src_gid=1.0, target_gid=1.0, loc=1.0, receptor=1.0,
                       weight='1.0', lamtha='1.0')
@@ -178,6 +181,12 @@ def test_network():
             kwargs = kwargs_default.copy()
             kwargs[arg] = kwargs_bad[arg]
             net.add_connection(**kwargs)
+
+    match = f'target_gid must be an instance of'
+    with pytest.raises(TypeError, match=match):
+        kwargs = kwargs_default.copy()
+        kwargs['target_gid'] = [35, '36']
+        net.add_connection(**kwargs)
 
     for arg in ['src_gid', 'target_gid']:
         with pytest.raises(AssertionError):
