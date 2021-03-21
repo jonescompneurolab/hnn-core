@@ -166,14 +166,14 @@ def test_network():
 
     # Test inputs for connectivity API
     kwargs_default = dict(src_gid=36, target_gid=35,
-                          loc='proximal', receptor='nmda', delay=1.0,
-                          weight=5e-4, lamtha=3.0, threshold=0.)
+                          loc='proximal', receptor='nmda',
+                          weight=5e-4, lamtha=3.0)
     net.add_connection(**kwargs_default)  # smoke test
 
     kwargs_bad = dict(src_gid=1.0, target_gid=1.0, loc=1.0, receptor=1.0,
-                      delay='1.0', weight='1.0', lamtha='1.0', threshold='1.0')
+                      weight='1.0', lamtha='1.0')
     expected_type = dict(src_gid='int', target_gid='int', loc='str',
-                         receptor='str', delay='int or float')
+                         receptor='str')
     for arg, arg_type in expected_type.items():
         got_type = type(kwargs_bad[arg]).__name__
         match = (f'{arg} must be of type {arg_type}, got {got_type}')
