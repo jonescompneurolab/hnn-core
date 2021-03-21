@@ -71,7 +71,16 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     return dpls
 
 
-def _read_all_bytes(fd, chunk_size=4096):
+def _read_all_bytes(fd, chunk_size=65536):
+    """read bytes from file descriptor in discrete chunks
+
+    Note that a small chunk size will queue up lots of events
+    on the selector to read. Each event has a significant overhead
+    compared to reading as many bytes as possible. There is no benefit
+    to increasing the chunk_size beyond 64k because we see no more
+    than that from each event (likely determined by some OS buffer size
+    setting).
+    """
     all_data = b""
     while True:
         data = os.read(fd, chunk_size)
