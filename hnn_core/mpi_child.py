@@ -97,15 +97,9 @@ class MPISimulation(object):
     def run(self, net):
         """Run MPI simulation(s) and write results to stderr"""
 
-        from hnn_core.parallel_backends import _clone_and_simulate
+        from hnn_core.parallel_backends import _clone_and_simulate_trials
 
-        sim_data = []
-        for trial_idx in range(net.params['N_trials']):
-            single_sim_data = _clone_and_simulate(net, trial_idx)
-
-            # go ahead and append trial data for each rank, though
-            # only rank 0 has data that should be sent back to MPIBackend
-            sim_data.append(single_sim_data)
+        sim_data = _clone_and_simulate_trials(net, net.params['N_trials'])
 
         # flush output buffers from all ranks (any errors or status mesages)
         sys.stdout.flush()

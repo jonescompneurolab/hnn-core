@@ -19,12 +19,10 @@ from time import sleep
 _BACKEND = None
 
 
-def _clone_and_simulate(net, trial_idx):
+def _clone_and_simulate_trial(net, trial_idx):
     """Run a simulation including building the network
 
-    This is used by both backends. MPIBackend calls this in mpi_child.py, once
-    for each trial (blocking), and JoblibBackend calls this for each trial
-    (non-blocking)
+    This is used by JoblibBackend for each trial (non-blocking)
     """
 
     # avoid relative lookups after being forked (Joblib)
@@ -37,6 +35,27 @@ def _clone_and_simulate(net, trial_idx):
     spikedata = neuron_net.get_data_from_neuron()
 
     return dpl, spikedata
+
+
+def _clone_and_simulate_trials(net, n_trials=None):
+    """Run multiple simulation trials on the same network
+
+    This is called by MPIBackend in mpi_child.py (blocking)
+    """
+
+    # avoid relative lookups after being forked (Joblib)
+    from hnn_core.network_builder import NetworkBuilder
+    from hnn_core.network_builder import _simulate_single_trial
+
+    neuron_net = NetworkBuilder(net)
+
+    sim_data = []
+    for trial_idx in range(n_trials):
+        dpl = _simulate_single_trial(neuron_net, trial_idx)
+        spikedata = neuron_net.get_data_from_neuron()
+        sim_data.append((dpl, spikedata))
+
+    return sim_data
 
 
 def _gather_trial_data(sim_data, net, n_trials, postproc):
@@ -173,7 +192,7 @@ class JoblibBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-        parallel, myfunc = self._parallel_func(_clone_and_simulate)
+        parallel, myfunc = self._parallel_func(_clone_and_simulate_trial)
         sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
