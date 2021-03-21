@@ -89,7 +89,7 @@ net_erp.cell_response.plot_spikes_raster()
 # connectivity patterns. For example, we can remove all layer 2 inhibitory
 # connections.
 new_connectivity = [conn for conn in net.connectivity
-                    if conn['src_type'] != 'L2Basket']
+                    if conn['src_type'] != 'L2_basket']
 net.connectivity = new_connectivity
 
 net_remove = net.copy()
