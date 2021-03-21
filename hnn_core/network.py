@@ -227,6 +227,8 @@ class Network(object):
 
         # network connectivity
         self.connectivity = list()
+        self.threshold = 0.0
+        self.delay = 1.0
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -560,7 +562,7 @@ class Network(object):
 
         # Update connectivity_list
         nc_dict = {
-            'A_delay': 1.,
+            'A_delay': self.delay,
             'threshold': self.params['threshold'],
         }
         receptors = ['ampa', 'nmda']
@@ -804,7 +806,7 @@ class Network(object):
     # Both for synapses AND for external inputs
     def _set_default_connections(self):
         nc_dict = {
-            'A_delay': 1.,
+            'A_delay': self.delay,
             'threshold': self.params['threshold'],
         }
 
@@ -951,12 +953,11 @@ class Network(object):
                 if not allow_autapses and src_gid == target_gid:
                     continue
                 self.add_connection(
-                    src_gid, target_gid, loc, receptor, nc_dict['A_delay'],
-                    nc_dict['A_weight'], nc_dict['lamtha'],
-                    nc_dict['threshold'])
+                    src_gid, target_gid, loc, receptor,
+                    nc_dict['A_weight'], nc_dict['lamtha'])
 
-    def add_connection(self, src_gid, target_gid, loc, receptor, delay,
-                       weight, lamtha, threshold=0.0):
+    def add_connection(self, src_gid, target_gid, loc, receptor,
+                       weight, lamtha):
         """Appends connections to connectivity list
 
         Parameters
@@ -971,17 +972,14 @@ class Network(object):
         receptor : str
             Synaptic receptor of connection. Must be one of:
             'ampa', 'nmda', 'gabaa', or 'gabab'.
-        delay : float
-            Time (ms) between source crossing threshold and
-            delivery of event to target.
         weight : float
             Synaptic weight on target cell.
         lamtha : float
             Space constant.
-        threshold : float
-            Source threshold.
         """
         conn = dict()
+        threshold = self.threshold
+        delay = self.delay
         if not isinstance(src_gid, int):
             raise TypeError(
                 "src_gid must be of type int, "
