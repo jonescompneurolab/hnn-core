@@ -172,11 +172,8 @@ def test_network():
 
     kwargs_bad = dict(src_gid=1.0, target_gid=1.0, loc=1.0, receptor=1.0,
                       weight='1.0', lamtha='1.0')
-    expected_type = dict(src_gid='int', target_gid='int', loc='str',
-                         receptor='str')
-    for arg, arg_type in expected_type.items():
-        got_type = type(kwargs_bad[arg]).__name__
-        match = (f'{arg} must be of type {arg_type}, got {got_type}')
+    for arg in kwargs_bad.keys():
+        match = (f'{arg} must be an instance of')
         with pytest.raises(TypeError, match=match):
             kwargs = kwargs_default.copy()
             kwargs[arg] = kwargs_bad[arg]
@@ -188,11 +185,9 @@ def test_network():
             kwargs[arg] = -1
             net.add_connection(**kwargs)
 
-    valid_string = {'loc': "'proximal', 'distal', or 'soma'",
-                    'receptor': "'ampa', 'nmda', 'gabaa', or 'gabab'"}
     for arg in ['loc', 'receptor']:
         string_arg = 'invalid_string'
-        match = f'{arg} must be one of {valid_string[arg]}. got {string_arg}.'
+        match = f"Invalid value for the '{arg}' parameter"
         with pytest.raises(ValueError, match=match):
             kwargs = kwargs_default.copy()
             kwargs[arg] = string_arg

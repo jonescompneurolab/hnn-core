@@ -16,6 +16,7 @@ from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .params import _long_name
 from .viz import plot_spikes_hist, plot_spikes_raster, plot_cells
+from .externals.mne import _validate_type, _check_option
 
 
 def read_spikes(fname, gid_ranges=None):
@@ -964,8 +965,8 @@ class Network(object):
         ----------
         src_gid : int
             Integer identifying source cell ID.
-        target_gid : int
-            Integer identifying target cell ID.
+        target_gid : list | int
+            Integer or list of integers identifying target cell ID.
         loc : str
             Location of synapse on target cell. Must be
             'proximal' or 'distal'.
@@ -980,48 +981,29 @@ class Network(object):
         conn = dict()
         threshold = self.threshold
         delay = self.delay
-        if not isinstance(src_gid, int):
-            raise TypeError(
-                "src_gid must be of type int, "
-                'got {}'.format(type(src_gid).__name__))
 
-        if not isinstance(target_gid, int):
-            raise TypeError(
-                "target_gid must be of type int, "
-                'got {}'.format(type(target_gid).__name__))
+        _validate_type(src_gid, int, 'src_gid', 'int')
+        _validate_type(target_gid, (list, int), 'target_gid', 'list or int')
+        if isinstance(target_gid, int):
+            target_gid = [target_gid]
 
         # Ensure gids in range of Network.gid_ranges
         assert np.sum([src_gid in gid_range for
                        gid_range in self.gid_ranges.values()]) == 1
-        assert np.sum([target_gid in gid_range for
-                       gid_range in self.gid_ranges.values()]) == 1
 
         conn['src_gid'] = src_gid
-        conn['target_gid'] = target_gid
         conn['src_type'] = self.gid_to_type(src_gid)
-        conn['target_type'] = self.gid_to_type(target_gid)
 
         # Ensure string inputs
-        string_args = ['loc', 'receptor']
-        string_items = [loc, receptor]
-        for arg, item in zip(string_args, string_items):
-            if not isinstance(item, str):
-                raise TypeError(
-                    "{} must be of type str"
-                    ', got {}'.format(arg, type(item).__name__))
+        _validate_type(loc, str, 'loc')
+        _validate_type(receptor, str, 'receptor')
 
         valid_loc = ['proximal', 'distal', 'soma']
-        if loc not in valid_loc:
-            raise ValueError(
-                f"loc must be one of 'proximal', 'distal', or 'soma'."
-                f" got {loc}.")
+        _check_option('loc', loc, valid_loc)
         conn['loc'] = loc
 
         valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
-        if receptor not in valid_receptor:
-            raise ValueError(
-                f"receptor must be one of 'ampa', 'nmda', 'gabaa', or 'gabab'."
-                f" got {receptor}.")
+        _check_option('receptor', receptor, valid_receptor)
         conn['receptor'] = receptor
 
         # Create and validate nc_dict
@@ -1030,13 +1012,17 @@ class Network(object):
         nc_dict_keys = ['A_delay', 'A_weight', 'lamtha', 'threshold']
         nc_conn_items = [delay, weight, lamtha, threshold]
         for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
-            if not isinstance(item, (int, float)):
-                raise TypeError(
-                    "{} must be of type int or float, "
-                    "got {}".format(arg_name, type(item).__name__))
+            _validate_type(item, (int, float), arg_name, 'int or float')
             conn['nc_dict'][key] = item
 
-        self.connectivity.append(conn)
+        for t_gid in target_gid:
+            _validate_type(t_gid, int, 'target_gid', 'list or int')
+            conn['target_gid'] = t_gid
+            conn['target_type'] = self.gid_to_type(t_gid)
+            assert np.sum([t_gid in gid_range for
+                           gid_range in self.gid_ranges.values()]) == 1
+
+            self.connectivity.append(deepcopy(conn))
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity_list"""
