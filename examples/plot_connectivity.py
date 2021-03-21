@@ -107,10 +107,9 @@ print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
 target_gids = net.gid_ranges['L2_pyramidal']
 location, receptor = 'soma', 'gabaa'
-delay, weight, lamtha, threshold = 1.0, 1.0, 70, 0.0
+weight, lamtha = 1.0, 70,
 for target_gid in target_gids:
-    net.add_connection(src_gid, target_gid, location, receptor, delay,
-                       weight, lamtha, threshold)
+    net.add_connection(src_gid, target_gid, location, receptor, weight, lamtha)
 
 net_add = net.copy()
 dpl_add = simulate_dipole(net_add, n_trials=1)
