@@ -182,7 +182,7 @@ def test_network():
             kwargs[arg] = kwargs_bad[arg]
             net.add_connection(**kwargs)
 
-    match = f'target_gid must be an instance of'
+    match = 'target_gid must be an instance of'
     with pytest.raises(TypeError, match=match):
         kwargs = kwargs_default.copy()
         kwargs['target_gid'] = [35, '36']
