@@ -228,7 +228,7 @@ class Network(object):
 
         # network connectivity
         self.connectivity = list()
-        self.threshold = 0.0
+        self.threshold = self.params['threshold']
         self.delay = 1.0
 
         # contents of pos_dict determines all downstream inferences of
@@ -564,7 +564,7 @@ class Network(object):
         # Update connectivity_list
         nc_dict = {
             'A_delay': self.delay,
-            'threshold': self.params['threshold'],
+            'threshold': self.threshold,
         }
         receptors = ['ampa', 'nmda']
         if drive['type'] == 'gaussian':
@@ -581,8 +581,8 @@ class Network(object):
                         receptor]['A_weight']
                     loc = drive_conn['location']
                     self._all_to_all_connect(
-                        drive['name'], target_cell,
-                        loc, receptor, nc_dict, unique=drive['cell_specific'])
+                        drive['name'], target_cell, loc, receptor,
+                        deepcopy(nc_dict), unique=drive['cell_specific'])
 
     def _create_drive_conns(self, target_populations, weights_by_receptor,
                             location, space_constant, synaptic_delays,
@@ -808,7 +808,7 @@ class Network(object):
     def _set_default_connections(self):
         nc_dict = {
             'A_delay': self.delay,
-            'threshold': self.params['threshold'],
+            'threshold': self.threshold,
         }
 
         # source of synapse is always at soma
@@ -928,11 +928,11 @@ class Network(object):
         target_cell : str
             Target cell type.
         loc : str
-            If 'proximal' or 'distal', the corresponding
-            dendritic sections from Cell.sect_loc['proximal']
-            or Cell.Sect_loc['distal'] are used
+            Location of synapse on target cell. Must be
+            'proximal' or 'distal'.
         receptor : str
-            The receptor.
+            Synaptic receptor of connection. Must be one of:
+            'ampa', 'nmda', 'gabaa', or 'gabab'.
         nc_dict : dict
             The connection dictionary containing keys
             A_delay, A_weight, lamtha, and threshold.
@@ -955,10 +955,10 @@ class Network(object):
                     continue
                 self.add_connection(
                     src_gid, target_gid, loc, receptor,
-                    nc_dict['A_weight'], nc_dict['lamtha'])
+                    nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
 
     def add_connection(self, src_gid, target_gid, loc, receptor,
-                       weight, lamtha):
+                       weight, delay, lamtha):
         """Appends connections to connectivity list
 
         Parameters
@@ -975,12 +975,13 @@ class Network(object):
             'ampa', 'nmda', 'gabaa', or 'gabab'.
         weight : float
             Synaptic weight on target cell.
+        delay : float
+            Synaptic delay in ms.
         lamtha : float
             Space constant.
         """
         conn = dict()
         threshold = self.threshold
-        delay = self.delay
 
         _validate_type(src_gid, int, 'src_gid', 'int')
         _validate_type(target_gid, (list, int), 'target_gid', 'list or int')
