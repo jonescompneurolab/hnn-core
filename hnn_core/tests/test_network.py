@@ -167,14 +167,14 @@ def test_network():
     # Test inputs for connectivity API
     kwargs_default = dict(src_gid=36, target_gid=35,
                           loc='proximal', receptor='nmda',
-                          weight=5e-4, lamtha=3.0)
+                          weight=5e-4, delay=1.0, lamtha=3.0)
     net.add_connection(**kwargs_default)  # smoke test
     kwargs = kwargs_default.copy()
     kwargs['target_gid'] = [35, 36]
     net.add_connection(**kwargs)
 
     kwargs_bad = dict(src_gid=1.0, target_gid=1.0, loc=1.0, receptor=1.0,
-                      weight='1.0', lamtha='1.0')
+                      weight='1.0', delay='1.0', lamtha='1.0')
     for arg in kwargs_bad.keys():
         match = (f'{arg} must be an instance of')
         with pytest.raises(TypeError, match=match):
