@@ -7,17 +7,16 @@ This script is called directly from MPIBackend.simulate()
 import sys
 import pickle
 import base64
+from queue import Queue, Empty
+from threading import Thread
+
+from hnn_core.parallel_backends import _extract_data, _extract_data_length
 
 
-def _read_all_bytes(stream_in, chunk_size=4096):
-    all_data = b""
-    while True:
-        data = stream_in.read(chunk_size)
-        all_data += data
-        if len(data) < chunk_size:
-            break
-
-    return all_data
+def _enqueue_output(out, queue):
+    for line in iter(out.readline, b''):
+        line = line.rstrip('\n')
+        queue.put(line)
 
 
 class MPISimulation(object):
@@ -36,6 +35,8 @@ class MPISimulation(object):
     """
 
     def __init__(self, skip_mpi_import=False):
+        self.input_bytes = b''
+
         self.skip_mpi_import = skip_mpi_import
         if skip_mpi_import:
             self.rank = 0
@@ -54,15 +55,55 @@ class MPISimulation(object):
             from mpi4py import MPI
             MPI.Finalize()
 
+    def _process_input(self, in_q):
+        self.input_bytes = b''
+        try:
+            input_str = in_q.get(timeout=0.01)
+        except Empty:
+            return None
+
+        data = _extract_data(input_str, 'net')
+        if len(data) > 0:
+            # start the search after data
+            data_length = _extract_data_length(input_str[len(data):],
+                                               'net')
+            self.input_bytes += data.encode()
+            if len(data) != data_length:
+                # This is a weird "bug" for which there isn't a good fix.
+                # An eextra 4082 bytes are read from stdin that weren't
+                # put there by the parent process. They extra bytes are
+                # inserted at byte 65535, so it's in the middle of the Network
+                # object. Simply slicing out the 4082 seems to give the correct
+                # object too, but resending is less opaque.
+                print("Got incorrect network size: %d bytes" % len(data))
+                print("expected length: %d" % data_length)
+
+                # signal to parent that there was an error with the network
+                sys.stderr.write("@net_receive_error@\n")
+                sys.stderr.flush()
+                return None
+            return data_length
+
+        return None
+
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
 
         # get parameters from stdin
         if self.rank == 0:
-            input_bytes = _read_all_bytes(sys.stdin.buffer)
-            sys.stdin.close()
+            in_q = Queue()
+            in_t = Thread(target=_enqueue_output, args=(sys.stdin, in_q))
+            in_t.daemon = True
+            in_t.start()
 
-            net = pickle.loads(base64.b64decode(input_bytes, validate=True))
+            while True:
+                data_len = self._process_input(in_q)
+                # data is in self.input_bytes
+                if isinstance(data_len, int):
+                    break
+
+            net = pickle.loads(base64.b64decode(self.input_bytes,
+                                                validate=True))
         else:
             net = None
 
@@ -83,12 +124,11 @@ class MPISimulation(object):
         if self.rank > 0:
             return
 
+        sys.stderr.write('@start_of_data@')
         pickled_bytes = self._pickle_data(sim_data)
-
         sys.stderr.write(pickled_bytes.decode())
-        sys.stderr.flush()
 
-        # the parent process is waiting for "@end_of_sim:[#bytes]@" with the
+        # the parent process is waiting for "@end_of_data:[#bytes]@" with the
         # length of data. The '@' is not found in base64 encoding, so we can
         # be certain it is the border of the signal
         sys.stderr.write('@end_of_data:%d@' % len(pickled_bytes))
@@ -110,12 +150,6 @@ class MPISimulation(object):
         # flush output buffers from all ranks (any errors or status mesages)
         sys.stdout.flush()
         sys.stderr.flush()
-
-        if self.rank == 0:
-            # the parent process is waiting for "end_of_sim" to signal that
-            # the following stderr will only contain sim_data
-            sys.stdout.write('end_of_sim')
-            sys.stdout.flush()  # flush to ensure signal is not buffered
 
         return sim_data
 

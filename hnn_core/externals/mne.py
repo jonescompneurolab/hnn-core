@@ -765,3 +765,10 @@ def _check_tfr_param(freqs, sfreq, method, zero_mean, n_cycles,
     _check_option('method', method, ['multitaper', 'morlet'])
 
     return freqs, sfreq, zero_mean, n_cycles, time_bandwidth, decim
+
+
+####################################################
+# mne/utils/misc.py
+def _enqueue_output(out, queue):
+    for line in iter(out.readline, b''):
+        queue.put(line)
