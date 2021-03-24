@@ -1158,6 +1158,8 @@ class CellResponse(object):
 
     Methods
     -------
+    reset()
+        Reset all recorded attributes to empty lists.
     update_types(gid_ranges)
         Update spike types in the current instance of CellResponse.
     plot(ax=None, show=True)
@@ -1316,6 +1318,14 @@ class CellResponse(object):
     @property
     def times(self):
         return self._times
+
+    def reset(self):
+        """Reset all recorded attributes to empty lists."""
+        self._spike_times = list()
+        self._spike_gids = list()
+        self._spike_types = list()
+        self._vsoma = list()
+        self._isoma = list()
 
     def update_types(self, gid_ranges):
         """Update spike types in the current instance of CellResponse.
