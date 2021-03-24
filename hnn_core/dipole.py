@@ -93,6 +93,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     # XXX needed in mpi_child.py:run()#L103; include fix in #211 or later PR
     net.params['N_trials'] = n_trials
     net._instantiate_drives(n_trials=n_trials)
+    net.cell_response.reset()  # see #290 for context; relevant for MPI
 
     if isinstance(record_vsoma, bool):
         net.params['record_vsoma'] = record_vsoma
