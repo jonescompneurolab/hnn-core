@@ -227,17 +227,28 @@ def test_cell_response(tmpdir):
     spike_gids = [[1, 3], [5, 7]]
     spike_types = [['L2_pyramidal', 'L2_basket'],
                    ['L5_pyramidal', 'L5_basket']]
-    tstart, tstop = 0.1, 98.4
+    tstart, tstop, fs = 0.1, 98.4, 1000.
+    sim_times = np.arange(tstart, tstop, 1 / fs)
     gid_ranges = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
                   'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
     cell_response = CellResponse(spike_times=spike_times,
                                  spike_gids=spike_gids,
-                                 spike_types=spike_types)
+                                 spike_types=spike_types,
+                                 times=sim_times)
     cell_response.plot_spikes_hist(show=False)
     cell_response.write(tmpdir.join('spk_%d.txt'))
     assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
+
+    cell_response.reset()
+    assert ("CellResponse | 0 simulation trials" in repr(cell_response))
+    # reset clears all recorded variables, but leaves simulation time intact
+    assert len(cell_response.times) == len(sim_times)
+    attributes = ['_spike_times', '_spike_gids', '_spike_types',
+                  '_vsoma', '_isoma']
+    for attr in attributes:
+        assert len(getattr(cell_response, attr)) == 0  # all lists are empty
 
     # Test recovery of empty spike files
     empty_spike = CellResponse(spike_times=[[], []], spike_gids=[[], []],
