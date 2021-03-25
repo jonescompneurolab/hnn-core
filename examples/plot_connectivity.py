@@ -27,9 +27,10 @@ params = read_params(params_fname)
 # To explore how to modify network connectivity, we will start with simulating
 # the evoked response from the
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`, and
-# explore how it changes with new connections. We first instantiate build
-# the network.
-net = Network(params)
+# explore how it changes with new connections. We first instantiate the
+# network. (Note: Setting ``add_drives_from_params=True`` loads a set of
+# predefined drives without the drives API shown previously).
+net = Network(params, add_drives_from_params=True)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that
@@ -38,43 +39,7 @@ net = Network(params)
 # connection.
 print(len(net.connectivity))
 print(net.connectivity[0])
-
-###############################################################################
-# Next we add the distal drive. Note that adding drives creates new drive-cell
-# connections that are appended to ``net.connectivity``
-weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
-                   'L5_pyramidal': 0.142300}
-weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
-                   'L5_pyramidal': 0.080074}
-synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                      'L5_pyramidal': 0.1}
-net.add_evoked_drive(
-    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
-    weights_nmda=weights_nmda_d1, location='distal',
-    synaptic_delays=synaptic_delays_d1, seedcore=4)
-
 print(net.connectivity[-1])
-
-###############################################################################
-# Then we add two proximal drives and simuate the network.
-weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
-                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
-synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                        'L5_basket': 1., 'L5_pyramidal': 1.}
-# all NMDA weights are zero; pass None explicitly
-net.add_evoked_drive(
-    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
-    weights_nmda=None, location='proximal',
-    synaptic_delays=synaptic_delays_prox, seedcore=4)
-
-# Second proximal evoked drive. NB: only AMPA weights differ from first
-weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
-# all NMDA weights are zero; omit weights_nmda (defaults to None)
-net.add_evoked_drive(
-    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
-    weights_ampa=weights_ampa_p2, location='proximal',
-    synaptic_delays=synaptic_delays_prox, seedcore=4)
 
 ###############################################################################
 # Data recorded during simulations are stored under
@@ -108,9 +73,8 @@ src_gid = net.gid_ranges['L2_basket'][0]
 target_gids = net.gid_ranges['L2_pyramidal']
 location, receptor = 'soma', 'gabaa'
 weight, delay, lamtha = 1.0, 1.0, 70
-for target_gid in target_gids:
-    net.add_connection(src_gid, target_gid, location, receptor,
-                       delay, weight, lamtha)
+net.add_connection(src_gid, target_gids, location, receptor,
+                   delay, weight, lamtha)
 
 net_add = net.copy()
 dpl_add = simulate_dipole(net_add, n_trials=1)
