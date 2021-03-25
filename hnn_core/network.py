@@ -190,7 +190,7 @@ class Network(object):
         List of dictionaries specifying each cell-cell and drive-cell
         connection
     threshold : float
-
+        Firing threshold of all cells.
     delay : float
         Synaptic delay in ms.
     """
@@ -1012,16 +1012,6 @@ class Network(object):
         valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
         _check_option('receptor', receptor, valid_receptor)
         conn['receptor'] = receptor
-
-        # Check for valid inhibitory synapses on L2 pyramidal
-        contains_l2pyr = np.any(np.in1d(target_gid,
-                                        self.gid_ranges['L2_pyramidal']))
-        if (contains_l2pyr and (receptor == 'gabaa' or
-                                receptor == 'gabab') and loc != 'soma'):
-            raise ValueError("Proximal and distal inputs on L2 pyramidal cells"
-                             " must be excitatory. Valid receptors include "
-                             "'ampa' and 'nmda'. Inhibitory receptors such as "
-                             "'gabaa' and 'gabab' are valid for loc='soma'.")
 
         # Create and validate nc_dict
         conn['nc_dict'] = dict()
