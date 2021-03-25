@@ -11,7 +11,7 @@ from glob import glob
 from copy import deepcopy
 from warnings import warn
 
-from .feed import _drive_cell_event_times
+from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .params import _long_name
