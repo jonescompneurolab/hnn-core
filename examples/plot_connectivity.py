@@ -70,7 +70,7 @@ net_remove.cell_response.plot_spikes_raster()
 # find the gids of interest.
 print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
-target_gids = net.gid_ranges['L2_pyramidal']
+target_gids = list(net.gid_ranges['L2_pyramidal'])
 location, receptor = 'soma', 'gabaa'
 weight, delay, lamtha = 1.0, 1.0, 70
 net.add_connection(src_gid, target_gids, location, receptor,
