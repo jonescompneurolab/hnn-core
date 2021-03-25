@@ -189,6 +189,10 @@ class Network(object):
     connectivity : list of dict
         List of dictionaries specifying each cell-cell and drive-cell
         connection
+    threshold : float
+
+    delay : float
+        Synaptic delay in ms.
     """
 
     def __init__(self, params, add_drives_from_params=False,
@@ -929,7 +933,7 @@ class Network(object):
             Target cell type.
         loc : str
             Location of synapse on target cell. Must be
-            'proximal' or 'distal'.
+            'proximal', 'distal', or 'soma'.
         receptor : str
             Synaptic receptor of connection. Must be one of:
             'ampa', 'nmda', 'gabaa', or 'gabab'.
@@ -969,7 +973,9 @@ class Network(object):
             Integer or list of integers identifying target cell ID.
         loc : str
             Location of synapse on target cell. Must be
-            'proximal' or 'distal'.
+            'proximal', 'distal', or 'soma'. Note that inhibitory synapses
+            (receptor='gabaa' or 'gabab') of L2 pyramidal neurons are only
+            valid loc='soma'.
         receptor : str
             Synaptic receptor of connection. Must be one of:
             'ampa', 'nmda', 'gabaa', or 'gabab'.
@@ -1006,6 +1012,16 @@ class Network(object):
         valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
         _check_option('receptor', receptor, valid_receptor)
         conn['receptor'] = receptor
+
+        # Check for valid inhibitory synapses on L2 pyramidal
+        contains_l2pyr = np.any(np.in1d(target_gid,
+                                        self.gid_ranges['L2_pyramidal']))
+        if (contains_l2pyr and (receptor == 'gabaa' or
+                                receptor == 'gabab') and loc != 'soma'):
+            raise ValueError("Proximal and distal inputs on L2 pyramidal cells"
+                             " must be excitatory. Valid receptors include "
+                             "'ampa' and 'nmda'. Inhibitory receptors such as "
+                             "'gabaa' and 'gabab' are valid for loc='soma'.")
 
         # Create and validate nc_dict
         conn['nc_dict'] = dict()

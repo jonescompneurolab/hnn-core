@@ -202,6 +202,13 @@ def test_network():
             kwargs[arg] = string_arg
             net.add_connection(**kwargs)
 
+    match = 'Proximal and distal inputs on'
+    with pytest.raises(ValueError):
+        kwargs = kwargs_default.copy()
+        kwargs['loc'] = 'proximal'
+        kwargs['receptor'] = 'gabaa'
+        net.add_connection(**kwargs)
+
     net.clear_connectivity()
     assert len(net.connectivity) == 0
 
