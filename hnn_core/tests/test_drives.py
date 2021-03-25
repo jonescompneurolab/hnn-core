@@ -7,7 +7,7 @@ import os.path as op
 import numpy as np
 
 from hnn_core import Params, Network, read_params
-from hnn_core.drives import (feed_event_times, _get_prng, _create_extpois,
+from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
                              _create_bursty_input)
 from hnn_core.params import create_pext
 
@@ -21,14 +21,14 @@ def test_extfeed():
 
     # feed name must be valid and unambiguous
     p_bogus = {'prng_seedcore': 0}
-    pytest.raises(ValueError, feed_event_times,
+    pytest.raises(ValueError, drive_event_times,
                   'invalid_feed', None, p_bogus, 0)
-    pytest.raises(ValueError, feed_event_times,
+    pytest.raises(ValueError, drive_event_times,
                   'ev', None, p_bogus, 0)  # ambiguous
 
     # 'unique' external feeds are always created
     for feed_type in ['extpois', 'extgauss']:
-        event_times = feed_event_times(
+        event_times = drive_event_times(
             feed_type=feed_type,
             target_cell_type='L2_basket',
             params=p_unique[feed_type],
@@ -36,7 +36,7 @@ def test_extfeed():
 
     # but 'common' (rhythmic) feeds are not
     for ii in range(len(p_common)):  # len == 0 for def. params
-        event_times = feed_event_times(
+        event_times = drive_event_times(
             feed_type='common',
             target_cell_type=None,
             params=p_common[ii],
@@ -54,13 +54,13 @@ def test_extfeed():
     p_extpois['L2_basket'] = (1., 1., 0., 0.)
     with pytest.raises(ValueError, match='The end time for Poisson input'):
         p_extpois['t_interval'] = (p_extpois['t_interval'][0], -1)
-        event_times = feed_event_times(
+        event_times = drive_event_times(
             feed_type='extpois',
             target_cell_type='L2_basket',
             params=p_extpois, gid=0)
     with pytest.raises(ValueError, match='The start time for Poisson'):
         p_extpois['t_interval'] = (-1, 5)
-        event_times = feed_event_times(
+        event_times = drive_event_times(
             feed_type='extpois',
             target_cell_type='L2_basket',
             params=p_extpois, gid=0)

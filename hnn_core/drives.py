@@ -272,10 +272,10 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     return event_times
 
 
-def feed_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
+def drive_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
     """External spike input times.
 
-    An external input "feed" to the network, i.e., one that is independent of
+    An external input drive to the network, i.e., one that is independent of
     the spiking output of cells in the network.
 
     Parameters
