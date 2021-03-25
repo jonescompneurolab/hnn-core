@@ -969,7 +969,7 @@ class Network(object):
         ----------
         src_gid : int
             Integer identifying source cell ID.
-        target_gid : list | int
+        target_gid : list | range | int
             Integer or list of integers identifying target cell ID.
         loc : str
             Location of synapse on target cell. Must be
@@ -990,7 +990,8 @@ class Network(object):
         threshold = self.threshold
 
         _validate_type(src_gid, int, 'src_gid', 'int')
-        _validate_type(target_gid, (list, int), 'target_gid', 'list or int')
+        _validate_type(target_gid, (list, range, int), 'target_gid',
+                       'list, range or int')
         if isinstance(target_gid, int):
             target_gid = [target_gid]
 
