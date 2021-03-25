@@ -21,19 +21,7 @@ Bug
 
 API
 ~~~
-- New API for defining cell-cell and drive-cell connections. Custom connections can be added with :function:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
-
-People who contributed to this release (in alphabetical order):
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- `Blake Caldwell`_
-- `Christopher Bailey`_
-- `Carmen Kohl`_
-- `Mainak Jas`_
-- `Nick Tolley`_
-- `Ryan Thorpe`_
-- `Samika Kanekar`_
-- `Stephanie Jones`_
+- New API for defining cell-cell and drive-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
 
 .. _0.1:
 
