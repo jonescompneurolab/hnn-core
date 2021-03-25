@@ -165,10 +165,15 @@ def test_network():
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
     # Test inputs for connectivity API
-    kwargs_default = dict(src_gid=36, target_gid=35,
-                          loc='proximal', receptor='nmda',
+    net = Network(deepcopy(params), add_drives_from_params=True)
+    n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
+    kwargs_default = dict(src_gid=0, target_gid=35,
+                          loc='soma', receptor='gabaa',
                           weight=5e-4, delay=1.0, lamtha=3.0)
     net.add_connection(**kwargs_default)  # smoke test
+    network_builder = NetworkBuilder(net)
+    assert len(network_builder.ncs['L2Basket_L2Pyr_gabaa']) == n_conn + 1
+
     kwargs = kwargs_default.copy()
     kwargs['target_gid'] = [35, 36]
     net.add_connection(**kwargs)
