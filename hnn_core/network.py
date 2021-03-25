@@ -794,7 +794,7 @@ class Network(object):
                 return gidtype
 
     def _get_src_type_and_pos(self, gid):
-        """Source type, position and whether it's a cell or artificial feed"""
+        """Source type, position and whether it's a cell or external drive"""
 
         # get type of cell and pos via gid
         src_type = self.gid_to_type(gid)

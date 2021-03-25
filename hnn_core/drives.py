@@ -217,16 +217,16 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
                             gid=drive_cell_gid,
                             sync_evinput=sync_evinput)
 
-    # check feed name validity, allowing substring matches
-    valid_feeds = ['evoked', 'poisson', 'gaussian', 'bursty']
-    # NB check if feed_type has a valid substring, not vice versa
-    matches = [f for f in valid_feeds if f in drive_type]
+    # check drive name validity, allowing substring matches
+    valid_drives = ['evoked', 'poisson', 'gaussian', 'bursty']
+    # NB check if drive_type has a valid substring, not vice versa
+    matches = [f for f in valid_drives if f in drive_type]
     if len(matches) == 0:
         raise ValueError('Invalid external drive: %s' % drive_type)
     elif len(matches) > 1:
         raise ValueError('Ambiguous external drive: %s' % drive_type)
 
-    # Return values not checked: False if all weights for given feed type
+    # Return values not checked: False if all weights for given drive type
     # are zero. Designed to be silent so that zeroing input weights
     # effectively disables each.
     n_ampa_nmda_weights = (len(drive_conn['ampa'].keys()) +
@@ -272,7 +272,7 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     return event_times
 
 
-def drive_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
+def drive_event_times(drive_type, target_cell_type, params, gid, trial_idx=0):
     """External spike input times.
 
     An external input drive to the network, i.e., one that is independent of
@@ -280,24 +280,24 @@ def drive_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
 
     Parameters
     ----------
-    feed_type : str
-        The feed type, which is one of
+    drive_type : str
+        The drive type, which is one of
         'extpois' : Poisson-distributed input to proximal dendrites
         'extgauss' : Gaussian-distributed input to proximal dendrites
         'evprox' : Proximal input at specified time (or Gaussian spread)
         'evdist' : Distal input at specified time (or Gaussian spread)
 
-        'common' : As opposed to other feed types, these have timing that is
+        'common' : As opposed to other drive types, these have timing that is
         identical (synchronous) for all real cells in the network. Proximal
         and distal dendrites have separate parameter sets, and need not be
         synchronous. Note that not all cells classes (types) are required to
         receive 'common' input---separate conductivity values can be assigned
         to basket vs. pyramidal cells and AMPA vs. NMDA synapses
     target_cell_type : str | None
-        The target cell type of the feed, e.g., 'L2_basket', 'L5_pyramidal',
+        The target cell type of the drive, e.g., 'L2_basket', 'L5_pyramidal',
         etc., or None for 'common' inputs
     params : dict
-        Parameters of the external input feed, arranged into a dictionary.
+        Parameters of the external input drive, arranged into a dictionary.
     gid : int
         The cell ID.
     trial_idx : int
@@ -313,16 +313,16 @@ def drive_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
         gid=gid,
         sync_evinput=params.get('sync_evinput', False))
 
-    # check feed name validity, allowing substring matches ('evprox1' etc)
-    valid_feeds = ['extpois', 'extgauss', 'common', 'evprox', 'evdist']
-    # NB check if feed_type has a valid substring, not vice versa
-    matches = [f for f in valid_feeds if f in feed_type]
+    # check drive name validity, allowing substring matches ('evprox1' etc)
+    valid_drives = ['extpois', 'extgauss', 'common', 'evprox', 'evdist']
+    # NB check if drive_type has a valid substring, not vice versa
+    matches = [f for f in valid_drives if f in drive_type]
     if len(matches) == 0:
-        raise ValueError('Invalid external feed: %s' % feed_type)
+        raise ValueError('Invalid external drive: %s' % drive_type)
     elif len(matches) > 1:
-        raise ValueError('Ambiguous external feed: %s' % feed_type)
+        raise ValueError('Ambiguous external drive: %s' % drive_type)
 
-    # Return values not checked: False if all weights for given feed type
+    # Return values not checked: False if all weights for given drive type
     # are zero. Designed to be silent so that zeroing input weights
     # effectively disables each.
     target_syn_weights_zero = False
@@ -337,14 +337,14 @@ def drive_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
                 all_syn_weights_zero = False
 
     event_times = list()
-    if feed_type == 'extpois' and not target_syn_weights_zero:
+    if drive_type == 'extpois' and not target_syn_weights_zero:
         event_times = _create_extpois(
             t0=params['t_interval'][0],
             T=params['t_interval'][1],
             # ind 3 is frequency (lamtha))
             lamtha=params[target_cell_type][3],
             prng=prng)
-    elif feed_type.startswith(('evprox', 'evdist')) and \
+    elif drive_type.startswith(('evprox', 'evdist')) and \
             target_cell_type in params:
         event_times = _create_gauss(
             mu=params['t0'],
@@ -352,13 +352,13 @@ def drive_event_times(feed_type, target_cell_type, params, gid, trial_idx=0):
             sigma=params[target_cell_type][3],
             numspikes=int(params['numspikes']),
             prng=prng)
-    elif feed_type == 'extgauss' and not target_syn_weights_zero:
+    elif drive_type == 'extgauss' and not target_syn_weights_zero:
         event_times = _create_gauss(
             mu=params[target_cell_type][3],
             sigma=params[target_cell_type][4],
             numspikes=50,
             prng=prng)
-    elif feed_type == 'common' and not all_syn_weights_zero:
+    elif drive_type == 'common' and not all_syn_weights_zero:
         event_times = _create_bursty_input(
             distribution=params['distribution'],
             t0=params['t0'],
@@ -488,7 +488,7 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
     """
     if distribution not in ('normal', 'uniform'):
         raise ValueError("Indicated distribution not recognized. "
-                         "Not making any common feeds.")
+                         "Not making any common drives.")
 
     if t0_stdev > 0.0:
         t0 = prng2.normal(t0, t0_stdev)
