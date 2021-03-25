@@ -173,6 +173,8 @@ def test_network():
     net.add_connection(**kwargs_default)  # smoke test
     network_builder = NetworkBuilder(net)
     assert len(network_builder.ncs['L2Basket_L2Pyr_gabaa']) == n_conn + 1
+    nc = network_builder.ncs['L2Basket_L2Pyr_gabaa'][-1]
+    assert nc.weight[0] == kwargs_default['weight']
 
     kwargs = kwargs_default.copy()
     kwargs['target_gid'] = [35, 36]
