@@ -13,8 +13,8 @@ from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
 from hnn_core.params import create_pext
 
 
-def test_extfeed():
-    """Test the different external feeds."""
+def test_external_drive_times():
+    """Test the different external drives."""
 
     params = Params()
     p_common, p_unique = create_pext(params,

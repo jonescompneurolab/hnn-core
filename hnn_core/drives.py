@@ -143,6 +143,7 @@ def _add_drives_from_params(net):
 
     net._instantiate_drives(n_trials=net.params['N_trials'])
 
+
 def _get_prng(seed, gid, sync_evinput=False):
     """Random generator for this instance.
 
