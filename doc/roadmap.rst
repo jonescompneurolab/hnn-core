@@ -46,7 +46,7 @@ One Year Plan Through 2021
 Modularize HNN code to simplify installation, development and maintenance
 -------------------------------------------------------------------------
 
-Over the past year, we have been cleaning up and re-organizing the
+We are working to cleaning up and re-organizing the
 underlying code that defines the current distribution of HNN to facilitate
 expansion and community engagement in its use and development. To minimize the
 dependencies that are required to install before contributing to HNN development
@@ -59,30 +59,43 @@ and plotting (`HNN-core`_).
 The functionality in HNN-core will be imported into the HNN repository
 (to be renamed HNN-GUI)  and will be used by the interactive GUI.
 
-This modularization will begin with reorganization and improvements within
+This modularization will entail reorganization and improvements within
 the HNN-core repository and simplification of the HNN-GUI repository in the 
 following steps:
 
--   Creation of two modules in the HNN-core, one of which 
-    will contain parts of the code that interact directly with the NEURON simulator 
-    (``hnn_core.simulator``), while the other module will contain post-processing data 
-    analysis and plotting functions (``hnn_core.analysis``). Removal of all 
-    simulation code from the HNN repository, which will be replaced with by 
-    importing from ``hnn_core.simulator`` module. HNN repository will then be 
-    renamed HNN-GUI. 
--   Parallelization of the simulation in the ``hnn_core.simulator`` module via a
-    combination of MPI and Joblib.
--   All post-processing data analysis functions will be moved from the HNN repository 
-    into the ``hnn_core.analysis`` module.
--   Extending ``hnn_core.simulator`` module to run batch simulations that enable parameter
-    sweeps.
--   Development of functions in HNN-GUI to enable parameter sweeps via the GUI. 
--   Reorganization of the Network class within the ``hnn_core.simulator`` module 
+-   Following best practice in open-source software design, including continuous integration testing, 
+    develop HNN-core. HNN-core will contain clean and reorganized code, and separate all components that 
+    interact directly with the NEURON simulator (e.g. cell and network intantiation, external drives, etc..), 
+    from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis). 
+    **COMPLETED FEB 2021** 
+-   Convert installation procedures to PIP 
+   **COMPLETED FEB 2021** 
+-   Parallelization of the simulations in HNN-core via a combination of MPI and Joblib.
+   **COMPLETED FEB 2021** 
+-   Reorganization of the Network class within HNN-core module 
     to separate cortical column model from exogenous drive, and optimization routines.
     See `gh-104`_, `gh-124`_, and `gh-129`_ for related discussions.
+    **COMPLETED FEB 2021** 
+-   Develop initial HNN-core documentation and example simulations following those 
+    detailed in the HNN-GUI tutorials https://jonescompneurolab.github.io/hnn-core/stable/index.html
+   **COMPLETED MARCH 2021** 
+-   First release of HNN-Core 0.1 to the community
+    **COMPLETED MARCH 2021** 
+-   Removal of all simulation code from the HNN repository, which will be replaced with by 
+    importing from HNN-Core
+     **COMPLETED MARCH 2021** 
+-   Cleaning optimization routines in HNN-GUI to interact with HNN-core 
+-   Testing HNN-GUI tutorials with HNN-Core integration 
+-   Rename HNN to HNN-GUI and release updated version to the community 
+-   Extending HNN-core to run batch simulations that enable parameter sweeps.
+-   Development of functions in HNN-GUI to enable parameter sweeps via the GUI. 
 -   Reorganization of Param.py file within ``hnn_core.simulator`` module to multiple files that 
     contain smaller dictionaries of parameters related to different modules of the code.
     See `gh-104`_ for related discussions.
+-   Creation of two modules in the HNN-core, one with parts of the code that interact with 
+    the NEURON simulation of which (``hnn_core.simulator``), and one tha contains post-processing data 
+    analysis and plotting functions (``hnn_core.analysis``).
+
 
 LFP/CSD Simulation, Visualization and Data Comparison
 -----------------------------------------------------
@@ -109,13 +122,13 @@ Parameter estimation is an inherent difficulty in neural model simulation.
 HNN currently enables some parameter estimation, focussing on parameters relevant
 to an ERP. New methods have been recently developed that apply a machine learning
 approach to parameter estimation, namely Sequential Neural Parameter Estimation (SNPE)
-(Gonçalves et al BioRxiv 2019:838383). We will adapt this method for parameter 
+(Gonçalves et al Elife 2020: DOI: 10.7554/eLife.56261). We will adapt this method for parameter 
 estimation to work with HNN-core, enabling estimation of a distribution of parameters
 that could account for empirical data, and then integrate it into the HNN-GUI with 
 example tutorials for the following tasks:
 
-- Move current ERP parameter estimation code from HNN into ``hnn_core.analysis`` module.
-- Develop code for SNPE parameter estimation and visualization in ``hnn_core.analysis``.
+- Move current ERP parameter estimation code from HNN into ``hnn_core.simulator`` module.
+- Develop code for SNPE parameter estimation and visualization in ``hnn_core.simulator``.
 - Develop functions in HNN-GUI to enable SNPE estimation in the GUI.
 
 Different Cortical Model Template Choices
@@ -129,9 +142,9 @@ with those developed by the HNN team and ultimately expanding to model developme
 in other platforms (e.g. NetPyNE), see 5-year plan.
 
 - Develop new cortical column template models with pyramidal neuron 
-  calcium dynamics, and with updated inhibitory connectivity,
-  as part of the  ``hnn_core.simulator`` module.
-- Develop function in HNN-GUI to choose among different template models in the GUI
+  calcium dynamics, in ``hnn_core.simulator`` module.
+- Update examples and HNN-GUI tutorials to include description of network with updated calcium dynamics. 
+- Develop function in HNN-GUI to choose among different template models in the GUI.
 
 See `gh-111`_ for more discussions.
 
@@ -154,8 +167,8 @@ needed to examine the neural mechanisms contributing to the signal. As new
 components are developed in HNN-GUI, new tutorials will be developed to train 
 the community on how to apply them in their studies.
 
-Some of the pending API documentation and GUI tutorials based on the above  HNN Roadmap 
-include,
+Several of the API documentation and GUI tutorials updates are described above, and other 
+pending based on the One-Year HNN Roadmap plan include,
 
 - Running parameter sweeps
 - Simulating and visualizing LFP/CSD and comparison to invasive animal recordings
@@ -177,6 +190,7 @@ We have begun creation of a framework where models built in NetPyNE can be adapt
 to the HNN workflows of use. As a test bed, this currently entails integration of 
 the HNN cortical column model and exogenous drives into the full NetPyNE 
 platform (https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne). 
+See also update from **MARCH 2021** https://github.com/jonescompneurolab/hnn/tree/hnn2 .
 To limit the scope of this effort to HNN-specific goals, i.e. neural modeling 
 designed for interpretation of human EEG/MEG signals, we will work to adapt 
 NetPyNE developed models into the HNN framework, and to make the adaptation 
@@ -186,6 +200,12 @@ flexible enough to include models developed in other neural modeling platforms.
 source localization using MNE-Python is seamlessly integrated with HNN  for 
 circuit-level interpretation of the signal. We will begin with median-nerve 
 stimulation as a test-case example.
+
+- Develop example using open-source median nerve data of how to go from 
+  sensor space data to source localized signal using MNE-Python, and then
+  simulate the neural mechanisms of the source signal using HNN-core.  
+  https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html
+   **COMPLETED MARCH 2021** 
 
 **Convert HNN to web-based platform with dual GUI and Command Line Interface (CLI):**
 We have begun working with MetaCell (metacell.org) to convert HNN to a web-based 
