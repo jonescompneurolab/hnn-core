@@ -221,7 +221,7 @@ differ from first.
 
 Here, we explain more details about the data structures and how they can
 be used to better interpret the data. The cell IDs (gids) uniquely define
-neurons in the network and are stored in the :class:`~hnn_core.Network` 
+neurons in the network and are stored in the :class:`~hnn_core.Network`
 object as a dictionary
 
 .. GENERATED FROM PYTHON SOURCE LINES 89-92
@@ -430,7 +430,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  46.783 seconds)
+   **Total running time of the script:** ( 1 minutes  43.888 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

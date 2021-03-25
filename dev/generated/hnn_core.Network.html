@@ -168,6 +168,13 @@ index for trials, second for event time lists for each drive cell).</p>
 </dd>
 <dt><strong>external_biases</strong><span class="classifier">dict of dict (bias parameters for each cell type)</span></dt><dd><p>The parameters of bias inputs to cell somata, e.g., tonic current clamp</p>
 </dd>
+<dt><strong>connectivity</strong><span class="classifier">list of dict</span></dt><dd><p>List of dictionaries specifying each cell-cell and drive-cell
+connection</p>
+</dd>
+<dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>Firing threshold of all cells.</p>
+</dd>
+<dt><strong>delay</strong><span class="classifier">float</span></dt><dd><p>Synaptic delay in ms.</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -225,6 +232,36 @@ weights and delays within the simulated column</p>
 <dt><strong>seedcore</strong><span class="classifier">int</span></dt><dd><p>Optional initial seed for random number generator (default: 2).</p>
 </dd>
 <dt><strong>distribution</strong><span class="classifier">str</span></dt><dd><p>Must be ‘normal’ (will be deprecated in a future release).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.Network.add_connection">
+<code class="sig-name descname"><span class="pre">add_connection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends connections to connectivity list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>src_gid</strong><span class="classifier">int</span></dt><dd><p>Integer identifying source cell ID.</p>
+</dd>
+<dt><strong>target_gid</strong><span class="classifier">list | range | int</span></dt><dd><p>Integer or list of integers identifying target cell ID.</p>
+</dd>
+<dt><strong>loc</strong><span class="classifier">str</span></dt><dd><p>Location of synapse on target cell. Must be
+‘proximal’, ‘distal’, or ‘soma’. Note that inhibitory synapses
+(receptor=’gabaa’ or ‘gabab’) of L2 pyramidal neurons are only
+valid loc=’soma’.</p>
+</dd>
+<dt><strong>receptor</strong><span class="classifier">str</span></dt><dd><p>Synaptic receptor of connection. Must be one of:
+‘ampa’, ‘nmda’, ‘gabaa’, or ‘gabab’.</p>
+</dd>
+<dt><strong>weight</strong><span class="classifier">float</span></dt><dd><p>Synaptic weight on target cell.</p>
+</dd>
+<dt><strong>delay</strong><span class="classifier">float</span></dt><dd><p>Synaptic delay in ms.</p>
+</dd>
+<dt><strong>lamtha</strong><span class="classifier">float</span></dt><dd><p>Space constant.</p>
 </dd>
 </dl>
 </dd>
@@ -334,6 +371,12 @@ simulation).</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.Network.clear_connectivity">
+<code class="sig-name descname"><span class="pre">clear_connectivity</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.clear_connectivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all connections defined in Network.connectivity_list</p>
 </dd></dl>
 
 <dl class="py method">
