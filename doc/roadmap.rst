@@ -46,7 +46,7 @@ One Year Plan Through 2021
 Modularize HNN code to simplify installation, development and maintenance
 -------------------------------------------------------------------------
 
-We are working to cleaning up and re-organizing the
+We are working on cleaning up and re-organizing the
 underlying code that defines the current distribution of HNN to facilitate
 expansion and community engagement in its use and development. To minimize the
 dependencies that are required to install before contributing to HNN development
@@ -63,8 +63,8 @@ This modularization will entail reorganization and improvements within
 the HNN-core repository and simplification of the HNN-GUI repository in the 
 following steps:
 
--   Following best practice in open-source software design, including continuous integration testing, 
-    develop HNN-core. HNN-core will contain clean and reorganized code, and separate all components that 
+-   Following best practices in open-source software design, including continuous integration testing, 
+    to develop HNN-core. HNN-core will contain clean and reorganized code, and separate all components that 
     interact directly with the NEURON simulator (e.g. cell and network intantiation, external drives, etc..), 
     from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis). 
     **COMPLETED FEB 2021** 
@@ -93,7 +93,7 @@ following steps:
     contain smaller dictionaries of parameters related to different modules of the code.
     See `gh-104`_ for related discussions.
 -   Creation of two modules in the HNN-core, one with parts of the code that interact with 
-    the NEURON simulation of which (``hnn_core.simulator``), and one tha contains post-processing data 
+    the NEURON simulation of which (``hnn_core.simulator``), and one that contains post-processing data 
     analysis and plotting functions (``hnn_core.analysis``).
 
 
