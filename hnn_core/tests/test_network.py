@@ -295,9 +295,14 @@ def test_cell_response(tmpdir):
     assert ("CellResponse | 0 simulation trials" in repr(cell_response))
     # reset clears all recorded variables, but leaves simulation time intact
     assert len(cell_response.times) == len(sim_times)
-    attributes = ['_spike_times', '_spike_gids', '_spike_types',
-                  '_vsoma', '_isoma']
-    for attr in attributes:
+    sim_attributes = ['_spike_times', '_spike_gids', '_spike_types',
+                      '_vsoma', '_isoma']
+    net_attributes = ['_times']  # `Network.__init__` creates these
+    # check that we always know which response attributes are simulated
+    # see #291 for discussion; objective is to keep cell_response size small
+    assert list(cell_response.__dict__.keys()) == \
+        sim_attributes + net_attributes
+    for attr in sim_attributes:  # populated by `simulate_dipole`
         assert len(getattr(cell_response, attr)) == 0  # all lists are empty
 
     # Test recovery of empty spike files
