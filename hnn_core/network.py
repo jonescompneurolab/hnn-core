@@ -11,7 +11,7 @@ from glob import glob
 from copy import deepcopy
 from warnings import warn
 
-from .feed import _drive_cell_event_times
+from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .params import _long_name
@@ -794,7 +794,7 @@ class Network(object):
                 return gidtype
 
     def _get_src_type_and_pos(self, gid):
-        """Source type, position and whether it's a cell or artificial feed"""
+        """Source type, position and whether it's a cell or external drive"""
 
         # get type of cell and pos via gid
         src_type = self.gid_to_type(gid)

@@ -261,7 +261,7 @@ class NetworkBuilder(object):
         # Note that GIDs are already defined in Network.gid_ranges
         # All that's left for NetworkBuilder is then to:
         # - _PC.set_gid2node(gid, rank)
-        # - _PC.cell(gid, nrn_netcon) (or _PC.cell(feed_cell.gid, nrn_netcon))
+        # - _PC.cell(gid, nrn_netcon) (or _PC.cell(drive_cell.gid, nrn_netcon))
 
         # create cells (and create self.origin in create_cells_pyr())
         self.cells = list()
@@ -298,9 +298,9 @@ class NetworkBuilder(object):
 
         record_vsoma = self.net.params['record_vsoma']
         record_isoma = self.net.params['record_isoma']
-        self._create_cells_and_feeds(threshold=self.net.params['threshold'],
-                                     record_vsoma=record_vsoma,
-                                     record_isoma=record_isoma)
+        self._create_cells_and_drives(threshold=self.net.params['threshold'],
+                                      record_vsoma=record_vsoma,
+                                      record_isoma=record_isoma)
 
         self.state_init()
 
@@ -361,14 +361,14 @@ class NetworkBuilder(object):
         # extremely important to get the gids in the right order
         self._gid_list.sort()
 
-    def _create_cells_and_feeds(self, threshold, record_vsoma=False,
-                                record_isoma=False):
-        """Parallel create cells AND external inputs (feeds)
+    def _create_cells_and_drives(self, threshold, record_vsoma=False,
+                                 record_isoma=False):
+        """Parallel create cells AND external drives
 
         NB: _Cell.__init__ calls h.Section -> non-picklable!
         NB: _ArtificialCell.__init__ calls h.*** -> non-picklable!
 
-        These feeds are spike SOURCES but cells are also targets.
+        These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
         type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
@@ -380,7 +380,7 @@ class NetworkBuilder(object):
         for gid in self._gid_list:
             src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
 
-            if is_cell:  # not a feed
+            if is_cell:  # not a drive
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
@@ -417,7 +417,6 @@ class NetworkBuilder(object):
 
     def _connect_celltypes(self):
         """Connect two cell types for a particular receptor."""
-
         net = self.net
         connectivity = self.net.connectivity
 
