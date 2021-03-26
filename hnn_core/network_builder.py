@@ -415,33 +415,8 @@ class NetworkBuilder(object):
                 _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
                 self._drive_cells.append(drive_cell)
 
-    def _connect_celltypes(self, src_type, target_type, loc,
-                           receptor, nc_dict, unique=False,
-                           allow_autapses=True):
-        """Connect two cell types for a particular receptor.
-
-        Parameters
-        ----------
-        src_type : str
-            The source cell type
-        target_type : str
-            The target cell type
-        loc : str
-            If 'proximal' or 'distal', the corresponding
-            dendritic sections from Cell.sect_loc['proximal']
-            or Cell.Sect_loc['distal'] are used
-        receptor : str
-            The receptor.
-        nc_dict : dict
-            The connection dictionary containing keys
-            A_delay, A_weight, lamtha, and threshold.
-        unique : bool
-            If True, each target cell gets one "unique" drive.
-            If False, all src_type cells are connected to
-            all target_type cells.
-        allow_autapses : bool
-            If True, allow connecting neuron to itself.
-        """
+    def _connect_celltypes(self):
+        """Connect two cell types for a particular receptor."""
         net = self.net
         connectivity = self.net.connectivity
 
