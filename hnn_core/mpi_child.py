@@ -7,6 +7,7 @@ This script is called directly from MPIBackend.simulate()
 import sys
 import pickle
 import base64
+from warnings import warn
 from queue import Queue, Empty
 from threading import Thread
 
@@ -15,6 +16,7 @@ from hnn_core.parallel_backends import _extract_data, _extract_data_length
 
 def _enqueue_output(out, queue):
     for line in iter(out.readline, b''):
+        # different from MNE version in that newlines are removed
         line = line.rstrip('\n')
         queue.put(line)
 
@@ -68,21 +70,21 @@ class MPISimulation(object):
             data_length = _extract_data_length(input_str[len(data):],
                                                'net')
             self.input_bytes += data.encode()
-            if len(data) != data_length:
+            if len(data) == data_length:
+                return data_length
+            else:
                 # This is a weird "bug" for which there isn't a good fix.
                 # An eextra 4082 bytes are read from stdin that weren't
                 # put there by the parent process. They extra bytes are
                 # inserted at byte 65535, so it's in the middle of the Network
                 # object. Simply slicing out the 4082 seems to give the correct
                 # object too, but resending is less opaque.
-                print("Got incorrect network size: %d bytes" % len(data))
-                print("expected length: %d" % data_length)
+                warn("Got incorrect network size: %d bytes " % len(data) +
+                     "expected length: %d" % data_length)
 
                 # signal to parent that there was an error with the network
                 sys.stderr.write("@net_receive_error@\n")
                 sys.stderr.flush()
-                return None
-            return data_length
 
         return None
 
@@ -92,7 +94,8 @@ class MPISimulation(object):
         # get parameters from stdin
         if self.rank == 0:
             in_q = Queue()
-            in_t = Thread(target=_enqueue_output, args=(sys.stdin, in_q))
+            in_t = Thread(target=_enqueue_output,
+                          args=(sys.stdin, in_q))
             in_t.daemon = True
             in_t.start()
 
