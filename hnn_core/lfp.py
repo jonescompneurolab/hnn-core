@@ -7,13 +7,13 @@ LFPsim works reliably on biophysically detailed multi-compartmental neurons
 with ion channels in some or all compartments.
 
 Last updated 12-March-2016
-Developed by : 
+Developed by :
 Harilal Parasuram & Shyam Diwakar
 Computational Neuroscience & Neurophysiology Lab, School of Biotechnology, 
 Amrita University, India.
 
 Email: harilalp@am.amrita.edu; shyam@amrita.edu
-www.amrita.edu/compneuro 
+www.amrita.edu/compneuro
 
 translated to Python and modified to use use_fast_imem by Sam Neymotin
 based on mhines code
@@ -64,7 +64,7 @@ class LFPElectrode:
 
     def __init__(self, coord, sigma=3.0, pc=None, method='psa'):
 
-        # see http://jn.physiology.org/content/104/6/3388.long shows table of 
+        # see http://jn.physiology.org/content/104/6/3388.long shows table of
         # values with conductivity
         self.sigma = sigma
         self.coord = coord
@@ -188,7 +188,9 @@ class LFPElectrode:
     def callback(self):
         # print('In lfp callback - pc.id = ',self.pc.id(),' t=',self.pc.t(0))
         self.imem_ptrvec.gather(self.imem_vec)
-        # s = pc.allreduce(imem_vec.sum(), 1) #verify sum i_membrane_ == stimulus
+
+        # verify sum i_membrane_ == stimulus
+        # s = pc.allreduce(imem_vec.sum(), 1)
         # if rank == 0: print pc.t(0), s
 
         # sum up the weighted i_membrane_. Result in vx
