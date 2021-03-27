@@ -337,6 +337,11 @@ class Network(object):
         Firing threshold of all cells.
     delay : float
         Synaptic delay in ms.
+    lfp : list of dict
+        Stores local field potential recordings. Each list element is a
+        dictionary containing the LFP recording (after a simulation is run)
+        as well as information for each electrode. Keys include:
+        'pos', 'sigma', 'method', and 'lfp'.
 
     Notes
     ----
@@ -388,6 +393,8 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
+        self.lfp = list()
+
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self.pos_dict = dict()
@@ -438,6 +445,7 @@ class Network(object):
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
+        net_copy.lfp = list()
         return net_copy
 
     def _update_cells(self):
@@ -1188,6 +1196,35 @@ class Network(object):
                 connectivity.append(conn)
         self.external_drives = dict()
         self.connectivity = connectivity
+
+    def add_electrode(self, electrode_pos, sigma=3.0, method='psa'):
+        """Specify coordinates of electrodes for LFP recording.
+
+        Parameters
+        ----------
+        electrode_pos : tuple | list of tuple
+            Coordinates specifying the position for LFP electrodes in
+            the form of (x, y, z).
+        sigma : float | int
+            Extracellular conductivity in mS/cm (uniform for simplicity)
+        method : str
+            'psa' (default), i.e., point source approximation or line source
+            approximation, i.e., 'lsa'
+        """
+        _validate_type(electrode_pos, (list, tuple), 'electrode_pos')
+        _validate_type(sigma, (float, int), 'sigma')
+        assert sigma > 0.0
+        _validate_type(method, str, 'method')
+        _check_option('method', method, ['psa', 'lsa'])
+        if isinstance(electrode_pos, tuple):
+            electrode_pos = [electrode_pos]
+        for e_pos in electrode_pos:
+            assert len(e_pos) == 3
+            for pos in e_pos:
+                _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
+            electrode_dict = {
+                'data': list(), 'pos': e_pos, 'sigma': sigma, 'method': method}
+            self.lfp.append(electrode_dict)
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
