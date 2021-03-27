@@ -59,10 +59,12 @@ class MPISimulation(object):
 
     def _process_input(self, in_q):
         self.input_bytes = b''
+        data_length = 0
+
         try:
             input_str = in_q.get(timeout=0.01)
         except Empty:
-            return None
+            return data_length
 
         data = _extract_data(input_str, 'net')
         if len(data) > 0:
@@ -73,20 +75,11 @@ class MPISimulation(object):
             if len(data) == data_length:
                 return data_length
             else:
-                # This is a weird "bug" for which there isn't a good fix.
-                # An eextra 4082 bytes are read from stdin that weren't
-                # put there by the parent process. They extra bytes are
-                # inserted at byte 65535, so it's in the middle of the Network
-                # object. Simply slicing out the 4082 seems to give the correct
-                # object too, but resending is less opaque.
-                warn("Got incorrect network size: %d bytes " % len(data) +
-                     "expected length: %d" % data_length)
+                raise ValueError("Got incorrect network size: %d bytes " %
+                                 len(data) + "expected length: %d" %
+                                 data_length)
 
-                # signal to parent that there was an error with the network
-                sys.stderr.write("@net_receive_error@\n")
-                sys.stderr.flush()
-
-        return None
+        return data_length
 
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
@@ -99,11 +92,9 @@ class MPISimulation(object):
             in_t.daemon = True
             in_t.start()
 
-            while True:
-                data_len = self._process_input(in_q)
+            while self._process_input(in_q) == 0:
                 # data is in self.input_bytes
-                if isinstance(data_len, int):
-                    break
+                pass
 
             net = pickle.loads(base64.b64decode(self.input_bytes,
                                                 validate=True))
