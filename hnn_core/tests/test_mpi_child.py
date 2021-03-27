@@ -115,20 +115,13 @@ def test_process_input():
         in_q = Queue()
         in_q.put(data_str)
 
+        expected_string = "Got incorrect network size: %d bytes " % \
+            len(mpi_sim.input_bytes) + "expected length: %d" % \
+            (len(pickled_net) + 1)
+
         # process input from queue
-        with io.StringIO() as buf_err, redirect_stderr(buf_err):
-            with pytest.warns(UserWarning) as record:
-                mpi_sim._process_input(in_q)
-
-                expected_string = "Got incorrect network size: %d bytes " % \
-                    len(mpi_sim.input_bytes) + "expected length: %d" % \
-                    (len(pickled_net) + 1)
-
-            assert len(record) == 1
-            assert record[0].message.args[0] == expected_string
-
-            stderr_str = buf_err.getvalue()
-        assert "@net_receive_error@\n" in stderr_str
+        with pytest.raises(ValueError, match=expected_string):
+            mpi_sim._process_input(in_q)
 
 
 def test_child_run():

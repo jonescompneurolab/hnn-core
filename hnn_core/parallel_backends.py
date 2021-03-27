@@ -301,14 +301,9 @@ class MPIBackend(object):
         The string of the mpi command with number of procs and options
     proc_data_bytes: bytes object
         This will contain data received from the MPI child process via stderr.
-    net_receive_error : bool
-        Whether the child sent us a message that there is an error with the
-        network object this backend sent it. If this gets set, the network
-        object will be resent to the child.
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
         self.proc_data_bytes = b''
-        self.net_receive_error = False
 
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
@@ -442,11 +437,6 @@ class MPIBackend(object):
             err = err.replace('@end_of_data:%d@' % data_length, '')
             self.proc_data_bytes += extracted_data.encode()
 
-        # check for bad network signal
-        if '@net_receive_error@' in err:
-            err = err.replace('@net_receive_error@\n', '')
-            self.net_receive_error = True
-
         # print the rest of the child's stderr to our stdout
         sys.stdout.write(err)
 
@@ -471,7 +461,6 @@ class MPIBackend(object):
             The Dipole results from each simulation trial
         """
         self.proc_data_bytes = b''
-        self.net_receive_error = False
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
@@ -532,11 +521,6 @@ class MPIBackend(object):
             while True:
                 if proc.poll() is not None:
                     do_break = True
-
-                if self.net_receive_error:
-                    warn("Resending network to MPI Child")
-                    self._write_net_to_stream(proc.stdin, pickled_net)
-                    self.net_receive_error = False
 
                 data_len = self._process_output(out_q, err_q)
                 if isinstance(data_len, int):
