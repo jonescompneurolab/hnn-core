@@ -1,5 +1,4 @@
 import os.path as op
-import os
 import io
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
@@ -16,7 +15,7 @@ from hnn_core.parallel_backends import (MPIBackend, _gather_trial_data,
 
 
 def test_process_out_stderr():
-    """Test _process_output for handling stderr, i.e. error messages"""
+    """Test _get_data_from_output for handling stderr, i.e. error messages"""
     # write data to queue
     out_q = Queue()
     err_q = Queue()
@@ -25,14 +24,13 @@ def test_process_out_stderr():
 
     with MPIBackend() as backend:
         with io.StringIO() as buf_out, redirect_stdout(buf_out):
-            data_len = backend._process_output(out_q, err_q)
+            backend._get_data_from_output(out_q, err_q)
             output = buf_out.getvalue()
-        assert data_len is None
         assert output == test_string
 
 
 def test_process_out_stdout():
-    """Test _process_output for handling stdout, i.e. simulation messages"""
+    """Test _get_data_from_output for handling stdout, i.e. status messages"""
     # write data to queue
     out_q = Queue()
     err_q = Queue()
@@ -41,9 +39,8 @@ def test_process_out_stdout():
 
     with MPIBackend() as backend:
         with io.StringIO() as buf_out, redirect_stdout(buf_out):
-            data_len = backend._process_output(out_q, err_q)
+            backend._get_data_from_output(out_q, err_q)
             output = buf_out.getvalue()
-        assert data_len is None
         assert output == test_string
 
 
@@ -161,9 +158,8 @@ def test_child_run():
 
         # use _read_stderr to get data_len (but not the data this time)
         with MPIBackend() as backend:
-            data_len = backend._process_output(out_q, err_q)
-            sim_data = backend._process_child_data(backend.proc_data_bytes,
-                                                   data_len)
+            backend._get_data_from_output(out_q, err_q)
+            sim_data = backend._process_child_data()
         n_trials = 1
         postproc = False
         dpls = _gather_trial_data(sim_data, net_reduced, n_trials, postproc)
@@ -173,11 +169,12 @@ def test_child_run():
 def test_empty_data():
     """Test that an empty string raises RuntimeError"""
     data_bytes = b''
-    expected_len = len(data_bytes)
-    backend = MPIBackend()
-    with pytest.raises(RuntimeError, match="MPI simulation didn't return any "
-                       "data"):
-        backend._process_child_data(data_bytes, expected_len)
+    with MPIBackend() as backend:
+        backend.proc_data_bytes = data_bytes
+        backend.expected_data_length = len(data_bytes)
+        with pytest.raises(RuntimeError, match="MPI simulation didn't return "
+                                               "any data"):
+            backend._process_child_data()
 
 
 def test_data_len_mismatch():
@@ -188,9 +185,11 @@ def test_data_len_mismatch():
 
     expected_len = len(pickled_bytes) + 1
 
-    backend = MPIBackend()
-    with pytest.warns(UserWarning) as record:
-        backend._process_child_data(pickled_bytes, expected_len)
+    with MPIBackend() as backend:
+        backend.proc_data_bytes = pickled_bytes
+        backend.expected_data_length = expected_len
+        with pytest.warns(UserWarning) as record:
+            backend._process_child_data()
 
     expected_string = "Length of received data unexpected. " + \
         "Expecting %d bytes, got %d" % (expected_len, len(pickled_bytes))
