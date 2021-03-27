@@ -11,6 +11,7 @@ from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import _long_name, _short_name
+from .lfp import LFPElectrode
 
 # a few globals
 _PC = None
@@ -77,6 +78,8 @@ def _simulate_single_trial(neuron_net, trial_idx):
     neuron_net.aggregate_data()
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
+    for elec in neuron_net._lfp:
+        elec.pc.allreduce(elec.lfp_v, 1)
 
     # aggregate the currents and voltages independently on each proc
     vsoma_list = _PC.py_gather(neuron_net._vsoma, 0)
@@ -198,6 +201,7 @@ def _create_parallel_context(n_cores=None):
 
         # be explicit about using fixed step integration
         _CVODE.active(0)
+        _CVODE.use_fast_imem(1)
 
         # use cache_efficient mode for allocating elements in contiguous order
         # cvode.cache_efficient(1)
@@ -304,11 +308,12 @@ class NetworkBuilder(object):
 
         self.state_init()
 
-        # set to record spikes and somatic voltages
+        # set to record spikes, somatic voltages, and LFP
         self._spike_times = h.Vector()
         self._spike_gids = h.Vector()
         self._vsoma = dict()
         self._isoma = dict()
+        self._lfp = list()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spike_times = h.Vector()
@@ -318,6 +323,7 @@ class NetworkBuilder(object):
 
         self.move_cells_to_pos()  # position cells in 2D grid
         self._connect_celltypes()
+        self._record_lfp()
 
         if _get_rank() == 0:
             print('[Done]')
@@ -459,6 +465,21 @@ class NetworkBuilder(object):
                     src_gid, nc_dict, target_cell.synapses[syn_key])
                 self.ncs[connection_name].append(nc)
 
+    def _record_lfp(self):
+        method = 'psa'
+        for pos in self.net.lfp_electrode_pos:
+            elec = LFPElectrode(pos, pc=_PC, cvode=_CVODE,
+                                method=method)
+            elec.setup()
+            elec.LFPinit()
+            self._lfp.append(elec)
+
+        # for pos in range(elec_grid.shape[0]):
+        #     elec_list[pos].pc.allreduce(elec_list[pos].lfp_v, 1)
+
+        #     lfp_rec[method][0].append(elec_list[pos].lfp_t.to_python())
+        #     lfp_rec[method][1].append(elec_list[pos].lfp_v.to_python())
+
     # setup spike recording for this node
     def _record_spikes(self):
 
@@ -552,12 +573,19 @@ class NetworkBuilder(object):
             isoma_py[gid] = {key: rec_i.to_python()
                              for key, rec_i in rec_i.items()}
 
+        lfp_py = list()
+        for elec in self._lfp:
+            # elec.pc.allreduce(elec.lfp_v, 1)
+            # lfp_py.append(elec_list[pos].lfp_t.to_python())
+            lfp_py.append(elec.lfp_v.to_python())
+
         from copy import deepcopy
         data = (self._all_spike_times.to_python(),
                 self._all_spike_gids.to_python(),
                 deepcopy(self.net.gid_ranges),
                 deepcopy(vsoma_py),
-                deepcopy(isoma_py))
+                deepcopy(isoma_py),
+                lfp_py)
         return data
 
     def _clear_last_network_objects(self):

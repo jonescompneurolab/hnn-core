@@ -62,7 +62,7 @@ class LFPElectrode:
         The transmembrane ionic current.
     """
 
-    def __init__(self, coord, sigma=3.0, pc=None, method='psa'):
+    def __init__(self, coord, sigma=3.0, pc=None, cvode=None, method='psa'):
 
         # see http://jn.physiology.org/content/104/6/3388.long shows table of
         # values with conductivity
@@ -74,6 +74,7 @@ class LFPElectrode:
         self.imem_vec = None
         self.bscallback = None
         self.fih = None
+        self.cvode = cvode
         self.method = method
 
         if pc is None:
@@ -84,8 +85,8 @@ class LFPElectrode:
     def setup(self):
         """Enables fast calculation of transmembrane current (nA) at
            each segment."""
-        h.cvode.use_fast_imem(1)
-        self.bscallback = h.cvode.extra_scatter_gather(0, self.callback)
+        # h.cvode.use_fast_imem(1)
+        self.bscallback = self.cvode.extra_scatter_gather(0, self.callback)
         fih = h.FInitializeHandler(1, self.LFPinit)
 
     def transfer_resistance(self, exyz, method):
