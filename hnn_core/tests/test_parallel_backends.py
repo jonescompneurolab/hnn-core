@@ -12,7 +12,7 @@ from mne.utils import _fetch_file
 import hnn_core
 from hnn_core import read_params
 from hnn_core import MPIBackend
-from hnn_core.parallel_backends import requires_mpi4py
+from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 # The purpose of this incremental mark is to avoid running the full length
 # simulation when there are failures in previous (faster) tests. When a test
@@ -47,6 +47,7 @@ class TestParallelBackends():
                                dpls_reduced_joblib[trial_idx].data['agg'])
 
     @requires_mpi4py
+    @requires_psutil
     def test_mpi_nprocs(self):
         """Test that MPIBackend can use more than 1 processor"""
         # if only 1 processor is available, then MPIBackend tests will not
@@ -55,6 +56,7 @@ class TestParallelBackends():
         assert backend.n_procs > 1
 
     @requires_mpi4py
+    @requires_psutil
     def test_run_mpibackend(self, run_hnn_core_fixture):
         """Test running a MPIBackend on reduced model"""
         global dpls_reduced_default, dpls_reduced_mpi
@@ -66,6 +68,7 @@ class TestParallelBackends():
                             atol=1e-14)
 
     @requires_mpi4py
+    @requires_psutil
     def test_run_mpibackend_oversubscribed(self, run_hnn_core_fixture):
         """Test running MPIBackend with oversubscribed number of procs"""
         oversubscribed = round(cpu_count() * 1.5)
@@ -123,6 +126,7 @@ class TestParallelBackends():
 # there are no dependencies if this unit tests fails; no need to be in
 # class marked incremental
 @requires_mpi4py
+@requires_psutil
 def test_mpi_failure(run_hnn_core_fixture):
     """Test that an MPI failure is handled and messages are printed"""
     # this MPI paramter will cause a MPI job to fail
