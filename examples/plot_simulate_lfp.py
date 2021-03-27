@@ -1,104 +1,64 @@
 """
-===============
-Simulate LFP
-===============
+==============
+08. Record LFP
+==============
 
-This example demonstrates how to simulate a dipole for evoked-like
-waveforms using HNN-core.
+This example demonstrates how to record local field potentials (LFPs).
 """
 
+# Authors: Nick Tolley <nicholas_tolley@brown.edu>
+#          Mainak Jas <mainakjas@gmail.com>
+
+# sphinx_gallery_thumbnail_number = 3
+
 import os.path as op
-import numpy as np
 
-import matplotlib.pyplot as plt
-import itertools as it
-from glob import glob
-
-from neuron import h
+###############################################################################
+# Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core.tests import test_network, test_dipole
-from hnn_core.network import Spikes, read_spikes
-from hnn_core import lfp    
-
-import matplotlib.pyplot as plt
-
-from hnn_core import JoblibBackend
-from hnn_core import simulate_dipole, read_params, Network, read_spikes, viz
+from hnn_core import read_params, Network, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
+###############################################################################
+# Then we read the parameters file
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 
-net = Network(params)
+###############################################################################
+# We will start with simulating the evoked response from
+# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
+# We first instantiate the network.
+# (Note: Setting ``add_drives_from_params=True`` loads a set of predefined
+# drives without the drives API shown previously).
+net = Network(params, add_drives_from_params=True)
 
 ###############################################################################
-# Let us import hnn_core
+# LFP recordings require specifying the electrode postion. It can be useful
+# to visualize the cells of the network to decide on the placement of each
+# electrode.
+net.plot_cells()
 
-from hnn_core.pyramidal import L5Pyr
-from hnn_core.network_builder import load_custom_mechanisms
+###############################################################################
+# Electrode positions are stored under ``Network.lfp`` as a list
+# of tuples. Once we have chosen x,y,z coordinates for each electrode, we can
+# add them to the simulation.
+electrode_pos = [(2, 2, 400), (6, 6, 800)]
+net.add_electrode(electrode_pos)
+print(net.lfp)
+net.plot_cells()
 
-load_custom_mechanisms()
-cell = L5Pyr()
-soma_pos = [cell.get3dinfo()[idx][0] for idx in range(3)]
-apical_trunk_pos = [cell.get3dinfo()[idx][1] for idx in range(3)]
+###############################################################################
+# Now that our electrodes are specified, we can run the simulation. The LFP
+# recordings are also stored under ``Network.lfp``.
+import matplotlib.pyplot as plt
 
-num_elec = 5
-x_width = [-100,100]
-y_width = [-100,100]
-
-z_pos = 0
-elec_grid = np.array([[c,r,z_pos] for c in np.linspace(x_width[0], x_width[1], num_elec) 
-            for r in np.linspace(y_width[0], y_width[1], num_elec)])
-
-h.load_file("stdgui.hoc")
-h.cvode_active(1)
-
-ns = h.NetStim()
-ns.number = 1
-ns.start = 100
-ns.interval = 50.0
-ns.noise = 0.  # deterministic
-
-nc = h.NetCon(ns, cell.synapses['apicaltuft_ampa'])
-nc.weight[0] = 0.001
-
-h.tstop = 500.0
-lfp_rec = {'lsa': ([], []), 'psa': ([], [])}
-for method in ['lsa', 'psa']:
-    elec_list = []
-    for pos in range(elec_grid.shape[0]):
-        elec = lfp.LFPElectrode(list(elec_grid[pos,:]), pc=h.ParallelContext(),
-                                method=method)
-        elec.setup()
-        elec.LFPinit()
-        elec_list.append(elec)
-
-    h.run()
-    for pos in range(elec_grid.shape[0]):
-        elec_list[pos].pc.allreduce(elec_list[pos].lfp_v, 1)
-
-        lfp_rec[method][0].append(elec_list[pos].lfp_t.to_python()) 
-        lfp_rec[method][1].append(elec_list[pos].lfp_v.to_python())
-
-######
-# Plot results  
-plt.figure(figsize=(5, 5))
-plt.scatter(soma_pos[0], soma_pos[1], s=1000)
-plt.plot(elec_grid[:,0], elec_grid[:, 1], 'ko')
-plt.plot([soma_pos[0], apical_trunk_pos[0]], [soma_pos[1], apical_trunk_pos[1]])
-
-for elec_idx in range(num_elec**2):
-    elec_pos = elec_grid[elec_idx,:]
-    elec_t = lfp_rec['lsa'][0][elec_idx]
-    elec_v = lfp_rec['lsa'][1][elec_idx]
-    elec_v = np.array(elec_v)
-
-    # elec_v_scaled = (elec_v - elec_v[0]) / max(np.abs(np.max(elec_v - elec_v[0])), np.abs(np.min(elec_v - elec_v[0])))
-    elec_v_scaled = (elec_v - elec_v[0])/2
-
-    plot_t = np.linspace(elec_pos[0], elec_pos[0] + 25, len(elec_t))
-    plot_v = (elec_v_scaled * 5) + elec_pos[1]
-
-    plt.plot(plot_t, plot_v)
+dpl = simulate_dipole(net)
+times = dpl[0].times[:-1]
+plt.figure()
+trial_idx = 0
+plt.plot(times, net.lfp[0]['data'][trial_idx])
+plt.plot(times, net.lfp[1]['data'][trial_idx])
+plt.legend([f'e_pos {electrode_pos[0]}', f'e_pos {electrode_pos[1]}'])
+plt.show()
