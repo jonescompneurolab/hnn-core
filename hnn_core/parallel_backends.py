@@ -379,25 +379,28 @@ class MPIBackend(object):
 
         _BACKEND = self._old_backend
 
-    def _process_child_data(self, data_bytes, data_len):
-        if not data_len == len(data_bytes):
+    def _process_child_data(self):
+        # run some checks on data
+        if not self.expected_data_length == len(self.proc_data_bytes):
             # This is indicative of a failure. For debugging purposes.
             warn("Length of received data unexpected. Expecting %d bytes, "
-                 "got %d" % (data_len, len(data_bytes)))
+                 "got %d" % (self.expected_data_length,
+                             len(self.proc_data_bytes)))
 
-        if len(data_bytes) == 0:
+        if len(self.proc_data_bytes) == 0:
             raise RuntimeError("MPI simulation didn't return any data")
 
         # decode base64 byte string
         try:
-            data_pickled = base64.b64decode(data_bytes, validate=True)
+            data_pickled = base64.b64decode(self.proc_data_bytes,
+                                            validate=True)
         except binascii.Error:
             # This is here for future debugging purposes. Unit tests can't
             # reproduce an incorrectly padded string, but this has been an
             # issue before
             raise ValueError("Incorrect padding for data length %d bytes" %
-                             len(data_bytes) + " (mod 4 = %d)" %
-                             (len(data_bytes) % 4))
+                             len(self.expected_data_length) + " (mod 4 = %d)" %
+                             (len(self.expected_data_length) % 4))
 
         # unpickle the data
         return pickle.loads(data_pickled)
@@ -409,10 +412,10 @@ class MPIBackend(object):
         stream.write('@end_of_net:%d@\n' % len(pickled_net))
         stream.flush()
 
-    def _process_output(self, out_q, err_q):
+    def _get_data_from_output(self, out_q, err_q):
         out = ''
         err = ''
-        data_length = None
+        data_complete = False
 
         while True:
             try:
@@ -431,16 +434,21 @@ class MPIBackend(object):
         # check for data signal
         extracted_data = _extract_data(err, 'data')
         if len(extracted_data) > 0:
+            # _extract_data only returns data when signals on
+            # both sides were seen
+            data_complete = True
+
             err = err.replace('@start_of_data@', '')
             err = err.replace(extracted_data, '')
             data_length = _extract_data_length(err, 'data')
             err = err.replace('@end_of_data:%d@' % data_length, '')
-            self.proc_data_bytes += extracted_data.encode()
+            self.proc_data_bytes = extracted_data.encode()
+            self.expected_data_length = data_length
 
         # print the rest of the child's stderr to our stdout
         sys.stdout.write(err)
 
-        return data_length
+        return data_complete
 
     def simulate(self, net, n_trials, postproc=True):
         """Simulate the HNN model in parallel on all cores
@@ -493,7 +501,8 @@ class MPIBackend(object):
         out_q = Queue()
         err_q = Queue()
 
-        # process will read stdin on startup for params
+        timeout = 0
+        threads_started = False
 
         try:
             proc = Popen(cmdargs, stdin=PIPE, stdout=PIPE,
@@ -501,50 +510,47 @@ class MPIBackend(object):
                          universal_newlines=True)
 
             # Send network object to child so it can start
-            self._write_net_to_stream(proc.stdin, pickled_net)
+            try:
+                self._write_net_to_stream(proc.stdin, pickled_net)
+            except BrokenPipeError:
+                # if child failed to start, don't start loop
+                warn("Received BrokenPipeError because child process failed"
+                     " to start. Output from child below:")
+            else:
+                # child seems to be alive at this point b/c we could write
+                # data to it's stdin, so continue
+                event = Event()
+                out_t = Thread(target=_thread_handler,
+                               args=(event, proc.stdout, out_q))
+                err_t = Thread(target=_thread_handler,
+                               args=(event, proc.stderr, err_q))
+                out_t.start()
+                err_t.start()
+                threads_started = True
 
-            data_len = 0
-            timeout = 0
-
-            event = Event()
-            out_t = Thread(target=_thread_handler, args=(event, proc.stdout,
-                                                         out_q))
-            err_t = Thread(target=_thread_handler, args=(event, proc.stderr,
-                                                         err_q))
-            out_t.start()
-            err_t.start()
-
-            do_break = False
-            received_data = False
-            # loop while the process is running
-
-            while True:
-                if proc.poll() is not None:
-                    do_break = True
-
-                data_len = self._process_output(out_q, err_q)
-                if isinstance(data_len, int):
-                    received_data = True
-                    break
-
-                if do_break:
-                    if timeout > 4:
-                        # This is indicative of a failure. For debugging
-                        warn("Timed out (5s) waiting for end of data after "
-                             "child process stopped")
+                # loop while the process is running the simulation
+                while True:
+                    if self._get_data_from_output(out_q, err_q):
                         break
-                    else:
-                        do_break = False
-                        timeout += 1
-                        sleep(1)
+
+                    if proc.poll() is not None:
+                        if timeout > 4:
+                            # This is indicative of a failure. For debugging
+                            warn("Timed out (5s) waiting for end of data "
+                                 "after child process stopped")
+                            break
+                        else:
+                            timeout += 1
+                            sleep(1)
 
         except KeyboardInterrupt:
-            warn("Received KeyboardInterrupt. Stopping simulation process")
+            warn("Received KeyboardInterrupt. Stopping simulation process...")
 
-        # stop the threads
-        event.set()
-        out_t.join()
-        err_t.join()
+        if threads_started:
+            # stop the threads
+            event.set()  # close signal
+            out_t.join()
+            err_t.join()
 
         # wait for the process to terminate. we need use proc.communicate to
         # read any output at its end of life.
@@ -552,7 +558,8 @@ class MPIBackend(object):
             outs, errs = proc.communicate(timeout=1)
         except TimeoutExpired:
             proc.kill()
-            outs, errs = proc.communicate()
+            # wait for output again after kill signal
+            outs, errs = proc.communicate(timeout=1)
 
         sys.stdout.write(outs)
         sys.stdout.write(errs)
@@ -577,9 +584,6 @@ class MPIBackend(object):
             raise RuntimeError("MPI simulation failed. Return code: %d" %
                                proc.returncode)
 
-        if not received_data:
-            raise RuntimeError("MPI simulations didn't return any data")
-
-        sim_data = self._process_child_data(self.proc_data_bytes, data_len)
+        sim_data = self._process_child_data()
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls

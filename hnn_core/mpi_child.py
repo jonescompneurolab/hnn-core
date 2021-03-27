@@ -7,7 +7,6 @@ This script is called directly from MPIBackend.simulate()
 import sys
 import pickle
 import base64
-from warnings import warn
 from queue import Queue, Empty
 from threading import Thread
 
