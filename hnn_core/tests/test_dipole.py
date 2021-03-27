@@ -9,7 +9,7 @@ import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles, Network
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole
-from hnn_core.parallel_backends import requires_mpi4py
+from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 matplotlib.use('agg')
 
@@ -112,6 +112,7 @@ def test_dipole_simulation():
 
 
 @requires_mpi4py
+@requires_psutil
 def test_cell_response_backends(run_hnn_core_fixture):
     """Test cell_response outputs across backends."""
 

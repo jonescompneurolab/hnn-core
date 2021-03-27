@@ -2,82 +2,133 @@ import os.path as op
 import os
 import io
 from contextlib import redirect_stdout, redirect_stderr
-import selectors
+from queue import Queue
+import pickle
+import base64
 
 import pytest
 
 import hnn_core
 from hnn_core import read_params, Network
 from hnn_core.mpi_child import MPISimulation
-from hnn_core.parallel_backends import MPIBackend
+from hnn_core.parallel_backends import (MPIBackend, _gather_trial_data,
+                                        _extract_data, _extract_data_length)
 
 
-def test_read_stderr():
-    """Test the _read_stderr handler for processing data and signals"""
-    (pipe_stderr_r, pipe_stderr_w) = os.pipe()
-    stderr = os.fdopen(pipe_stderr_w, 'w')
-    backend = MPIBackend()
+def test_process_out_stderr():
+    """Test _process_output for handling stderr, i.e. error messages"""
+    # write data to queue
+    out_q = Queue()
+    err_q = Queue()
+    test_string = "this gets printed to stdout"
+    err_q.put(test_string)
 
-    stderr.write("test_data")
-    stderr.flush()
-    backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
-    assert backend.proc_data_bytes == "test_data".encode()
-    backend.proc_data_bytes = b''
-
-    stderr.write("@")
-    stderr.flush()
-    with pytest.raises(ValueError, match="Invalid signal start"):
-        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
-
-    stderr.write("@end_of_data:")
-    stderr.flush()
-    with pytest.raises(ValueError, match="Invalid signal start"):
-        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
-
-    stderr.write("blahblah@end_of_data:100")
-    stderr.flush()
-    # actually invalid end (only match first part of string)
-    with pytest.raises(ValueError, match="Invalid signal start"):
-        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
-
-    stderr.write("@end_of_data:@")
-    stderr.flush()
-    with pytest.raises(ValueError, match="Completion signal from child MPI "
-                       "process did not contain data length."):
-        backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
-
-    stderr.write("blahblah@end_of_data:1000@blah")
-    stderr.flush()
-    data_len = backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
-    assert data_len == 1000
-    assert backend.proc_data_bytes == "blahblahblah".encode()
+    with MPIBackend() as backend:
+        with io.StringIO() as buf_out, redirect_stdout(buf_out):
+            data_len = backend._process_output(out_q, err_q)
+            output = buf_out.getvalue()
+        assert data_len is None
+        assert output == test_string
 
 
-def test_read_stdout():
-    """Test the _read_stdout handler for processing simulation messages"""
-    (pipe_stdout_r, pipe_stdout_w) = os.pipe()
-    stdout = os.fdopen(pipe_stdout_w, 'w')
-    backend = MPIBackend()
+def test_process_out_stdout():
+    """Test _process_output for handling stdout, i.e. simulation messages"""
+    # write data to queue
+    out_q = Queue()
+    err_q = Queue()
+    test_string = "Test output"
+    out_q.put(test_string)
 
-    stdout.write("Test output")
-    stdout.flush()
-    with io.StringIO() as buf_out, redirect_stdout(buf_out):
-        backend._read_stdout(pipe_stdout_r, selectors.EVENT_READ)
-        output = buf_out.getvalue()
-    assert output == "Test output"
+    with MPIBackend() as backend:
+        with io.StringIO() as buf_out, redirect_stdout(buf_out):
+            data_len = backend._process_output(out_q, err_q)
+            output = buf_out.getvalue()
+        assert data_len is None
+        assert output == test_string
 
-    stdout.write("end_of_sim")
-    stdout.flush()
-    signal = backend._read_stdout(pipe_stdout_r, selectors.EVENT_READ)
-    assert signal == "end_of_sim"
 
-    stdout.write("blahend_of_simblahblah")
-    stdout.flush()
-    with io.StringIO() as buf_out, redirect_stdout(buf_out):
-        backend._read_stdout(pipe_stdout_r, selectors.EVENT_READ)
-        output = buf_out.getvalue()
-    assert output == "blahblahblah"
-    assert signal == "end_of_sim"
+def test_extract_data():
+    """Test _extract_data for extraction between signals"""
+
+    # no ending
+    test_string = "@start_of_data@start of data"
+    output = _extract_data(test_string, 'data')
+    assert output == ''
+
+    # valid end, but no start to data
+    test_string = "end of data@end_of_data:11@"
+    output = _extract_data(test_string, 'data')
+    assert output == ''
+
+    test_string = "@start_of_data@all data@end_of_data:8@"
+    output = _extract_data(test_string, 'data')
+    assert output == 'all data'
+
+
+def test_extract_data_length():
+    """Test _extract_data_length for data length in signal"""
+
+    test_string = "end of data@end_of_data:@"
+    with pytest.raises(ValueError, match="Couldn't find data length in "
+                       "string"):
+        _extract_data_length(test_string, 'data')
+
+    test_string = "all data@end_of_data:8@"
+    output = _extract_data_length(test_string, 'data')
+    assert output == 8
+
+
+def test_process_input():
+    """Test reading the network via a Queue"""
+
+    hnn_core_root = op.dirname(hnn_core.__file__)
+
+    # prepare network
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    net = Network(params, add_drives_from_params=True)
+
+    with MPISimulation(skip_mpi_import=True) as mpi_sim:
+        pickled_net = mpi_sim._pickle_data(net)
+
+        data_str = '@start_of_net@' + pickled_net.decode() + \
+            '@end_of_net:%d@\n' % (len(pickled_net))
+
+        # write contents to a Queue
+        in_q = Queue()
+        in_q.put(data_str)
+
+        # process input from queue
+        data_len = mpi_sim._process_input(in_q)
+        assert isinstance(data_len, int)
+
+        # unpickle net
+        received_net = pickle.loads(base64.b64decode(mpi_sim.input_bytes,
+                                                     validate=True))
+        assert isinstance(received_net, Network)
+
+        # muck with the data size in the signal
+        data_str = '@start_of_net@' + pickled_net.decode() + \
+            '@end_of_net:%d@\n' % (len(pickled_net) + 1)
+
+        # write contents to a Queue
+        in_q = Queue()
+        in_q.put(data_str)
+
+        # process input from queue
+        with io.StringIO() as buf_err, redirect_stderr(buf_err):
+            with pytest.warns(UserWarning) as record:
+                mpi_sim._process_input(in_q)
+
+                expected_string = "Got incorrect network size: %d bytes " % \
+                    len(mpi_sim.input_bytes) + "expected length: %d" % \
+                    (len(pickled_net) + 1)
+
+            assert len(record) == 1
+            assert record[0].message.args[0] == expected_string
+
+            stderr_str = buf_err.getvalue()
+        assert "@net_receive_error@\n" in stderr_str
 
 
 def test_child_run():
@@ -102,29 +153,28 @@ def test_child_run():
         with io.StringIO() as buf, redirect_stdout(buf):
             sim_data = mpi_sim.run(net_reduced)
             stdout = buf.getvalue()
-        assert "end_of_sim" in stdout
+        assert "Simulation time:" in stdout
 
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
-            with io.StringIO() as buf_out, redirect_stdout(buf_out):
-                mpi_sim._write_data_stderr(sim_data)
-                stdout = buf_out.getvalue()
+            mpi_sim._write_data_stderr(sim_data)
             stderr_str = buf_err.getvalue()
+        assert "@start_of_data@" in stderr_str
         assert "@end_of_data:" in stderr_str
 
-        # data will be before "@end_of_data:"
-        signal_index_start = stderr_str.rfind('@end_of_data:')
-        data = stderr_str[0:signal_index_start].encode()
-
-        # setup stderr pipe just for signal (with data_len)
-        (pipe_stderr_r, pipe_stderr_w) = os.pipe()
-        stderr_fd = os.fdopen(pipe_stderr_w, 'w')
-        stderr_fd.write(stderr_str[signal_index_start:])
-        stderr_fd.flush()
+        # write data to queue
+        out_q = Queue()
+        err_q = Queue()
+        err_q.put(stderr_str)
 
         # use _read_stderr to get data_len (but not the data this time)
-        backend = MPIBackend()
-        data_len = backend._read_stderr(pipe_stderr_r, selectors.EVENT_READ)
-        sim_data = backend._process_child_data(data, data_len)
+        with MPIBackend() as backend:
+            data_len = backend._process_output(out_q, err_q)
+            sim_data = backend._process_child_data(backend.proc_data_bytes,
+                                                   data_len)
+        n_trials = 1
+        postproc = False
+        dpls = _gather_trial_data(sim_data, net_reduced, n_trials, postproc)
+        assert len(dpls) == 1
 
 
 def test_empty_data():
