@@ -11,16 +11,21 @@ import shlex
 import pickle
 import base64
 from warnings import warn
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 import binascii
 from time import sleep
 from queue import Queue, Empty
-from threading import Thread
-from .externals.mne import _enqueue_output
+from threading import Thread, Event
 
 from psutil import wait_procs, process_iter, NoSuchProcess
 
 _BACKEND = None
+
+
+def _thread_handler(event, out, queue):
+    while not event.isSet():
+        line = out.readline()
+        queue.put(line)
 
 
 def _clone_and_simulate(net, trial_idx):
@@ -92,45 +97,21 @@ def requires_mpi4py(function):
     return pytest.mark.skipif(skip, reason=reason)(function)
 
 
-def _kill_list_of_procs(procs):
-    """tries to terminate processes in a list before sending kill signal"""
-    # try terminate first
-    for p in procs:
-        try:
-            p.terminate()
-        except NoSuchProcess:
-            pass
-    _, alive = wait_procs(procs, timeout=3)
+def requires_psutil(function):
+    """Decorator for testing functions that require psutil."""
+    import pytest
 
-    # now try kill
-    for p in alive:
-        p.kill()
-    _, alive = wait_procs(procs, timeout=3)
-
-    return alive
-
-
-def _get_nrniv_procs_running():
-    """return a list of nrniv processes running"""
-    process_list = []
-    name = 'nrniv'
-    for p in process_iter(attrs=["name", "exe", "cmdline"]):
-        if name == p.info['name'] or \
-                p.info['exe'] and os.path.basename(p.info['exe']) == name or \
-                p.info['cmdline'] and p.info['cmdline'][0] == name:
-            process_list.append(p)
-    return process_list
-
-
-def _kill_and_check_nrniv_procs():
-    """handle killing any stale nrniv processess"""
-    procs = _get_nrniv_procs_running()
-    if len(procs) > 0:
-        running = _kill_list_of_procs(procs)
-        if len(running) > 0:
-            pids = [str(proc.pid) for proc in running]
-            print("ERROR: failed to kill nrniv process(es) %s" %
-                  ','.join(pids))
+    try:
+        import psutil
+        assert hasattr(psutil, '__version__')
+        skip = False
+    except (ImportError, ModuleNotFoundError) as err:
+        if "TRAVIS_OS_NAME" not in os.environ:
+            skip = True
+        else:
+            raise ImportError(err)
+    reason = 'psutil not available'
+    return pytest.mark.skipif(skip, reason=reason)(function)
 
 
 def _extract_data_length(data_str, object_name):
@@ -148,12 +129,77 @@ def _extract_data(data_str, object_name):
     start_match = re.search('@start_of_%s@' % object_name, data_str)
     if start_match is not None:
         start_idx = start_match.end()
+    else:
+        # need start signal
+        return ''
 
     end_match = re.search('@end_of_%s:' % object_name + r'\d+@', data_str)
     if end_match is not None:
         end_idx = end_match.start()
 
     return data_str[start_idx:end_idx]
+
+
+# Next 3 functions are from HNN. Will move here. They require psutil
+def _kill_procs(procs):
+    """Tries to terminate processes in a list before sending kill signal"""
+    # try terminate first
+    for p in procs:
+        try:
+            p.terminate()
+        except NoSuchProcess:
+            pass
+    _, alive = wait_procs(procs, timeout=3)
+
+    # now try kill
+    for p in alive:
+        p.kill()
+    _, alive = wait_procs(procs, timeout=3)
+
+    return alive
+
+
+def _get_procs_running(proc_name):
+    """Return a list of processes currently running"""
+    process_list = []
+    for p in process_iter(attrs=["name", "exe", "cmdline"]):
+        if proc_name == p.info['name'] or \
+                (p.info['exe'] is not None and
+                 os.path.basename(p.info['exe']) == proc_name) or \
+                (p.info['cmdline'] and
+                 p.info['cmdline'][0] == proc_name):
+            process_list.append(p)
+    return process_list
+
+
+def kill_proc_name(proc_name):
+    """Make best effort to kill processes
+
+    Parameters
+    ----------
+    proc_name : str
+        A string to match process names against and kill all matches
+
+    Returns
+    -------
+    killed_procs : bool
+        True if any processes were killed
+    """
+
+    killed_procs = False
+    procs = _get_procs_running(proc_name)
+    if len(procs) > 0:
+        running = _kill_procs(procs)
+        if len(running) > 0:
+            if len(running) < len(procs):
+                killed_procs = True
+            pids = [str(proc.pid) for proc in running]
+            warn("Failed to kill nrniv process(es) %s" %
+                 ','.join(pids))
+        else:
+            killed_procs = True
+
+    return killed_procs
 
 
 class JoblibBackend(object):
@@ -371,7 +417,7 @@ class MPIBackend(object):
     def _process_output(self, out_q, err_q):
         out = ''
         err = ''
-        data_length = 0
+        data_length = None
 
         while True:
             try:
@@ -404,10 +450,7 @@ class MPIBackend(object):
         # print the rest of the child's stderr to our stdout
         sys.stdout.write(err)
 
-        if data_length > 0:
-            return data_length
-
-        return None
+        return data_length
 
     def simulate(self, net, n_trials, postproc=True):
         """Simulate the HNN model in parallel on all cores
@@ -474,10 +517,11 @@ class MPIBackend(object):
             data_len = 0
             timeout = 0
 
-            out_t = Thread(target=_enqueue_output, args=(proc.stdout, out_q))
-            err_t = Thread(target=_enqueue_output, args=(proc.stderr, err_q))
-            out_t.daemon = True
-            err_t.daemon = True
+            event = Event()
+            out_t = Thread(target=_thread_handler, args=(event, proc.stdout,
+                                                         out_q))
+            err_t = Thread(target=_thread_handler, args=(event, proc.stderr,
+                                                         err_q))
             out_t.start()
             err_t.start()
 
@@ -510,28 +554,48 @@ class MPIBackend(object):
                         timeout += 1
                         sleep(1)
 
-            # wait a little if process hasn't fjnished
-
         except KeyboardInterrupt:
             warn("Received KeyboardInterrupt. Stopping simulation process")
-            proc.terminate()
 
-        # wait a maximum of 1s, usually the process has already finished and
-        # this returns immediately
-        proc.wait(1000)
+        # stop the threads
+        event.set()
+        out_t.join()
+        err_t.join()
+
+        # wait for the process to terminate. we need use proc.communicate to
+        # read any output at its end of life.
+        try:
+            outs, errs = proc.communicate(timeout=1)
+        except TimeoutExpired:
+            proc.kill()
+            outs, errs = proc.communicate()
+
+        sys.stdout.write(outs)
+        sys.stdout.write(errs)
 
         # kill orphan nrniv processes if necessary
-        if proc.returncode != 0:
-            _kill_and_check_nrniv_procs()
-            if proc.returncode is None:
-                if not received_data:
-                    raise RuntimeError("MPI simulation failed")
-            else:
-                raise RuntimeError("MPI simulation failed")
+        if not proc.returncode == 0:
+            kill_proc_name('nrniv')
 
-        # If process was terminated, data_len can be None
-        if data_len is not None:
-            sim_data = self._process_child_data(self.proc_data_bytes, data_len)
+        if proc.returncode is None:
+            # It's theoretically possible that we have received data
+            # and exited the loop above, but the child process has not
+            # yet terminated. This is unexpected unless KeyboarInterrupt
+            # is caught
+            proc.terminate()
+            try:
+                proc.wait(1)  # wait maximum of 1s
+            except TimeoutExpired:
+                warn("Could not kill python subprocess: PID %d" % proc.pid)
 
+        if not proc.returncode == 0:
+            # simulation failed with a numeric return code
+            raise RuntimeError("MPI simulation failed. Return code: %d" %
+                               proc.returncode)
+
+        if not received_data:
+            raise RuntimeError("MPI simulations didn't return any data")
+
+        sim_data = self._process_child_data(self.proc_data_bytes, data_len)
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
