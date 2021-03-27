@@ -234,6 +234,9 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
+        self.lfp_electrode_pos = list()
+        self.lfp = list()
+
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self.pos_dict = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
