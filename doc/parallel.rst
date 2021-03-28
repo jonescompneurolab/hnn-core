@@ -76,12 +76,26 @@ Verifies that MPI, NEURON, and Python are all working together.
 
 **Notes for contributors**::
 
-MPI parallelization with NEURON requires that the simulation be launched with the ``nrniv`` binary from the command-line. The ``mpiexec`` command is used to launch multiple ``nrniv`` processes which communicate via MPI. This is done using ``subprocess.Popen()`` in ``MPIBackend.simulate()`` to launch parallel child processes (``MPISimulation``) to carry out the simulation. The communication sequence between ``MPIBackend`` and ``MPISimulation`` is outlined below.
+MPI parallelization with NEURON requires that the simulation be launched with the ``nrniv`` binary
+from the command-line. The ``mpiexec`` command is used to launch multiple ``nrniv`` processes which
+communicate via MPI. This is done using ``subprocess.Popen()`` in ``MPIBackend.simulate()`` to
+launch parallel child processes (``MPISimulation``) to carry out the simulation.
+The communication sequence between ``MPIBackend`` and ``MPISimulation`` is outlined below.
 
-#. In order to pass the network to simulate from ``MPIBackend``, the child ``MPISimulation`` processes' ``stdin`` is used. The ready-to-use `Network` object is pickled and base64 encoded before being written to the child processes' ``stdin`` by way of a Queue in a non-blocking way. See how it is `used in MNE-Python`_. The data is marked by start and end signals that are used to extra the pickled net object. After being unpicked, the parallel simulation begins.
-#. Output from the simulation (either to ``stdout`` or ``stderr``) is communicated back to ``MPIBackend``, where it will be printed to the console. Typical output at this point would be simulation progress messages as well as any MPI warnings/errors during the simulation.
-#. Once the simulation has completed, the child process with rank 0 adds markings to the data for the start and end of the encoded data, including the expected length of data (in bytes) in the end of data marking.
-#. ``MPIBackend`` will look for these markings to know that data is being sent (and will not print this) has completed. It will verify the length of data it receives, printing a ``UserWarning`` if the data length received doesn't match the length part of the marking. At this point, ``MPIBackend`` unpickles the simulation results and returns
+#. In order to pass the network to simulate from ``MPIBackend``, the child ``MPISimulation``
+   processes' ``stdin`` is used. The ready-to-use `Network` object is pickled and base64 encoded
+   before being written to the child processes' ``stdin`` by way of a Queue in a non-blocking way.
+   See how it is `used in MNE-Python`_. The data is marked by start and end signals that are used
+   to extra the pickled net object. After being unpicked, the parallel simulation begins.
+#. Output from the simulation (either to ``stdout`` or ``stderr``) is communicated back
+   to ``MPIBackend``, where it will be printed to the console. Typical output at this point
+   would be simulation progress messages as well as any MPI warnings/errors during the simulation.
+#. Once the simulation has completed, the child process with rank 0 adds markings to the data for the start
+   and end of the encoded data, including the expected length of data (in bytes) in the end of data marking.
+#. ``MPIBackend`` will look for these markings to know that data is being sent (and will not
+   print this) has completed. It will verify the length of data it receives, printing a
+   ``UserWarning`` if the data length received doesn't match the length part of the marking.
+   At this point, ``MPIBackend`` unpickles the simulation results and returns
 
 It is important that ``flush()`` is used whenever data is written to stdin or stderr to ensure that the signal will immediately be available for reading by the other side.
 
