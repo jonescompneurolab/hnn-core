@@ -52,6 +52,7 @@ net.plot_cells()
 import matplotlib.pyplot as plt
 
 dpl = simulate_dipole(net)
-plt.plot(net.lfp[0])
-plt.plot(net.lfp[1])
+times = dpl[0].times[:-1]
+plt.plot(times, net.lfp[0])
+plt.plot(times, net.lfp[1])
 plt.legend([f'e_pos {electrode_pos[0]}', f'e_pos {electrode_pos[1]}'])
