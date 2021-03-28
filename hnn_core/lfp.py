@@ -9,7 +9,7 @@ with ion channels in some or all compartments.
 Last updated 12-March-2016
 Developed by :
 Harilal Parasuram & Shyam Diwakar
-Computational Neuroscience & Neurophysiology Lab, School of Biotechnology, 
+Computational Neuroscience & Neurophysiology Lab, School of Biotechnology,
 Amrita University, India.
 
 Email: harilalp@am.amrita.edu; shyam@amrita.edu
@@ -87,7 +87,7 @@ class LFPElectrode:
            each segment."""
         # h.cvode.use_fast_imem(1)
         self.bscallback = self.cvode.extra_scatter_gather(0, self.callback)
-        fih = h.FInitializeHandler(1, self.LFPinit)
+        # fih = h.FInitializeHandler(1, self.LFPinit)
 
     def transfer_resistance(self, exyz, method):
         """Transfer resistance.
@@ -204,38 +204,3 @@ class LFPElectrode:
         # append to Vector
         self.lfp_t.append(self.pc.t(0))
         self.lfp_v.append(val)
-
-
-if __name__ == '__main__':
-    from hnn_core.pyramidal import L5Pyr
-    from hnn_core.network_builder import load_custom_mechanisms
-
-    load_custom_mechanisms()
-    cell = L5Pyr()
-
-    h.load_file("stdgui.hoc")
-    h.cvode_active(1)
-
-    ns = h.NetStim()
-    ns.number = 10
-    ns.start = 100
-    ns.interval = 50.0
-    ns.noise = 0.  # deterministic
-
-    nc = h.NetCon(ns, cell.synapses['apicaltuft_ampa'])
-    nc.weight[0] = 0.001
-
-    h.tstop = 2000.0
-
-    for method in ['lsa', 'psa']:
-        elec = LFPElectrode([0, 100.0, 100.0], pc=h.ParallelContext(),
-                            method='psa')
-        elec.setup()
-        elec.LFPinit()
-        h.run()
-        elec.pc.allreduce(elec.lfp_v, 1)
-
-        plt.plot(elec.lfp_t.to_python(), elec.lfp_v.to_python(),
-                 label=method)
-    plt.legend()
-    plt.show()
