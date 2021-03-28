@@ -28,6 +28,8 @@ and Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65
 
 from neuron import h
 
+import matplotlib.pyplot as plt
+
 
 def get_all_sections(sec_type='Pyr'):
     ls = h.allsec()
