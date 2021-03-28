@@ -2,8 +2,6 @@ import os.path as op
 import io
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
-import pickle
-import base64
 
 import pytest
 
