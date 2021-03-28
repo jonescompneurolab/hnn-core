@@ -7,7 +7,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network
-from hnn_core.mpi_child import MPISimulation
+from hnn_core.mpi_child import MPISimulation, _pickle_data
 from hnn_core.parallel_backends import (MPIBackend, _gather_trial_data,
                                         _extract_data, _extract_data_length)
 
@@ -84,7 +84,7 @@ def test_str_to_net():
     net = Network(params, add_drives_from_params=True)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
-        pickled_net = mpi_sim._pickle_data(net)
+        pickled_net = _pickle_data(net)
 
         input_str = '@start_of_net@' + pickled_net.decode() + \
             '@end_of_net:%d@\n' % (len(pickled_net))
@@ -164,8 +164,7 @@ def test_empty_data():
 def test_data_len_mismatch():
     """Test that padded data can be unpickled with warning for length """
 
-    with MPISimulation(skip_mpi_import=True) as mpi_sim:
-        pickled_bytes = mpi_sim._pickle_data({})
+    pickled_bytes = _pickle_data({})
 
     expected_len = len(pickled_bytes) + 1
 

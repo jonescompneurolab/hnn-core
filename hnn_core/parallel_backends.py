@@ -201,6 +201,20 @@ def kill_proc_name(proc_name):
     return killed_procs
 
 
+def _write_net(stream, pickled_net):
+    stream.flush()
+    stream.write('@start_of_net@')
+    stream.write(pickled_net.decode())
+    stream.write('@end_of_net:%d@\n' % len(pickled_net))
+    stream.flush()
+
+
+def _write_child_exit_signal(stream):
+    stream.flush()
+    stream.write('@data_received@\n')
+    stream.flush()
+
+
 class JoblibBackend(object):
     """The JoblibBackend class.
 
@@ -408,13 +422,6 @@ class MPIBackend(object):
         # unpickle the data
         return pickle.loads(data_pickled)
 
-    def _write_net_to_stream(self, stream, pickled_net):
-        stream.flush()
-        stream.write('@start_of_net@')
-        stream.write(pickled_net.decode())
-        stream.write('@end_of_net:%d@\n' % len(pickled_net))
-        stream.flush()
-
     def _get_data_from_output(self, out_q, err_q):
         out = ''
         err = ''
@@ -444,7 +451,7 @@ class MPIBackend(object):
             err = err.replace('@start_of_data@', '')
             err = err.replace(extracted_data, '')
             data_length = _extract_data_length(err, 'data')
-            err = err.replace('@end_of_data:%d@' % data_length, '')
+            err = err.replace('@end_of_data:%d@\n' % data_length, '')
             self.proc_data_bytes = extracted_data.encode()
             self.expected_data_length = data_length
 
@@ -511,38 +518,55 @@ class MPIBackend(object):
                          stderr=PIPE, env=my_env, cwd=os.getcwd(),
                          universal_newlines=True)
 
-            # Send network object to child so it can start
-            try:
-                self._write_net_to_stream(proc.stdin, pickled_net)
-            except BrokenPipeError:
-                # if child failed to start, don't start loop
-                warn("Received BrokenPipeError because child process failed"
-                     " to start. Output from child below:")
-            else:
-                # child seems to be alive at this point b/c we could write
-                # data to it's stdin, so continue
-                event = Event()
-                out_t = Thread(target=_thread_handler,
-                               args=(event, proc.stdout, out_q))
-                err_t = Thread(target=_thread_handler,
-                               args=(event, proc.stderr, err_q))
-                out_t.start()
-                err_t.start()
-                threads_started = True
-                data_received = False
+            # set up polling first so all of child's stdout/stderr
+            # gets captured
+            event = Event()
+            out_t = Thread(target=_thread_handler,
+                           args=(event, proc.stdout, out_q))
+            err_t = Thread(target=_thread_handler,
+                           args=(event, proc.stderr, err_q))
+            out_t.start()
+            err_t.start()
+            threads_started = True
+            data_received = False
+            sent_network = False
 
-                # loop while the process is running the simulation
-                while True:
-                    child_terminated = proc.poll() is not None
+            # loop while the process is running the simulation
+            while True:
+                child_terminated = proc.poll() is not None
 
-                    if not data_received:
-                        if self._get_data_from_output(out_q, err_q):
-                            data_received = True
-
-                    if child_terminated and data_received:
-                        # both exit conditions have been met
+                if not data_received:
+                    # look for data in stderr and print child stdout
+                    if self._get_data_from_output(out_q, err_q):
+                        data_received = True
+                        _write_child_exit_signal(proc.stdin)
+                    elif child_terminated:
+                        # child terminated early, but we ran
+                        # _get_data_from_output() above to capture
+                        # any output that was left in queues
+                        warn("Child process failed unexpectedly. Output from"
+                             " child below:")
                         break
 
+                if not sent_network:
+                    # Send network object to child so it can start
+                    try:
+                        _write_net(proc.stdin, pickled_net)
+                    except BrokenPipeError:
+                        # child failed during _write_net(). get the
+                        # output and break out of loop on the next
+                        # iteration
+                        continue
+                    else:
+                        sent_network = True
+                        # This is not the same as "network received", but we
+                        # assume it was successful and move on to waiting for
+                        # data in the next loop iteration.
+
+                if child_terminated and data_received:
+                    # both exit conditions have been met (also we know that
+                    # the network has been sent)
+                    break
         except KeyboardInterrupt:
             warn("Received KeyboardInterrupt. Stopping simulation process...")
 
