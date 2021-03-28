@@ -234,7 +234,7 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
-        self.lfp_electrode_pos = list()
+        self.pos_lfp = list()
         self.lfp = list()
 
         # contents of pos_dict determines all downstream inferences of
@@ -282,6 +282,7 @@ class Network(object):
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
+        net_copy.lfp = list()
         return net_copy
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
@@ -1037,6 +1038,24 @@ class Network(object):
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity_list"""
         self.connectivity = list()
+
+    def add_electrode(self, electrode_pos):
+        """Specify coordinates of electrodes for LFP recording.
+        Parameters
+        ----------
+        electrode_pos : tuple | list of tuple
+            Coordinates specifying the position for LFP electrodes in
+            the form of (x, y, z).
+        """
+        _validate_type(electrode_pos, (list, tuple))
+        if isinstance(electrode_pos, tuple):
+            electrode_pos = [electrode_pos]
+        for e_pos in electrode_pos:
+            assert len(e_pos) == 3
+            for pos in e_pos:
+                _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
+
+        self.pos_lfp.extend(electrode_pos)
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

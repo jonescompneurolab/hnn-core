@@ -467,18 +467,11 @@ class NetworkBuilder(object):
 
     def _record_lfp(self):
         method = 'psa'
-        for pos in self.net.lfp_electrode_pos:
-            elec = LFPElectrode(pos, pc=_PC, cvode=_CVODE,
-                                method=method)
+        for pos in self.net.pos_lfp:
+            elec = LFPElectrode(pos, pc=_PC, cvode=_CVODE, method=method)
             elec.setup()
             elec.LFPinit()
             self._lfp.append(elec)
-
-        # for pos in range(elec_grid.shape[0]):
-        #     elec_list[pos].pc.allreduce(elec_list[pos].lfp_v, 1)
-
-        #     lfp_rec[method][0].append(elec_list[pos].lfp_t.to_python())
-        #     lfp_rec[method][1].append(elec_list[pos].lfp_v.to_python())
 
     # setup spike recording for this node
     def _record_spikes(self):
