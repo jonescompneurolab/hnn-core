@@ -7,12 +7,14 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network
-from hnn_core.mpi_child import MPISimulation, _pickle_data
-from hnn_core.parallel_backends import (MPIBackend, _gather_trial_data,
+from hnn_core.mpi_child import (MPISimulation, _str_to_net, _pickle_data)
+from hnn_core.parallel_backends import (_gather_trial_data,
+                                        _process_child_data,
+                                        _get_data_from_output,
                                         _extract_data, _extract_data_length)
 
 
-def test_process_out_stderr():
+def test_get_data_from_output():
     """Test _get_data_from_output for handling stderr, i.e. error messages"""
     # write data to queue
     out_q = Queue()
@@ -20,11 +22,10 @@ def test_process_out_stderr():
     test_string = "this gets printed to stdout"
     err_q.put(test_string)
 
-    with MPIBackend() as backend:
-        with io.StringIO() as buf_out, redirect_stdout(buf_out):
-            backend._get_data_from_output(out_q, err_q)
-            output = buf_out.getvalue()
-        assert output == test_string
+    with io.StringIO() as buf_out, redirect_stdout(buf_out):
+        _get_data_from_output(out_q, err_q)
+        output = buf_out.getvalue()
+    assert output == test_string
 
 
 def test_process_out_stdout():
@@ -35,11 +36,10 @@ def test_process_out_stdout():
     test_string = "Test output"
     out_q.put(test_string)
 
-    with MPIBackend() as backend:
-        with io.StringIO() as buf_out, redirect_stdout(buf_out):
-            backend._get_data_from_output(out_q, err_q)
-            output = buf_out.getvalue()
-        assert output == test_string
+    with io.StringIO() as buf_out, redirect_stdout(buf_out):
+        _get_data_from_output(out_q, err_q)
+        output = buf_out.getvalue()
+    assert output == test_string
 
 
 def test_extract_data():
@@ -83,26 +83,25 @@ def test_str_to_net():
     params = read_params(params_fname)
     net = Network(params, add_drives_from_params=True)
 
-    with MPISimulation(skip_mpi_import=True) as mpi_sim:
-        pickled_net = _pickle_data(net)
+    pickled_net = _pickle_data(net)
 
-        input_str = '@start_of_net@' + pickled_net.decode() + \
-            '@end_of_net:%d@\n' % (len(pickled_net))
+    input_str = '@start_of_net@' + pickled_net.decode() + \
+        '@end_of_net:%d@\n' % (len(pickled_net))
 
-        received_net = mpi_sim._str_to_net(input_str)
-        assert isinstance(received_net, Network)
+    received_net = _str_to_net(input_str)
+    assert isinstance(received_net, Network)
 
-        # muck with the data size in the signal
-        input_str = '@start_of_net@' + pickled_net.decode() + \
-            '@end_of_net:%d@\n' % (len(pickled_net) + 1)
+    # muck with the data size in the signal
+    input_str = '@start_of_net@' + pickled_net.decode() + \
+        '@end_of_net:%d@\n' % (len(pickled_net) + 1)
 
-        expected_string = "Got incorrect network size: %d bytes " % \
-            len(pickled_net) + "expected length: %d" % \
-            (len(pickled_net) + 1)
+    expected_string = "Got incorrect network size: %d bytes " % \
+        len(pickled_net) + "expected length: %d" % \
+        (len(pickled_net) + 1)
 
-        # process input from queue
-        with pytest.raises(ValueError, match=expected_string):
-            mpi_sim._str_to_net(input_str)
+    # process input from queue
+    with pytest.raises(ValueError, match=expected_string):
+        _str_to_net(input_str)
 
 
 def test_child_run():
@@ -141,9 +140,8 @@ def test_child_run():
         err_q.put(stderr_str)
 
         # use _read_stderr to get data_len (but not the data this time)
-        with MPIBackend() as backend:
-            backend._get_data_from_output(out_q, err_q)
-            sim_data = backend._process_child_data()
+        data_len, data = _get_data_from_output(out_q, err_q)
+        sim_data = _process_child_data(data, data_len)
         n_trials = 1
         postproc = False
         dpls = _gather_trial_data(sim_data, net_reduced, n_trials, postproc)
@@ -153,12 +151,9 @@ def test_child_run():
 def test_empty_data():
     """Test that an empty string raises RuntimeError"""
     data_bytes = b''
-    with MPIBackend() as backend:
-        backend.proc_data_bytes = data_bytes
-        backend.expected_data_length = len(data_bytes)
-        with pytest.raises(RuntimeError, match="MPI simulation didn't return "
-                                               "any data"):
-            backend._process_child_data()
+    with pytest.raises(RuntimeError,
+                       match="MPI simulation didn't return any data"):
+        _process_child_data(data_bytes, len(data_bytes))
 
 
 def test_data_len_mismatch():
@@ -168,11 +163,8 @@ def test_data_len_mismatch():
 
     expected_len = len(pickled_bytes) + 1
 
-    with MPIBackend() as backend:
-        backend.proc_data_bytes = pickled_bytes
-        backend.expected_data_length = expected_len
-        with pytest.warns(UserWarning) as record:
-            backend._process_child_data()
+    with pytest.warns(UserWarning) as record:
+        _process_child_data(pickled_bytes, expected_len)
 
     expected_string = "Length of received data unexpected. " + \
         "Expecting %d bytes, got %d" % (expected_len, len(pickled_bytes))

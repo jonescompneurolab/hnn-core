@@ -20,6 +20,24 @@ def _pickle_data(sim_data):
     return pickled_bytes
 
 
+def _str_to_net(input_str):
+    net = None
+
+    data_str = _extract_data(input_str, 'net')
+    if len(data_str) > 0:
+        # get the size, but start the search after data
+        net_size = _extract_data_length(input_str[len(data_str):],
+                                        'net')
+        # check the size
+        if len(data_str) != net_size:
+            raise ValueError("Got incorrect network size: %d bytes " %
+                             len(data_str) + "expected length: %d" % net_size)
+        # unpickle the net
+        net = pickle.loads(base64.b64decode(data_str.encode(),
+                                            validate=True))
+    return net
+
+
 class MPISimulation(object):
     """The MPISimulation class.
     Parameters
@@ -53,24 +71,6 @@ class MPISimulation(object):
             from mpi4py import MPI
             MPI.Finalize()
 
-    def _str_to_net(self, input_str):
-        net = None
-
-        data_str = _extract_data(input_str, 'net')
-        if len(data_str) > 0:
-            # get the size, but start the search after data
-            net_size = _extract_data_length(input_str[len(data_str):],
-                                            'net')
-            # check the size
-            if len(data_str) != net_size:
-                raise ValueError("Got incorrect network size: %d bytes " %
-                                 len(data_str) + "expected length: %d" %
-                                 net_size)
-            # unpickle the net
-            net = pickle.loads(base64.b64decode(data_str.encode(),
-                                                validate=True))
-        return net
-
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
 
@@ -85,7 +85,7 @@ class MPISimulation(object):
                 if end_match is not None:
                     break
 
-            net = self._str_to_net(input_str)
+            net = _str_to_net(input_str)
         else:
             net = None
 

@@ -79,6 +79,220 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     return dpls
 
 
+def _get_mpi_env():
+    """Set some MPI environment variables."""
+    my_env = os.environ.copy()
+    if 'win' not in sys.platform:
+        my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
+
+    if 'darwin' in sys.platform:
+        my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
+        my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
+    return my_env
+
+
+def run_subprocess(command, obj, timeout, *args, **kwargs):
+    """Run process and communicate with it.
+    Parameters
+    ----------
+    command : list of str | str
+        Command to run as subprocess (see subprocess.Popen documentation).
+    obj : object
+        The object to write to stdin after starting child process
+        with MPI command.
+    timeout : float
+        The number of seconds to wait after process ends.
+    *args, **kwargs : arguments
+        Additional arguments to pass to subprocess.Popen.
+    Returns
+    -------
+    child_data : object
+        The data returned by the child process.
+    """
+    proc_data_bytes = b''
+
+    pickled_obj = base64.b64encode(pickle.dumps(obj))
+
+    # non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501
+    out_q = Queue()
+    err_q = Queue()
+
+    threads_started = False
+
+    try:
+        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args,
+                     **kwargs)
+
+        # set up polling first so all of child's stdout/stderr
+        # gets captured
+        event = Event()
+        out_t = Thread(target=_thread_handler,
+                       args=(event, proc.stdout, out_q))
+        err_t = Thread(target=_thread_handler,
+                       args=(event, proc.stderr, err_q))
+        out_t.start()
+        err_t.start()
+        threads_started = True
+        data_received = False
+        sent_network = False
+
+        # loop while the process is running the simulation
+        while True:
+            child_terminated = proc.poll() is not None
+
+            if not data_received:
+                # look for data in stderr and print child stdout
+                data_len, proc_data_bytes = _get_data_from_output(out_q, err_q)
+                if data_len > 0:
+                    data_received = True
+                    _write_child_exit_signal(proc.stdin)
+                elif child_terminated:
+                    # child terminated early, but we ran
+                    # _get_data_from_output() above to capture
+                    # any output that was left in queues
+                    warn("Child process failed unexpectedly. Output from"
+                         " child below:")
+                    break
+
+            if not sent_network:
+                # Send network object to child so it can start
+                try:
+                    _write_net(proc.stdin, pickled_obj)
+                except BrokenPipeError:
+                    # child failed during _write_net(). get the
+                    # output and break out of loop on the next
+                    # iteration
+                    continue
+                else:
+                    sent_network = True
+                    # This is not the same as "network received", but we
+                    # assume it was successful and move on to waiting for
+                    # data in the next loop iteration.
+
+            if child_terminated and data_received:
+                # both exit conditions have been met (also we know that
+                # the network has been sent)
+                break
+    except KeyboardInterrupt:
+        warn("Received KeyboardInterrupt. Stopping simulation process...")
+
+    if threads_started:
+        # stop the threads
+        event.set()  # close signal
+        out_t.join()
+        err_t.join()
+
+    # wait for the process to terminate. we need use proc.communicate to
+    # read any output at its end of life.
+    try:
+        outs, errs = proc.communicate(timeout=1)
+    except TimeoutExpired:
+        proc.kill()
+        # wait for output again after kill signal
+        outs, errs = proc.communicate(timeout=1)
+
+    sys.stdout.write(outs)
+    sys.stdout.write(errs)
+
+    # kill orphan nrniv processes if necessary
+    if not proc.returncode == 0:
+        kill_proc_name('nrniv')
+
+    if proc.returncode is None:
+        # It's theoretically possible that we have received data
+        # and exited the loop above, but the child process has not
+        # yet terminated. This is unexpected unless KeyboarInterrupt
+        # is caught
+        proc.terminate()
+        try:
+            proc.wait(1)  # wait maximum of 1s
+        except TimeoutExpired:
+            warn("Could not kill python subprocess: PID %d" % proc.pid)
+
+    if not proc.returncode == 0:
+        # simulation failed with a numeric return code
+        raise RuntimeError("MPI simulation failed. Return code: %d" %
+                           proc.returncode)
+
+    child_data = _process_child_data(proc_data_bytes, data_len)
+
+    return child_data
+
+
+def _process_child_data(data_bytes, data_len):
+    """Process the data returned by child process.
+
+    Parameters
+    ----------
+    data_bytes : str
+        The data bytes
+
+    Returns
+    -------
+    data_unpickled : object
+        The unpickled data.
+    """
+    if not data_len == len(data_bytes):
+        # This is indicative of a failure. For debugging purposes.
+        warn("Length of received data unexpected. Expecting %d bytes, "
+             "got %d" % (data_len, len(data_bytes)))
+
+    if len(data_bytes) == 0:
+        raise RuntimeError("MPI simulation didn't return any data")
+
+    # decode base64 byte string
+    try:
+        data_pickled = base64.b64decode(data_bytes, validate=True)
+    except binascii.Error:
+        # This is here for future debugging purposes. Unit tests can't
+        # reproduce an incorrectly padded string, but this has been an
+        # issue before
+        raise ValueError("Incorrect padding for data length %d bytes" %
+                         len(data_len) + " (mod 4 = %d)" %
+                         (len(data_len) % 4))
+
+    # unpickle the data
+    return pickle.loads(data_pickled)
+
+
+def _get_data_from_output(out_q, err_q):
+    out = ''
+    err = ''
+    data_length = 0
+    data_bytes = b''
+
+    while True:
+        try:
+            out = out_q.get(timeout=0.01)
+        except Empty:
+            break
+        else:
+            sys.stdout.write(out)
+
+    while True:
+        try:
+            err += err_q.get(timeout=0.01)
+        except Empty:
+            break
+
+    # check for data signal
+    extracted_data = _extract_data(err, 'data')
+    if len(extracted_data) > 0:
+        # _extract_data only returns data when signals on
+        # both sides were seen
+
+        err = err.replace('@start_of_data@', '')
+        err = err.replace(extracted_data, '')
+        data_length = _extract_data_length(err, 'data')
+        err = err.replace('@end_of_data:%d@\n' % data_length, '')
+        data_bytes = extracted_data.encode()
+
+    # print the rest of the child's stderr to our stdout
+    sys.stdout.write(err)
+
+    return data_length, data_bytes
+
+
 def requires_mpi4py(function):
     """Decorator for testing functions that require MPI."""
     import pytest
@@ -310,16 +524,13 @@ class MPIBackend(object):
         can be less than the user specified value if limited by the cores on
         the system, the number of cores allowed by the job scheduler, or
         if mpi4py could not be loaded.
-    mpi_cmd_str : str
-        The string of the mpi command with number of procs and options
-    proc_data_bytes: bytes object
-        This will contain data received from the MPI child process via stderr.
+    mpi_cmd: list of str
+        The mpi command with number of procs and options to be passed to Popen
     expected_data_length : int
         Used to check consistency between data that was sent and what
         MPIBackend received.
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
-        self.proc_data_bytes = b''
         self.expected_data_length = 0
 
         n_logical_cores = multiprocessing.cpu_count()
@@ -362,7 +573,7 @@ class MPIBackend(object):
             warn('mpi4py not installed. will run on single processor')
             self.n_procs = 1
 
-        self.mpi_cmd_str = mpi_cmd
+        self.mpi_cmd = mpi_cmd
 
         if self.n_procs == 1:
             print("Backend will use 1 core. Running simulation without MPI")
@@ -371,17 +582,24 @@ class MPIBackend(object):
             print("MPI will run over %d processes" % (self.n_procs))
 
         if hyperthreading:
-            self.mpi_cmd_str += ' --use-hwthread-cpus'
+            self.mpi_cmd += ' --use-hwthread-cpus'
 
         if oversubscribe:
-            self.mpi_cmd_str += ' --oversubscribe'
+            self.mpi_cmd += ' --oversubscribe'
 
-        self.mpi_cmd_str += ' -np ' + str(self.n_procs)
+        self.mpi_cmd += ' -np ' + str(self.n_procs)
 
-        self.mpi_cmd_str += ' nrniv -python -mpi -nobanner ' + \
+        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
+
+        # Split the command into shell arguments for passing to Popen
+        if 'win' in sys.platform:
+            use_posix = True
+        else:
+            use_posix = False
+        self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
 
     def __enter__(self):
         global _BACKEND
@@ -395,70 +613,6 @@ class MPIBackend(object):
         global _BACKEND
 
         _BACKEND = self._old_backend
-
-    def _process_child_data(self):
-        # run some checks on data
-        if not self.expected_data_length == len(self.proc_data_bytes):
-            # This is indicative of a failure. For debugging purposes.
-            warn("Length of received data unexpected. Expecting %d bytes, "
-                 "got %d" % (self.expected_data_length,
-                             len(self.proc_data_bytes)))
-
-        if len(self.proc_data_bytes) == 0:
-            raise RuntimeError("MPI simulation didn't return any data")
-
-        # decode base64 byte string
-        try:
-            data_pickled = base64.b64decode(self.proc_data_bytes,
-                                            validate=True)
-        except binascii.Error:
-            # This is here for future debugging purposes. Unit tests can't
-            # reproduce an incorrectly padded string, but this has been an
-            # issue before
-            raise ValueError("Incorrect padding for data length %d bytes" %
-                             len(self.expected_data_length) + " (mod 4 = %d)" %
-                             (len(self.expected_data_length) % 4))
-
-        # unpickle the data
-        return pickle.loads(data_pickled)
-
-    def _get_data_from_output(self, out_q, err_q):
-        out = ''
-        err = ''
-        data_complete = False
-
-        while True:
-            try:
-                out = out_q.get(timeout=0.01)
-            except Empty:
-                break
-            else:
-                sys.stdout.write(out)
-
-        while True:
-            try:
-                err += err_q.get(timeout=0.01)
-            except Empty:
-                break
-
-        # check for data signal
-        extracted_data = _extract_data(err, 'data')
-        if len(extracted_data) > 0:
-            # _extract_data only returns data when signals on
-            # both sides were seen
-            data_complete = True
-
-            err = err.replace('@start_of_data@', '')
-            err = err.replace(extracted_data, '')
-            data_length = _extract_data_length(err, 'data')
-            err = err.replace('@end_of_data:%d@\n' % data_length, '')
-            self.proc_data_bytes = extracted_data.encode()
-            self.expected_data_length = data_length
-
-        # print the rest of the child's stderr to our stdout
-        sys.stdout.write(err)
-
-        return data_complete
 
     def simulate(self, net, n_trials, postproc=True):
         """Simulate the HNN model in parallel on all cores
@@ -478,8 +632,6 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-        self.proc_data_bytes = b''
-
         # just use the joblib backend for a single core
         if self.n_procs == 1:
             return JoblibBackend(n_jobs=1).simulate(net, n_trials=n_trials,
@@ -488,126 +640,11 @@ class MPIBackend(object):
         print("Running %d trials..." % (n_trials))
         dpls = []
 
-        # Split the command into shell arguments for passing to Popen
-        if 'win' in sys.platform:
-            use_posix = True
-        else:
-            use_posix = False
+        env = _get_mpi_env()
 
-        cmdargs = shlex.split(self.mpi_cmd_str, posix=use_posix)
+        sim_data = run_subprocess(command=self.mpi_cmd, obj=net, timeout=4,
+                                  env=env, cwd=os.getcwd(),
+                                  universal_newlines=True)
 
-        pickled_net = base64.b64encode(pickle.dumps(net))
-
-        # set some MPI environment variables
-        my_env = os.environ.copy()
-        if 'win' not in sys.platform:
-            my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
-
-        if 'darwin' in sys.platform:
-            my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
-            my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
-
-        # non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501
-        out_q = Queue()
-        err_q = Queue()
-
-        threads_started = False
-
-        try:
-            proc = Popen(cmdargs, stdin=PIPE, stdout=PIPE,
-                         stderr=PIPE, env=my_env, cwd=os.getcwd(),
-                         universal_newlines=True)
-
-            # set up polling first so all of child's stdout/stderr
-            # gets captured
-            event = Event()
-            out_t = Thread(target=_thread_handler,
-                           args=(event, proc.stdout, out_q))
-            err_t = Thread(target=_thread_handler,
-                           args=(event, proc.stderr, err_q))
-            out_t.start()
-            err_t.start()
-            threads_started = True
-            data_received = False
-            sent_network = False
-
-            # loop while the process is running the simulation
-            while True:
-                child_terminated = proc.poll() is not None
-
-                if not data_received:
-                    # look for data in stderr and print child stdout
-                    if self._get_data_from_output(out_q, err_q):
-                        data_received = True
-                        _write_child_exit_signal(proc.stdin)
-                    elif child_terminated:
-                        # child terminated early, but we ran
-                        # _get_data_from_output() above to capture
-                        # any output that was left in queues
-                        warn("Child process failed unexpectedly. Output from"
-                             " child below:")
-                        break
-
-                if not sent_network:
-                    # Send network object to child so it can start
-                    try:
-                        _write_net(proc.stdin, pickled_net)
-                    except BrokenPipeError:
-                        # child failed during _write_net(). get the
-                        # output and break out of loop on the next
-                        # iteration
-                        continue
-                    else:
-                        sent_network = True
-                        # This is not the same as "network received", but we
-                        # assume it was successful and move on to waiting for
-                        # data in the next loop iteration.
-
-                if child_terminated and data_received:
-                    # both exit conditions have been met (also we know that
-                    # the network has been sent)
-                    break
-        except KeyboardInterrupt:
-            warn("Received KeyboardInterrupt. Stopping simulation process...")
-
-        if threads_started:
-            # stop the threads
-            event.set()  # close signal
-            out_t.join()
-            err_t.join()
-
-        # wait for the process to terminate. we need use proc.communicate to
-        # read any output at its end of life.
-        try:
-            outs, errs = proc.communicate(timeout=1)
-        except TimeoutExpired:
-            proc.kill()
-            # wait for output again after kill signal
-            outs, errs = proc.communicate(timeout=1)
-
-        sys.stdout.write(outs)
-        sys.stdout.write(errs)
-
-        # kill orphan nrniv processes if necessary
-        if not proc.returncode == 0:
-            kill_proc_name('nrniv')
-
-        if proc.returncode is None:
-            # It's theoretically possible that we have received data
-            # and exited the loop above, but the child process has not
-            # yet terminated. This is unexpected unless KeyboarInterrupt
-            # is caught
-            proc.terminate()
-            try:
-                proc.wait(1)  # wait maximum of 1s
-            except TimeoutExpired:
-                warn("Could not kill python subprocess: PID %d" % proc.pid)
-
-        if not proc.returncode == 0:
-            # simulation failed with a numeric return code
-            raise RuntimeError("MPI simulation failed. Return code: %d" %
-                               proc.returncode)
-
-        sim_data = self._process_child_data()
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
