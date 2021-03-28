@@ -75,7 +75,7 @@ def test_extract_data_length():
     assert output == 8
 
 
-def test_process_input():
+def test_str_to_net():
     """Test reading the network via a Queue"""
 
     hnn_core_root = op.dirname(hnn_core.__file__)
@@ -96,7 +96,7 @@ def test_process_input():
         in_q.put(data_str)
 
         # process input from queue
-        data_len = mpi_sim._process_input(in_q)
+        data_len = mpi_sim._str_to_net(in_q)
         assert isinstance(data_len, int)
 
         # unpickle net
@@ -118,7 +118,7 @@ def test_process_input():
 
         # process input from queue
         with pytest.raises(ValueError, match=expected_string):
-            mpi_sim._process_input(in_q)
+            mpi_sim._str_to_net(in_q)
 
 
 def test_child_run():

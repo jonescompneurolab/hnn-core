@@ -52,8 +52,8 @@ class TestParallelBackends():
         """Test that MPIBackend can use more than 1 processor"""
         # if only 1 processor is available, then MPIBackend tests will not
         # be valid
-        backend = MPIBackend()
-        assert backend.n_procs > 1
+        with MPIBackend() as backend:
+            assert backend.n_procs > 1
 
     @requires_mpi4py
     @requires_psutil
