@@ -33,6 +33,8 @@ class MPISimulation(object):
         The handle used for communicating among MPI processes
     rank : int
         The rank for each processor part of the MPI communicator
+    input_bytes : str
+        The input bytes to be converted to Network object.
     """
 
     def __init__(self, skip_mpi_import=False):
@@ -56,29 +58,27 @@ class MPISimulation(object):
             from mpi4py import MPI
             MPI.Finalize()
 
-    def _process_input(self, in_q):
+    def _str_to_net(self, in_q):
         self.input_bytes = b''
-        data_length = 0
+        net_size = 0
 
         try:
             input_str = in_q.get(timeout=0.01)
         except Empty:
-            return data_length
+            return net_size
 
-        data = _extract_data(input_str, 'net')
-        if len(data) > 0:
+        net_unpickled = _extract_data(input_str, 'net')
+        if len(net_unpickled) > 0:
             # start the search after data
-            data_length = _extract_data_length(input_str[len(data):],
-                                               'net')
-            self.input_bytes += data.encode()
-            if len(data) == data_length:
-                return data_length
-            else:
+            net_size = _extract_data_length(input_str[len(net_unpickled):],
+                                            'net')
+            self.input_bytes += net_unpickled.encode()
+            if len(net_unpickled) != net_size:
                 raise ValueError("Got incorrect network size: %d bytes " %
-                                 len(data) + "expected length: %d" %
-                                 data_length)
+                                 len(net_unpickled) + "expected length: %d" %
+                                 net_size)
 
-        return data_length
+        return net_size
 
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
@@ -91,7 +91,7 @@ class MPISimulation(object):
             in_t.daemon = True
             in_t.start()
 
-            while self._process_input(in_q) == 0:
+            while self._str_to_net(in_q) == 0:
                 # data is in self.input_bytes
                 pass
 
