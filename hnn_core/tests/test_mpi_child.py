@@ -76,7 +76,7 @@ def test_extract_data_length():
 
 
 def test_str_to_net():
-    """Test reading the network via a Queue"""
+    """Test reading the network via a string"""
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -88,37 +88,23 @@ def test_str_to_net():
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         pickled_net = mpi_sim._pickle_data(net)
 
-        data_str = '@start_of_net@' + pickled_net.decode() + \
+        input_str = '@start_of_net@' + pickled_net.decode() + \
             '@end_of_net:%d@\n' % (len(pickled_net))
 
-        # write contents to a Queue
-        in_q = Queue()
-        in_q.put(data_str)
-
-        # process input from queue
-        data_len = mpi_sim._str_to_net(in_q)
-        assert isinstance(data_len, int)
-
-        # unpickle net
-        received_net = pickle.loads(base64.b64decode(mpi_sim.input_bytes,
-                                                     validate=True))
+        received_net = mpi_sim._str_to_net(input_str)
         assert isinstance(received_net, Network)
 
         # muck with the data size in the signal
-        data_str = '@start_of_net@' + pickled_net.decode() + \
+        input_str = '@start_of_net@' + pickled_net.decode() + \
             '@end_of_net:%d@\n' % (len(pickled_net) + 1)
 
-        # write contents to a Queue
-        in_q = Queue()
-        in_q.put(data_str)
-
         expected_string = "Got incorrect network size: %d bytes " % \
-            len(mpi_sim.input_bytes) + "expected length: %d" % \
+            len(pickled_net) + "expected length: %d" % \
             (len(pickled_net) + 1)
 
         # process input from queue
         with pytest.raises(ValueError, match=expected_string):
-            mpi_sim._str_to_net(in_q)
+            mpi_sim._str_to_net(input_str)
 
 
 def test_child_run():
