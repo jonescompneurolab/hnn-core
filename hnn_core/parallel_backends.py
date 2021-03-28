@@ -300,9 +300,13 @@ class MPIBackend(object):
         The string of the mpi command with number of procs and options
     proc_data_bytes: bytes object
         This will contain data received from the MPI child process via stderr.
+    expected_data_length : int
+        Used to check consistency between data that was sent and what
+        MPIBackend received.
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
         self.proc_data_bytes = b''
+        self.expected_data_length = 0
 
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
@@ -525,17 +529,18 @@ class MPIBackend(object):
                 out_t.start()
                 err_t.start()
                 threads_started = True
+                data_received = False
 
                 # loop while the process is running the simulation
                 while True:
-                    do_break = proc.poll() is not None
+                    child_terminated = proc.poll() is not None
 
-                    self._get_data_from_output(out_q, err_q)
-                    # Note that data may be received, but waiting on
-                    # proc.poll() ensures that the child process has properly
-                    # terminated
+                    if not data_received:
+                        if self._get_data_from_output(out_q, err_q):
+                            data_received = True
 
-                    if do_break:
+                    if child_terminated and data_received:
+                        # both exit conditions have been met
                         break
 
         except KeyboardInterrupt:
