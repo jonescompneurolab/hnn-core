@@ -7,17 +7,9 @@ This script is called directly from MPIBackend.simulate()
 import sys
 import pickle
 import base64
-from queue import Queue, Empty
-from threading import Thread
+import re
 
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
-
-
-def _enqueue_output(out, queue):
-    for line in iter(out.readline, b''):
-        # different from MNE version in that newlines are removed
-        line = line.rstrip('\n')
-        queue.put(line)
 
 
 class MPISimulation(object):
@@ -33,13 +25,9 @@ class MPISimulation(object):
         The handle used for communicating among MPI processes
     rank : int
         The rank for each processor part of the MPI communicator
-    input_bytes : str
-        The input bytes to be converted to Network object.
     """
 
     def __init__(self, skip_mpi_import=False):
-        self.input_bytes = b''
-
         self.skip_mpi_import = skip_mpi_import
         if skip_mpi_import:
             self.rank = 0
@@ -58,45 +46,39 @@ class MPISimulation(object):
             from mpi4py import MPI
             MPI.Finalize()
 
-    def _str_to_net(self, in_q):
-        self.input_bytes = b''
-        net_size = 0
+    def _str_to_net(self, input_str):
+        net = None
 
-        try:
-            input_str = in_q.get(timeout=0.01)
-        except Empty:
-            return net_size
-
-        net_unpickled = _extract_data(input_str, 'net')
-        if len(net_unpickled) > 0:
-            # start the search after data
-            net_size = _extract_data_length(input_str[len(net_unpickled):],
+        data_str = _extract_data(input_str, 'net')
+        if len(data_str) > 0:
+            # get the size, but start the search after data
+            net_size = _extract_data_length(input_str[len(data_str):],
                                             'net')
-            self.input_bytes += net_unpickled.encode()
-            if len(net_unpickled) != net_size:
+            # check the size
+            if len(data_str) != net_size:
                 raise ValueError("Got incorrect network size: %d bytes " %
-                                 len(net_unpickled) + "expected length: %d" %
+                                 len(data_str) + "expected length: %d" %
                                  net_size)
-
-        return net_size
+            # unpickle the net
+            net = pickle.loads(base64.b64decode(data_str.encode(),
+                                                validate=True))
+        return net
 
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
 
-        # get parameters from stdin
+        # read Network from stdin
         if self.rank == 0:
-            in_q = Queue()
-            in_t = Thread(target=_enqueue_output,
-                          args=(sys.stdin, in_q))
-            in_t.daemon = True
-            in_t.start()
+            input_str = ''
+            while True:
+                line = sys.stdin.readline()
+                line = line.rstrip('\n')
+                input_str += line
+                end_match = re.search(r'@end_of_net:\d+@', line)
+                if end_match is not None:
+                    break
 
-            while self._str_to_net(in_q) == 0:
-                # data is in self.input_bytes
-                pass
-
-            net = pickle.loads(base64.b64decode(self.input_bytes,
-                                                validate=True))
+            net = self._str_to_net(input_str)
         else:
             net = None
 
