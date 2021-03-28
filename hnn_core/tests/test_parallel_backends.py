@@ -132,17 +132,11 @@ def test_mpi_failure(run_hnn_core_fixture):
     # this MPI paramter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
-    with pytest.warns(UserWarning) as record:
-        with io.StringIO() as buf, redirect_stdout(buf):
-            with pytest.raises(RuntimeError, match="MPI simulation failed"):
-                run_hnn_core_fixture(backend='mpi', reduced=True)
-            stdout = buf.getvalue()
+    with io.StringIO() as buf, redirect_stdout(buf):
+        with pytest.raises(RuntimeError, match="MPI simulation failed"):
+            run_hnn_core_fixture(backend='mpi', reduced=True)
+        stdout = buf.getvalue()
 
     assert "MPI processes are unable to reach each other" in stdout
-
-    expected_string = "Timed out (5s) waiting for end of data " + \
-        "after child process stopped"
-    assert len(record) == 1
-    assert record[0].message.args[0] == expected_string
 
     del environ["OMPI_MCA_btl"]

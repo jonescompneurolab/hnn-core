@@ -13,7 +13,6 @@ import base64
 from warnings import warn
 from subprocess import Popen, PIPE, TimeoutExpired
 import binascii
-from time import sleep
 from queue import Queue, Empty
 from threading import Thread, Event
 
@@ -501,7 +500,6 @@ class MPIBackend(object):
         out_q = Queue()
         err_q = Queue()
 
-        timeout = 0
         threads_started = False
 
         try:
@@ -530,18 +528,15 @@ class MPIBackend(object):
 
                 # loop while the process is running the simulation
                 while True:
-                    if self._get_data_from_output(out_q, err_q):
-                        break
+                    do_break = proc.poll() is not None
 
-                    if proc.poll() is not None:
-                        if timeout > 4:
-                            # This is indicative of a failure. For debugging
-                            warn("Timed out (5s) waiting for end of data "
-                                 "after child process stopped")
-                            break
-                        else:
-                            timeout += 1
-                            sleep(1)
+                    self._get_data_from_output(out_q, err_q)
+                    # Note that data may be received, but waiting on
+                    # proc.poll() ensures that the child process has properly
+                    # terminated
+
+                    if do_break:
+                        break
 
         except KeyboardInterrupt:
             warn("Received KeyboardInterrupt. Stopping simulation process...")
