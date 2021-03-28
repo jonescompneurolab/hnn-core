@@ -97,7 +97,12 @@ The communication sequence between ``MPIBackend`` and ``MPISimulation`` is outli
 #. ``MPIBackend`` will look for these markings to know that data is being sent (and will not
    print this). It will verify the length of data it receives, printing a
    ``UserWarning`` if the data length received doesn't match the length part of the marking.
-   At this point, ``MPIBackend`` unpickles the simulation results and returns
+#. To signal that the child process should terminate, ``MPIBackend`` sends a signal to the child
+   proccesses' ``stdin``. After sending the simulation data, rank 0 waits for this completion signal
+   before continuing and letting all ranks of the MPI process exit successfully.
+#. At this point, ``MPIBackend.simulate()`` decodes and unpickles the data, populates the network's
+   CellResponse object, and returns the simulation dipoles to the caller.
+
 
 It is important that ``flush()`` is used whenever data is written to stdin or stderr to ensure that the signal will immediately be available for reading by the other side.
 
