@@ -5,12 +5,23 @@ from contextlib import redirect_stdout
 from multiprocessing import cpu_count
 from numpy import loadtxt
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
+from threading import Thread
+from time import sleep
 
 import pytest
 from mne.utils import _fetch_file
 
-from hnn_core import MPIBackend
+import hnn_core
+from hnn_core import MPIBackend, Network, read_params
+from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+
+
+def _terminate_mpibackend(backend):
+    while True:
+        backend.terminate()
+        sleep(0.01)
+
 
 # The purpose of this incremental mark is to avoid running the full length
 # simulation when there are failures in previous (faster) tests. When a test
@@ -64,6 +75,29 @@ class TestParallelBackends():
             assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
                             dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
                             atol=1e-14)
+
+    @requires_mpi4py
+    @requires_psutil
+    def test_terminate_mpibackend(self, run_hnn_core_fixture):
+        """Test terminating MPIBackend from thread"""
+        hnn_core_root = op.dirname(hnn_core.__file__)
+        params_fname = op.join(hnn_core_root, 'param', 'default.json')
+        params = read_params(params_fname)
+        net = Network(params, add_drives_from_params=True)
+
+        with MPIBackend() as backend:
+            kill_t = Thread(target=_terminate_mpibackend,
+                            args=(backend,))
+            kill_t.daemon = True
+            kill_t.start()
+            with pytest.warns(UserWarning) as record:
+                with pytest.raises(
+                        RuntimeError,
+                        match="MPI simulation failed. Return code: 143"):
+                    simulate_dipole(net)
+
+        expected_string = "Child process failed unexpectedly"
+        assert record[0].message.args[0] == expected_string
 
     @requires_mpi4py
     @requires_psutil
