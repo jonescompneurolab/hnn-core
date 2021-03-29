@@ -147,9 +147,10 @@ can be less than the user specified value if limited by the cores on
 the system, the number of cores allowed by the job scheduler, or
 if mpi4py could not be loaded.</p>
 </dd>
-<dt><strong>mpi_cmd_str</strong><span class="classifier">str</span></dt><dd><p>The string of the mpi command with number of procs and options</p>
+<dt><strong>mpi_cmd: list of str</strong></dt><dd><p>The mpi command with number of procs and options to be passed to Popen</p>
 </dd>
-<dt><strong>proc_data_bytes: bytes object</strong></dt><dd><p>This will contain data received from the MPI child process via stderr.</p>
+<dt><strong>expected_data_length</strong><span class="classifier">int</span></dt><dd><p>Used to check consistency between data that was sent and what
+MPIBackend received.</p>
 </dd>
 </dl>
 </dd>
