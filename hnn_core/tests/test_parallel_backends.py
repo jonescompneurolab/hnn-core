@@ -132,8 +132,7 @@ def test_mpi_failure(run_hnn_core_fixture):
 
     assert "MPI processes are unable to reach each other" in stdout
 
-    expected_string = "Child process failed unexpectedly. Output from " + \
-        "child below:"
+    expected_string = "Child process failed unexpectedly"
     assert len(record) == 1
     assert record[0].message.args[0] == expected_string
 

@@ -14,7 +14,7 @@ from warnings import warn
 from subprocess import Popen, PIPE, TimeoutExpired
 import binascii
 from queue import Queue, Empty
-from threading import Thread, Event
+from threading import Thread, Event, Lock
 
 from psutil import wait_procs, process_iter, NoSuchProcess
 
@@ -152,8 +152,7 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
                     # child terminated early, but we ran
                     # _get_data_from_output() above to capture
                     # any output that was left in queues
-                    warn("Child process failed unexpectedly. Output from"
-                         " child below:")
+                    warn("Child process failed unexpectedly")
                     break
 
             if not sent_network:
@@ -218,7 +217,7 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
 
     child_data = _process_child_data(proc_data_bytes, data_len)
 
-    return child_data
+    return proc, child_data
 
 
 def _process_child_data(data_bytes, data_len):
@@ -534,6 +533,9 @@ class MPIBackend(object):
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
         self.expected_data_length = 0
+        self.proc = None
+        self.killed_lock = Lock()
+        self.killed = False
 
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
@@ -616,6 +618,9 @@ class MPIBackend(object):
 
         _BACKEND = self._old_backend
 
+        # always kill nrniv processes for good measure
+        kill_proc_name('nrniv')
+
     def simulate(self, net, n_trials, postproc=True):
         """Simulate the HNN model in parallel on all cores
 
@@ -634,6 +639,10 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
+        with self.killed_lock:
+            if self.killed:
+                print("Preventing new MPIBackend simulation from starting")
+
         # just use the joblib backend for a single core
         if self.n_procs == 1:
             return JoblibBackend(n_jobs=1).simulate(net, n_trials=n_trials,
@@ -644,9 +653,24 @@ class MPIBackend(object):
 
         env = _get_mpi_env()
 
-        sim_data = run_subprocess(command=self.mpi_cmd, obj=net, timeout=4,
-                                  env=env, cwd=os.getcwd(),
-                                  universal_newlines=True)
+        self.proc, sim_data = run_subprocess(
+            command=self.mpi_cmd, obj=net, timeout=4,
+            env=env, cwd=os.getcwd(), universal_newlines=True)
 
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
+
+    def terminate(self):
+        with self.killed_lock:
+            self.killed = True
+
+            if self.proc is not None:
+                self.proc.terminate()
+                try:
+                    self.proc.wait(1)  # wait maximum of 1s
+                except TimeoutExpired:
+                    warn("Could not kill python subprocess: PID %d" %
+                         self.proc.pid)
+            kill_proc_name('nrniv')
+
+            self.killed = False
