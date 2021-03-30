@@ -9,8 +9,6 @@ from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 import pytest
 from mne.utils import _fetch_file
 
-import hnn_core
-from hnn_core import read_params
 from hnn_core import MPIBackend
 from hnn_core.parallel_backends import requires_mpi4py
 
