@@ -97,7 +97,7 @@ class TestParallelBackends():
                     simulate_dipole(net)
 
         expected_string = "Child process failed unexpectedly"
-        assert record[0].message.args[0] == expected_string
+        assert expected_string in record[0].message.args[0]
 
     @requires_mpi4py
     @requires_psutil
