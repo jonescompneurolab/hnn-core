@@ -81,6 +81,11 @@ and then install the dependencies separately::
 and install Neuron using the traditional package installer available here
 `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
 
+As a final step, .mod files must be compiled with Neuron by running:
+
+   $ python -c 'import site; print(site.getsitepackages()[1] + \hnn_core\)' | cd
+   $ nrnivmodl
+
 Documentation and examples
 ==========================
 
