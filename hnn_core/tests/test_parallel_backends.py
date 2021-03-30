@@ -87,13 +87,7 @@ class TestParallelBackends():
             _fetch_file(data_url, 'dpl.txt')
         dpl_master = loadtxt('dpl.txt')
 
-        hnn_core_root = op.dirname(hnn_core.__file__)
-
-        # default params
-        params_fname = op.join(hnn_core_root, 'param', 'default.json')
-        params = read_params(params_fname)
-
-        dpls, net = run_hnn_core_fixture(params, backend)
+        dpls, net = run_hnn_core_fixture(backend=backend)
         dpl = dpls[0]
 
         # write the dipole to a file and compare
