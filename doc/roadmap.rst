@@ -68,16 +68,16 @@ following steps:
     interact directly with the NEURON simulator (e.g. cell and network intantiation, external drives, etc..), 
     from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis). 
     **COMPLETED FEB 2021** 
--   Convert installation procedures to PIP 
--   Parallelization of the simulations in HNN-core via a combination of MPI and Joblib.
+-   Convert installation procedures to PIP **COMPLETED FEB 2021** 
+-   Parallelization of the simulations in HNN-core via MPI or Joblib.**COMPLETED SEP 2020** 
 -   Reorganization of the Network class within HNN-core module 
     to separate cortical column model from exogenous drive, and optimization routines.
     See `gh-104`_, `gh-124`_, and `gh-129`_ for related discussions.
     **COMPLETED FEB 2021** 
 -   Develop initial HNN-core documentation and example simulations following those 
     detailed in the HNN-GUI tutorials https://jonescompneurolab.github.io/hnn-core/stable/index.html
-   **COMPLETED MARCH 2021** 
--   First release of HNN-Core 0.1 to the community
+    **COMPLETED MARCH 2021** 
+-   First release of HNN-Core 0.1 to the community **COMPLETED MARCH 2021** 
 -   Removal of all simulation code from the HNN repository, which will be replaced with by 
     importing from HNN-Core
 -   Cleaning optimization routines in HNN-GUI to interact with HNN-core 
@@ -201,7 +201,7 @@ stimulation as a test-case example.
   sensor space data to source localized signal using MNE-Python, and then
   simulate the neural mechanisms of the source signal using HNN-core.  
   https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html
-   **COMPLETED MARCH 2021** 
+  **COMPLETED MARCH 2021** 
 
 **Convert HNN to web-based platform with dual GUI and Command Line Interface (CLI):**
 We have begun working with MetaCell (metacell.org) to convert HNN to a web-based 
