@@ -69,9 +69,7 @@ following steps:
     from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis). 
     **COMPLETED FEB 2021** 
 -   Convert installation procedures to PIP 
-   **COMPLETED FEB 2021** 
 -   Parallelization of the simulations in HNN-core via a combination of MPI and Joblib.
-   **COMPLETED FEB 2021** 
 -   Reorganization of the Network class within HNN-core module 
     to separate cortical column model from exogenous drive, and optimization routines.
     See `gh-104`_, `gh-124`_, and `gh-129`_ for related discussions.
@@ -80,10 +78,8 @@ following steps:
     detailed in the HNN-GUI tutorials https://jonescompneurolab.github.io/hnn-core/stable/index.html
    **COMPLETED MARCH 2021** 
 -   First release of HNN-Core 0.1 to the community
-    **COMPLETED MARCH 2021** 
 -   Removal of all simulation code from the HNN repository, which will be replaced with by 
     importing from HNN-Core
-     **COMPLETED MARCH 2021** 
 -   Cleaning optimization routines in HNN-GUI to interact with HNN-core 
 -   Testing HNN-GUI tutorials with HNN-Core integration 
 -   Rename HNN to HNN-GUI and release updated version to the community 
