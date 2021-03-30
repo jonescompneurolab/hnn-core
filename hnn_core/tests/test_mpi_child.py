@@ -10,35 +10,35 @@ from hnn_core import read_params, Network
 from hnn_core.mpi_child import (MPISimulation, _str_to_net, _pickle_data)
 from hnn_core.parallel_backends import (_gather_trial_data,
                                         _process_child_data,
-                                        _get_data_from_output,
+                                        _echo_child_output,
+                                        _get_data_from_child_err,
                                         _extract_data, _extract_data_length)
 
 
-def test_get_data_from_output():
-    """Test _get_data_from_output for handling stderr, i.e. error messages"""
+def test_get_data_from_child_err():
+    """Test _get_data_from_child_err for handling stderr"""
     # write data to queue
-    out_q = Queue()
     err_q = Queue()
     test_string = "this gets printed to stdout"
     err_q.put(test_string)
 
     with io.StringIO() as buf_out, redirect_stdout(buf_out):
-        _get_data_from_output(out_q, err_q)
+        _get_data_from_child_err(err_q)
         output = buf_out.getvalue()
     assert output == test_string
 
 
-def test_process_out_stdout():
-    """Test _get_data_from_output for handling stdout, i.e. status messages"""
+def test_echo_child_output():
+    """Test _echo_child_output for handling stdout, i.e. status messages"""
     # write data to queue
     out_q = Queue()
-    err_q = Queue()
     test_string = "Test output"
     out_q.put(test_string)
 
     with io.StringIO() as buf_out, redirect_stdout(buf_out):
-        _get_data_from_output(out_q, err_q)
+        got_output = _echo_child_output(out_q)
         output = buf_out.getvalue()
+    assert got_output
     assert output == test_string
 
 
@@ -135,12 +135,11 @@ def test_child_run():
         assert "@end_of_data:" in stderr_str
 
         # write data to queue
-        out_q = Queue()
         err_q = Queue()
         err_q.put(stderr_str)
 
         # use _read_stderr to get data_len (but not the data this time)
-        data_len, data = _get_data_from_output(out_q, err_q)
+        data_len, data = _get_data_from_child_err(err_q)
         sim_data = _process_child_data(data, data_len)
         n_trials = 1
         postproc = False

@@ -137,21 +137,25 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
         threads_started = True
         data_received = False
         sent_network = False
+        count_since_last_output = 0
 
         # loop while the process is running the simulation
         while True:
             child_terminated = proc.poll() is not None
 
             if not data_received:
+                if _echo_child_output(out_q):
+                    count_since_last_output = 0
+                else:
+                    count_since_last_output += 1
                 # look for data in stderr and print child stdout
-                data_len, proc_data_bytes = _get_data_from_output(out_q, err_q)
+                data_len, proc_data_bytes = _get_data_from_child_err(err_q)
                 if data_len > 0:
                     data_received = True
                     _write_child_exit_signal(proc.stdin)
                 elif child_terminated:
-                    # child terminated early, but we ran
-                    # _get_data_from_output() above to capture
-                    # any output that was left in queues
+                    # child terminated early, and we already
+                    # captured output left in queues
                     warn("Child process failed unexpectedly")
                     break
 
@@ -176,6 +180,14 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
                 # both exit conditions have been met (also we know that
                 # the network has been sent)
                 break
+
+            if not child_terminated and count_since_last_output > 500:
+                # each loop spend waiting will involve two get() timeouts
+                # of 0.01 s each, so approx. 50 loops per second. No
+                # need to be precise, and error on the side of longer
+                # than 10 s.
+                warn("No output from child process in approx 10s. "
+                     "Terminating...")
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
 
@@ -258,19 +270,24 @@ def _process_child_data(data_bytes, data_len):
     return pickle.loads(data_pickled)
 
 
-def _get_data_from_output(out_q, err_q):
+def _echo_child_output(out_q):
     out = ''
+    while True:
+        try:
+            out += out_q.get(timeout=0.01)
+        except Empty:
+            break
+
+    if len(out) > 0:
+        sys.stdout.write(out)
+        return True
+    return False
+
+
+def _get_data_from_child_err(err_q):
     err = ''
     data_length = 0
     data_bytes = b''
-
-    while True:
-        try:
-            out = out_q.get(timeout=0.01)
-        except Empty:
-            break
-        else:
-            sys.stdout.write(out)
 
     while True:
         try:
