@@ -177,7 +177,7 @@ corresponding tutorials.</p>
 </div>
 <div class="section" id="modularize-hnn-code-to-simplify-installation-development-and-maintenance">
 <h2>Modularize HNN code to simplify installation, development and maintenance<a class="headerlink" href="#modularize-hnn-code-to-simplify-installation-development-and-maintenance" title="Permalink to this headline">¶</a></h2>
-<p>Over the past year, we have been cleaning up and re-organizing the
+<p>We are working on cleaning up and re-organizing the
 underlying code that defines the current distribution of HNN to facilitate
 expansion and community engagement in its use and development. To minimize the
 dependencies that are required to install before contributing to HNN development
@@ -188,30 +188,38 @@ contain the code for the neural model simulation, post-processing data analysis
 and plotting (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">HNN-core</a>).</p>
 <p>The functionality in HNN-core will be imported into the HNN repository
 (to be renamed HNN-GUI)  and will be used by the interactive GUI.</p>
-<p>This modularization will begin with reorganization and improvements within
+<p>This modularization will entail reorganization and improvements within
 the HNN-core repository and simplification of the HNN-GUI repository in the
 following steps:</p>
 <ul class="simple">
-<li><p>Creation of two modules in the HNN-core, one of which
-will contain parts of the code that interact directly with the NEURON simulator
-(<code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code>), while the other module will contain post-processing data
-analysis and plotting functions (<code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code>). Removal of all
-simulation code from the HNN repository, which will be replaced with by
-importing from <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module. HNN repository will then be
-renamed HNN-GUI.</p></li>
-<li><p>Parallelization of the simulation in the <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module via a
-combination of MPI and Joblib.</p></li>
-<li><p>All post-processing data analysis functions will be moved from the HNN repository
-into the <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code> module.</p></li>
-<li><p>Extending <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module to run batch simulations that enable parameter
-sweeps.</p></li>
-<li><p>Development of functions in HNN-GUI to enable parameter sweeps via the GUI.</p></li>
-<li><p>Reorganization of the Network class within the <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module
+<li><p>Following best practices in open-source software design, including continuous integration testing,
+to develop HNN-core. HNN-core will contain clean and reorganized code, and separate all components that
+interact directly with the NEURON simulator (e.g. cell and network intantiation, external drives, etc..),
+from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis).
+<strong>COMPLETED FEB 2021</strong></p></li>
+<li><p>Convert installation procedures to PIP <strong>COMPLETED FEB 2021</strong></p></li>
+<li><p>Parallelization of the simulations in HNN-core via MPI or Joblib. <strong>COMPLETED SEP 2020</strong></p></li>
+<li><p>Reorganization of the Network class within HNN-core module
 to separate cortical column model from exogenous drive, and optimization routines.
-See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a>, <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/129">gh-124</a>, and <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/124">gh-129</a> for related discussions.</p></li>
+See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a>, <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/129">gh-124</a>, and <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/124">gh-129</a> for related discussions.
+<strong>COMPLETED FEB 2021</strong></p></li>
+<li><p>Develop initial HNN-core documentation and example simulations following those
+detailed in the HNN-GUI tutorials <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">https://jonescompneurolab.github.io/hnn-core/stable/index.html</a>
+<strong>COMPLETED MARCH 2021</strong></p></li>
+<li><p>First release of HNN-Core 0.1 to the community <strong>COMPLETED MARCH 2021</strong></p></li>
+<li><p>Removal of all simulation code from the HNN repository, which will be replaced with by
+importing from HNN-Core</p></li>
+<li><p>Cleaning optimization routines in HNN-GUI to interact with HNN-core</p></li>
+<li><p>Testing HNN-GUI tutorials with HNN-Core integration</p></li>
+<li><p>Rename HNN to HNN-GUI and release updated version to the community</p></li>
+<li><p>Extending HNN-core to run batch simulations that enable parameter sweeps.</p></li>
+<li><p>Development of functions in HNN-GUI to enable parameter sweeps via the GUI.</p></li>
 <li><p>Reorganization of Param.py file within <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module to multiple files that
 contain smaller dictionaries of parameters related to different modules of the code.
 See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a> for related discussions.</p></li>
+<li><p>Creation of two modules in the HNN-core, one with parts of the code that interact with
+the NEURON simulation of which (<code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code>), and one that contains post-processing data
+analysis and plotting functions (<code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code>).</p></li>
 </ul>
 </div>
 <div class="section" id="lfp-csd-simulation-visualization-and-data-comparison">
@@ -239,13 +247,13 @@ in the GUI.</p></li>
 HNN currently enables some parameter estimation, focussing on parameters relevant
 to an ERP. New methods have been recently developed that apply a machine learning
 approach to parameter estimation, namely Sequential Neural Parameter Estimation (SNPE)
-(Gonçalves et al BioRxiv 2019:838383). We will adapt this method for parameter
+(Gonçalves et al Elife 2020: DOI: 10.7554/eLife.56261). We will adapt this method for parameter
 estimation to work with HNN-core, enabling estimation of a distribution of parameters
 that could account for empirical data, and then integrate it into the HNN-GUI with
 example tutorials for the following tasks:</p>
 <ul class="simple">
-<li><p>Move current ERP parameter estimation code from HNN into <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code> module.</p></li>
-<li><p>Develop code for SNPE parameter estimation and visualization in <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code>.</p></li>
+<li><p>Move current ERP parameter estimation code from HNN into <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module.</p></li>
+<li><p>Develop code for SNPE parameter estimation and visualization in <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code>.</p></li>
 <li><p>Develop functions in HNN-GUI to enable SNPE estimation in the GUI.</p></li>
 </ul>
 </div>
@@ -260,9 +268,9 @@ with those developed by the HNN team and ultimately expanding to model developme
 in other platforms (e.g. NetPyNE), see 5-year plan.</p>
 <ul class="simple">
 <li><p>Develop new cortical column template models with pyramidal neuron
-calcium dynamics, and with updated inhibitory connectivity,
-as part of the  <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module.</p></li>
-<li><p>Develop function in HNN-GUI to choose among different template models in the GUI</p></li>
+calcium dynamics, in <code class="docutils literal notranslate"><span class="pre">hnn_core.simulator</span></code> module.</p></li>
+<li><p>Update examples and HNN-GUI tutorials to include description of network with updated calcium dynamics.</p></li>
+<li><p>Develop function in HNN-GUI to choose among different template models in the GUI.</p></li>
 </ul>
 <p>See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/111">gh-111</a> for more discussions.</p>
 </div>
@@ -283,8 +291,8 @@ changes in the simulated current dipole signal through the GUI provides the base
 needed to examine the neural mechanisms contributing to the signal. As new
 components are developed in HNN-GUI, new tutorials will be developed to train
 the community on how to apply them in their studies.</p>
-<p>Some of the pending API documentation and GUI tutorials based on the above  HNN Roadmap
-include,</p>
+<p>Several of the API documentation and GUI tutorials updates are described above, and other
+pending based on the One-Year HNN Roadmap plan include,</p>
 <ul class="simple">
 <li><p>Running parameter sweeps</p></li>
 <li><p>Simulating and visualizing LFP/CSD and comparison to invasive animal recordings</p></li>
@@ -306,6 +314,7 @@ We have begun creation of a framework where models built in NetPyNE can be adapt
 to the HNN workflows of use. As a test bed, this currently entails integration of
 the HNN cortical column model and exogenous drives into the full NetPyNE
 platform (<a class="reference external" href="https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne">https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne</a>).
+See also update from <strong>MARCH 2021</strong> <a class="reference external" href="https://github.com/jonescompneurolab/hnn/tree/hnn2">https://github.com/jonescompneurolab/hnn/tree/hnn2</a> .
 To limit the scope of this effort to HNN-specific goals, i.e. neural modeling
 designed for interpretation of human EEG/MEG signals, we will work to adapt
 NetPyNE developed models into the HNN framework, and to make the adaptation
@@ -314,6 +323,13 @@ flexible enough to include models developed in other neural modeling platforms.<
 source localization using MNE-Python is seamlessly integrated with HNN  for
 circuit-level interpretation of the signal. We will begin with median-nerve
 stimulation as a test-case example.</p>
+<ul class="simple">
+<li><p>Develop example using open-source median nerve data of how to go from
+sensor space data to source localized signal using MNE-Python, and then
+simulate the neural mechanisms of the source signal using HNN-core.
+<a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html">https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html</a>
+<strong>COMPLETED MARCH 2021</strong></p></li>
+</ul>
 <p><strong>Convert HNN to web-based platform with dual GUI and Command Line Interface (CLI):</strong>
 We have begun working with MetaCell (metacell.org) to convert HNN to a web-based
 interactive GUI with updated graphics (<a class="reference external" href="https://github.com/MetaCell/HNN-UI">https://github.com/MetaCell/HNN-UI</a>).
