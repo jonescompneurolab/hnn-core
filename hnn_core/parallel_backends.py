@@ -163,6 +163,8 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
                     # child failed during _write_net(). get the
                     # output and break out of loop on the next
                     # iteration
+                    warn("Received BrokenPipeError exception. "
+                         "Child process failed unexpectedly")
                     continue
                 else:
                     sent_network = True
