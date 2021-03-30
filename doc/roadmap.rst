@@ -69,7 +69,7 @@ following steps:
     from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis). 
     **COMPLETED FEB 2021** 
 -   Convert installation procedures to PIP **COMPLETED FEB 2021** 
--   Parallelization of the simulations in HNN-core via MPI or Joblib.**COMPLETED SEP 2020** 
+-   Parallelization of the simulations in HNN-core via MPI or Joblib. **COMPLETED SEP 2020** 
 -   Reorganization of the Network class within HNN-core module 
     to separate cortical column model from exogenous drive, and optimization routines.
     See `gh-104`_, `gh-124`_, and `gh-129`_ for related discussions.
