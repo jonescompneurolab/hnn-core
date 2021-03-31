@@ -52,7 +52,7 @@ class BuildMod(Command):
         print("=> Building mod files ...")
 
         if platform.system() == 'Windows':
-            mod_path = op.join(op.dirname(__file__), 'mod')
+            mod_path = op.join(op.dirname(op.abspath(__file__)), 'hnn_core', 'mod')
             shell = True
         else:
             mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
