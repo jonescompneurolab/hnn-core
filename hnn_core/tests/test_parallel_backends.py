@@ -127,9 +127,15 @@ class TestParallelBackends():
     @requires_psutil
     def test_run_mpibackend_oversubscribed(self, run_hnn_core_fixture):
         """Test running MPIBackend with oversubscribed number of procs"""
+        hnn_core_root = op.dirname(hnn_core.__file__)
+        params_fname = op.join(hnn_core_root, 'param', 'default.json')
+        params = read_params(params_fname)
+        net = Network(params, add_drives_from_params=True)
+
         oversubscribed = round(cpu_count() * 1.5)
-        run_hnn_core_fixture(backend='mpi', n_procs=oversubscribed,
-                             reduced=True)
+        with MPIBackend(n_procs=oversubscribed) as backend:
+            assert backend.n_procs == oversubscribed
+            simulate_dipole(net)
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
     def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
