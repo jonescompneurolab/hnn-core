@@ -1,6 +1,6 @@
 """
 =====================
-08. Plot Simulate LFP
+08. Record LFP
 =====================
 
 This example demonstrates how to record local field potentials (LFPs).

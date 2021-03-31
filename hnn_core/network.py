@@ -1041,6 +1041,7 @@ class Network(object):
 
     def add_electrode(self, electrode_pos):
         """Specify coordinates of electrodes for LFP recording.
+
         Parameters
         ----------
         electrode_pos : tuple | list of tuple
