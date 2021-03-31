@@ -1,7 +1,7 @@
 """
-=====================================
-01. Simulate dipole for evoked inputs
-=====================================
+================================
+01. Simulate an evoked potential
+================================
 
 This example demonstrates how to simulate a dipole for evoked-like
 waveforms using HNN-core.
