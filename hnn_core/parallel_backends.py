@@ -93,7 +93,7 @@ def _get_mpi_env():
     return my_env
 
 
-def run_subprocess(command, obj, timeout, *args, **kwargs):
+def run_subprocess(command, obj, timeout=10, *args, **kwargs):
     """Run process and communicate with it.
     Parameters
     ----------
@@ -102,8 +102,9 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
     obj : object
         The object to write to stdin after starting child process
         with MPI command.
-    timeout : float
-        The number of seconds to wait after process ends.
+    timeout : float | None
+        The number of seconds to wait for a process without output. If None
+        specified, will default to 10s
     *args, **kwargs : arguments
         Additional arguments to pass to subprocess.Popen.
     Returns
@@ -112,6 +113,10 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
         The data returned by the child process.
     """
     proc_data_bytes = b''
+    # each loop while waiting will involve two Queue.get() timeouts, each
+    # 0.01s. This caclulation will error on the side of a longer timeout
+    # than is specified because more is done each loop that just Queue.get()
+    timeout_cycles = timeout / 0.02
 
     pickled_obj = base64.b64encode(pickle.dumps(obj))
 
@@ -157,6 +162,7 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
                     # child terminated early, and we already
                     # captured output left in queues
                     warn("Child process failed unexpectedly")
+                    kill_proc_name('nrniv')
                     break
 
             if not sent_network:
@@ -181,13 +187,12 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
                 # the network has been sent)
                 break
 
-            if not child_terminated and count_since_last_output > 500:
-                # each loop spend waiting will involve two get() timeouts
-                # of 0.01 s each, so approx. 50 loops per second. No
-                # need to be precise, and error on the side of longer
-                # than 10 s.
+            if not child_terminated and \
+                    count_since_last_output > timeout_cycles:
                 warn("No output from child process in approx 10s. "
                      "Terminating...")
+                kill_proc_name('nrniv')
+                break
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
 
@@ -208,10 +213,6 @@ def run_subprocess(command, obj, timeout, *args, **kwargs):
 
     sys.stdout.write(outs)
     sys.stdout.write(errs)
-
-    # kill orphan nrniv processes if necessary
-    if not proc.returncode == 0:
-        kill_proc_name('nrniv')
 
     if proc.returncode is None:
         # It's theoretically possible that we have received data
