@@ -551,10 +551,9 @@ class MPIBackend(object):
     ----------
 
     n_procs : int
-        The number of processes MPI will actually use (spread over cores). This
-        can be less than the user specified value if limited by the cores on
-        the system, the number of cores allowed by the job scheduler, or
-        if mpi4py could not be loaded.
+        The number of processes MPI will actually use (spread over cores). If 1
+        is specified or mpi4py could not be loaded, the simulation will be run
+        with the JoblibBackend
     mpi_cmd : list of str
         The mpi command with number of procs and options to be passed to Popen
     expected_data_length : int
@@ -575,11 +574,6 @@ class MPIBackend(object):
             self.n_procs = n_logical_cores
         else:
             self.n_procs = n_procs
-
-        # obey limits set by scheduler
-        if hasattr(os, 'sched_getaffinity'):
-            scheduler_cores = len(os.sched_getaffinity(0))
-            self.n_procs = min(self.n_procs, scheduler_cores)
 
         # did user try to force running on more cores than available?
         oversubscribe = False
