@@ -5,7 +5,7 @@ from contextlib import redirect_stdout
 from multiprocessing import cpu_count
 from numpy import loadtxt
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
-from threading import Thread
+from threading import Thread, Event
 from time import sleep
 
 import pytest
@@ -17,8 +17,8 @@ from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 
-def _terminate_mpibackend(backend):
-    while True:
+def _terminate_mpibackend(event, backend):
+    while not event.isSet():
         backend.terminate()
         sleep(0.01)
 
@@ -86,16 +86,24 @@ class TestParallelBackends():
         net = Network(params, add_drives_from_params=True)
 
         with MPIBackend() as backend:
+            event = Event()
+            # start background thread that will kill all MPIBackends
+            # until event.set()
             kill_t = Thread(target=_terminate_mpibackend,
-                            args=(backend,))
+                            args=(event, backend))
+            # make thread a daemon in case we throw an exception
+            # and don't run event.set() so that py.test will
+            # not hang before exiting
             kill_t.daemon = True
             kill_t.start()
+
             with pytest.warns(UserWarning) as record:
                 with pytest.raises(
                         RuntimeError,
                         match="MPI simulation failed. Return code: 143"):
                     simulate_dipole(net)
 
+            event.set()
         expected_string = "Child process failed unexpectedly"
         assert expected_string in record[0].message.args[0]
 
