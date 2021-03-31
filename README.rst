@@ -72,7 +72,7 @@ than one CPU core, refer to `parallel_backends`_
 The pip installer for Neuron does not yet work for Windows. In this case, it is better to
 install ``hnn_core`` without the dependencies::
 
-   $ pip install hnn_core --no-deps
+   $ pip install --no-build-isolation --no-deps hnn_core
 
 and then install the dependencies separately::
 
