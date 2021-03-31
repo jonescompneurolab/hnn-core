@@ -469,8 +469,6 @@ class NetworkBuilder(object):
         method = 'psa'
         for pos in self.net.pos_lfp:
             elec = LFPElectrode(pos, pc=_PC, cvode=_CVODE, method=method)
-            elec.setup()
-            elec.LFPinit()
             self._lfp.append(elec)
 
     # setup spike recording for this node
