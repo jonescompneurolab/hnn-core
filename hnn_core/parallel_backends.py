@@ -682,7 +682,7 @@ class MPIBackend(object):
         env = _get_mpi_env()
 
         self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd, obj=net, timeout=4,
+            command=self.mpi_cmd, obj=net, timeout=10,
             env=env, cwd=os.getcwd(), universal_newlines=True)
 
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
