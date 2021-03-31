@@ -76,7 +76,7 @@ install ``hnn_core`` without the dependencies::
 
 and then install the dependencies separately::
 
-   $ pip install scipy numpy matplotlib
+   $ pip install scipy numpy matplotlib psutil
 
 and install Neuron using the traditional package installer available here
 `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
