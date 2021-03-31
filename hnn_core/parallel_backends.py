@@ -545,11 +545,19 @@ class MPIBackend(object):
         can be less than the user specified value if limited by the cores on
         the system, the number of cores allowed by the job scheduler, or
         if mpi4py could not be loaded.
-    mpi_cmd: list of str
+    mpi_cmd : list of str
         The mpi command with number of procs and options to be passed to Popen
     expected_data_length : int
         Used to check consistency between data that was sent and what
         MPIBackend received.
+    killed : bool
+        Whether MPIBackend has been signalled to terminate by an external
+        process. To prevent proceeding with a simulation after this has been
+        set, it is checked immediately before starting.
+    killed_lock : threading.Lock
+        A lock to prevent reads from self.killed while the other process is
+        currently writing. It means a read will reflect the consistent state
+        of self.killed
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
         self.expected_data_length = 0
