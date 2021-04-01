@@ -93,7 +93,7 @@ def _get_mpi_env():
     return my_env
 
 
-def run_subprocess(command, obj, timeout=10, proc_queue=None, *args, **kwargs):
+def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     """Run process and communicate with it.
     Parameters
     ----------
@@ -102,9 +102,8 @@ def run_subprocess(command, obj, timeout=10, proc_queue=None, *args, **kwargs):
     obj : object
         The object to write to stdin after starting child process
         with MPI command.
-    timeout : float | None
-        The number of seconds to wait for a process without output. If None
-        specified, will default to 10s
+    timeout : float
+        The number of seconds to wait for a process without output.
     *args, **kwargs : arguments
         Additional arguments to pass to subprocess.Popen.
     Returns
@@ -685,7 +684,7 @@ class MPIBackend(object):
         env = _get_mpi_env()
 
         self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd, obj=net, timeout=10,
+            command=self.mpi_cmd, obj=net, timeout=30,
             proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
             universal_newlines=True)
 
