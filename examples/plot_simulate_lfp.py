@@ -6,7 +6,10 @@
 This example demonstrates how to record local field potentials (LFPs).
 """
 
-# Author: Nick Tolley <nicholas_tolley@brown.edu>
+# Authors: Nick Tolley <nicholas_tolley@brown.edu>
+#          Mainak Jas <mainakjas@gmail.com>
+
+# sphinx_gallery_thumbnail_number = 3
 
 import os.path as op
 
