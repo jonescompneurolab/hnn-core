@@ -47,11 +47,14 @@ def _check_drive_parameter_values(drive_type, **kwargs):
 
     if ('numspikes' in kwargs and 'spike_isi' in kwargs and
             'burst_rate' in kwargs):
-        nspikes = kwargs['numspikes']
+        n_spikes = kwargs['numspikes']
         isi = kwargs['spike_isi']
         burst_period = 1000. / kwargs['burst_rate']
-        if (nspikes - 1) * isi > burst_period:
-            raise ValueError('Burst duration cannot be greater than period')
+        burst_duration = (n_spikes - 1) * isi
+        if burst_duration > burst_period:
+            raise ValueError(f'Burst duration ({burst_duration} s) cannot'
+                             f' be greater than burst period ({burst_period} s)'
+                              'Consider increasing the spike ISI or burst rate')
 
 
 def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
@@ -496,8 +499,11 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
 
     if distribution == 'normal':
         burst_period = 1000. / f_input
-        if (events_per_cycle - 1) * cycle_events_isi > burst_period:
-            raise ValueError('Burst duration cannot be greater than period')
+        burst_duration = (events_per_cycle - 1) * cycle_events_isi
+        if  burst_duration > burst_period:
+            raise ValueError(f'Burst duration ({burst_duration} s) cannot'
+                             f' be greater than burst period ({burst_period} s)'
+                              'Consider increasing the spike ISI or burst rate')
 
         # array of mean stimulus times, starts at t0
         isi_array = np.arange(t0, tstop, burst_period)
