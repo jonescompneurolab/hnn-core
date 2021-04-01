@@ -130,6 +130,13 @@ class TestParallelBackends():
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
+        params.update({'N_pyr_x': 3,
+                       'N_pyr_y': 3,
+                       'tstop': 40,
+                       't_evprox_1': 5,
+                       't_evdist_1': 10,
+                       't_evprox_2': 20,
+                       'N_trials': 2})
         net = Network(params, add_drives_from_params=True)
 
         oversubscribed = round(cpu_count() * 1.5)
