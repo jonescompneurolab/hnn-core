@@ -93,7 +93,7 @@ def _get_mpi_env():
     return my_env
 
 
-def run_subprocess(command, obj, timeout=10, *args, **kwargs):
+def run_subprocess(command, obj, timeout=10, proc_queue=None, *args, **kwargs):
     """Run process and communicate with it.
     Parameters
     ----------
@@ -129,6 +129,11 @@ def run_subprocess(command, obj, timeout=10, *args, **kwargs):
     try:
         proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args,
                      **kwargs)
+
+        # now that the process has started, add it to the queue
+        # used by MPIBackend.terminate()
+        if proc_queue is not None:
+            proc_queue.put(proc)
 
         # set up polling first so all of child's stdout/stderr
         # gets captured
@@ -231,6 +236,12 @@ def run_subprocess(command, obj, timeout=10, *args, **kwargs):
                            proc.returncode)
 
     child_data = _process_child_data(proc_data_bytes, data_len)
+
+    # clean up the queue
+    try:
+        proc_queue.get_nowait()
+    except Empty:
+        pass
 
     return proc, child_data
 
@@ -550,20 +561,15 @@ class MPIBackend(object):
     expected_data_length : int
         Used to check consistency between data that was sent and what
         MPIBackend received.
-    killed : bool
-        Whether MPIBackend has been signalled to terminate by an external
-        process. To prevent proceeding with a simulation after this has been
-        set, it is checked immediately before starting.
-    killed_lock : threading.Lock
-        A lock to prevent reads from self.killed while the other process is
-        currently writing. It means a read will reflect the consistent state
-        of self.killed
+    proc_queue : threading.Queue
+        A Queue object to hold process handles from Popen in a thread-safe way.
+        There will be a valid process handle present the queue when a MPI
+        åsimulation is running.
     """
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
         self.expected_data_length = 0
         self.proc = None
-        self.killed_lock = Lock()
-        self.killed = False
+        self.proc_queue = Queue()
 
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
@@ -667,9 +673,6 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-        with self.killed_lock:
-            if self.killed:
-                print("Preventing new MPIBackend simulation from starting")
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
@@ -683,22 +686,23 @@ class MPIBackend(object):
 
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd, obj=net, timeout=10,
-            env=env, cwd=os.getcwd(), universal_newlines=True)
+            proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
+            universal_newlines=True)
 
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
 
     def terminate(self):
-        with self.killed_lock:
-            self.killed = True
+        proc = None
+        try:
+            proc = self.proc_queue.get(timeout=1)
+        except Empty:
+            warn("No currently running process to terminate")
 
-            if self.proc is not None:
-                self.proc.terminate()
-                try:
-                    self.proc.wait(1)  # wait maximum of 1s
-                except TimeoutExpired:
-                    warn("Could not kill python subprocess: PID %d" %
-                         self.proc.pid)
-            kill_proc_name('nrniv')
-
-            self.killed = False
+        if proc is not None:
+            proc.terminate()
+            try:
+                proc.wait(5)  # wait maximum of 1s
+            except TimeoutExpired:
+                warn("Could not kill python subprocess: PID %d" %
+                     proc.pid)
