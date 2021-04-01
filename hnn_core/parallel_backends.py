@@ -14,7 +14,7 @@ from warnings import warn
 from subprocess import Popen, PIPE, TimeoutExpired
 import binascii
 from queue import Queue, Empty
-from threading import Thread, Event, Lock
+from threading import Thread, Event
 
 from psutil import wait_procs, process_iter, NoSuchProcess
 
