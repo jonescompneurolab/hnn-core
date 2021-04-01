@@ -234,7 +234,7 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
-        self.pos_lfp = list()
+        self.pos_lfp = dict()
         self.lfp = list()
 
         # contents of pos_dict determines all downstream inferences of
@@ -1039,7 +1039,7 @@ class Network(object):
         """Remove all connections defined in Network.connectivity_list"""
         self.connectivity = list()
 
-    def add_electrode(self, electrode_pos):
+    def add_electrode(self, electrode_pos, sigma=3.0, method='psa'):
         """Specify coordinates of electrodes for LFP recording.
 
         Parameters
@@ -1047,16 +1047,28 @@ class Network(object):
         electrode_pos : tuple | list of tuple
             Coordinates specifying the position for LFP electrodes in
             the form of (x, y, z).
+        sigma : float | int
+            Extracellular conductivity in mS/cm (uniform for simplicity)
+        method : str
+            'psa' (default), i.e., point source approximation or line source
+            approximation, i.e., 'lsa'
         """
+        electrode_dict = dict()
+        n_electrodes = len(self.pos_lfp)
         _validate_type(electrode_pos, (list, tuple))
+        _validate_type(sigma, (float, int))
+        assert sigma > 0.0
+        _check_option('method', method, ['psa', 'lsa'])
         if isinstance(electrode_pos, tuple):
             electrode_pos = [electrode_pos]
-        for e_pos in electrode_pos:
+        for e_idx, e_pos in enumerate(electrode_pos):
             assert len(e_pos) == 3
             for pos in e_pos:
                 _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
+            electrode_dict[e_idx + n_electrodes] = {
+                'pos': pos, 'sigma': sigma, 'method': method}
 
-        self.pos_lfp.extend(electrode_pos)
+        self.pos_lfp.update(electrode_dict)
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

@@ -118,14 +118,14 @@ def _transfer_resistance(exyz, sigma, method):
     return vres
 
 
-class LFPElectrode:
+class _LFPElectrode:
     """LFP electrode class.
 
     Parameters
     ----------
     coord : tuple
         The (x, y, z) coordinates of the LFP electrode.
-    sigma : float
+    sigma : float | int
         Extracellular conductivity in mS/cm (uniform for simplicity)
     pc : instance of h.ParallelContext()
         ParallelContext instance for running in parallel

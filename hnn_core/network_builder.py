@@ -11,7 +11,7 @@ from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import _long_name, _short_name
-from .externals.lfp import LFPElectrode
+from .externals.lfp import _LFPElectrode
 
 # a few globals
 _PC = None
@@ -467,8 +467,10 @@ class NetworkBuilder(object):
 
     def _record_lfp(self):
         method = 'psa'
-        for pos in self.net.pos_lfp:
-            elec = LFPElectrode(pos, pc=_PC, cvode=_CVODE, method=method)
+        for _, item in self.net.pos_lfp.items():
+            pos, sigma, method = item['pos'], item['sigma'], item['method']
+            elec = _LFPElectrode(pos, sigma=sigma, pc=_PC, cvode=_CVODE,
+                                 method=method)
             self._lfp.append(elec)
 
     # setup spike recording for this node
