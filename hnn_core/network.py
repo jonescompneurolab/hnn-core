@@ -1097,10 +1097,9 @@ class _NetworkDrive(dict):
                 Source (artificial) cell GIDs;
             'location' : str
                 Valid values are 'distal' or 'proximal'
-            'conn' : dict
-                Connectivity parameters for each receptor type.
-                Valid keys are 'ampa' and 'nmda'.
-                conn['nmda'] is a dict specifying the synaptic weights:
+            'nmda' or 'ampa' : dict
+                Connectivity parameters for each receptor type
+                specifying the synaptic weights. Valid keys are:
                     'A_weight': float
                         Synaptic weight
                     'A_delay': float
