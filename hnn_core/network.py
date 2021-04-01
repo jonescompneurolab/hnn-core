@@ -1085,16 +1085,27 @@ class _NetworkDrive(dict):
         drive. The keys are specific to the type of drive ('evoked', 'bursty',
         etc.). See the drive add-methods in Network for details.
     conn : dict
-        Parameters describing how the drive connects to the network. Keys are:
-        'target_gids': range of target cell GIDs;
-        'target_type': target cell type (e.g. 'L2_basket');
-        'src_gids': range of source (artificial) cell GIDs;
-        'location': 'distal' or 'proximal';
-    conn['ampa'] and conn['nmda']: dict
-        Sub-dicts specifying the synaptic weights:
-        'A_weight': synaptic weight;
-        'A_delay': synaptic delay at d=0 (used with space constant);
-        'lamtha': space constant
+        Parameters describing how the drive connects to the network.
+        Valid keys are 'L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal'
+        conn['L2_basket'] is a dict with the following keys:
+            'target_gids' : range
+                Range of target cell GIDs;
+            'target_type' : str
+                Target cell type (e.g. 'L2_basket');
+            'src_gids' : range
+                Source (artificial) cell GIDs;
+            'location' : str
+                Valid values are 'distal' or 'proximal'
+            'conn' : dict
+                Connectivity parameters for each receptor type.
+                Valid keys are 'ampa' and 'nmda'.
+                conn['nmda'] is a dict specifying the synaptic weights:
+                    'A_weight': float
+                        Synaptic weight
+                    'A_delay': float
+                        Synaptic delay at d=0 (used with space constant)
+                    'lamtha': float
+                        Space constant
     """
     def __repr__(self):
         entr = f"<External drive '{self['name']}'"
