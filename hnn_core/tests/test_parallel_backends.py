@@ -18,6 +18,15 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 
 def _terminate_mpibackend(event, backend):
+    # wait for run_subprocess to start MPI proc and put handle on queue
+    proc = backend.proc_queue.get()
+    # put the proc back in the queue. used by backend.terminate()
+    backend.proc_queue.put(proc)
+
+    # give the process a little time to startup
+    sleep(0.1)
+
+    # run terminate until it is successful
     while not event.isSet():
         backend.terminate()
         sleep(0.01)
@@ -83,6 +92,13 @@ class TestParallelBackends():
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
+        params.update({'N_pyr_x': 3,
+                       'N_pyr_y': 3,
+                       'tstop': 40,
+                       't_evprox_1': 5,
+                       't_evdist_1': 10,
+                       't_evprox_2': 20,
+                       'N_trials': 2})
         net = Network(params, add_drives_from_params=True)
 
         with MPIBackend() as backend:
@@ -100,7 +116,7 @@ class TestParallelBackends():
             with pytest.warns(UserWarning) as record:
                 with pytest.raises(
                         RuntimeError,
-                        match="MPI simulation failed. Return code: 143"):
+                        match="MPI simulation failed. Return code: 1"):
                     simulate_dipole(net)
 
             event.set()
