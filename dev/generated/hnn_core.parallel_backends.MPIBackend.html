@@ -147,10 +147,14 @@ can be less than the user specified value if limited by the cores on
 the system, the number of cores allowed by the job scheduler, or
 if mpi4py could not be loaded.</p>
 </dd>
-<dt><strong>mpi_cmd: list of str</strong></dt><dd><p>The mpi command with number of procs and options to be passed to Popen</p>
+<dt><strong>mpi_cmd</strong><span class="classifier">list of str</span></dt><dd><p>The mpi command with number of procs and options to be passed to Popen</p>
 </dd>
 <dt><strong>expected_data_length</strong><span class="classifier">int</span></dt><dd><p>Used to check consistency between data that was sent and what
 MPIBackend received.</p>
+</dd>
+<dt><strong>proc_queue</strong><span class="classifier">threading.Queue</span></dt><dd><p>A Queue object to hold process handles from Popen in a thread-safe way.
+There will be a valid process handle present the queue when a MPI
+åsimulation is running.</p>
 </dd>
 </dl>
 </dd>
@@ -178,6 +182,14 @@ connected.</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="hnn_core.parallel_backends.MPIBackend.terminate">
+<code class="sig-name descname"><span class="pre">terminate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.parallel_backends.MPIBackend.terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminate running simulation on this MPIBackend</p>
+<p>Safe to call from another thread from the one <em class="xref py py-obj">simulate_dipole</em>
+was called from.</p>
 </dd></dl>
 
 </dd></dl>
