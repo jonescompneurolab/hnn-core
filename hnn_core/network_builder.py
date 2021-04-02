@@ -323,6 +323,7 @@ class NetworkBuilder(object):
 
         self.move_cells_to_pos()  # position cells in 2D grid
         self._connect_celltypes()
+        # Must be run after cells are moved to position for LFP calculations
         self._record_lfp()
 
         if _get_rank() == 0:
