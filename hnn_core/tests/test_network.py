@@ -210,6 +210,40 @@ def test_network():
     net.clear_connectivity()
     assert len(net.connectivity) == 0
 
+    # Test LFP electrodes
+    kwargs_default = {
+        'electrode_pos': (2, 2, 400),
+        'sigma': 3.0, 'method': 'psa'}
+    net.add_electrode(**kwargs_default)
+    kwargs_default['electrode_pos'] = [(2, 2, 400), (6, 6, 800)]
+    net.add_electrode(**kwargs_default)
+    assert len(net.lfp) == 3
+    with pytest.raises(AssertionError):
+        kwargs = kwargs_default.copy()
+        kwargs['electrode_pos'] = [(2, 2), (6, 6, 800)]
+        net.add_electrode(**kwargs)
+    with pytest.raises(AssertionError):
+        kwargs = kwargs_default.copy()
+        kwargs['sigma'] = -1.0
+        net.add_electrode(**kwargs)
+
+    match = "Invalid value for the 'method' parameter"
+    with pytest.raises(ValueError, match=match):
+        kwargs = kwargs_default.copy()
+        kwargs['method'] = 'LSA'
+        net.add_electrode(**kwargs)
+
+    bad_kwargs = [
+        ('electrode_pos', '[(2, 2, 400), (6, 6, 800)]'),
+        ('electrode_pos', (2, '2', 400)),
+        ('sigma', '3.0'), ('method', 3.0)]
+    for arg, item in bad_kwargs:
+        kwargs = kwargs_default.copy()
+        kwargs[arg] = item
+        match = 'must be an instance of'
+        with pytest.raises(TypeError, match=match):
+            net.add_electrode(**kwargs)
+
 
 def test_tonic_biases():
     """Test tonic biases."""

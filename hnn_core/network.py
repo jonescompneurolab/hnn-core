@@ -1057,9 +1057,10 @@ class Network(object):
             'psa' (default), i.e., point source approximation or line source
             approximation, i.e., 'lsa'
         """
-        _validate_type(electrode_pos, (list, tuple))
-        _validate_type(sigma, (float, int))
+        _validate_type(electrode_pos, (list, tuple), 'electrode_pos')
+        _validate_type(sigma, (float, int), 'sigma')
         assert sigma > 0.0
+        _validate_type(method, str, 'method')
         _check_option('method', method, ['psa', 'lsa'])
         if isinstance(electrode_pos, tuple):
             electrode_pos = [electrode_pos]
