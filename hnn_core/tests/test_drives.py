@@ -101,13 +101,15 @@ def test_external_drive_times():
         events_per_cycle=events_per_cycle, cycle_events_isi=cycle_events_isi,
         repeats=repeats, prng=prng, prng2=prng2)
 
+    events_per_cycle = 5
+    cycle_events_isi = 20
     with pytest.raises(ValueError,
-                       match='Burst duration cannot be greater than period'):
+                       match=r'Burst duration (?s).* cannot be greater than'):
         _create_bursty_input(distribution='normal', t0=t0, t0_stdev=t0_stdev,
                              tstop=tstop, f_input=f_input,
                              events_jitter_std=events_jitter_std,
-                             events_per_cycle=5,
-                             cycle_events_isi=20,
+                             events_per_cycle=events_per_cycle,
+                             cycle_events_isi=cycle_events_isi,
                              repeats=repeats, prng=prng, prng2=prng2)
 
 
@@ -190,8 +192,9 @@ def test_add_drives():
         net.add_bursty_drive('bursty_drive', tstop=params['tstop'] + 1,
                              location='distal', burst_rate=10)
 
-    with pytest.raises(ValueError,
-                       match='Burst duration cannot be greater than period'):
+    msg = (r'Burst duration (?s).* cannot be greater than '
+           'burst period')
+    with pytest.raises(ValueError, match=msg):
         net.add_bursty_drive('bursty_drive', location='distal',
                              burst_rate=10, burst_std=20., numspikes=4,
                              spike_isi=50)
