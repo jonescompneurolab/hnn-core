@@ -329,10 +329,11 @@ def plot_cells(net, ax=None, show=True):
             marker = markers[cell_type]
             ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
 
-    x = [e_dict['pos'][0] for e_dict in net.lfp]
-    y = [e_dict['pos'][1] for e_dict in net.lfp]
-    z = [e_dict['pos'][2] for e_dict in net.lfp]
-    ax.scatter(x, y, z, c='r', s=100, marker='o', label='Electrode')
+    if net.lfp:
+        x = [e_dict['pos'][0] for e_dict in net.lfp]
+        y = [e_dict['pos'][1] for e_dict in net.lfp]
+        z = [e_dict['pos'][2] for e_dict in net.lfp]
+        ax.scatter(x, y, z, c='r', s=100, marker='o', label='Electrode')
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
 

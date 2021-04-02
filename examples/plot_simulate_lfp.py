@@ -1,7 +1,7 @@
 """
-=====================
+==============
 08. Record LFP
-=====================
+==============
 
 This example demonstrates how to record local field potentials (LFPs).
 """
@@ -41,7 +41,7 @@ net = Network(params, add_drives_from_params=True)
 net.plot_cells()
 
 ###############################################################################
-# Electrode positions are stored under :attr:`~hnn_core.Network.lfp` as a list
+# Electrode positions are stored under ``Network.lfp`` as a list
 # of tuples. Once we have chosen x,y,z coordinates for each electrode, we can
 # add them to the simulation.
 electrode_pos = [(2, 2, 400), (6, 6, 800)]
@@ -51,14 +51,14 @@ net.plot_cells()
 
 ###############################################################################
 # Now that our electrodes are specified, we can run the simulation. The LFP
-# recordings are also stored under :attr:`~hnn_core.Network.lfp`.
+# recordings are also stored under ``Network.lfp``.
 import matplotlib.pyplot as plt
 
 dpl = simulate_dipole(net)
 times = dpl[0].times[:-1]
 plt.figure()
 trial_idx = 0
-plt.plot(times, net.lfp[0]['lfp'][trial_idx])
-plt.plot(times, net.lfp[1]['lfp'][trial_idx])
+plt.plot(times, net.lfp[0]['data'][trial_idx])
+plt.plot(times, net.lfp[1]['data'][trial_idx])
 plt.legend([f'e_pos {electrode_pos[0]}', f'e_pos {electrode_pos[1]}'])
 plt.show()
