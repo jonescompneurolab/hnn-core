@@ -193,8 +193,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
 
             if not child_terminated and \
                     count_since_last_output > timeout_cycles:
-                warn("No output from child process in approx 10s. "
-                     "Terminating...")
+                warn("Timeout exceeded while waiting for child process output"
+                     ". Terminating...")
                 kill_proc_name('nrniv')
                 break
     except KeyboardInterrupt:
@@ -692,6 +692,11 @@ class MPIBackend(object):
         return dpls
 
     def terminate(self):
+        """Terminate running simulation on this MPIBackend
+
+        Safe to call from another thread from the one `simulate_dipole`
+        was called from.
+        """
         proc = None
         try:
             proc = self.proc_queue.get(timeout=1)
