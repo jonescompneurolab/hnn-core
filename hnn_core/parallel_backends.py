@@ -701,7 +701,7 @@ class MPIBackend(object):
         if proc is not None:
             proc.terminate()
             try:
-                proc.wait(5)  # wait maximum of 1s
+                proc.wait(5)  # wait maximum of 5s
             except TimeoutExpired:
                 warn("Could not kill python subprocess: PID %d" %
                      proc.pid)
