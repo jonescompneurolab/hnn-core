@@ -11,7 +11,7 @@ from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import _long_name, _short_name
-from .externals.lfp import _LFPElectrode
+from .lfp import _LFPElectrode
 
 # a few globals
 _PC = None

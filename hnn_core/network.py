@@ -1068,7 +1068,7 @@ class Network(object):
             for pos in e_pos:
                 _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
             electrode_dict = {
-                'lfp': list(), 'pos': pos, 'sigma': sigma, 'method': method}
+                'lfp': list(), 'pos': e_pos, 'sigma': sigma, 'method': method}
             self.lfp.append(electrode_dict)
 
     def plot_cells(self, ax=None, show=True):
