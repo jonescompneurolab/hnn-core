@@ -125,7 +125,7 @@ class _LFPElectrode:
     ----------
     coord : tuple
         The (x, y, z) coordinates of the LFP electrode.
-    sigma : float | int
+    sigma : float
         Extracellular conductivity in mS/cm (uniform for simplicity)
     pc : instance of h.ParallelContext()
         ParallelContext instance for running in parallel

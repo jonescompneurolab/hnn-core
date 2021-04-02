@@ -192,6 +192,11 @@ class Network(object):
         Firing threshold of all cells.
     delay : float
         Synaptic delay in ms.
+    lfp : list of dict
+        Stores local field potential recordings. Each list element is a
+        dictionary containing the LFP recording (after a simulation is run)
+        as well as information for each electrode. Keys include:
+        'pos', 'sigma', 'method', and 'lfp'.
     """
 
     def __init__(self, params, add_drives_from_params=False,
@@ -234,7 +239,6 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
-        self.pos_lfp = dict()
         self.lfp = list()
 
         # contents of pos_dict determines all downstream inferences of
@@ -1053,22 +1057,19 @@ class Network(object):
             'psa' (default), i.e., point source approximation or line source
             approximation, i.e., 'lsa'
         """
-        electrode_dict = dict()
-        n_electrodes = len(self.pos_lfp)
         _validate_type(electrode_pos, (list, tuple))
         _validate_type(sigma, (float, int))
         assert sigma > 0.0
         _check_option('method', method, ['psa', 'lsa'])
         if isinstance(electrode_pos, tuple):
             electrode_pos = [electrode_pos]
-        for e_idx, e_pos in enumerate(electrode_pos):
+        for e_pos in electrode_pos:
             assert len(e_pos) == 3
             for pos in e_pos:
                 _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
-            electrode_dict[e_idx + n_electrodes] = {
-                'pos': pos, 'sigma': sigma, 'method': method}
-
-        self.pos_lfp.update(electrode_dict)
+            electrode_dict = {
+                'lfp': list(), 'pos': pos, 'sigma': sigma, 'method': method}
+            self.lfp.append(electrode_dict)
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

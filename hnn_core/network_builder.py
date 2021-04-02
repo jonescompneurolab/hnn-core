@@ -467,8 +467,9 @@ class NetworkBuilder(object):
 
     def _record_lfp(self):
         method = 'psa'
-        for _, item in self.net.pos_lfp.items():
-            pos, sigma, method = item['pos'], item['sigma'], item['method']
+        for e_dict in self.net.lfp:
+            pos, sigma = e_dict['pos'], e_dict['sigma']
+            method = e_dict['method']
             elec = _LFPElectrode(pos, sigma=sigma, pc=_PC, cvode=_CVODE,
                                  method=method)
             self._lfp.append(elec)

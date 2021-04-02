@@ -46,7 +46,7 @@ net.plot_cells()
 # simulation.
 electrode_pos = [(2, 2, 400), (6, 6, 800)]
 net.add_electrode(electrode_pos)
-print(net.pos_lfp)
+print(net.lfp)
 net.plot_cells()
 
 ###############################################################################
@@ -57,7 +57,8 @@ import matplotlib.pyplot as plt
 dpl = simulate_dipole(net)
 times = dpl[0].times[:-1]
 plt.figure()
-plt.plot(times, net.lfp[0])
-plt.plot(times, net.lfp[1])
+trial_idx = 0
+plt.plot(times, net.lfp[0]['lfp'][trial_idx])
+plt.plot(times, net.lfp[1]['lfp'][trial_idx])
 plt.legend([f'e_pos {electrode_pos[0]}', f'e_pos {electrode_pos[1]}'])
 plt.show()
