@@ -20,9 +20,9 @@ import matplotlib.pyplot as plt
 
 import hnn_core
 from hnn_core import simulate_dipole, average_dipoles, rmse
-from hnn_core import Params, Network, Dipole
+from hnn_core import read_params, Network, Dipole
 
-hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
 ###############################################################################
 # Set some global variables
@@ -186,6 +186,7 @@ def generate_weights(evinput_params, params, decay_multiplier):
 def create_last_chunk(input_chunks):
     """ This creates a chunk that combines parameters for
     all chunks in input_chunks (final step)
+
     Parameters
     ----------
     input_chunks: List
@@ -266,6 +267,7 @@ def consolidate_chunks(inputs):
 
 def optrun(new_params, grad=0):
     """ This is the function to run a simulation
+
     Parameters
     ----------
     new_params: Array
@@ -295,10 +297,11 @@ def optrun(new_params, grad=0):
             return 1e9  # invalid param value -> large error
 
     # run the simulation, but stop early if possible
-    net = Network(params)
-    net.params['tstop'] = opt_params['opt_end']
-    dpls = simulate_dipole(net, n_jobs=1, n_trials=1)
-    avg_dpl = average_dipoles(dpls)
+    params['tstop'] = opt_params['opt_end']
+    net = Network(params, add_drives_from_params=True)
+    dpls = simulate_dipole(net, n_trials=1)
+    # avg_dpl = average_dipoles(dpls)
+    avg_dpl = dpls[0].copy()
     avg_rmse = rmse(avg_dpl, exp_dpl,
                     tstart=opt_params['opt_start'],
                     tstop=opt_params['opt_end'],
@@ -374,12 +377,12 @@ def run_optimization(seed=0):
 # tuned. So, the initial RMSE will be large, giving the optimization procedure
 # a lot to work with.
 extdata = np.loadtxt('S1_SupraT.txt')
-exp_dpl = Dipole(extdata[:, 0], np.c_[extdata[:, 1]])
+exp_dpl = Dipole(extdata[:, 0], np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]])
 
 ###############################################################################
 # Read the base parameters from a file
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = Params(params_fname)
+params = read_params(params_fname)
 
 ###############################################################################
 # Create a sorted dictionary with the inputs and parameters belonging to each.
@@ -397,10 +400,11 @@ param_chunks = consolidate_chunks(weighted_evinput_params)
 # Start the optimization!
 
 print("Running simulation with initial parameters")
-net = Network(params)
-dpls = simulate_dipole(net, n_jobs=1, n_trials=1)
-initial_dpl = average_dipoles(dpls)
-avg_rmse = rmse(initial_dpl, exp_dpl, tstop=params['tstop'])
+net = Network(params, add_drives_from_params=True)
+dpls = simulate_dipole(net, n_trials=1)
+# initial_dpl = average_dipoles(dpls)
+initial_dpl = dpls.copy()
+avg_rmse = rmse(initial_dpl[0], exp_dpl, tstop=params['tstop'])
 print("Initial RMSE: %.2f" % avg_rmse)
 
 for step in range(len(param_chunks)):
