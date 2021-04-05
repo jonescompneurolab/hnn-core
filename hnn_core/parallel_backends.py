@@ -66,13 +66,13 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         net.cell_response._vsoma.append(spikedata[3])
         net.cell_response._isoma.append(spikedata[4])
 
-        N_pyr_x = net.params['N_pyr_x']
-        N_pyr_y = net.params['N_pyr_y']
+        N_pyr_x = net._params['N_pyr_x']
+        N_pyr_y = net._params['N_pyr_y']
         dpls[-1]._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
         dpls[-1]._convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:
-            window_len = net.params['dipole_smooth_win']  # specified in ms
-            fctr = net.params['dipole_scalefctr']
+            window_len = net._params['dipole_smooth_win']  # specified in ms
+            fctr = net._params['dipole_scalefctr']
             if window_len > 0:  # param files set this to zero for no smoothing
                 dpls[-1].smooth(window_len=window_len)
             if fctr > 0:

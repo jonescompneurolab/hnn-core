@@ -79,9 +79,9 @@ def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
 
 def _add_drives_from_params(net):
     drive_specs = _extract_drive_specs_from_hnn_params(
-        net.params, net.cellname_list)
+        net._params, net.cellname_list)
     bias_specs = _extract_bias_specs_from_hnn_params(
-        net.params, net.cellname_list)
+        net._params, net.cellname_list)
 
     for drive_name in sorted(drive_specs.keys()):  # order matters
         specs = drive_specs[drive_name]
@@ -144,7 +144,7 @@ def _add_drives_from_params(net):
             t0=bias_specs['tonic'][cellname]['t0'],
             T=bias_specs['tonic'][cellname]['T'])
 
-    net._instantiate_drives(n_trials=net.params['N_trials'])
+    net._instantiate_drives(n_trials=net._params['N_trials'])
 
 
 def _get_prng(seed, gid, sync_evinput=False):

@@ -162,8 +162,6 @@ class Network(object):
 
     Attributes
     ----------
-    params : dict
-        The parameters of the network
     cellname_list : list
         The names of real cell types in the network (e.g. 'L2_basket')
     gid_ranges : dict
@@ -198,7 +196,7 @@ class Network(object):
     def __init__(self, params, add_drives_from_params=False,
                  legacy_mode=True):
         # Save the parameters used to create the Network
-        self.params = params
+        self._params = params
         # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
@@ -232,13 +230,13 @@ class Network(object):
 
         # network connectivity
         self.connectivity = list()
-        self.threshold = self.params['threshold']
+        self.threshold = self._params['threshold']
         self.delay = 1.0
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
-        self.pos_dict = _create_cell_coords(n_pyr_x=self.params['N_pyr_x'],
-                                            n_pyr_y=self.params['N_pyr_y'],
+        self.pos_dict = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
+                                            n_pyr_y=self._params['N_pyr_y'],
                                             zdiff=1307.4)
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
@@ -255,7 +253,7 @@ class Network(object):
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self.params['N_pyr_x'], self.params['N_pyr_y']))
+             % (self._params['N_pyr_x'], self._params['N_pyr_y']))
         s += ("\n%d L2 basket cells\n%d L5 basket cells"
               % (len(self.pos_dict['L2_basket']),
                  len(self.pos_dict['L5_basket'])))
@@ -824,7 +822,7 @@ class Network(object):
         for target_cell in ['L2Pyr', 'L5Pyr']:
             for receptor in ['nmda', 'ampa']:
                 key = f'gbar_{target_cell}_{target_cell}_{receptor}'
-                nc_dict['A_weight'] = self.params[key]
+                nc_dict['A_weight'] = self._params[key]
                 self._all_to_all_connect(
                     target_cell, target_cell, loc, receptor,
                     nc_dict, allow_autapses=False)
@@ -836,7 +834,7 @@ class Network(object):
         loc = 'soma'
         for receptor in ['gabaa', 'gabab']:
             key = f'gbar_L2Basket_L2Pyr_{receptor}'
-            nc_dict['A_weight'] = self.params[key]
+            nc_dict['A_weight'] = self._params[key]
             self._all_to_all_connect(
                 src_cell, target_cell, loc, receptor, nc_dict)
 
@@ -847,7 +845,7 @@ class Network(object):
         loc = 'soma'
         for receptor in ['gabaa', 'gabab']:
             key = f'gbar_L5Basket_{target_cell}_{receptor}'
-            nc_dict['A_weight'] = self.params[key]
+            nc_dict['A_weight'] = self._params[key]
             self._all_to_all_connect(
                 src_cell, target_cell, loc, receptor, nc_dict)
 
@@ -857,7 +855,7 @@ class Network(object):
         receptor = 'ampa'
         for loc in ['proximal', 'distal']:
             key = f'gbar_L2Pyr_{target_cell}'
-            nc_dict['A_weight'] = self.params[key]
+            nc_dict['A_weight'] = self._params[key]
             self._all_to_all_connect(
                 src_cell, target_cell, loc, receptor, nc_dict)
 
@@ -865,7 +863,7 @@ class Network(object):
         src_cell = 'L2Basket'
         nc_dict['lamtha'] = 50.
         key = f'gbar_L2Basket_{target_cell}'
-        nc_dict['A_weight'] = self.params[key]
+        nc_dict['A_weight'] = self._params[key]
         loc = 'distal'
         receptor = 'gabaa'
         self._all_to_all_connect(
@@ -876,7 +874,7 @@ class Network(object):
         target_cell = 'L2Basket'
         nc_dict['lamtha'] = 3.
         key = f'gbar_L2Pyr_{target_cell}'
-        nc_dict['A_weight'] = self.params[key]
+        nc_dict['A_weight'] = self._params[key]
         loc = 'soma'
         receptor = 'ampa'
         self._all_to_all_connect(
@@ -885,7 +883,7 @@ class Network(object):
         src_cell = 'L2Basket'
         nc_dict['lamtha'] = 20.
         key = f'gbar_L2Basket_{target_cell}'
-        nc_dict['A_weight'] = self.params[key]
+        nc_dict['A_weight'] = self._params[key]
         loc = 'soma'
         receptor = 'gabaa'
         self._all_to_all_connect(
@@ -898,7 +896,7 @@ class Network(object):
         loc = 'soma'
         receptor = 'gabaa'
         key = f'gbar_L5Basket_{target_cell}'
-        nc_dict['A_weight'] = self.params[key]
+        nc_dict['A_weight'] = self._params[key]
         self._all_to_all_connect(
             src_cell, target_cell, loc, receptor, nc_dict,
             allow_autapses=False)
@@ -906,7 +904,7 @@ class Network(object):
         src_cell = 'L5Pyr'
         nc_dict['lamtha'] = 3.
         key = f'gbar_L5Pyr_{target_cell}'
-        nc_dict['A_weight'] = self.params[key]
+        nc_dict['A_weight'] = self._params[key]
         loc = 'soma'
         receptor = 'ampa'
         self._all_to_all_connect(
@@ -914,7 +912,7 @@ class Network(object):
 
         src_cell = 'L2Pyr'
         key = f'gbar_L2Pyr_{target_cell}'
-        nc_dict['A_weight'] = self.params[key]
+        nc_dict['A_weight'] = self._params[key]
         loc = 'soma'
         receptor = 'ampa'
         self._all_to_all_connect(

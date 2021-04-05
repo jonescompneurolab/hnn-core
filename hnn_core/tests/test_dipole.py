@@ -70,8 +70,8 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
 
-    dpls_raw[0]._post_proc(net.params['dipole_smooth_win'],
-                           net.params['dipole_scalefctr'])
+    dpls_raw[0]._post_proc(net._params['dipole_smooth_win'],
+                           net._params['dipole_scalefctr'])
     assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
 
 
