@@ -20,7 +20,7 @@ repository with an editable pip install::
 
     $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
     $ cd hnn-core
-    $ python setup.py develop
+    $ pip install -e .
     $ python setup.py build_mod
 
 Then, install the following python packages::
