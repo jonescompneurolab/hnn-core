@@ -1,0 +1,38 @@
+# HNN-core build
+
+
+# Distribution / packaging
+.Python
+dist/
+*.egg*
+build
+coverage
+*.xml
+.venv
+
+# Sphinx documentation
+doc/_build/
+doc/generated/
+doc/auto_examples/
+doc/auto_tutorials/
+doc/modules/generated/
+doc/sphinxext/cachedir
+pip-log.txt
+.coverage
+tags
+doc/coverages
+doc/samples
+cover
+
+# Pycharm
+.idea/
+
+*.pyc
+
+.cache
+.pytest_cache
+.ipynb_checkpoints
+.DS_Store
+.vscode/
+
+__pycache__
