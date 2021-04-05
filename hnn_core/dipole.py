@@ -66,7 +66,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         connected.
     n_trials : int | None
         The number of trials to simulate. If None, the 'N_trials' value
-        of the ``net`` params is used (must be >0)
+        of the ``params`` used to create ``net`` is used (must be >0)
     record_vsoma : bool
         Option to record somatic voltages from cells
     record_isoma : bool
