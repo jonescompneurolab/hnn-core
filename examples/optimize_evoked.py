@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 import hnn_core
 from hnn_core import simulate_dipole, average_dipoles, rmse
-from hnn_core import read_params, Network, Dipole
+from hnn_core import read_params, Network, Dipole, MPIBackend
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
@@ -401,7 +401,8 @@ param_chunks = consolidate_chunks(weighted_evinput_params)
 
 print("Running simulation with initial parameters")
 net = Network(params, add_drives_from_params=True)
-dpls = simulate_dipole(net, n_trials=1)
+with MPIBackend(n_procs=2):
+    dpls = simulate_dipole(net, n_trials=1)
 # initial_dpl = average_dipoles(dpls)
 initial_dpl = dpls.copy()
 avg_rmse = rmse(initial_dpl[0], exp_dpl, tstop=params['tstop'])
