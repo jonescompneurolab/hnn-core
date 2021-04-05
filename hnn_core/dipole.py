@@ -65,8 +65,8 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         The Network object specifying how cells are
         connected.
     n_trials : int | None
-        The number of trials to simulate. If None, the value in
-        net.params['N_trials'] is used (must be >0)
+        The number of trials to simulate. If None, the 'N_trials' value
+        of the ``params`` used to create ``net`` is used (must be >0)
     record_vsoma : bool
         Option to record somatic voltages from cells
     record_isoma : bool
@@ -86,23 +86,23 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         _BACKEND = JoblibBackend(n_jobs=1)
 
     if n_trials is None:
-        n_trials = net.params['N_trials']
+        n_trials = net._params['N_trials']
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
     # XXX needed in mpi_child.py:run()#L103; include fix in #211 or later PR
-    net.params['N_trials'] = n_trials
+    net._params['N_trials'] = n_trials
     net._instantiate_drives(n_trials=n_trials)
     net.cell_response.reset()  # see #290 for context; relevant for MPI
 
     if isinstance(record_vsoma, bool):
-        net.params['record_vsoma'] = record_vsoma
+        net._params['record_vsoma'] = record_vsoma
     else:
         raise TypeError("record_vsoma must be bool, got %s"
                         % type(record_vsoma).__name__)
 
     if isinstance(record_isoma, bool):
-        net.params['record_isoma'] = record_isoma
+        net._params['record_isoma'] = record_isoma
     else:
         raise TypeError("record_isoma must be bool, got %s"
                         % type(record_isoma).__name__)

@@ -27,8 +27,8 @@ def test_network():
 
     # Assert that params are conserved across Network initialization
     for p in params:
-        assert params[p] == net.params[p]
-    assert len(params) == len(net.params)
+        assert params[p] == net._params[p]
+    assert len(params) == len(net._params)
     print(network_builder)
     print(network_builder.cells[:2])
 
@@ -262,6 +262,6 @@ def test_tonic_biases():
     assert 'L5_pyramidal' not in net.external_biases['tonic']
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
     assert net.external_biases[
-        'tonic']['L2_pyramidal']['T'] == net.params['tstop']
+        'tonic']['L2_pyramidal']['T'] == net._params['tstop']
     with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)

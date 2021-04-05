@@ -43,9 +43,9 @@ def _simulate_single_trial(neuron_net, trial_idx):
               (trial_idx + 1, nhosts))
 
     # Set tstop before instantiating any classes
-    h.tstop = neuron_net.net.params['tstop']
-    h.dt = neuron_net.net.params['dt']  # simulation duration and time-step
-    h.celsius = neuron_net.net.params['celsius']  # 37.0 - set temperature
+    h.tstop = neuron_net.net._params['tstop']
+    h.dt = neuron_net.net._params['dt']  # simulation duration and time-step
+    h.celsius = neuron_net.net._params['celsius']  # 37.0 - set temperature
 
     times = neuron_net.net.cell_response.times
 
@@ -244,7 +244,7 @@ class NetworkBuilder(object):
     The `_build` routine can be called again to run more simulations without
     creating new `nrniv` processes. Instead, the NERUON objects are recreated
     and gids are reassigned according to the specifications in
-    `self.net.params` and the network is ready for another simulation.
+    `self.net._params` and the network is ready for another simulation.
     """
 
     def __init__(self, net, trial_idx=0):
@@ -296,9 +296,9 @@ class NetworkBuilder(object):
 
         self._gid_assign()
 
-        record_vsoma = self.net.params['record_vsoma']
-        record_isoma = self.net.params['record_isoma']
-        self._create_cells_and_drives(threshold=self.net.params['threshold'],
+        record_vsoma = self.net._params['record_vsoma']
+        record_isoma = self.net._params['record_isoma']
+        self._create_cells_and_drives(threshold=self.net._params['threshold'],
                                       record_vsoma=record_vsoma,
                                       record_isoma=record_isoma)
 
