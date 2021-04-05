@@ -129,6 +129,8 @@ class _LFPElectrode:
         Extracellular conductivity in mS/cm (uniform for simplicity)
     pc : instance of h.ParallelContext()
         ParallelContext instance for running in parallel
+    cvode : instanse of h.CVode
+        Multi order variable time step integration method.
     method : str
         'psa' (default), i.e., point source approximation or line source
         approximation, i.e., 'lsa'
