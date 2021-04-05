@@ -22,11 +22,18 @@
 05. From MEG sensor-space data to HNN simulation
 ================================================
 
-This example demonstrates how to calculate the inverse solution of the median
-nerve evoked response in S1 from the MNE somatosensory dataset, and then
-simulate a biophysical model network that reproduces the observed dynamics.
+This example demonstrates how to calculate an inverse solution of the median
+nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset,
+and then simulate a biophysical model network that reproduces the observed
+dynamics. Note that we do not expound on how we came up with the sequence of
+evoked drives used in this example, rather, we only demonstrate its
+implementation. For those who want more background on the HNN model and the
+process used to articulate the proximal and distal drives needed to simulate
+evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives
+presented here is not part of a current publication but is motivated by prior
+studies [1]_, [2]_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-16
+.. GENERATED FROM PYTHON SOURCE LINES 17-23
 
 .. code-block:: default
 
@@ -43,14 +50,14 @@ simulate a biophysical model network that reproduces the observed dynamics.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-21
+.. GENERATED FROM PYTHON SOURCE LINES 24-28
 
 First, we will import the packages needed for computing the inverse solution
 from the MNE somatosensory dataset. `MNE`_ can be installed with
 ``pip install mne``, and the somatosensory dataset can be downloaded by
 importing ``somato`` from ``mne.datasets``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-28
+.. GENERATED FROM PYTHON SOURCE LINES 28-35
 
 .. code-block:: default
 
@@ -68,11 +75,11 @@ importing ``somato`` from ``mne.datasets``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-30
+.. GENERATED FROM PYTHON SOURCE LINES 36-37
 
 Now we set the the path of the ``somato`` dataset for subject ``'01'``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-39
+.. GENERATED FROM PYTHON SOURCE LINES 37-46
 
 .. code-block:: default
 
@@ -99,7 +106,7 @@ Now we set the the path of the ``somato`` dataset for subject ``'01'``.
     Creating ~/mne_data
     Downloading archive MNE-somato-data.tar.gz to /home/circleci/mne_data
     Downloading https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e2849ad5a1025d4b7346?version=7&action=download&direct (582.2 MB)
-      0%|          | Downloading : 0.00/582M [00:00<?,        ?B/s]      0%|          | Downloading : 0.99M/582M [00:00<00:10,    57.6MB/s]      1%|          | Downloading : 2.99M/582M [00:00<00:10,    59.1MB/s]      2%|1         | Downloading : 8.99M/582M [00:00<00:09,    61.2MB/s]      2%|2         | Downloading : 13.0M/582M [00:00<00:09,    62.7MB/s]      3%|2         | Downloading : 17.0M/582M [00:00<00:09,    64.6MB/s]      4%|3         | Downloading : 21.0M/582M [00:00<00:08,    67.1MB/s]      4%|4         | Downloading : 25.0M/582M [00:00<00:08,    69.7MB/s]      5%|4         | Downloading : 29.0M/582M [00:00<00:08,    70.5MB/s]      6%|6         | Downloading : 37.0M/582M [00:00<00:07,    72.8MB/s]      7%|7         | Downloading : 41.0M/582M [00:00<00:07,    75.3MB/s]      8%|7         | Downloading : 45.0M/582M [00:00<00:07,    77.9MB/s]      8%|8         | Downloading : 49.0M/582M [00:00<00:06,    80.4MB/s]     10%|#         | Downloading : 61.0M/582M [00:00<00:06,    83.2MB/s]     12%|#1        | Downloading : 69.0M/582M [00:00<00:06,    84.6MB/s]     13%|#3        | Downloading : 77.0M/582M [00:00<00:06,    87.8MB/s]     15%|#4        | Downloading : 85.0M/582M [00:00<00:05,    89.6MB/s]     16%|#5        | Downloading : 93.0M/582M [00:00<00:05,    92.9MB/s]     17%|#7        | Downloading : 101M/582M [00:00<00:05,    93.9MB/s]      19%|#8        | Downloading : 109M/582M [00:00<00:05,    96.7MB/s]     20%|##        | Downloading : 117M/582M [00:00<00:05,    97.3MB/s]     21%|##1       | Downloading : 125M/582M [00:00<00:04,     100MB/s]     23%|##2       | Downloading : 133M/582M [00:00<00:04,     101MB/s]     24%|##4       | Downloading : 141M/582M [00:00<00:04,     105MB/s]     26%|##5       | Downloading : 149M/582M [00:00<00:04,     106MB/s]     27%|##6       | Downloading : 157M/582M [00:00<00:04,     108MB/s]     28%|##8       | Downloading : 165M/582M [00:01<00:03,     110MB/s]     30%|##9       | Downloading : 173M/582M [00:01<00:03,     113MB/s]     31%|###1      | Downloading : 181M/582M [00:01<00:03,     117MB/s]     32%|###2      | Downloading : 189M/582M [00:01<00:03,     118MB/s]     34%|###3      | Downloading : 197M/582M [00:01<00:03,     121MB/s]     35%|###5      | Downloading : 205M/582M [00:01<00:03,     122MB/s]     37%|###6      | Downloading : 213M/582M [00:01<00:03,     126MB/s]     38%|###7      | Downloading : 221M/582M [00:01<00:03,     126MB/s]     39%|###9      | Downloading : 229M/582M [00:01<00:02,     128MB/s]     41%|####      | Downloading : 237M/582M [00:01<00:02,     128MB/s]     42%|####2     | Downloading : 245M/582M [00:01<00:02,     133MB/s]     43%|####3     | Downloading : 253M/582M [00:01<00:02,     131MB/s]     45%|####4     | Downloading : 261M/582M [00:01<00:02,     125MB/s]     46%|####5     | Downloading : 265M/582M [00:01<00:02,     127MB/s]     46%|####6     | Downloading : 269M/582M [00:01<00:02,     125MB/s]     47%|####6     | Downloading : 273M/582M [00:01<00:02,     128MB/s]     48%|####7     | Downloading : 277M/582M [00:01<00:02,     128MB/s]     48%|####8     | Downloading : 281M/582M [00:01<00:02,     124MB/s]     50%|#####     | Downloading : 293M/582M [00:01<00:02,     125MB/s]     52%|#####1    | Downloading : 301M/582M [00:01<00:02,     127MB/s]     53%|#####3    | Downloading : 309M/582M [00:02<00:02,     127MB/s]     54%|#####4    | Downloading : 317M/582M [00:02<00:02,     129MB/s]     56%|#####5    | Downloading : 325M/582M [00:02<00:02,     129MB/s]     57%|#####7    | Downloading : 333M/582M [00:02<00:02,     130MB/s]     59%|#####8    | Downloading : 341M/582M [00:02<00:01,     132MB/s]     60%|#####9    | Downloading : 349M/582M [00:02<00:01,     131MB/s]     61%|######1   | Downloading : 357M/582M [00:02<00:01,     134MB/s]     63%|######2   | Downloading : 365M/582M [00:02<00:01,     131MB/s]     64%|######4   | Downloading : 373M/582M [00:02<00:01,     133MB/s]     65%|######5   | Downloading : 381M/582M [00:02<00:01,     133MB/s]     67%|######6   | Downloading : 389M/582M [00:02<00:01,     132MB/s]     68%|######8   | Downloading : 397M/582M [00:02<00:01,     136MB/s]     70%|######9   | Downloading : 405M/582M [00:02<00:01,     137MB/s]     71%|#######   | Downloading : 413M/582M [00:02<00:01,     136MB/s]     72%|#######2  | Downloading : 421M/582M [00:02<00:01,     136MB/s]     74%|#######3  | Downloading : 429M/582M [00:02<00:01,     140MB/s]     75%|#######5  | Downloading : 437M/582M [00:02<00:01,     139MB/s]     76%|#######6  | Downloading : 445M/582M [00:02<00:01,     140MB/s]     78%|#######7  | Downloading : 453M/582M [00:03<00:00,     140MB/s]     79%|#######9  | Downloading : 461M/582M [00:03<00:00,     144MB/s]     81%|########  | Downloading : 469M/582M [00:03<00:00,     143MB/s]     82%|########1 | Downloading : 477M/582M [00:03<00:00,     144MB/s]     83%|########3 | Downloading : 485M/582M [00:03<00:00,     144MB/s]     85%|########4 | Downloading : 493M/582M [00:03<00:00,     142MB/s]     86%|########6 | Downloading : 501M/582M [00:03<00:00,     144MB/s]     87%|########7 | Downloading : 509M/582M [00:03<00:00,     142MB/s]     89%|########8 | Downloading : 517M/582M [00:03<00:00,     145MB/s]     90%|######### | Downloading : 525M/582M [00:03<00:00,     145MB/s]     92%|#########1| Downloading : 533M/582M [00:03<00:00,     145MB/s]     93%|#########2| Downloading : 541M/582M [00:03<00:00,     124MB/s]     95%|#########4| Downloading : 553M/582M [00:03<00:00,     128MB/s]     96%|#########6| Downloading : 561M/582M [00:03<00:00,     128MB/s]     98%|#########7| Downloading : 569M/582M [00:03<00:00,     131MB/s]     99%|#########9| Downloading : 577M/582M [00:04<00:00,     132MB/s]    100%|##########| Downloading : 582M/582M [00:04<00:00,     135MB/s]    100%|##########| Downloading : 582M/582M [00:04<00:00,     151MB/s]
+      0%|          | Downloading : 0.00/582M [00:00<?,        ?B/s]      0%|          | Downloading : 0.99M/582M [00:00<00:12,    47.7MB/s]      0%|          | Downloading : 2.49M/582M [00:00<00:12,    48.2MB/s]      1%|          | Downloading : 3.49M/582M [00:00<00:12,    48.8MB/s]      1%|          | Downloading : 5.49M/582M [00:00<00:12,    49.6MB/s]      1%|1         | Downloading : 6.49M/582M [00:00<00:12,    49.8MB/s]      1%|1         | Downloading : 7.49M/582M [00:00<00:12,    49.3MB/s]      1%|1         | Downloading : 8.49M/582M [00:00<00:13,    43.5MB/s]      2%|1         | Downloading : 9.49M/582M [00:00<00:13,    44.0MB/s]      2%|1         | Downloading : 11.5M/582M [00:00<00:13,    44.8MB/s]      2%|2         | Downloading : 14.5M/582M [00:00<00:12,    46.2MB/s]      3%|2         | Downloading : 16.5M/582M [00:00<00:12,    47.5MB/s]      3%|3         | Downloading : 18.5M/582M [00:00<00:12,    48.9MB/s]      4%|3         | Downloading : 20.5M/582M [00:00<00:11,    49.8MB/s]      4%|3         | Downloading : 22.5M/582M [00:00<00:11,    50.6MB/s]      4%|4         | Downloading : 24.5M/582M [00:00<00:11,    51.1MB/s]      5%|4         | Downloading : 26.5M/582M [00:00<00:11,    52.1MB/s]      5%|5         | Downloading : 30.5M/582M [00:00<00:10,    53.7MB/s]      6%|5         | Downloading : 32.5M/582M [00:00<00:10,    55.2MB/s]      6%|5         | Downloading : 34.5M/582M [00:00<00:10,    56.5MB/s]      6%|6         | Downloading : 36.5M/582M [00:00<00:09,    57.8MB/s]      7%|6         | Downloading : 38.5M/582M [00:00<00:09,    58.1MB/s]      7%|6         | Downloading : 40.5M/582M [00:00<00:09,    59.3MB/s]      7%|7         | Downloading : 42.5M/582M [00:00<00:09,    60.8MB/s]      8%|7         | Downloading : 44.5M/582M [00:00<00:09,    62.2MB/s]      8%|7         | Downloading : 46.5M/582M [00:00<00:08,    63.6MB/s]      9%|8         | Downloading : 50.5M/582M [00:00<00:08,    65.3MB/s]      9%|9         | Downloading : 52.5M/582M [00:00<00:08,    66.9MB/s]      9%|9         | Downloading : 54.5M/582M [00:00<00:08,    68.3MB/s]     10%|9         | Downloading : 56.5M/582M [00:00<00:07,    69.8MB/s]     10%|#         | Downloading : 58.5M/582M [00:00<00:07,    70.7MB/s]     10%|#         | Downloading : 60.5M/582M [00:00<00:07,    71.6MB/s]     11%|#         | Downloading : 62.5M/582M [00:00<00:07,    72.7MB/s]     11%|#1        | Downloading : 64.5M/582M [00:00<00:07,    74.0MB/s]     12%|#1        | Downloading : 68.5M/582M [00:00<00:07,    75.7MB/s]     12%|#2        | Downloading : 70.5M/582M [00:00<00:06,    77.4MB/s]     12%|#2        | Downloading : 72.5M/582M [00:00<00:06,    78.1MB/s]     13%|#2        | Downloading : 74.5M/582M [00:00<00:06,    79.2MB/s]     13%|#3        | Downloading : 76.5M/582M [00:00<00:06,    80.8MB/s]     13%|#3        | Downloading : 78.5M/582M [00:00<00:06,    82.3MB/s]     14%|#4        | Downloading : 82.5M/582M [00:00<00:06,    83.9MB/s]     15%|#4        | Downloading : 86.5M/582M [00:01<00:06,    85.0MB/s]     15%|#5        | Downloading : 88.5M/582M [00:01<00:06,    83.6MB/s]     16%|#5        | Downloading : 90.5M/582M [00:01<00:06,    82.4MB/s]     16%|#5        | Downloading : 92.5M/582M [00:01<00:06,    83.1MB/s]     16%|#6        | Downloading : 94.5M/582M [00:01<00:06,    82.7MB/s]     17%|#6        | Downloading : 96.5M/582M [00:01<00:06,    81.9MB/s]     17%|#6        | Downloading : 98.5M/582M [00:01<00:06,    78.2MB/s]     17%|#7        | Downloading : 100M/582M [00:01<00:06,    76.6MB/s]      18%|#7        | Downloading : 102M/582M [00:01<00:06,    77.0MB/s]     18%|#7        | Downloading : 104M/582M [00:01<00:06,    77.7MB/s]     18%|#8        | Downloading : 106M/582M [00:01<00:06,    78.5MB/s]     19%|#8        | Downloading : 108M/582M [00:01<00:06,    80.0MB/s]     19%|#8        | Downloading : 110M/582M [00:01<00:06,    81.6MB/s]     20%|#9        | Downloading : 114M/582M [00:01<00:05,    83.3MB/s]     20%|##        | Downloading : 116M/582M [00:01<00:05,    84.6MB/s]     20%|##        | Downloading : 118M/582M [00:01<00:05,    86.1MB/s]     21%|##1       | Downloading : 122M/582M [00:01<00:05,    87.1MB/s]     21%|##1       | Downloading : 124M/582M [00:01<00:05,    88.1MB/s]     22%|##1       | Downloading : 126M/582M [00:01<00:05,    89.0MB/s]     22%|##2       | Downloading : 130M/582M [00:01<00:05,    90.6MB/s]     23%|##2       | Downloading : 132M/582M [00:01<00:05,    91.5MB/s]     23%|##3       | Downloading : 134M/582M [00:01<00:05,    92.7MB/s]     23%|##3       | Downloading : 136M/582M [00:01<00:04,    94.0MB/s]     24%|##3       | Downloading : 138M/582M [00:01<00:05,    91.2MB/s]     24%|##4       | Downloading : 140M/582M [00:01<00:05,    89.7MB/s]     24%|##4       | Downloading : 142M/582M [00:01<00:05,    90.8MB/s]     25%|##4       | Downloading : 144M/582M [00:01<00:04,    92.0MB/s]     26%|##5       | Downloading : 148M/582M [00:01<00:04,    93.7MB/s]     26%|##5       | Downloading : 150M/582M [00:01<00:05,    88.7MB/s]     26%|##6       | Downloading : 152M/582M [00:01<00:05,    85.5MB/s]     27%|##6       | Downloading : 154M/582M [00:01<00:05,    86.8MB/s]     27%|##6       | Downloading : 156M/582M [00:01<00:05,    87.6MB/s]     27%|##7       | Downloading : 158M/582M [00:01<00:04,    89.1MB/s]     28%|##7       | Downloading : 162M/582M [00:01<00:04,    90.9MB/s]     28%|##8       | Downloading : 164M/582M [00:01<00:04,    92.1MB/s]     29%|##8       | Downloading : 168M/582M [00:01<00:04,    93.2MB/s]     30%|##9       | Downloading : 172M/582M [00:01<00:04,    94.8MB/s]     30%|##9       | Downloading : 174M/582M [00:01<00:04,    94.5MB/s]     30%|###       | Downloading : 176M/582M [00:01<00:04,    94.6MB/s]     31%|###       | Downloading : 178M/582M [00:02<00:04,    94.8MB/s]     31%|###1      | Downloading : 180M/582M [00:02<00:04,    94.6MB/s]     31%|###1      | Downloading : 182M/582M [00:02<00:04,    95.8MB/s]     32%|###2      | Downloading : 186M/582M [00:02<00:04,    97.2MB/s]     32%|###2      | Downloading : 188M/582M [00:02<00:04,    98.2MB/s]     33%|###2      | Downloading : 190M/582M [00:02<00:04,    99.0MB/s]     33%|###3      | Downloading : 194M/582M [00:02<00:04,     100MB/s]     34%|###4      | Downloading : 198M/582M [00:02<00:03,     102MB/s]     34%|###4      | Downloading : 200M/582M [00:02<00:03,     102MB/s]     35%|###4      | Downloading : 202M/582M [00:02<00:03,     102MB/s]     35%|###5      | Downloading : 204M/582M [00:02<00:03,     103MB/s]     35%|###5      | Downloading : 206M/582M [00:02<00:03,     104MB/s]     36%|###5      | Downloading : 208M/582M [00:02<00:03,     101MB/s]     36%|###6      | Downloading : 210M/582M [00:02<00:03,    97.6MB/s]     36%|###6      | Downloading : 212M/582M [00:02<00:03,    97.7MB/s]     37%|###6      | Downloading : 214M/582M [00:02<00:03,    97.7MB/s]     37%|###7      | Downloading : 216M/582M [00:02<00:03,    98.3MB/s]     38%|###7      | Downloading : 218M/582M [00:02<00:03,    98.9MB/s]     38%|###7      | Downloading : 220M/582M [00:02<00:03,    99.6MB/s]     39%|###8      | Downloading : 224M/582M [00:02<00:03,    97.9MB/s]     39%|###8      | Downloading : 226M/582M [00:02<00:04,    91.5MB/s]     39%|###9      | Downloading : 228M/582M [00:02<00:04,    92.1MB/s]     40%|###9      | Downloading : 230M/582M [00:02<00:03,    93.2MB/s]     40%|###9      | Downloading : 232M/582M [00:02<00:04,    91.5MB/s]     40%|####      | Downloading : 234M/582M [00:02<00:04,    90.4MB/s]     41%|####      | Downloading : 236M/582M [00:02<00:04,    79.0MB/s]     41%|####      | Downloading : 238M/582M [00:02<00:04,    78.2MB/s]     41%|####1     | Downloading : 240M/582M [00:02<00:04,    79.2MB/s]     42%|####1     | Downloading : 242M/582M [00:02<00:05,    70.3MB/s]     42%|####1     | Downloading : 244M/582M [00:02<00:05,    66.6MB/s]     42%|####2     | Downloading : 246M/582M [00:02<00:05,    65.7MB/s]     43%|####2     | Downloading : 248M/582M [00:02<00:05,    65.0MB/s]     43%|####3     | Downloading : 250M/582M [00:03<00:05,    64.7MB/s]     43%|####3     | Downloading : 252M/582M [00:03<00:05,    65.8MB/s]     44%|####3     | Downloading : 254M/582M [00:03<00:05,    66.6MB/s]     44%|####4     | Downloading : 256M/582M [00:03<00:05,    67.7MB/s]     44%|####4     | Downloading : 258M/582M [00:03<00:04,    68.7MB/s]     45%|####4     | Downloading : 260M/582M [00:03<00:04,    70.0MB/s]     45%|####5     | Downloading : 262M/582M [00:03<00:04,    71.2MB/s]     45%|####5     | Downloading : 264M/582M [00:03<00:04,    72.4MB/s]     46%|####5     | Downloading : 266M/582M [00:03<00:04,    74.0MB/s]     46%|####6     | Downloading : 268M/582M [00:03<00:04,    74.5MB/s]     46%|####6     | Downloading : 270M/582M [00:03<00:04,    76.0MB/s]     47%|####6     | Downloading : 272M/582M [00:03<00:04,    77.4MB/s]     47%|####7     | Downloading : 274M/582M [00:03<00:04,    78.8MB/s]     47%|####7     | Downloading : 276M/582M [00:03<00:04,    77.5MB/s]     48%|####7     | Downloading : 278M/582M [00:03<00:04,    76.5MB/s]     48%|####8     | Downloading : 280M/582M [00:03<00:04,    77.2MB/s]     49%|####8     | Downloading : 282M/582M [00:03<00:04,    75.0MB/s]     49%|####8     | Downloading : 284M/582M [00:03<00:04,    76.2MB/s]     49%|####9     | Downloading : 286M/582M [00:03<00:04,    77.1MB/s]     50%|####9     | Downloading : 288M/582M [00:03<00:03,    78.4MB/s]     50%|####9     | Downloading : 290M/582M [00:03<00:03,    78.7MB/s]     50%|#####     | Downloading : 292M/582M [00:03<00:03,    78.1MB/s]     51%|#####     | Downloading : 294M/582M [00:03<00:03,    79.0MB/s]     51%|#####     | Downloading : 296M/582M [00:03<00:03,    75.1MB/s]     51%|#####1    | Downloading : 298M/582M [00:03<00:03,    75.8MB/s]     52%|#####1    | Downloading : 300M/582M [00:03<00:03,    76.6MB/s]     52%|#####1    | Downloading : 302M/582M [00:03<00:03,    77.4MB/s]     52%|#####2    | Downloading : 304M/582M [00:03<00:03,    77.4MB/s]     53%|#####2    | Downloading : 306M/582M [00:03<00:03,    78.0MB/s]     53%|#####3    | Downloading : 310M/582M [00:03<00:03,    79.9MB/s]     54%|#####4    | Downloading : 314M/582M [00:03<00:03,    82.3MB/s]     55%|#####4    | Downloading : 318M/582M [00:03<00:03,    83.5MB/s]     55%|#####5    | Downloading : 322M/582M [00:03<00:03,    85.0MB/s]     56%|#####6    | Downloading : 326M/582M [00:03<00:03,    85.6MB/s]     57%|#####6    | Downloading : 330M/582M [00:03<00:03,    87.2MB/s]     57%|#####7    | Downloading : 334M/582M [00:03<00:02,    89.3MB/s]     58%|#####8    | Downloading : 338M/582M [00:04<00:02,    85.2MB/s]     59%|#####8    | Downloading : 342M/582M [00:04<00:02,    84.8MB/s]     60%|#####9    | Downloading : 346M/582M [00:04<00:02,    85.4MB/s]     60%|######    | Downloading : 350M/582M [00:04<00:02,    85.6MB/s]     61%|######    | Downloading : 354M/582M [00:04<00:02,    86.8MB/s]     62%|######1   | Downloading : 358M/582M [00:04<00:02,    87.9MB/s]     62%|######2   | Downloading : 362M/582M [00:04<00:02,    88.4MB/s]     63%|######2   | Downloading : 366M/582M [00:04<00:02,    88.9MB/s]     64%|######3   | Downloading : 370M/582M [00:04<00:02,    89.8MB/s]     64%|######4   | Downloading : 374M/582M [00:04<00:02,    87.7MB/s]     65%|######5   | Downloading : 378M/582M [00:04<00:02,    87.7MB/s]     66%|######5   | Downloading : 382M/582M [00:04<00:02,    89.1MB/s]     66%|######6   | Downloading : 386M/582M [00:04<00:02,    89.2MB/s]     67%|######7   | Downloading : 390M/582M [00:04<00:02,    89.4MB/s]     68%|######7   | Downloading : 394M/582M [00:04<00:02,    91.1MB/s]     68%|######8   | Downloading : 398M/582M [00:04<00:02,    91.9MB/s]     69%|######9   | Downloading : 402M/582M [00:04<00:02,    93.1MB/s]     70%|######9   | Downloading : 406M/582M [00:04<00:01,    94.6MB/s]     71%|#######   | Downloading : 410M/582M [00:04<00:01,    94.9MB/s]     71%|#######1  | Downloading : 414M/582M [00:04<00:01,    88.4MB/s]     72%|#######1  | Downloading : 416M/582M [00:04<00:01,    88.8MB/s]     72%|#######1  | Downloading : 418M/582M [00:04<00:01,    89.4MB/s]     72%|#######2  | Downloading : 420M/582M [00:04<00:01,    89.2MB/s]     73%|#######2  | Downloading : 422M/582M [00:04<00:01,    90.3MB/s]     73%|#######2  | Downloading : 424M/582M [00:04<00:01,    90.5MB/s]     73%|#######3  | Downloading : 426M/582M [00:05<00:01,    91.1MB/s]     74%|#######3  | Downloading : 428M/582M [00:05<00:01,    91.9MB/s]     74%|#######3  | Downloading : 430M/582M [00:05<00:01,    93.1MB/s]     74%|#######4  | Downloading : 432M/582M [00:05<00:01,    92.0MB/s]     75%|#######4  | Downloading : 434M/582M [00:05<00:02,    74.7MB/s]     75%|#######4  | Downloading : 435M/582M [00:05<00:02,    73.8MB/s]     75%|#######4  | Downloading : 436M/582M [00:05<00:02,    68.0MB/s]     75%|#######5  | Downloading : 437M/582M [00:05<00:02,    65.5MB/s]     75%|#######5  | Downloading : 438M/582M [00:05<00:02,    62.8MB/s]     75%|#######5  | Downloading : 439M/582M [00:05<00:02,    61.9MB/s]     76%|#######5  | Downloading : 440M/582M [00:05<00:02,    60.6MB/s]     76%|#######5  | Downloading : 441M/582M [00:05<00:02,    57.5MB/s]     76%|#######6  | Downloading : 442M/582M [00:05<00:02,    56.9MB/s]     76%|#######6  | Downloading : 443M/582M [00:05<00:02,    57.1MB/s]     76%|#######6  | Downloading : 444M/582M [00:05<00:02,    56.8MB/s]     77%|#######6  | Downloading : 446M/582M [00:05<00:02,    57.4MB/s]     77%|#######7  | Downloading : 449M/582M [00:05<00:02,    58.5MB/s]     78%|#######7  | Downloading : 451M/582M [00:05<00:02,    59.0MB/s]     78%|#######7  | Downloading : 453M/582M [00:05<00:02,    59.6MB/s]     78%|#######8  | Downloading : 455M/582M [00:05<00:02,    58.8MB/s]     79%|#######8  | Downloading : 459M/582M [00:05<00:02,    60.5MB/s]     79%|#######9  | Downloading : 461M/582M [00:05<00:02,    60.5MB/s]     80%|#######9  | Downloading : 463M/582M [00:05<00:02,    60.5MB/s]     80%|#######9  | Downloading : 465M/582M [00:05<00:02,    60.4MB/s]     80%|########  | Downloading : 467M/582M [00:05<00:01,    61.2MB/s]     81%|########  | Downloading : 469M/582M [00:05<00:01,    62.3MB/s]     81%|########  | Downloading : 471M/582M [00:05<00:01,    63.2MB/s]     81%|########1 | Downloading : 473M/582M [00:05<00:01,    64.3MB/s]     82%|########1 | Downloading : 475M/582M [00:05<00:01,    65.4MB/s]     82%|########2 | Downloading : 479M/582M [00:05<00:01,    67.1MB/s]     83%|########3 | Downloading : 483M/582M [00:05<00:01,    68.5MB/s]     84%|########4 | Downloading : 489M/582M [00:05<00:01,    70.5MB/s]     85%|########4 | Downloading : 493M/582M [00:06<00:01,    72.4MB/s]     85%|########5 | Downloading : 497M/582M [00:06<00:01,    74.4MB/s]     86%|########6 | Downloading : 501M/582M [00:06<00:01,    75.7MB/s]     87%|########6 | Downloading : 505M/582M [00:06<00:01,    75.4MB/s]     88%|########7 | Downloading : 509M/582M [00:06<00:01,    73.8MB/s]     88%|########8 | Downloading : 513M/582M [00:06<00:00,    73.7MB/s]     89%|########8 | Downloading : 517M/582M [00:06<00:00,    74.6MB/s]     90%|########9 | Downloading : 521M/582M [00:06<00:00,    75.7MB/s]     90%|######### | Downloading : 525M/582M [00:06<00:00,    75.5MB/s]     91%|######### | Downloading : 529M/582M [00:06<00:00,    74.1MB/s]     92%|#########1| Downloading : 533M/582M [00:06<00:00,    70.4MB/s]     92%|#########1| Downloading : 535M/582M [00:06<00:00,    66.2MB/s]     92%|#########2| Downloading : 537M/582M [00:06<00:00,    66.6MB/s]     93%|#########2| Downloading : 539M/582M [00:06<00:00,    67.6MB/s]     93%|#########3| Downloading : 541M/582M [00:06<00:00,    67.3MB/s]     93%|#########3| Downloading : 543M/582M [00:06<00:00,    66.8MB/s]     94%|#########3| Downloading : 545M/582M [00:06<00:00,    64.1MB/s]     94%|#########4| Downloading : 547M/582M [00:06<00:00,    62.5MB/s]     94%|#########4| Downloading : 549M/582M [00:06<00:00,    63.2MB/s]     95%|#########4| Downloading : 551M/582M [00:06<00:00,    63.9MB/s]     95%|#########5| Downloading : 553M/582M [00:06<00:00,    64.8MB/s]     95%|#########5| Downloading : 555M/582M [00:06<00:00,    66.2MB/s]     96%|#########6| Downloading : 559M/582M [00:07<00:00,    68.0MB/s]     96%|#########6| Downloading : 561M/582M [00:07<00:00,    69.5MB/s]     97%|#########6| Downloading : 563M/582M [00:07<00:00,    71.0MB/s]     97%|#########7| Downloading : 565M/582M [00:07<00:00,    72.6MB/s]     97%|#########7| Downloading : 567M/582M [00:07<00:00,    72.6MB/s]     98%|#########7| Downloading : 569M/582M [00:07<00:00,    72.7MB/s]     98%|#########8| Downloading : 571M/582M [00:07<00:00,    73.3MB/s]     99%|#########8| Downloading : 573M/582M [00:07<00:00,    74.7MB/s]     99%|#########8| Downloading : 575M/582M [00:07<00:00,    75.1MB/s]    100%|#########9| Downloading : 579M/582M [00:07<00:00,    76.7MB/s]    100%|#########9| Downloading : 581M/582M [00:07<00:00,    78.2MB/s]    100%|##########| Downloading : 582M/582M [00:07<00:00,    84.1MB/s]
     Verifying hash 32fd2f6c8c7eb0784a1de6435273c48b.
     Decompressing the archive: /home/circleci/mne_data/MNE-somato-data.tar.gz
     (please be patient, this can take some time)
@@ -110,11 +117,11 @@ Now we set the the path of the ``somato`` dataset for subject ``'01'``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-41
+.. GENERATED FROM PYTHON SOURCE LINES 47-48
 
 Then, we load the raw data and estimate the inverse operator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-61
+.. GENERATED FROM PYTHON SOURCE LINES 48-68
 
 .. code-block:: default
 
@@ -188,7 +195,7 @@ Then, we load the raw data and estimate the inverse operator.
         Using tolerance 1.5e-08 (2.2e-16 eps * 306 dim * 2.2e+05  max singular value)
         Estimated rank (mag + grad): 306
         MEG: rank 306 computed from 306 data channels with 0 projectors
-    /home/circleci/project/examples/plot_simulate_somato.py:58: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 > 64). Consider setting rank to "auto" or setting it explicitly as an integer.
+    /home/circleci/project/examples/plot_simulate_somato.py:65: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 > 64). Consider setting rank to "auto" or setting it explicitly as an integer.
       cov = mne.compute_covariance(epochs)
     Reducing data rank from 306 -> 306
     Estimating covariance using EMPIRICAL
@@ -222,7 +229,7 @@ Then, we load the raw data and estimate the inverse operator.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-70
+.. GENERATED FROM PYTHON SOURCE LINES 69-77
 
 There are several methods to do source reconstruction. Some of the methods
 such as MNE are distributed source methods whereas dipole fitting will
@@ -233,7 +240,7 @@ to note that the dipole currents simulated with HNN are assumed to be normal
 to the cortical surface. Hence, using the option ``pick_ori='normal'`` is
 appropriate.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-77
+.. GENERATED FROM PYTHON SOURCE LINES 77-84
 
 .. code-block:: default
 
@@ -270,12 +277,12 @@ appropriate.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-80
+.. GENERATED FROM PYTHON SOURCE LINES 85-87
 
 To extract the primary response in primary somatosensory cortex (S1), we
 create a label for the postcentral gyrus (S1) in source-space
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-86
+.. GENERATED FROM PYTHON SOURCE LINES 87-93
 
 .. code-block:: default
 
@@ -301,7 +308,7 @@ create a label for the postcentral gyrus (S1) in source-space
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-98
+.. GENERATED FROM PYTHON SOURCE LINES 94-105
 
 Visualizing the distributed S1 activation in reference to the geometric
 structure of the cortex (i.e., plotted on a structural MRI) can help us
@@ -315,7 +322,7 @@ post-central gyrus label from which the dipole time course was extracted and
 the second showing MNE activation at 0.040 sec that resemble the following
 images.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-108
+.. GENERATED FROM PYTHON SOURCE LINES 105-115
 
 .. code-block:: default
 
@@ -344,13 +351,13 @@ images.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-112
+.. GENERATED FROM PYTHON SOURCE LINES 116-119
 
 |mne_label_fig|
 
 |mne_activity_fig|
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-122
+.. GENERATED FROM PYTHON SOURCE LINES 121-129
 
 Now we extract the representative time course of dipole activation in our
 labeled brain region using ``mode='pca_flip'`` (see `this MNE-python
@@ -361,7 +368,7 @@ extracted waveform so that the deflection at ~0.040 sec is pointed downwards.
 Thus, the ~0.040 sec deflection corresponds to current flow traveling from
 superficial to deep layers of cortex.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-134
+.. GENERATED FROM PYTHON SOURCE LINES 129-141
 
 .. code-block:: default
 
@@ -396,12 +403,12 @@ superficial to deep layers of cortex.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-137
+.. GENERATED FROM PYTHON SOURCE LINES 142-144
 
 Now, let us try to simulate the same with ``hnn-core``. We read in the
 network parameters from ``N20.json`` and instantiate the network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-149
+.. GENERATED FROM PYTHON SOURCE LINES 144-156
 
 .. code-block:: default
 
@@ -424,17 +431,20 @@ network parameters from ``N20.json`` and instantiate the network.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-157
+.. GENERATED FROM PYTHON SOURCE LINES 157-167
 
 To simulate the source of the median nerve evoked response, we add a
 sequence of synchronous evoked drives: 1 proximal, 2 distal, and 1 final
-proximal drive. Note that setting ``sync_within_trial=True`` creates drives
-with synchronous input (arriving to and transmitted by hypothetical granular
-cells at the center of the network) to all pyramidal and basket cells that
-receive distal drive. Note that granule cells are not explicitly modelled
-within HNN.
+proximal drive. In order to understand the physiological implications of
+proximal and distal drive as well as the general process used to articulate
+a sequence of exogenous drive for simulating evoked responses, see the
+`HNN ERP tutorial`_. Note that setting ``sync_within_trial=True`` creates
+drives with synchronous input (arriving to and transmitted by hypothetical
+granular cells at the center of the network) to all pyramidal and basket
+cells that receive distal drive. Note that granule cells are not explicitly
+modelled within HNN.
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-210
+.. GENERATED FROM PYTHON SOURCE LINES 167-220
 
 .. code-block:: default
 
@@ -498,20 +508,20 @@ within HNN.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-214
+.. GENERATED FROM PYTHON SOURCE LINES 221-224
 
 Now we run the simulation over 2 trials so that we can plot the average
 aggregate dipole. For a better match to the empirical waveform, set
 ``n_trials`` to be >=25.
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-219
+.. GENERATED FROM PYTHON SOURCE LINES 224-229
 
 .. code-block:: default
 
     n_trials = 2
     # n_trials = 25
     with JoblibBackend(n_jobs=2):
-        dpls = simulate_dipole(net, n_trials=n_trials)
+        dpls = simulate_dipole(net, n_trials=n_trials, postproc=False)
 
 
 
@@ -528,12 +538,39 @@ aggregate dipole. For a better match to the empirical waveform, set
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 220-222
+.. GENERATED FROM PYTHON SOURCE LINES 230-237
+
+Since the model is a reduced representation of the larger network
+contributing to the response, the model response is noisier than it would be
+in the net activity from a larger network where these effects are averaged
+out, and the dipole amplitude is smaller than the recorded data. The
+post-processing steps of smoothing and scaling the simulated dipole response
+allow us to more accurately approximate the true signal responsible for the
+recorded macroscopic evoked response [1]_, [2]_.
+
+.. GENERATED FROM PYTHON SOURCE LINES 237-243
+
+.. code-block:: default
+
+    dpl_smooth_win = 20
+    dpl_scalefctr = 12
+    for dpl in dpls:
+        dpl.smooth(dpl_smooth_win)
+        dpl.scale(dpl_scalefctr)
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 244-246
 
 Finally, we plot the driving spike histogram, empirical and simulated median
 nerve evoked response waveforms, and output spike histogram.
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-234
+.. GENERATED FROM PYTHON SOURCE LINES 246-258
 
 .. code-block:: default
 
@@ -568,12 +605,27 @@ nerve evoked response waveforms, and output spike histogram.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 235-243
+.. GENERATED FROM PYTHON SOURCE LINES 259-270
+
+References
+----------
+.. [1] Jones, S. R., Pritchett, D. L., Stufflebeam, S. M., Hämäläinen, M.
+   & Moore, C. I. Neural correlates of tactile detection: a combined
+   magnetoencephalography and biophysically based computational modeling
+   study. J. Neurosci. 27, 10751–10764 (2007).
+.. [2] Neymotin SA, Daniels DS, Caldwell B, McDougal RA, Carnevale NT,
+   Jas M, Moore CI, Hines ML, Hämäläinen M, Jones SR. Human Neocortical
+   Neurosolver (HNN), a new software tool for interpreting the cellular and
+   network origin of human MEG/EEG data. eLife 9, e51214 (2020).
+   https://doi.org/10.7554/eLife.51214
+
+.. GENERATED FROM PYTHON SOURCE LINES 272-281
 
 .. LINKS
 
 .. _MNE: https://mne.tools/
-.. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py # noqa
+.. _HNN ERP tutorial: https://jonescompneurolab.github.io/hnn-tutorials/erp/erp
+.. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py
 .. |mne_label_fig| image:: https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png # noqa
   :width: 400
 .. |mne_activity_fig| image:: https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png # noqa
@@ -582,7 +634,7 @@ nerve evoked response waveforms, and output spike histogram.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  27.847 seconds)
+   **Total running time of the script:** ( 2 minutes  39.360 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_somato.py:

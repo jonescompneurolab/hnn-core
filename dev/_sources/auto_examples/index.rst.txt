@@ -98,7 +98,7 @@ Some introductory examples to get started with hnn-core
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate the inverse solution of the median nerve evoked resp...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate an inverse solution of the median nerve evoked respo...">
 
 .. only:: html
 
