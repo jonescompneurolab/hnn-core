@@ -65,7 +65,6 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsoma.append(spikedata[3])
         net.cell_response._isoma.append(spikedata[4])
-        assert len(net.lfp) == len(spikedata[5])
         for e_idx in range(len(net.lfp)):
             net.lfp[e_idx]['data'].append(spikedata[5][e_idx])
 

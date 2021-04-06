@@ -166,7 +166,7 @@ def test_lfp_backends(run_hnn_core_fixture):
 
     # reduced simulation has n_trials=2
     # trial_idx, n_trials = 0, 2
-    electrode_pos = electrode_pos = [(2, 2, 400), (6, 6, 800)]
+    electrode_pos = [(2, 2, 400), (6, 6, 800)]
     _, joblib_net = run_hnn_core_fixture(
         backend='joblib', n_jobs=1, reduced=True, record_isoma=True,
         record_vsoma=True, electrode_pos=electrode_pos)
@@ -174,5 +174,6 @@ def test_lfp_backends(run_hnn_core_fixture):
         backend='mpi', n_procs=2, reduced=True, record_isoma=True,
         record_vsoma=True, electrode_pos=electrode_pos)
 
+    assert len(electrode_pos) == len(joblib_net.lfp) == len(mpi_net.lfp)
     assert_allclose(joblib_net.lfp[0]['data'], mpi_net.lfp[0]['data'])
     assert_allclose(joblib_net.lfp[1]['data'], mpi_net.lfp[1]['data'])
