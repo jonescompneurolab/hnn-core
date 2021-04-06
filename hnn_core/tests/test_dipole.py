@@ -157,3 +157,21 @@ def test_cell_response_backends(run_hnn_core_fixture):
             net_ets = [spike_times[i] for i, g in enumerate(spike_gids) if
                        g == gid_ran[idx_drive]]
             assert_allclose(np.array(event_times), np.array(net_ets))
+
+
+@requires_mpi4py
+@requires_psutil
+def test_lfp_backends(run_hnn_core_fixture):
+    """Test lfp outputs across backends."""
+
+    # reduced simulation has n_trials=2
+    # trial_idx, n_trials = 0, 2
+    electrode_pos = electrode_pos = [(2, 2, 400), (6, 6, 800)]
+    _, joblib_net = run_hnn_core_fixture(
+        backend='joblib', n_jobs=1, reduced=True, record_isoma=True,
+        record_vsoma=True, electrode_pos=electrode_pos)
+    _, mpi_net = run_hnn_core_fixture(
+        backend='mpi', n_procs=2, reduced=True, record_isoma=True,
+        record_vsoma=True, electrode_pos=electrode_pos)
+
+    assert joblib_net.lfp == mpi_net.lfp
