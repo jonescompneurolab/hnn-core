@@ -174,4 +174,5 @@ def test_lfp_backends(run_hnn_core_fixture):
         backend='mpi', n_procs=2, reduced=True, record_isoma=True,
         record_vsoma=True, electrode_pos=electrode_pos)
 
-    assert joblib_net.lfp == mpi_net.lfp
+    assert_allclose(joblib_net.lfp[0]['data'], mpi_net.lfp[0]['data'])
+    assert_allclose(joblib_net.lfp[1]['data'], mpi_net.lfp[1]['data'])
