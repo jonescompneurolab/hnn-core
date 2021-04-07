@@ -988,12 +988,15 @@ class Network(object):
             Space constant.
         """
         conn = dict()
-        # gid_types = list()
         threshold = self.threshold
-        for src_gid, target_gid in gid_pairs:
+        _validate_type(gid_pairs, list, 'gid_pairs', 'list')
+        for gid_pair in gid_pairs:
+            _validate_type(gid_pair, (list, tuple), 'gid_pairs',
+                           'list or tuple')
+            assert len(gid_pair) == 2
+            src_gid, target_gid = gid_pair
             _validate_type(src_gid, int, 'src_gid', 'int')
-            _validate_type(target_gid, (list, range, int), 'target_gid',
-                           'list, range or int')
+            _validate_type(target_gid, int, 'target_gid', 'int')
 
             # Ensure gids in range of Network.gid_ranges
             assert np.sum([src_gid in gid_range for
@@ -1001,11 +1004,7 @@ class Network(object):
             assert np.sum([target_gid in gid_range for
                            gid_range in self.gid_ranges.values()]) == 1
 
-            # gid_types.append((self.gid_to_type(src_gid),
-            #                 self.gid_to_type(target_gid))
-
         conn['gid_pairs'] = gid_pairs
-        # conn['gid_types'] = gid_types
 
         # Ensure string inputs
         _validate_type(loc, str, 'loc')
