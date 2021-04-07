@@ -165,7 +165,7 @@ def test_network():
     # Test inputs for connectivity API
     net = Network(deepcopy(params), add_drives_from_params=True)
     n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
-    kwargs_default = dict(src_gid=0, target_gid=35,
+    kwargs_default = dict(gid_pairs=[(0, 35)],
                           loc='soma', receptor='gabaa',
                           weight=5e-4, delay=1.0, lamtha=3.0)
     net.add_connection(**kwargs_default)  # smoke test
@@ -175,28 +175,28 @@ def test_network():
     assert nc.weight[0] == kwargs_default['weight']
 
     kwargs = kwargs_default.copy()
-    kwargs['target_gid'] = [35, 36]
+    kwargs['gid_pairs'] = [(35, 36)]
     net.add_connection(**kwargs)
 
-    kwargs_bad = dict(src_gid=1.0, target_gid=1.0, loc=1.0, receptor=1.0,
-                      weight='1.0', delay='1.0', lamtha='1.0')
-    for arg in kwargs_bad.keys():
-        match = (f'{arg} must be an instance of')
+    kwargs_bad = [
+        ('gid_pairs', 0), ('gid_pairs', [(0.0, 35)]),
+        ('gid_pairs', [(0, 35.0)]), ('gid_pairs', [0, 35]), ('loc', 1.0),
+        ('receptor', 1.0), ('weight', '1.0'), ('delay', '1.0'),
+        ('lamtha', '1.0')]
+    for arg, item in kwargs_bad:
+        match = ('must be an instance of')
         with pytest.raises(TypeError, match=match):
             kwargs = kwargs_default.copy()
-            kwargs[arg] = kwargs_bad[arg]
+            kwargs[arg] = item
             net.add_connection(**kwargs)
 
-    match = 'target_gid must be an instance of'
-    with pytest.raises(TypeError, match=match):
-        kwargs = kwargs_default.copy()
-        kwargs['target_gid'] = [35, '36']
-        net.add_connection(**kwargs)
-
-    for arg in ['src_gid', 'target_gid']:
+    kwargs_bad = [
+        ('gid_pairs', [(-1, 0)]), ('gid_pairs', [(0, -1)]),
+        ('gid_pairs', [(0, 35, 36)])]
+    for arg, item in kwargs_bad:
         with pytest.raises(AssertionError):
             kwargs = kwargs_default.copy()
-            kwargs[arg] = -1
+            kwargs[arg] = item
             net.add_connection(**kwargs)
 
     for arg in ['loc', 'receptor']:
