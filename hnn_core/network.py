@@ -950,26 +950,28 @@ class Network(object):
         target_gids = self.gid_ranges[_long_name(target_cell)]
 
         src_start = src_gids[0]  # Necessary for unique feeds
+        connections = []
         for target_gid in target_gids:
             if unique:
                 src_gids = [target_gid + src_start]
             for src_gid in src_gids:
                 if not allow_autapses and src_gid == target_gid:
                     continue
-                self.add_connection(
-                    src_gid, target_gid, loc, receptor,
-                    nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
+                connections.append((src_gid, target_gid))
 
-    def add_connection(self, src_gid, target_gid, loc, receptor,
+        self.add_connection(
+            connections, loc, receptor,
+            nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
+
+    def add_connection(self, connections, loc, receptor,
                        weight, delay, lamtha):
         """Appends connections to connectivity list
 
         Parameters
         ----------
-        src_gid : int
-            Integer identifying source cell ID.
-        target_gid : list | range | int
-            Integer or list of integers identifying target cell ID.
+        connections : list of tuple | list of list
+            List of connected gids with the format:
+            [(src_gid, target_gid), ...]
         loc : str
             Location of synapse on target cell. Must be
             'proximal', 'distal', or 'soma'. Note that inhibitory synapses
@@ -987,19 +989,17 @@ class Network(object):
         """
         conn = dict()
         threshold = self.threshold
-
-        _validate_type(src_gid, int, 'src_gid', 'int')
-        _validate_type(target_gid, (list, range, int), 'target_gid',
-                       'list, range or int')
-        if isinstance(target_gid, int):
-            target_gid = [target_gid]
-
-        # Ensure gids in range of Network.gid_ranges
-        assert np.sum([src_gid in gid_range for
-                       gid_range in self.gid_ranges.values()]) == 1
-
-        conn['src_gid'] = src_gid
-        conn['src_type'] = self.gid_to_type(src_gid)
+        for src_gid, target_gid in connections:
+            _validate_type(src_gid, int, 'src_gid', 'int')
+            _validate_type(target_gid, (list, range, int), 'target_gid',
+                           'list, range or int')
+     
+            # Ensure gids in range of Network.gid_ranges
+            assert np.sum([src_gid in gid_range for
+                           gid_range in self.gid_ranges.values()]) == 1
+            assert np.sum([target_gid in gid_range for
+                           gid_range in self.gid_ranges.values()]) == 1
+        conn['connections'] = connections
 
         # Ensure string inputs
         _validate_type(loc, str, 'loc')
@@ -1021,13 +1021,6 @@ class Network(object):
         for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
             _validate_type(item, (int, float), arg_name, 'int or float')
             conn['nc_dict'][key] = item
-
-        for t_gid in target_gid:
-            _validate_type(t_gid, int, 'target_gid', 'list or int')
-            conn['target_gid'] = t_gid
-            conn['target_type'] = self.gid_to_type(t_gid)
-            assert np.sum([t_gid in gid_range for
-                           gid_range in self.gid_ranges.values()]) == 1
 
             self.connectivity.append(deepcopy(conn))
 
