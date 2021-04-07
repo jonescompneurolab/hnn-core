@@ -421,19 +421,10 @@ class NetworkBuilder(object):
         connectivity = self.net.connectivity
 
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
-        # Gather indeces of targets on current node
-        # connectivity = [conn for conn in connectivity if
-        #                 _PC.gid_exists(conn['target_gid'])]
-        # target_gids = [conn['target_gid'] for conn in connectivity]
-        # target_filter = {}
-        # for idx in range(len(self.cells)):
-        #     gid = self._gid_list[idx]
-        #     if gid in target_gids:
-        #         target_filter[gid] = idx
 
         for conn in connectivity:
             # Gather indeces of targets on current node
-            connections = [gid_pair for gid_pair in conn if
+            connections = [gid_pair for gid_pair in conn['gid_pairs'] if
                            _PC.gid_exists(gid_pair[1])]
             target_gids = [gid_pair[1] for gid_pair in connections]
             target_filter = dict()
