@@ -950,26 +950,26 @@ class Network(object):
         target_gids = self.gid_ranges[_long_name(target_cell)]
 
         src_start = src_gids[0]  # Necessary for unique feeds
-        connections = []
+        gid_pairs = []
         for target_gid in target_gids:
             if unique:
                 src_gids = [target_gid + src_start]
             for src_gid in src_gids:
                 if not allow_autapses and src_gid == target_gid:
                     continue
-                connections.append((src_gid, target_gid))
+                gid_pairs.append((src_gid, target_gid))
 
         self.add_connection(
-            connections, loc, receptor,
+            gid_pairs, loc, receptor,
             nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
 
-    def add_connection(self, connections, loc, receptor,
+    def add_connection(self, gid_pairs, loc, receptor,
                        weight, delay, lamtha):
         """Appends connections to connectivity list
 
         Parameters
         ----------
-        connections : list of tuple | list of list
+        gid_pairs : list of tuple | list of list
             List of connected gids with the format:
             [(src_gid, target_gid), ...]
         loc : str
@@ -988,18 +988,24 @@ class Network(object):
             Space constant.
         """
         conn = dict()
+        # gid_types = list()
         threshold = self.threshold
-        for src_gid, target_gid in connections:
+        for src_gid, target_gid in gid_pairs:
             _validate_type(src_gid, int, 'src_gid', 'int')
             _validate_type(target_gid, (list, range, int), 'target_gid',
                            'list, range or int')
-     
+
             # Ensure gids in range of Network.gid_ranges
             assert np.sum([src_gid in gid_range for
                            gid_range in self.gid_ranges.values()]) == 1
             assert np.sum([target_gid in gid_range for
                            gid_range in self.gid_ranges.values()]) == 1
-        conn['connections'] = connections
+
+            # gid_types.append((self.gid_to_type(src_gid),
+            #                 self.gid_to_type(target_gid))
+
+        conn['gid_pairs'] = gid_pairs
+        # conn['gid_types'] = gid_types
 
         # Ensure string inputs
         _validate_type(loc, str, 'loc')
@@ -1022,7 +1028,7 @@ class Network(object):
             _validate_type(item, (int, float), arg_name, 'int or float')
             conn['nc_dict'][key] = item
 
-            self.connectivity.append(deepcopy(conn))
+        self.connectivity.append(deepcopy(conn))
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity_list"""
