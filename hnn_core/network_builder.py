@@ -318,7 +318,6 @@ class NetworkBuilder(object):
 
         self._record_spikes()
 
-        self.move_cells_to_pos()  # position cells in 2D grid
         self._connect_celltypes()
 
         if _get_rank() == 0:
