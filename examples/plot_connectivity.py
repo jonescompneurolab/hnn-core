@@ -52,9 +52,10 @@ net_erp.cell_response.plot_spikes_raster()
 ###############################################################################
 # We can modify the connectivity list to test the effect of different
 # connectivity patterns. For example, we can remove all layer 2 inhibitory
-# connections.
+# connections. In the default network, the src_gids of each connection are
+# all of the same type so we'll just check the first element.
 new_connectivity = [conn for conn in net.connectivity
-                    if conn['src_type'] != 'L2_basket']
+                    if net.gid_to_type(conn['gid_pairs'][0][0]) != 'L2_basket']
 net.connectivity = new_connectivity
 
 net_remove = net.copy()
@@ -73,7 +74,8 @@ src_gid = net.gid_ranges['L2_basket'][0]
 target_gids = net.gid_ranges['L2_pyramidal']
 location, receptor = 'soma', 'gabaa'
 weight, delay, lamtha = 1.0, 1.0, 70
-net.add_connection(src_gid, target_gids, location, receptor,
+gid_pairs = [(src_gid, target_gid) for target_gid in target_gids]
+net.add_connection(gid_pairs, location, receptor,
                    delay, weight, lamtha)
 
 net_add = net.copy()
