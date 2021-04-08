@@ -301,20 +301,6 @@ class Cell:
                              f'section of the current cell or None. '
                              f'Got {sec_name_apical}.')
 
-    def move_to_pos(self):
-        """Move cell to position."""
-        x0 = self.sections['soma'].x3d(0)
-        y0 = self.sections['soma'].y3d(0)
-        z0 = self.sections['soma'].z3d(0)
-        dx = self.pos[0] * 100 - x0
-        dy = self.pos[2] - y0
-        dz = self.pos[1] * 100 - z0
-
-        for s in list(self.sections.values()):
-            for i in range(s.n3d()):
-                h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
-                             s.z3d(i) + dz, s.diam3d(i), sec=s)
-
     # two things need to happen here for h:
     # 1. dipole needs to be inserted into each section
     # 2. a list needs to be created with a Dipole (Point Process) in each
