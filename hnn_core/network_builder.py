@@ -11,6 +11,7 @@ from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
 from .params import _long_name, _short_name
+from copy import deepcopy
 
 # a few globals
 _PC = None
@@ -423,44 +424,52 @@ class NetworkBuilder(object):
         assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
 
         for conn in connectivity:
+            loc, receptor = conn['loc'], conn['receptor']
+            nc_dict = conn['nc_dict']
             # Gather indeces of targets on current node
-            connections = [gid_pair for gid_pair in conn['gid_pairs'] if
-                           _PC.gid_exists(gid_pair[1])]
-            target_gids = [gid_pair[1] for gid_pair in connections]
+            valid_targets = set()
+            for idx, (src_gid, target_gids) in enumerate(conn['gid_pairs']):
+                filtered_targets = list()
+                for target_gid in target_gids:
+                    if _PC.gid_exists(target_gid):
+                        filtered_targets.append(target_gid)
+                        valid_targets.add(target_gid)
+                conn['gid_pairs'][idx] = [src_gid, filtered_targets]
+
             target_filter = dict()
             for idx in range(len(self.cells)):
                 gid = self._gid_list[idx]
-                if gid in target_gids:
+                if gid in valid_targets:
                     target_filter[gid] = idx
 
             # Iterate over src/target pairs and connect cells
-            for src_gid, target_gid in connections:
-                src_type = self.net.gid_to_type(src_gid)
-                target_type = self.net.gid_to_type(target_gid)
-                loc, receptor = conn['loc'], conn['receptor']
-                nc_dict = conn['nc_dict']
-                target_cell = self.cells[target_filter[target_gid]]
-                connection_name = f'{_short_name(src_type)}_'\
-                                  f'{_short_name(target_type)}_{receptor}'
-                if connection_name not in self.ncs:
-                    self.ncs[connection_name] = list()
-                pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
-                # NB pos_dict for this drive must include ALL cell types!
-                nc_dict['pos_src'] = net.pos_dict[
-                    _long_name(src_type)][pos_idx]
+            for src_gid, target_gids in conn['gid_pairs']:
+                for target_gid in target_gids:
+                    src_type = self.net.gid_to_type(src_gid)
+                    target_type = self.net.gid_to_type(target_gid)
+                    target_cell = self.cells[target_filter[target_gid]]
+                    connection_name = f'{_short_name(src_type)}_'\
+                                      f'{_short_name(target_type)}_{receptor}'
+                    if connection_name not in self.ncs:
+                        self.ncs[connection_name] = list()
+                    pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
+                    # NB pos_dict for this drive must include ALL cell types!
+                    nc_dict['pos_src'] = net.pos_dict[
+                        _long_name(src_type)][pos_idx]
 
-                # get synapse locations
-                syn_keys = list()
-                if loc in ['proximal', 'distal']:
-                    for sect in target_cell.sect_loc[loc]:
-                        syn_keys.append(f'{sect}_{receptor}')
-                else:
-                    syn_keys = [f'{loc}_{receptor}']
+                    # get synapse locations
+                    syn_keys = list()
+                    if loc in ['proximal', 'distal']:
+                        for sect in target_cell.sect_loc[loc]:
+                            syn_keys.append(f'{sect}_{receptor}')
+                    else:
+                        syn_keys = [f'{loc}_{receptor}']
 
-                for syn_key in syn_keys:
-                    nc = target_cell.parconnect_from_src(
-                        src_gid, nc_dict, target_cell.synapses[syn_key])
-                    self.ncs[connection_name].append(nc)
+                    for syn_key in syn_keys:
+                        nc = target_cell.parconnect_from_src(
+                            src_gid, deepcopy(nc_dict), 
+                            target_cell.synapses[syn_key])
+                        self.ncs[connection_name].append(nc)
 
     # setup spike recording for this node
     def _record_spikes(self):
