@@ -55,7 +55,8 @@ def _savgol_filter(data, h_freq, sfreq):
     return filt_data
 
 
-def simulate_dipole(net, n_trials=None, record_vsoma=False,
+def simulate_dipole(net, tstop, dt, n_trials=None,
+                    record_vsoma=False,
                     record_isoma=False, postproc=True):
     """Simulate a dipole given the experiment parameters.
 
@@ -64,6 +65,10 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     net : Network object
         The Network object specifying how cells are
         connected.
+    tstop : float
+        The stop time (ms)
+    dt : float
+        The sampling time (s)
     n_trials : int | None
         The number of trials to simulate. If None, the 'N_trials' value
         of the ``params`` used to create ``net`` is used (must be >0)

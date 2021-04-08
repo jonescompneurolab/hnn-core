@@ -29,7 +29,7 @@ def _thread_handler(event, out, queue):
         queue.put(line)
 
 
-def _clone_and_simulate(net, trial_idx):
+def _clone_and_simulate(net, tstop, dt, trial_idx):
     """Run a simulation including building the network
 
     This is used by both backends. MPIBackend calls this in mpi_child.py, once
@@ -42,7 +42,7 @@ def _clone_and_simulate(net, trial_idx):
     from hnn_core.network_builder import _simulate_single_trial
 
     neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
-    dpl = _simulate_single_trial(neuron_net, trial_idx)
+    dpl = _simulate_single_trial(neuron_net, tstop, dt, trial_idx)
 
     spikedata = neuron_net.get_data_from_neuron()
 
@@ -507,7 +507,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, n_trials, postproc=True):
+    def simulate(self, net, tstop, dt, n_trials, postproc=True):
         """Simulate the HNN model
 
         Parameters
@@ -526,7 +526,7 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
         parallel, myfunc = self._parallel_func(_clone_and_simulate)
-        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
+        sim_data = parallel(myfunc(net, tstop, dt, idx) for idx in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
                                   postproc=postproc)
@@ -648,7 +648,7 @@ class MPIBackend(object):
         # always kill nrniv processes for good measure
         kill_proc_name('nrniv')
 
-    def simulate(self, net, n_trials, postproc=True):
+    def simulate(self, net, tstop, dt, n_trials, postproc=True):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -669,7 +669,8 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            return JoblibBackend(n_jobs=1).simulate(net, n_trials=n_trials,
+            return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
+                                                    dt=dt, n_trials=n_trials,
                                                     postproc=postproc)
 
         print("Running %d trials..." % (n_trials))

@@ -27,7 +27,7 @@ _CVODE = None
 _LAST_NETWORK = None
 
 
-def _simulate_single_trial(neuron_net, trial_idx):
+def _simulate_single_trial(neuron_net, tstop, dt, trial_idx):
     """Simulate one trial."""
 
     from .dipole import Dipole
