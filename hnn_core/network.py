@@ -947,17 +947,25 @@ class Network(object):
             all target_type cells.
         """
         src_gids = self.gid_ranges[_long_name(src_cell)]
-        target_gids = self.gid_ranges[_long_name(target_cell)]
+        target_range = self.gid_ranges[_long_name(target_cell)]
 
         src_start = src_gids[0]  # Necessary for unique feeds
-        gid_pairs = []
-        for target_gid in target_gids:
-            if unique:
-                src_gids = [target_gid + src_start]
+        gid_pairs = list()
+        target_gids = list()
+
+        if unique:
+            src_gids = list(np.array(target_range) + src_start)
+            # Recasting as int necessary after using numpy array
+            gid_pairs = [[int(src_gid), [int(target_gid)]] for
+                         (src_gid, target_gid) in zip(src_gids, target_range)]
+        else:
             for src_gid in src_gids:
-                if not allow_autapses and src_gid == target_gid:
-                    continue
-                gid_pairs.append((src_gid, target_gid))
+                target_gids = list()
+                for target_gid in target_range:
+                    if not allow_autapses and src_gid == target_gid:
+                        continue
+                    target_gids.append(target_gid)
+                gid_pairs.append([src_gid, target_gids])
 
         self.add_connection(
             gid_pairs, loc, receptor,
@@ -969,9 +977,9 @@ class Network(object):
 
         Parameters
         ----------
-        gid_pairs : list of tuple | list of list
+        gid_pairs : list of list
             List of connected gids with the format:
-            [(src_gid, target_gid), ...]
+            [[src_gid, [target_gids, ...]], ...]
         loc : str
             Location of synapse on target cell. Must be
             'proximal', 'distal', or 'soma'. Note that inhibitory synapses
@@ -991,18 +999,19 @@ class Network(object):
         threshold = self.threshold
         _validate_type(gid_pairs, list, 'gid_pairs', 'list')
         for gid_pair in gid_pairs:
-            _validate_type(gid_pair, (list, tuple), 'gid_pairs',
-                           'list or tuple')
+            _validate_type(gid_pair, list, 'gid_pairs', 'list')
             assert len(gid_pair) == 2
-            src_gid, target_gid = gid_pair
+            src_gid, target_gids = gid_pair
             _validate_type(src_gid, int, 'src_gid', 'int')
-            _validate_type(target_gid, int, 'target_gid', 'int')
+            _validate_type(target_gids, list, 'target_gid', 'list')
 
             # Ensure gids in range of Network.gid_ranges
             assert np.sum([src_gid in gid_range for
                            gid_range in self.gid_ranges.values()]) == 1
-            assert np.sum([target_gid in gid_range for
-                           gid_range in self.gid_ranges.values()]) == 1
+            for target_gid in target_gids:
+                _validate_type(target_gid, int, 'target_gid', 'int')
+                assert np.sum([target_gid in gid_range for
+                               gid_range in self.gid_ranges.values()]) == 1
 
         conn['gid_pairs'] = gid_pairs
 
