@@ -317,7 +317,6 @@ class NetworkBuilder(object):
         self._all_spike_gids = h.Vector()
 
         self._record_spikes()
-
         self._connect_celltypes()
 
         if _get_rank() == 0:
@@ -481,7 +480,6 @@ class NetworkBuilder(object):
             if _PC.gid_exists(gid):
                 _PC.spike_record(gid, self._spike_times, self._spike_gids)
 
-    # aggregate recording all the somatic voltages for pyr
     def aggregate_data(self):
         """Aggregate somatic currents, voltages, and dipoles."""
         for cell in self._cells:

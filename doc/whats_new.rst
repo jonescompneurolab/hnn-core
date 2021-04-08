@@ -27,6 +27,8 @@ Changelog
 Bug
 ~~~
 
+- Remove repositioning of cells which moves x and z coordinates of all sections slightly, by `Mainak Jas`_ in `#314 <https://github.com/jonescompneurolab/hnn-core/pull/314>`_
+
 API
 ~~~
 - New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
