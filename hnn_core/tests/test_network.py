@@ -3,6 +3,7 @@
 from copy import deepcopy
 import os.path as op
 from numpy.testing import assert_allclose
+import numpy as np
 import pytest
 
 import hnn_core
@@ -165,22 +166,29 @@ def test_network():
     # Test inputs for connectivity API
     net = Network(deepcopy(params), add_drives_from_params=True)
     n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
-    kwargs_default = dict(gid_pairs=[[0, [35]]],
+    kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
                           loc='soma', receptor='gabaa',
-                          weight=5e-4, delay=1.0, lamtha=3.0)
+                          weight=5e-4, delay=1.0, lamtha=1e9)
     net.add_connection(**kwargs_default)  # smoke test
     network_builder = NetworkBuilder(net)
-    assert len(network_builder.ncs['L2Basket_L2Pyr_gabaa']) == n_conn + 1
+    assert len(network_builder.ncs['L2Basket_L2Pyr_gabaa']) == n_conn + 4
     nc = network_builder.ncs['L2Basket_L2Pyr_gabaa'][-1]
-    assert nc.weight[0] == kwargs_default['weight']
+    assert_allclose(nc.weight[0], kwargs_default['weight'])
 
-    kwargs = kwargs_default.copy()
-    kwargs['gid_pairs'] = [[35, [36]]]
-    net.add_connection(**kwargs)
+    kwargs_good = [
+        ('src_gids', 0), ('src_gids', 'L2_pyramidal'), ('src_gids', range(2)),
+        ('target_gids', 35), ('target_gids', range(2)),
+        ('target_gids', 'L2_pyramidal'),
+        ('target_gids', [[35, 36], [37, 38]])]
+    for arg, item in kwargs_good:
+        kwargs = kwargs_default.copy()
+        kwargs[arg] = item
+        net.add_connection(**kwargs)
 
     kwargs_bad = [
-        ('gid_pairs', 0), ('gid_pairs', [[0.0, [35]]]),
-        ('gid_pairs', [[0, [35.0]]]), ('gid_pairs', [0, 35]), ('loc', 1.0),
+        ('src_gids', 0.0), ('src_gids', [0.0]),
+        ('target_gids', 35.0), ('target_gids', [35.0]),
+        ('target_gids', [[35], [36.0]]), ('loc', 1.0),
         ('receptor', 1.0), ('weight', '1.0'), ('delay', '1.0'),
         ('lamtha', '1.0')]
     for arg, item in kwargs_bad:
@@ -188,18 +196,20 @@ def test_network():
         with pytest.raises(TypeError, match=match):
             kwargs = kwargs_default.copy()
             kwargs[arg] = item
+            print(item)
             net.add_connection(**kwargs)
 
     kwargs_bad = [
-        ('gid_pairs', [[-1, [0]]]), ('gid_pairs', [[0, [-1]]]),
-        ('gid_pairs', [[0, 35, 36]])]
+        ('src_gids', -1), ('src_gids', [-1]),
+        ('target_gids', -1), ('target_gids', [-1]),
+        ('target_gids', [[35], [-1]]), ('target_gids', [[35]])]
     for arg, item in kwargs_bad:
         with pytest.raises(AssertionError):
             kwargs = kwargs_default.copy()
             kwargs[arg] = item
             net.add_connection(**kwargs)
 
-    for arg in ['loc', 'receptor']:
+    for arg in ['src_gids', 'target_gids', 'loc', 'receptor']:
         string_arg = 'invalid_string'
         match = f"Invalid value for the '{arg}' parameter"
         with pytest.raises(ValueError, match=match):

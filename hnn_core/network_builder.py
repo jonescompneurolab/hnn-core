@@ -425,7 +425,7 @@ class NetworkBuilder(object):
 
         for conn in connectivity:
             loc, receptor = conn['loc'], conn['receptor']
-            nc_dict = conn['nc_dict']
+            nc_dict = deepcopy(conn['nc_dict'])
             # Gather indeces of targets on current node
             valid_targets = set()
             for idx, (src_gid, target_gids) in enumerate(conn['gid_pairs']):

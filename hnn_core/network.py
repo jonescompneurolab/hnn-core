@@ -976,13 +976,16 @@ class Network(object):
         Parameters
         ----------
         src_gids : str | int | range | list of int
-
+            Identifier for src cells. Passing str arguments
+            ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
+            equivalent to passing a list of gids for the relvant cell type.
+            src-target connections depend on the input type of target_gids.
         target_gids : str | int | range | list of int | list of list of int
             Identifer for targets of src cell. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
             equivalent to passing a list of gids for the relvant cell type.
             Inputs of type (str, int, range, and list of int) connect every
-            src_gid to the same targets.
+            src_gid to an identical set of targets.
             Targets can be uniquely specified for each src_gid by passing a
             list of lists (must contain one element for each src_gid).
         loc : str
@@ -1009,27 +1012,29 @@ class Network(object):
         threshold = self.threshold
         _validate_type(src_gids, (int, list, range, str), 'src_gids',
                        'int list, range, or str')
-        _validate_type(target_gids, (int, list, str), 'target_gids',
+        _validate_type(target_gids, (int, list, range, str), 'target_gids',
                        'int list, range or str')
+        valid_cells = [
+            'L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket']
         # Convert src_gids to list
         if isinstance(src_gids, int):
             src_gids = [src_gids]
         elif isinstance(src_gids, str):
+            _check_option('src_gids', src_gids, valid_cells)
             src_gids = self.gid_ranges[_long_name(src_gids)]
 
         # Convert target_gids to list of list, one element for each src_gid
         if isinstance(target_gids, int):
             target_gids = [[target_gids] for _ in range(len(src_gids))]
         elif isinstance(target_gids, str):
+            _check_option('target_gids', target_gids, valid_cells)
             target_gids = [list(self.gid_ranges[_long_name(target_gids)])
                            for _ in range(len(src_gids))]
         elif isinstance(target_gids, range):
-            [list(target_gids) for _ in range(len(src_gids))]
+            target_gids = [list(target_gids) for _ in range(len(src_gids))]
         elif isinstance(target_gids, list) and all(isinstance(t_gid, int)
                                                    for t_gid in target_gids):
             target_gids = [target_gids for _ in range(len(src_gids))]
-        if len(target_gids) != len(src_gids):
-            raise AssertionError('target_gids must have a list for each src.')
 
         # Validate each target list - src pairs.
         # set() used to avoid redundant checks.
@@ -1044,6 +1049,9 @@ class Network(object):
             # Ensure gids in range of Network.gid_ranges
             assert np.sum([target_gid in gid_range for
                            gid_range in self.gid_ranges.values()]) == 1
+
+        if len(target_gids) != len(src_gids):
+            raise AssertionError('target_gids must have a list for each src.')
 
         # Format gid_pairs and add to conn dictionary
         gid_pairs = list()
