@@ -3,7 +3,6 @@
 from copy import deepcopy
 import os.path as op
 from numpy.testing import assert_allclose
-import numpy as np
 import pytest
 
 import hnn_core
