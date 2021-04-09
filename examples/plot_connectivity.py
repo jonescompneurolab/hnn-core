@@ -55,7 +55,7 @@ net_erp.cell_response.plot_spikes_raster()
 # connections. In the default network, the src_gids of each connection are
 # all of the same type so we'll just check the first element.
 new_connectivity = [conn for conn in net.connectivity
-                    if net.gid_to_type(conn['gid_pairs'][0][0]) != 'L2_basket']
+                    if net.gid_to_type(conn['src_gids'][0]) != 'L2_basket']
 net.connectivity = new_connectivity
 
 net_remove = net.copy()
@@ -67,15 +67,13 @@ net_remove.cell_response.plot_spikes_raster()
 # connections increases network wide excitability. We can additionally add
 # new connections using ``net.add_connection()``. Let's try connecting a
 # single layer 2 basket cell, to every layer 2 pyramidal cell. We can utilize
-# ``net.gid_ranges`` to help
-# find the gids of interest.
+# ``net.gid_ranges`` to help find the gids of interest.
 print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
 target_gids = net.gid_ranges['L2_pyramidal']
 location, receptor = 'soma', 'gabaa'
 weight, delay, lamtha = 1.0, 1.0, 70
-gid_pairs = [(src_gid, target_gid) for target_gid in target_gids]
-net.add_connection(gid_pairs, location, receptor,
+net.add_connection(src_gid, target_gids, location, receptor,
                    delay, weight, lamtha)
 
 net_add = net.copy()
