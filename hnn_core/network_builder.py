@@ -467,7 +467,7 @@ class NetworkBuilder(object):
 
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
-                            src_gid, deepcopy(nc_dict), 
+                            src_gid, deepcopy(nc_dict),
                             target_cell.synapses[syn_key])
                         self.ncs[connection_name].append(nc)
 

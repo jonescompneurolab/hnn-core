@@ -950,36 +950,41 @@ class Network(object):
         target_range = self.gid_ranges[_long_name(target_cell)]
 
         src_start = src_gids[0]  # Necessary for unique feeds
-        gid_pairs = list()
-        target_gids = list()
 
         if unique:
-            src_gids = list(np.array(target_range) + src_start)
-            # Recasting as int necessary after using numpy array
-            gid_pairs = [[int(src_gid), [int(target_gid)]] for
-                         (src_gid, target_gid) in zip(src_gids, target_range)]
+            src_gids = np.array(target_range) + src_start
+            src_gids = src_gids.astype(int).tolist()
+            target_gids = [[target_gid] for target_gid in target_range]
         else:
+            target_gids = list()
             for src_gid in src_gids:
-                target_gids = list()
+                target_src_pair = list()
                 for target_gid in target_range:
                     if not allow_autapses and src_gid == target_gid:
                         continue
-                    target_gids.append(target_gid)
-                gid_pairs.append([src_gid, target_gids])
+                    target_src_pair.append(target_gid)
+                target_gids.append(target_src_pair)
 
         self.add_connection(
-            gid_pairs, loc, receptor,
+            src_gids, target_gids, loc, receptor,
             nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
 
-    def add_connection(self, gid_pairs, loc, receptor,
+    def add_connection(self, src_gids, target_gids, loc, receptor,
                        weight, delay, lamtha):
         """Appends connections to connectivity list
 
         Parameters
         ----------
-        gid_pairs : list of list
-            List of connected gids with the format:
-            [[src_gid, [target_gids, ...]], ...]
+        src_gids : str | int | range | list of int
+
+        target_gids : str | int | range | list of int | list of list of int
+            Identifer for targets of src cell. Passing str arguments
+            ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
+            equivalent to passing a list of gids for the relvant cell type.
+            Inputs of type (str, int, range, and list of int) connect every
+            src_gid to the same targets.
+            Targets can be uniquely specified for each src_gid by passing a
+            list of lists (must contain one element for each src_gid).
         loc : str
             Location of synapse on target cell. Must be
             'proximal', 'distal', or 'soma'. Note that inhibitory synapses
@@ -994,28 +999,63 @@ class Network(object):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+
+        N.B. Connections are stored in:
+        net.connectivity[idx]['gid_pairs'] : list of list
+            List of connected gids with the format:
+            [[src_gid, [target_gids, ...]], ...]
         """
         conn = dict()
         threshold = self.threshold
-        _validate_type(gid_pairs, list, 'gid_pairs', 'list')
-        for gid_pair in gid_pairs:
-            _validate_type(gid_pair, list, 'gid_pairs', 'list')
-            assert len(gid_pair) == 2
-            src_gid, target_gids = gid_pair
-            _validate_type(src_gid, int, 'src_gid', 'int')
-            _validate_type(target_gids, list, 'target_gid', 'list')
+        _validate_type(src_gids, (int, list, range, str), 'src_gids',
+                       'int list, range, or str')
+        _validate_type(target_gids, (int, list, str), 'target_gids',
+                       'int list, range or str')
+        # Convert src_gids to list
+        if isinstance(src_gids, int):
+            src_gids = [src_gids]
+        elif isinstance(src_gids, str):
+            src_gids = self.gid_ranges[_long_name(src_gids)]
 
+        # Convert target_gids to list of list, one element for each src_gid
+        if isinstance(target_gids, int):
+            target_gids = [[target_gids] for _ in range(len(src_gids))]
+        elif isinstance(target_gids, str):
+            target_gids = [list(self.gid_ranges[_long_name(target_gids)])
+                           for _ in range(len(src_gids))]
+        elif isinstance(target_gids, range):
+            [list(target_gids) for _ in range(len(src_gids))]
+        elif isinstance(target_gids, list) and all(isinstance(t_gid, int)
+                                                   for t_gid in target_gids):
+            target_gids = [target_gids for _ in range(len(src_gids))]
+        if len(target_gids) != len(src_gids):
+            raise AssertionError('target_gids must have a list for each src.')
+
+        # Validate each target list - src pairs.
+        # set() used to avoid redundant checks.
+        target_set = set()
+        for target_src_pair in target_gids:
+            _validate_type(target_src_pair, list, 'target_gids[idx]',
+                           'list or range')
+            for target_gid in target_src_pair:
+                target_set.add(target_gid)
+        for target_gid in target_set:
+            _validate_type(target_gid, int, 'target_gid', 'int')
             # Ensure gids in range of Network.gid_ranges
+            assert np.sum([target_gid in gid_range for
+                           gid_range in self.gid_ranges.values()]) == 1
+
+        # Format gid_pairs and add to conn dictionary
+        gid_pairs = list()
+        for src_gid, target_src_pair in zip(src_gids, target_gids):
+            _validate_type(src_gid, int, 'src_gid', 'int')
             assert np.sum([src_gid in gid_range for
                            gid_range in self.gid_ranges.values()]) == 1
-            for target_gid in target_gids:
-                _validate_type(target_gid, int, 'target_gid', 'int')
-                assert np.sum([target_gid in gid_range for
-                               gid_range in self.gid_ranges.values()]) == 1
+            gid_pairs.append([src_gid, target_src_pair])
 
         conn['gid_pairs'] = gid_pairs
 
-        # Ensure string inputs
+        # Validate string inputs
         _validate_type(loc, str, 'loc')
         _validate_type(receptor, str, 'receptor')
 
