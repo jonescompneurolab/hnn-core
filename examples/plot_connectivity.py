@@ -38,8 +38,7 @@ net = Network(params, add_drives_from_params=True)
 # is a list of dictionaries which detail every cell-cell, and drive-cell
 # connection.
 print(len(net.connectivity))
-print(net.connectivity[0])
-print(net.connectivity[-1])
+print(net.connectivity[0].keys())
 
 ###############################################################################
 # Data recorded during simulations are stored under
@@ -53,9 +52,13 @@ net_erp.cell_response.plot_spikes_raster()
 # We can modify the connectivity list to test the effect of different
 # connectivity patterns. For example, we can remove all layer 2 inhibitory
 # connections. In the default network, the src_gids of each connection are
-# all of the same type so we'll just check the first element.
+# all of the same type so we'll just check the first element. Connections are
+# stored under ``conn['gid_pairs']`` as a list of lists of the form
+# ``[[src_gid, [target_gid1, target_gid1]], ...]``. For each inner list,
+# the first element corresponds to the src_gid, and the second corresponds to
+# all of its target cells.
 new_connectivity = [conn for conn in net.connectivity
-                    if net.gid_to_type(conn['src_gids'][0]) != 'L2_basket']
+                    if net.gid_to_type(conn['gid_pairs'][0][0]) != 'L2_basket']
 net.connectivity = new_connectivity
 
 net_remove = net.copy()
@@ -68,9 +71,11 @@ net_remove.cell_response.plot_spikes_raster()
 # new connections using ``net.add_connection()``. Let's try connecting a
 # single layer 2 basket cell, to every layer 2 pyramidal cell. We can utilize
 # ``net.gid_ranges`` to help find the gids of interest.
+# ``net.add_connection()`` allows connections to be specified with either cell
+# names, or the gids directly.
 print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
-target_gids = net.gid_ranges['L2_pyramidal']
+target_gids = 'L2_pyramidal'
 location, receptor = 'soma', 'gabaa'
 weight, delay, lamtha = 1.0, 1.0, 70
 net.add_connection(src_gid, target_gids, location, receptor,
