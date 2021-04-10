@@ -947,27 +947,32 @@ class Network(object):
             all target_type cells.
         """
         src_gids = self.gid_ranges[_long_name(src_cell)]
-        target_range = self.gid_ranges[_long_name(target_cell)]
+        target_gids = self.gid_ranges[_long_name(target_cell)]
 
         src_start = src_gids[0]  # Necessary for unique feeds
 
         if unique:
-            src_gids = np.array(target_range) + src_start
+            src_gids = np.array(target_gids) + src_start
             src_gids = src_gids.astype(int).tolist()
-            target_gids = [[target_gid] for target_gid in target_range]
+            target_gids = [[target_gid] for target_gid in target_gids]
+            for src_gid, target_gid in zip(src_gids, target_gids):
+                self.add_connection(
+                    src_gid, target_gid, loc, receptor,
+                    nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
         else:
-            target_gids = list()
-            for src_gid in src_gids:
-                target_src_pair = list()
-                for target_gid in target_range:
-                    if not allow_autapses and src_gid == target_gid:
-                        continue
-                    target_src_pair.append(target_gid)
-                target_gids.append(target_src_pair)
-
-        self.add_connection(
-            src_gids, target_gids, loc, receptor,
-            nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
+            if allow_autapses:
+                self.add_connection(
+                    src_gids, target_gids, loc, receptor,
+                    nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
+            else:
+                target_gids = np.array(target_gids)
+                for src_gid in src_gids:
+                    target_filtered = target_gids[
+                        np.where(target_gids != src_gid)[0]].tolist()
+                    self.add_connection(
+                        src_gid, target_filtered, loc, receptor,
+                        nc_dict['A_weight'], nc_dict['A_delay'],
+                        nc_dict['lamtha'])
 
     def add_connection(self, src_gids, target_gids, loc, receptor,
                        weight, delay, lamtha):
@@ -986,8 +991,6 @@ class Network(object):
             equivalent to passing a list of gids for the relvant cell type.
             Inputs of type (str, int, range, and list of int) connect every
             src_gid to an identical set of targets.
-            Targets can be uniquely specified for each src_gid by passing a
-            list of lists (must contain one element for each src_gid).
         loc : str
             Location of synapse on target cell. Must be
             'proximal', 'distal', or 'soma'. Note that inhibitory synapses
@@ -1035,6 +1038,9 @@ class Network(object):
         elif isinstance(target_gids, list) and all(isinstance(t_gid, int)
                                                    for t_gid in target_gids):
             target_gids = [target_gids for _ in range(len(src_gids))]
+        # else:
+        #     raise TypeError('target_gids must contain an int for every' 
+        #                     'element when specified as a list.')
 
         # Validate each target list - src pairs.
         # set() used to avoid redundant checks.
