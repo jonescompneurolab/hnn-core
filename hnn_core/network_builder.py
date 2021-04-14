@@ -428,13 +428,13 @@ class NetworkBuilder(object):
             nc_dict = deepcopy(conn['nc_dict'])
             # Gather indeces of targets on current node
             valid_targets = set()
-            for idx, (src_gid, target_gids) in enumerate(conn['gid_pairs']):
+            for src_gid, target_gids in conn['gid_pairs'].items():
                 filtered_targets = list()
                 for target_gid in target_gids:
                     if _PC.gid_exists(target_gid):
                         filtered_targets.append(target_gid)
                         valid_targets.add(target_gid)
-                conn['gid_pairs'][idx] = [src_gid, filtered_targets]
+                conn['gid_pairs'][src_gid] = filtered_targets
 
             target_filter = dict()
             for idx in range(len(self.cells)):
@@ -443,7 +443,7 @@ class NetworkBuilder(object):
                     target_filter[gid] = idx
 
             # Iterate over src/target pairs and connect cells
-            for src_gid, target_gids in conn['gid_pairs']:
+            for src_gid, target_gids in conn['gid_pairs'].items():
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)

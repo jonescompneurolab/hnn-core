@@ -1061,7 +1061,7 @@ class Network(object):
             raise AssertionError('target_gids must have a list for each src.')
 
         # Format gid_pairs and add to conn dictionary
-        gid_pairs = list()
+        gid_pairs = dict()
         src_type = self.gid_to_type(src_gids[0])
         for src_gid, target_src_pair in zip(src_gids, target_gids):
             _validate_type(src_gid, int, 'src_gid', 'int')
@@ -1071,7 +1071,7 @@ class Network(object):
                     f'src_gid {src_gid} not in net.gid_ranges')
             elif gid_type != src_type:
                 raise AssertionError('All src_gids must be of the same type')
-            gid_pairs.append([src_gid, target_src_pair])
+            gid_pairs[src_gid] = target_src_pair
         conn['src_type'] = src_type
 
         conn['gid_pairs'] = gid_pairs
