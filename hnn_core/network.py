@@ -1044,22 +1044,35 @@ class Network(object):
                            'list or range')
             for target_gid in target_src_pair:
                 target_set.add(target_gid)
+        target_type = self.gid_to_type(target_gids[0][0])
         for target_gid in target_set:
             _validate_type(target_gid, int, 'target_gid', 'int')
             # Ensure gids in range of Network.gid_ranges
-            assert np.sum([target_gid in gid_range for
-                           gid_range in self.gid_ranges.values()]) == 1
+            gid_type = self.gid_to_type(target_gid)
+            if gid_type is None:
+                raise AssertionError(
+                    f'target_gid {target_gid}''not in net.gid_ranges')
+            elif gid_type != target_type:
+                raise AssertionError(
+                    'All target_gids must be of the same type')
+        conn['target_type'] = target_type
 
         if len(target_gids) != len(src_gids):
             raise AssertionError('target_gids must have a list for each src.')
 
         # Format gid_pairs and add to conn dictionary
         gid_pairs = list()
+        src_type = self.gid_to_type(src_gids[0])
         for src_gid, target_src_pair in zip(src_gids, target_gids):
             _validate_type(src_gid, int, 'src_gid', 'int')
-            assert np.sum([src_gid in gid_range for
-                           gid_range in self.gid_ranges.values()]) == 1
+            gid_type = self.gid_to_type(src_gid)
+            if gid_type is None:
+                raise AssertionError(
+                    f'src_gid {src_gid} not in net.gid_ranges')
+            elif gid_type != src_type:
+                raise AssertionError('All src_gids must be of the same type')
             gid_pairs.append([src_gid, target_src_pair])
+        conn['src_type'] = src_type
 
         conn['gid_pairs'] = gid_pairs
 

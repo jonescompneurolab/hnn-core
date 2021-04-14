@@ -201,7 +201,8 @@ def test_network():
     kwargs_bad = [
         ('src_gids', -1), ('src_gids', [-1]),
         ('target_gids', -1), ('target_gids', [-1]),
-        ('target_gids', [[35], [-1]]), ('target_gids', [[35]])]
+        ('target_gids', [[35], [-1]]), ('target_gids', [[35]]),
+        ('src_gids', [0, 100]), ('target_gids', [0, 100])]
     for arg, item in kwargs_bad:
         with pytest.raises(AssertionError):
             kwargs = kwargs_default.copy()
