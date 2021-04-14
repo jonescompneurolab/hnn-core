@@ -1008,7 +1008,7 @@ class Network(object):
             List of connected gids with the format:
             [[src_gid, [target_gids, ...]], ...]
         """
-        conn = dict()
+        conn = _Connectivity()
         threshold = self.threshold
         _validate_type(src_gids, (int, list, range, str), 'src_gids',
                        'int list, range, or str')
@@ -1056,6 +1056,7 @@ class Network(object):
                 raise AssertionError(
                     'All target_gids must be of the same type')
         conn['target_type'] = target_type
+        conn['num_targets'] = len(target_set)
 
         if len(target_gids) != len(src_gids):
             raise AssertionError('target_gids must have a list for each src.')
@@ -1073,6 +1074,7 @@ class Network(object):
                 raise AssertionError('All src_gids must be of the same type')
             gid_pairs[src_gid] = target_src_pair
         conn['src_type'] = src_type
+        conn['num_srcs'] = len(src_gids)
 
         conn['gid_pairs'] = gid_pairs
 
@@ -1120,6 +1122,54 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+
+class _Connectivity(dict):
+    """A class for containing the connectivity details of the network
+
+    Class instances are essentially dictionaries, with the keys described below
+    as 'attributes'.
+
+    Attributes
+    ----------
+    src_type : str
+        Cell type of src gids.
+    target_type : str
+        Cell type of target gids.
+    num_srcs : int
+        Number of unique src gids.
+    num_targets : int
+        Number of unique target gids.
+    loc : str
+        Location of synapse on target cell. Must be
+        'proximal', 'distal', or 'soma'. Note that inhibitory synapses
+        (receptor='gabaa' or 'gabab') of L2 pyramidal neurons are only
+        valid loc='soma'.
+    receptor : str
+        Synaptic receptor of connection. Must be one of:
+        'ampa', 'nmda', 'gabaa', or 'gabab'.
+    nc_dict : dict
+        Dictionary containing details of synaptic connection.
+        Elements include:
+        A_weight : float
+            Synaptic weight on target cell.
+        A_delay : float
+            Synaptic delay in ms.
+        lamtha : float
+            Space constant.
+    """
+
+    def __repr__(self):
+        entr = f"{self['src_type']} -> {self['target_type']}"
+        entr += f"\nCell counts: {self['num_srcs']} srcs; "
+        entr += f"{self['num_targets']} targets"
+        entr += f"\nloc: '{self['loc']}'; receptor: '{self['receptor']}'"
+        entr += f"\nweight: {self['nc_dict']['A_weight']}; "
+        entr += f"delay: {self['nc_dict']['A_delay']}; "
+        entr += f"lamtha: {self['nc_dict']['lamtha']}"
+        entr += "\n "
+
+        return entr
 
 
 class _NetworkDrive(dict):
