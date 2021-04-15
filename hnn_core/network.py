@@ -952,8 +952,7 @@ class Network(object):
         src_start = src_gids[0]  # Necessary for unique feeds
 
         if unique:
-            src_gids = np.array(target_range) + src_start
-            src_gids = src_gids.astype(int).tolist()
+            src_gids = [src_gid + src_start for src_gid in target_range]
             target_gids = [[target_gid] for target_gid in target_range]
         else:
             target_gids = list()

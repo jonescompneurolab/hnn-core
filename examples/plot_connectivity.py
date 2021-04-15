@@ -55,7 +55,7 @@ net_erp.cell_response.plot_spikes_raster()
 # all the same cell type.. Connections are stored under ``conn['gid_pairs']``
 # as a dictionary indexed by src_gid:
 # ``{src_gid1: [target_gid1, target_gid2], ...]``. Each src_gid indexes a
-# list with it's target gids
+# list with its target gids
 new_connectivity = [conn for conn in net.connectivity
                     if conn['src_type'] != 'L2_basket']
 net.connectivity = new_connectivity
