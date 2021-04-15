@@ -70,9 +70,10 @@ net_remove.cell_response.plot_spikes_raster()
 # new connections using ``net.add_connection()``. Let's try connecting a
 # single layer 2 basket cell, to every layer 2 pyramidal cell. We can utilize
 # ``net.gid_ranges`` to help find the gids of interest.
-# ``net.add_connection()`` allows connections to be specified with either cell
-# names, or the gids directly. If multiple gids are provided for either the
-# sources or the targets, they will be connected in an all-to-all pattern.
+# :meth:`hnn_core.Network.add_connection` allows connections to be specified
+# with either cell names, or the gids directly. If multiple gids are provided
+# for either the sources or the targets, they will be connected in an
+# all-to-all pattern.
 print(net.gid_ranges)
 src_gid = net.gid_ranges['L2_basket'][0]
 target_gids = 'L2_pyramidal'

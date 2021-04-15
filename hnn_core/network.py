@@ -979,15 +979,12 @@ class Network(object):
             Identifier for source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
             equivalent to passing a list of gids for the relvant cell type.
-            src-target connections depend on the input type of target_gids.
-        target_gids : str | int | range | list of int | list of list of int
+            source - target connections are made in an all-to-all pattern.
+        target_gids : str | int | range | list of int
             Identifer for targets of source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
             equivalent to passing a list of gids for the relvant cell type.
-            Inputs of type (str, int, range, and list of int) connect every
-            src_gid to an identical set of targets.
-            Targets can be uniquely specified for each src_gid by passing a
-            list of lists (must contain one element for each src_gid).
+            source - target connections are made in an all-to-all pattern.
         loc : str
             Location of synapse on target cell. Must be
             'proximal', 'distal', or 'soma'. Note that inhibitory synapses
@@ -1003,10 +1000,13 @@ class Network(object):
         lamtha : float
             Space constant.
 
-        N.B. Connections are stored in:
-        net.connectivity[idx]['gid_pairs'] : list of list
-            List of connected gids with the format:
-            [[src_gid, [target_gids, ...]], ...]
+        Notes
+        -----
+        Connections are stored in:
+        net.connectivity[idx]['gid_pairs'] : dict
+            dict indexed by src gids with the format:
+            {src_gid: [target_gids, ...], ...}
+        where each src_gid indexes a list of all its targets.
         """
         conn = _Connectivity()
         threshold = self.threshold

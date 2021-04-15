@@ -195,7 +195,6 @@ def test_network():
         with pytest.raises(TypeError, match=match):
             kwargs = kwargs_default.copy()
             kwargs[arg] = item
-            print(item)
             net.add_connection(**kwargs)
 
     kwargs_bad = [
