@@ -1133,11 +1133,11 @@ class _Connectivity(dict):
     Attributes
     ----------
     src_type : str
-        Cell type of src gids.
+        Cell type of source gids.
     target_type : str
         Cell type of target gids.
     num_srcs : int
-        Number of unique src gids.
+        Number of unique source gids.
     num_targets : int
         Number of unique target gids.
     loc : str
@@ -1161,7 +1161,7 @@ class _Connectivity(dict):
 
     def __repr__(self):
         entr = f"{self['src_type']} -> {self['target_type']}"
-        entr += f"\nCell counts: {self['num_srcs']} srcs; "
+        entr += f"\ncell counts: {self['num_srcs']} srcs, "
         entr += f"{self['num_targets']} targets"
         entr += f"\nloc: '{self['loc']}'; receptor: '{self['receptor']}'"
         entr += f"\nweight: {self['nc_dict']['A_weight']}; "
