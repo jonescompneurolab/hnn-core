@@ -976,12 +976,12 @@ class Network(object):
         Parameters
         ----------
         src_gids : str | int | range | list of int
-            Identifier for src cells. Passing str arguments
+            Identifier for source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
             equivalent to passing a list of gids for the relvant cell type.
             src-target connections depend on the input type of target_gids.
         target_gids : str | int | range | list of int | list of list of int
-            Identifer for targets of src cell. Passing str arguments
+            Identifer for targets of source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
             equivalent to passing a list of gids for the relvant cell type.
             Inputs of type (str, int, range, and list of int) connect every
