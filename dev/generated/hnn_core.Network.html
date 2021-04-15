@@ -3,8 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.Network &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
@@ -123,7 +122,7 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <section id="hnn-core-network">
+  <div class="section" id="hnn-core-network">
 <h1>hnn_core.Network<a class="headerlink" href="#hnn-core-network" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="hnn_core.Network">
@@ -239,14 +238,20 @@ weights and delays within the simulated column</p>
 
 <dl class="py method">
 <dt id="hnn_core.Network.add_connection">
-<code class="sig-name descname"><span class="pre">add_connection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_connection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Appends connections to connectivity list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>src_gid</strong><span class="classifier">int</span></dt><dd><p>Integer identifying source cell ID.</p>
+<dt><strong>src_gids</strong><span class="classifier">str | int | range | list of int</span></dt><dd><p>Identifier for source cells. Passing str arguments
+(‘L2_pyramidal’, ‘L2_basket’, ‘L5_pyramidal’, ‘L5_basket’) is
+equivalent to passing a list of gids for the relvant cell type.
+source - target connections are made in an all-to-all pattern.</p>
 </dd>
-<dt><strong>target_gid</strong><span class="classifier">list | range | int</span></dt><dd><p>Integer or list of integers identifying target cell ID.</p>
+<dt><strong>target_gids</strong><span class="classifier">str | int | range | list of int</span></dt><dd><p>Identifer for targets of source cells. Passing str arguments
+(‘L2_pyramidal’, ‘L2_basket’, ‘L5_pyramidal’, ‘L5_basket’) is
+equivalent to passing a list of gids for the relvant cell type.
+source - target connections are made in an all-to-all pattern.</p>
 </dd>
 <dt><strong>loc</strong><span class="classifier">str</span></dt><dd><p>Location of synapse on target cell. Must be
 ‘proximal’, ‘distal’, or ‘soma’. Note that inhibitory synapses
@@ -265,6 +270,14 @@ valid loc=’soma’.</p>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Connections are stored in:
+net.connectivity[idx][‘gid_pairs’] : dict</p>
+<blockquote>
+<div><p>dict indexed by src gids with the format:
+{src_gid: [target_gids, …], …}</p>
+</div></blockquote>
+<p>where each src_gid indexes a list of all its targets.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -430,7 +443,7 @@ a new figure is created.</p>
 
 </dd></dl>
 
-</section>
+</div>
 
 
     </div>
@@ -445,7 +458,7 @@ a new figure is created.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

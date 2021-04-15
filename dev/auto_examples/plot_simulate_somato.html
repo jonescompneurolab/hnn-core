@@ -3,8 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>05. From MEG sensor-space data to HNN simulation &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
@@ -131,7 +130,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-somato-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<section class="sphx-glr-example-title" id="from-meg-sensor-space-data-to-hnn-simulation">
+<div class="sphx-glr-example-title section" id="from-meg-sensor-space-data-to-hnn-simulation">
 <span id="sphx-glr-auto-examples-plot-simulate-somato-py"></span><h1>05. From MEG sensor-space data to HNN simulation<a class="headerlink" href="#from-meg-sensor-space-data-to-hnn-simulation" title="Permalink to this headline">¶</a></h1>
 <p>This example demonstrates how to calculate an inverse solution of the median
 nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset,
@@ -179,128 +178,109 @@ Downloading archive MNE-somato-data.tar.gz to /home/circleci/mne_data
 Downloading https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e2849ad5a1025d4b7346?version=7&amp;action=download&amp;direct (582.2 MB)
 
   0%|          | Downloading : 0.00/582M [00:00&lt;?,        ?B/s]
-  0%|          | Downloading : 0.99M/582M [00:00&lt;00:11,    54.1MB/s]
-  1%|          | Downloading : 2.99M/582M [00:00&lt;00:10,    55.4MB/s]
-  1%|          | Downloading : 4.99M/582M [00:00&lt;00:10,    56.0MB/s]
-  2%|1         | Downloading : 8.99M/582M [00:00&lt;00:10,    57.8MB/s]
-  2%|1         | Downloading : 11.0M/582M [00:00&lt;00:10,    59.4MB/s]
-  2%|2         | Downloading : 13.0M/582M [00:00&lt;00:09,    60.8MB/s]
-  3%|2         | Downloading : 17.0M/582M [00:00&lt;00:09,    62.6MB/s]
-  3%|3         | Downloading : 19.0M/582M [00:00&lt;00:09,    63.9MB/s]
-  4%|3         | Downloading : 23.0M/582M [00:00&lt;00:08,    65.8MB/s]
-  4%|4         | Downloading : 25.0M/582M [00:00&lt;00:08,    67.3MB/s]
-  5%|4         | Downloading : 29.0M/582M [00:00&lt;00:08,    68.9MB/s]
-  5%|5         | Downloading : 31.0M/582M [00:00&lt;00:08,    70.0MB/s]
-  6%|6         | Downloading : 35.0M/582M [00:00&lt;00:07,    71.9MB/s]
-  6%|6         | Downloading : 37.0M/582M [00:00&lt;00:07,    73.5MB/s]
-  7%|7         | Downloading : 41.0M/582M [00:00&lt;00:07,    75.4MB/s]
-  7%|7         | Downloading : 43.0M/582M [00:00&lt;00:07,    75.9MB/s]
-  8%|8         | Downloading : 49.0M/582M [00:00&lt;00:07,    77.9MB/s]
-  9%|9         | Downloading : 53.0M/582M [00:00&lt;00:07,    79.2MB/s]
- 10%|9         | Downloading : 57.0M/582M [00:00&lt;00:06,    80.7MB/s]
- 10%|#         | Downloading : 61.0M/582M [00:00&lt;00:06,    81.8MB/s]
- 11%|#1        | Downloading : 65.0M/582M [00:00&lt;00:06,    83.2MB/s]
- 12%|#1        | Downloading : 69.0M/582M [00:00&lt;00:06,    83.9MB/s]
- 13%|#2        | Downloading : 73.0M/582M [00:00&lt;00:06,    86.1MB/s]
- 13%|#3        | Downloading : 77.0M/582M [00:00&lt;00:06,    88.1MB/s]
- 14%|#3        | Downloading : 81.0M/582M [00:00&lt;00:05,    89.8MB/s]
- 15%|#4        | Downloading : 85.0M/582M [00:00&lt;00:05,    91.5MB/s]
- 15%|#5        | Downloading : 89.0M/582M [00:00&lt;00:05,    92.6MB/s]
- 16%|#5        | Downloading : 93.0M/582M [00:00&lt;00:05,    93.4MB/s]
- 17%|#6        | Downloading : 97.0M/582M [00:00&lt;00:05,    94.4MB/s]
- 17%|#7        | Downloading : 101M/582M [00:00&lt;00:05,    95.8MB/s]
- 18%|#8        | Downloading : 105M/582M [00:00&lt;00:05,    96.7MB/s]
- 19%|#8        | Downloading : 109M/582M [00:00&lt;00:05,    96.8MB/s]
- 19%|#9        | Downloading : 113M/582M [00:00&lt;00:05,    97.1MB/s]
- 20%|##        | Downloading : 117M/582M [00:01&lt;00:05,    96.2MB/s]
- 21%|##        | Downloading : 121M/582M [00:01&lt;00:05,    95.9MB/s]
- 21%|##1       | Downloading : 125M/582M [00:01&lt;00:04,    96.5MB/s]
- 22%|##2       | Downloading : 129M/582M [00:01&lt;00:04,    98.0MB/s]
- 23%|##2       | Downloading : 133M/582M [00:01&lt;00:04,    98.1MB/s]
- 24%|##3       | Downloading : 137M/582M [00:01&lt;00:04,     100MB/s]
- 24%|##4       | Downloading : 141M/582M [00:01&lt;00:04,     101MB/s]
- 25%|##4       | Downloading : 145M/582M [00:01&lt;00:04,     101MB/s]
- 26%|##5       | Downloading : 149M/582M [00:01&lt;00:04,     101MB/s]
- 26%|##6       | Downloading : 153M/582M [00:01&lt;00:04,     101MB/s]
- 27%|##6       | Downloading : 157M/582M [00:01&lt;00:04,     101MB/s]
- 28%|##7       | Downloading : 161M/582M [00:01&lt;00:04,     102MB/s]
- 28%|##8       | Downloading : 165M/582M [00:01&lt;00:04,     104MB/s]
- 29%|##9       | Downloading : 169M/582M [00:01&lt;00:04,     105MB/s]
- 30%|##9       | Downloading : 173M/582M [00:01&lt;00:04,     107MB/s]
- 30%|###       | Downloading : 177M/582M [00:01&lt;00:03,     108MB/s]
- 31%|###1      | Downloading : 181M/582M [00:01&lt;00:03,     108MB/s]
- 33%|###3      | Downloading : 193M/582M [00:01&lt;00:03,     110MB/s]
- 35%|###4      | Downloading : 201M/582M [00:01&lt;00:03,     112MB/s]
- 36%|###5      | Downloading : 209M/582M [00:01&lt;00:03,     113MB/s]
- 37%|###7      | Downloading : 217M/582M [00:01&lt;00:03,     115MB/s]
- 39%|###8      | Downloading : 225M/582M [00:01&lt;00:03,     115MB/s]
- 40%|####      | Downloading : 233M/582M [00:01&lt;00:03,     117MB/s]
- 41%|####1     | Downloading : 241M/582M [00:02&lt;00:03,     118MB/s]
- 43%|####2     | Downloading : 249M/582M [00:02&lt;00:02,     117MB/s]
- 44%|####4     | Downloading : 257M/582M [00:02&lt;00:02,     119MB/s]
- 46%|####5     | Downloading : 265M/582M [00:02&lt;00:02,     120MB/s]
- 47%|####6     | Downloading : 273M/582M [00:02&lt;00:02,     120MB/s]
- 48%|####8     | Downloading : 281M/582M [00:02&lt;00:02,     121MB/s]
- 50%|####9     | Downloading : 289M/582M [00:02&lt;00:02,     123MB/s]
- 51%|#####1    | Downloading : 297M/582M [00:02&lt;00:02,     125MB/s]
- 52%|#####2    | Downloading : 305M/582M [00:02&lt;00:02,     125MB/s]
- 54%|#####3    | Downloading : 313M/582M [00:02&lt;00:02,     127MB/s]
- 55%|#####5    | Downloading : 321M/582M [00:02&lt;00:02,     128MB/s]
- 57%|#####6    | Downloading : 329M/582M [00:02&lt;00:02,     129MB/s]
- 58%|#####7    | Downloading : 337M/582M [00:02&lt;00:01,     129MB/s]
- 59%|#####9    | Downloading : 345M/582M [00:02&lt;00:01,     128MB/s]
- 61%|######    | Downloading : 353M/582M [00:02&lt;00:01,     126MB/s]
- 62%|######2   | Downloading : 361M/582M [00:02&lt;00:01,     126MB/s]
- 63%|######3   | Downloading : 369M/582M [00:03&lt;00:01,     125MB/s]
- 65%|######4   | Downloading : 377M/582M [00:03&lt;00:01,     125MB/s]
- 66%|######6   | Downloading : 385M/582M [00:03&lt;00:01,     126MB/s]
- 67%|######7   | Downloading : 393M/582M [00:03&lt;00:01,     126MB/s]
- 69%|######8   | Downloading : 401M/582M [00:03&lt;00:01,     125MB/s]
- 70%|#######   | Downloading : 409M/582M [00:03&lt;00:01,     126MB/s]
- 72%|#######1  | Downloading : 417M/582M [00:03&lt;00:01,     126MB/s]
- 73%|#######2  | Downloading : 425M/582M [00:03&lt;00:01,     127MB/s]
- 74%|#######4  | Downloading : 433M/582M [00:03&lt;00:01,     127MB/s]
- 76%|#######5  | Downloading : 441M/582M [00:03&lt;00:01,     126MB/s]
- 77%|#######7  | Downloading : 449M/582M [00:03&lt;00:01,     125MB/s]
- 78%|#######8  | Downloading : 457M/582M [00:03&lt;00:01,     117MB/s]
- 79%|#######9  | Downloading : 461M/582M [00:03&lt;00:01,     115MB/s]
- 80%|#######9  | Downloading : 465M/582M [00:03&lt;00:01,     115MB/s]
- 81%|########  | Downloading : 469M/582M [00:03&lt;00:01,     114MB/s]
- 81%|########1 | Downloading : 473M/582M [00:04&lt;00:01,     114MB/s]
- 82%|########1 | Downloading : 477M/582M [00:04&lt;00:00,     113MB/s]
- 83%|########2 | Downloading : 481M/582M [00:04&lt;00:00,     111MB/s]
- 83%|########3 | Downloading : 485M/582M [00:04&lt;00:00,     112MB/s]
- 84%|########3 | Downloading : 489M/582M [00:04&lt;00:00,     110MB/s]
- 85%|########4 | Downloading : 493M/582M [00:04&lt;00:00,     111MB/s]
- 85%|########5 | Downloading : 497M/582M [00:04&lt;00:00,     107MB/s]
- 86%|########6 | Downloading : 501M/582M [00:04&lt;00:00,     104MB/s]
- 87%|########6 | Downloading : 505M/582M [00:04&lt;00:00,     101MB/s]
- 87%|########7 | Downloading : 509M/582M [00:04&lt;00:00,     101MB/s]
- 88%|########8 | Downloading : 513M/582M [00:04&lt;00:00,    98.9MB/s]
- 89%|########8 | Downloading : 517M/582M [00:04&lt;00:00,    97.1MB/s]
- 89%|########9 | Downloading : 521M/582M [00:04&lt;00:00,    94.9MB/s]
- 90%|######### | Downloading : 525M/582M [00:04&lt;00:00,    93.4MB/s]
- 91%|######### | Downloading : 529M/582M [00:04&lt;00:00,    92.2MB/s]
- 92%|#########1| Downloading : 533M/582M [00:04&lt;00:00,    92.3MB/s]
- 92%|#########2| Downloading : 537M/582M [00:04&lt;00:00,    92.2MB/s]
- 93%|#########2| Downloading : 541M/582M [00:04&lt;00:00,    91.2MB/s]
- 94%|#########3| Downloading : 545M/582M [00:04&lt;00:00,    91.1MB/s]
- 94%|#########4| Downloading : 549M/582M [00:04&lt;00:00,    90.6MB/s]
- 95%|#########4| Downloading : 553M/582M [00:05&lt;00:00,    90.6MB/s]
- 96%|#########5| Downloading : 557M/582M [00:05&lt;00:00,    81.2MB/s]
- 96%|#########6| Downloading : 559M/582M [00:05&lt;00:00,    81.1MB/s]
- 96%|#########6| Downloading : 561M/582M [00:05&lt;00:00,    80.7MB/s]
- 97%|#########6| Downloading : 563M/582M [00:05&lt;00:00,    81.4MB/s]
- 97%|#########7| Downloading : 565M/582M [00:05&lt;00:00,    81.6MB/s]
- 97%|#########7| Downloading : 567M/582M [00:05&lt;00:00,    81.2MB/s]
- 98%|#########7| Downloading : 569M/582M [00:05&lt;00:00,    82.0MB/s]
- 98%|#########8| Downloading : 571M/582M [00:05&lt;00:00,    82.6MB/s]
- 98%|#########8| Downloading : 573M/582M [00:05&lt;00:00,    83.5MB/s]
- 99%|#########8| Downloading : 575M/582M [00:05&lt;00:00,    84.1MB/s]
- 99%|#########9| Downloading : 577M/582M [00:05&lt;00:00,    85.0MB/s]
- 99%|#########9| Downloading : 579M/582M [00:05&lt;00:00,    86.5MB/s]
-100%|##########| Downloading : 582M/582M [00:05&lt;00:00,    88.4MB/s]
-100%|##########| Downloading : 582M/582M [00:05&lt;00:00,     112MB/s]
+  0%|          | Downloading : 248k/582M [00:00&lt;00:41,    14.7MB/s]
+  0%|          | Downloading : 632k/582M [00:00&lt;00:40,    14.9MB/s]
+  0%|          | Downloading : 1.62M/582M [00:00&lt;00:39,    15.5MB/s]
+  1%|          | Downloading : 4.62M/582M [00:00&lt;00:37,    16.3MB/s]
+  2%|1         | Downloading : 10.6M/582M [00:00&lt;00:35,    17.0MB/s]
+  3%|3         | Downloading : 18.6M/582M [00:00&lt;00:33,    17.8MB/s]
+  4%|3         | Downloading : 22.6M/582M [00:00&lt;00:31,    18.5MB/s]
+  5%|4         | Downloading : 26.6M/582M [00:00&lt;00:30,    19.4MB/s]
+  6%|5         | Downloading : 34.6M/582M [00:00&lt;00:28,    20.3MB/s]
+  7%|6         | Downloading : 38.6M/582M [00:00&lt;00:26,    21.1MB/s]
+  7%|7         | Downloading : 42.6M/582M [00:00&lt;00:25,    22.2MB/s]
+  8%|8         | Downloading : 46.6M/582M [00:00&lt;00:24,    23.0MB/s]
+  9%|8         | Downloading : 50.6M/582M [00:00&lt;00:23,    24.0MB/s]
+  9%|9         | Downloading : 54.6M/582M [00:00&lt;00:22,    25.0MB/s]
+ 10%|#         | Downloading : 58.6M/582M [00:00&lt;00:21,    25.9MB/s]
+ 11%|#         | Downloading : 62.6M/582M [00:00&lt;00:20,    27.0MB/s]
+ 11%|#1        | Downloading : 66.6M/582M [00:00&lt;00:19,    28.1MB/s]
+ 12%|#2        | Downloading : 70.6M/582M [00:00&lt;00:18,    29.1MB/s]
+ 14%|#4        | Downloading : 82.6M/582M [00:00&lt;00:17,    30.5MB/s]
+ 16%|#5        | Downloading : 90.6M/582M [00:00&lt;00:16,    31.7MB/s]
+ 17%|#6        | Downloading : 98.6M/582M [00:00&lt;00:15,    33.0MB/s]
+ 18%|#8        | Downloading : 107M/582M [00:00&lt;00:14,    34.3MB/s]
+ 20%|#9        | Downloading : 115M/582M [00:00&lt;00:13,    35.5MB/s]
+ 21%|##1       | Downloading : 123M/582M [00:00&lt;00:13,    37.0MB/s]
+ 22%|##2       | Downloading : 131M/582M [00:01&lt;00:12,    38.4MB/s]
+ 24%|##3       | Downloading : 139M/582M [00:01&lt;00:11,    39.9MB/s]
+ 25%|##5       | Downloading : 147M/582M [00:01&lt;00:11,    41.5MB/s]
+ 27%|##6       | Downloading : 155M/582M [00:01&lt;00:10,    42.8MB/s]
+ 28%|##7       | Downloading : 163M/582M [00:01&lt;00:09,    44.6MB/s]
+ 29%|##9       | Downloading : 171M/582M [00:01&lt;00:09,    46.0MB/s]
+ 31%|###       | Downloading : 179M/582M [00:01&lt;00:08,    48.0MB/s]
+ 32%|###2      | Downloading : 187M/582M [00:01&lt;00:08,    49.3MB/s]
+ 33%|###3      | Downloading : 195M/582M [00:01&lt;00:08,    50.8MB/s]
+ 35%|###4      | Downloading : 203M/582M [00:01&lt;00:07,    52.3MB/s]
+ 36%|###6      | Downloading : 211M/582M [00:01&lt;00:07,    53.6MB/s]
+ 38%|###7      | Downloading : 219M/582M [00:01&lt;00:06,    54.7MB/s]
+ 39%|###8      | Downloading : 227M/582M [00:01&lt;00:06,    56.3MB/s]
+ 40%|####      | Downloading : 235M/582M [00:01&lt;00:06,    58.3MB/s]
+ 42%|####1     | Downloading : 243M/582M [00:01&lt;00:05,    60.1MB/s]
+ 43%|####3     | Downloading : 251M/582M [00:01&lt;00:05,    62.0MB/s]
+ 44%|####4     | Downloading : 259M/582M [00:02&lt;00:05,    63.9MB/s]
+ 46%|####5     | Downloading : 267M/582M [00:02&lt;00:05,    65.0MB/s]
+ 47%|####7     | Downloading : 275M/582M [00:02&lt;00:04,    67.4MB/s]
+ 49%|####8     | Downloading : 283M/582M [00:02&lt;00:04,    69.1MB/s]
+ 50%|####9     | Downloading : 291M/582M [00:02&lt;00:04,    70.7MB/s]
+ 51%|#####1    | Downloading : 299M/582M [00:02&lt;00:04,    72.7MB/s]
+ 53%|#####2    | Downloading : 307M/582M [00:02&lt;00:03,    74.7MB/s]
+ 54%|#####4    | Downloading : 315M/582M [00:02&lt;00:03,    76.3MB/s]
+ 55%|#####5    | Downloading : 323M/582M [00:02&lt;00:03,    76.7MB/s]
+ 57%|#####6    | Downloading : 331M/582M [00:02&lt;00:03,    77.9MB/s]
+ 58%|#####8    | Downloading : 339M/582M [00:02&lt;00:03,    78.6MB/s]
+ 60%|#####9    | Downloading : 347M/582M [00:02&lt;00:03,    81.0MB/s]
+ 61%|######    | Downloading : 355M/582M [00:02&lt;00:02,    82.7MB/s]
+ 62%|######2   | Downloading : 363M/582M [00:02&lt;00:02,    83.0MB/s]
+ 64%|######3   | Downloading : 371M/582M [00:03&lt;00:02,    83.4MB/s]
+ 65%|######5   | Downloading : 379M/582M [00:03&lt;00:02,    85.6MB/s]
+ 66%|######6   | Downloading : 387M/582M [00:03&lt;00:02,    87.2MB/s]
+ 68%|######7   | Downloading : 395M/582M [00:03&lt;00:02,    88.5MB/s]
+ 69%|######9   | Downloading : 403M/582M [00:03&lt;00:02,    86.9MB/s]
+ 70%|######9   | Downloading : 407M/582M [00:03&lt;00:02,    87.2MB/s]
+ 71%|#######   | Downloading : 411M/582M [00:03&lt;00:02,    86.1MB/s]
+ 71%|#######1  | Downloading : 415M/582M [00:03&lt;00:02,    85.5MB/s]
+ 72%|#######1  | Downloading : 419M/582M [00:03&lt;00:02,    83.1MB/s]
+ 73%|#######2  | Downloading : 423M/582M [00:03&lt;00:02,    81.7MB/s]
+ 73%|#######3  | Downloading : 427M/582M [00:03&lt;00:02,    81.5MB/s]
+ 74%|#######3  | Downloading : 431M/582M [00:03&lt;00:01,    82.2MB/s]
+ 75%|#######4  | Downloading : 435M/582M [00:03&lt;00:01,    83.8MB/s]
+ 75%|#######5  | Downloading : 439M/582M [00:03&lt;00:01,    85.9MB/s]
+ 76%|#######6  | Downloading : 443M/582M [00:03&lt;00:01,    87.0MB/s]
+ 77%|#######6  | Downloading : 447M/582M [00:03&lt;00:01,    90.0MB/s]
+ 77%|#######7  | Downloading : 451M/582M [00:03&lt;00:01,    91.8MB/s]
+ 78%|#######8  | Downloading : 455M/582M [00:03&lt;00:01,    92.4MB/s]
+ 79%|#######8  | Downloading : 459M/582M [00:03&lt;00:01,    94.5MB/s]
+ 79%|#######9  | Downloading : 463M/582M [00:03&lt;00:01,    94.6MB/s]
+ 80%|########  | Downloading : 467M/582M [00:04&lt;00:01,    94.7MB/s]
+ 81%|########  | Downloading : 471M/582M [00:04&lt;00:01,    95.2MB/s]
+ 82%|########1 | Downloading : 475M/582M [00:04&lt;00:01,    96.5MB/s]
+ 82%|########2 | Downloading : 479M/582M [00:04&lt;00:01,    97.8MB/s]
+ 83%|########2 | Downloading : 483M/582M [00:04&lt;00:01,    98.9MB/s]
+ 84%|########3 | Downloading : 487M/582M [00:04&lt;00:01,    96.6MB/s]
+ 84%|########4 | Downloading : 491M/582M [00:04&lt;00:00,    99.5MB/s]
+ 85%|########4 | Downloading : 495M/582M [00:04&lt;00:00,    98.9MB/s]
+ 86%|########5 | Downloading : 499M/582M [00:04&lt;00:00,    98.1MB/s]
+ 86%|########6 | Downloading : 503M/582M [00:04&lt;00:00,    99.5MB/s]
+ 87%|########7 | Downloading : 507M/582M [00:04&lt;00:00,    98.1MB/s]
+ 88%|########7 | Downloading : 511M/582M [00:04&lt;00:00,     101MB/s]
+ 89%|########9 | Downloading : 519M/582M [00:04&lt;00:00,     103MB/s]
+ 90%|########9 | Downloading : 523M/582M [00:04&lt;00:00,     103MB/s]
+ 90%|######### | Downloading : 527M/582M [00:04&lt;00:00,     104MB/s]
+ 91%|#########1| Downloading : 531M/582M [00:04&lt;00:00,     105MB/s]
+ 92%|#########1| Downloading : 535M/582M [00:04&lt;00:00,     106MB/s]
+ 93%|#########2| Downloading : 539M/582M [00:04&lt;00:00,     105MB/s]
+ 93%|#########3| Downloading : 543M/582M [00:04&lt;00:00,     104MB/s]
+ 94%|#########3| Downloading : 547M/582M [00:04&lt;00:00,     107MB/s]
+ 95%|#########4| Downloading : 551M/582M [00:04&lt;00:00,     107MB/s]
+ 95%|#########5| Downloading : 555M/582M [00:04&lt;00:00,     106MB/s]
+ 96%|#########5| Downloading : 559M/582M [00:04&lt;00:00,     109MB/s]
+ 97%|#########6| Downloading : 563M/582M [00:04&lt;00:00,     112MB/s]
+ 97%|#########7| Downloading : 567M/582M [00:04&lt;00:00,     112MB/s]
+ 98%|#########8| Downloading : 571M/582M [00:04&lt;00:00,     112MB/s]
+ 99%|#########8| Downloading : 575M/582M [00:04&lt;00:00,     111MB/s]
+ 99%|#########9| Downloading : 579M/582M [00:05&lt;00:00,     109MB/s]
+100%|##########| Downloading : 582M/582M [00:05&lt;00:00,     121MB/s]
 Verifying hash 32fd2f6c8c7eb0784a1de6435273c48b.
 Decompressing the archive: /home/circleci/mne_data/MNE-somato-data.tar.gz
 (please be patient, this can take some time)
@@ -626,7 +606,7 @@ nerve evoked response waveforms, and output spike histogram.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 3 Axes&gt;
 </pre></div>
 </div>
-<section id="references">
+<div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <dl class="footnote brackets">
 <dt class="label" id="id5"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>)</span></dt>
@@ -643,7 +623,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
 <a class="reference external" href="https://doi.org/10.7554/eLife.51214">https://doi.org/10.7554/eLife.51214</a></p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  40.800 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  52.751 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-somato-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/plot_simulate_somato.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
@@ -656,8 +636,8 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
     </div>
@@ -672,7 +652,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

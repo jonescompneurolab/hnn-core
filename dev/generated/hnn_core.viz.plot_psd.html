@@ -3,8 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.viz.plot_psd &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
@@ -123,13 +122,13 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <section id="hnn-core-viz-plot-psd">
+  <div class="section" id="hnn-core-viz-plot-psd">
 <h1>hnn_core.viz.plot_psd<a class="headerlink" href="#hnn-core-viz-plot-psd" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="hnn_core.viz.plot_psd">
 <code class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></code><code class="sig-name descname"><span class="pre">plot_psd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpl</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot power spectral density (PSD) of dipole time course</p>
-<p>Applies <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.periodogram.html#scipy.signal.periodogram" title="(in SciPy v1.7.0.dev0+20642e5)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">periodogram</span></code></a> from SciPy with <code class="docutils literal notranslate"><span class="pre">window='hamming'</span></code>.
+<p>Applies <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.periodogram.html#scipy.signal.periodogram" title="(in SciPy v1.7.0.dev0+374e5bf)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">periodogram</span></code></a> from SciPy with <code class="docutils literal notranslate"><span class="pre">window='hamming'</span></code>.
 Note that no spectral averaging is applied across time, as most
 <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> simulations are short-duration. However, passing a list of
 <em class="xref py py-obj">Dipole</em> instances will plot their average (Hamming-windowed) power, which
@@ -164,7 +163,7 @@ resembles the <em class="xref py py-obj">Welch</em>-method applied over time.</p
 </dl>
 </dd></dl>
 
-</section>
+</div>
 
 
     </div>
@@ -179,7 +178,7 @@ resembles the <em class="xref py py-obj">Welch</em>-method applied over time.</p
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

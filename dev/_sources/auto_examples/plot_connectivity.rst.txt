@@ -108,13 +108,12 @@ reflect the canonical neocortical microcircuit. ``net.connectivity``
 is a list of dictionaries which detail every cell-cell, and drive-cell
 connection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-44
+.. GENERATED FROM PYTHON SOURCE LINES 40-43
 
 .. code-block:: default
 
     print(len(net.connectivity))
-    print(net.connectivity[0])
-    print(net.connectivity[-1])
+    print(net.connectivity[0:2])
 
 
 
@@ -126,20 +125,27 @@ connection.
 
  .. code-block:: none
 
-    91025
-    {'src_gid': 36, 'src_type': 'L2_pyramidal', 'loc': 'proximal', 'receptor': 'nmda', 'nc_dict': {'A_delay': 1.0, 'A_weight': 0.0005, 'lamtha': 3.0, 'threshold': 0.0}, 'target_gid': 35, 'target_type': 'L2_pyramidal'}
-    {'src_gid': 1081, 'src_type': 'evprox2', 'loc': 'proximal', 'receptor': 'ampa', 'nc_dict': {'A_delay': 1.0, 'A_weight': 0.684013, 'lamtha': 3.0, 'threshold': 0.0}, 'target_gid': 269, 'target_type': 'L5_pyramidal'}
+    30
+    [L2_pyramidal -> L2_pyramidal
+    cell counts: 100 srcs, 100 targets
+    loc: 'proximal'; receptor: 'nmda'
+    weight: 0.0005; delay: 1.0; lamtha: 3.0
+     , L2_pyramidal -> L2_pyramidal
+    cell counts: 100 srcs, 100 targets
+    loc: 'proximal'; receptor: 'ampa'
+    weight: 0.0005; delay: 1.0; lamtha: 3.0
+     ]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-48
+.. GENERATED FROM PYTHON SOURCE LINES 44-47
 
 Data recorded during simulations are stored under
 :class:`~hnn_core.Cell_Response`. To test multiple network structures, we can
 create a copy of the original network. The copied network is then simulated.
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-52
+.. GENERATED FROM PYTHON SOURCE LINES 47-51
 
 .. code-block:: default
 
@@ -187,13 +193,17 @@ create a copy of the original network. The copied network is then simulated.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-56
+.. GENERATED FROM PYTHON SOURCE LINES 52-59
 
 We can modify the connectivity list to test the effect of different
 connectivity patterns. For example, we can remove all layer 2 inhibitory
-connections.
+connections. In the default network, the src_gids of each connection are
+all the same cell type.. Connections are stored under ``conn['gid_pairs']``
+as a dictionary indexed by src_gid:
+``{src_gid1: [target_gid1, target_gid2], ...]``. Each src_gid indexes a
+list with its target gids
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-64
+.. GENERATED FROM PYTHON SOURCE LINES 59-67
 
 .. code-block:: default
 
@@ -245,22 +255,25 @@ connections.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-71
+.. GENERATED FROM PYTHON SOURCE LINES 68-77
 
 That's a lot of spiking! Since basket cells are inhibitory, removing these
 connections increases network wide excitability. We can additionally add
 new connections using ``net.add_connection()``. Let's try connecting a
 single layer 2 basket cell, to every layer 2 pyramidal cell. We can utilize
-``net.gid_ranges`` to help
-find the gids of interest.
+``net.gid_ranges`` to help find the gids of interest.
+:meth:`hnn_core.Network.add_connection` allows connections to be specified
+with either cell names, or the gids directly. If multiple gids are provided
+for either the sources or the targets, they will be connected in an
+all-to-all pattern.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-83
+.. GENERATED FROM PYTHON SOURCE LINES 77-89
 
 .. code-block:: default
 
     print(net.gid_ranges)
     src_gid = net.gid_ranges['L2_basket'][0]
-    target_gids = net.gid_ranges['L2_pyramidal']
+    target_gids = 'L2_pyramidal'
     location, receptor = 'soma', 'gabaa'
     weight, delay, lamtha = 1.0, 1.0, 70
     net.add_connection(src_gid, target_gids, location, receptor,
@@ -311,14 +324,14 @@ find the gids of interest.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-88
+.. GENERATED FROM PYTHON SOURCE LINES 90-94
 
 Adding more inhibitory connections did not completely restore the normal
 spiking. L2 basket and pyramidal cells rhythymically fire in the gamma
 range (30-80 Hz). As a final step, we can see how this change in spiking
 activity impacts the aggregate current dipole.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-97
+.. GENERATED FROM PYTHON SOURCE LINES 94-103
 
 .. code-block:: default
 
@@ -353,7 +366,7 @@ activity impacts the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  52.534 seconds)
+   **Total running time of the script:** ( 3 minutes  23.203 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_connectivity.py:
