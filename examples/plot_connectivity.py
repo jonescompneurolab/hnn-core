@@ -58,7 +58,7 @@ net_erp.cell_response.plot_spikes_raster()
 # the first element corresponds to the src_gid, and the second corresponds to
 # all of its target cells.
 new_connectivity = [conn for conn in net.connectivity
-                    if net.gid_to_type(conn['gid_pairs'][0][0]) != 'L2_basket']
+                    if conn['src_type'] != 'L2_basket']
 net.connectivity = new_connectivity
 
 net_remove = net.copy()
