@@ -9,12 +9,11 @@ from hnn_core import simulate_dipole, read_params, Network
 
 from IPython.display import display
 
-from ipywidgets import (FloatSlider, Dropdown, Accordion, Tab,
-                        interactive_output, HBox, VBox,
-                        FloatText, interactive, Dropdown, interact, Output,
-                        RadioButtons, Button)
-from ipywidgets import Layout, AppLayout, fixed
-
+from ipywidgets import (FloatSlider, Dropdown, Button, RadioButtons,
+                        fixed, interactive_output, interactive, interact,
+                        FloatText, Output,
+                        HBox, VBox, Tab, Accordion,
+                        Layout, AppLayout)
 
 drives_out = Output()
 drive_widgets = list()
@@ -119,7 +118,7 @@ def add_drive_widget(drive_type):
                          location=location,
                          weights_ampa_L5Pyr=weights_ampa_L5Pyr,
                          weights_nmda_L5Pyr=weights_nmda_L5Pyr)
-        elif drive_type['new'] == 'Evoked':            
+        elif drive_type['new'] == 'Evoked':
             mu = FloatText(value=7.5, description='Mean time:',
                            layout=layout)
             sigma = FloatText(value=8.5, description='Std dev time:',
@@ -138,12 +137,12 @@ def add_drive_widget(drive_type):
                               weights_ampa_L5Pyr, weights_nmda_L5Pyr])
             drive = dict(type='Evoked', name=drive_title,
                          mu=mu,
-                         sigma=sigma, 
-                         numspikes=numspikes, 
-                         sync_within_trial=False, 
-                         location=location, 
-                         weights_ampa_L5Pyr=weights_ampa_L5Pyr, 
-                         weights_nmda_L5Pyr=weights_nmda_L5Pyr, 
+                         sigma=sigma,
+                         numspikes=numspikes,
+                         sync_within_trial=False,
+                         location=location,
+                         weights_ampa_L5Pyr=weights_ampa_L5Pyr,
+                         weights_nmda_L5Pyr=weights_nmda_L5Pyr,
                          space_constant=3.0)
 
         drive_titles.append(drive_title)
@@ -174,46 +173,47 @@ def update_plot(variables, plot_out, plot_type):
 
 def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
     """Run the simulation and plot outputs."""
+    for drive in drive_widgets:
+        if drive['type'] == 'Poisson':
+            variables['net'].add_poisson_drive(
+                name=drive['name'],
+                tstart=drive['tstart'].value,
+                tstop=drive['tstop'].value,
+                rate_constant=dict(L5_pyramidal=drive['rate_constant'].value),
+                location=drive['location'].value,
+                weights_ampa=dict(L5_pyramidal=drive['weights_ampa_L5Pyr'].value),
+                weights_nmda=dict(L5_pyramidal=drive['weights_nmda_L5Pyr'].value),
+                space_constant=100.0
+            )
+        elif drive['type'] == 'Evoked':
+            variables['net'].add_evoked_drive(
+                name=drive['name'],
+                mu=drive['mu'].value,
+                sigma=drive['sigma'].value,
+                numspikes=drive['numspikes'].value, 
+                sync_within_trial=False, 
+                location=drive['location'].value, 
+                weights_ampa=dict(L5_pyramidal=drive['weights_ampa_L5Pyr'].value),
+                weights_nmda=dict(L5_pyramidal=drive['weights_nmda_L5Pyr'].value),
+                space_constant=3.0
+            )
+        elif drive['type'] == 'Rhythmic':
+            variables['net'].add_bursty_drive(
+                name=drive['name'],
+                tstart=drive['tstart'].value,
+                tstart_std=drive['tstart_std'].value,
+                burst_rate=drive['burst_rate'].value,
+                burst_std=drive['burst_std'].value,
+                location=drive['location'].value
+            )
     with log_out:
-        for drive in drive_widgets:
-            if drive['type'] == 'Poisson':
-                variables['net'].add_poisson_drive(
-                    name=drive['name'],
-                    tstart=drive['tstart'].value, 
-                    tstop=drive['tstop'].value,
-                    rate_constant=dict(L5_pyramidal=drive['rate_constant'].value), 
-                    location=drive['location'].value,
-                    weights_ampa=dict(L5_pyramidal=drive['weights_ampa_L5Pyr'].value), 
-                    weights_nmda=dict(L5_pyramidal=drive['weights_nmda_L5Pyr'].value), 
-                    space_constant=100.0
-                )
-            elif drive['type'] == 'Evoked':
-                variables['net'].add_evoked_drive(
-                        name=drive['name'],
-                        mu=drive['mu'].value,
-                        sigma=drive['sigma'].value, 
-                        numspikes=drive['numspikes'].value, 
-                        sync_within_trial=False, 
-                        location=drive['location'].value, 
-                        weights_ampa=dict(L5_pyramidal=drive['weights_ampa_L5Pyr'].value), 
-                        weights_nmda=dict(L5_pyramidal=drive['weights_nmda_L5Pyr'].value), 
-                        space_constant=3.0
-                )
-            elif drive['type'] == 'Rhythmic':
-                variables['net'].add_bursty_drive(
-                    name=drive['name'],
-                    tstart=drive['tstart'].value,
-                    tstart_std=drive['tstart_std'].value,
-                    burst_rate=drive['burst_rate'].value,
-                    burst_std=drive['burst_std'].value,
-                    location=drive['location'].value
-                )
         variables['dpls'] = simulate_dipole(variables['net'], n_trials=1)
     with plot_out:
         variables['dpls'][0].plot()
 
 
 def run_hnn_gui():
+    """Create the HNN GUI."""
 
     hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
@@ -275,19 +275,16 @@ def run_hnn_gui():
         left_tab.set_title(idx, title)
 
     # Dropdown menu to switch between plots
+    def _update_plot(plot_type):
+        return update_plot(variables, plot_out, plot_type)
+
     dropdown = Dropdown(
         options=['input histogram', 'dipole current', 'spikes'],
         value='dipole current',
         description='Plot:',
         disabled=False,
     )
-
-    interactive(update_plot, plot_type='dipole current',
-                variables=fixed(variables), plot_out=fixed(plot_out))
-
-    def _update_plot(plot_type):
-        return update_plot(variables, plot_out, plot_type)
-
+    interactive(_update_plot, plot_type='dipole current')
     dropdown.observe(_update_plot, 'value')
 
     # Run button
@@ -299,7 +296,6 @@ def run_hnn_gui():
                                  b)
 
     run_button.on_click(_on_button_clicked)
-
     footer = HBox([run_button, load_button, dropdown])
 
     # Final layout of the app
