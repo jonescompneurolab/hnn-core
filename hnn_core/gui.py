@@ -68,53 +68,71 @@ def _get_sliders(params, param_keys):
 
 
 def add_drive_widget(drive_type):
-
+    """Add a widget for a new drive."""
     layout = Layout(width='200px', height='auto')
     drives_out.clear_output()
     with drives_out:
         drive_title = drive_type['new'] + str(len(drive_boxes))
 
         if drive_type['new'] == 'Rhythmic':
-            tstart = FloatText(value=7.5, description='Start time:', layout=layout)
-            tstart_std = FloatText(value=7.5, description='Start time dev:', layout=layout)
-            tstop = FloatText(value=7.5, description='Stop time:', layout=layout)
-            burst_rate = FloatText(value=7.5, description='Burst rate:', layout=layout)
-            burst_std = FloatText(value=7.5, description='Burst std dev:', layout=layout)
+            tstart = FloatText(value=7.5, description='Start time:',
+                               layout=layout)
+            tstart_std = FloatText(value=7.5, description='Start time dev:',
+                                   layout=layout)
+            tstop = FloatText(value=7.5, description='Stop time:',
+                              layout=layout)
+            burst_rate = FloatText(value=7.5, description='Burst rate:',
+                                   layout=layout)
+            burst_std = FloatText(value=7.5, description='Burst std dev:',
+                                  layout=layout)
             location = RadioButtons(options=['proximal', 'distal'])
 
-            drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std, location])
+            drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std,
+                              location])
             drive = dict(type='Rhythmic', name=drive_title,
                          tstart=tstart,
                          tstart_std=tstart_std,
                          burst_rate=burst_rate,
                          burst_std=burst_std,
-                         location=location
-            )
-        elif drive_type['new'] == 'Poisson':            
-            tstart = FloatText(value=7.5, description='Start time:', layout=layout)
-            tstop = FloatText(value=8.5, description='Stop time:', layout=layout)
-            rate_constant = FloatText(value=8.5, description='Rate constant:', layout=layout)
+                         location=location)
+        elif drive_type['new'] == 'Poisson':
+            tstart = FloatText(value=7.5, description='Start time:',
+                               layout=layout)
+            tstop = FloatText(value=8.5, description='Stop time:',
+                              layout=layout)
+            rate_constant = FloatText(value=8.5, description='Rate constant:',
+                                      layout=layout)
             location = RadioButtons(options=['proximal', 'distal'])
-            weights_ampa_L5Pyr = FloatText(value=8.5, description='AMPA (L5 Pyr):', layout=layout)
-            weights_nmda_L5Pyr = FloatText(value=8.5, description='NMDA (L5 Pyr):', layout=layout)
-            
+            weights_ampa_L5Pyr = FloatText(value=8.5,
+                                           description='AMPA (L5 Pyr):',
+                                           layout=layout)
+            weights_nmda_L5Pyr = FloatText(value=8.5,
+                                           description='NMDA (L5 Pyr):',
+                                           layout=layout)
+
             drive_box = VBox([tstart, tstop, rate_constant, location,
                               weights_ampa_L5Pyr, weights_nmda_L5Pyr])
             drive = dict(type='Poisson', name=drive_title,
-                         tstart=tstart, 
+                         tstart=tstart,
                          tstop=tstop,
-                         rate_constant=rate_constant, 
-                         location=location, 
-                         weights_ampa_L5Pyr=weights_ampa_L5Pyr, 
-                         weights_nmda_L5Pyr=weights_nmda_L5Pyr
-                        )
+                         rate_constant=rate_constant,
+                         location=location,
+                         weights_ampa_L5Pyr=weights_ampa_L5Pyr,
+                         weights_nmda_L5Pyr=weights_nmda_L5Pyr)
         elif drive_type['new'] == 'Evoked':            
-            mu = FloatText(value=7.5, description='Mean time:', layout=layout)
-            sigma = FloatText(value=8.5, description='Std dev time:', layout=layout)
-            numspikes = FloatText(value=8.5, description='Number of spikes:', layout=layout)
+            mu = FloatText(value=7.5, description='Mean time:',
+                           layout=layout)
+            sigma = FloatText(value=8.5, description='Std dev time:',
+                              layout=layout)
+            numspikes = FloatText(value=8.5, description='Number of spikes:',
+                                  layout=layout)
             location = RadioButtons(options=['proximal', 'distal'])
-            weights_ampa_L5Pyr = FloatText(value=8.5, description='AMPA (L5 Pyr):', layout=layout)
-            weights_nmda_L5Pyr = FloatText(value=8.5, description='NMDA (L5 Pyr):', layout=layout)
+            weights_ampa_L5Pyr = FloatText(value=8.5,
+                                           description='AMPA (L5 Pyr):',
+                                           layout=layout)
+            weights_nmda_L5Pyr = FloatText(value=8.5,
+                                           description='NMDA (L5 Pyr):',
+                                           layout=layout)
 
             drive_box = VBox([mu, sigma, numspikes, location,
                               weights_ampa_L5Pyr, weights_nmda_L5Pyr])
@@ -214,13 +232,17 @@ def run_hnn_gui():
                                            'success')
 
     # Sliders to change local-connectivity Params
-    sliders = [_get_sliders(params, ['gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
-                                     'gbar_L2Basket_L2Pyr_gabaa', 'gbar_L2Basket_L2Pyr_gabab']),
-               _get_sliders(params, ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr', 'gbar_L5Pyr_L5Pyr_ampa',
-                                     'gbar_L5Pyr_L5Pyr_nmda', 'gbar_L5Basket_L5Pyr_gabaa',
-                                     'gbar_L5Basket_L5Pyr_gabab']),
-               _get_sliders(params, ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
-               _get_sliders(params, ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr'])]
+    sliders = [_get_sliders(params,
+               ['gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
+                'gbar_L2Basket_L2Pyr_gabaa', 'gbar_L2Basket_L2Pyr_gabab']),
+               _get_sliders(params,
+               ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr',
+                'gbar_L5Pyr_L5Pyr_ampa', 'gbar_L5Pyr_L5Pyr_nmda',
+                'gbar_L5Basket_L5Pyr_gabaa', 'gbar_L5Basket_L5Pyr_gabab']),
+               _get_sliders(params,
+               ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
+               _get_sliders(params,
+               ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr'])]
 
     # accordians
     boxes = [VBox(slider) for slider in sliders]
@@ -262,13 +284,21 @@ def run_hnn_gui():
 
     interactive(update_plot, plot_type='dipole current',
                 variables=fixed(variables), plot_out=fixed(plot_out))
-    dropdown.observe(lambda plot_type: update_plot(variables, plot_out, plot_type), 'value')
+
+    def _update_plot(plot_type):
+        return update_plot(variables, plot_out, plot_type)
+
+    dropdown.observe(_update_plot, 'value')
 
     # Run button
     run_button = create_expanded_button('Run', 'success')
     load_button = create_expanded_button('Load parameters', 'success')
 
-    run_button.on_click(lambda b: on_button_clicked(log_out, plot_out, drive_widgets, variables, b))
+    def _on_button_clicked(b):
+        return on_button_clicked(log_out, plot_out, drive_widgets, variables,
+                                 b)
+
+    run_button.on_click(_on_button_clicked)
 
     footer = HBox([run_button, load_button, dropdown])
 
