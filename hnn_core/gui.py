@@ -68,94 +68,100 @@ def _get_sliders(params, param_keys):
     return sliders
 
 
+def _get_rhythmic_widget(drive_title, layout, style):
+    tstart = FloatText(value=7.5, description='Start time:',
+                       layout=layout, style=style)
+    tstart_std = FloatText(value=7.5, description='Start time dev:',
+                           layout=layout, style=style)
+    tstop = FloatText(value=7.5, description='Stop time:',
+                      layout=layout, style=style)
+    burst_rate = FloatText(value=7.5, description='Burst rate:',
+                           layout=layout, style=style)
+    burst_std = FloatText(value=7.5, description='Burst std dev:',
+                          layout=layout, style=style)
+    location = RadioButtons(options=['proximal', 'distal'])
+
+    drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std,
+                     location])
+    drive = dict(type='Rhythmic', name=drive_title,
+                 tstart=tstart, tstart_std=tstart_std,
+                 burst_rate=burst_rate, burst_std=burst_std,
+                 location=location)
+    return drive, drive_box
+
+
+def _get_poisson_widget(drive_title, layout, style):
+    cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket',
+                  'L2_basket']
+    tstart = FloatText(value=0.0, description='Start time:',
+                       layout=layout, style=style)
+    tstop = FloatText(value=8.5, description='Stop time:',
+                      layout=layout, style=style)
+    location = RadioButtons(options=['proximal', 'distal'])
+    weights_ampa, weights_nmda = dict(), dict()
+    rate_constant = dict()
+    for cell_type in cell_types:
+        rate_constant[f'{cell_type}'] = FloatText(
+            value=8.5, description=f'Rate constant ({cell_type}):',
+            layout=layout, style=style)
+        weights_ampa[f'{cell_type}'] = FloatText(
+            value=0., description=f'AMPA ({cell_type}):',
+            layout=layout, style=style)
+        weights_nmda[f'{cell_type}'] = FloatText(
+            value=0., description=f'NMDA ({cell_type}):', layout=layout,
+            style=style)
+
+    drive_box = VBox([tstart, tstop, location] +
+                     list(rate_constant.values()) +
+                     list(weights_ampa.values()) +
+                     list(weights_nmda.values()))
+    drive = dict(type='Poisson', name=drive_title, tstart=tstart,
+                 tstop=tstop, rate_constant=rate_constant,
+                 location=location, weights_ampa=weights_ampa,
+                 weights_nmda=weights_nmda)
+    return drive, drive_box
+
+
+def _get_evoked_widget(drive_title, layout, style):
+    mu = FloatText(value=7.5, description='Mean time:',
+                   layout=layout)
+    sigma = FloatText(value=8.5, description='Std dev time:',
+                      layout=layout)
+    numspikes = FloatText(value=8.5, description='Number of spikes:',
+                          layout=layout)
+    location = RadioButtons(options=['proximal', 'distal'])
+    weights_ampa_L5Pyr = FloatText(value=8.5,
+                                   description='AMPA (L5 Pyr):',
+                                   layout=layout)
+    weights_nmda_L5Pyr = FloatText(value=8.5,
+                                   description='NMDA (L5 Pyr):',
+                                   layout=layout)
+
+    drive_box = VBox([mu, sigma, numspikes, location,
+                      weights_ampa_L5Pyr, weights_nmda_L5Pyr])
+    drive = dict(type='Evoked', name=drive_title,
+                 mu=mu, sigma=sigma, numspikes=numspikes,
+                 sync_within_trial=False, location=location,
+                 weights_ampa_L5Pyr=weights_ampa_L5Pyr,
+                 weights_nmda_L5Pyr=weights_nmda_L5Pyr,
+                 space_constant=3.0)
+    return drive, drive_box
+
+
 def add_drive_widget(drive_type):
     """Add a widget for a new drive."""
     layout = Layout(width='280px', height='auto')
-    cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket',
-                  'L2_basket']
     style = {'description_width': '150px'}
     drives_out.clear_output()
     with drives_out:
         drive_title = drive_type['new'] + str(len(drive_boxes))
 
         if drive_type['new'] == 'Rhythmic':
-            tstart = FloatText(value=7.5, description='Start time:',
-                               layout=layout, style=style)
-            tstart_std = FloatText(value=7.5, description='Start time dev:',
-                                   layout=layout, style=style)
-            tstop = FloatText(value=7.5, description='Stop time:',
-                              layout=layout, style=style)
-            burst_rate = FloatText(value=7.5, description='Burst rate:',
-                                   layout=layout, style=style)
-            burst_std = FloatText(value=7.5, description='Burst std dev:',
-                                  layout=layout, style=style)
-            location = RadioButtons(options=['proximal', 'distal'])
-
-            drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std,
-                              location])
-            drive = dict(type='Rhythmic', name=drive_title,
-                         tstart=tstart,
-                         tstart_std=tstart_std,
-                         burst_rate=burst_rate,
-                         burst_std=burst_std,
-                         location=location)
+            drive, drive_box = _get_rhythmic_widget(drive_title, layout, style)
         elif drive_type['new'] == 'Poisson':
-            tstart = FloatText(value=0.0, description='Start time:',
-                               layout=layout, style=style)
-            tstop = FloatText(value=8.5, description='Stop time:',
-                              layout=layout, style=style)
-            location = RadioButtons(options=['proximal', 'distal'])
-            weights_ampa = dict()
-            weights_nmda = dict()
-            rate_constant = dict()
-            for cell_type in cell_types:
-                rate_constant[f'{cell_type}'] = FloatText(
-                    value=8.5, description=f'Rate constant ({cell_type}):',
-                    layout=layout, style=style)
-                weights_ampa[f'{cell_type}'] = FloatText(
-                    value=0., description=f'AMPA ({cell_type}):',
-                    layout=layout, style=style)
-                weights_nmda[f'{cell_type}'] = FloatText(
-                    value=0., description=f'NMDA ({cell_type}):', layout=layout,
-                    style=style)
-
-            drive_box = VBox([tstart, tstop, location] +
-                             list(rate_constant.values()) +
-                             list(weights_ampa.values()) +
-                             list(weights_nmda.values()))
-            drive = dict(type='Poisson', name=drive_title,
-                         tstart=tstart,
-                         tstop=tstop,
-                         rate_constant=rate_constant,
-                         location=location,
-                         weights_ampa=weights_ampa,
-                         weights_nmda=weights_nmda)
+            drive, drive_box = _get_poisson_widget(drive_title, layout, style)
         elif drive_type['new'] == 'Evoked':
-            mu = FloatText(value=7.5, description='Mean time:',
-                           layout=layout)
-            sigma = FloatText(value=8.5, description='Std dev time:',
-                              layout=layout)
-            numspikes = FloatText(value=8.5, description='Number of spikes:',
-                                  layout=layout)
-            location = RadioButtons(options=['proximal', 'distal'])
-            weights_ampa_L5Pyr = FloatText(value=8.5,
-                                           description='AMPA (L5 Pyr):',
-                                           layout=layout)
-            weights_nmda_L5Pyr = FloatText(value=8.5,
-                                           description='NMDA (L5 Pyr):',
-                                           layout=layout)
-
-            drive_box = VBox([mu, sigma, numspikes, location,
-                              weights_ampa_L5Pyr, weights_nmda_L5Pyr])
-            drive = dict(type='Evoked', name=drive_title,
-                         mu=mu,
-                         sigma=sigma,
-                         numspikes=numspikes,
-                         sync_within_trial=False,
-                         location=location,
-                         weights_ampa_L5Pyr=weights_ampa_L5Pyr,
-                         weights_nmda_L5Pyr=weights_nmda_L5Pyr,
-                         space_constant=3.0)
+            drive, drive_box = _get_evoked_widget(drive_title, layout, style)
 
         if drive_type['new'] in ['Evoked', 'Poisson', 'Rhythmic']:
             drive_titles.append(drive_title)
