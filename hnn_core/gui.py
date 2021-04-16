@@ -70,22 +70,25 @@ def _get_sliders(params, param_keys):
 
 def add_drive_widget(drive_type):
     """Add a widget for a new drive."""
-    layout = Layout(width='200px', height='auto')
+    layout = Layout(width='280px', height='auto')
+    cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket',
+                  'L2_basket']
+    style = {'description_width': '150px'}
     drives_out.clear_output()
     with drives_out:
         drive_title = drive_type['new'] + str(len(drive_boxes))
 
         if drive_type['new'] == 'Rhythmic':
             tstart = FloatText(value=7.5, description='Start time:',
-                               layout=layout)
+                               layout=layout, style=style)
             tstart_std = FloatText(value=7.5, description='Start time dev:',
-                                   layout=layout)
+                                   layout=layout, style=style)
             tstop = FloatText(value=7.5, description='Stop time:',
-                              layout=layout)
+                              layout=layout, style=style)
             burst_rate = FloatText(value=7.5, description='Burst rate:',
-                                   layout=layout)
+                                   layout=layout, style=style)
             burst_std = FloatText(value=7.5, description='Burst std dev:',
-                                  layout=layout)
+                                  layout=layout, style=style)
             location = RadioButtons(options=['proximal', 'distal'])
 
             drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std,
@@ -97,29 +100,36 @@ def add_drive_widget(drive_type):
                          burst_std=burst_std,
                          location=location)
         elif drive_type['new'] == 'Poisson':
-            tstart = FloatText(value=7.5, description='Start time:',
-                               layout=layout)
+            tstart = FloatText(value=0.0, description='Start time:',
+                               layout=layout, style=style)
             tstop = FloatText(value=8.5, description='Stop time:',
-                              layout=layout)
-            rate_constant = FloatText(value=8.5, description='Rate constant:',
-                                      layout=layout)
+                              layout=layout, style=style)
             location = RadioButtons(options=['proximal', 'distal'])
-            weights_ampa_L5Pyr = FloatText(value=8.5,
-                                           description='AMPA (L5 Pyr):',
-                                           layout=layout)
-            weights_nmda_L5Pyr = FloatText(value=8.5,
-                                           description='NMDA (L5 Pyr):',
-                                           layout=layout)
+            weights_ampa = dict()
+            weights_nmda = dict()
+            rate_constant = dict()
+            for cell_type in cell_types:
+                rate_constant[f'{cell_type}'] = FloatText(
+                    value=8.5, description=f'Rate constant ({cell_type}):',
+                    layout=layout, style=style)
+                weights_ampa[f'{cell_type}'] = FloatText(
+                    value=0., description=f'AMPA ({cell_type}):',
+                    layout=layout, style=style)
+                weights_nmda[f'{cell_type}'] = FloatText(
+                    value=0., description=f'NMDA ({cell_type}):', layout=layout,
+                    style=style)
 
-            drive_box = VBox([tstart, tstop, rate_constant, location,
-                              weights_ampa_L5Pyr, weights_nmda_L5Pyr])
+            drive_box = VBox([tstart, tstop, location] +
+                             list(rate_constant.values()) +
+                             list(weights_ampa.values()) +
+                             list(weights_nmda.values()))
             drive = dict(type='Poisson', name=drive_title,
                          tstart=tstart,
                          tstop=tstop,
                          rate_constant=rate_constant,
                          location=location,
-                         weights_ampa_L5Pyr=weights_ampa_L5Pyr,
-                         weights_nmda_L5Pyr=weights_nmda_L5Pyr)
+                         weights_ampa=weights_ampa,
+                         weights_nmda=weights_nmda)
         elif drive_type['new'] == 'Evoked':
             mu = FloatText(value=7.5, description='Mean time:',
                            layout=layout)
@@ -159,7 +169,7 @@ def add_drive_widget(drive_type):
         display(accordion)
 
 
-def update_plot(variables, plot_out, plot_type):
+def update_plot_window(variables, plot_out, plot_type):
     plot_out.clear_output()
 
     if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
@@ -181,14 +191,20 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
     """Run the simulation and plot outputs."""
     for drive in drive_widgets:
         if drive['type'] == 'Poisson':
+            weights_ampa = {k: v.value for k, v in
+                            drive['weights_ampa'].items()}
+            weights_nmda = {k: v.value for k, v in
+                            drive['weights_nmda'].items()}
+            rate_constant = {k: v.value for k, v in
+                             drive['rate_constant'].items()}
             variables['net'].add_poisson_drive(
                 name=drive['name'],
                 tstart=drive['tstart'].value,
                 tstop=drive['tstop'].value,
-                rate_constant=dict(L5_pyramidal=drive['rate_constant'].value),
+                rate_constant=rate_constant,
                 location=drive['location'].value,
-                weights_ampa=dict(L5_pyramidal=drive['weights_ampa_L5Pyr'].value),
-                weights_nmda=dict(L5_pyramidal=drive['weights_nmda_L5Pyr'].value),
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
                 space_constant=100.0
             )
         elif drive['type'] == 'Evoked':
@@ -282,8 +298,8 @@ def run_hnn_gui():
         left_tab.set_title(idx, title)
 
     # Dropdown menu to switch between plots
-    def _update_plot(plot_type):
-        return update_plot(variables, plot_out, plot_type)
+    def _update_plot_window(plot_type):
+        return update_plot_window(variables, plot_out, plot_type)
 
     dropdown = Dropdown(
         options=['input histogram', 'current dipole', 'spikes', 'spectogram'],
@@ -291,8 +307,8 @@ def run_hnn_gui():
         description='Plot:',
         disabled=False,
     )
-    interactive(_update_plot, plot_type='current dipole')
-    dropdown.observe(_update_plot, 'value')
+    interactive(_update_plot_window, plot_type='current dipole')
+    dropdown.observe(_update_plot_window, 'value')
 
     # Run button
     run_button = create_expanded_button('Run', 'success', '15')
