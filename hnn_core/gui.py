@@ -4,6 +4,8 @@
 import os.path as op
 from functools import partial, update_wrapper
 
+import numpy as np
+
 import hnn_core
 from hnn_core import simulate_dipole, read_params, Network
 
@@ -165,10 +167,13 @@ def update_plot(variables, plot_out, plot_type):
     with plot_out:
         if plot_type['new'] == 'spikes':
             variables['net'].cell_response.plot_spikes_raster()
-        elif plot_type['new'] == 'dipole current':
+        elif plot_type['new'] == 'current dipole':
             variables['dpls'][0].plot()
         elif plot_type['new'] == 'input histogram':
             variables['net'].cell_response.plot_spikes_hist()
+        elif plot_type['new'] == 'spectogram':
+            freqs = np.arange(20., 100., 1.)
+            variables['dpls'][0].plot_tfr_morlet(freqs)
 
 
 def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
@@ -279,12 +284,12 @@ def run_hnn_gui():
         return update_plot(variables, plot_out, plot_type)
 
     dropdown = Dropdown(
-        options=['input histogram', 'dipole current', 'spikes'],
-        value='dipole current',
+        options=['input histogram', 'current dipole', 'spikes', 'spectogram'],
+        value='current dipole',
         description='Plot:',
         disabled=False,
     )
-    interactive(_update_plot, plot_type='dipole current')
+    interactive(_update_plot, plot_type='current dipole')
     dropdown.observe(_update_plot, 'value')
 
     # Run button
