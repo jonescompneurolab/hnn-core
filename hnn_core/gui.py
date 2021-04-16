@@ -23,9 +23,9 @@ drive_titles = list()
 drive_boxes = list()
 
 
-def create_expanded_button(description, button_style):
+def create_expanded_button(description, button_style, height):
     return Button(description=description, button_style=button_style,
-                  layout=Layout(height='10', width='auto'))
+                  layout=Layout(height=height, width='auto'))
 
 
 def update_params(params, **updates):
@@ -230,12 +230,13 @@ def run_hnn_gui():
     variables['net'] = Network(params, add_drives_from_params=False)
 
     # Output windows
-    log_out = Output(layout={'border': '1px solid gray'})
-    plot_out = Output(layout={'border': '1px solid gray'})
+    log_out = Output(layout={'border': '1px solid gray', 'height': '150px',
+                             'overflow_y': 'auto'})
+    plot_out = Output(layout={'border': '1px solid gray', 'height': '350px'})
 
     # header_button
     header_button = create_expanded_button('Human Neocortical Neurosolver',
-                                           'success')
+                                           'success', '20')
 
     # Sliders to change local-connectivity Params
     sliders = [_get_sliders(params,
@@ -294,8 +295,8 @@ def run_hnn_gui():
     dropdown.observe(_update_plot, 'value')
 
     # Run button
-    run_button = create_expanded_button('Run', 'success')
-    load_button = create_expanded_button('Load parameters', 'success')
+    run_button = create_expanded_button('Run', 'success', '15')
+    load_button = create_expanded_button('Load parameters', 'success', '15')
 
     def _on_button_clicked(b):
         return on_button_clicked(log_out, plot_out, drive_widgets, variables,
@@ -304,11 +305,12 @@ def run_hnn_gui():
     run_button.on_click(_on_button_clicked)
     footer = HBox([run_button, load_button, dropdown])
 
+    right_sidebar = VBox([plot_out, log_out])
+
     # Final layout of the app
     hnn_gui = AppLayout(header=header_button,
                         left_sidebar=left_tab,
-                        center=log_out,
-                        right_sidebar=plot_out,
+                        right_sidebar=right_sidebar,
                         footer=footer,
                         pane_widths=['380px', 1, 1],
                         pane_heights=[1, '500px', 1])
