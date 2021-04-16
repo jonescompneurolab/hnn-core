@@ -147,9 +147,10 @@ def add_drive_widget(drive_type):
                          weights_nmda_L5Pyr=weights_nmda_L5Pyr,
                          space_constant=3.0)
 
-        drive_titles.append(drive_title)
-        drive_boxes.append(drive_box)
-        drive_widgets.append(drive)
+        if drive_type['new'] in ['Evoked', 'Poisson', 'Rhythmic']:
+            drive_titles.append(drive_title)
+            drive_boxes.append(drive_box)
+            drive_widgets.append(drive)
 
         accordion = Accordion(children=drive_boxes,
                               selected_index=len(drive_boxes) - 1)
@@ -195,9 +196,9 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
                 name=drive['name'],
                 mu=drive['mu'].value,
                 sigma=drive['sigma'].value,
-                numspikes=drive['numspikes'].value, 
-                sync_within_trial=False, 
-                location=drive['location'].value, 
+                numspikes=drive['numspikes'].value,
+                sync_within_trial=False,
+                location=drive['location'].value,
                 weights_ampa=dict(L5_pyramidal=drive['weights_ampa_L5Pyr'].value),
                 weights_nmda=dict(L5_pyramidal=drive['weights_nmda_L5Pyr'].value),
                 space_constant=3.0
@@ -259,8 +260,8 @@ def run_hnn_gui():
     # Dropdown for different drives
     layout = Layout(width='200px', height='auto')
     drives_dropdown = Dropdown(
-        options=['Evoked', 'Poisson', 'Rhythmic'],
-        value='Evoked',
+        options=['Evoked', 'Poisson', 'Rhythmic', ''],
+        value='',
         description='Drive:',
         disabled=False,
         layout=layout
