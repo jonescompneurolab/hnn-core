@@ -13,7 +13,7 @@ from IPython.display import display
 
 from ipywidgets import (FloatSlider, Dropdown, Button, RadioButtons,
                         fixed, interactive_output, interactive, interact,
-                        FloatText, HTML, Output,
+                        FloatText, FileUpload, HTML, Output,
                         HBox, VBox, Tab, Accordion,
                         Layout, AppLayout)
 
@@ -24,7 +24,7 @@ drive_boxes = list()
 
 
 def create_expanded_button(description, button_style, height):
-    style = {'button_color': '#8A2BE2', 'font_size': height}
+    style = {'button_color': '#8A2BE2'}
     return Button(description=description, button_style=button_style,
                   layout=Layout(height=height, width='auto'),
                   style=style)
@@ -321,14 +321,28 @@ def run_hnn_gui():
     interactive(_update_plot_window, plot_type='current dipole')
     dropdown.observe(_update_plot_window, 'value')
 
-    # Run button
+    # Run and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
-    load_button = create_expanded_button('Load parameters', 'success', height='30px')
+    style = {'button_color': '#8A2BE2', 'font_color': 'white'}
+    load_button = FileUpload(accept='.json', multiple=False, style=style,
+                             description='Load network', button_style='success')
+
+    def _on_upload_change(change):
+        import json
+        import codecs
+
+        if len(change['owner'].value) == 0:
+            return
+
+        file_uploaded = change['owner'].value
+        json_data = list(file_uploaded.values())[0]['content']
+        params = json.loads(json_data)
 
     def _on_button_clicked(b):
         return on_button_clicked(log_out, plot_out, drive_widgets, variables,
                                  b)
 
+    load_button.observe(_on_upload_change)
     run_button.on_click(_on_button_clicked)
     footer = HBox([run_button, load_button, dropdown])
 
