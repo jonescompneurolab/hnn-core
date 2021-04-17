@@ -202,12 +202,12 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
     """Run the simulation and plot outputs."""
     for drive in drive_widgets:
         if drive['type'] == 'Poisson':
-            weights_ampa = {k: v.value for k, v in
-                            drive['weights_ampa'].items()}
-            weights_nmda = {k: v.value for k, v in
-                            drive['weights_nmda'].items()}
-            rate_constant = {k: v.value for k, v in
-                             drive['rate_constant'].items()}
+            weights_ampa, weights_nmda, rate_constant = dict(), dict(), dict()
+            for k, v in drive['rate_constant'].items():
+                if v.value > 0:
+                    weights_ampa[k] = drive['weights_ampa'][k].value
+                    weights_nmda[k] = drive['weights_nmda'][k].value
+                    rate_constant[k] = drive['rate_constant'][k].value
             variables['net'].add_poisson_drive(
                 name=drive['name'],
                 tstart=drive['tstart'].value,
