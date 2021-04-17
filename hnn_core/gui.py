@@ -1,5 +1,7 @@
 """IPywidgets GUI."""
+
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
+
 import json
 import os.path as op
 from functools import partial, update_wrapper
@@ -181,6 +183,23 @@ def update_plot_window(variables, plot_out, plot_type):
             variables['dpls'][0].plot_tfr_morlet(freqs)
 
 
+def on_upload_change(change, sliders, variables):
+    if len(change['owner'].value) == 0:
+        return
+
+    file_uploaded = change['owner'].value
+    json_data = list(file_uploaded.values())[0]['content']
+    params = json.loads(json_data)
+    for slider in sliders:
+        for sl in slider:
+            key = 'gbar_' + sl.description
+            sl.value = params[key]
+
+    external_drives = variables['net'].external_drives.copy()
+    variables['net'] = Network(params, add_drives_from_params=False)
+    variables['net'].external_drives = external_drives.copy()
+
+
 def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
     """Run the simulation and plot outputs."""
     for drive in drive_widgets:
@@ -261,7 +280,7 @@ def run_hnn_gui():
                _get_sliders(params,
                ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr'])]
 
-    # accordians
+    # accordians to group local-connectivity by cel type
     boxes = [VBox(slider) for slider in sliders]
     titles = ['Layer 2/3 Pyr', 'Layer 5 Pyr', 'Layer 2 Bas', 'Layer 5 Bas']
     accordian = Accordion(children=boxes)
@@ -310,25 +329,12 @@ def run_hnn_gui():
     load_button = FileUpload(accept='.json', multiple=False, style=style,
                              description='Load network', button_style='success')
 
-    def _on_upload_change(change):
-        if len(change['owner'].value) == 0:
-            return
-
-        file_uploaded = change['owner'].value
-        json_data = list(file_uploaded.values())[0]['content']
-        params = json.loads(json_data)
-        for slider in sliders:
-            for sl in slider:
-                key = 'gbar_' + sl.description
-                sl.value = params[key]
-
-        external_drives = variables['net'].external_drives.copy()
-        variables['net'] = Network(params, add_drives_from_params=False)
-        variables['net'].external_drives = external_drives.copy()
-
     def _on_button_clicked(b):
         return on_button_clicked(log_out, plot_out, drive_widgets, variables,
                                  b)
+
+    def _on_upload_change(change):
+        return on_upload_change(change, sliders, variables)
 
     load_button.observe(_on_upload_change)
     run_button.on_click(_on_button_clicked)
