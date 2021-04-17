@@ -24,8 +24,10 @@ drive_boxes = list()
 
 
 def create_expanded_button(description, button_style, height):
+    style = {'button_color': '#8A2BE2', 'font_size': height}
     return Button(description=description, button_style=button_style,
-                  layout=Layout(height=height, width='auto'))
+                  layout=Layout(height=height, width='auto'),
+                  style=style)
 
 
 def update_params(params, **updates):
@@ -35,16 +37,16 @@ def update_params(params, **updates):
 
 def _get_min(v):
     if v < 0:
-        return v * 10
+        return v * 1.5
     else:
-        return v * 0.1
+        return v * 0.5
 
 
 def _get_max(v):
     if v > 0:
-        return v * 10
+        return v * 1.5
     else:
-        return v * 0.1
+        return v * 0.5
 
 
 def _get_sliders(params, param_keys):
@@ -257,8 +259,8 @@ def run_hnn_gui():
     plot_out = Output(layout={'border': '1px solid gray', 'height': '350px'})
 
     # header_button
-    header_button = create_expanded_button('Human Neocortical Neurosolver',
-                                           'success', '20')
+    header_button = create_expanded_button('HUMAN NEOCORTICAL NEUROSOLVER',
+                                           'success', height='40px')
 
     # Sliders to change local-connectivity Params
     sliders = [_get_sliders(params,
@@ -317,8 +319,8 @@ def run_hnn_gui():
     dropdown.observe(_update_plot_window, 'value')
 
     # Run button
-    run_button = create_expanded_button('Run', 'success', '15')
-    load_button = create_expanded_button('Load parameters', 'success', '15')
+    run_button = create_expanded_button('Run', 'success', height='30px')
+    load_button = create_expanded_button('Load parameters', 'success', height='30px')
 
     def _on_button_clicked(b):
         return on_button_clicked(log_out, plot_out, drive_widgets, variables,
