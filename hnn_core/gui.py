@@ -11,7 +11,7 @@ from hnn_core import simulate_dipole, read_params, Network
 
 from IPython.display import display
 
-from ipywidgets import (FloatSlider, Dropdown, Button, RadioButtons,
+from ipywidgets import (FloatLogSlider, Dropdown, Button, RadioButtons,
                         fixed, interactive_output, interactive, interact,
                         FloatText, FileUpload, HTML, Output,
                         HBox, VBox, Tab, Accordion,
@@ -35,31 +35,14 @@ def update_params(params, **updates):
     return params
 
 
-def _get_min(v):
-    if v < 0:
-        return v * 1.5
-    else:
-        return v * 0.5
-
-
-def _get_max(v):
-    if v > 0:
-        return v * 1.5
-    else:
-        return v * 0.5
-
-
 def _get_sliders(params, param_keys):
     """Get sliders"""
-    style = {'description_width': 'initial'}
+    style = {'description_width': '150px'}
     sliders = list()
     for d in param_keys:
-        min_val = _get_min(params[d])
-        max_val = _get_max(params[d])
-        step = (max_val - min_val) / 10.
-        slider = FloatSlider(
-            value=params[d], min=min_val, max=max_val, step=step,
-            description=d,
+        slider = FloatLogSlider(
+            value=params[d], min=-5, max=1, step=0.2,
+            description=d.split('gbar_')[1],
             disabled=False, continuous_update=False, orientation='horizontal',
             readout=True, readout_format='.2e',
             style=style)
