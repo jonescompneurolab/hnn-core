@@ -13,7 +13,7 @@ from IPython.display import display
 
 from ipywidgets import (FloatSlider, Dropdown, Button, RadioButtons,
                         fixed, interactive_output, interactive, interact,
-                        FloatText, Output,
+                        FloatText, HTML, Output,
                         HBox, VBox, Tab, Accordion,
                         Layout, AppLayout)
 
@@ -100,22 +100,25 @@ def _get_poisson_widget(drive_title, layout, style):
     tstop = FloatText(value=8.5, description='Stop time:',
                       layout=layout, style=style)
     location = RadioButtons(options=['proximal', 'distal'])
+    labels = {'rate_constant': HTML(value="<b>Rate constants</b>"),
+              'ampa': HTML(value="<b>AMPA weights</b>"),
+              'nmda': HTML(value="<b>NMDA weights</b>")}
     weights_ampa, weights_nmda = dict(), dict()
     rate_constant = dict()
     for cell_type in cell_types:
         rate_constant[f'{cell_type}'] = FloatText(
-            value=8.5, description=f'Rate constant ({cell_type}):',
+            value=8.5, description=f'{cell_type}:',
             layout=layout, style=style)
         weights_ampa[f'{cell_type}'] = FloatText(
-            value=0., description=f'AMPA ({cell_type}):',
+            value=0., description=f'{cell_type}:',
             layout=layout, style=style)
         weights_nmda[f'{cell_type}'] = FloatText(
-            value=0., description=f'NMDA ({cell_type}):', layout=layout,
+            value=0., description=f'{cell_type}:', layout=layout,
             style=style)
 
-    drive_box = VBox([tstart, tstop, location] +
-                     list(rate_constant.values()) +
-                     list(weights_ampa.values()) +
+    drive_box = VBox([tstart, tstop, location] + [labels['rate_constant']] +
+                     list(rate_constant.values()) + [labels['ampa']] +
+                     list(weights_ampa.values()) + [labels['nmda']] +
                      list(weights_nmda.values()))
     drive = dict(type='Poisson', name=drive_title, tstart=tstart,
                  tstop=tstop, rate_constant=rate_constant,
@@ -152,7 +155,7 @@ def _get_evoked_widget(drive_title, layout, style):
 
 def add_drive_widget(drive_type):
     """Add a widget for a new drive."""
-    layout = Layout(width='280px', height='auto')
+    layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
     drives_out.clear_output()
     with drives_out:
