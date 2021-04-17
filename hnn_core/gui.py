@@ -1,6 +1,6 @@
 """IPywidgets GUI."""
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
-
+import json
 import os.path as op
 from functools import partial, update_wrapper
 
@@ -311,15 +311,20 @@ def run_hnn_gui():
                              description='Load network', button_style='success')
 
     def _on_upload_change(change):
-        import json
-        import codecs
-
         if len(change['owner'].value) == 0:
             return
 
         file_uploaded = change['owner'].value
         json_data = list(file_uploaded.values())[0]['content']
         params = json.loads(json_data)
+        for slider in sliders:
+            for sl in slider:
+                key = 'gbar_' + sl.description
+                sl.value = params[key]
+
+        external_drives = variables['net'].external_drives.copy()
+        variables['net'] = Network(params, add_drives_from_params=False)
+        variables['net'].external_drives = external_drives.copy()
 
     def _on_button_clicked(b):
         return on_button_clicked(log_out, plot_out, drive_widgets, variables,
