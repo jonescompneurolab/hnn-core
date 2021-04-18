@@ -19,11 +19,6 @@ from ipywidgets import (FloatLogSlider, Dropdown, Button, RadioButtons,
                         HBox, VBox, Tab, Accordion,
                         Layout, AppLayout)
 
-drives_out = Output()
-drive_widgets = list()
-drive_titles = list()
-drive_boxes = list()
-
 
 def create_expanded_button(description, button_style, height):
     style = {'button_color': '#8A2BE2'}
@@ -138,7 +133,8 @@ def _get_evoked_widget(drive_title, layout, style):
     return drive, drive_box
 
 
-def add_drive_widget(drive_type):
+def add_drive_widget(drive_type, drive_titles, drive_boxes, drive_widgets,
+                     drives_out):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
@@ -255,10 +251,28 @@ def run_hnn_gui():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
+    drive_widgets = list()
+    drive_titles = list()
+    drive_boxes = list()
     variables = dict(net=None, dpls=None)
     variables['net'] = Network(params, add_drives_from_params=False)
 
+    def _add_drive_widget(drive_type):
+        return add_drive_widget(drive_type, drive_titles, drive_boxes,
+                                drive_widgets, drives_out)
+
+    def _on_button_clicked(b):
+        return on_button_clicked(log_out, plot_out, drive_widgets, variables,
+                                 b)
+
+    def _on_upload_change(change):
+        return on_upload_change(change, sliders, variables)
+
+    def _update_plot_window(plot_type):
+        return update_plot_window(variables, plot_out, plot_type)
+
     # Output windows
+    drives_out = Output()  # window to add new drives
     log_out = Output(layout={'border': '1px solid gray', 'height': '150px',
                              'overflow_y': 'auto'})
     plot_out = Output(layout={'border': '1px solid gray', 'height': '350px'})
@@ -291,16 +305,13 @@ def run_hnn_gui():
     layout = Layout(width='200px', height='auto')
     drives_dropdown = Dropdown(
         options=['Evoked', 'Poisson', 'Rhythmic', ''],
-        value='',
-        description='Drive:',
-        disabled=False,
-        layout=layout
-    )
+        value='', description='Drive:',disabled=False,
+        layout=layout)
 
     # XXX: should be simpler to use Stacked class starting
     # from IPywidgets > 8.0
-    interactive(add_drive_widget, drive_type='Evoked')
-    drives_dropdown.observe(add_drive_widget, 'value')
+    interactive(_add_drive_widget, drive_type='Evoked')
+    drives_dropdown.observe(_add_drive_widget, 'value')
     drives_options = VBox([drives_dropdown, drives_out])
 
     # Tabs for left pane
@@ -311,17 +322,14 @@ def run_hnn_gui():
         left_tab.set_title(idx, title)
 
     # Dropdown menu to switch between plots
-    def _update_plot_window(plot_type):
-        return update_plot_window(variables, plot_out, plot_type)
-
-    dropdown = Dropdown(
+    plot_dropdown = Dropdown(
         options=['input histogram', 'current dipole', 'spikes', 'spectogram'],
         value='current dipole',
         description='Plot:',
         disabled=False,
     )
     interactive(_update_plot_window, plot_type='current dipole')
-    dropdown.observe(_update_plot_window, 'value')
+    plot_dropdown.observe(_update_plot_window, 'value')
 
     # Run and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
@@ -329,16 +337,9 @@ def run_hnn_gui():
     load_button = FileUpload(accept='.json', multiple=False, style=style,
                              description='Load network', button_style='success')
 
-    def _on_button_clicked(b):
-        return on_button_clicked(log_out, plot_out, drive_widgets, variables,
-                                 b)
-
-    def _on_upload_change(change):
-        return on_upload_change(change, sliders, variables)
-
     load_button.observe(_on_upload_change)
     run_button.on_click(_on_button_clicked)
-    footer = HBox([run_button, load_button, dropdown])
+    footer = HBox([run_button, load_button, plot_dropdown])
 
     right_sidebar = VBox([plot_out, log_out])
 
