@@ -174,6 +174,8 @@ def update_plot_window(variables, plot_out, plot_type):
             variables['dpls'][0].plot()
         elif plot_type['new'] == 'input histogram':
             variables['net'].cell_response.plot_spikes_hist()
+        elif plot_type['new'] == 'PSD':
+            variables['dpls'][0].plot_psd(fmin=0, fmax=50)
         elif plot_type['new'] == 'spectogram':
             freqs = np.arange(20., 100., 1.)
             variables['dpls'][0].plot_tfr_morlet(freqs)
@@ -305,7 +307,7 @@ def run_hnn_gui():
     layout = Layout(width='200px', height='auto')
     drives_dropdown = Dropdown(
         options=['Evoked', 'Poisson', 'Rhythmic', ''],
-        value='', description='Drive:',disabled=False,
+        value='', description='Drive:', disabled=False,
         layout=layout)
 
     # XXX: should be simpler to use Stacked class starting
@@ -323,11 +325,10 @@ def run_hnn_gui():
 
     # Dropdown menu to switch between plots
     plot_dropdown = Dropdown(
-        options=['input histogram', 'current dipole', 'spikes', 'spectogram'],
-        value='current dipole',
-        description='Plot:',
-        disabled=False,
-    )
+        options=['input histogram', 'current dipole',
+                 'spikes', 'PSD', 'spectogram'],
+        value='current dipole', description='Plot:',
+        disabled=False)
     interactive(_update_plot_window, plot_type='current dipole')
     plot_dropdown.observe(_update_plot_window, 'value')
 
@@ -335,7 +336,8 @@ def run_hnn_gui():
     run_button = create_expanded_button('Run', 'success', height='30px')
     style = {'button_color': '#8A2BE2', 'font_color': 'white'}
     load_button = FileUpload(accept='.json', multiple=False, style=style,
-                             description='Load network', button_style='success')
+                             description='Load network',
+                             button_style='success')
 
     load_button.observe(_on_upload_change)
     run_button.on_click(_on_button_clicked)
