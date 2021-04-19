@@ -80,22 +80,28 @@ def _get_rhythmic_widget(drive_title, layout, style):
 
     tstart = FloatText(value=0., description='Start time:',
                        layout=layout, style=style)
-    tstart_std = FloatText(value=7.5, description='Start time dev:',
+    tstart_std = FloatText(value=0, description='Start time dev:',
                            layout=layout, style=style)
-    tstop = FloatText(value=7.5, description='Stop time:',
+    tstop = FloatText(value=200, description='Stop time:',
                       layout=layout, style=style)
     burst_rate = FloatText(value=7.5, description='Burst rate:',
                            layout=layout, style=style)
-    burst_std = FloatText(value=7.5, description='Burst std dev:',
+    burst_std = FloatText(value=0, description='Burst std dev:',
                           layout=layout, style=style)
+    repeats = FloatText(value=1, description='Spikes/burst:',
+                        layout=layout, style=style)
+    seedcore = IntText(value=14, description='Seed: ',
+                       layout=layout, style=style)
     location = RadioButtons(options=['proximal', 'distal'])
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
     drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std,
-                     location] + widgets_list)
+                      repeats, location, seedcore] + widgets_list)
     drive = dict(type='Rhythmic', name=drive_title,
                  tstart=tstart, tstart_std=tstart_std,
-                 burst_rate=burst_rate, burst_std=burst_std)
+                 burst_rate=burst_rate, burst_std=burst_std,
+                 repeats=repeats, seedcore=seedcore,
+                 location=location)
     drive.update(widgets_dict)
     return drive, drive_box
 
@@ -105,6 +111,8 @@ def _get_poisson_widget(drive_title, layout, style):
                        layout=layout, style=style)
     tstop = FloatText(value=8.5, description='Stop time:',
                       layout=layout, style=style)
+    seedcore = IntText(value=14, description='Seed: ',
+                       layout=layout, style=style)
     location = RadioButtons(options=['proximal', 'distal'])
 
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket',
@@ -120,10 +128,10 @@ def _get_poisson_widget(drive_title, layout, style):
     widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
-    drive_box = VBox([tstart, tstop, location] + widgets_list)
+    drive_box = VBox([tstart, tstop, seedcore, location] + widgets_list)
     drive = dict(type='Poisson', name=drive_title, tstart=tstart,
                  tstop=tstop, rate_constant=rate_constant,
-                 location=location)
+                 seedcore=seedcore, location=location)
     drive.update(widgets_dict)
     return drive, drive_box
 
@@ -135,14 +143,17 @@ def _get_evoked_widget(drive_title, layout, style):
                       layout=layout)
     numspikes = IntText(value=1, description='No. Spikes:',
                         layout=layout)
+    seedcore = IntText(value=14, description='Seed: ',
+                       layout=layout, style=style)
     location = RadioButtons(options=['proximal', 'distal'])
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
-    drive_box = VBox([mu, sigma, numspikes, location] +
+    drive_box = VBox([mu, sigma, numspikes, seedcore, location] +
                      widgets_list)
     drive = dict(type='Evoked', name=drive_title,
                  mu=mu, sigma=sigma, numspikes=numspikes,
-                 sync_within_trial=False, location=location)
+                 seedcore=seedcore, location=location,
+                 sync_within_trial=False)
     drive.update(widgets_dict)
     return drive, drive_box
 
@@ -234,7 +245,8 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
                 weights_ampa=weights_ampa,
                 weights_nmda=weights_nmda,
                 synaptic_delays=synaptic_delays,
-                space_constant=100.0
+                space_constant=100.0,
+                seedcore=drive['seedcore'].value
             )
         elif drive['type'] == 'Evoked':
             variables['net'].add_evoked_drive(
@@ -247,7 +259,8 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
                 weights_ampa=weights_ampa,
                 weights_nmda=weights_nmda,
                 synaptic_delays=synaptic_delays,
-                space_constant=3.0
+                space_constant=3.0,
+                seedcore=drive['seedcore'].value
             )
         elif drive['type'] == 'Rhythmic':
             variables['net'].add_bursty_drive(
@@ -256,10 +269,12 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
                 tstart_std=drive['tstart_std'].value,
                 burst_rate=drive['burst_rate'].value,
                 burst_std=drive['burst_std'].value,
+                repeats=drive['repeats'].value,
                 location=drive['location'].value,
                 weights_ampa=weights_ampa,
                 weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays
+                synaptic_delays=synaptic_delays,
+                seedcore=drive['seedcore'].value
             )
     with log_out:
         variables['dpls'] = simulate_dipole(variables['net'], n_trials=1)
