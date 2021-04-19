@@ -50,15 +50,15 @@ net_erp.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can modify the connectivity list to test the effect of different
-# connectivity patterns. For example, we can remove all layer 2 inhibitory
-# connections. In the default network, the src_gids of each connection are
-# all the same cell type.. Connections are stored under ``conn['gid_pairs']``
-# as a dictionary indexed by src_gid:
-# ``{src_gid1: [target_gid1, target_gid2], ...]``. Each src_gid indexes a
-# list with its target gids
-new_connectivity = [conn for conn in net.connectivity
-                    if conn['src_type'] != 'L2_basket']
-net.connectivity = new_connectivity
+# connectivity patterns. For example, we can remove 90% all layer 2 inhibitory
+# connections.
+# This can be achieved with :meth:`hnn_core._Connectivity.update_probability`,
+# a function that is available for each element of `net.connectivity`.
+# Note that in the default network, the src_gids of each connection are
+# all the same cell type allowing for easy modifications.
+for conn in net.connectivity:
+    if conn['src_type'] == 'L2_basket':
+        conn.update_probability(0.1)
 
 net_remove = net.copy()
 dpl_remove = simulate_dipole(net_remove, n_trials=1)
@@ -87,9 +87,8 @@ dpl_add = simulate_dipole(net_add, n_trials=1)
 net_add.cell_response.plot_spikes_raster()
 
 ###############################################################################
-# Adding more inhibitory connections did not completely restore the normal
-# spiking. L2 basket and pyramidal cells rhythymically fire in the gamma
-# range (30-80 Hz). As a final step, we can see how this change in spiking
+# Adding a single inhibitory connection almost completely restored the normal
+# spiking. As a final step, we can see how this change in spiking
 # activity impacts the aggregate current dipole.
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole
