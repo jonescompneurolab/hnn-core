@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 import os.path as op
+import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
@@ -177,7 +178,8 @@ def test_network():
     n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
     kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
                           loc='soma', receptor='gabaa',
-                          weight=5e-4, delay=1.0, lamtha=1e9)
+                          weight=5e-4, delay=1.0, lamtha=1e9,
+                          probability=1.0)
     net.add_connection(**kwargs_default)  # smoke test
     network_builder = NetworkBuilder(net)
     assert len(network_builder.ncs['L2Basket_L2Pyr_gabaa']) == n_conn + 4
@@ -188,7 +190,7 @@ def test_network():
         ('src_gids', 0), ('src_gids', 'L2_pyramidal'), ('src_gids', range(2)),
         ('target_gids', 35), ('target_gids', range(2)),
         ('target_gids', 'L2_pyramidal'),
-        ('target_gids', [[35, 36], [37, 38]])]
+        ('target_gids', [[35, 36], [37, 38]]), ('probability', 0.5)]
     for arg, item in kwargs_good:
         kwargs = kwargs_default.copy()
         kwargs[arg] = item
@@ -199,7 +201,7 @@ def test_network():
         ('target_gids', 35.0), ('target_gids', [35.0]),
         ('target_gids', [[35], [36.0]]), ('loc', 1.0),
         ('receptor', 1.0), ('weight', '1.0'), ('delay', '1.0'),
-        ('lamtha', '1.0')]
+        ('lamtha', '1.0'), ('probability', '0.5')]
     for arg, item in kwargs_bad:
         match = ('must be an instance of')
         with pytest.raises(TypeError, match=match):
@@ -225,6 +227,20 @@ def test_network():
             kwargs = kwargs_default.copy()
             kwargs[arg] = string_arg
             net.add_connection(**kwargs)
+
+    n_connections = np.sum(
+        [len(t_gids) for
+         t_gids in net.connectivity[0]['gid_pairs'].values()])
+    net.connectivity[0].update_probability(0.5)
+    n_connections_new = np.sum(
+        [len(t_gids) for
+         t_gids in net.connectivity[0]['gid_pairs'].values()])
+    assert n_connections_new == np.round(n_connections * 0.5).astype(int)
+    assert net.connectivity[0]['probability'] == 0.5
+    with pytest.raises(ValueError, match='probability must be'):
+        kwargs = kwargs_default.copy()
+        kwargs['probability'] = -1.0
+        net.add_connection(**kwargs)
 
     net.clear_connectivity()
     assert len(net.connectivity) == 0
