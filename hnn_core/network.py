@@ -941,7 +941,7 @@ class Network(object):
             nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
 
     def add_connection(self, src_gids, target_gids, loc, receptor,
-                       weight, delay, lamtha):
+                       weight, delay, lamtha, probability=1.0):
         """Appends connections to connectivity list
 
         Parameters
@@ -970,6 +970,9 @@ class Network(object):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+        probability : float
+            Probability of connection between any src-target pair.
+            Defaults to 1.0 producing an all-to-all pattern.
 
         Notes
         -----
@@ -977,7 +980,7 @@ class Network(object):
         net.connectivity[idx]['gid_pairs'] : dict
             dict indexed by src gids with the format:
             {src_gid: [target_gids, ...], ...}
-        where each src_gid indexes a list of all its targets.
+            where each src_gid indexes a list of all its targets.
         """
         conn = _Connectivity()
         threshold = self.threshold
@@ -1070,6 +1073,10 @@ class Network(object):
             _validate_type(item, (int, float), arg_name, 'int or float')
             conn['nc_dict'][key] = item
 
+        if probability != 1.0:
+            conn.update_probability(probability)
+        conn['probability'] = probability
+
         self.connectivity.append(deepcopy(conn))
 
     def clear_connectivity(self):
@@ -1128,6 +1135,10 @@ class _Connectivity(dict):
         Cell type of source gids.
     target_type : str
         Cell type of target gids.
+    gid_pairs : dict
+        dict indexed by src gids with the format:
+        {src_gid: [target_gids, ...], ...}
+        where each src_gid indexes a list of all its targets.
     num_srcs : int
         Number of unique source gids.
     num_targets : int
@@ -1149,12 +1160,16 @@ class _Connectivity(dict):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+    probability : float
+        Probability of connection between any src-target pair.
+        Defaults to 1.0 producing an all-to-all pattern.
     """
 
     def __repr__(self):
         entr = f"{self['src_type']} -> {self['target_type']}"
         entr += f"\ncell counts: {self['num_srcs']} srcs, "
         entr += f"{self['num_targets']} targets"
+        entr += f"\nconnection probability: {self['probability']} "
         entr += f"\nloc: '{self['loc']}'; receptor: '{self['receptor']}'"
         entr += f"\nweight: {self['nc_dict']['A_weight']}; "
         entr += f"delay: {self['nc_dict']['A_delay']}; "
@@ -1162,6 +1177,58 @@ class _Connectivity(dict):
         entr += "\n "
 
         return entr
+
+    def update_probability(self, probability):
+        """Remove/keep a random subset of connections.
+
+        Parameters
+        ----------
+        probability : float
+            Probability of connection between any src-target pair.
+            Defaults to 1.0 producing an all-to-all pattern.
+
+        Notes
+        -----
+        num_srcs and num_targets are not updated after pruning connections.
+        These variables are meant to describe the set of original connections
+        before they are randomly removed.
+
+        The probability attribute will store the most recent value passed to
+        this function. As such, this number does not accurately describe the
+        connections probability of the original set after successive calls.
+        """
+        _validate_type(probability, float, 'probability')
+        if probability <= 0.0 or probability >= 1.0:
+            raise ValueError('probability must be in the range [0,1]')
+        # Flatten connections into a list of targets.
+        all_connections = np.concatenate(
+            [target_src_pair for
+             target_src_pair in self['gid_pairs'].values()])
+        n_connections = np.round(
+            len(all_connections) * probability).astype(int)
+        print(len(all_connections), n_connections)
+        # Select a random subset of connections to retain.
+        new_connections = np.random.choice(
+            range(len(all_connections)), n_connections, replace=False)
+        remove_srcs = list()
+        connection_idx = 0
+        for src_gid, target_src_pair in self['gid_pairs'].items():
+            target_new = list()
+            for target_gid in target_src_pair:
+                if connection_idx in new_connections:
+                    target_new.append(target_gid)
+                connection_idx += 1
+
+            # Update targets for src_gid
+            if target_new:
+                self['gid_pairs'][src_gid] = target_new
+            else:
+                remove_srcs.append(src_gid)
+        # Remove src_gids with no targets
+        for src_gid in remove_srcs:
+            self['gid_pairs'].pop(src_gid)
+
+        self['probability'] = probability
 
 
 class _NetworkDrive(dict):
