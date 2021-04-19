@@ -15,7 +15,7 @@ from IPython.display import display
 
 from ipywidgets import (FloatLogSlider, Dropdown, Button, RadioButtons,
                         fixed, interactive_output, interactive, interact,
-                        FloatText, FileUpload, HTML, Output,
+                        FloatText, IntText, FileUpload, HTML, Output,
                         HBox, VBox, Tab, Accordion,
                         Layout, AppLayout)
 
@@ -51,7 +51,7 @@ def _get_sliders(params, param_keys):
 
 
 def _get_rhythmic_widget(drive_title, layout, style):
-    tstart = FloatText(value=7.5, description='Start time:',
+    tstart = FloatText(value=0., description='Start time:',
                        layout=layout, style=style)
     tstart_std = FloatText(value=7.5, description='Start time dev:',
                            layout=layout, style=style)
@@ -108,27 +108,40 @@ def _get_poisson_widget(drive_title, layout, style):
 
 
 def _get_evoked_widget(drive_title, layout, style):
-    mu = FloatText(value=7.5, description='Mean time:',
+    cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket',
+                  'L2_basket']
+    mu = FloatText(value=0, description='Mean time:',
                    layout=layout)
-    sigma = FloatText(value=8.5, description='Std dev time:',
+    sigma = FloatText(value=1, description='Std dev time:',
                       layout=layout)
-    numspikes = FloatText(value=8.5, description='Number of spikes:',
-                          layout=layout)
+    numspikes = IntText(value=1, description='No. Spikes:',
+                        layout=layout)
     location = RadioButtons(options=['proximal', 'distal'])
-    weights_ampa_L5Pyr = FloatText(value=8.5,
-                                   description='AMPA (L5 Pyr):',
-                                   layout=layout)
-    weights_nmda_L5Pyr = FloatText(value=8.5,
-                                   description='NMDA (L5 Pyr):',
-                                   layout=layout)
+    labels = {'ampa': HTML(value="<b>AMPA weights</b>"),
+              'nmda': HTML(value="<b>NMDA weights</b>"),
+              'delays': HTML(value="<b>Synaptic delays</b>")}
 
-    drive_box = VBox([mu, sigma, numspikes, location,
-                      weights_ampa_L5Pyr, weights_nmda_L5Pyr])
+    weights_ampa, weights_nmda, delays = dict(), dict(), dict()
+    for cell_type in cell_types:
+        weights_ampa[f'{cell_type}'] = FloatText(
+            value=0., description=f'{cell_type}:',
+            layout=layout, style=style)
+        weights_nmda[f'{cell_type}'] = FloatText(
+            value=0., description=f'{cell_type}:', layout=layout,
+            style=style)
+        delays[f'{cell_type}'] = FloatText(
+            value=0.1, description=f'{cell_type}:', layout=layout,
+            style=style)
+
+    drive_box = VBox([mu, sigma, numspikes, location] +
+                     [labels['ampa']] + list(weights_ampa.values()) +
+                     [labels['nmda']] + list(weights_nmda.values()) +
+                     [labels['delays']] + list(delays.values()))
     drive = dict(type='Evoked', name=drive_title,
                  mu=mu, sigma=sigma, numspikes=numspikes,
                  sync_within_trial=False, location=location,
-                 weights_ampa_L5Pyr=weights_ampa_L5Pyr,
-                 weights_nmda_L5Pyr=weights_nmda_L5Pyr,
+                 weights_ampa=weights_ampa,
+                 weights_nmda=weights_nmda, delays=delays,
                  space_constant=3.0)
     return drive, drive_box
 
@@ -219,6 +232,11 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
                 space_constant=100.0
             )
         elif drive['type'] == 'Evoked':
+            weights_ampa = {k: v.value for k, v in
+                            drive['weights_ampa'].items()}
+            weights_nmda = {k: v.value for k, v in
+                            drive['weights_nmda'].items()}
+            delays = {k: v.value for k, v in drive['delays'].items()}
             variables['net'].add_evoked_drive(
                 name=drive['name'],
                 mu=drive['mu'].value,
@@ -226,8 +244,9 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
                 numspikes=drive['numspikes'].value,
                 sync_within_trial=False,
                 location=drive['location'].value,
-                weights_ampa=dict(L5_pyramidal=drive['weights_ampa_L5Pyr'].value),
-                weights_nmda=dict(L5_pyramidal=drive['weights_nmda_L5Pyr'].value),
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
+                synaptic_delays=delays,
                 space_constant=3.0
             )
         elif drive['type'] == 'Rhythmic':
