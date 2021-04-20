@@ -58,7 +58,7 @@ net_erp.cell_response.plot_spikes_raster()
 # all the same cell type allowing for easy modifications.
 for conn in net.connectivity:
     if conn['src_type'] == 'L2_basket':
-        conn.update_probability(0.1)
+        conn.drop(0.1)
 
 net_remove = net.copy()
 dpl_remove = simulate_dipole(net_remove, n_trials=1)

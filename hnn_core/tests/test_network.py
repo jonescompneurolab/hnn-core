@@ -231,7 +231,7 @@ def test_network():
     n_connections = np.sum(
         [len(t_gids) for
          t_gids in net.connectivity[0]['gid_pairs'].values()])
-    net.connectivity[0].update_probability(0.5)
+    net.connectivity[0].drop(0.5)
     n_connections_new = np.sum(
         [len(t_gids) for
          t_gids in net.connectivity[0]['gid_pairs'].values()])
