@@ -1074,7 +1074,7 @@ class Network(object):
             conn['nc_dict'][key] = item
 
         if probability != 1.0:
-            conn.update_probability(probability)
+            conn.drop(probability)
         conn['probability'] = probability
 
         self.connectivity.append(deepcopy(conn))
@@ -1178,7 +1178,7 @@ class _Connectivity(dict):
 
         return entr
 
-    def update_probability(self, probability):
+    def drop(self, probability):
         """Remove/keep a random subset of connections.
 
         Parameters
@@ -1206,7 +1206,7 @@ class _Connectivity(dict):
              target_src_pair in self['gid_pairs'].values()])
         n_connections = np.round(
             len(all_connections) * probability).astype(int)
-        print(len(all_connections), n_connections)
+
         # Select a random subset of connections to retain.
         new_connections = np.random.choice(
             range(len(all_connections)), n_connections, replace=False)
