@@ -52,8 +52,9 @@ net_erp.cell_response.plot_spikes_raster()
 # We can modify the connectivity list to test the effect of different
 # connectivity patterns. For example, we can remove 90% all layer 2 inhibitory
 # connections.
-# This can be achieved with :meth:`hnn_core._Connectivity.update_probability`,
-# a function that is available for each element of ``net.connectivity``.
+# This can be achieved with ``net.connectivity[idx].drop``, a function that is
+# available for each element of ``net.connectivity``. We can also visualize
+# any connection using ``net.connectivity.plot``.
 # Note that in the default network, the src_gids of each connection are
 # all the same cell type allowing for easy modifications.
 for conn in net.connectivity:
@@ -63,6 +64,7 @@ for conn in net.connectivity:
 net_remove = net.copy()
 dpl_remove = simulate_dipole(net_remove, n_trials=1)
 net_remove.cell_response.plot_spikes_raster()
+net.connectivity[10].plot()
 
 ###############################################################################
 # That's a lot of spiking! Since basket cells are inhibitory, removing these
@@ -85,6 +87,7 @@ net.add_connection(src_gid, target_gids, location, receptor,
 net_add = net.copy()
 dpl_add = simulate_dipole(net_add, n_trials=1)
 net_add.cell_response.plot_spikes_raster()
+net.connectivity[-1].plot()
 
 ###############################################################################
 # Adding a single inhibitory connection didn't completely restored the normal
