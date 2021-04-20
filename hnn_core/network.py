@@ -1210,7 +1210,7 @@ class _Connectivity(dict):
         """
         _validate_type(probability, float, 'probability')
         if probability <= 0.0 or probability >= 1.0:
-            raise ValueError('probability must be in the range [0,1]')
+            raise ValueError('probability must be in the range (0,1)')
         # Flatten connections into a list of targets.
         all_connections = np.concatenate(
             [target_src_pair for
