@@ -27,11 +27,6 @@ def create_expanded_button(description, button_style, height):
                   style=style)
 
 
-def update_params(params, **updates):
-    params.update(dict(**updates))
-    return params
-
-
 def _get_sliders(params, param_keys):
     """Get sliders"""
     style = {'description_width': '150px'}
@@ -44,8 +39,11 @@ def _get_sliders(params, param_keys):
             readout=True, readout_format='.2e', style=style)
         sliders.append(slider)
 
-    _update_params = partial(update_params, params)
-    interactive_output(update_params, {s.description: s for s in sliders})
+    def _update_params(params, **updates):
+        params.update(dict(**updates))
+        return params
+
+    interactive_output(_update_params, {s.description: s for s in sliders})
     return sliders
 
 
@@ -329,17 +327,17 @@ def run_hnn_gui():
     tstep = FloatText(value=0.025, description='tstep (s):', disabled=False)
     simulation_box = VBox([tstop, tstep])
 
-    # Sliders to change local-connectivity Params
-    sliders = [_get_sliders(params,
+    # Sliders to change local-connectivity params
+    sliders = [_get_sliders(variables['net']._params,
                ['gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
                 'gbar_L2Basket_L2Pyr_gabaa', 'gbar_L2Basket_L2Pyr_gabab']),
-               _get_sliders(params,
+               _get_sliders(variables['net']._params,
                ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr',
                 'gbar_L5Pyr_L5Pyr_ampa', 'gbar_L5Pyr_L5Pyr_nmda',
                 'gbar_L5Basket_L5Pyr_gabaa', 'gbar_L5Basket_L5Pyr_gabab']),
-               _get_sliders(params,
+               _get_sliders(variables['net']._params,
                ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
-               _get_sliders(params,
+               _get_sliders(variables['net']._params,
                ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr'])]
 
     # accordians to group local-connectivity by cell type
