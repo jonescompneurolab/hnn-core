@@ -41,8 +41,7 @@ def _get_sliders(params, param_keys):
             value=params[d], min=-5, max=1, step=0.2,
             description=d.split('gbar_')[1],
             disabled=False, continuous_update=False, orientation='horizontal',
-            readout=True, readout_format='.2e',
-            style=style)
+            readout=True, readout_format='.2e', style=style)
         sliders.append(slider)
 
     _update_params = partial(update_params, params)
@@ -51,19 +50,17 @@ def _get_sliders(params, param_keys):
 
 
 def _get_cell_specific_widgets(layout, style):
+    kwargs = dict(layout=layout, style=style)
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket',
                   'L2_basket']
     weights_ampa, weights_nmda, delays = dict(), dict(), dict()
     for cell_type in cell_types:
         weights_ampa[f'{cell_type}'] = FloatText(
-            value=0., description=f'{cell_type}:',
-            layout=layout, style=style)
+            value=0., description=f'{cell_type}:', **kwargs)
         weights_nmda[f'{cell_type}'] = FloatText(
-            value=0., description=f'{cell_type}:', layout=layout,
-            style=style)
+            value=0., description=f'{cell_type}:', **kwargs)
         delays[f'{cell_type}'] = FloatText(
-            value=0.1, description=f'{cell_type}:', layout=layout,
-            style=style)
+            value=0.1, description=f'{cell_type}:', **kwargs)
 
     widgets_dict = {'weights_ampa': weights_ampa,
                     'weights_nmda': weights_nmda, 'delays': delays}
@@ -78,21 +75,16 @@ def _get_cell_specific_widgets(layout, style):
 
 def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
 
-    tstart = FloatText(value=0., description='Start time:',
-                       layout=layout, style=style)
+    kwargs = dict(layout=layout, style=style)
+    tstart = FloatText(value=0., description='Start time:', **kwargs)
     tstart_std = FloatText(value=0, description='Start time dev:',
-                           layout=layout, style=style)
+                           **kwargs)
     tstop = BoundedFloatText(value=tstop_widget.value, description='Stop time:',
-                             max=tstop_widget.value,
-                             layout=layout, style=style)
-    burst_rate = FloatText(value=7.5, description='Burst rate:',
-                           layout=layout, style=style)
-    burst_std = FloatText(value=0, description='Burst std dev:',
-                          layout=layout, style=style)
-    repeats = FloatText(value=1, description='Spikes/burst:',
-                        layout=layout, style=style)
-    seedcore = IntText(value=14, description='Seed: ',
-                       layout=layout, style=style)
+                             max=tstop_widget.value, **kwargs)
+    burst_rate = FloatText(value=7.5, description='Burst rate:', **kwargs)
+    burst_std = FloatText(value=0, description='Burst std dev:', **kwargs)
+    repeats = FloatText(value=1, description='Spikes/burst:', **kwargs)
+    seedcore = IntText(value=14, description='Seed: ', **kwargs)
     location = RadioButtons(options=['proximal', 'distal'])
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
@@ -140,14 +132,13 @@ def _get_poisson_widget(drive_title, tstop_widget, layout, style):
 
 
 def _get_evoked_widget(drive_title, layout, style):
-    mu = FloatText(value=0, description='Mean time:',
-                   layout=layout)
+    kwargs = dict(layout=layout, style=style)
+    mu = FloatText(value=0, description='Mean time:', **kwargs)
     sigma = FloatText(value=1, description='Std dev time:',
-                      layout=layout)
+                      **kwargs)
     numspikes = IntText(value=1, description='No. Spikes:',
-                        layout=layout)
-    seedcore = IntText(value=14, description='Seed: ',
-                       layout=layout, style=style)
+                        **kwargs)
+    seedcore = IntText(value=14, description='Seed: ', **kwargs)
     location = RadioButtons(options=['proximal', 'distal'])
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
