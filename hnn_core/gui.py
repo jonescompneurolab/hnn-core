@@ -219,8 +219,8 @@ def on_upload_change(change, sliders, variables):
     variables['net'].external_drives = external_drives.copy()
 
 
-def on_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
-                      tstop, b):
+def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
+                       tstop, b):
     """Run the simulation and plot outputs."""
     plot_out.clear_output()
     log_out.clear_output()
@@ -304,9 +304,9 @@ def run_hnn_gui():
         return add_drive_widget(drive_type, drive_titles, drive_boxes,
                                 drive_widgets, drives_out, tstop)
 
-    def _on_button_clicked(b):
-        return on_button_clicked(log_out, plot_out, drive_widgets, variables,
-                                 tstep, tstop, b)
+    def _run_button_clicked(b):
+        return run_button_clicked(log_out, plot_out, drive_widgets, variables,
+                                  tstep, tstop, b)
 
     def _on_upload_change(change):
         return on_upload_change(change, sliders, variables)
@@ -386,7 +386,7 @@ def run_hnn_gui():
                              button_style='success')
 
     load_button.observe(_on_upload_change)
-    run_button.on_click(_on_button_clicked)
+    run_button.on_click(_run_button_clicked)
     footer = HBox([run_button, load_button, plot_dropdown])
 
     right_sidebar = VBox([plot_out, log_out])
