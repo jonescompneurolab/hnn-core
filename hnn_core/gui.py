@@ -15,8 +15,8 @@ from IPython.display import display
 
 from ipywidgets import (FloatLogSlider, Dropdown, Button, RadioButtons,
                         fixed, interactive_output, interactive, interact,
-                        FloatText, IntText, FileUpload, HTML, Output,
-                        HBox, VBox, Tab, Accordion,
+                        FloatText, BoundedFloatText, IntText, FileUpload,
+                        HTML, Output, HBox, VBox, Tab, Accordion,
                         Layout, AppLayout)
 
 
@@ -76,14 +76,15 @@ def _get_cell_specific_widgets(layout, style):
     return widgets_list, widgets_dict
 
 
-def _get_rhythmic_widget(drive_title, layout, style):
+def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
 
     tstart = FloatText(value=0., description='Start time:',
                        layout=layout, style=style)
     tstart_std = FloatText(value=0, description='Start time dev:',
                            layout=layout, style=style)
-    tstop = FloatText(value=200, description='Stop time:',
-                      layout=layout, style=style)
+    tstop = BoundedFloatText(value=tstop_widget.value, description='Stop time:',
+                             max=tstop_widget.value,
+                             layout=layout, style=style)
     burst_rate = FloatText(value=7.5, description='Burst rate:',
                            layout=layout, style=style)
     burst_std = FloatText(value=0, description='Burst std dev:',
@@ -106,11 +107,13 @@ def _get_rhythmic_widget(drive_title, layout, style):
     return drive, drive_box
 
 
-def _get_poisson_widget(drive_title, layout, style):
+def _get_poisson_widget(drive_title, tstop_widget, layout, style):
     tstart = FloatText(value=0.0, description='Start time:',
                        layout=layout, style=style)
-    tstop = FloatText(value=8.5, description='Stop time:',
-                      layout=layout, style=style)
+    tstop = BoundedFloatText(value=tstop_widget.value,
+                             max=tstop_widget.value,
+                             description='Stop time:',
+                             layout=layout, style=style)
     seedcore = IntText(value=14, description='Seed: ',
                        layout=layout, style=style)
     location = RadioButtons(options=['proximal', 'distal'])
@@ -159,7 +162,7 @@ def _get_evoked_widget(drive_title, layout, style):
 
 
 def add_drive_widget(drive_type, drive_titles, drive_boxes, drive_widgets,
-                     drives_out):
+                     drives_out, tstop_widget):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
@@ -168,9 +171,11 @@ def add_drive_widget(drive_type, drive_titles, drive_boxes, drive_widgets,
         drive_title = drive_type['new'] + str(len(drive_boxes))
 
         if drive_type['new'] == 'Rhythmic':
-            drive, drive_box = _get_rhythmic_widget(drive_title, layout, style)
+            drive, drive_box = _get_rhythmic_widget(drive_title, tstop_widget,
+                                                    layout, style)
         elif drive_type['new'] == 'Poisson':
-            drive, drive_box = _get_poisson_widget(drive_title, layout, style)
+            drive, drive_box = _get_poisson_widget(drive_title, tstop_widget,
+                                                   layout, style)
         elif drive_type['new'] == 'Evoked':
             drive, drive_box = _get_evoked_widget(drive_title, layout, style)
 
@@ -306,7 +311,7 @@ def run_hnn_gui():
 
     def _add_drive_widget(drive_type):
         return add_drive_widget(drive_type, drive_titles, drive_boxes,
-                                drive_widgets, drives_out)
+                                drive_widgets, drives_out, tstop)
 
     def _on_button_clicked(b):
         return on_button_clicked(log_out, plot_out, drive_widgets, variables,
