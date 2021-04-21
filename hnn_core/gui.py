@@ -223,8 +223,11 @@ def on_upload_change(change, sliders, variables):
     variables['net'].external_drives = external_drives.copy()
 
 
-def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
+def on_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
+                      tstop, b):
     """Run the simulation and plot outputs."""
+    plot_out.clear_output()
+    log_out.clear_output()
     for drive in drive_widgets:
         weights_ampa = {k: v.value for k, v in drive['weights_ampa'].items()}
         weights_nmda = {k: v.value for k, v in drive['weights_nmda'].items()}
@@ -277,6 +280,11 @@ def on_button_clicked(log_out, plot_out, drive_widgets, variables, b):
                 seedcore=drive['seedcore'].value
             )
     with log_out:
+        # XXX: hack, shouldn't modify variables['net']
+        variables['net']._params['dt'] = tstep.value
+        variables['net']._params['tstop'] = tstop.value
+        variables['net'].cell_response._times = np.arange(
+            0., tstop.value + tstep.value, tstep.value)
         variables['dpls'] = simulate_dipole(variables['net'], n_trials=1)
     with plot_out:
         variables['dpls'][0].plot()
@@ -302,7 +310,7 @@ def run_hnn_gui():
 
     def _on_button_clicked(b):
         return on_button_clicked(log_out, plot_out, drive_widgets, variables,
-                                 b)
+                                 tstep, tstop, b)
 
     def _on_upload_change(change):
         return on_upload_change(change, sliders, variables)
@@ -320,6 +328,11 @@ def run_hnn_gui():
     header_button = create_expanded_button('HUMAN NEOCORTICAL NEUROSOLVER',
                                            'success', height='40px')
 
+    # Simulation parameters
+    tstop = FloatText(value=170, description='tstop (s):', disabled=False)
+    tstep = FloatText(value=0.025, description='tstep (s):', disabled=False)
+    simulation_box = VBox([tstop, tstep])
+
     # Sliders to change local-connectivity Params
     sliders = [_get_sliders(params,
                ['gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
@@ -333,7 +346,7 @@ def run_hnn_gui():
                _get_sliders(params,
                ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr'])]
 
-    # accordians to group local-connectivity by cel type
+    # accordians to group local-connectivity by cell type
     boxes = [VBox(slider) for slider in sliders]
     titles = ['Layer 2/3 Pyr', 'Layer 5 Pyr', 'Layer 2 Bas', 'Layer 5 Bas']
     accordian = Accordion(children=boxes)
@@ -355,8 +368,8 @@ def run_hnn_gui():
 
     # Tabs for left pane
     left_tab = Tab()
-    left_tab.children = [accordian, drives_options]
-    titles = ['Cell connectivity', 'Drives']
+    left_tab.children = [simulation_box, accordian, drives_options]
+    titles = ['Simulation', 'Cell connectivity', 'Drives']
     for idx, title in enumerate(titles):
         left_tab.set_title(idx, title)
 
