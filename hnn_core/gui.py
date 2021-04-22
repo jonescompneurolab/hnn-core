@@ -74,15 +74,16 @@ def _get_cell_specific_widgets(layout, style):
 def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
 
     kwargs = dict(layout=layout, style=style)
-    tstart = FloatText(value=0., description='Start time:', **kwargs)
-    tstart_std = FloatText(value=0, description='Start time dev:',
+    tstart = FloatText(value=0., description='Start time (s)', **kwargs)
+    tstart_std = FloatText(value=0, description='Start time dev (s)',
                            **kwargs)
-    tstop = BoundedFloatText(value=tstop_widget.value, description='Stop time',
+    tstop = BoundedFloatText(value=tstop_widget.value,
+                             description='Stop time (s)',
                              max=tstop_widget.value, **kwargs)
-    burst_rate = FloatText(value=7.5, description='Burst rate:', **kwargs)
-    burst_std = FloatText(value=0, description='Burst std dev:', **kwargs)
-    repeats = FloatText(value=1, description='Spikes/burst:', **kwargs)
-    seedcore = IntText(value=14, description='Seed: ', **kwargs)
+    burst_rate = FloatText(value=7.5, description='Burst rate (Hz)', **kwargs)
+    burst_std = FloatText(value=0, description='Burst std dev (Hz)', **kwargs)
+    repeats = FloatText(value=1, description='Repeats', **kwargs)
+    seedcore = IntText(value=14, description='Seed', **kwargs)
     location = RadioButtons(options=['proximal', 'distal'])
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
@@ -92,19 +93,19 @@ def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
                  tstart=tstart, tstart_std=tstart_std,
                  burst_rate=burst_rate, burst_std=burst_std,
                  repeats=repeats, seedcore=seedcore,
-                 location=location)
+                 location=location, tstop=tstop)
     drive.update(widgets_dict)
     return drive, drive_box
 
 
 def _get_poisson_widget(drive_title, tstop_widget, layout, style):
-    tstart = FloatText(value=0.0, description='Start time:',
+    tstart = FloatText(value=0.0, description='Start time (s)',
                        layout=layout, style=style)
     tstop = BoundedFloatText(value=tstop_widget.value,
                              max=tstop_widget.value,
-                             description='Stop time:',
+                             description='Stop time (s)',
                              layout=layout, style=style)
-    seedcore = IntText(value=14, description='Seed: ',
+    seedcore = IntText(value=14, description='Seed',
                        layout=layout, style=style)
     location = RadioButtons(options=['proximal', 'distal'])
 
@@ -269,6 +270,7 @@ def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
                 burst_std=drive['burst_std'].value,
                 repeats=drive['repeats'].value,
                 location=drive['location'].value,
+                tstop=drive['tstop'].value,
                 weights_ampa=weights_ampa,
                 weights_nmda=weights_nmda,
                 synaptic_delays=synaptic_delays,
@@ -343,7 +345,8 @@ def run_hnn_gui():
 
     # accordians to group local-connectivity by cell type
     boxes = [VBox(slider) for slider in sliders]
-    titles = ['Layer 2/3 Pyr', 'Layer 5 Pyr', 'Layer 2 Bas', 'Layer 5 Bas']
+    titles = ['Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
+              'Layer 5 Basket']
     accordian = Accordion(children=boxes)
     for idx, title in enumerate(titles):
         accordian.set_title(idx, title)
