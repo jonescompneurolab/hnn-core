@@ -77,7 +77,7 @@ def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
     tstart = FloatText(value=0., description='Start time:', **kwargs)
     tstart_std = FloatText(value=0, description='Start time dev:',
                            **kwargs)
-    tstop = BoundedFloatText(value=tstop_widget.value, description='Stop time:',
+    tstop = BoundedFloatText(value=tstop_widget.value, description='Stop time',
                              max=tstop_widget.value, **kwargs)
     burst_rate = FloatText(value=7.5, description='Burst rate:', **kwargs)
     burst_std = FloatText(value=0, description='Burst std dev:', **kwargs)
@@ -196,8 +196,9 @@ def update_plot_window(variables, plot_out, plot_type):
         elif plot_type['new'] == 'PSD':
             variables['dpls'][0].plot_psd(fmin=0, fmax=50)
         elif plot_type['new'] == 'spectogram':
-            freqs = np.arange(20., 100., 1.)
-            variables['dpls'][0].plot_tfr_morlet(freqs)
+            freqs = np.arange(10., 100., 1.)
+            n_cycles = freqs / 8.
+            variables['dpls'][0].plot_tfr_morlet(freqs, n_cycles=n_cycles)
 
 
 def on_upload_change(change, sliders, variables):
