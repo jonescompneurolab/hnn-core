@@ -200,6 +200,8 @@ def update_plot_window(variables, plot_out, plot_type):
             freqs = np.arange(10., 100., 1.)
             n_cycles = freqs / 8.
             variables['dpls'][0].plot_tfr_morlet(freqs, n_cycles=n_cycles)
+        elif plot_type['new'] == 'network':
+            variables['net'].plot_cells()
 
 
 def on_upload_change(change, sliders, variables):
@@ -374,7 +376,7 @@ def run_hnn_gui():
     # Dropdown menu to switch between plots
     plot_dropdown = Dropdown(
         options=['input histogram', 'current dipole',
-                 'spikes', 'PSD', 'spectogram'],
+                 'spikes', 'PSD', 'spectogram', 'network'],
         value='current dipole', description='Plot:',
         disabled=False)
     interactive(_update_plot_window, plot_type='current dipole')
