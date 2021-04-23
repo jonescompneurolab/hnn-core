@@ -16,6 +16,8 @@ Changelog
 ~~~~~~~~~
 - Store all connectivity information under :attr:`~hnn_core.Network.connectivity` before building the network, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
 
+- Add new function :func:`~hnn_core.viz.plot_cell_morphology` to visualize cell morphology in `#319 <https://github.com/jonescompneurolab/hnn-core/pull/319>`_
+
 Bug
 ~~~
 
