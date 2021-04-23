@@ -334,7 +334,7 @@ class L2Pyr(Pyr):
             'name': 'L2Pyr',
         }
 
-    def secs():
+    def secs(self):
         return _secs_L2Pyr()
 
     def set_biophysics(self, p_all):
@@ -409,7 +409,7 @@ class L5Pyr(Pyr):
             corresponding params in p."""
         Pyr.__init__(self, pos, 'L5_pyramidal', override_params, gid=gid)
 
-    def secs():
+    def secs(self):
         return _secs_L5Pyr()
 
     def _get_soma_props(self, pos, p_all):

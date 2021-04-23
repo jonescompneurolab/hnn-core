@@ -6,7 +6,8 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, Network
-from hnn_core.viz import plot_cells, plot_dipole, plot_psd, plot_tfr_morlet
+from hnn_core.viz import (plot_cells, plot_dipole, plot_psd, plot_tfr_morlet,
+                          plot_cell_morphology)
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
@@ -21,6 +22,11 @@ def test_network_visualization():
                    'N_pyr_y': 3})
     net = Network(params)
     plot_cells(net)
+    with pytest.raises(ValueError, match='Unrecognized cell type'):
+        plot_cell_morphology(cell_types='blah')
+    axes = plot_cell_morphology(cell_types='L2Pyr')
+    len(axes) == 1
+    assert len(axes[0].lines) == 8
 
 
 def test_dipole_visualization():
