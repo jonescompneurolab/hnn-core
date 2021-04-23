@@ -3,6 +3,8 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import numpy as np
+
 
 def get_params_default(nprox=2, ndist=1):
     """ Note that nearly all start times are set BEYOND tstop for this file
@@ -359,3 +361,124 @@ def get_L5Pyr_params_default():
         'L5Pyr_dend_gbar_cat': 2e-4,
         'L5Pyr_dend_gbar_ar': 1e-6,
     }
+
+
+def _secs_L2Pyr():
+    """The geometry of the default sections in the neuron."""
+    sec_pts = {
+        'soma': [[-50, 765, 0], [-50, 778, 0]],
+        'apical_trunk': [[-50, 778, 0], [-50, 813, 0]],
+        'apical_oblique': [[-50, 813, 0], [-250, 813, 0]],
+        'apical_1': [[-50, 813, 0], [-50, 993, 0]],
+        'apical_tuft': [[-50, 993, 0], [-50, 1133, 0]],
+        'basal_1': [[-50, 765, 0], [-50, 715, 0]],
+        'basal_2': [[-50, 715, 0], [-156, 609, 0]],
+        'basal_3': [[-50, 715, 0], [56, 609, 0]],
+    }
+    # increased by 70% for human
+    sec_lens = {  # microns
+        'soma': 22.1,
+        'apical_trunk': 59.5,
+        'apical_oblique': 340,
+        'apical_1': 306,
+        'apical_tuft': 238,
+        'basal_1': 85,
+        'basal_2': 255,
+        'basal_3': 255
+    }
+    sec_diams = {  # microns
+        'soma': 23.4,
+        'apical_trunk': 4.25,
+        'apical_oblique': 3.91,
+        'apical_1': 4.08,
+        'apical_tuft': 3.4,
+        'basal_1': 4.25,
+        'basal_2': 2.72,
+        'basal_3': 2.72
+    }
+    sec_scales = {  # factor to scale the dipole by
+        'soma': 1.,
+        'apical_trunk': 1.,
+        'apical_oblique': 0.,
+        'apical_1': 1.,
+        'apical_tuft': 1.,
+        'basal_1': -1.,
+        'basal_2': -np.sqrt(2.) / 2.,
+        'basal_3': -np.sqrt(2.) / 2.
+    }
+    # parent, parent_end, child, {child_start=0}
+    topology = [
+        # Distal (Apical)
+        ['soma', 1, 'apical_trunk', 0],
+        ['apical_trunk', 1, 'apical_1', 0],
+        ['apical_1', 1, 'apical_tuft', 0],
+        # apical_oblique comes off distal end of apical_trunk
+        ['apical_trunk', 1, 'apical_oblique', 0],
+        # Proximal (basal)
+        ['soma', 0, 'basal_1', 0],
+        ['basal_1', 1, 'basal_2', 0],
+        ['basal_1', 1, 'basal_3', 0]
+    ]
+    return sec_pts, sec_lens, sec_diams, sec_scales, topology
+
+
+def _secs_L5Pyr():
+    """The geometry of the default sections in the Neuron."""
+    sec_pts = {
+        'soma': [[0, 0, 0], [0, 23, 0]],
+        'apical_trunk': [[0, 23, 0], [0, 83, 0]],
+        'apical_oblique': [[0, 83, 0], [-150, 83, 0]],
+        'apical_1': [[0, 83, 0], [0, 483, 0]],
+        'apical_2': [[0, 483, 0], [0, 883, 0]],
+        'apical_tuft': [[0, 883, 0], [0, 1133, 0]],
+        'basal_1': [[0, 0, 0], [0, -50, 0]],
+        'basal_2': [[0, -50, 0], [-106, -156, 0]],
+        'basal_3': [[0, -50, 0], [106, -156, 0]]
+    }
+    sec_lens = {  # microns
+        'soma': 39,
+        'apical_trunk': 102,
+        'apical_oblique': 255,
+        'apical_1': 680,
+        'apical_2': 680,
+        'apical_tuft': 425,
+        'basal_1': 85,
+        'basal_2': 255,
+        'basal_3': 255
+    }
+    sec_diams = {  # microns
+        'soma': 28.9,
+        'apical_trunk': 10.2,
+        'apical_oblique': 5.1,
+        'apical_1': 7.48,
+        'apical_2': 4.93,
+        'apical_tuft': 3.4,
+        'basal_1': 6.8,
+        'basal_2': 8.5,
+        'basal_3': 8.5
+    }
+    sec_scales = {  # factor to scale the dipole by
+        'soma': 1.,
+        'apical_trunk': 1.,
+        'apical_oblique': 0.,
+        'apical_1': 1.,
+        'apical_2': 1.,
+        'apical_tuft': 1.,
+        'basal_1': -1.,
+        'basal_2': -np.sqrt(2.) / 2.,
+        'basal_3': -np.sqrt(2.) / 2.
+    }
+    topology = [
+        # Distal (Apical)
+        ['soma', 1, 'apical_trunk', 0],
+        ['apical_trunk', 1, 'apical_1', 0],
+        ['apical_1', 1, 'apical_2', 0],
+        ['apical_2', 1, 'apical_tuft', 0],
+        # apical_oblique comes off distal end of apical_trunk
+        ['apical_trunk', 1, 'apical_oblique', 0],
+        # Proximal (basal)
+        ['soma', 0, 'basal_1', 0],
+        ['basal_1', 1, 'basal_2', 0],
+        ['basal_1', 1, 'basal_3', 0]
+    ]
+    return sec_pts, sec_lens, sec_diams, sec_scales, topology

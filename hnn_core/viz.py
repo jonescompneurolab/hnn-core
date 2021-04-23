@@ -6,6 +6,8 @@
 import numpy as np
 from itertools import cycle
 
+from .params_default import _secs_L2Pyr, _secs_L5Pyr
+
 
 def _get_plot_data(dpl, layer, tmin, tmax):
     plot_tmin = dpl.times[0]
@@ -516,3 +518,59 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
 
     plt_show(show)
     return ax.get_figure()
+
+
+def _plot_cell_morphology(ax, cell_type):
+    if cell_type == 'L2Pyr':
+        sec_pts, _, _, _, _ = _secs_L2Pyr()
+    elif cell_type == 'L5Pyr':
+        sec_pts, _, _, _, _ = _secs_L5Pyr()
+    else:
+        raise ValueError('Unrecognized cell type to plot')
+
+    for sec_pt in sec_pts.values():
+        xs = [pt[0] for pt in sec_pt]
+        ys = [pt[1] for pt in sec_pt]
+        zs = [pt[2] for pt in sec_pt]
+        ax.plot(xs, ys, zs, 'b.-')
+
+
+def plot_cell_morphology(axes=None, cell_types=None, show=True):
+    """Plot the cell morphology.
+
+    Parameters
+    ----------
+    axes : list of instance of Axes3D
+        Matplotlib 3D axis
+    cell_types : 'L5Pyr' | 'L5Basket' | list
+        The cell types.
+    show : bool
+        If True, show the plot
+
+    Returns
+    -------
+    axes : list of instance of Axes3D
+        The matplotlib 3D axis handle.
+    """
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+
+    if cell_types is None:
+        cell_types = ['L2Pyr', 'L5Pyr']
+    if isinstance(cell_types, str):
+        cell_types = [cell_types]
+
+    n_cells = len(cell_types)
+    if axes is None:
+        fig = plt.figure()
+        axes = list()
+        for idx in range(1, n_cells + 1):
+            ax = fig.add_subplot(1, n_cells, idx, projection='3d')
+            axes.append(ax)
+
+    for ax, cell_type in zip(axes, cell_types):
+        _plot_cell_morphology(ax, cell_type)
+        ax.set_title(cell_type)
+
+    plt_show(show)
+    return axes
