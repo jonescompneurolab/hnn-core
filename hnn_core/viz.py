@@ -553,7 +553,7 @@ def plot_cell_morphology(axes=None, cell_types=None, show=True):
         The matplotlib 3D axis handle.
     """
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
+    from mpl_toolkits.mplot3d import Axes3D  # noqa
 
     if cell_types is None:
         cell_types = ['L2Pyr', 'L5Pyr']
