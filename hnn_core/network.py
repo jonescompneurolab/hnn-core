@@ -7,7 +7,6 @@
 
 import itertools as it
 import numpy as np
-from glob import glob
 from copy import deepcopy
 from warnings import warn
 
@@ -18,61 +17,6 @@ from .cell_response import CellResponse
 from .params import _long_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
-
-
-def read_spikes(fname, gid_ranges=None):
-    """Read spiking activity from a collection of spike trial files.
-
-    Parameters
-    ----------
-    fname : str
-        Wildcard expression (e.g., '<pathname>/spk_*.txt') of the
-        path to the spike file(s).
-    gid_ranges : dict of lists or range objects | None
-        Dictionary with keys 'evprox1', 'evdist1' etc.
-        containing the range of Cell or input IDs of different
-        cell or input types. If None, each spike file must contain
-        a 3rd column for spike type.
-
-    Returns
-    ----------
-    cell_response : CellResponse
-        An instance of the CellResponse object.
-    """
-
-    spike_times = list()
-    spike_gids = list()
-    spike_types = list()
-    for file in sorted(glob(str(fname))):
-        spike_trial = np.loadtxt(file, dtype=str)
-        if spike_trial.shape[0] > 0:
-            spike_times += [list(spike_trial[:, 0].astype(float))]
-            spike_gids += [list(spike_trial[:, 1].astype(int))]
-
-            # Note that legacy HNN 'spk.txt' files don't contain a 3rd column
-            # for spike type. If reading a legacy version, validate that a
-            # gid_dict is provided.
-            if spike_trial.shape[1] == 3:
-                spike_types += [list(spike_trial[:, 2].astype(str))]
-            else:
-                if gid_ranges is None:
-                    raise ValueError("gid_ranges must be provided if spike "
-                                     "types are unspecified in the "
-                                     "file %s" % (file,))
-                spike_types += [[]]
-        else:
-            spike_times += [[]]
-            spike_gids += [[]]
-            spike_types += [[]]
-
-    cell_response = CellResponse(spike_times=spike_times,
-                                 spike_gids=spike_gids,
-                                 spike_types=spike_types)
-    if gid_ranges is not None:
-        cell_response.update_types(gid_ranges)
-
-    return CellResponse(spike_times=spike_times, spike_gids=spike_gids,
-                        spike_types=spike_types)
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
