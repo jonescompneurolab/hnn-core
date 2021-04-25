@@ -25,49 +25,44 @@ def _count_evoked_inputs(d):
     return nprox, ndist
 
 
-def _read_json(fname):
+def _read_json(param_data):
     """Read param values from a .json file.
     Parameters
     ----------
-    fname : str
-        Full path to the file (.json)
+    param_data : str
+        The data read in from the param file
 
     Returns
     -------
     params_input : dict
         Dictionary of parameters
     """
-    with open(fname) as json_data:
-        params_input = json.load(json_data)
-
-    return params_input
+    return json.loads(param_data)
 
 
-def _read_legacy_params(fname):
+def _read_legacy_params(param_data):
     """Read param values from a .param file (legacy).
     Parameters
     ----------
-    fname : str
-        Full path to the file (.param)
+    param_data : str
+        The data read in from the param file
 
     Returns
     -------
     params_input : dict
         Dictionary of parameters
     """
-
     params_input = dict()
-    with open(fname, 'r') as fp:
-        for line in fp.readlines():
-            split_line = line.lstrip().split(':')
-            key, value = [field.strip() for field in split_line]
-            try:
-                if '.' in value or 'e' in value:
-                    params_input[key] = float(value)
-                else:
-                    params_input[key] = int(value)
-            except ValueError:
-                params_input[key] = str(value)
+    for line in param_data.splitlines():
+        split_line = line.lstrip().split(':')
+        key, value = [field.strip() for field in split_line]
+        try:
+            if '.' in value or 'e' in value:
+                params_input[key] = float(value)
+            else:
+                params_input[key] = int(value)
+        except ValueError:
+            params_input[key] = str(value)
 
     return params_input
 
@@ -89,13 +84,14 @@ def read_params(params_fname):
     split_fname = op.splitext(params_fname)
     ext = split_fname[1]
 
-    if ext == '.json':
-        params_dict = _read_json(params_fname)
-    elif ext == '.param':
-        params_dict = _read_legacy_params(params_fname)
-    else:
+    if ext not in ['.json', '.param']:
         raise ValueError('Unrecognized extension, expected one of' +
                          ' .json, .param. Got %s' % ext)
+
+    read_func = {'.json': _read_json, '.param': _read_legacy_params}
+    with open(params_fname, 'r') as fp:
+        param_data = fp.read()
+        params_dict = read_func[ext](param_data)
 
     if len(params_dict) == 0:
         raise ValueError("Failed to read parameters from file: %s" %

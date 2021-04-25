@@ -3,6 +3,7 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 
 import json
+import codecs
 import os.path as op
 from functools import partial, update_wrapper
 
@@ -10,6 +11,7 @@ import numpy as np
 
 import hnn_core
 from hnn_core import simulate_dipole, read_params, Network
+from hnn_core.params import _read_legacy_params, _read_json
 
 from IPython.display import display
 
@@ -207,9 +209,15 @@ def on_upload_change(change, sliders, variables):
     if len(change['owner'].value) == 0:
         return
 
+    params_fname = change['owner'].metadata[0]['name']
     file_uploaded = change['owner'].value
-    json_data = list(file_uploaded.values())[0]['content']
-    params = json.loads(json_data)
+    param_data = list(file_uploaded.values())[0]['content']
+    param_data = codecs.decode(param_data, encoding="utf-8")
+
+    ext = op.splitext(params_fname)[1]
+    read_func = {'.json': _read_json, '.param': _read_legacy_params}
+    params = read_func[ext](param_data)
+
     for slider in sliders:
         for sl in slider:
             key = 'gbar_' + sl.description
@@ -383,8 +391,8 @@ def run_hnn_gui():
     # Run and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
     style = {'button_color': '#8A2BE2', 'font_color': 'white'}
-    load_button = FileUpload(accept='.json', multiple=False, style=style,
-                             description='Load network',
+    load_button = FileUpload(accept='.json,.param', multiple=False,
+                             style=style, description='Load network',
                              button_style='success')
 
     load_button.observe(_on_upload_change)
