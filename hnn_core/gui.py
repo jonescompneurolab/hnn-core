@@ -71,7 +71,7 @@ def _get_cell_specific_widgets(layout, style):
     return widgets_list, widgets_dict
 
 
-def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
+def _get_rhythmic_widget(name, tstop_widget, layout, style):
 
     kwargs = dict(layout=layout, style=style)
     tstart = FloatText(value=0., description='Start time (s)', **kwargs)
@@ -89,7 +89,7 @@ def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
     widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
     drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std,
                       repeats, location, seedcore] + widgets_list)
-    drive = dict(type='Rhythmic', name=drive_title,
+    drive = dict(type='Rhythmic', name=name,
                  tstart=tstart, tstart_std=tstart_std,
                  burst_rate=burst_rate, burst_std=burst_std,
                  repeats=repeats, seedcore=seedcore,
@@ -98,7 +98,7 @@ def _get_rhythmic_widget(drive_title, tstop_widget, layout, style):
     return drive, drive_box
 
 
-def _get_poisson_widget(drive_title, tstop_widget, layout, style):
+def _get_poisson_widget(name, tstop_widget, layout, style):
     tstart = FloatText(value=0.0, description='Start time (s)',
                        layout=layout, style=style)
     tstop = BoundedFloatText(value=tstop_widget.value,
@@ -123,14 +123,14 @@ def _get_poisson_widget(drive_title, tstop_widget, layout, style):
                         list(widgets_dict['rate_constant'].values()))
 
     drive_box = VBox([tstart, tstop, seedcore, location] + widgets_list)
-    drive = dict(type='Poisson', name=drive_title, tstart=tstart,
+    drive = dict(type='Poisson', name=name, tstart=tstart,
                  tstop=tstop, rate_constant=rate_constant,
                  seedcore=seedcore, location=location)
     drive.update(widgets_dict)
     return drive, drive_box
 
 
-def _get_evoked_widget(drive_title, layout, style):
+def _get_evoked_widget(name, layout, style):
     kwargs = dict(layout=layout, style=style)
     mu = FloatText(value=0, description='Mean time:', **kwargs)
     sigma = FloatText(value=1, description='Std dev time:',
@@ -143,7 +143,7 @@ def _get_evoked_widget(drive_title, layout, style):
     widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
     drive_box = VBox([mu, sigma, numspikes, seedcore, location] +
                      widgets_list)
-    drive = dict(type='Evoked', name=drive_title,
+    drive = dict(type='Evoked', name=name,
                  mu=mu, sigma=sigma, numspikes=numspikes,
                  seedcore=seedcore, location=location,
                  sync_within_trial=False)
@@ -151,33 +151,32 @@ def _get_evoked_widget(drive_title, layout, style):
     return drive, drive_box
 
 
-def add_drive_widget(drive_type, drive_titles, drive_boxes, drive_widgets,
+def add_drive_widget(drive_type, drive_boxes, drive_widgets,
                      drives_out, tstop_widget):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
     drives_out.clear_output()
     with drives_out:
-        drive_title = drive_type['new'] + str(len(drive_boxes))
+        name = drive_type['new'] + str(len(drive_boxes))
 
         if drive_type['new'] == 'Rhythmic':
-            drive, drive_box = _get_rhythmic_widget(drive_title, tstop_widget,
+            drive, drive_box = _get_rhythmic_widget(name, tstop_widget,
                                                     layout, style)
         elif drive_type['new'] == 'Poisson':
-            drive, drive_box = _get_poisson_widget(drive_title, tstop_widget,
+            drive, drive_box = _get_poisson_widget(name, tstop_widget,
                                                    layout, style)
         elif drive_type['new'] == 'Evoked':
-            drive, drive_box = _get_evoked_widget(drive_title, layout, style)
+            drive, drive_box = _get_evoked_widget(name, layout, style)
 
         if drive_type['new'] in ['Evoked', 'Poisson', 'Rhythmic']:
-            drive_titles.append(drive_title)
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
 
         accordion = Accordion(children=drive_boxes,
                               selected_index=len(drive_boxes) - 1)
-        for idx, this_title in enumerate(drive_titles):
-            accordion.set_title(idx, this_title)
+        for idx, drive in enumerate(drive_widgets):
+            accordion.set_title(idx, drive['name'])
         display(accordion)
 
 
@@ -298,13 +297,12 @@ def run_hnn_gui():
     params = read_params(params_fname)
 
     drive_widgets = list()
-    drive_titles = list()
     drive_boxes = list()
     variables = dict(net=None, dpls=None)
     variables['net'] = Network(params, add_drives_from_params=False)
 
     def _add_drive_widget(drive_type):
-        return add_drive_widget(drive_type, drive_titles, drive_boxes,
+        return add_drive_widget(drive_type, drive_boxes,
                                 drive_widgets, drives_out, tstop)
 
     def _run_button_clicked(b):
