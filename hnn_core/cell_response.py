@@ -426,7 +426,7 @@ def read_spikes(fname, gid_ranges=None):
             spike_gids += [list(spike_trial[:, 1].astype(int))]
 
             # Note that legacy HNN 'spk.txt' files don't contain a 3rd column
-            # for spike type. If reading a legacy version, validate that a
+            # for spike type. If reading a legacy version, ensure that a
             # gid_dict is provided.
             if spike_trial.shape[1] == 3:
                 spike_types += [list(spike_trial[:, 2].astype(str))]
@@ -435,11 +435,11 @@ def read_spikes(fname, gid_ranges=None):
                     raise ValueError("gid_ranges must be provided if spike "
                                      "types are unspecified in the "
                                      "file %s" % (file,))
-                spike_types += [[]]
+                spike_types += [list()]
         else:
-            spike_times += [[]]
-            spike_gids += [[]]
-            spike_types += [[]]
+            spike_times += [list()]
+            spike_gids += [list()]
+            spike_types += [list()]
 
     cell_response = CellResponse(spike_times=spike_times,
                                  spike_gids=spike_gids,
