@@ -1082,6 +1082,10 @@ class Network(object):
         """
         return plot_cells(net=self, ax=ax, show=show)
 
+    def set_cell_biophysics(self, property, cell_type=None, synapse=None,
+                            receptor=None):
+        pass
+
 
 class _Connectivity(dict):
     """A class for containing the connectivity details of the network
