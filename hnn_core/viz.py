@@ -533,6 +533,10 @@ def _plot_cell_morphology(ax, cell_type):
         ys = [pt[1] for pt in sec_pt]
         zs = [pt[2] for pt in sec_pt]
         ax.plot(xs, ys, zs, 'b.-')
+    ax.view_init(90, -90)
+    ax.axis('off')
+    ax.set_ylim((-100, 1200))
+    ax.set_xlim((-250, 150))
 
 
 def plot_cell_morphology(axes=None, cell_types=None, show=True):
