@@ -53,11 +53,7 @@ class BasketSingle(_Cell):
         return _secs_Basket()
 
     def set_geometry(self):
-        """Define geometry.
-
-        .. warning:: needed for gui representation of cell
-                     DO NOT need to call h.define_shape() explicitly!
-        """
+        """Define geometry."""
         sec_pts, sec_lens, sec_diams, _, _ = self.secs()
         for sec in [self.soma]:
             h.pt3dclear(sec=sec)
