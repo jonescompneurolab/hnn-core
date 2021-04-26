@@ -1111,8 +1111,9 @@ class Network(object):
         ----------
         axes : list of instance of Axes3D
             Matplotlib 3D axis
-        cell_types : 'L5Pyr' | 'L5Basket' | list
-            The cell types.
+        cell_types : str | list
+            The cell types. Valid cell types are 'L2Pyr', 'L5Pyr',
+            'L2Basket', and 'L5Basket'.
         show : bool
             If True, show the plot
 
