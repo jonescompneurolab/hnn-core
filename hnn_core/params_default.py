@@ -363,8 +363,24 @@ def get_L5Pyr_params_default():
     }
 
 
+def _secs_Basket():
+    """The geometry of default sections in L2/L5 Basket neuron."""
+    sec_pts = {
+        'soma': [[0, 0, 0], [0, 39., 0]],
+    }
+    sec_lens = {
+        'soma': 39.
+    }
+    sec_diams = {
+        'soma': 20.
+    }
+    sec_scales = None
+    topology = None
+    return sec_pts, sec_lens, sec_diams, sec_scales, topology
+
+
 def _secs_L2Pyr():
-    """The geometry of the default sections in the neuron."""
+    """The geometry of the default sections in L2Pyr neuron."""
     sec_pts = {
         'soma': [[-50, 765, 0], [-50, 778, 0]],
         'apical_trunk': [[-50, 778, 0], [-50, 813, 0]],
@@ -423,7 +439,7 @@ def _secs_L2Pyr():
 
 
 def _secs_L5Pyr():
-    """The geometry of the default sections in the Neuron."""
+    """The geometry of the default sections in L5Pyr Neuron."""
     sec_pts = {
         'soma': [[0, 0, 0], [0, 23, 0]],
         'apical_trunk': [[0, 23, 0], [0, 83, 0]],

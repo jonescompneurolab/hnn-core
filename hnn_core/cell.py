@@ -360,15 +360,3 @@ class _Cell(ABC):
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
         return np.sqrt(dx**2 + dy**2)
-
-    def shape_soma(self):
-        """Define 3D shape of soma.
-
-        .. warning:: needed for gui representation of cell
-                     DO NOT need to call h.define_shape() explicitly!
-        """
-        h.pt3dclear(sec=self.soma)
-        # h.ptdadd(x, y, z, diam) -- if this function is run, clobbers
-        # self.soma.diam set above
-        h.pt3dadd(0, 0, 0, self.diam, sec=self.soma)
-        h.pt3dadd(0, self.L, 0, self.diam, sec=self.soma)

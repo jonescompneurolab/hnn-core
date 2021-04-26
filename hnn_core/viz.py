@@ -6,7 +6,7 @@
 import numpy as np
 from itertools import cycle
 
-from .params_default import _secs_L2Pyr, _secs_L5Pyr
+from .params_default import _secs_L2Pyr, _secs_L5Pyr, _secs_Basket
 
 
 def _get_plot_data(dpl, layer, tmin, tmax):
@@ -525,6 +525,8 @@ def _plot_cell_morphology(ax, cell_type):
         sec_pts, _, _, _, _ = _secs_L2Pyr()
     elif cell_type == 'L5Pyr':
         sec_pts, _, _, _, _ = _secs_L5Pyr()
+    elif cell_type in ['L2Basket', 'L5Basket']:
+        sec_pts, _, _, _, _ = _secs_Basket()
     else:
         raise ValueError('Unrecognized cell type to plot')
 
@@ -546,8 +548,9 @@ def plot_cell_morphology(axes=None, cell_types=None, show=True):
     ----------
     axes : list of instance of Axes3D
         Matplotlib 3D axis
-    cell_types : 'L5Pyr' | 'L5Basket' | list
-        The cell types.
+    cell_types : str | list
+        The cell types. Valid cell types are 'L2Pyr', 'L5Pyr',
+        'L2Basket', and 'L5Basket'.
     show : bool
         If True, show the plot
 
@@ -560,7 +563,7 @@ def plot_cell_morphology(axes=None, cell_types=None, show=True):
     from mpl_toolkits.mplot3d import Axes3D  # noqa
 
     if cell_types is None:
-        cell_types = ['L2Pyr', 'L5Pyr']
+        cell_types = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']
     if isinstance(cell_types, str):
         cell_types = [cell_types]
 

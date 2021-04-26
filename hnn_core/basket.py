@@ -3,7 +3,10 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+from neuron import h
+
 from .cell import _Cell
+from .params_default import _secs_Basket
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
@@ -30,7 +33,7 @@ class BasketSingle(_Cell):
         # Define 3D shape and position of cell. By default neuron uses xy plane
         # for height and xz plane for depth. This is opposite for model as a
         # whole, but convention is followed in this function ease use of gui.
-        self.shape_soma()
+        self.set_geometry()
         self.synapses = dict()
 
     def set_biophysics(self):
@@ -45,6 +48,24 @@ class BasketSingle(_Cell):
             'Ra': 200.,
             'name': cell_name,
         }
+
+    def secs(self):
+        return _secs_Basket()
+
+    def set_geometry(self):
+        """Define geometry.
+
+        .. warning:: needed for gui representation of cell
+                     DO NOT need to call h.define_shape() explicitly!
+        """
+        sec_pts, sec_lens, sec_diams, _, _ = self.secs()
+        for sec in [self.soma]:
+            h.pt3dclear(sec=sec)
+            sec_name = sec.name().split('_', 1)[1]
+            for pt in sec_pts[sec_name]:
+                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
+            sec.L = sec_lens[sec_name]
+            sec.diam = sec_diams[sec_name]
 
     def get_sections(self):
         """Get sections."""
