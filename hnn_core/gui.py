@@ -318,6 +318,14 @@ def run_hnn_gui():
     def _update_plot_window(plot_type):
         return update_plot_window(variables, plot_out, plot_type)
 
+    def _delete_drives_clicked(b):
+        drives_out.clear_output()
+        # black magic: the following does not work
+        # global drive_widgets; drive_widgets = list()
+        while len(drive_widgets) > 0:
+            drive_widgets.pop()
+            drive_boxes.pop()
+
     # Output windows
     drives_out = Output()  # window to add new drives
     log_out = Output(layout={'border': '1px solid gray', 'height': '150px',
@@ -383,16 +391,18 @@ def run_hnn_gui():
     interactive(_update_plot_window, plot_type='current dipole')
     plot_dropdown.observe(_update_plot_window, 'value')
 
-    # Run and load button
+    # Run, delete drives and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
     style = {'button_color': '#8A2BE2', 'font_color': 'white'}
     load_button = FileUpload(accept='.json,.param', multiple=False,
                              style=style, description='Load network',
                              button_style='success')
+    delete_button = create_expanded_button('Delete drives', 'success', height='30px')
 
     load_button.observe(_on_upload_change)
     run_button.on_click(_run_button_clicked)
-    footer = HBox([run_button, load_button, plot_dropdown])
+    delete_button.on_click(_delete_drives_clicked)
+    footer = HBox([run_button, load_button, delete_button, plot_dropdown])
 
     right_sidebar = VBox([plot_out, log_out])
 
