@@ -397,7 +397,8 @@ def run_hnn_gui():
     load_button = FileUpload(accept='.json,.param', multiple=False,
                              style=style, description='Load network',
                              button_style='success')
-    delete_button = create_expanded_button('Delete drives', 'success', height='30px')
+    delete_button = create_expanded_button('Delete drives', 'success',
+                                           height='30px')
 
     load_button.observe(_on_upload_change)
     run_button.on_click(_run_button_clicked)
@@ -411,6 +412,6 @@ def run_hnn_gui():
                         left_sidebar=left_tab,
                         right_sidebar=right_sidebar,
                         footer=footer,
-                        pane_widths=['380px', 1, 1],
+                        pane_widths=['380px', '500px', '500px'],
                         pane_heights=[1, '500px', 1])
     return hnn_gui
