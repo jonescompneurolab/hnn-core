@@ -29,23 +29,20 @@ def create_expanded_button(description, button_style, height):
                   style=style)
 
 
-def _get_sliders(variables, param_keys):
+def _get_sliders(params, param_keys):
     """Get sliders"""
     style = {'description_width': '150px'}
     sliders = list()
     for d in param_keys:
         slider = FloatLogSlider(
-            value=variables['net']._params[d], min=-5, max=1, step=0.2,
+            value=params[d], min=-5, max=1, step=0.2,
             description=d.split('gbar_')[1],
             disabled=False, continuous_update=False, orientation='horizontal',
             readout=True, readout_format='.2e', style=style)
         sliders.append(slider)
 
     def _update_params(variables, **updates):
-        variables['net']._params.update(dict(**updates))
-        variables['net'].connectivity = list()
-        # XXX: hack until there is a proper API
-        variables['net'].self._set_default_connections()
+        params.update(dict(**updates))
 
     interactive_output(_update_params, {s.description: s for s in sliders})
     return sliders
@@ -207,7 +204,7 @@ def update_plot_window(variables, plot_out, plot_type):
             variables['net'].plot_cells()
 
 
-def on_upload_change(change, sliders, variables):
+def on_upload_change(change, sliders, params):
     if len(change['owner'].value) == 0:
         return
 
@@ -218,23 +215,25 @@ def on_upload_change(change, sliders, variables):
 
     ext = op.splitext(params_fname)[1]
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    params = read_func[ext](param_data)
+    params_network = read_func[ext](param_data)
 
     for slider in sliders:
         for sl in slider:
             key = 'gbar_' + sl.description
-            sl.value = params[key]
+            sl.value = params_network[key]
 
-    external_drives = variables['net'].external_drives.copy()
-    variables['net'] = Network(params, add_drives_from_params=False)
-    variables['net'].external_drives = external_drives.copy()
+    params.update(params_network)
 
 
 def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
-                       tstop, b):
+                       tstop, params, b):
     """Run the simulation and plot outputs."""
     plot_out.clear_output()
     log_out.clear_output()
+    with log_out:
+        params['dt'] = tstep.value
+        params['tstop'] = tstop.value
+        variables['net'] = Network(params, add_drives_from_params=False)
     for drive in drive_widgets:
         weights_ampa = {k: v.value for k, v in drive['weights_ampa'].items()}
         weights_nmda = {k: v.value for k, v in drive['weights_nmda'].items()}
@@ -288,11 +287,6 @@ def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
                 seedcore=drive['seedcore'].value
             )
     with log_out:
-        # XXX: hack, shouldn't modify variables['net']
-        variables['net']._params['dt'] = tstep.value
-        variables['net']._params['tstop'] = tstop.value
-        variables['net'].cell_response._times = np.arange(
-            0., tstop.value + tstep.value, tstep.value)
         variables['dpls'] = simulate_dipole(variables['net'], n_trials=1)
     with plot_out:
         variables['dpls'][0].plot()
@@ -309,7 +303,6 @@ def run_hnn_gui():
     drive_widgets = list()
     drive_boxes = list()
     variables = dict(net=None, dpls=None)
-    variables['net'] = Network(params, add_drives_from_params=False)
 
     def _add_drive_widget(drive_type):
         return add_drive_widget(drive_type, drive_boxes,
@@ -317,10 +310,10 @@ def run_hnn_gui():
 
     def _run_button_clicked(b):
         return run_button_clicked(log_out, plot_out, drive_widgets, variables,
-                                  tstep, tstop, b)
+                                  tstep, tstop, params, b)
 
     def _on_upload_change(change):
-        return on_upload_change(change, sliders, variables)
+        return log_out.capture(on_upload_change(change, sliders, params))
 
     def _update_plot_window(plot_type):
         return update_plot_window(variables, plot_out, plot_type)
@@ -341,16 +334,16 @@ def run_hnn_gui():
     simulation_box = VBox([tstop, tstep])
 
     # Sliders to change local-connectivity params
-    sliders = [_get_sliders(variables,
+    sliders = [_get_sliders(params,
                ['gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
                 'gbar_L2Basket_L2Pyr_gabaa', 'gbar_L2Basket_L2Pyr_gabab']),
-               _get_sliders(variables,
+               _get_sliders(params,
                ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr',
                 'gbar_L5Pyr_L5Pyr_ampa', 'gbar_L5Pyr_L5Pyr_nmda',
                 'gbar_L5Basket_L5Pyr_gabaa', 'gbar_L5Basket_L5Pyr_gabab']),
-               _get_sliders(variables,
+               _get_sliders(params,
                ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
-               _get_sliders(variables,
+               _get_sliders(params,
                ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr'])]
 
     # accordians to group local-connectivity by cell type
