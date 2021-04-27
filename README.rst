@@ -13,6 +13,10 @@ hnn-core
 	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
 	:alt: Test coverage
 
+.. image:: https://user-images.githubusercontent.com/15852194/115123685-2df1ef00-9f8c-11eb-8f3b-663486466193.png
+   :target: https://user-images.githubusercontent.com/15852194/115123685-2df1ef00-9f8c-11eb-8f3b-663486466193.png
+   :alt: HNN-core GUI
+
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
 It is early Work in Progress. Contributors are very welcome.
