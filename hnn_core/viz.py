@@ -520,25 +520,36 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
     return ax.get_figure()
 
 
+def _linewidth_from_data_units(ax, linewidth):
+    # see: https://stackoverflow.com/a/35501485
+    fig = ax.get_figure()
+    length = fig.bbox_inches.width * ax.get_position().width
+    value_range = np.diff(ax.get_xlim())[0]
+    length *= 72  # Convert length to points
+    # Scale linewidth to value range
+    return linewidth * (length / value_range)
+
+
 def _plot_cell_morphology(ax, cell_type):
     if cell_type == 'L2Pyr':
-        sec_pts, _, _, _, _ = _secs_L2Pyr()
+        sec_pts, _, sec_diams, _, _ = _secs_L2Pyr()
     elif cell_type == 'L5Pyr':
-        sec_pts, _, _, _, _ = _secs_L5Pyr()
+        sec_pts, _, sec_diams, _, _ = _secs_L5Pyr()
     elif cell_type in ['L2Basket', 'L5Basket']:
-        sec_pts, _, _, _, _ = _secs_Basket()
+        sec_pts, _, sec_diams, _, _ = _secs_Basket()
     else:
         raise ValueError('Unrecognized cell type to plot')
 
-    for sec_pt in sec_pts.values():
-        xs = [pt[0] for pt in sec_pt]
-        ys = [pt[1] for pt in sec_pt]
-        zs = [pt[2] for pt in sec_pt]
-        ax.plot(xs, ys, zs, 'b.-')
-    ax.view_init(90, -90)
-    ax.axis('off')
     ax.set_ylim((-100, 1200))
     ax.set_xlim((-250, 150))
+    for sec in sec_pts:
+        linewidth = _linewidth_from_data_units(ax, sec_diams[sec])
+        xs = [pt[0] for pt in sec_pts[sec]]
+        ys = [pt[1] for pt in sec_pts[sec]]
+        zs = [pt[2] for pt in sec_pts[sec]]
+        ax.plot(xs, ys, zs, 'b-', linewidth=linewidth)
+    ax.view_init(90, -90)
+    ax.axis('off')
 
 
 def plot_cell_morphology(axes=None, cell_types=None, show=True):
