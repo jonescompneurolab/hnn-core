@@ -383,33 +383,26 @@ class L5Pyr(Pyr):
         self.soma.gl_hh2 = p_all['L5Pyr_soma_gl_hh2']
         self.soma.el_hh2 = p_all['L5Pyr_soma_el_hh2']
 
-        # insert 'ca' mechanism
-        # Units: pS/um^2
-        self.soma.insert('ca')
-        self.soma.gbar_ca = p_all['L5Pyr_soma_gbar_ca']
-
         # insert 'cad' mechanism
         # units of tau are ms
         self.soma.insert('cad')
         self.soma.taur_cad = p_all['L5Pyr_soma_taur_cad']
 
-        # insert 'kca' mechanism
-        # units are S/cm^2?
-        self.soma.insert('kca')
-        self.soma.gbar_kca = p_all['L5Pyr_soma_gbar_kca']
-
-        # Insert 'km' mechanism
-        # Units: pS/um^2
-        self.soma.insert('km')
-        self.soma.gbar_km = p_all['L5Pyr_soma_gbar_km']
-
-        # insert 'cat' mechanism
-        self.soma.insert('cat')
-        self.soma.gbar_cat = p_all['L5Pyr_soma_gbar_cat']
-
-        # insert 'ar' mechanism
         self.soma.insert('ar')
-        self.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
+        self.soma.taur_cad = p_all['L5Pyr_soma_gbar_ar']
+
+        mechanisms = ['ca', 'kca', 'km', 'cat']
+        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', '??']
+        for mechanism in mechanisms:
+            self.soma.insert(mechanism)
+            attr = f'gbar_{mechanism}'
+            setattr(self.soma, attr, p_all[f'L5Pyr_soma_{attr}'])
+
+        for sec in self.dends.values():
+            for mechanism in mechanisms:
+                sec.insert(mechanism)
+                attr = f'gbar_{mechanism}'
+                setattr(sec, attr, p_all[f'L5Pyr_dend_{attr}'])
 
         # set dend biophysics not specified in Pyr()
         for key in self.dends:
@@ -420,27 +413,9 @@ class L5Pyr(Pyr):
             self.dends[key].gnabar_hh2 = p_all['L5Pyr_dend_gnabar_hh2']
             self.dends[key].el_hh2 = p_all['L5Pyr_dend_el_hh2']
 
-            # Insert 'ca' mechanims
-            # Units: pS/um^2
-            self.dends[key].insert('ca')
-            self.dends[key].gbar_ca = p_all['L5Pyr_dend_gbar_ca']
-
             # Insert 'cad' mechanism
             self.dends[key].insert('cad')
             self.dends[key].taur_cad = p_all['L5Pyr_dend_taur_cad']
-
-            # Insert 'kca' mechanism
-            self.dends[key].insert('kca')
-            self.dends[key].gbar_kca = p_all['L5Pyr_dend_gbar_kca']
-
-            # Insert 'km' mechansim
-            # Units: pS/um^2
-            self.dends[key].insert('km')
-            self.dends[key].gbar_km = p_all['L5Pyr_dend_gbar_km']
-
-            # insert 'cat' mechanism
-            self.dends[key].insert('cat')
-            self.dends[key].gbar_cat = p_all['L5Pyr_dend_gbar_cat']
 
             # insert 'ar' mechanism
             self.dends[key].insert('ar')
