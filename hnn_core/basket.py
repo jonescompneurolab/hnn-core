@@ -3,8 +3,6 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
-from neuron import h
-
 from .cell import _Cell
 from .params_default import _secs_Basket
 

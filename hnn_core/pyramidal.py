@@ -18,6 +18,22 @@ from .params_default import (get_L2Pyr_params_default,
 # Units for gbar: S/cm^2 unless otherwise noted
 
 
+def _flat_to_nested(params, prefix, level1_keys, level2_keys):
+    """Convert a flat dictionary to a nested dictionary."""
+    nested_dict = dict()
+    for level1_key in level1_keys:
+        level2_dict = dict()
+        for key in level2_keys:
+            if key in ['Ra', 'cm']:
+                middle = 'dend'
+            else:
+                # map apicaltrunk -> apical_trunk etc.
+                middle = level1_key.replace('_', '')
+            level2_dict[key] = params[f'{prefix}_{middle}_{key}']
+        nested_dict[level1_key] = level2_dict
+    return nested_dict
+
+
 class Pyr(_Cell):
     """Pyramidal neuron.
 
@@ -81,7 +97,10 @@ class Pyr(_Cell):
         self.list_dend = []
         self.celltype = celltype
 
-        p_dend = self._get_dend_props(p_all)
+        level2_keys = ['L', 'diam', 'Ra', 'cm']
+        p_dend = _flat_to_nested(p_all, prefix=self.name,
+                                 level1_keys=self.section_names(),
+                                 level2_keys=level2_keys)
         p_syn = self._get_syn_props(p_all)
 
         # Geometry
@@ -157,63 +176,6 @@ class Pyr(_Cell):
             if key in self.dends:
                 ls.append(self.dends[key])
         return ls
-
-    def _get_dend_props(self, p_all):
-        """Returns hardcoded dendritic properties."""
-        props = {
-            'apical_trunk': {
-                'L': p_all['%s_apicaltrunk_L' % self.name],
-                'diam': p_all['%s_apicaltrunk_diam' % self.name],
-                'cm': p_all['%s_dend_cm' % self.name],
-                'Ra': p_all['%s_dend_Ra' % self.name],
-            },
-            'apical_1': {
-                'L': p_all['%s_apical1_L' % self.name],
-                'diam': p_all['%s_apical1_diam' % self.name],
-                'cm': p_all['%s_dend_cm' % self.name],
-                'Ra': p_all['%s_dend_Ra' % self.name],
-            },
-            'apical_tuft': {
-                'L': p_all['%s_apicaltuft_L' % self.name],
-                'diam': p_all['%s_apicaltuft_diam' % self.name],
-                'cm': p_all['%s_dend_cm' % self.name],
-                'Ra': p_all['%s_dend_Ra' % self.name],
-            },
-            'apical_oblique': {
-                'L': p_all['%s_apicaloblique_L' % self.name],
-                'diam': p_all['%s_apicaloblique_diam' % self.name],
-                'cm': p_all['%s_dend_cm' % self.name],
-                'Ra': p_all['%s_dend_Ra' % self.name],
-            },
-            'basal_1': {
-                'L': p_all['%s_basal1_L' % self.name],
-                'diam': p_all['%s_basal1_diam' % self.name],
-                'cm': p_all['%s_dend_cm' % self.name],
-                'Ra': p_all['%s_dend_Ra' % self.name],
-            },
-            'basal_2': {
-                'L': p_all['%s_basal2_L' % self.name],
-                'diam': p_all['%s_basal2_diam' % self.name],
-                'cm': p_all['%s_dend_cm' % self.name],
-                'Ra': p_all['%s_dend_Ra' % self.name],
-            },
-            'basal_3': {
-                'L': p_all['%s_basal3_L' % self.name],
-                'diam': p_all['%s_basal3_diam' % self.name],
-                'cm': p_all['%s_dend_cm' % self.name],
-                'Ra': p_all['%s_dend_Ra' % self.name],
-            },
-        }
-        if self.name == 'L5Pyr':
-            props.update({
-                'apical_2': {
-                    'L': p_all['L5Pyr_apical2_L'],
-                    'diam': p_all['L5Pyr_apical2_diam'],
-                    'cm': p_all['L5Pyr_dend_cm'],
-                    'Ra': p_all['L5Pyr_dend_Ra'],
-                },
-            })
-        return props
 
     def _get_syn_props(self, p_all):
         return {
@@ -303,6 +265,10 @@ class L2Pyr(Pyr):
     def __init__(self, pos=None, override_params=None, gid=None):
         Pyr.__init__(self, pos, 'L2_pyramidal', override_params, gid=gid)
 
+    def section_names(self):
+        return ['apical_trunk', 'apical_1', 'apical_tuft',
+                'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+
     def _get_soma_props(self, pos, p_all):
         """Hardcoded somatic properties."""
         return {
@@ -388,6 +354,10 @@ class L5Pyr(Pyr):
         """Get default L5Pyr params and update them with
             corresponding params in p."""
         Pyr.__init__(self, pos, 'L5_pyramidal', override_params, gid=gid)
+
+    def section_names(self):
+        return ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
+                'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
 
     def secs(self):
         return _secs_L5Pyr()
