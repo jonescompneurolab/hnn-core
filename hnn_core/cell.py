@@ -108,6 +108,8 @@ class _Cell(ABC):
         # variable for the list_IClamp
         self.list_IClamp = None
         self.soma_props = soma_props
+        self.list_dend = list()
+        self.dends = list()
         self.create_soma()
         self.rec_v = h.Vector()
         self.rec_i = dict()
@@ -360,3 +362,30 @@ class _Cell(ABC):
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
         return np.sqrt(dx**2 + dy**2)
+
+    def set_geometry(self):
+        """Define geometry."""
+        # Define 3D shape and position of cell. By default neuron uses xy plane
+        # for height and xz plane for depth. This is opposite for model as a
+        # whole, but convention is followed in this function ease use of gui.
+        sec_pts, sec_lens, sec_diams, _, topology = self.secs()
+        for sec in [self.soma] + self.list_dend:
+            h.pt3dclear(sec=sec)
+            sec_name = sec.name().split('_', 1)[1]
+            for pt in sec_pts[sec_name]:
+                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
+            sec.L = sec_lens[sec_name]
+            sec.diam = sec_diams[sec_name]
+
+        if topology is None:
+            topology = list()
+
+        # Connects sections of THIS cell together.
+        for connection in topology:
+            # XXX: risky to use self.soma as default. Unfortunately there isn't
+            # a dictionary with all the sections (including soma)
+            parent_sec = self.dends.get(connection[0], self.soma)
+            parent_loc = connection[1]
+            child_sec = self.dends.get(connection[2], self.soma)
+            child_loc = connection[3]
+            child_sec.connect(parent_sec, parent_loc, child_loc)

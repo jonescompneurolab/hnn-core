@@ -119,27 +119,7 @@ class Pyr(_Cell):
             * cm: membrane capacitance in micro-Farads
             * Ra: axial resistivity in ohm-cm
         """
-        sec_pts, sec_lens, sec_diams, _, topology = self.secs()
-
-        # Connects sections of THIS cell together.
-        for connection in topology:
-            # XXX: risky to use self.soma as default. Unfortunately there isn't
-            # a dictionary with all the sections (including soma)
-            parent_sec = self.dends.get(connection[0], self.soma)
-            parent_loc = connection[1]
-            child_sec = self.dends.get(connection[2], self.soma)
-            child_loc = connection[3]
-            child_sec.connect(parent_sec, parent_loc, child_loc)
-
-        # Neuron shape based on Jones et al., 2009
-        for sec in [self.soma] + self.list_dend:
-            h.pt3dclear(sec=sec)
-            sec_name = sec.name().split('_', 1)[1]
-            for pt in sec_pts[sec_name]:
-                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
-            sec.L = sec_lens[sec_name]
-            sec.diam = sec_diams[sec_name]
-
+        _Cell.set_geometry(self)
         # resets length,diam,etc. based on param specification
         for key in p_dend:
             # set dend props
