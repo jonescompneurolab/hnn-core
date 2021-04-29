@@ -1,0 +1,6 @@
+﻿hnn\_core.viz.plot\_cell\_morphology
+====================================
+
+.. currentmodule:: hnn_core.viz
+
+.. autofunction:: plot_cell_morphology

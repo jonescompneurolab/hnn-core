@@ -370,19 +370,31 @@ relate to within-network connections and the cell geometry.
 Let us first create our network from the params file and visualize the cells
 inside it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-48
+.. GENERATED FROM PYTHON SOURCE LINES 45-49
 
 .. code-block:: default
 
     net = Network(params)
     net.plot_cells()
+    net.plot_cell_morphology()
 
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
-    :alt: plot simulate evoked
-    :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_001.png
+          :alt: plot simulate evoked
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_002.png
+          :alt: L2Pyr, L5Pyr, L2Basket, L5Basket
+          :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -392,11 +404,11 @@ inside it.
  .. code-block:: none
 
 
-    <Figure size 640x480 with 1 Axes>
+    [<Axes3DSubplot:title={'center':'L2Pyr'}>, <Axes3DSubplot:title={'center':'L5Pyr'}>, <Axes3DSubplot:title={'center':'L2Basket'}>, <Axes3DSubplot:title={'center':'L5Basket'}>]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-57
+.. GENERATED FROM PYTHON SOURCE LINES 50-58
 
 The network of cells is now defined, to which we add external drives as
 required. Weights are prescribed separately for AMPA and NMDA receptors
@@ -407,11 +419,11 @@ drive types include the following (click on the links for documentation):
 - :meth:`hnn_core.Network.add_poisson_drive`
 - :meth:`hnn_core.Network.add_bursty_drive`
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-60
+.. GENERATED FROM PYTHON SOURCE LINES 60-61
 
 First, we add a distal evoked drive
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-71
+.. GENERATED FROM PYTHON SOURCE LINES 61-72
 
 .. code-block:: default
 
@@ -433,11 +445,11 @@ First, we add a distal evoked drive
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-73
+.. GENERATED FROM PYTHON SOURCE LINES 73-74
 
 Then, we add two proximal drives
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-92
+.. GENERATED FROM PYTHON SOURCE LINES 74-93
 
 .. code-block:: default
 
@@ -467,7 +479,7 @@ Then, we add two proximal drives
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-98
+.. GENERATED FROM PYTHON SOURCE LINES 94-99
 
 Now let's simulate the dipole, running 2 trials with the
 :class:`~hnn_core.parallel_backends.Joblib` backend.
@@ -475,7 +487,7 @@ To run them in parallel we could set ``n_jobs`` to equal the number of
 trials. The ``Joblib`` backend allows running the simulations in parallel
 across trials.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-103
+.. GENERATED FROM PYTHON SOURCE LINES 99-104
 
 .. code-block:: default
 
@@ -540,12 +552,12 @@ across trials.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-106
+.. GENERATED FROM PYTHON SOURCE LINES 105-107
 
 and then plot the amplitudes of the simulated aggregate dipole moments over
 time
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-113
+.. GENERATED FROM PYTHON SOURCE LINES 107-114
 
 .. code-block:: default
 
@@ -559,7 +571,7 @@ time
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_002.png
+.. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_003.png
     :alt: Aggregate (L2 + L5)
     :class: sphx-glr-single-img
 
@@ -575,7 +587,7 @@ time
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-120
+.. GENERATED FROM PYTHON SOURCE LINES 115-121
 
 Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens. This is achieved by setting the parameter
@@ -584,7 +596,7 @@ a clone of the network defined above, and then modify the drive dynamics for
 each drive. Making a copy removes any existing outputs from the network
 such as spiking information and voltages at the soma.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-126
+.. GENERATED FROM PYTHON SOURCE LINES 121-127
 
 .. code-block:: default
 
@@ -601,11 +613,11 @@ such as spiking information and voltages at the soma.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-128
+.. GENERATED FROM PYTHON SOURCE LINES 128-129
 
 You may interrogate current values defining the spike event time dynamics by
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-130
+.. GENERATED FROM PYTHON SOURCE LINES 129-131
 
 .. code-block:: default
 
@@ -626,11 +638,11 @@ You may interrogate current values defining the spike event time dynamics by
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-132
+.. GENERATED FROM PYTHON SOURCE LINES 132-133
 
 Finally, let's simulate this network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-137
+.. GENERATED FROM PYTHON SOURCE LINES 133-138
 
 .. code-block:: default
 
@@ -647,13 +659,13 @@ Finally, let's simulate this network.
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_003.png
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_004.png
           :alt: Aggregate (L2 + L5)
           :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_004.png
+      .. image:: /auto_examples/images/sphx_glr_plot_simulate_evoked_005.png
           :alt: plot simulate evoked
           :class: sphx-glr-multi-img
 
@@ -693,7 +705,7 @@ Finally, let's simulate this network.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 4 minutes  9.244 seconds)
+   **Total running time of the script:** ( 5 minutes  17.930 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

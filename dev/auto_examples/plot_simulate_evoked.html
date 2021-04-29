@@ -415,11 +415,17 @@ relate to within-network connections and the cell geometry.</p>
 inside it.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="n">net</span><span class="o">.</span><span class="n">plot_cells</span><span class="p">()</span>
+<span class="n">net</span><span class="o">.</span><span class="n">plot_cell_morphology</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="plot simulate evoked" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
+<ul class="sphx-glr-horizontal">
+<li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
+</li>
+<li><img alt="L2Pyr, L5Pyr, L2Basket, L5Basket" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
+</li>
+</ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 1 Axes&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L2Pyr&#39;}&gt;, &lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L5Pyr&#39;}&gt;, &lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L2Basket&#39;}&gt;, &lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L5Basket&#39;}&gt;]
 </pre></div>
 </div>
 <p>The network of cells is now defined, to which we add external drives as
@@ -531,7 +537,7 @@ time</p>
                                    <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;evprox&#39;</span><span class="p">,</span> <span class="s1">&#39;evdist&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
+<img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_simulate_evoked_003.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
 </pre></div>
@@ -565,9 +571,9 @@ such as spiking information and voltages at the soma.</p>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="Aggregate (L2 + L5)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_003.png" />
+<li><img alt="Aggregate (L2 + L5)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_004.png" />
 </li>
-<li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_004.png" />
+<li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_005.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
@@ -596,7 +602,7 @@ Simulation time: 160.0 ms...
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  9.244 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  17.930 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>

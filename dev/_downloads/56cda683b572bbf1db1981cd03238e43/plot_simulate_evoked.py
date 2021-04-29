@@ -44,6 +44,7 @@ print(params['L2Pyr_soma*'])
 # inside it.
 net = Network(params)
 net.plot_cells()
+net.plot_cell_morphology()
 
 ###############################################################################
 # The network of cells is now defined, to which we add external drives as
