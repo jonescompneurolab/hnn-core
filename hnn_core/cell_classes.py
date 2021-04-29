@@ -17,6 +17,7 @@ from .params_default import (get_L2Pyr_params_default,
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
+# units for taur: ms
 
 
 def _flat_to_nested(params, cell_type, level1_keys, level2_keys):
@@ -345,9 +346,6 @@ class L2Pyr(Pyr):
     def secs(self):
         return _secs_L2Pyr()
 
-# Units for e: mV
-# Units for gbar: S/cm^2 unless otherwise noted
-# units for taur: ms
 
 class L5Pyr(Pyr):
     """Layer 5 Pyramidal class.

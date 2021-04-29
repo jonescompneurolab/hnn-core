@@ -176,8 +176,6 @@ class _Cell(ABC):
         # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
         soma_props = self.soma_props
 
-        self.L = soma_props['L']
-        self.diam = soma_props['diam']
         self.pos = soma_props['pos']
 
         self.soma = h.Section(cell=self, name=soma_props['name'] + '_soma')
