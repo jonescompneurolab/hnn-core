@@ -489,8 +489,8 @@ class NetworkBuilder(object):
     def aggregate_data(self):
         """Aggregate somatic currents, voltages, and dipoles."""
         for cell in self.cells:
-            if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
-                self.dipoles[cell.celltype].add(cell.dipole)
+            if cell.name in ('L5Pyr', 'L2Pyr'):
+                self.dipoles[_long_name(cell.name)].add(cell.dipole)
 
             self._vsoma[cell.gid] = cell.rec_v
             self._isoma[cell.gid] = cell.rec_i
@@ -503,9 +503,9 @@ class NetworkBuilder(object):
             seclist.wholetree(sec=cell.soma)
             for sect in seclist:
                 for seg in sect:
-                    if cell.celltype == 'L2_pyramidal':
+                    if cell.name == 'L2Pyr':
                         seg.v = -71.46
-                    elif cell.celltype == 'L5_pyramidal':
+                    elif cell.name == 'L5Pyr':
                         if sect.name() == 'L5Pyr_apical_1':
                             seg.v = -71.32
                         elif sect.name() == 'L5Pyr_apical_2':
@@ -514,9 +514,9 @@ class NetworkBuilder(object):
                             seg.v = -67.30
                         else:
                             seg.v = -72.
-                    elif cell.celltype == 'L2_basket':
+                    elif cell.name == 'L2Basket':
                         seg.v = -64.9737
-                    elif cell.celltype == 'L5_basket':
+                    elif cell.name == 'L5Basket':
                         seg.v = -64.9737
 
     def move_cells_to_pos(self):

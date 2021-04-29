@@ -143,7 +143,6 @@ class L2Basket(BasketSingle):
         # BasketSingle.__init__(self, pos, L, diam, Ra, cm)
         # Note: Basket cell properties set in BasketSingle())
         BasketSingle.__init__(self, pos, cell_name='L2Basket', gid=gid)
-        self.celltype = 'L2_basket'
         self.sect_loc = dict(proximal=['soma'], distal=['soma'])
 
 
@@ -163,7 +162,6 @@ class L5Basket(BasketSingle):
     def __init__(self, pos, gid=None):
         # Note: Cell properties are set in BasketSingle()
         BasketSingle.__init__(self, pos, cell_name='L5Basket', gid=gid)
-        self.celltype = 'L5_basket'
         self.sect_loc = dict(proximal=['soma'], distal=[])
 
 
@@ -174,8 +172,6 @@ class Pyr(_Cell):
     ----------
     pos : tuple
         Coordinates of cell soma in xyz-space
-    celltype : str
-        Either 'L2_Pyramidal' or 'L5_Pyramidal'
     override_params : dict or None (optional)
         Parameters specific to L2 pyramidal neurons to override the default set
     gid : int or None (optional)
@@ -190,8 +186,6 @@ class Pyr(_Cell):
     sect_loc : dict of list
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.
-    celltype : str
-        The cell type, 'L5_Pyramidal' or 'L2_Pyramidal'
     synapses : dict
         The synapses that the cell can use for connections.
     """
@@ -219,8 +213,6 @@ class Pyr(_Cell):
 
         _Cell.__init__(self, soma_props, gid=gid)
         self.create_soma()
-
-        self.celltype = celltype
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
         p_dend = _flat_to_nested(p_all, cell_type=self.name,
