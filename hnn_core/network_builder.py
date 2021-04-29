@@ -13,8 +13,7 @@ if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
-from .pyramidal import L2Pyr, L5Pyr
-from .basket import L2Basket, L5Basket
+from .cell_classes import L2Pyr, L5Pyr, L2Basket, L5Basket
 from .params import _long_name, _short_name
 from copy import deepcopy
 
