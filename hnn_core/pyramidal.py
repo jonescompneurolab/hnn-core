@@ -286,37 +286,21 @@ class L2Pyr(Pyr):
     def set_biophysics(self, p_all):
         """Adds biophysics to soma."""
 
-        # Insert 'hh2' mechanism
-        self.soma.insert('hh2')
-        self.soma.gkbar_hh2 = p_all['L2Pyr_soma_gkbar_hh2']
-        self.soma.gl_hh2 = p_all['L2Pyr_soma_gl_hh2']
-        self.soma.el_hh2 = p_all['L2Pyr_soma_el_hh2']
-        self.soma.gnabar_hh2 = p_all['L2Pyr_soma_gnabar_hh2']
+        mechanisms = {'km': ['gbar_km'],
+                      'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                              'gl_hh2', 'el_hh2']}
 
-        # Insert 'km' mechanism
-        # Units: pS/um^2
-        self.soma.insert('km')
-        self.soma.gbar_km = p_all['L2Pyr_soma_gbar_km']
-
-        # set dend biophysics
-        # iterate over keys in self.dends and set biophysics for each dend
-        for key in self.dends:
-            # neuron syntax is used to set values for mechanisms
-            # sec.gbar_mech = x sets value of gbar for mech to x for all segs
-            # in a section. This method is significantly faster than using
-            # a for loop to iterate over all segments to set mech values
-
-            # Insert 'hh' mechanism
-            self.dends[key].insert('hh2')
-            self.dends[key].gkbar_hh2 = p_all['L2Pyr_dend_gkbar_hh2']
-            self.dends[key].gl_hh2 = p_all['L2Pyr_dend_gl_hh2']
-            self.dends[key].gnabar_hh2 = p_all['L2Pyr_dend_gnabar_hh2']
-            self.dends[key].el_hh2 = p_all['L2Pyr_dend_el_hh2']
-
-            # Insert 'km' mechanism
-            # Units: pS/um^2
-            self.dends[key].insert('km')
-            self.dends[key].gbar_km = p_all['L2Pyr_dend_gbar_km']
+        # neuron syntax is used to set values for mechanisms
+        # sec.gbar_mech = x sets value of gbar for mech to x for all segs
+        # in a section. This method is significantly faster than using
+        # a for loop to iterate over all segments to set mech values
+        for sec in self.get_sections():
+            sec_name = sec.name().split('_', 1)[1]
+            sec_name = 'soma' if sec_name == 'soma' else 'dend'
+            for key, attrs in mechanisms.items():
+                sec.insert(key)
+                for attr in attrs:
+                    setattr(sec, attr, p_all[f'L2Pyr_{sec_name}_{attr}'])
 
 
 # Units for e: mV
@@ -376,47 +360,28 @@ class L5Pyr(Pyr):
     def set_biophysics(self, p_all):
         "Set the biophysics for the default Pyramidal cell."
 
-        # Insert 'hh2' mechanism
-        self.soma.insert('hh2')
-        self.soma.gkbar_hh2 = p_all['L5Pyr_soma_gkbar_hh2']
-        self.soma.gnabar_hh2 = p_all['L5Pyr_soma_gnabar_hh2']
-        self.soma.gl_hh2 = p_all['L5Pyr_soma_gl_hh2']
-        self.soma.el_hh2 = p_all['L5Pyr_soma_el_hh2']
+        mechanisms = {'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                              'gl_hh2', 'el_hh2'],
+                      'ca': ['gbar_ca'],
+                      'cad': ['taur_cad'],
+                      'kca': ['gbar_kca'],
+                      'km': ['gbar_km'],
+                      'cat': ['gbar_cat']}
 
-        # insert 'cad' mechanism
-        # units of tau are ms
-        self.soma.insert('cad')
-        self.soma.taur_cad = p_all['L5Pyr_soma_taur_cad']
+        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
+        for sec in self.get_sections():
+            sec_name = sec.name().split('_', 1)[1]
+            sec_name = 'soma' if sec_name == 'soma' else 'dend'
+            for key, attrs in mechanisms.items():
+                sec.insert(key)
+                for attr in attrs:
+                    setattr(sec, attr, p_all[f'L5Pyr_{sec_name}_{attr}'])
 
         self.soma.insert('ar')
-        self.soma.taur_cad = p_all['L5Pyr_soma_gbar_ar']
-
-        mechanisms = ['ca', 'kca', 'km', 'cat']
-        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', '??']
-        for mechanism in mechanisms:
-            self.soma.insert(mechanism)
-            attr = f'gbar_{mechanism}'
-            setattr(self.soma, attr, p_all[f'L5Pyr_soma_{attr}'])
-
-        for sec in self.dends.values():
-            for mechanism in mechanisms:
-                sec.insert(mechanism)
-                attr = f'gbar_{mechanism}'
-                setattr(sec, attr, p_all[f'L5Pyr_dend_{attr}'])
+        self.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
 
         # set dend biophysics not specified in Pyr()
         for key in self.dends:
-            # Insert 'hh2' mechanism
-            self.dends[key].insert('hh2')
-            self.dends[key].gkbar_hh2 = p_all['L5Pyr_dend_gkbar_hh2']
-            self.dends[key].gl_hh2 = p_all['L5Pyr_dend_gl_hh2']
-            self.dends[key].gnabar_hh2 = p_all['L5Pyr_dend_gnabar_hh2']
-            self.dends[key].el_hh2 = p_all['L5Pyr_dend_el_hh2']
-
-            # Insert 'cad' mechanism
-            self.dends[key].insert('cad')
-            self.dends[key].taur_cad = p_all['L5Pyr_dend_taur_cad']
-
             # insert 'ar' mechanism
             self.dends[key].insert('ar')
 
