@@ -127,8 +127,8 @@ class BasketSingle(_Cell):
             self.soma(0.5), e=0., tau1=1., tau2=20.)
 
 
-class L2Basket(BasketSingle):
-    """Class for layer 2 basket cells.
+def basket(pos, cell_name='L2Basket', gid=None):
+    """Get layer 2 basket cells.
 
     Parameters
     ----------
@@ -138,32 +138,18 @@ class L2Basket(BasketSingle):
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
         yet attached to a network. Once the GID is set, it cannot be changed.
+
+    Returns
+    -------
+    cell : instance of BasketSingle
+        The basket cell.
     """
-
-    def __init__(self, pos, gid=None):
-        # BasketSingle.__init__(self, pos, L, diam, Ra, cm)
-        # Note: Basket cell properties set in BasketSingle())
-        BasketSingle.__init__(self, pos, cell_name='L2Basket', gid=gid)
-        self.sect_loc = dict(proximal=['soma'], distal=['soma'])
-
-
-class L5Basket(BasketSingle):
-    """Class for layer 5 basket cells.
-
-    Parameters
-    ----------
-    pos : tuple
-        Coordinates of cell soma in xyz-space
-    gid : int or None (optional)
-        Each cell in a network is uniquely identified by it's "global ID": GID.
-        The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed.
-    """
-
-    def __init__(self, pos, gid=None):
-        # Note: Cell properties are set in BasketSingle()
-        BasketSingle.__init__(self, pos, cell_name='L5Basket', gid=gid)
-        self.sect_loc = dict(proximal=['soma'], distal=[])
+    cell = BasketSingle(pos, cell_name=cell_name, gid=gid)
+    if cell_name == 'L2Basket':
+        cell.sect_loc = dict(proximal=['soma'], distal=['soma'])
+    elif cell_name == 'L5Basket':
+        cell.sect_loc = dict(proximal=['soma'], distal=[])
+    return cell
 
 
 class Pyr(_Cell):

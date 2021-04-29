@@ -13,7 +13,7 @@ if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
-from .cell_classes import L2Pyr, L5Pyr, L2Basket, L5Basket
+from .cell_classes import L2Pyr, L5Pyr, basket
 from .params import _long_name, _short_name
 from copy import deepcopy
 
@@ -377,7 +377,7 @@ class NetworkBuilder(object):
         External inputs are not targets.
         """
         type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
-                      'L2_basket': L2Basket, 'L5_basket': L5Basket}
+                      'L2_basket': basket, 'L5_basket': basket}
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
@@ -395,8 +395,9 @@ class NetworkBuilder(object):
                     cell = PyramidalCell(src_pos, override_params=None,
                                          gid=gid)
                 else:
-                    BasketCell = type2class[src_type]
-                    cell = BasketCell(src_pos, gid=gid)
+                    basket_cell = type2class[src_type]
+                    cell = basket_cell(src_pos, cell_name=_short_name(src_type),
+                                       gid=gid)
                 if ('tonic' in self.net.external_biases and
                         src_type in self.net.external_biases['tonic']):
                     cell.create_tonic_bias(**self.net.external_biases
