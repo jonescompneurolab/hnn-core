@@ -218,29 +218,11 @@ class Pyr(_Cell):
                                                       **p_syn['gabab'])
 
         # Dendritic synapses
-        self.synapses['apicaloblique_ampa'] = self.syn_create(
-            self.dends['apical_oblique'](0.5), **p_syn['ampa'])
-        self.synapses['apicaloblique_nmda'] = self.syn_create(
-            self.dends['apical_oblique'](0.5), **p_syn['nmda'])
-
-        self.synapses['basal2_ampa'] = self.syn_create(
-            self.dends['basal_2'](0.5), **p_syn['ampa'])
-        self.synapses['basal2_nmda'] = self.syn_create(
-            self.dends['basal_2'](0.5), **p_syn['nmda'])
-
-        self.synapses['basal3_ampa'] = self.syn_create(
-            self.dends['basal_3'](0.5), **p_syn['ampa'])
-        self.synapses['basal3_nmda'] = self.syn_create(
-            self.dends['basal_3'](0.5), **p_syn['nmda'])
-
-        self.synapses['apicaltuft_ampa'] = self.syn_create(
-            self.dends['apical_tuft'](0.5), **p_syn['ampa'])
-        self.synapses['apicaltuft_nmda'] = self.syn_create(
-            self.dends['apical_tuft'](0.5), **p_syn['nmda'])
-
-        if self.name == 'L5Pyr':
-            self.synapses['apicaltuft_gabaa'] = self.syn_create(
-                self.dends['apical_tuft'](0.5), **p_syn['gabaa'])
+        for sec in self.section_names():
+            for receptor in p_syn:
+                syn_key = sec.replace('_', '') + '_' + receptor
+                self.synapses[syn_key] = self.syn_create(
+                    self.dends[sec](0.5), **p_syn[receptor])
 
 
 class L2Pyr(Pyr):
@@ -342,17 +324,6 @@ class L5Pyr(Pyr):
 
     def secs(self):
         return _secs_L5Pyr()
-
-    def _get_soma_props(self, pos, p_all):
-        """Sets somatic properties. Returns dictionary."""
-        return {
-            'pos': pos,
-            'L': p_all['L5Pyr_soma_L'],
-            'diam': p_all['L5Pyr_soma_diam'],
-            'cm': p_all['L5Pyr_soma_cm'],
-            'Ra': p_all['L5Pyr_soma_Ra'],
-            'name': 'L5Pyr',
-        }
 
     def set_biophysics(self, p_all):
         "Set the biophysics for the default Pyramidal cell."
