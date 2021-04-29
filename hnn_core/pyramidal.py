@@ -202,19 +202,12 @@ class Pyr(_Cell):
                 name=self.name + '_' + key)  # create dend
         # apical: 0--4; basal: 5--7
         self.list_dend = [self.dends[key] for key in
-                          ['apical_trunk', 'apical_oblique', 'apical_1',
-                           'apical_2', 'apical_tuft', 'basal_1', 'basal_2',
-                           'basal_3'] if key in self.dends]
+                          self.section_names() if key in self.dends]
         self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
         self.sect_loc['distal'] = ['apicaltuft']
 
     def get_sections(self):
-        ls = [self.soma]
-        for key in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
-                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']:
-            if key in self.dends:
-                ls.append(self.dends[key])
-        return ls
+        return [self.soma] + list(self.dends.values())
 
     def _synapse_create(self, p_syn):
         """Creates synapses onto this cell."""
