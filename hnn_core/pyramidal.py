@@ -91,8 +91,6 @@ class Pyr(_Cell):
     ----------
     name : str
         The name of the cell, 'L5Pyr' or 'L2Pyr'
-    list_dend : list of str
-        List of dendrites.
     sect_loc : dict of list
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.
@@ -132,8 +130,6 @@ class Pyr(_Cell):
         self.dends = {}
         self.synapses = dict()
         self.sect_loc = dict()
-        # for legacy use with L5Pyr
-        self.list_dend = []
         self.celltype = celltype
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
@@ -200,9 +196,7 @@ class Pyr(_Cell):
         for key in p_dend_props:
             self.dends[key] = h.Section(
                 name=self.name + '_' + key)  # create dend
-        # apical: 0--4; basal: 5--7
-        self.list_dend = [self.dends[key] for key in
-                          self.section_names() if key in self.dends]
+
         self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
         self.sect_loc['distal'] = ['apicaltuft']
 
@@ -243,8 +237,6 @@ class L2Pyr(Pyr):
     ----------
     name : str
         The name of the cell
-    list_dend : list of str
-        List of dendrites.
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.
@@ -304,8 +296,6 @@ class L5Pyr(Pyr):
     ----------
     name : str
         The name of the cell
-    list_dend : list of str
-        List of dendrites.
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.

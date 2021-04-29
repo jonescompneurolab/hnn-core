@@ -108,7 +108,6 @@ class _Cell(ABC):
         # variable for the list_IClamp
         self.list_IClamp = None
         self.soma_props = soma_props
-        self.list_dend = list()
         self.dends = list()
         self.create_soma()
         self.rec_v = h.Vector()
@@ -369,7 +368,7 @@ class _Cell(ABC):
         # for height and xz plane for depth. This is opposite for model as a
         # whole, but convention is followed in this function ease use of gui.
         sec_pts, sec_lens, sec_diams, _, topology = self.secs()
-        for sec in [self.soma] + self.list_dend:
+        for sec in self.get_sections():
             h.pt3dclear(sec=sec)
             sec_name = sec.name().split('_', 1)[1]
             for pt in sec_pts[sec_name]:
