@@ -18,7 +18,7 @@ from .params_default import (get_L2Pyr_params_default,
 # Units for gbar: S/cm^2 unless otherwise noted
 
 
-def _flat_to_nested(params, prefix, level1_keys, level2_keys):
+def _flat_to_nested(params, cell_type, level1_keys, level2_keys):
     """Convert a flat dictionary to a nested dictionary."""
     nested_dict = dict()
     for level1_key in level1_keys:
@@ -29,9 +29,46 @@ def _flat_to_nested(params, prefix, level1_keys, level2_keys):
             else:
                 # map apicaltrunk -> apical_trunk etc.
                 middle = level1_key.replace('_', '')
-            level2_dict[key] = params[f'{prefix}_{middle}_{key}']
+            level2_dict[key] = params[f'{cell_type}_{middle}_{key}']
         nested_dict[level1_key] = level2_dict
     return nested_dict
+
+
+def _get_soma_props(p_all, cell_type, pos):
+    """Hardcoded somatic properties."""
+    return {
+        'pos': pos,
+        'L': p_all[f'{cell_type}_soma_L'],
+        'diam': p_all[f'{cell_type}_soma_diam'],
+        'cm': p_all[f'{cell_type}_soma_cm'],
+        'Ra': p_all[f'{cell_type}_soma_Ra'],
+        'name': cell_type,
+    }
+
+
+def _get_syn_props(p_all, cell_type):
+    return {
+        'ampa': {
+            'e': p_all['%s_ampa_e' % cell_type],
+            'tau1': p_all['%s_ampa_tau1' % cell_type],
+            'tau2': p_all['%s_ampa_tau2' % cell_type],
+        },
+        'nmda': {
+            'e': p_all['%s_nmda_e' % cell_type],
+            'tau1': p_all['%s_nmda_tau1' % cell_type],
+            'tau2': p_all['%s_nmda_tau2' % cell_type],
+        },
+        'gabaa': {
+            'e': p_all['%s_gabaa_e' % cell_type],
+            'tau1': p_all['%s_gabaa_tau1' % cell_type],
+            'tau2': p_all['%s_gabaa_tau2' % cell_type],
+        },
+        'gabab': {
+            'e': p_all['%s_gabab_e' % cell_type],
+            'tau1': p_all['%s_gabab_tau1' % cell_type],
+            'tau2': p_all['%s_gabab_tau2' % cell_type],
+        }
+    }
 
 
 class Pyr(_Cell):
@@ -83,12 +120,14 @@ class Pyr(_Cell):
             p_all = compare_dictionaries(p_all_default, override_params)
 
         # Get somatic, dendritic, and synapse properties
-        soma_props = self._get_soma_props(pos, p_all)
+        if celltype == 'L5_pyramidal':
+            self.name = 'L5Pyr'
+        else:
+            self.name = 'L2Pyr'
+        soma_props = _get_soma_props(p_all, self.name, pos)
 
         _Cell.__init__(self, soma_props, gid=gid)
         self.create_soma()
-        # store cell_name as self variable for later use
-        self.name = soma_props['name']
         # preallocate dict to store dends
         self.dends = {}
         self.synapses = dict()
@@ -98,10 +137,10 @@ class Pyr(_Cell):
         self.celltype = celltype
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
-        p_dend = _flat_to_nested(p_all, prefix=self.name,
+        p_dend = _flat_to_nested(p_all, cell_type=self.name,
                                  level1_keys=self.section_names(),
                                  level2_keys=level2_keys)
-        p_syn = self._get_syn_props(p_all)
+        p_syn = _get_syn_props(p_all, self.name)
 
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
@@ -177,30 +216,6 @@ class Pyr(_Cell):
                 ls.append(self.dends[key])
         return ls
 
-    def _get_syn_props(self, p_all):
-        return {
-            'ampa': {
-                'e': p_all['%s_ampa_e' % self.name],
-                'tau1': p_all['%s_ampa_tau1' % self.name],
-                'tau2': p_all['%s_ampa_tau2' % self.name],
-            },
-            'nmda': {
-                'e': p_all['%s_nmda_e' % self.name],
-                'tau1': p_all['%s_nmda_tau1' % self.name],
-                'tau2': p_all['%s_nmda_tau2' % self.name],
-            },
-            'gabaa': {
-                'e': p_all['%s_gabaa_e' % self.name],
-                'tau1': p_all['%s_gabaa_tau1' % self.name],
-                'tau2': p_all['%s_gabaa_tau2' % self.name],
-            },
-            'gabab': {
-                'e': p_all['%s_gabab_e' % self.name],
-                'tau1': p_all['%s_gabab_tau1' % self.name],
-                'tau2': p_all['%s_gabab_tau2' % self.name],
-            }
-        }
-
     def _synapse_create(self, p_syn):
         """Creates synapses onto this cell."""
         # Somatic synapses
@@ -268,17 +283,6 @@ class L2Pyr(Pyr):
     def section_names(self):
         return ['apical_trunk', 'apical_1', 'apical_tuft',
                 'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-
-    def _get_soma_props(self, pos, p_all):
-        """Hardcoded somatic properties."""
-        return {
-            'pos': pos,
-            'L': p_all['L2Pyr_soma_L'],
-            'diam': p_all['L2Pyr_soma_diam'],
-            'cm': p_all['L2Pyr_soma_cm'],
-            'Ra': p_all['L2Pyr_soma_Ra'],
-            'name': 'L2Pyr',
-        }
 
     def secs(self):
         return _secs_L2Pyr()
