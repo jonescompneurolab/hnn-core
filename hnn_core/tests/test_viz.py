@@ -25,7 +25,7 @@ def test_network_visualization():
     with pytest.raises(ValueError, match='Unrecognized cell type'):
         plot_cell_morphology(cell_types='blah')
     axes = plot_cell_morphology(cell_types='L2Pyr')
-    len(axes) == 1
+    assert len(axes) == 1
     assert len(axes[0].lines) == 8
 
 
