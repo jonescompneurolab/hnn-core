@@ -88,6 +88,11 @@ class _Cell(ABC):
     ----------
     pos : list of length 3
         The position of the cell.
+    dends : dict
+        The dendrites. The key is the name of the dendrite
+        and the value is an instance of h.Section.
+    synapses : dict
+        The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
     rec_v : h.Vector()
@@ -108,10 +113,15 @@ class _Cell(ABC):
         # variable for the list_IClamp
         self.list_IClamp = None
         self.soma_props = soma_props
-        self.dends = list()
+        # preallocate dict to store dends
+        self.dends = dict()
+        self.synapses = dict()
+        self.sect_loc = dict()
         self.create_soma()
         self.rec_v = h.Vector()
         self.rec_i = dict()
+        # insert iclamp
+        self.list_IClamp = []
         self._gid = None
         self.tonic_biases = list()
         if gid is not None:
@@ -142,6 +152,23 @@ class _Cell(ABC):
     def get_sections(self):
         """Get sections in a cell."""
         pass
+
+    def set_biophysics(self, p_all):
+        "Set the biophysics for the default Pyramidal cell."
+
+        # neuron syntax is used to set values for mechanisms
+        # sec.gbar_mech = x sets value of gbar for mech to x for all segs
+        # in a section. This method is significantly faster than using
+        # a for loop to iterate over all segments to set mech values
+
+        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
+        for sec in self.get_sections():
+            sec_name = sec.name().split('_', 1)[1]
+            sec_name = 'soma' if sec_name == 'soma' else 'dend'
+            for key, attrs in self.mechanisms.items():
+                sec.insert(key)
+                for attr in attrs:
+                    setattr(sec, attr, p_all[f'{self.name}_{sec_name}_{attr}'])
 
     def create_soma(self):
         """Create soma and set geometry."""

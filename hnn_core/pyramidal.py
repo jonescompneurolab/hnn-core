@@ -96,9 +96,6 @@ class Pyr(_Cell):
         names of section locations that are proximal or distal.
     celltype : str
         The cell type, 'L5_Pyramidal' or 'L2_Pyramidal'
-    dends : dict
-        The dendrites. The key is the name of the dendrite
-        and the value is an instance of h.Section.
     synapses : dict
         The synapses that the cell can use for connections.
     """
@@ -126,10 +123,7 @@ class Pyr(_Cell):
 
         _Cell.__init__(self, soma_props, gid=gid)
         self.create_soma()
-        # preallocate dict to store dends
-        self.dends = {}
-        self.synapses = dict()
-        self.sect_loc = dict()
+
         self.celltype = celltype
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
@@ -141,9 +135,29 @@ class Pyr(_Cell):
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
         self.create_dends(p_dend)  # just creates the sections
+
+        self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
+        self.sect_loc['distal'] = ['apicaltuft']
+
         # sets geom properties; adjusted after translation from
         # hoc (2009 model)
         self.set_geometry(p_dend)
+
+        if celltype == 'L5_pyramidal':
+            self.mechanisms = {
+                'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                        'gl_hh2', 'el_hh2'],
+                'ca': ['gbar_ca'],
+                'cad': ['taur_cad'],
+                'kca': ['gbar_kca'],
+                'km': ['gbar_km'],
+                'cat': ['gbar_cat']
+            }
+        else:
+            self.mechanisms = {
+                'km': ['gbar_km'],
+                'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                        'gl_hh2', 'el_hh2']}
 
         # biophysics
         self.set_biophysics(p_all)
@@ -154,9 +168,6 @@ class Pyr(_Cell):
 
         # create synapses
         self._synapse_create(p_syn)
-
-        # insert iclamp
-        self.list_IClamp = []
 
     def set_geometry(self, p_dend):
         """Define shape of the neuron and connect sections.
@@ -197,9 +208,6 @@ class Pyr(_Cell):
             self.dends[key] = h.Section(
                 name=self.name + '_' + key)  # create dend
 
-        self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
-        self.sect_loc['distal'] = ['apicaltuft']
-
     def get_sections(self):
         return [self.soma] + list(self.dends.values())
 
@@ -237,11 +245,6 @@ class L2Pyr(Pyr):
     ----------
     name : str
         The name of the cell
-    dends : dict
-        The dendrites. The key is the name of the dendrite
-        and the value is an instance of h.Section.
-    synapses : dict
-        The synapses that the cell can use for connections.
     """
 
     def __init__(self, pos=None, override_params=None, gid=None):
@@ -253,26 +256,6 @@ class L2Pyr(Pyr):
 
     def secs(self):
         return _secs_L2Pyr()
-
-    def set_biophysics(self, p_all):
-        """Adds biophysics to soma."""
-
-        mechanisms = {'km': ['gbar_km'],
-                      'hh2': ['gkbar_hh2', 'gnabar_hh2',
-                              'gl_hh2', 'el_hh2']}
-
-        # neuron syntax is used to set values for mechanisms
-        # sec.gbar_mech = x sets value of gbar for mech to x for all segs
-        # in a section. This method is significantly faster than using
-        # a for loop to iterate over all segments to set mech values
-        for sec in self.get_sections():
-            sec_name = sec.name().split('_', 1)[1]
-            sec_name = 'soma' if sec_name == 'soma' else 'dend'
-            for key, attrs in mechanisms.items():
-                sec.insert(key)
-                for attr in attrs:
-                    setattr(sec, attr, p_all[f'L2Pyr_{sec_name}_{attr}'])
-
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
@@ -296,11 +279,6 @@ class L5Pyr(Pyr):
     ----------
     name : str
         The name of the cell
-    dends : dict
-        The dendrites. The key is the name of the dendrite
-        and the value is an instance of h.Section.
-    synapses : dict
-        The synapses that the cell can use for connections.
     """
 
     def __init__(self, pos=None, override_params=None, gid=None):
@@ -317,23 +295,7 @@ class L5Pyr(Pyr):
 
     def set_biophysics(self, p_all):
         "Set the biophysics for the default Pyramidal cell."
-
-        mechanisms = {'hh2': ['gkbar_hh2', 'gnabar_hh2',
-                              'gl_hh2', 'el_hh2'],
-                      'ca': ['gbar_ca'],
-                      'cad': ['taur_cad'],
-                      'kca': ['gbar_kca'],
-                      'km': ['gbar_km'],
-                      'cat': ['gbar_cat']}
-
-        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
-        for sec in self.get_sections():
-            sec_name = sec.name().split('_', 1)[1]
-            sec_name = 'soma' if sec_name == 'soma' else 'dend'
-            for key, attrs in mechanisms.items():
-                sec.insert(key)
-                for attr in attrs:
-                    setattr(sec, attr, p_all[f'L5Pyr_{sec_name}_{attr}'])
+        _Cell.set_biophysics(self, p_all)
 
         self.soma.insert('ar')
         self.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
