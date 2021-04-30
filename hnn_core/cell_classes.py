@@ -219,6 +219,31 @@ class Pyr(Cell):
         # biophysics
         self.set_biophysics(p_all)
 
+        if celltype == 'L5_pyramidal':
+            self.soma.insert('ar')
+            self.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
+
+            # set dend biophysics not specified in Pyr()
+            for key in self.dends:
+                # insert 'ar' mechanism
+                self.dends[key].insert('ar')
+
+            # set gbar_ar
+            # Value depends on distance from the soma. Soma is set as
+            # origin by passing self.soma as a sec argument to h.distance()
+            # Then iterate over segment nodes of dendritic sections
+            # and set gbar_ar depending on h.distance(seg.x), which returns
+            # distance from the soma to this point on the CURRENTLY ACCESSED
+            # SECTION!!!
+            h.distance(sec=self.soma)
+
+            for key in self.dends:
+                self.dends[key].push()
+                for seg in self.dends[key]:
+                    seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
+
+                h.pop_section()
+
         # insert dipole
         yscale = self.secs[3]
         self.insert_dipole(yscale)
@@ -337,31 +362,3 @@ class L5Pyr(Pyr):
     def section_names(self):
         return ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
                 'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-
-    def set_biophysics(self, p_all):
-        "Set the biophysics for the default Pyramidal cell."
-        Cell.set_biophysics(self, p_all)
-
-        self.soma.insert('ar')
-        self.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
-
-        # set dend biophysics not specified in Pyr()
-        for key in self.dends:
-            # insert 'ar' mechanism
-            self.dends[key].insert('ar')
-
-        # set gbar_ar
-        # Value depends on distance from the soma. Soma is set as
-        # origin by passing self.soma as a sec argument to h.distance()
-        # Then iterate over segment nodes of dendritic sections
-        # and set gbar_ar depending on h.distance(seg.x), which returns
-        # distance from the soma to this point on the CURRENTLY ACCESSED
-        # SECTION!!!
-        h.distance(sec=self.soma)
-
-        for key in self.dends:
-            self.dends[key].push()
-            for seg in self.dends[key]:
-                seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
-
-            h.pop_section()
