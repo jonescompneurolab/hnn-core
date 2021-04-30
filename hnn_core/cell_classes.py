@@ -165,6 +165,9 @@ class Pyr(Cell):
                 'km': ['gbar_km'],
                 'cat': ['gbar_cat']
             }
+            section_names = ['apical_trunk', 'apical_1',
+                             'apical_2', 'apical_tuft',
+                             'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
         elif celltype == 'L2_pyramidal':
             p_all_default = get_L2Pyr_params_default()
             self.name = 'L2Pyr'
@@ -173,6 +176,8 @@ class Pyr(Cell):
                 'km': ['gbar_km'],
                 'hh2': ['gkbar_hh2', 'gnabar_hh2',
                         'gl_hh2', 'el_hh2']}
+            section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
+                             'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
         else:
             raise ValueError(f'Unknown pyramidal cell type: {celltype}')
 
@@ -181,20 +186,19 @@ class Pyr(Cell):
             assert isinstance(override_params, dict)
             p_all = compare_dictionaries(p_all_default, override_params)
 
-        # Get somatic, dendritic, and synapse properties
-        soma_props = _get_soma_props(p_all, self.name)
-
         Cell.__init__(self, pos=pos, gid=gid)
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
+        # Get somatic, dendritic, and synapse properties
+        p_soma = _get_soma_props(p_all, self.name)
         p_dend = _flat_to_nested(p_all, cell_type=self.name,
-                                 level1_keys=self.section_names(),
+                                 level1_keys=section_names,
                                  level2_keys=level2_keys)
         p_syn = _get_syn_props(p_all, self.name)
 
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
-        self.create_soma(soma_props)
+        self.create_soma(p_soma)
         self.create_dends(p_dend)  # just creates the sections
         self.sections = [self.soma] + list(self.dends.values())
 
@@ -238,7 +242,7 @@ class Pyr(Cell):
         self.insert_dipole(yscale)
 
         # create synapses
-        self._synapse_create(p_syn)
+        self._synapse_create(p_syn, section_names)
 
     def set_geometry(self, p_dend):
         """Define shape of the neuron and connect sections.
@@ -265,15 +269,7 @@ class Pyr(Cell):
                 if not self.dends[key].nseg % 2:
                     self.dends[key].nseg += 1
 
-    def section_names(self):
-        if self.name == 'L2Pyr':
-            return ['apical_trunk', 'apical_1', 'apical_tuft',
-                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        else:
-            return ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
-                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-
-    def _synapse_create(self, p_syn):
+    def _synapse_create(self, p_syn, section_names):
         """Creates synapses onto this cell."""
         # Somatic synapses
         self.synapses['soma_gabaa'] = self.syn_create(self.soma(0.5),
@@ -282,7 +278,7 @@ class Pyr(Cell):
                                                       **p_syn['gabab'])
 
         # Dendritic synapses
-        for sec in self.section_names():
+        for sec in section_names:
             for receptor in p_syn:
                 syn_key = sec.replace('_', '') + '_' + receptor
                 self.synapses[syn_key] = self.syn_create(
