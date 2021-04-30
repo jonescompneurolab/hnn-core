@@ -78,7 +78,9 @@ class Cell(ABC):
     ----------
     soma_props : dict
         The properties of the soma. Must contain
-        keys 'L', 'diam', and 'pos'
+        keys 'L', 'diam'.
+    pos : tuple
+        The (x, y, z) coordinates.
     gid : int or None (optional)
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
@@ -109,9 +111,8 @@ class Cell(ABC):
         GID of the cell in a network (or None if not yet assigned)
     """
 
-    def __init__(self, soma_props, gid=None):
-        # variable for the list_IClamp
-        self.list_IClamp = None
+    def __init__(self, soma_props, pos, gid=None):
+        self.pos = pos
         self.soma_props = soma_props
         # preallocate dict to store dends
         self.dends = dict()
@@ -120,7 +121,7 @@ class Cell(ABC):
         self.rec_v = h.Vector()
         self.rec_i = dict()
         # insert iclamp
-        self.list_IClamp = []
+        self.list_IClamp = list()
         self._gid = None
         self.tonic_biases = list()
         if gid is not None:
@@ -169,8 +170,6 @@ class Cell(ABC):
         # make L_soma and diam_soma elements of self
         # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
         soma_props = self.soma_props
-
-        self.pos = soma_props['pos']
 
         self.soma = h.Section(cell=self, name=soma_props['name'] + '_soma')
         self.soma.L = soma_props['L']

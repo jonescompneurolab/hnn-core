@@ -12,16 +12,17 @@ def test_cell():
     """Test cells object."""
     # test that ExpSyn always takes nrn.Segment, not float
     soma_props = {"L": 22.1, "diam": 23.4, "cm": 0.6195, "Ra": 200.0,
-                  "pos": (0., 0., 0.), 'name': 'test_cell'}
+                  'name': 'test_cell'}
+    pos = (0., 0., 0.)
 
     # GID is assigned exactly once for each cell, either at initialisation...
-    cell = Cell(soma_props=soma_props, gid=42)
+    cell = Cell(soma_props=soma_props, pos=pos, gid=42)
     assert cell.gid == 42
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
     # ... or later
-    cell = Cell(soma_props=soma_props)  # cells can exist fine without gid
+    cell = Cell(soma_props=soma_props, pos=pos)  # cells can exist fine without gid
     assert cell.gid is None  # check that it's initialised to None
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
@@ -30,7 +31,7 @@ def test_cell():
     assert cell.gid == 42
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
-        cell = Cell(soma_props=soma_props, gid='one')  # test init checks gid
+        cell = Cell(soma_props=soma_props, pos=pos, gid='one')  # test init checks gid
 
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)

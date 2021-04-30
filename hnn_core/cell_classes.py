@@ -36,10 +36,9 @@ def _flat_to_nested(params, cell_type, level1_keys, level2_keys):
     return nested_dict
 
 
-def _get_soma_props(p_all, cell_type, pos):
+def _get_soma_props(p_all, cell_type):
     """Hardcoded somatic properties."""
     return {
-        'pos': pos,
         'L': p_all[f'{cell_type}_soma_L'],
         'diam': p_all[f'{cell_type}_soma_diam'],
         'cm': p_all[f'{cell_type}_soma_cm'],
@@ -48,9 +47,8 @@ def _get_soma_props(p_all, cell_type, pos):
     }
 
 
-def _get_basket_soma_props(cell_name, pos):
+def _get_basket_soma_props(cell_name):
     return {
-        'pos': pos,
         'L': 39.,
         'diam': 20.,
         'cm': 0.85,
@@ -101,8 +99,8 @@ def basket(pos, cell_name='L2Basket', gid=None):
     cell : instance of BasketSingle
         The basket cell.
     """
-    props = _get_basket_soma_props(cell_name, pos)
-    cell = Cell(props, gid=gid)
+    props = _get_basket_soma_props(cell_name)
+    cell = Cell(props, pos=pos, gid=gid)
 
     cell.create_soma()
     cell.sections = [cell.soma]   # XXX: needed?
@@ -186,9 +184,9 @@ class Pyr(Cell):
             p_all = compare_dictionaries(p_all_default, override_params)
 
         # Get somatic, dendritic, and synapse properties
-        soma_props = _get_soma_props(p_all, self.name, pos)
+        soma_props = _get_soma_props(p_all, self.name)
 
-        Cell.__init__(self, soma_props, gid=gid)
+        Cell.__init__(self, soma_props, pos=pos, gid=gid)
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
         p_dend = _flat_to_nested(p_all, cell_type=self.name,
