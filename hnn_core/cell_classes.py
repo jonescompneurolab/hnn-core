@@ -104,6 +104,7 @@ def basket(pos, cell_name='L2Basket', gid=None):
     props = _get_basket_soma_props(cell_name, pos)
     cell = Cell(props, gid=gid)
 
+    cell.create_soma()
     cell.sections = [cell.soma]   # XXX: needed?
     cell.name = cell_name
     cell.secs = _secs_Basket()
@@ -157,50 +158,8 @@ class Pyr(Cell):
 
         if celltype == 'L5_pyramidal':
             p_all_default = get_L5Pyr_params_default()
-        elif celltype == 'L2_pyramidal':
-            p_all_default = get_L2Pyr_params_default()
-        else:
-            raise ValueError(f'Unknown pyramidal cell type: {celltype}')
-
-        p_all = p_all_default
-        if override_params is not None:
-            assert isinstance(override_params, dict)
-            p_all = compare_dictionaries(p_all_default, override_params)
-
-        # Get somatic, dendritic, and synapse properties
-        if celltype == 'L5_pyramidal':
             self.name = 'L5Pyr'
-        else:
-            self.name = 'L2Pyr'
-        soma_props = _get_soma_props(p_all, self.name, pos)
-
-        Cell.__init__(self, soma_props, gid=gid)
-        self.create_soma()
-
-        level2_keys = ['L', 'diam', 'Ra', 'cm']
-        p_dend = _flat_to_nested(p_all, cell_type=self.name,
-                                 level1_keys=self.section_names(),
-                                 level2_keys=level2_keys)
-        p_syn = _get_syn_props(p_all, self.name)
-
-        # Geometry
-        # dend Cm and dend Ra set using soma Cm and soma Ra
-        self.create_dends(p_dend)  # just creates the sections
-        self.sections = [self.soma] + list(self.dends.values())
-
-        self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
-        self.sect_loc['distal'] = ['apicaltuft']
-
-        if celltype == 'L5_pyramidal':
             self.secs = _secs_L5Pyr()
-        else:
-            self.secs = _secs_L2Pyr()
-
-        # sets geom properties; adjusted after translation from
-        # hoc (2009 model)
-        self.set_geometry(p_dend)
-
-        if celltype == 'L5_pyramidal':
             self.mechanisms = {
                 'hh2': ['gkbar_hh2', 'gnabar_hh2',
                         'gl_hh2', 'el_hh2'],
@@ -210,11 +169,45 @@ class Pyr(Cell):
                 'km': ['gbar_km'],
                 'cat': ['gbar_cat']
             }
-        else:
+        elif celltype == 'L2_pyramidal':
+            p_all_default = get_L2Pyr_params_default()
+            self.name = 'L2Pyr'
+            self.secs = _secs_L2Pyr()
             self.mechanisms = {
                 'km': ['gbar_km'],
                 'hh2': ['gkbar_hh2', 'gnabar_hh2',
                         'gl_hh2', 'el_hh2']}
+        else:
+            raise ValueError(f'Unknown pyramidal cell type: {celltype}')
+
+        p_all = p_all_default
+        if override_params is not None:
+            assert isinstance(override_params, dict)
+            p_all = compare_dictionaries(p_all_default, override_params)
+
+        # Get somatic, dendritic, and synapse properties
+        soma_props = _get_soma_props(p_all, self.name, pos)
+
+        Cell.__init__(self, soma_props, gid=gid)
+
+        level2_keys = ['L', 'diam', 'Ra', 'cm']
+        p_dend = _flat_to_nested(p_all, cell_type=self.name,
+                                 level1_keys=self.section_names(),
+                                 level2_keys=level2_keys)
+        p_syn = _get_syn_props(p_all, self.name)
+
+        # Geometry
+        # dend Cm and dend Ra set using soma Cm and soma Ra
+        self.create_soma()
+        self.create_dends(p_dend)  # just creates the sections
+        self.sections = [self.soma] + list(self.dends.values())
+
+        self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
+        self.sect_loc['distal'] = ['apicaltuft']
+
+        # sets geom properties; adjusted after translation from
+        # hoc (2009 model)
+        self.set_geometry(p_dend)
 
         # biophysics
         self.set_biophysics(p_all)

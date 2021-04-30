@@ -117,7 +117,6 @@ class Cell(ABC):
         self.dends = dict()
         self.synapses = dict()
         self.sect_loc = dict()
-        self.create_soma()
         self.rec_v = h.Vector()
         self.rec_i = dict()
         # insert iclamp
