@@ -396,7 +396,8 @@ class NetworkBuilder(object):
                                          celltype=src_type, gid=gid)
                 else:
                     basket_cell = type2class[src_type]
-                    cell = basket_cell(src_pos, cell_name=_short_name(src_type),
+                    cell = basket_cell(src_pos,
+                                       cell_name=_short_name(src_type),
                                        gid=gid)
                 if ('tonic' in self.net.external_biases and
                         src_type in self.net.external_biases['tonic']):

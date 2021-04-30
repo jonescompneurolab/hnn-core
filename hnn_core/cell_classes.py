@@ -260,11 +260,6 @@ class Pyr(Cell):
         Cell.set_geometry(self)
         # resets length,diam,etc. based on param specification
         for key in p_dend:
-            # set dend props
-            self.dends[key].L = p_dend[key]['L']
-            self.dends[key].diam = p_dend[key]['diam']
-            self.dends[key].Ra = p_dend[key]['Ra']
-            self.dends[key].cm = p_dend[key]['cm']
             # set dend nseg
             if p_dend[key]['L'] > 100.:
                 self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
@@ -279,15 +274,6 @@ class Pyr(Cell):
         else:
             return ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
                     'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-
-    def create_dends(self, p_dend_props):
-        """Create dendrites."""
-        # XXX: name should be unique even across cell types?
-        # otherwise Neuron cannot disambiguate, hence
-        # self.name + '_' + key
-        for key in p_dend_props:
-            self.dends[key] = h.Section(
-                name=self.name + '_' + key)  # create dend
 
     def _synapse_create(self, p_syn):
         """Creates synapses onto this cell."""

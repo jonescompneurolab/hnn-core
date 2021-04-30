@@ -3,8 +3,6 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
-from abc import ABC, abstractmethod
-
 import numpy as np
 from neuron import h, nrn
 
@@ -71,7 +69,7 @@ class _ArtificialCell:
             raise RuntimeError('Global ID for this cell already assigned!')
 
 
-class Cell(ABC):
+class Cell:
     """Create a cell object.
 
     Parameters
@@ -164,6 +162,19 @@ class Cell(ABC):
                 sec.insert(key)
                 for attr in attrs:
                     setattr(sec, attr, p_all[f'{self.name}_{sec_name}_{attr}'])
+
+    def create_dends(self, p_dend):
+        """Create dendrites."""
+        # XXX: name should be unique even across cell types?
+        # otherwise Neuron cannot disambiguate, hence
+        # self.name + '_' + key
+        for key in p_dend:
+            self.dends[key] = h.Section(
+                name=self.name + '_' + key)  # create dend
+            self.dends[key].L = p_dend[key]['L']
+            self.dends[key].diam = p_dend[key]['diam']
+            self.dends[key].Ra = p_dend[key]['Ra']
+            self.dends[key].cm = p_dend[key]['cm']
 
     def create_soma(self):
         """Create soma and set geometry."""
