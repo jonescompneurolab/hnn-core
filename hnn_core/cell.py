@@ -74,9 +74,6 @@ class Cell:
 
     Parameters
     ----------
-    soma_props : dict
-        The properties of the soma. Must contain
-        keys 'L', 'diam'.
     pos : tuple
         The (x, y, z) coordinates.
     gid : int or None (optional)
@@ -109,9 +106,8 @@ class Cell:
         GID of the cell in a network (or None if not yet assigned)
     """
 
-    def __init__(self, soma_props, pos, gid=None):
+    def __init__(self, pos, gid=None):
         self.pos = pos
-        self.soma_props = soma_props
         # preallocate dict to store dends
         self.dends = dict()
         self.synapses = dict()
@@ -127,11 +123,7 @@ class Cell:
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        soma_props = self.soma_props
-        s = ('soma: L %f, diam %f, Ra %f, cm %f' %
-             (soma_props['L'], soma_props['diam'],
-              soma_props['Ra'], soma_props['cm']))
-        return '<%s | %s>' % (class_name, s)
+        return f'<{class_name} | gid={self._gid}>'
 
     @property
     def gid(self):
@@ -176,13 +168,16 @@ class Cell:
             self.dends[key].Ra = p_dend[key]['Ra']
             self.dends[key].cm = p_dend[key]['cm']
 
-    def create_soma(self):
-        """Create soma and set geometry."""
-        # make L_soma and diam_soma elements of self
-        # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
-        soma_props = self.soma_props
+    def create_soma(self, soma_props):
+        """Create soma and set geometry.
 
-        self.soma = h.Section(cell=self, name=soma_props['name'] + '_soma')
+        Parameters
+        ----------
+        soma_props : dict
+            The properties of the soma. Must contain
+            keys 'L', 'diam', 'Ra', and 'cm'.
+        """
+        self.soma = h.Section(cell=self, name=self.name + '_soma')
         self.soma.L = soma_props['L']
         self.soma.diam = soma_props['diam']
         self.soma.Ra = soma_props['Ra']

@@ -42,8 +42,7 @@ def _get_soma_props(p_all, cell_type):
         'L': p_all[f'{cell_type}_soma_L'],
         'diam': p_all[f'{cell_type}_soma_diam'],
         'cm': p_all[f'{cell_type}_soma_cm'],
-        'Ra': p_all[f'{cell_type}_soma_Ra'],
-        'name': cell_type,
+        'Ra': p_all[f'{cell_type}_soma_Ra']
     }
 
 
@@ -52,8 +51,7 @@ def _get_basket_soma_props(cell_name):
         'L': 39.,
         'diam': 20.,
         'cm': 0.85,
-        'Ra': 200.,
-        'name': cell_name,
+        'Ra': 200.
     }
 
 
@@ -99,12 +97,12 @@ def basket(pos, cell_name='L2Basket', gid=None):
     cell : instance of BasketSingle
         The basket cell.
     """
-    props = _get_basket_soma_props(cell_name)
-    cell = Cell(props, pos=pos, gid=gid)
-
-    cell.create_soma()
-    cell.sections = [cell.soma]   # XXX: needed?
+    cell = Cell(pos=pos, gid=gid)
     cell.name = cell_name
+
+    soma_props = _get_basket_soma_props(cell_name)
+    cell.create_soma(soma_props)
+    cell.sections = [cell.soma]   # XXX: needed?
     cell.secs = _secs_Basket()
 
     cell.set_geometry()
@@ -186,7 +184,7 @@ class Pyr(Cell):
         # Get somatic, dendritic, and synapse properties
         soma_props = _get_soma_props(p_all, self.name)
 
-        Cell.__init__(self, soma_props, pos=pos, gid=gid)
+        Cell.__init__(self, pos=pos, gid=gid)
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
         p_dend = _flat_to_nested(p_all, cell_type=self.name,
@@ -196,7 +194,7 @@ class Pyr(Cell):
 
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
-        self.create_soma()
+        self.create_soma(soma_props)
         self.create_dends(p_dend)  # just creates the sections
         self.sections = [self.soma] + list(self.dends.values())
 
