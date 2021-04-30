@@ -3,7 +3,7 @@ import pytest
 import matplotlib
 
 from hnn_core.network_builder import load_custom_mechanisms
-from hnn_core.cell import _ArtificialCell, _Cell
+from hnn_core.cell import _ArtificialCell, Cell
 
 matplotlib.use('agg')
 
@@ -13,13 +13,6 @@ def test_cell():
     # test that ExpSyn always takes nrn.Segment, not float
     soma_props = {"L": 22.1, "diam": 23.4, "cm": 0.6195, "Ra": 200.0,
                   "pos": (0., 0., 0.), 'name': 'test_cell'}
-
-    with pytest.raises(TypeError, match='with abstract methods get_sections'):
-        cell = _Cell(soma_props=soma_props)
-
-    class Cell(_Cell):
-        def get_sections(self):
-            return [self.soma]
 
     # GID is assigned exactly once for each cell, either at initialisation...
     cell = Cell(soma_props=soma_props, gid=42)

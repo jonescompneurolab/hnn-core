@@ -71,7 +71,7 @@ class _ArtificialCell:
             raise RuntimeError('Global ID for this cell already assigned!')
 
 
-class _Cell(ABC):
+class Cell(ABC):
     """Create a cell object.
 
     Parameters
@@ -148,11 +148,6 @@ class _Cell(ABC):
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
-    @abstractmethod
-    def get_sections(self):
-        """Get sections in a cell."""
-        pass
-
     def set_biophysics(self, p_all):
         "Set the biophysics for the default Pyramidal cell."
 
@@ -162,7 +157,7 @@ class _Cell(ABC):
         # a for loop to iterate over all segments to set mech values
 
         # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
-        for sec in self.get_sections():
+        for sec in self.sections:
             sec_name = sec.name().split('_', 1)[1]
             sec_name = 'soma' if sec_name == 'soma' else 'dend'
             for key, attrs in self.mechanisms.items():
@@ -193,7 +188,7 @@ class _Cell(ABC):
         dy = self.pos[2] - y0
         dz = self.pos[1] * 100 - z0
 
-        for s in self.get_sections():
+        for s in self.sections:
             for i in range(s.n3d()):
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
                              s.z3d(i) + dz, s.diam3d(i), sec=s)
@@ -392,8 +387,8 @@ class _Cell(ABC):
         # Define 3D shape and position of cell. By default neuron uses xy plane
         # for height and xz plane for depth. This is opposite for model as a
         # whole, but convention is followed in this function ease use of gui.
-        sec_pts, sec_lens, sec_diams, _, topology = self.secs()
-        for sec in self.get_sections():
+        sec_pts, sec_lens, sec_diams, _, topology = self.secs
+        for sec in self.sections:
             h.pt3dclear(sec=sec)
             sec_name = sec.name().split('_', 1)[1]
             for pt in sec_pts[sec_name]:

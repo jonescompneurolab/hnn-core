@@ -7,7 +7,7 @@ import numpy as np
 
 from neuron import h
 
-from .cell import _Cell
+from .cell import Cell
 
 from .params import compare_dictionaries
 from .params_default import (get_L2Pyr_params_default,
@@ -84,49 +84,6 @@ def _get_syn_props(p_all, cell_type):
     }
 
 
-class BasketSingle(_Cell):
-    """Inhibitory cell class.
-
-    Attributes
-    ----------
-    synapses : dict
-        The synapses that the cell can use for connections.
-    sect_loc : dict of list
-        Can have keys 'proximal' or 'distal' each containing
-        names of section locations that are proximal or distal.
-    """
-
-    def __init__(self, pos, cell_name='Basket', gid=None):
-        self.props = _get_basket_soma_props(cell_name, pos)
-        _Cell.__init__(self, self.props, gid=gid)
-        # store cell name for later
-        self.name = cell_name
-        self.set_geometry()
-        self.synapses = dict()
-        self._synapse_create()
-        self.set_biophysics()
-
-    def set_biophysics(self):
-        self.soma.insert('hh2')
-
-    def secs(self):
-        return _secs_Basket()
-
-    def get_sections(self):
-        """Get sections."""
-        return [self.soma]
-
-    # creation of synapses
-    def _synapse_create(self):
-        # creates synapses onto this cell
-        self.synapses['soma_ampa'] = self.syn_create(
-            self.soma(0.5), e=0., tau1=0.5, tau2=5.)
-        self.synapses['soma_gabaa'] = self.syn_create(
-            self.soma(0.5), e=-80, tau1=0.5, tau2=5.)
-        self.synapses['soma_nmda'] = self.syn_create(
-            self.soma(0.5), e=0., tau1=1., tau2=20.)
-
-
 def basket(pos, cell_name='L2Basket', gid=None):
     """Get layer 2 basket cells.
 
@@ -144,7 +101,26 @@ def basket(pos, cell_name='L2Basket', gid=None):
     cell : instance of BasketSingle
         The basket cell.
     """
-    cell = BasketSingle(pos, cell_name=cell_name, gid=gid)
+    props = _get_basket_soma_props(cell_name, pos)
+    cell = Cell(props, gid=gid)
+
+    cell.sections = [cell.soma]   # XXX: needed?
+    cell.name = cell_name
+    cell.secs = _secs_Basket()
+
+    cell.set_geometry()
+
+    cell.synapses = dict()
+    # cell._synapse_create()
+    cell.synapses['soma_ampa'] = cell.syn_create(
+        cell.soma(0.5), e=0., tau1=0.5, tau2=5.)
+    cell.synapses['soma_gabaa'] = cell.syn_create(
+        cell.soma(0.5), e=-80, tau1=0.5, tau2=5.)
+    cell.synapses['soma_nmda'] = cell.syn_create(
+        cell.soma(0.5), e=0., tau1=1., tau2=20.)
+
+    cell.soma.insert('hh2')
+
     if cell_name == 'L2Basket':
         cell.sect_loc = dict(proximal=['soma'], distal=['soma'])
     elif cell_name == 'L5Basket':
@@ -152,7 +128,7 @@ def basket(pos, cell_name='L2Basket', gid=None):
     return cell
 
 
-class Pyr(_Cell):
+class Pyr(Cell):
     """Pyramidal neuron.
 
     Parameters
@@ -198,7 +174,7 @@ class Pyr(_Cell):
             self.name = 'L2Pyr'
         soma_props = _get_soma_props(p_all, self.name, pos)
 
-        _Cell.__init__(self, soma_props, gid=gid)
+        Cell.__init__(self, soma_props, gid=gid)
         self.create_soma()
 
         level2_keys = ['L', 'diam', 'Ra', 'cm']
@@ -210,9 +186,15 @@ class Pyr(_Cell):
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
         self.create_dends(p_dend)  # just creates the sections
+        self.sections = [self.soma] + list(self.dends.values())
 
         self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
         self.sect_loc['distal'] = ['apicaltuft']
+
+        if celltype == 'L5_pyramidal':
+            self.secs = _secs_L5Pyr()
+        else:
+            self.secs = _secs_L2Pyr()
 
         # sets geom properties; adjusted after translation from
         # hoc (2009 model)
@@ -238,7 +220,7 @@ class Pyr(_Cell):
         self.set_biophysics(p_all)
 
         # insert dipole
-        yscale = self.secs()[3]
+        yscale = self.secs[3]
         self.insert_dipole(yscale)
 
         # create synapses
@@ -259,7 +241,7 @@ class Pyr(_Cell):
             * cm: membrane capacitance in micro-Farads
             * Ra: axial resistivity in ohm-cm
         """
-        _Cell.set_geometry(self)
+        Cell.set_geometry(self)
         # resets length,diam,etc. based on param specification
         for key in p_dend:
             # set dend props
@@ -282,9 +264,6 @@ class Pyr(_Cell):
         for key in p_dend_props:
             self.dends[key] = h.Section(
                 name=self.name + '_' + key)  # create dend
-
-    def get_sections(self):
-        return [self.soma] + list(self.dends.values())
 
     def _synapse_create(self, p_syn):
         """Creates synapses onto this cell."""
@@ -329,9 +308,6 @@ class L2Pyr(Pyr):
         return ['apical_trunk', 'apical_1', 'apical_tuft',
                 'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
 
-    def secs(self):
-        return _secs_L2Pyr()
-
 
 class L5Pyr(Pyr):
     """Layer 5 Pyramidal class.
@@ -362,12 +338,9 @@ class L5Pyr(Pyr):
         return ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
                 'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
 
-    def secs(self):
-        return _secs_L5Pyr()
-
     def set_biophysics(self, p_all):
         "Set the biophysics for the default Pyramidal cell."
-        _Cell.set_biophysics(self, p_all)
+        Cell.set_biophysics(self, p_all)
 
         self.soma.insert('ar')
         self.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
