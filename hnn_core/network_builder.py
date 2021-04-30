@@ -13,7 +13,7 @@ if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
-from .cell_classes import L2Pyr, L5Pyr, basket
+from .cell_classes import Pyr, basket
 from .params import _long_name, _short_name
 from copy import deepcopy
 
@@ -376,7 +376,7 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-        type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
+        type2class = {'L2_pyramidal': Pyr, 'L5_pyramidal': Pyr,
                       'L2_basket': basket, 'L5_basket': basket}
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
@@ -393,7 +393,7 @@ class NetworkBuilder(object):
                     # XXX Why doesn't a _Cell have a .threshold? Would make a
                     # lot of sense to include it, as _ArtificialCells do.
                     cell = PyramidalCell(src_pos, override_params=None,
-                                         gid=gid)
+                                         celltype=src_type, gid=gid)
                 else:
                     basket_cell = type2class[src_type]
                     cell = basket_cell(src_pos, cell_name=_short_name(src_type),

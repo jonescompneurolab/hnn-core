@@ -281,6 +281,14 @@ class Pyr(Cell):
                 if not self.dends[key].nseg % 2:
                     self.dends[key].nseg += 1
 
+    def section_names(self):
+        if self.name == 'L2Pyr':
+            return ['apical_trunk', 'apical_1', 'apical_tuft',
+                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+        else:
+            return ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
+                    'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+
     def create_dends(self, p_dend_props):
         """Create dendrites."""
         # XXX: name should be unique even across cell types?
@@ -304,61 +312,3 @@ class Pyr(Cell):
                 syn_key = sec.replace('_', '') + '_' + receptor
                 self.synapses[syn_key] = self.syn_create(
                     self.dends[sec](0.5), **p_syn[receptor])
-
-
-class L2Pyr(Pyr):
-    """Layer 2 pyramidal cell class.
-
-    Parameters
-    ----------
-    pos : tuple
-        Coordinates of cell soma in xyz-space
-    override_params : dict or None (optional)
-        Parameters specific to L2 pyramidal neurons to override the default set
-    gid : int or None (optional)
-        Each cell in a network is uniquely identified by it's "global ID": GID.
-        The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed.
-
-    Attributes
-    ----------
-    name : str
-        The name of the cell
-    """
-
-    def __init__(self, pos=None, override_params=None, gid=None):
-        Pyr.__init__(self, pos, 'L2_pyramidal', override_params, gid=gid)
-
-    def section_names(self):
-        return ['apical_trunk', 'apical_1', 'apical_tuft',
-                'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-
-
-class L5Pyr(Pyr):
-    """Layer 5 Pyramidal class.
-
-    Parameters
-    ----------
-    pos : tuple
-        Coordinates of cell soma in xyz-space
-    override_params : dict or None (optional)
-        Parameters specific to L2 pyramidal neurons to override the default set
-    gid : int or None (optional)
-        Each cell in a network is uniquely identified by it's "global ID": GID.
-        The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed.
-
-    Attributes
-    ----------
-    name : str
-        The name of the cell
-    """
-
-    def __init__(self, pos=None, override_params=None, gid=None):
-        """Get default L5Pyr params and update them with
-            corresponding params in p."""
-        Pyr.__init__(self, pos, 'L5_pyramidal', override_params, gid=gid)
-
-    def section_names(self):
-        return ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft',
-                'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
