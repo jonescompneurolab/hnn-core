@@ -138,7 +138,7 @@ class Cell:
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
-    def set_biophysics(self, p_all):
+    def set_biophysics(self, p_mech):
         "Set the biophysics for the default Pyramidal cell."
 
         # neuron syntax is used to set values for mechanisms
@@ -146,14 +146,12 @@ class Cell:
         # in a section. This method is significantly faster than using
         # a for loop to iterate over all segments to set mech values
 
-        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
         for sec in self.sections:
             sec_name = sec.name().split('_', 1)[1]
-            sec_name = 'soma' if sec_name == 'soma' else 'dend'
-            for key, attrs in self.mechanisms.items():
-                sec.insert(key)
-                for attr in attrs:
-                    setattr(sec, attr, p_all[f'{self.name}_{sec_name}_{attr}'])
+            for mech_name in p_mech[sec_name]:
+                sec.insert(mech_name)
+                for attr in p_mech[sec_name][mech_name]:
+                    setattr(sec, attr, p_mech[sec_name][mech_name][attr])
 
     def create_dends(self, p_dend):
         """Create dendrites."""

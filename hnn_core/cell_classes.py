@@ -80,6 +80,41 @@ def _get_syn_props(p_all, cell_type):
     }
 
 
+def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
+    """Get mechanism
+
+    Parameters
+    ----------
+    cell_type : str
+        The cell type
+    section_names : str
+        The section_names
+    mechanisms : dict of list
+        The mechanism properties to extract
+
+    Returns
+    -------
+    mech_props : dict of dict of dict
+        Nested dictionary of the form
+        sections -> mechanism -> mechanism properties
+        used to instantiate the mechanism in Neuron
+    """
+    mech_props = dict()
+    for sec_name in section_names:
+        this_sec_prop = dict()
+        for mech_name in mechanisms:
+            this_mech_prop = dict()
+            for mech_attr in mechanisms[mech_name]:
+                if sec_name == 'soma':
+                    key = f'{cell_type}_soma_{mech_attr}'
+                else:
+                    key = f'{cell_type}_dend_{mech_attr}'
+                this_mech_prop[mech_attr] = p_all[key]
+            this_sec_prop[mech_name] = this_mech_prop
+        mech_props[sec_name] = this_sec_prop
+    return mech_props
+
+
 def basket(pos, cell_name='L2Basket', gid=None):
     """Get layer 2 basket cells.
 
@@ -156,7 +191,8 @@ class Pyr(Cell):
             p_all_default = get_L5Pyr_params_default()
             self.name = 'L5Pyr'
             self.secs = _secs_L5Pyr()
-            self.mechanisms = {
+            # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
+            mechanisms = {
                 'hh2': ['gkbar_hh2', 'gnabar_hh2',
                         'gl_hh2', 'el_hh2'],
                 'ca': ['gbar_ca'],
@@ -172,7 +208,7 @@ class Pyr(Cell):
             p_all_default = get_L2Pyr_params_default()
             self.name = 'L2Pyr'
             self.secs = _secs_L2Pyr()
-            self.mechanisms = {
+            mechanisms = {
                 'km': ['gbar_km'],
                 'hh2': ['gkbar_hh2', 'gnabar_hh2',
                         'gl_hh2', 'el_hh2']}
@@ -195,6 +231,8 @@ class Pyr(Cell):
                                  level1_keys=section_names,
                                  level2_keys=level2_keys)
         p_syn = _get_syn_props(p_all, self.name)
+        p_mech = _get_mechanisms(p_all, self.name, ['soma'] + section_names,
+                                 mechanisms)
 
         # Geometry
         # dend Cm and dend Ra set using soma Cm and soma Ra
@@ -210,7 +248,7 @@ class Pyr(Cell):
         self.set_geometry(p_dend)
 
         # biophysics
-        self.set_biophysics(p_all)
+        self.set_biophysics(p_mech)
 
         if celltype == 'L5_pyramidal':
             self.soma.insert('ar')
