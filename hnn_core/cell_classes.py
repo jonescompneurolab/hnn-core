@@ -93,6 +93,26 @@ def _get_syn_props(p_all, cell_type):
     }
 
 
+def _get_basket_syn_props():
+    return {
+        'ampa': {
+            'e': 0,
+            'tau1': 0.5,
+            'tau2': 5.
+        },
+        'gabaa': {
+            'e': -80,
+            'tau1': 0.5,
+            'tau2': 5.
+        },
+        'nmda': {
+            'e': 0,
+            'tau1': 1.,
+            'tau2': 20.
+        }
+    }
+
+
 def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     """Get mechanism
 
@@ -157,12 +177,10 @@ def basket(pos, cell_name='L2Basket', gid=None):
 
     cell.synapses = dict()
     # cell._synapse_create()
-    cell.synapses['soma_ampa'] = cell.syn_create(
-        cell.soma(0.5), e=0., tau1=0.5, tau2=5.)
-    cell.synapses['soma_gabaa'] = cell.syn_create(
-        cell.soma(0.5), e=-80, tau1=0.5, tau2=5.)
-    cell.synapses['soma_nmda'] = cell.syn_create(
-        cell.soma(0.5), e=0., tau1=1., tau2=20.)
+    p_syn = _get_basket_syn_props()
+    for receptor in p_syn:
+        cell.synapses[f'soma_{receptor}'] = cell.syn_create(
+            cell.soma(0.5), **p_syn[receptor])
 
     cell.soma.insert('hh2')
 
