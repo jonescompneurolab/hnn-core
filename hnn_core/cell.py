@@ -141,7 +141,7 @@ class Cell:
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
-    def set_biophysics(self, p_mech):
+    def set_biophysics(self, p_secs):
         "Set the biophysics for the default Pyramidal cell."
 
         # neuron syntax is used to set values for mechanisms
@@ -151,10 +151,11 @@ class Cell:
 
         for sec in self.sections:
             sec_name = sec.name().split('_', 1)[1]
-            for mech_name in p_mech[sec_name]:
+            for mech_name in p_secs[sec_name]['mechs']:
                 sec.insert(mech_name)
-                for attr in p_mech[sec_name][mech_name]:
-                    setattr(sec, attr, p_mech[sec_name][mech_name][attr])
+                for attr in p_secs[sec_name]['mechs'][mech_name]:
+                    setattr(sec, attr,
+                            p_secs[sec_name]['mechs'][mech_name][attr])
 
     def create_dends(self, p_dend):
         """Create dendrites."""
@@ -168,6 +169,19 @@ class Cell:
             self.dends[key].diam = p_dend[key]['diam']
             self.dends[key].Ra = p_dend[key]['Ra']
             self.dends[key].cm = p_dend[key]['cm']
+
+    def create_synapses(self, p_secs, p_syn):
+        """Create synapses."""
+        for sec_name in p_secs:
+            for receptor in p_secs[sec_name]['syns']:
+                sec_name_sanitized = sec_name.replace('_', '')
+                syn_key = f'{sec_name_sanitized}_{receptor}'
+                if sec_name == 'soma':
+                    seg = self.soma(0.5)
+                else:
+                    seg = self.dends[sec_name](0.5)
+                self.synapses[syn_key] = self.syn_create(
+                    seg, **p_syn[receptor])
 
     def create_soma(self, soma_props):
         """Create soma and set geometry.

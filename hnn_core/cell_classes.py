@@ -168,19 +168,17 @@ def basket(pos, cell_name='L2Basket', gid=None):
     cell = Cell(pos=pos, gid=gid)
     cell.name = cell_name
 
-    soma_props = _get_basket_soma_props(cell_name)
-    cell.create_soma(soma_props)
+    p_secs = dict()
+    p_secs['soma'] = _get_basket_soma_props(cell_name)
+    cell.create_soma(p_secs['soma'])
     cell.sections = [cell.soma]   # XXX: needed?
     cell.secs = _secs_Basket()
 
-    cell.set_geometry()
-
-    cell.synapses = dict()
-    # cell._synapse_create()
     p_syn = _get_basket_syn_props()
-    for receptor in p_syn:
-        cell.synapses[f'soma_{receptor}'] = cell.syn_create(
-            cell.soma(0.5), **p_syn[receptor])
+    p_secs['soma']['syns'] = list(p_syn.keys())
+
+    cell.set_geometry()
+    cell.create_synapses(p_secs, p_syn)
 
     cell.soma.insert('hh2')
 
@@ -249,8 +247,18 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
                              section_names=section_names,
                              prop_names=prop_names)
     p_syn = _get_syn_props(p_all, cell.name)
+    p_secs = p_dend.copy()
+    p_secs['soma'] = p_soma
     p_mech = _get_mechanisms(p_all, cell.name, ['soma'] + section_names,
                              mechanisms)
+    for key in p_secs:
+        p_secs[key]['mechs'] = p_mech[key]
+    for key in p_secs:
+        if key == 'soma':
+            syns = ['gabaa', 'gabab']
+        else:
+            syns = list(p_syn.keys())
+        p_secs[key]['syns'] = syns
 
     # Geometry
     # dend Cm and dend Ra set using soma Cm and soma Ra
@@ -274,7 +282,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
                 cell.dends[key].nseg += 1
 
     # biophysics
-    cell.set_biophysics(p_mech)
+    cell.set_biophysics(p_secs)
 
     if celltype == 'L5_pyramidal':
         cell.soma.insert('ar')
@@ -306,15 +314,5 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     cell.insert_dipole(yscale)
 
     # create synapses
-    cell.synapses['soma_gabaa'] = cell.syn_create(cell.soma(0.5),
-                                                  **p_syn['gabaa'])
-    cell.synapses['soma_gabab'] = cell.syn_create(cell.soma(0.5),
-                                                  **p_syn['gabab'])
-
-    # Dendritic synapses
-    for sec in section_names:
-        for receptor in p_syn:
-            syn_key = sec.replace('_', '') + '_' + receptor
-            cell.synapses[syn_key] = cell.syn_create(
-                cell.dends[sec](0.5), **p_syn[receptor])
+    cell.create_synapses(p_secs, p_syn)
     return cell
