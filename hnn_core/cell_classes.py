@@ -21,7 +21,20 @@ from .params_default import (get_L2Pyr_params_default,
 
 
 def _get_dend_props(params, cell_type, section_names, prop_names):
-    """Convert a flat dictionary to a nested dictionary."""
+    """Convert a flat dictionary to a nested dictionary.
+
+    Returns
+    -------
+    dend_props : dict
+        Nested dictionary. The outer dictionary has keys
+        with names of dendrites and the inner dictionary
+        specifies the geometry of these sections.
+
+        * L: length of a section in microns
+        * diam: diameter of a section in microns
+        * cm: membrane capacitance in micro-Farads
+        * Ra: axial resistivity in ohm-cm
+    """
     dend_props = dict()
     for section_name in section_names:
         dend_prop = dict()
@@ -245,7 +258,15 @@ class Pyr(Cell):
 
         # sets geom properties; adjusted after translation from
         # hoc (2009 model)
-        self.set_geometry(p_dend)
+        self.set_geometry()
+        # resets length,diam,etc. based on param specification
+        for key in p_dend:
+            # set dend nseg
+            if p_dend[key]['L'] > 100.:
+                self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
+                # make dend.nseg odd for all sections
+                if not self.dends[key].nseg % 2:
+                    self.dends[key].nseg += 1
 
         # biophysics
         self.set_biophysics(p_mech)
@@ -281,31 +302,6 @@ class Pyr(Cell):
 
         # create synapses
         self._synapse_create(p_syn, section_names)
-
-    def set_geometry(self, p_dend):
-        """Define shape of the neuron and connect sections.
-
-        Parameters
-        ----------
-        p_dend : dict | None
-            Nested dictionary. The outer dictionary has keys
-            with names of dendrites and the inner dictionary
-            specifies the geometry of these sections.
-
-            * L: length of a section in microns
-            * diam: diameter of a section in microns
-            * cm: membrane capacitance in micro-Farads
-            * Ra: axial resistivity in ohm-cm
-        """
-        Cell.set_geometry(self)
-        # resets length,diam,etc. based on param specification
-        for key in p_dend:
-            # set dend nseg
-            if p_dend[key]['L'] > 100.:
-                self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
-                # make dend.nseg odd for all sections
-                if not self.dends[key].nseg % 2:
-                    self.dends[key].nseg += 1
 
     def _synapse_create(self, p_syn, section_names):
         """Creates synapses onto this cell."""
