@@ -173,7 +173,7 @@ def basket(pos, cell_name='L2Basket', gid=None):
     return cell
 
 
-class Pyr(Cell):
+def pyramidal(pos, celltype, override_params=None, gid=None):
     """Pyramidal neuron.
 
     Parameters
@@ -185,129 +185,118 @@ class Pyr(Cell):
     gid : int or None (optional)
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed..
-
-    Attributes
-    ----------
-    name : str
-        The name of the cell, 'L5Pyr' or 'L2Pyr'
-    sect_loc : dict of list
-        Can have keys 'proximal' or 'distal' each containing
-        names of section locations that are proximal or distal.
-    synapses : dict
-        The synapses that the cell can use for connections.
+        yet attached to a network. Once the GID is set, it cannot be changed.
     """
 
-    def __init__(self, pos, celltype, override_params=None, gid=None):
+    cell = Cell(pos=pos, gid=gid)
+    if celltype == 'L5_pyramidal':
+        p_all_default = get_L5Pyr_params_default()
+        cell.name = 'L5Pyr'
+        cell.secs = _secs_L5Pyr()
+        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
+        mechanisms = {
+            'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                    'gl_hh2', 'el_hh2'],
+            'ca': ['gbar_ca'],
+            'cad': ['taur_cad'],
+            'kca': ['gbar_kca'],
+            'km': ['gbar_km'],
+            'cat': ['gbar_cat']
+        }
+        section_names = ['apical_trunk', 'apical_1',
+                         'apical_2', 'apical_tuft',
+                         'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+    elif celltype == 'L2_pyramidal':
+        p_all_default = get_L2Pyr_params_default()
+        cell.name = 'L2Pyr'
+        cell.secs = _secs_L2Pyr()
+        mechanisms = {
+            'km': ['gbar_km'],
+            'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                    'gl_hh2', 'el_hh2']}
+        section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
+                         'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+    else:
+        raise ValueError(f'Unknown pyramidal cell type: {celltype}')
 
-        Cell.__init__(self, pos=pos, gid=gid)
-        if celltype == 'L5_pyramidal':
-            p_all_default = get_L5Pyr_params_default()
-            self.name = 'L5Pyr'
-            self.secs = _secs_L5Pyr()
-            # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
-            mechanisms = {
-                'hh2': ['gkbar_hh2', 'gnabar_hh2',
-                        'gl_hh2', 'el_hh2'],
-                'ca': ['gbar_ca'],
-                'cad': ['taur_cad'],
-                'kca': ['gbar_kca'],
-                'km': ['gbar_km'],
-                'cat': ['gbar_cat']
-            }
-            section_names = ['apical_trunk', 'apical_1',
-                             'apical_2', 'apical_tuft',
-                             'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        elif celltype == 'L2_pyramidal':
-            p_all_default = get_L2Pyr_params_default()
-            self.name = 'L2Pyr'
-            self.secs = _secs_L2Pyr()
-            mechanisms = {
-                'km': ['gbar_km'],
-                'hh2': ['gkbar_hh2', 'gnabar_hh2',
-                        'gl_hh2', 'el_hh2']}
-            section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
-                             'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        else:
-            raise ValueError(f'Unknown pyramidal cell type: {celltype}')
+    p_all = p_all_default
+    if override_params is not None:
+        assert isinstance(override_params, dict)
+        p_all = compare_dictionaries(p_all_default, override_params)
 
-        p_all = p_all_default
-        if override_params is not None:
-            assert isinstance(override_params, dict)
-            p_all = compare_dictionaries(p_all_default, override_params)
+    prop_names = ['L', 'diam', 'Ra', 'cm']
+    # Get somatic, dendritic, and synapse properties
+    p_soma = _get_soma_props(p_all, cell.name)
+    p_dend = _get_dend_props(p_all, cell_type=cell.name,
+                             section_names=section_names,
+                             prop_names=prop_names)
+    p_syn = _get_syn_props(p_all, cell.name)
+    p_mech = _get_mechanisms(p_all, cell.name, ['soma'] + section_names,
+                             mechanisms)
 
-        prop_names = ['L', 'diam', 'Ra', 'cm']
-        # Get somatic, dendritic, and synapse properties
-        p_soma = _get_soma_props(p_all, self.name)
-        p_dend = _get_dend_props(p_all, cell_type=self.name,
-                                 section_names=section_names,
-                                 prop_names=prop_names)
-        p_syn = _get_syn_props(p_all, self.name)
-        p_mech = _get_mechanisms(p_all, self.name, ['soma'] + section_names,
-                                 mechanisms)
+    # Geometry
+    # dend Cm and dend Ra set using soma Cm and soma Ra
+    cell.create_soma(p_soma)
+    cell.create_dends(p_dend)  # just creates the sections
+    cell.sections = [cell.soma] + list(cell.dends.values())
 
-        # Geometry
-        # dend Cm and dend Ra set using soma Cm and soma Ra
-        self.create_soma(p_soma)
-        self.create_dends(p_dend)  # just creates the sections
-        self.sections = [self.soma] + list(self.dends.values())
+    cell.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
+    cell.sect_loc['distal'] = ['apicaltuft']
 
-        self.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
-        self.sect_loc['distal'] = ['apicaltuft']
+    # sets geom properties; adjusted after translation from
+    # hoc (2009 model)
+    cell.set_geometry()
+    # resets length,diam,etc. based on param specification
+    for key in p_dend:
+        # set dend nseg
+        if p_dend[key]['L'] > 100.:
+            cell.dends[key].nseg = int(p_dend[key]['L'] / 50.)
+            # make dend.nseg odd for all sections
+            if not cell.dends[key].nseg % 2:
+                cell.dends[key].nseg += 1
 
-        # sets geom properties; adjusted after translation from
-        # hoc (2009 model)
-        self.set_geometry()
-        # resets length,diam,etc. based on param specification
-        for key in p_dend:
-            # set dend nseg
-            if p_dend[key]['L'] > 100.:
-                self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
-                # make dend.nseg odd for all sections
-                if not self.dends[key].nseg % 2:
-                    self.dends[key].nseg += 1
+    # biophysics
+    cell.set_biophysics(p_mech)
 
-        # biophysics
-        self.set_biophysics(p_mech)
+    if celltype == 'L5_pyramidal':
+        cell.soma.insert('ar')
+        cell.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
 
-        if celltype == 'L5_pyramidal':
-            self.soma.insert('ar')
-            self.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
+        # set dend biophysics not specified in Pyr()
+        for key in cell.dends:
+            # insert 'ar' mechanism
+            cell.dends[key].insert('ar')
 
-            # set dend biophysics not specified in Pyr()
-            for key in self.dends:
-                # insert 'ar' mechanism
-                self.dends[key].insert('ar')
+        # set gbar_ar
+        # Value depends on distance from the soma. Soma is set as
+        # origin by passing cell.soma as a sec argument to h.distance()
+        # Then iterate over segment nodes of dendritic sections
+        # and set gbar_ar depending on h.distance(seg.x), which returns
+        # distance from the soma to this point on the CURRENTLY ACCESSED
+        # SECTION!!!
+        h.distance(sec=cell.soma)
 
-            # set gbar_ar
-            # Value depends on distance from the soma. Soma is set as
-            # origin by passing self.soma as a sec argument to h.distance()
-            # Then iterate over segment nodes of dendritic sections
-            # and set gbar_ar depending on h.distance(seg.x), which returns
-            # distance from the soma to this point on the CURRENTLY ACCESSED
-            # SECTION!!!
-            h.distance(sec=self.soma)
+        for key in cell.dends:
+            cell.dends[key].push()
+            for seg in cell.dends[key]:
+                seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
 
-            for key in self.dends:
-                self.dends[key].push()
-                for seg in self.dends[key]:
-                    seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
+            h.pop_section()
 
-                h.pop_section()
+    # insert dipole
+    yscale = cell.secs[3]
+    cell.insert_dipole(yscale)
 
-        # insert dipole
-        yscale = self.secs[3]
-        self.insert_dipole(yscale)
+    # create synapses
+    cell.synapses['soma_gabaa'] = cell.syn_create(cell.soma(0.5),
+                                                  **p_syn['gabaa'])
+    cell.synapses['soma_gabab'] = cell.syn_create(cell.soma(0.5),
+                                                  **p_syn['gabab'])
 
-        # create synapses
-        self.synapses['soma_gabaa'] = self.syn_create(self.soma(0.5),
-                                                      **p_syn['gabaa'])
-        self.synapses['soma_gabab'] = self.syn_create(self.soma(0.5),
-                                                      **p_syn['gabab'])
-
-        # Dendritic synapses
-        for sec in section_names:
-            for receptor in p_syn:
-                syn_key = sec.replace('_', '') + '_' + receptor
-                self.synapses[syn_key] = self.syn_create(
-                    self.dends[sec](0.5), **p_syn[receptor])
+    # Dendritic synapses
+    for sec in section_names:
+        for receptor in p_syn:
+            syn_key = sec.replace('_', '') + '_' + receptor
+            cell.synapses[syn_key] = cell.syn_create(
+                cell.dends[sec](0.5), **p_syn[receptor])
+    return cell

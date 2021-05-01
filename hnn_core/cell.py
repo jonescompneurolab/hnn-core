@@ -104,6 +104,9 @@ class Cell:
         for tonic biasing inputs.
     gid : int
         GID of the cell in a network (or None if not yet assigned)
+    sect_loc : dict of list
+        Can have keys 'proximal' or 'distal' each containing
+        names of section locations that are proximal or distal.
     """
 
     def __init__(self, pos, gid=None):
