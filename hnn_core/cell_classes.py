@@ -20,20 +20,20 @@ from .params_default import (get_L2Pyr_params_default,
 # units for taur: ms
 
 
-def _flat_to_nested(params, cell_type, level1_keys, level2_keys):
+def _get_dend_props(params, cell_type, section_names, prop_names):
     """Convert a flat dictionary to a nested dictionary."""
-    nested_dict = dict()
-    for level1_key in level1_keys:
-        level2_dict = dict()
-        for key in level2_keys:
+    dend_props = dict()
+    for section_name in section_names:
+        dend_prop = dict()
+        for key in prop_names:
             if key in ['Ra', 'cm']:
                 middle = 'dend'
             else:
                 # map apicaltrunk -> apical_trunk etc.
-                middle = level1_key.replace('_', '')
-            level2_dict[key] = params[f'{cell_type}_{middle}_{key}']
-        nested_dict[level1_key] = level2_dict
-    return nested_dict
+                middle = section_name.replace('_', '')
+            dend_prop[key] = params[f'{cell_type}_{middle}_{key}']
+        dend_props[section_name] = dend_prop
+    return dend_props
 
 
 def _get_soma_props(p_all, cell_type):
@@ -224,12 +224,12 @@ class Pyr(Cell):
 
         Cell.__init__(self, pos=pos, gid=gid)
 
-        level2_keys = ['L', 'diam', 'Ra', 'cm']
+        prop_names = ['L', 'diam', 'Ra', 'cm']
         # Get somatic, dendritic, and synapse properties
         p_soma = _get_soma_props(p_all, self.name)
-        p_dend = _flat_to_nested(p_all, cell_type=self.name,
-                                 level1_keys=section_names,
-                                 level2_keys=level2_keys)
+        p_dend = _get_dend_props(p_all, cell_type=self.name,
+                                 section_names=section_names,
+                                 prop_names=prop_names)
         p_syn = _get_syn_props(p_all, self.name)
         p_mech = _get_mechanisms(p_all, self.name, ['soma'] + section_names,
                                  mechanisms)
