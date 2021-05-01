@@ -200,6 +200,7 @@ class Pyr(Cell):
 
     def __init__(self, pos, celltype, override_params=None, gid=None):
 
+        Cell.__init__(self, pos=pos, gid=gid)
         if celltype == 'L5_pyramidal':
             p_all_default = get_L5Pyr_params_default()
             self.name = 'L5Pyr'
@@ -234,8 +235,6 @@ class Pyr(Cell):
         if override_params is not None:
             assert isinstance(override_params, dict)
             p_all = compare_dictionaries(p_all_default, override_params)
-
-        Cell.__init__(self, pos=pos, gid=gid)
 
         prop_names = ['L', 'diam', 'Ra', 'cm']
         # Get somatic, dendritic, and synapse properties
@@ -301,11 +300,6 @@ class Pyr(Cell):
         self.insert_dipole(yscale)
 
         # create synapses
-        self._synapse_create(p_syn, section_names)
-
-    def _synapse_create(self, p_syn, section_names):
-        """Creates synapses onto this cell."""
-        # Somatic synapses
         self.synapses['soma_gabaa'] = self.syn_create(self.soma(0.5),
                                                       **p_syn['gabaa'])
         self.synapses['soma_gabab'] = self.syn_create(self.soma(0.5),
