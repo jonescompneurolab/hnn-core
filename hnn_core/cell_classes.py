@@ -170,17 +170,17 @@ def basket(pos, cell_name='L2Basket', gid=None):
 
     p_secs = dict()
     p_secs['soma'] = _get_basket_soma_props(cell_name)
+    p_syn = _get_basket_syn_props()
+    p_secs['soma']['syns'] = list(p_syn.keys())
+    p_secs['soma']['mechs'] = {'hh2': dict()}
+
     cell.create_soma(p_secs['soma'])
     cell.sections = [cell.soma]   # XXX: needed?
     cell.secs = _secs_Basket()
 
-    p_syn = _get_basket_syn_props()
-    p_secs['soma']['syns'] = list(p_syn.keys())
-
     cell.set_geometry()
     cell.create_synapses(p_secs, p_syn)
-
-    cell.soma.insert('hh2')
+    cell.set_biophysics(p_secs)
 
     if cell_name == 'L2Basket':
         cell.sect_loc = dict(proximal=['soma'], distal=['soma'])
