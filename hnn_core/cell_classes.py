@@ -68,7 +68,7 @@ def _get_basket_soma_props(cell_name):
     }
 
 
-def _get_syn_props(p_all, cell_type):
+def _get_pyr_syn_props(p_all, cell_type):
     return {
         'ampa': {
             'e': p_all['%s_ampa_e' % cell_type],
@@ -174,13 +174,9 @@ def basket(pos, cell_name='L2Basket', gid=None):
     p_secs['soma']['syns'] = list(p_syn.keys())
     p_secs['soma']['mechs'] = {'hh2': dict()}
 
-    cell.create_soma(p_secs['soma'])
-    cell.sections = [cell.soma]   # XXX: needed?
     cell.secs = _secs_Basket()
 
-    cell.set_geometry()
-    cell.create_synapses(p_secs, p_syn)
-    cell.set_biophysics(p_secs)
+    cell.build(p_secs, p_syn)
 
     if cell_name == 'L2Basket':
         cell.sect_loc = dict(proximal=['soma'], distal=['soma'])
@@ -196,6 +192,8 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     ----------
     pos : tuple
         Coordinates of cell soma in xyz-space
+    celltype : str
+        'L5_pyramidal' or 'L2_pyramidal'. The pyramidal cell type.
     override_params : dict or None (optional)
         Parameters specific to L2 pyramidal neurons to override the default set
     gid : int or None (optional)
@@ -246,7 +244,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     p_dend = _get_dend_props(p_all, cell_type=cell.name,
                              section_names=section_names,
                              prop_names=prop_names)
-    p_syn = _get_syn_props(p_all, cell.name)
+    p_syn = _get_pyr_syn_props(p_all, cell.name)
     p_secs = p_dend.copy()
     p_secs['soma'] = p_soma
     p_mech = _get_mechanisms(p_all, cell.name, ['soma'] + section_names,
@@ -260,29 +258,10 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
             syns = list(p_syn.keys())
         p_secs[key]['syns'] = syns
 
-    # Geometry
-    # dend Cm and dend Ra set using soma Cm and soma Ra
-    cell.create_soma(p_soma)
-    cell.create_dends(p_dend)  # just creates the sections
-    cell.sections = [cell.soma] + list(cell.dends.values())
-
     cell.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
     cell.sect_loc['distal'] = ['apicaltuft']
 
-    # sets geom properties; adjusted after translation from
-    # hoc (2009 model)
-    cell.set_geometry()
-    # resets length,diam,etc. based on param specification
-    for key in p_dend:
-        # set dend nseg
-        if p_dend[key]['L'] > 100.:
-            cell.dends[key].nseg = int(p_dend[key]['L'] / 50.)
-            # make dend.nseg odd for all sections
-            if not cell.dends[key].nseg % 2:
-                cell.dends[key].nseg += 1
-
-    # biophysics
-    cell.set_biophysics(p_secs)
+    cell.build(p_secs, p_syn)
 
     if celltype == 'L5_pyramidal':
         cell.soma.insert('ar')
@@ -313,6 +292,4 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     yscale = cell.secs[3]
     cell.insert_dipole(yscale)
 
-    # create synapses
-    cell.create_synapses(p_secs, p_syn)
     return cell

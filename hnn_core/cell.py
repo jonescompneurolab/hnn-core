@@ -159,6 +159,8 @@ class Cell:
 
     def create_dends(self, p_dend):
         """Create dendrites."""
+        # sets geom properties based on hoc (2009 model)
+
         # XXX: name should be unique even across cell types?
         # otherwise Neuron cannot disambiguate, hence
         # self.name + '_' + key
@@ -169,6 +171,14 @@ class Cell:
             self.dends[key].diam = p_dend[key]['diam']
             self.dends[key].Ra = p_dend[key]['Ra']
             self.dends[key].cm = p_dend[key]['cm']
+
+        for key in p_dend:
+            # set dend nseg
+            if p_dend[key]['L'] > 100.:
+                self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
+                # make dend.nseg odd for all sections
+                if not self.dends[key].nseg % 2:
+                    self.dends[key].nseg += 1
 
     def create_synapses(self, p_secs, p_syn):
         """Create synapses."""
@@ -197,6 +207,17 @@ class Cell:
         self.soma.diam = soma_props['diam']
         self.soma.Ra = soma_props['Ra']
         self.soma.cm = soma_props['cm']
+
+    def build(self, p_secs, p_syn):
+        """Build cell in Neuron."""
+        self.create_soma(p_secs['soma'])
+        p_dend = p_secs.copy()
+        del p_dend['soma']
+        self.create_dends(p_dend)  # just creates the sections
+        self.sections = [self.soma] + list(self.dends.values())
+        self.set_geometry()
+        self.create_synapses(p_secs, p_syn)
+        self.set_biophysics(p_secs)
 
     def move_to_pos(self):
         """Move cell to position."""
