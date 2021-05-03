@@ -167,18 +167,6 @@ class Cell:
         for key in p_dend:
             self.dends[key] = h.Section(
                 name=self.name + '_' + key)  # create dend
-            self.dends[key].L = p_dend[key]['L']
-            self.dends[key].diam = p_dend[key]['diam']
-            self.dends[key].Ra = p_dend[key]['Ra']
-            self.dends[key].cm = p_dend[key]['cm']
-
-        for key in p_dend:
-            # set dend nseg
-            if p_dend[key]['L'] > 100.:
-                self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
-                # make dend.nseg odd for all sections
-                if not self.dends[key].nseg % 2:
-                    self.dends[key].nseg += 1
 
     def create_synapses(self, p_secs, p_syn):
         """Create synapses."""
@@ -215,7 +203,7 @@ class Cell:
         del p_dend['soma']
         self.create_dends(p_dend)  # just creates the sections
         self.sections = [self.soma] + list(self.dends.values())
-        self.set_geometry()
+        self.set_geometry(p_dend)
         self.create_synapses(p_secs, p_syn)
         self.set_biophysics(p_secs)
 
@@ -422,7 +410,7 @@ class Cell:
         dy = self.pos[1] - pos_pre[1]
         return np.sqrt(dx**2 + dy**2)
 
-    def set_geometry(self):
+    def set_geometry(self, p_dend):
         """Define geometry."""
         # Define 3D shape and position of cell. By default neuron uses xy plane
         # for height and xz plane for depth. This is opposite for model as a
@@ -435,6 +423,20 @@ class Cell:
                 h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
             sec.L = sec_lens[sec_name]
             sec.diam = sec_diams[sec_name]
+
+        for sec_name in p_dend:
+            self.dends[sec_name].Ra = p_dend[sec_name]['Ra']
+            self.dends[sec_name].cm = p_dend[sec_name]['cm']
+            self.dends[sec_name].L = p_dend[sec_name]['L']
+            self.dends[sec_name].diam = p_dend[sec_name]['diam']
+
+        for key in p_dend:
+            # set dend nseg
+            if p_dend[key]['L'] > 100.:
+                self.dends[key].nseg = int(p_dend[key]['L'] / 50.)
+                # make dend.nseg odd for all sections
+                if not self.dends[key].nseg % 2:
+                    self.dends[key].nseg += 1
 
         if topology is None:
             topology = list()
