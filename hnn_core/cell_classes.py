@@ -49,8 +49,8 @@ def _get_dend_props(params, cell_type, section_names, prop_names):
     return dend_props
 
 
-def _get_soma_props(p_all, cell_type):
-    """Hardcoded somatic properties."""
+def _get_pyr_soma_props(p_all, cell_type):
+    """Get somatic properties."""
     return {
         'L': p_all[f'{cell_type}_soma_L'],
         'diam': p_all[f'{cell_type}_soma_diam'],
@@ -149,7 +149,7 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
 
 
 def basket(pos, cell_name='L2Basket', gid=None):
-    """Get layer 2 basket cells.
+    """Get layer 2 / layer 5 basket cells.
 
     Parameters
     ----------
@@ -240,7 +240,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
 
     prop_names = ['L', 'diam', 'Ra', 'cm']
     # Get somatic, dendritic, and synapse properties
-    p_soma = _get_soma_props(p_all, cell.name)
+    p_soma = _get_pyr_soma_props(p_all, cell.name)
     p_dend = _get_dend_props(p_all, cell_type=cell.name,
                              section_names=section_names,
                              prop_names=prop_names)
