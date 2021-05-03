@@ -176,12 +176,13 @@ def basket(pos, cell_name='L2Basket', gid=None):
 
     cell.secs = _secs_Basket()
 
-    cell.build(p_secs, p_syn)
-
     if cell_name == 'L2Basket':
         cell.sect_loc = dict(proximal=['soma'], distal=['soma'])
     elif cell_name == 'L5Basket':
         cell.sect_loc = dict(proximal=['soma'], distal=[])
+
+    cell.build(p_secs, p_syn)
+
     return cell
 
 
@@ -214,7 +215,8 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
             'cad': ['taur_cad'],
             'kca': ['gbar_kca'],
             'km': ['gbar_km'],
-            'cat': ['gbar_cat']
+            'cat': ['gbar_cat'],
+            'ar': ['gbar_ar']
         }
         section_names = ['apical_trunk', 'apical_1',
                          'apical_2', 'apical_tuft',
@@ -264,13 +266,6 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     cell.build(p_secs, p_syn)
 
     if celltype == 'L5_pyramidal':
-        cell.soma.insert('ar')
-        cell.soma.gbar_ar = p_all['L5Pyr_soma_gbar_ar']
-
-        # set dend biophysics not specified in Pyr()
-        for key in cell.dends:
-            # insert 'ar' mechanism
-            cell.dends[key].insert('ar')
 
         # set gbar_ar
         # Value depends on distance from the soma. Soma is set as
