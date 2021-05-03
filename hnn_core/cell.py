@@ -157,17 +157,6 @@ class Cell:
                     setattr(sec, attr,
                             p_secs[sec_name]['mechs'][mech_name][attr])
 
-    def create_dends(self, p_dend):
-        """Create dendrites."""
-        # sets geom properties based on hoc (2009 model)
-
-        # XXX: name should be unique even across cell types?
-        # otherwise Neuron cannot disambiguate, hence
-        # self.name + '_' + key
-        for key in p_dend:
-            self.dends[key] = h.Section(
-                name=self.name + '_' + key)  # create dend
-
     def create_synapses(self, p_secs, p_syn):
         """Create synapses."""
         for sec_name in p_secs:
@@ -181,29 +170,63 @@ class Cell:
                 self.synapses[syn_key] = self.syn_create(
                     seg, **p_syn[receptor])
 
-    def create_soma(self, soma_props):
+    def create_sections(self, p_secs):
         """Create soma and set geometry.
 
         Parameters
         ----------
-        soma_props : dict
-            The properties of the soma. Must contain
+        p_secs : dict
+            The properties of the section. Must contain
             keys 'L', 'diam', 'Ra', and 'cm'.
+
+        Notes
+        -----
+        By default neuron uses xy plane
+        for height and xz plane for depth. This is opposite for model as a
+        whole, but convention is followed in this function ease use of gui.
         """
-        self.soma = h.Section(cell=self, name=self.name + '_soma')
-        self.soma.L = soma_props['L']
-        self.soma.diam = soma_props['diam']
-        self.soma.Ra = soma_props['Ra']
-        self.soma.cm = soma_props['cm']
+        sec_pts, _, _, _, topology = self.secs
+
+        for sec_name in p_secs:
+            if sec_name == 'soma':
+                self.soma = h.Section(cell=self, name=self.name + '_soma')
+                sec = self.soma
+            else:
+                self.dends[sec_name] = h.Section(
+                    name=self.name + '_' + sec_name)
+                sec = self.dends[sec_name]
+
+            h.pt3dclear(sec=sec)
+            for pt in sec_pts[sec_name]:
+                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
+            sec.L = p_secs[sec_name]['L']
+            sec.diam = p_secs[sec_name]['diam']
+            sec.Ra = p_secs[sec_name]['Ra']
+            sec.cm = p_secs[sec_name]['cm']
+
+            if sec.L > 100.:
+                sec.nseg = int(sec.L / 50.)
+                # make dend.nseg odd for all sections
+                if not sec.nseg % 2:
+                    sec.nseg += 1
+
+        if topology is None:
+            topology = list()
+
+        # Connects sections of THIS cell together.
+        for connection in topology:
+            # XXX: risky to use self.soma as default. Unfortunately there isn't
+            # a dictionary with all the sections (including soma)
+            parent_sec = self.dends.get(connection[0], self.soma)
+            parent_loc = connection[1]
+            child_sec = self.dends.get(connection[2], self.soma)
+            child_loc = connection[3]
+            child_sec.connect(parent_sec, parent_loc, child_loc)
 
     def build(self, p_secs, p_syn):
         """Build cell in Neuron."""
-        self.create_soma(p_secs['soma'])
-        p_dend = p_secs.copy()
-        del p_dend['soma']
-        self.create_dends(p_dend)  # just creates the sections
+        self.create_sections(p_secs)
         self.sections = [self.soma] + list(self.dends.values())
-        self.set_geometry(p_secs)
         self.create_synapses(p_secs, p_syn)
         self.set_biophysics(p_secs)
 
@@ -409,43 +432,3 @@ class Cell:
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
         return np.sqrt(dx**2 + dy**2)
-
-    def set_geometry(self, p_secs):
-        """Define geometry."""
-        # Define 3D shape and position of cell. By default neuron uses xy plane
-        # for height and xz plane for depth. This is opposite for model as a
-        # whole, but convention is followed in this function ease use of gui.
-        sec_pts, _, _, _, topology = self.secs
-
-        for sec_name in p_secs:
-            if sec_name == 'soma':
-                sec = self.soma
-            else:
-                sec = self.dends[sec_name]
-
-            h.pt3dclear(sec=sec)
-            for pt in sec_pts[sec_name]:
-                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
-            sec.L = p_secs[sec_name]['L']
-            sec.diam = p_secs[sec_name]['diam']
-            sec.Ra = p_secs[sec_name]['Ra']
-            sec.cm = p_secs[sec_name]['cm']
-
-            if sec.L > 100.:
-                sec.nseg = int(sec.L / 50.)
-                # make dend.nseg odd for all sections
-                if not sec.nseg % 2:
-                    sec.nseg += 1
-
-        if topology is None:
-            topology = list()
-
-        # Connects sections of THIS cell together.
-        for connection in topology:
-            # XXX: risky to use self.soma as default. Unfortunately there isn't
-            # a dictionary with all the sections (including soma)
-            parent_sec = self.dends.get(connection[0], self.soma)
-            parent_loc = connection[1]
-            child_sec = self.dends.get(connection[2], self.soma)
-            child_loc = connection[3]
-            child_sec.connect(parent_sec, parent_loc, child_loc)
