@@ -206,7 +206,6 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     if celltype == 'L5_pyramidal':
         p_all_default = get_L5Pyr_params_default()
         cell.name = 'L5Pyr'
-        cell.secs = _secs_L5Pyr()
         # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
         mechanisms = {
             'hh2': ['gkbar_hh2', 'gnabar_hh2',
@@ -220,16 +219,17 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
         section_names = ['apical_trunk', 'apical_1',
                          'apical_2', 'apical_tuft',
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+        cell.secs = _secs_L5Pyr()
     elif celltype == 'L2_pyramidal':
         p_all_default = get_L2Pyr_params_default()
         cell.name = 'L2Pyr'
-        cell.secs = _secs_L2Pyr()
         mechanisms = {
             'km': ['gbar_km'],
             'hh2': ['gkbar_hh2', 'gnabar_hh2',
                     'gl_hh2', 'el_hh2']}
         section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+        cell.secs = _secs_L2Pyr()
     else:
         raise ValueError(f'Unknown pyramidal cell type: {celltype}')
 
