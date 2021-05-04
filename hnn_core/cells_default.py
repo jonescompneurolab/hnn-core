@@ -1,4 +1,4 @@
-"""Model for Pyramidal cell class."""
+"""Default cell models."""
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>

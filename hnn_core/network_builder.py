@@ -13,7 +13,7 @@ if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
-from .cell_classes import pyramidal, basket
+from .cells_default import pyramidal, basket
 from .params import _long_name, _short_name
 from copy import deepcopy
 
