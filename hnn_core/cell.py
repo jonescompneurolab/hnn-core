@@ -85,9 +85,14 @@ class Cell:
     ----------
     pos : list of length 3
         The position of the cell.
+    soma : instance of h.Section | None
+        The soma of the cell instantiated in Neuron. If None,
+        the cell has not yet been built in Neuron.
     dends : dict
         The dendrites. The key is the name of the dendrite
         and the value is an instance of h.Section.
+    sections : list of h.Section
+        All the sections including soma and dendrites.
     synapses : dict
         The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
@@ -111,7 +116,7 @@ class Cell:
 
     def __init__(self, pos, gid=None):
         self.pos = pos
-        # preallocate dict to store dends
+        self.soma = None
         self.dends = dict()
         self.synapses = dict()
         self.sect_loc = dict()
@@ -131,6 +136,12 @@ class Cell:
     @property
     def gid(self):
         return self._gid
+
+    @property
+    def sections(self):
+        if self.soma is None:
+            raise ValueError('Cell has not yet been built in Neuron')
+        return [self.soma] + list(self.dends.values())
 
     @gid.setter
     def gid(self, gid):
@@ -210,7 +221,7 @@ class Cell:
             sec.Ra = p_secs[sec_name]['Ra']
             sec.cm = p_secs[sec_name]['cm']
 
-            if sec.L > 100.:
+            if sec.L > 100.:  # 100 um
                 sec.nseg = int(sec.L / 50.)
                 # make dend.nseg odd for all sections
                 if not sec.nseg % 2:
@@ -221,11 +232,15 @@ class Cell:
 
         # Connects sections of THIS cell together.
         for connection in topology:
-            # XXX: risky to use self.soma as default. Unfortunately there isn't
-            # a dictionary with all the sections (including soma)
-            parent_sec = self.dends.get(connection[0], self.soma)
+            if connection[0] == 'soma':
+                parent_sec = self.soma
+            else:
+                parent_sec = self.dends[connection[0]]
+            if connection[2] == 'soma':
+                child_sec = self.soma
+            else:
+                child_sec = self.dends[connection[2]]
             parent_loc = connection[1]
-            child_sec = self.dends.get(connection[2], self.soma)
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
 
@@ -266,7 +281,6 @@ class Cell:
         }
         """
         self._create_sections(p_secs)
-        self.sections = [self.soma] + list(self.dends.values())
         self._create_synapses(p_secs, p_syn)
         self._set_biophysics(p_secs)
 
