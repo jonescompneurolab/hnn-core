@@ -253,35 +253,19 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
                              mechanisms)
     for key in p_secs:
         p_secs[key]['mechs'] = p_mech[key]
-    for key in p_secs:
         if key == 'soma':
             syns = ['gabaa', 'gabab']
         else:
             syns = list(p_syn.keys())
+            if celltype == 'L5_pyramidal':
+                p_secs[key]['mechs'][
+                    'ar']['gbar_ar'] = lambda x: 1e-6 * np.exp(3e-3 * x)
         p_secs[key]['syns'] = syns
 
     cell.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
     cell.sect_loc['distal'] = ['apicaltuft']
 
     cell.build(p_secs, p_syn)
-
-    if celltype == 'L5_pyramidal':
-
-        # set gbar_ar
-        # Value depends on distance from the soma. Soma is set as
-        # origin by passing cell.soma as a sec argument to h.distance()
-        # Then iterate over segment nodes of dendritic sections
-        # and set gbar_ar depending on h.distance(seg.x), which returns
-        # distance from the soma to this point on the CURRENTLY ACCESSED
-        # SECTION!!!
-        h.distance(sec=cell.soma)
-
-        for key in cell.dends:
-            cell.dends[key].push()
-            for seg in cell.dends[key]:
-                seg.gbar_ar = 1e-6 * np.exp(3e-3 * h.distance(seg.x))
-
-            h.pop_section()
 
     # insert dipole
     yscale = cell.secs[3]

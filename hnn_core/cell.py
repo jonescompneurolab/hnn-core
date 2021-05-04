@@ -149,13 +149,25 @@ class Cell:
         # in a section. This method is significantly faster than using
         # a for loop to iterate over all segments to set mech values
 
+        # Value depends on distance from the soma. Soma is set as
+        # origin by passing cell.soma as a sec argument to h.distance()
+        # Then iterate over segment nodes of dendritic sections
+        # and set gbar_ar depending on h.distance(seg.x), which returns
+        # distance from the soma to this point on the CURRENTLY ACCESSED
+        # SECTION!!!
+        h.distance(sec=self.soma)
         for sec in self.sections:
             sec_name = sec.name().split('_', 1)[1]
-            for mech_name in p_secs[sec_name]['mechs']:
+            for mech_name, mech in p_secs[sec_name]['mechs'].items():
                 sec.insert(mech_name)
-                for attr in p_secs[sec_name]['mechs'][mech_name]:
-                    setattr(sec, attr,
-                            p_secs[sec_name]['mechs'][mech_name][attr])
+                for attr, val in mech.items():
+                    if hasattr(val, '__call__'):
+                        sec.push()
+                        for seg in sec:
+                            setattr(seg, attr, val(h.distance(seg.x)))
+                        h.pop_section()
+                    else:
+                        setattr(sec, attr, val)
 
     def create_synapses(self, p_secs, p_syn):
         """Create synapses."""
