@@ -174,14 +174,16 @@ def basket(pos, cell_name='L2Basket', gid=None):
     p_secs['soma']['syns'] = list(p_syn.keys())
     p_secs['soma']['mechs'] = {'hh2': dict()}
 
-    cell.secs = _secs_Basket()
+    sec_pts, _, _, _, topology = _secs_Basket()
+    for sec_name in p_secs:
+        p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
     if cell_name == 'L2Basket':
         cell.sect_loc = dict(proximal=['soma'], distal=['soma'])
     elif cell_name == 'L5Basket':
         cell.sect_loc = dict(proximal=['soma'], distal=[])
 
-    cell.build(p_secs, p_syn)
+    cell.build(p_secs, p_syn, topology)
 
     return cell
 
@@ -221,7 +223,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
         section_names = ['apical_trunk', 'apical_1',
                          'apical_2', 'apical_tuft',
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        cell.secs = _secs_L5Pyr()
+        sec_pts, _, _, yscale, topology = _secs_L5Pyr()
     elif celltype == 'L2_pyramidal':
         p_all_default = get_L2Pyr_params_default()
         cell.name = 'L2Pyr'
@@ -231,7 +233,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
                     'gl_hh2', 'el_hh2']}
         section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        cell.secs = _secs_L2Pyr()
+        sec_pts, _, _, yscale, topology = _secs_L2Pyr()
     else:
         raise ValueError(f'Unknown pyramidal cell type: {celltype}')
 
@@ -262,13 +264,16 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
                     'ar']['gbar_ar'] = lambda x: 1e-6 * np.exp(3e-3 * x)
         p_secs[key]['syns'] = syns
 
+    for sec_name in p_secs:
+        p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
+
     cell.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
     cell.sect_loc['distal'] = ['apicaltuft']
 
-    cell.build(p_secs, p_syn)
+    cell.build(p_secs, p_syn, topology)
 
     # insert dipole
-    yscale = cell.secs[3]
+    yscale = yscale
     cell.insert_dipole(yscale)
 
     return cell

@@ -193,7 +193,7 @@ class Cell:
                 self.synapses[syn_key] = self.syn_create(
                     seg, **p_syn[receptor])
 
-    def _create_sections(self, p_secs):
+    def _create_sections(self, p_secs, topology):
         """Create soma and set geometry.
 
         Notes
@@ -202,8 +202,6 @@ class Cell:
         for height and xz plane for depth. This is opposite for model as a
         whole, but convention is followed in this function ease use of gui.
         """
-        sec_pts, _, _, _, topology = self.secs
-
         for sec_name in p_secs:
             if sec_name == 'soma':
                 self.soma = h.Section(cell=self, name=self.name + '_soma')
@@ -214,7 +212,7 @@ class Cell:
                 sec = self.dends[sec_name]
 
             h.pt3dclear(sec=sec)
-            for pt in sec_pts[sec_name]:
+            for pt in p_secs[sec_name]['sec_pts']:
                 h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
             sec.L = p_secs[sec_name]['L']
             sec.diam = p_secs[sec_name]['diam']
@@ -244,7 +242,7 @@ class Cell:
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
 
-    def build(self, p_secs, p_syn):
+    def build(self, p_secs, p_syn, topology):
         """Build cell in Neuron.
 
         Parameters
@@ -261,6 +259,14 @@ class Cell:
             Keys are name of synaptic mechanism. Each synaptic mechanism
             has keys for parameters of the mechanism, e.g., 'e', 'tau1',
             'tau2'.
+        topology : list of list
+            The topology of cell sections. Each element is a list of
+            4 items in the format
+            [parent_sec, parent_loc, child_sec, child_loc] where
+            parent_sec and parent_loc are float between 0 and 1
+            specifying the location in the section to connect and
+            parent_sec and child_sec are names of the connecting
+            sections.
 
         Examples
         --------
@@ -280,7 +286,7 @@ class Cell:
             }
         }
         """
-        self._create_sections(p_secs)
+        self._create_sections(p_secs, topology)
         self._create_synapses(p_secs, p_syn)
         self._set_biophysics(p_secs)
 
