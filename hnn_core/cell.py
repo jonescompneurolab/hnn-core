@@ -141,7 +141,7 @@ class Cell:
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
-    def set_biophysics(self, p_secs):
+    def _set_biophysics(self, p_secs):
         "Set the biophysics for the default Pyramidal cell."
 
         # neuron syntax is used to set values for mechanisms
@@ -169,7 +169,7 @@ class Cell:
                     else:
                         setattr(sec, attr, val)
 
-    def create_synapses(self, p_secs, p_syn):
+    def _create_synapses(self, p_secs, p_syn):
         """Create synapses."""
         for sec_name in p_secs:
             for receptor in p_secs[sec_name]['syns']:
@@ -182,14 +182,8 @@ class Cell:
                 self.synapses[syn_key] = self.syn_create(
                     seg, **p_syn[receptor])
 
-    def create_sections(self, p_secs):
+    def _create_sections(self, p_secs):
         """Create soma and set geometry.
-
-        Parameters
-        ----------
-        p_secs : dict
-            The properties of the section. Must contain
-            keys 'L', 'diam', 'Ra', and 'cm'.
 
         Notes
         -----
@@ -236,11 +230,45 @@ class Cell:
             child_sec.connect(parent_sec, parent_loc, child_loc)
 
     def build(self, p_secs, p_syn):
-        """Build cell in Neuron."""
-        self.create_sections(p_secs)
+        """Build cell in Neuron.
+
+        Parameters
+        ----------
+        p_secs : dict
+            Dictionary with keys as section name.
+            p_secs[sec_name] is a dictionary with keys
+            L, diam, Ra, cm, syns and mech.
+            syns is a list specifying the synapses at that section.
+            The properties of syn are specified in p_syn.
+            mech is a dict with keys as the mechanism names. The
+            values are dictionaries with properties of the mechanism.
+        p_syn : dict of dict
+            Keys are name of synaptic mechanism. Each synaptic mechanism
+            has keys for parameters of the mechanism, e.g., 'e', 'tau1',
+            'tau2'.
+
+        Examples
+        --------
+        p_secs = {
+            'soma':
+            {
+                'L': 39,
+                'diam': 20,
+                'cm': 0.85,
+                'Ra': 200.,
+                'syns': ['ampa', 'gabaa', 'nmda'],
+                'mechs' : {
+                    'ca': {
+                        'gbar_ca': 60
+                    }
+                }
+            }
+        }
+        """
+        self._create_sections(p_secs)
         self.sections = [self.soma] + list(self.dends.values())
-        self.create_synapses(p_secs, p_syn)
-        self.set_biophysics(p_secs)
+        self._create_synapses(p_secs, p_syn)
+        self._set_biophysics(p_secs)
 
     def move_to_pos(self):
         """Move cell to position."""
