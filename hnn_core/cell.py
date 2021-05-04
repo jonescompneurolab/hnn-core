@@ -74,6 +74,8 @@ class Cell:
 
     Parameters
     ----------
+    name : str
+        The name of the cell.
     pos : tuple
         The (x, y, z) coordinates.
     gid : int or None (optional)
@@ -114,7 +116,8 @@ class Cell:
         names of section locations that are proximal or distal.
     """
 
-    def __init__(self, pos, gid=None):
+    def __init__(self, name, pos, gid=None):
+        self.name = name
         self.pos = pos
         self.soma = None
         self.dends = dict()
@@ -242,7 +245,7 @@ class Cell:
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
 
-    def build(self, p_secs, p_syn, topology):
+    def build(self, p_secs, p_syn, topology, sect_loc):
         """Build cell in Neuron.
 
         Parameters
@@ -267,6 +270,9 @@ class Cell:
             specifying the location in the section to connect and
             parent_sec and child_sec are names of the connecting
             sections.
+        sect_loc : dict of list
+            Can have keys 'proximal' or 'distal' each containing
+            names of section locations that are proximal or distal.
 
         Examples
         --------
@@ -277,6 +283,7 @@ class Cell:
                 'diam': 20,
                 'cm': 0.85,
                 'Ra': 200.,
+                'sec_pts': [[0, 0, 0], [0, 39., 0]],
                 'syns': ['ampa', 'gabaa', 'nmda'],
                 'mechs' : {
                     'ca': {
@@ -289,6 +296,7 @@ class Cell:
         self._create_sections(p_secs, topology)
         self._create_synapses(p_secs, p_syn)
         self._set_biophysics(p_secs)
+        self.sect_loc = sect_loc
 
     def move_to_pos(self):
         """Move cell to position."""

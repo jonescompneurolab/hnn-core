@@ -165,9 +165,6 @@ def basket(pos, cell_name='L2Basket', gid=None):
     cell : instance of BasketSingle
         The basket cell.
     """
-    cell = Cell(pos=pos, gid=gid)
-    cell.name = cell_name
-
     p_secs = dict()
     p_secs['soma'] = _get_basket_soma_props(cell_name)
     p_syn = _get_basket_syn_props()
@@ -179,11 +176,12 @@ def basket(pos, cell_name='L2Basket', gid=None):
         p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
     if cell_name == 'L2Basket':
-        cell.sect_loc = dict(proximal=['soma'], distal=['soma'])
+        sect_loc = dict(proximal=['soma'], distal=['soma'])
     elif cell_name == 'L5Basket':
-        cell.sect_loc = dict(proximal=['soma'], distal=[])
+        sect_loc = dict(proximal=['soma'], distal=[])
 
-    cell.build(p_secs, p_syn, topology)
+    cell = Cell(cell_name, pos=pos, gid=gid)
+    cell.build(p_secs, p_syn, topology, sect_loc)
 
     return cell
 
@@ -205,10 +203,9 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
         yet attached to a network. Once the GID is set, it cannot be changed.
     """
 
-    cell = Cell(pos=pos, gid=gid)
     if celltype == 'L5_pyramidal':
         p_all_default = get_L5Pyr_params_default()
-        cell.name = 'L5Pyr'
+        cell_name = 'L5Pyr'
         # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
         mechanisms = {
             'hh2': ['gkbar_hh2', 'gnabar_hh2',
@@ -226,7 +223,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
         sec_pts, _, _, yscale, topology = _secs_L5Pyr()
     elif celltype == 'L2_pyramidal':
         p_all_default = get_L2Pyr_params_default()
-        cell.name = 'L2Pyr'
+        cell_name = 'L2Pyr'
         mechanisms = {
             'km': ['gbar_km'],
             'hh2': ['gkbar_hh2', 'gnabar_hh2',
@@ -244,14 +241,14 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
 
     prop_names = ['L', 'diam', 'Ra', 'cm']
     # Get somatic, dendritic, and synapse properties
-    p_soma = _get_pyr_soma_props(p_all, cell.name)
-    p_dend = _get_dend_props(p_all, cell_type=cell.name,
+    p_soma = _get_pyr_soma_props(p_all, cell_name)
+    p_dend = _get_dend_props(p_all, cell_type=cell_name,
                              section_names=section_names,
                              prop_names=prop_names)
-    p_syn = _get_pyr_syn_props(p_all, cell.name)
+    p_syn = _get_pyr_syn_props(p_all, cell_name)
     p_secs = p_dend.copy()
     p_secs['soma'] = p_soma
-    p_mech = _get_mechanisms(p_all, cell.name, ['soma'] + section_names,
+    p_mech = _get_mechanisms(p_all, cell_name, ['soma'] + section_names,
                              mechanisms)
     for key in p_secs:
         p_secs[key]['mechs'] = p_mech[key]
@@ -267,10 +264,11 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     for sec_name in p_secs:
         p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
-    cell.sect_loc['proximal'] = ['apicaloblique', 'basal2', 'basal3']
-    cell.sect_loc['distal'] = ['apicaltuft']
+    sect_loc = {'proximal': ['apicaloblique', 'basal2', 'basal3'],
+                'distal': ['apicaltuft']}
 
-    cell.build(p_secs, p_syn, topology)
+    cell = Cell(name=cell_name, pos=pos, gid=gid)
+    cell.build(p_secs, p_syn, topology, sect_loc=sect_loc)
 
     # insert dipole
     yscale = yscale

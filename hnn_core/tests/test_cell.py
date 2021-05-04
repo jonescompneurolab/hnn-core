@@ -11,16 +11,16 @@ matplotlib.use('agg')
 def test_cell():
     """Test cells object."""
     pos = (0., 0., 0.)
-
+    name = 'test'
     # GID is assigned exactly once for each cell, either at initialisation...
-    cell = Cell(pos=pos, gid=42)
+    cell = Cell(name, pos=pos, gid=42)
     assert cell.gid == 42
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
     # ... or later
     # cells can exist fine without gid
-    cell = Cell(pos=pos)
+    cell = Cell(name, pos=pos)
     assert cell.gid is None  # check that it's initialised to None
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
@@ -30,7 +30,7 @@ def test_cell():
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
         # test init checks gid
-        cell = Cell(pos=pos, gid='one')
+        cell = Cell(name, pos=pos, gid='one')
 
     # test that ExpSyn always takes nrn.Segment, not float
     with pytest.raises(TypeError, match='secloc must be instance of'):
