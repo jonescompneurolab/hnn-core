@@ -88,7 +88,7 @@ class Cell:
     pos : list of length 3
         The position of the cell.
     sections : dict
-        The sections. The key is the name of the dendrite
+        The sections. The key is the name of the section
         and the value is an instance of h.Section.
     synapses : dict
         The synapses that the cell can use for connections.
@@ -190,8 +190,6 @@ class Cell:
         for height and xz plane for depth. This is opposite for model as a
         whole, but convention is followed in this function ease use of gui.
         """
-        if 'soma' not in p_secs:
-            raise KeyError('soma must be defined for cell')
         for sec_name in p_secs:
             sec = h.Section(name=f'{self.name}_{sec_name}')
             self.sections[sec_name] = sec
@@ -269,6 +267,8 @@ class Cell:
             }
         }
         """
+        if 'soma' not in p_secs:
+            raise KeyError('soma must be defined for cell')
         self._create_sections(p_secs, topology)
         self._create_synapses(p_secs, p_syn)
         self._set_biophysics(p_secs)

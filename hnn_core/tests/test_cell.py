@@ -10,6 +10,8 @@ matplotlib.use('agg')
 
 def test_cell():
     """Test cells object."""
+    load_custom_mechanisms()
+
     pos = (0., 0., 0.)
     name = 'test'
     # GID is assigned exactly once for each cell, either at initialisation...
@@ -35,6 +37,38 @@ def test_cell():
     # test that ExpSyn always takes nrn.Segment, not float
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
+
+    p_secs = {'blah': 1}
+    p_syn = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
+    topology = None
+    sect_loc = {'proximal': 'soma'}
+    with pytest.raises(KeyError, match='soma must be defined'):
+        cell.build(p_secs, p_syn, topology, sect_loc)
+
+    p_secs = {
+        'soma':
+        {
+            'L': 39,
+            'diam': 20,
+            'cm': 0.85,
+            'Ra': 200.,
+            'sec_pts': [[0, 0, 0], [0, 39., 0]],
+            'syns': ['ampa'],
+            'mechs': {
+                'km': {
+                    'gbar_km': 60
+                },
+                'ca': {
+                    'gbar_ca': lambda x: 3e-3 * x
+                }
+            }
+        }
+    }
+    cell.build(p_secs, p_syn, topology, sect_loc)
+    assert 'soma' in cell.sections
+    assert cell.sections['soma'].L == p_secs['soma']['L']
+    assert cell.sections['soma'].gbar_km == p_secs[
+        'soma']['mechs']['km']['gbar_km']
 
 
 def test_artificial_cell():
