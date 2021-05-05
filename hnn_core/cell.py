@@ -166,15 +166,18 @@ class Cell:
         # If value depends on distance from the soma. Soma is set as
         # origin by passing cell.soma as a sec argument to h.distance()
         # Then iterate over segment nodes of dendritic sections
-        # and set gbar_ar depending on h.distance(seg.x), which returns
+        # and set attribute depending on h.distance(seg.x), which returns
         # distance from the soma to this point on the CURRENTLY ACCESSED
         # SECTION!!!
         h.distance(sec=self.soma)
-        for sec in self.sections:
-            sec_name = sec.name().split('_', 1)[1]
-            for mech_name, mech in p_secs[sec_name]['mechs'].items():
+        for sec_name, p_sec in p_secs.items():
+            if sec_name == 'soma':
+                sec = self.soma
+            else:
+                sec = self.dends[sec_name]
+            for mech_name, p_mech in p_sec['mechs'].items():
                 sec.insert(mech_name)
-                for attr, val in mech.items():
+                for attr, val in p_mech.items():
                     if hasattr(val, '__call__'):
                         sec.push()
                         for seg in sec:
