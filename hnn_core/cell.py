@@ -310,6 +310,7 @@ class Cell:
         dy = self.pos[2] - y0
         dz = self.pos[1] * 100 - z0
 
+        # dummy comment
         for s in self.get_sections():
             for i in range(s.n3d()):
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
