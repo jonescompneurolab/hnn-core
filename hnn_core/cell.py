@@ -1,6 +1,6 @@
 """Establish class def for general cell features."""
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
@@ -87,14 +87,9 @@ class Cell:
     ----------
     pos : list of length 3
         The position of the cell.
-    soma : instance of h.Section | None
-        The soma of the cell instantiated in Neuron. If None,
-        the cell has not yet been built in Neuron.
-    dends : dict
-        The dendrites. The key is the name of the dendrite
+    sections : dict
+        The sections. The key is the name of the dendrite
         and the value is an instance of h.Section.
-    sections : list of h.Section
-        All the sections including soma and dendrites.
     synapses : dict
         The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
@@ -119,8 +114,7 @@ class Cell:
     def __init__(self, name, pos, gid=None):
         self.name = name
         self.pos = pos
-        self.soma = None
-        self.dends = dict()
+        self.sections = dict()
         self.synapses = dict()
         self.sect_loc = dict()
         self.rec_v = h.Vector()
@@ -139,12 +133,6 @@ class Cell:
     @property
     def gid(self):
         return self._gid
-
-    @property
-    def sections(self):
-        if self.soma is None:
-            raise ValueError('Cell has not yet been built in Neuron')
-        return [self.soma] + list(self.dends.values())
 
     @gid.setter
     def gid(self, gid):
@@ -169,12 +157,9 @@ class Cell:
         # and set attribute depending on h.distance(seg.x), which returns
         # distance from the soma to this point on the CURRENTLY ACCESSED
         # SECTION!!!
-        h.distance(sec=self.soma)
+        h.distance(sec=self.sections['soma'])
         for sec_name, p_sec in p_secs.items():
-            if sec_name == 'soma':
-                sec = self.soma
-            else:
-                sec = self.dends[sec_name]
+            sec = self.sections[sec_name]
             for mech_name, p_mech in p_sec['mechs'].items():
                 sec.insert(mech_name)
                 for attr, val in p_mech.items():
@@ -192,10 +177,7 @@ class Cell:
             for receptor in p_secs[sec_name]['syns']:
                 sec_name_sanitized = sec_name.replace('_', '')
                 syn_key = f'{sec_name_sanitized}_{receptor}'
-                if sec_name == 'soma':
-                    seg = self.soma(0.5)
-                else:
-                    seg = self.dends[sec_name](0.5)
+                seg = self.sections[sec_name](0.5)
                 self.synapses[syn_key] = self.syn_create(
                     seg, **p_syn[receptor])
 
@@ -208,14 +190,11 @@ class Cell:
         for height and xz plane for depth. This is opposite for model as a
         whole, but convention is followed in this function ease use of gui.
         """
+        if 'soma' not in p_secs:
+            raise KeyError('soma must be defined for cell')
         for sec_name in p_secs:
-            if sec_name == 'soma':
-                self.soma = h.Section(cell=self, name=self.name + '_soma')
-                sec = self.soma
-            else:
-                self.dends[sec_name] = h.Section(
-                    name=self.name + '_' + sec_name)
-                sec = self.dends[sec_name]
+            sec = h.Section(name=f'{self.name}_{sec_name}')
+            self.sections[sec_name] = sec
 
             h.pt3dclear(sec=sec)
             for pt in p_secs[sec_name]['sec_pts']:
@@ -236,14 +215,8 @@ class Cell:
 
         # Connects sections of THIS cell together.
         for connection in topology:
-            if connection[0] == 'soma':
-                parent_sec = self.soma
-            else:
-                parent_sec = self.dends[connection[0]]
-            if connection[2] == 'soma':
-                child_sec = self.soma
-            else:
-                child_sec = self.dends[connection[2]]
+            parent_sec = self.sections[connection[0]]
+            child_sec = self.sections[connection[2]]
             parent_loc = connection[1]
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
@@ -303,14 +276,14 @@ class Cell:
 
     def move_to_pos(self):
         """Move cell to position."""
-        x0 = self.soma.x3d(0)
-        y0 = self.soma.y3d(0)
-        z0 = self.soma.z3d(0)
+        x0 = self.sections['soma'].x3d(0)
+        y0 = self.sections['soma'].y3d(0)
+        z0 = self.sections['soma'].z3d(0)
         dx = self.pos[0] * 100 - x0
         dy = self.pos[2] - y0
         dz = self.pos[1] * 100 - z0
 
-        for s in self.sections:
+        for s in list(self.sections.values()):
             for i in range(s.n3d()):
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
                              s.z3d(i) + dz, s.diam3d(i), sec=s)
@@ -335,7 +308,7 @@ class Cell:
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma
         sec_list = h.SectionList()
-        sec_list.wholetree(sec=self.soma)
+        sec_list.wholetree(sec=self.sections['soma'])
         sec_list = [sec for sec in sec_list]
         for sect in sec_list:
             sect.insert('dipole')
@@ -392,7 +365,7 @@ class Cell:
         loc : float (0 to 1)
             The location of the input in the soma section.
         """
-        stim = h.IClamp(self.soma(loc))
+        stim = h.IClamp(self.sections['soma'](loc))
         stim.delay = t0
         stim.dur = T - t0
         stim.amp = amplitude
@@ -409,7 +382,7 @@ class Cell:
             Option to record somatic currents from cells
 
         """
-        # a soma exists at self.soma
+        # a soma exists at self.sections['soma']
         if record_isoma:
             # assumes that self.synapses is a dict that exists
             list_syn_soma = [key for key in self.synapses.keys()
@@ -422,7 +395,7 @@ class Cell:
                 self.rec_i[key].record(self.synapses[key]._ref_i)
 
         if record_vsoma:
-            self.rec_v.record(self.soma(0.5)._ref_v)
+            self.rec_v.record(self.sections['soma'](0.5)._ref_v)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
@@ -460,7 +433,8 @@ class Cell:
         threshold : float
             The voltage threshold for action potential.
         """
-        nc = h.NetCon(self.soma(0.5)._ref_v, None, sec=self.soma)
+        nc = h.NetCon(self.sections['soma'](0.5)._ref_v, None,
+                      sec=self.sections['soma'])
         nc.threshold = threshold
         return nc
 

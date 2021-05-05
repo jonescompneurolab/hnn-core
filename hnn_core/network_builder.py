@@ -503,7 +503,7 @@ class NetworkBuilder(object):
 
         for cell in self.cells:
             seclist = h.SectionList()
-            seclist.wholetree(sec=cell.soma)
+            seclist.wholetree(sec=cell.sections['soma'])
             for sect in seclist:
                 for seg in sect:
                     if cell.name == 'L2Pyr':
