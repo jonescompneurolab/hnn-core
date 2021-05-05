@@ -5,8 +5,6 @@
 
 import numpy as np
 
-from neuron import h
-
 from .cell import Cell
 
 from .params import compare_dictionaries
@@ -155,6 +153,8 @@ def basket(pos, cell_name='L2Basket', gid=None):
     ----------
     pos : tuple
         Coordinates of cell soma in xyz-space
+    cell_name : str
+        The name of the cell.
     gid : int or None (optional)
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
@@ -271,7 +271,6 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
     cell.build(p_secs, p_syn, topology, sect_loc=sect_loc)
 
     # insert dipole
-    yscale = yscale
     cell.insert_dipole(yscale)
 
     return cell
