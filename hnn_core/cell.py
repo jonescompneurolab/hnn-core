@@ -224,7 +224,7 @@ class Cell:
 
         Parameters
         ----------
-        p_secs : dict
+        p_secs : nested dict
             Dictionary with keys as section name.
             p_secs[sec_name] is a dictionary with keys
             L, diam, Ra, cm, syns and mech.
@@ -307,9 +307,7 @@ class Cell:
 
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma
-        sec_list = h.SectionList()
-        sec_list.wholetree(sec=self.sections['soma'])
-        sec_list = [sec for sec in sec_list]
+        sec_list = list(self.sections.values())
         for sect in sec_list:
             sect.insert('dipole')
         # Dipole is defined in dipole_pp.mod

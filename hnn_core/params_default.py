@@ -440,7 +440,6 @@ def _secs_L2Pyr():
 
 def _secs_L5Pyr():
     """The geometry of the default sections in L5Pyr Neuron."""
-    # Neuron shape based on Jones et al., 2009
     sec_pts = {
         'soma': [[0, 0, 0], [0, 23, 0]],
         'apical_trunk': [[0, 23, 0], [0, 83, 0]],
