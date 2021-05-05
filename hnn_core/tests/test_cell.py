@@ -1,4 +1,5 @@
 import pytest
+import pickle
 
 import matplotlib
 
@@ -38,6 +39,7 @@ def test_cell():
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
+    pickle.dumps(cell)  # check cell object is picklable until built
     p_secs = {'blah': 1}
     p_syn = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
     topology = None
