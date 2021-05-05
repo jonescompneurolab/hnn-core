@@ -165,6 +165,13 @@ def basket(pos, cell_name='L2Basket', gid=None):
     cell : instance of BasketSingle
         The basket cell.
     """
+    if cell_name == 'L2Basket':
+        sect_loc = dict(proximal=['soma'], distal=['soma'])
+    elif cell_name == 'L5Basket':
+        sect_loc = dict(proximal=['soma'], distal=[])
+    else:
+        raise ValueError(f'Unknown basket cell type: {cell_name}')
+
     p_secs = dict()
     p_secs['soma'] = _get_basket_soma_props(cell_name)
     p_syn = _get_basket_syn_props()
@@ -175,26 +182,21 @@ def basket(pos, cell_name='L2Basket', gid=None):
     for sec_name in p_secs:
         p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
-    if cell_name == 'L2Basket':
-        sect_loc = dict(proximal=['soma'], distal=['soma'])
-    elif cell_name == 'L5Basket':
-        sect_loc = dict(proximal=['soma'], distal=[])
-
     cell = Cell(cell_name, pos=pos, gid=gid)
     cell.build(p_secs, p_syn, topology, sect_loc)
 
     return cell
 
 
-def pyramidal(pos, celltype, override_params=None, gid=None):
+def pyramidal(pos, cell_name, override_params=None, gid=None):
     """Pyramidal neuron.
 
     Parameters
     ----------
     pos : tuple
         Coordinates of cell soma in xyz-space
-    celltype : str
-        'L5_pyramidal' or 'L2_pyramidal'. The pyramidal cell type.
+    cell_name : str
+        'L5Pyr' or 'L2Pyr'. The pyramidal cell type.
     override_params : dict or None (optional)
         Parameters specific to L2 pyramidal neurons to override the default set
     gid : int or None (optional)
@@ -203,9 +205,8 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
         yet attached to a network. Once the GID is set, it cannot be changed.
     """
 
-    if celltype == 'L5_pyramidal':
+    if cell_name == 'L5Pyr':
         p_all_default = get_L5Pyr_params_default()
-        cell_name = 'L5Pyr'
         # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
         mechanisms = {
             'hh2': ['gkbar_hh2', 'gnabar_hh2',
@@ -221,9 +222,8 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
                          'apical_2', 'apical_tuft',
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
         sec_pts, _, _, yscale, topology = _secs_L5Pyr()
-    elif celltype == 'L2_pyramidal':
+    elif cell_name == 'L2Pyr':
         p_all_default = get_L2Pyr_params_default()
-        cell_name = 'L2Pyr'
         mechanisms = {
             'km': ['gbar_km'],
             'hh2': ['gkbar_hh2', 'gnabar_hh2',
@@ -232,7 +232,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
         sec_pts, _, _, yscale, topology = _secs_L2Pyr()
     else:
-        raise ValueError(f'Unknown pyramidal cell type: {celltype}')
+        raise ValueError(f'Unknown pyramidal cell type: {cell_name}')
 
     p_all = p_all_default
     if override_params is not None:
@@ -256,7 +256,7 @@ def pyramidal(pos, celltype, override_params=None, gid=None):
             syns = ['gabaa', 'gabab']
         else:
             syns = list(p_syn.keys())
-            if celltype == 'L5_pyramidal':
+            if cell_name == 'L5Pyr':
                 p_secs[key]['mechs'][
                     'ar']['gbar_ar'] = lambda x: 1e-6 * np.exp(3e-3 * x)
         p_secs[key]['syns'] = syns

@@ -156,14 +156,14 @@ class Cell:
             raise RuntimeError('Global ID for this cell already assigned!')
 
     def _set_biophysics(self, p_secs):
-        "Set the biophysics for the default Pyramidal cell."
+        "Set the biophysics for the cell."
 
         # neuron syntax is used to set values for mechanisms
         # sec.gbar_mech = x sets value of gbar for mech to x for all segs
         # in a section. This method is significantly faster than using
         # a for loop to iterate over all segments to set mech values
 
-        # Value depends on distance from the soma. Soma is set as
+        # If value depends on distance from the soma. Soma is set as
         # origin by passing cell.soma as a sec argument to h.distance()
         # Then iterate over segment nodes of dendritic sections
         # and set gbar_ar depending on h.distance(seg.x), which returns

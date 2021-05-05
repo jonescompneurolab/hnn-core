@@ -393,7 +393,8 @@ class NetworkBuilder(object):
                     # XXX Why doesn't a _Cell have a .threshold? Would make a
                     # lot of sense to include it, as _ArtificialCells do.
                     cell = pyramidal_cell(src_pos, override_params=None,
-                                          celltype=src_type, gid=gid)
+                                          cell_name=_short_name(src_type),
+                                          gid=gid)
                 else:
                     basket_cell = type2class[src_type]
                     cell = basket_cell(src_pos,
