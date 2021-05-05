@@ -5,20 +5,20 @@
 
 Computation times
 =================
-**31:27.249** total execution time for **auto_examples** files:
+**17:30.450** total execution time for **auto_examples** files:
 
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_somato.py` (``plot_simulate_somato.py``)           | 05:57.235 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_connectivity.py` (``plot_connectivity.py``)                 | 04:06.031 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)             | 05:56.625 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)             | 03:18.348 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_connectivity.py` (``plot_connectivity.py``)                 | 05:51.703 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py` (``plot_simulate_gamma.py``)             | 02:48.259 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` (``plot_simulate_evoked.py``)           | 05:17.930 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py` (``plot_simulate_evoked.py``)           | 02:45.626 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py` (``plot_simulate_gamma.py``)             | 05:06.575 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_somato.py` (``plot_simulate_somato.py``)           | 02:39.668 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_firing_pattern.py` (``plot_firing_pattern.py``)             | 01:56.742 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_firing_pattern.py` (``plot_firing_pattern.py``)             | 01:00.861 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``) | 01:20.439 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``) | 00:51.657 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
