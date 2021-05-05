@@ -7,6 +7,11 @@
 import numpy as np
 from neuron import h
 
+# This is due to: https://github.com/neuronsimulator/nrn/pull/746
+from neuron import __version__
+if int(__version__[0]) >= 8:
+    h.nrnunit_use_legacy(1)
+
 from .cell import _ArtificialCell
 from .pyramidal import L2Pyr, L5Pyr
 from .basket import L2Basket, L5Basket
