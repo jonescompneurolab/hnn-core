@@ -14,12 +14,9 @@ Simulation (:py:mod:`hnn_core`):
 .. autosummary::
    :toctree: generated/
 
-   L2Pyr
-   L5Pyr
-   L2Basket
-   L5Basket
    simulate_dipole
    Network
+   Cell
    CellResponse
 
 Dipole (:py:mod:`hnn_core.dipole`):
