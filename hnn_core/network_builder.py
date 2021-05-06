@@ -13,8 +13,7 @@ if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
-from .pyramidal import L2Pyr, L5Pyr
-from .basket import L2Basket, L5Basket
+from .cells_default import pyramidal, basket
 from .params import _long_name, _short_name
 from copy import deepcopy
 
@@ -377,8 +376,8 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-        type2class = {'L2_pyramidal': L2Pyr, 'L5_pyramidal': L5Pyr,
-                      'L2_basket': L2Basket, 'L5_basket': L5Basket}
+        type2class = {'L2_pyramidal': pyramidal, 'L5_pyramidal': pyramidal,
+                      'L2_basket': basket, 'L5_basket': basket}
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
@@ -390,14 +389,17 @@ class NetworkBuilder(object):
                 # figure out which cell type is assoc with the gid
                 # create cells based on loc property
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    PyramidalCell = type2class[src_type]
+                    pyramidal_cell = type2class[src_type]
                     # XXX Why doesn't a _Cell have a .threshold? Would make a
                     # lot of sense to include it, as _ArtificialCells do.
-                    cell = PyramidalCell(src_pos, override_params=None,
-                                         gid=gid)
+                    cell = pyramidal_cell(src_pos, override_params=None,
+                                          cell_name=_short_name(src_type),
+                                          gid=gid)
                 else:
-                    BasketCell = type2class[src_type]
-                    cell = BasketCell(src_pos, gid=gid)
+                    basket_cell = type2class[src_type]
+                    cell = basket_cell(src_pos,
+                                       cell_name=_short_name(src_type),
+                                       gid=gid)
                 if ('tonic' in self.net.external_biases and
                         src_type in self.net.external_biases['tonic']):
                     cell.create_tonic_bias(**self.net.external_biases
@@ -490,8 +492,8 @@ class NetworkBuilder(object):
     def aggregate_data(self):
         """Aggregate somatic currents, voltages, and dipoles."""
         for cell in self.cells:
-            if cell.celltype in ('L5_pyramidal', 'L2_pyramidal'):
-                self.dipoles[cell.celltype].add(cell.dipole)
+            if cell.name in ('L5Pyr', 'L2Pyr'):
+                self.dipoles[_long_name(cell.name)].add(cell.dipole)
 
             self._vsoma[cell.gid] = cell.rec_v
             self._isoma[cell.gid] = cell.rec_i
@@ -501,12 +503,12 @@ class NetworkBuilder(object):
 
         for cell in self.cells:
             seclist = h.SectionList()
-            seclist.wholetree(sec=cell.soma)
+            seclist.wholetree(sec=cell.sections['soma'])
             for sect in seclist:
                 for seg in sect:
-                    if cell.celltype == 'L2_pyramidal':
+                    if cell.name == 'L2Pyr':
                         seg.v = -71.46
-                    elif cell.celltype == 'L5_pyramidal':
+                    elif cell.name == 'L5Pyr':
                         if sect.name() == 'L5Pyr_apical_1':
                             seg.v = -71.32
                         elif sect.name() == 'L5Pyr_apical_2':
@@ -515,9 +517,9 @@ class NetworkBuilder(object):
                             seg.v = -67.30
                         else:
                             seg.v = -72.
-                    elif cell.celltype == 'L2_basket':
+                    elif cell.name == 'L2Basket':
                         seg.v = -64.9737
-                    elif cell.celltype == 'L5_basket':
+                    elif cell.name == 'L5Basket':
                         seg.v = -64.9737
 
     def move_cells_to_pos(self):

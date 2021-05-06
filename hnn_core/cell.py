@@ -1,9 +1,7 @@
 """Establish class def for general cell features."""
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
-
-from abc import ABC, abstractmethod
 
 import numpy as np
 from neuron import h, nrn
@@ -71,14 +69,15 @@ class _ArtificialCell:
             raise RuntimeError('Global ID for this cell already assigned!')
 
 
-class _Cell(ABC):
+class Cell:
     """Create a cell object.
 
     Parameters
     ----------
-    soma_props : dict
-        The properties of the soma. Must contain
-        keys 'L', 'diam', and 'pos'
+    name : str
+        The name of the cell.
+    pos : tuple
+        The (x, y, z) coordinates.
     gid : int or None (optional)
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
@@ -88,6 +87,11 @@ class _Cell(ABC):
     ----------
     pos : list of length 3
         The position of the cell.
+    sections : dict
+        The sections. The key is the name of the section
+        and the value is an instance of h.Section.
+    synapses : dict
+        The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
     rec_v : h.Vector()
@@ -102,15 +106,21 @@ class _Cell(ABC):
         for tonic biasing inputs.
     gid : int
         GID of the cell in a network (or None if not yet assigned)
+    sect_loc : dict of list
+        Can have keys 'proximal' or 'distal' each containing
+        names of section locations that are proximal or distal.
     """
 
-    def __init__(self, soma_props, gid=None):
-        # variable for the list_IClamp
-        self.list_IClamp = None
-        self.soma_props = soma_props
-        self.create_soma()
+    def __init__(self, name, pos, gid=None):
+        self.name = name
+        self.pos = pos
+        self.sections = dict()
+        self.synapses = dict()
+        self.sect_loc = dict()
         self.rec_v = h.Vector()
         self.rec_i = dict()
+        # insert iclamp
+        self.list_IClamp = list()
         self._gid = None
         self.tonic_biases = list()
         if gid is not None:
@@ -118,11 +128,7 @@ class _Cell(ABC):
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        soma_props = self.soma_props
-        s = ('soma: L %f, diam %f, Ra %f, cm %f' %
-             (soma_props['L'], soma_props['diam'],
-              soma_props['Ra'], soma_props['cm']))
-        return '<%s | %s>' % (class_name, s)
+        return f'<{class_name} | gid={self._gid}>'
 
     @property
     def gid(self):
@@ -137,37 +143,147 @@ class _Cell(ABC):
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
-    @abstractmethod
-    def get_sections(self):
-        """Get sections in a cell."""
-        pass
+    def _set_biophysics(self, p_secs):
+        "Set the biophysics for the cell."
 
-    def create_soma(self):
-        """Create soma and set geometry."""
-        # make L_soma and diam_soma elements of self
-        # Used in shape_change() b/c func clobbers self.soma.L, self.soma.diam
-        soma_props = self.soma_props
+        # neuron syntax is used to set values for mechanisms
+        # sec.gbar_mech = x sets value of gbar for mech to x for all segs
+        # in a section. This method is significantly faster than using
+        # a for loop to iterate over all segments to set mech values
 
-        self.L = soma_props['L']
-        self.diam = soma_props['diam']
-        self.pos = soma_props['pos']
+        # If value depends on distance from the soma. Soma is set as
+        # origin by passing cell.soma as a sec argument to h.distance()
+        # Then iterate over segment nodes of dendritic sections
+        # and set attribute depending on h.distance(seg.x), which returns
+        # distance from the soma to this point on the CURRENTLY ACCESSED
+        # SECTION!!!
+        h.distance(sec=self.sections['soma'])
+        for sec_name, p_sec in p_secs.items():
+            sec = self.sections[sec_name]
+            for mech_name, p_mech in p_sec['mechs'].items():
+                sec.insert(mech_name)
+                for attr, val in p_mech.items():
+                    if hasattr(val, '__call__'):
+                        sec.push()
+                        for seg in sec:
+                            setattr(seg, attr, val(h.distance(seg.x)))
+                        h.pop_section()
+                    else:
+                        setattr(sec, attr, val)
 
-        self.soma = h.Section(cell=self, name=soma_props['name'] + '_soma')
-        self.soma.L = soma_props['L']
-        self.soma.diam = soma_props['diam']
-        self.soma.Ra = soma_props['Ra']
-        self.soma.cm = soma_props['cm']
+    def _create_synapses(self, p_secs, p_syn):
+        """Create synapses."""
+        for sec_name in p_secs:
+            for receptor in p_secs[sec_name]['syns']:
+                sec_name_sanitized = sec_name.replace('_', '')
+                syn_key = f'{sec_name_sanitized}_{receptor}'
+                seg = self.sections[sec_name](0.5)
+                self.synapses[syn_key] = self.syn_create(
+                    seg, **p_syn[receptor])
+
+    def _create_sections(self, p_secs, topology):
+        """Create soma and set geometry.
+
+        Notes
+        -----
+        By default neuron uses xy plane
+        for height and xz plane for depth. This is opposite for model as a
+        whole, but convention is followed in this function ease use of gui.
+        """
+        for sec_name in p_secs:
+            sec = h.Section(name=f'{self.name}_{sec_name}')
+            self.sections[sec_name] = sec
+
+            h.pt3dclear(sec=sec)
+            for pt in p_secs[sec_name]['sec_pts']:
+                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
+            sec.L = p_secs[sec_name]['L']
+            sec.diam = p_secs[sec_name]['diam']
+            sec.Ra = p_secs[sec_name]['Ra']
+            sec.cm = p_secs[sec_name]['cm']
+
+            if sec.L > 100.:  # 100 um
+                sec.nseg = int(sec.L / 50.)
+                # make dend.nseg odd for all sections
+                if not sec.nseg % 2:
+                    sec.nseg += 1
+
+        if topology is None:
+            topology = list()
+
+        # Connects sections of THIS cell together.
+        for connection in topology:
+            parent_sec = self.sections[connection[0]]
+            child_sec = self.sections[connection[2]]
+            parent_loc = connection[1]
+            child_loc = connection[3]
+            child_sec.connect(parent_sec, parent_loc, child_loc)
+
+    def build(self, p_secs, p_syn, topology, sect_loc):
+        """Build cell in Neuron.
+
+        Parameters
+        ----------
+        p_secs : nested dict
+            Dictionary with keys as section name.
+            p_secs[sec_name] is a dictionary with keys
+            L, diam, Ra, cm, syns and mech.
+            syns is a list specifying the synapses at that section.
+            The properties of syn are specified in p_syn.
+            mech is a dict with keys as the mechanism names. The
+            values are dictionaries with properties of the mechanism.
+        p_syn : dict of dict
+            Keys are name of synaptic mechanism. Each synaptic mechanism
+            has keys for parameters of the mechanism, e.g., 'e', 'tau1',
+            'tau2'.
+        topology : list of list
+            The topology of cell sections. Each element is a list of
+            4 items in the format
+            [parent_sec, parent_loc, child_sec, child_loc] where
+            parent_sec and parent_loc are float between 0 and 1
+            specifying the location in the section to connect and
+            parent_sec and child_sec are names of the connecting
+            sections.
+        sect_loc : dict of list
+            Can have keys 'proximal' or 'distal' each containing
+            names of section locations that are proximal or distal.
+
+        Examples
+        --------
+        p_secs = {
+            'soma':
+            {
+                'L': 39,
+                'diam': 20,
+                'cm': 0.85,
+                'Ra': 200.,
+                'sec_pts': [[0, 0, 0], [0, 39., 0]],
+                'syns': ['ampa', 'gabaa', 'nmda'],
+                'mechs' : {
+                    'ca': {
+                        'gbar_ca': 60
+                    }
+                }
+            }
+        }
+        """
+        if 'soma' not in p_secs:
+            raise KeyError('soma must be defined for cell')
+        self._create_sections(p_secs, topology)
+        self._create_synapses(p_secs, p_syn)
+        self._set_biophysics(p_secs)
+        self.sect_loc = sect_loc
 
     def move_to_pos(self):
         """Move cell to position."""
-        x0 = self.soma.x3d(0)
-        y0 = self.soma.y3d(0)
-        z0 = self.soma.z3d(0)
+        x0 = self.sections['soma'].x3d(0)
+        y0 = self.sections['soma'].y3d(0)
+        z0 = self.sections['soma'].z3d(0)
         dx = self.pos[0] * 100 - x0
         dy = self.pos[2] - y0
         dz = self.pos[1] * 100 - z0
 
-        for s in self.get_sections():
+        for s in list(self.sections.values()):
             for i in range(s.n3d()):
                 h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
                              s.z3d(i) + dz, s.diam3d(i), sec=s)
@@ -191,9 +307,7 @@ class _Cell(ABC):
 
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma
-        sec_list = h.SectionList()
-        sec_list.wholetree(sec=self.soma)
-        sec_list = [sec for sec in sec_list]
+        sec_list = list(self.sections.values())
         for sect in sec_list:
             sect.insert('dipole')
         # Dipole is defined in dipole_pp.mod
@@ -249,7 +363,7 @@ class _Cell(ABC):
         loc : float (0 to 1)
             The location of the input in the soma section.
         """
-        stim = h.IClamp(self.soma(loc))
+        stim = h.IClamp(self.sections['soma'](loc))
         stim.delay = t0
         stim.dur = T - t0
         stim.amp = amplitude
@@ -266,7 +380,7 @@ class _Cell(ABC):
             Option to record somatic currents from cells
 
         """
-        # a soma exists at self.soma
+        # a soma exists at self.sections['soma']
         if record_isoma:
             # assumes that self.synapses is a dict that exists
             list_syn_soma = [key for key in self.synapses.keys()
@@ -279,7 +393,7 @@ class _Cell(ABC):
                 self.rec_i[key].record(self.synapses[key]._ref_i)
 
         if record_vsoma:
-            self.rec_v.record(self.soma(0.5)._ref_v)
+            self.rec_v.record(self.sections['soma'](0.5)._ref_v)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
@@ -317,7 +431,8 @@ class _Cell(ABC):
         threshold : float
             The voltage threshold for action potential.
         """
-        nc = h.NetCon(self.soma(0.5)._ref_v, None, sec=self.soma)
+        nc = h.NetCon(self.sections['soma'](0.5)._ref_v, None,
+                      sec=self.sections['soma'])
         nc.threshold = threshold
         return nc
 
