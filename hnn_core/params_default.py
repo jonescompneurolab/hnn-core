@@ -4,6 +4,7 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
+from numpy.linalg import norm
 
 
 def get_params_default(nprox=2, ndist=1):
@@ -379,6 +380,15 @@ def _secs_Basket():
     return sec_pts, sec_lens, sec_diams, sec_scales, topology
 
 
+def _get_yscale(sec_pts, trunk_sec):
+    a = np.array(sec_pts[trunk_sec][1]) - np.array(sec_pts[trunk_sec][0])
+    yscales = dict()
+    for sec_name, sec_pt in sec_pts.items():
+        b = np.array(sec_pt[1]) - np.array(sec_pt[0])
+        yscales[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
+    return yscales
+
+
 def _secs_L2Pyr():
     """The geometry of the default sections in L2Pyr neuron."""
     sec_pts = {
@@ -412,16 +422,9 @@ def _secs_L2Pyr():
         'basal_2': 2.72,
         'basal_3': 2.72
     }
-    sec_scales = {  # factor to scale the dipole by
-        'soma': 1.,
-        'apical_trunk': 1.,
-        'apical_oblique': 0.,
-        'apical_1': 1.,
-        'apical_tuft': 1.,
-        'basal_1': -1.,
-        'basal_2': -np.sqrt(2.) / 2.,
-        'basal_3': -np.sqrt(2.) / 2.
-    }
+
+    sec_scales = _get_yscale(sec_pts, 'apical_trunk')
+
     # parent, parent_end, child, {child_start=0}
     topology = [
         # Distal (Apical)
@@ -473,17 +476,9 @@ def _secs_L5Pyr():
         'basal_2': 8.5,
         'basal_3': 8.5
     }
-    sec_scales = {  # factor to scale the dipole by
-        'soma': 1.,
-        'apical_trunk': 1.,
-        'apical_oblique': 0.,
-        'apical_1': 1.,
-        'apical_2': 1.,
-        'apical_tuft': 1.,
-        'basal_1': -1.,
-        'basal_2': -np.sqrt(2.) / 2.,
-        'basal_3': -np.sqrt(2.) / 2.
-    }
+
+    sec_scales = _get_yscale(sec_pts, 'apical_trunk')
+
     topology = [
         # Distal (Apical)
         ['soma', 1, 'apical_trunk', 0],
