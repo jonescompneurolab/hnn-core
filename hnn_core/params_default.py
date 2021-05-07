@@ -3,8 +3,6 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
-import numpy as np
-
 
 def get_params_default(nprox=2, ndist=1):
     """ Note that nearly all start times are set BEYOND tstop for this file
