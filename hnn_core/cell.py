@@ -325,18 +325,16 @@ class Cell:
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
-
+        self.dipole_pp = list()
         yscale = _get_yscale(p_secs, 'apical_trunk')
 
-        # dends must have already been created!!
-        # it's easier to use wholetree here, this includes soma
-        sec_list = list(self.sections.values())
-        for sect in sec_list:
-            sect.insert('dipole')
-        # Dipole is defined in dipole_pp.mod
-        self.dipole_pp = [h.Dipole(1, sec=sect) for sect in sec_list]
         # setting pointers and ztan values
-        for sect, dpp in zip(sec_list, self.dipole_pp):
+        for sect_name in p_secs:
+            sect = self.sections[sect_name]
+            sect.insert('dipole')
+
+            dpp = h.Dipole(1, sec=sect)  # defined in dipole_pp.mod
+            self.dipole_pp.append(dpp)
             dpp.ri = h.ri(1, sec=sect)  # assign internal resistance
             # sets pointers in dipole mod file to the correct locations
             dpp._ref_pv = sect(0.99)._ref_v
@@ -346,7 +344,6 @@ class Cell:
             pos_all = np.array([seg.x for seg in sect.allseg()])
             # diff in yvals, scaled against the pos np.array. y_long as
             # in longitudinal
-            sect_name = sect.name().split('_', 1)[1]
             y_scale = (yscale[sect_name] * sect.L) * pos_all
             # y_long = (h.y3d(1, sec=sect) - h.y3d(0, sec=sect)) * pos
             # diff values calculate length between successive section points
