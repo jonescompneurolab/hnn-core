@@ -532,11 +532,11 @@ def _linewidth_from_data_units(ax, linewidth):
 
 def _plot_cell_morphology(ax, cell_type):
     if cell_type == 'L2Pyr':
-        sec_pts, _, sec_diams, _, _ = _secs_L2Pyr()
+        sec_pts, _, sec_diams, _ = _secs_L2Pyr()
     elif cell_type == 'L5Pyr':
-        sec_pts, _, sec_diams, _, _ = _secs_L5Pyr()
+        sec_pts, _, sec_diams, _ = _secs_L5Pyr()
     elif cell_type in ['L2Basket', 'L5Basket']:
-        sec_pts, _, sec_diams, _, _ = _secs_Basket()
+        sec_pts, _, sec_diams, _ = _secs_Basket()
     else:
         raise ValueError('Unrecognized cell type to plot')
 

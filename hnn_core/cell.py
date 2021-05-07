@@ -4,10 +4,23 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
+from numpy.linalg import norm
+
 from neuron import h, nrn
 
 # Units for e: mV
 # Units for gbar: S/cm^2
+
+
+def _get_yscale(p_secs, dipole_sec):
+    """Get cos theta to compute dipole in z direction."""
+    a = (np.array(p_secs[dipole_sec]['sec_pts'][1]) -
+         np.array(p_secs[dipole_sec]['sec_pts'][0]))
+    yscales = dict()
+    for sec_name, p_sec in p_secs.items():
+        b = np.array(p_sec['sec_pts'][1]) - np.array(p_sec['sec_pts'][0])
+        yscales[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
+    return yscales
 
 
 class _ArtificialCell:
@@ -293,17 +306,27 @@ class Cell:
     # 2. a list needs to be created with a Dipole (Point Process) in each
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
-    def insert_dipole(self, yscale):
+    def insert_dipole(self, p_secs, dipole_sec):
         """Insert dipole into each section of this cell.
 
         Parameters
         ----------
-        yscale : dict
-            Dictionary of length scales to calculate dipole without
-            3d shape.
+        p_secs : nested dict
+            Dictionary with keys as section name.
+            p_secs[sec_name] is a dictionary with keys
+            L, diam, Ra, cm, syns and mech.
+            syns is a list specifying the synapses at that section.
+            The properties of syn are specified in p_syn.
+            mech is a dict with keys as the mechanism names. The
+            values are dictionaries with properties of the mechanism.
+        dipole_sec : str
+            The name of the section along which dipole is to
+            be computed.
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
+
+        yscale = _get_yscale(p_secs, 'apical_trunk')
 
         # dends must have already been created!!
         # it's easier to use wholetree here, this includes soma

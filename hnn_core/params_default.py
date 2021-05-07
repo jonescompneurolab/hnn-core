@@ -4,7 +4,6 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
-from numpy.linalg import norm
 
 
 def get_params_default(nprox=2, ndist=1):
@@ -375,18 +374,8 @@ def _secs_Basket():
     sec_diams = {
         'soma': 20.
     }
-    sec_scales = None
     topology = None
-    return sec_pts, sec_lens, sec_diams, sec_scales, topology
-
-
-def _get_yscale(sec_pts, trunk_sec):
-    a = np.array(sec_pts[trunk_sec][1]) - np.array(sec_pts[trunk_sec][0])
-    yscales = dict()
-    for sec_name, sec_pt in sec_pts.items():
-        b = np.array(sec_pt[1]) - np.array(sec_pt[0])
-        yscales[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
-    return yscales
+    return sec_pts, sec_lens, sec_diams, topology
 
 
 def _secs_L2Pyr():
@@ -423,8 +412,6 @@ def _secs_L2Pyr():
         'basal_3': 2.72
     }
 
-    sec_scales = _get_yscale(sec_pts, 'apical_trunk')
-
     # parent, parent_end, child, {child_start=0}
     topology = [
         # Distal (Apical)
@@ -438,7 +425,7 @@ def _secs_L2Pyr():
         ['basal_1', 1, 'basal_2', 0],
         ['basal_1', 1, 'basal_3', 0]
     ]
-    return sec_pts, sec_lens, sec_diams, sec_scales, topology
+    return sec_pts, sec_lens, sec_diams, topology
 
 
 def _secs_L5Pyr():
@@ -477,8 +464,6 @@ def _secs_L5Pyr():
         'basal_3': 8.5
     }
 
-    sec_scales = _get_yscale(sec_pts, 'apical_trunk')
-
     topology = [
         # Distal (Apical)
         ['soma', 1, 'apical_trunk', 0],
@@ -492,4 +477,4 @@ def _secs_L5Pyr():
         ['basal_1', 1, 'basal_2', 0],
         ['basal_1', 1, 'basal_3', 0]
     ]
-    return sec_pts, sec_lens, sec_diams, sec_scales, topology
+    return sec_pts, sec_lens, sec_diams, topology
