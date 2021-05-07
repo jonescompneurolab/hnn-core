@@ -129,6 +129,7 @@ class Cell:
         self.pos = pos
         self.sections = dict()
         self.synapses = dict()
+        self.dipole_pp = list()
         self.sect_loc = dict()
         self.rec_v = h.Vector()
         self.rec_i = dict()
@@ -263,7 +264,7 @@ class Cell:
 
         Examples
         --------
-        p_secs = {
+        >>> p_secs = {
             'soma':
             {
                 'L': 39,
@@ -325,7 +326,6 @@ class Cell:
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
-        self.dipole_pp = list()
         yscale = _get_yscale(p_secs, 'apical_trunk')
 
         # setting pointers and ztan values
