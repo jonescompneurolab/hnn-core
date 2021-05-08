@@ -12,8 +12,8 @@ from neuron import h, nrn
 # Units for gbar: S/cm^2
 
 
-def _get_yscale(p_secs, dipole_sec):
-    """Get cos theta to compute dipole in z direction."""
+def _get_cos_theta(p_secs, dipole_sec):
+    """Get cos(theta) to compute dipole along dipole_sec."""
     a = (np.array(p_secs[dipole_sec]['sec_pts'][1]) -
          np.array(p_secs[dipole_sec]['sec_pts'][0]))
     yscales = dict()
@@ -322,11 +322,11 @@ class Cell:
             values are dictionaries with properties of the mechanism.
         dipole_sec : str
             The name of the section along which dipole is to
-            be computed.
+            be projected.
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
-        yscale = _get_yscale(p_secs, 'apical_trunk')
+        cos_thetas = _get_cos_theta(p_secs, 'apical_trunk')
 
         # setting pointers and ztan values
         for sect_name in p_secs:
@@ -342,13 +342,14 @@ class Cell:
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
             pos_all = np.array([seg.x for seg in sect.allseg()])
-            # diff in yvals, scaled against the pos np.array. y_long as
-            # in longitudinal
-            y_scale = (yscale[sect_name] * sect.L) * pos_all
-            # y_long = (h.y3d(1, sec=sect) - h.y3d(0, sec=sect)) * pos
+            pos_proj = sect.L * cos_thetas[sect_name] * pos_all
             # diff values calculate length between successive section points
-            y_diff = np.diff(y_scale)
+            y_diff = np.diff(pos_proj)
+
+            # alternative procedure below with y_long(itudinal)
+            # y_long = (h.y3d(1, sec=sect) - h.y3d(0, sec=sect)) * pos
             # y_diff = np.diff(y_long)
+
             # doing range to index multiple values of the same
             # np.array simultaneously
             for idx, pos in enumerate(pos_all[1:-1]):
