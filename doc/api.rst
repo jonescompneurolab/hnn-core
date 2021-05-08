@@ -28,20 +28,7 @@ Dipole (:py:mod:`hnn_core.dipole`):
    :toctree: generated/
 
    Dipole
-   simulate_dipole
-   read_dipole
    average_dipoles
-
-Params (:py:mod:`hnn_core.params`):
------------------------------------
-
-.. currentmodule:: hnn_core.params
-
-.. autosummary::
-   :toctree: generated/
-
-   Params
-   read_params
 
 Visualization (:py:mod:`hnn_core.viz`):
 ---------------------------------------
@@ -78,5 +65,6 @@ Input and Output:
 .. autosummary::
    :toctree: generated/
 
+   read_params
    read_dipole
    read_spikes
