@@ -4,10 +4,23 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import numpy as np
+from numpy.linalg import norm
+
 from neuron import h, nrn
 
 # Units for e: mV
 # Units for gbar: S/cm^2
+
+
+def _get_cos_theta(p_secs, sec_name_apical):
+    """Get cos(theta) to compute dipole along the apical dendrite."""
+    a = (np.array(p_secs[sec_name_apical]['sec_pts'][1]) -
+         np.array(p_secs[sec_name_apical]['sec_pts'][0]))
+    cos_thetas = dict()
+    for sec_name, p_sec in p_secs.items():
+        b = np.array(p_sec['sec_pts'][1]) - np.array(p_sec['sec_pts'][0])
+        cos_thetas[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
+    return cos_thetas
 
 
 class _ArtificialCell:
@@ -116,6 +129,7 @@ class Cell:
         self.pos = pos
         self.sections = dict()
         self.synapses = dict()
+        self.dipole_pp = list()
         self.sect_loc = dict()
         self.rec_v = h.Vector()
         self.rec_i = dict()
@@ -175,8 +189,7 @@ class Cell:
         """Create synapses."""
         for sec_name in p_secs:
             for receptor in p_secs[sec_name]['syns']:
-                sec_name_sanitized = sec_name.replace('_', '')
-                syn_key = f'{sec_name_sanitized}_{receptor}'
+                syn_key = f'{sec_name}_{receptor}'
                 seg = self.sections[sec_name](0.5)
                 self.synapses[syn_key] = self.syn_create(
                     seg, **p_syn[receptor])
@@ -250,7 +263,7 @@ class Cell:
 
         Examples
         --------
-        p_secs = {
+        >>> p_secs = {
             'soma':
             {
                 'L': 39,
@@ -293,27 +306,33 @@ class Cell:
     # 2. a list needs to be created with a Dipole (Point Process) in each
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
-    def insert_dipole(self, yscale):
+    def insert_dipole(self, p_secs, sec_name_apical):
         """Insert dipole into each section of this cell.
 
         Parameters
         ----------
-        yscale : dict
-            Dictionary of length scales to calculate dipole without
-            3d shape.
+        p_secs : nested dict
+            Dictionary with keys as section name.
+            p_secs[sec_name] is a dictionary with keys
+            L, diam, Ra, cm, syns and mech.
+            syns is a list specifying the synapses at that section.
+            The properties of syn are specified in p_syn.
+            mech is a dict with keys as the mechanism names. The
+            values are dictionaries with properties of the mechanism.
+        sec_name_apical : str
+            The name of the section along which dipole moment is calculated.
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
+        cos_thetas = _get_cos_theta(p_secs, 'apical_trunk')
 
-        # dends must have already been created!!
-        # it's easier to use wholetree here, this includes soma
-        sec_list = list(self.sections.values())
-        for sect in sec_list:
-            sect.insert('dipole')
-        # Dipole is defined in dipole_pp.mod
-        self.dipole_pp = [h.Dipole(1, sec=sect) for sect in sec_list]
         # setting pointers and ztan values
-        for sect, dpp in zip(sec_list, self.dipole_pp):
+        for sect_name in p_secs:
+            sect = self.sections[sect_name]
+            sect.insert('dipole')
+
+            dpp = h.Dipole(1, sec=sect)  # defined in dipole_pp.mod
+            self.dipole_pp.append(dpp)
             dpp.ri = h.ri(1, sec=sect)  # assign internal resistance
             # sets pointers in dipole mod file to the correct locations
             dpp._ref_pv = sect(0.99)._ref_v
@@ -321,14 +340,13 @@ class Cell:
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
             pos_all = np.array([seg.x for seg in sect.allseg()])
-            # diff in yvals, scaled against the pos np.array. y_long as
-            # in longitudinal
-            sect_name = sect.name().split('_', 1)[1]
-            y_scale = (yscale[sect_name] * sect.L) * pos_all
+            seg_lens = np.diff(pos_all) * sect.L
+            seg_lens_z = seg_lens * cos_thetas[sect_name]
+
+            # alternative procedure below with y_long(itudinal)
             # y_long = (h.y3d(1, sec=sect) - h.y3d(0, sec=sect)) * pos
-            # diff values calculate length between successive section points
-            y_diff = np.diff(y_scale)
             # y_diff = np.diff(y_long)
+
             # doing range to index multiple values of the same
             # np.array simultaneously
             for idx, pos in enumerate(pos_all[1:-1]):
@@ -344,9 +362,9 @@ class Cell:
                 sect(pos).dipole._ref_Qsum = dpp._ref_Qsum
                 sect(pos).dipole._ref_Qtotal = self.dpl_ref
                 # add ztan values
-                sect(pos).dipole.ztan = y_diff[idx]
-            # set the pp dipole's ztan value to the last value from y_diff
-            dpp.ztan = y_diff[-1]
+                sect(pos).dipole.ztan = seg_lens_z[idx]
+            # set the pp dipole's ztan value to the last value from seg_lens_z
+            dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
     def create_tonic_bias(self, amplitude, t0, T, loc=0.5):

@@ -3,8 +3,6 @@
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
-import numpy as np
-
 
 def get_params_default(nprox=2, ndist=1):
     """ Note that nearly all start times are set BEYOND tstop for this file
@@ -374,9 +372,8 @@ def _secs_Basket():
     sec_diams = {
         'soma': 20.
     }
-    sec_scales = None
     topology = None
-    return sec_pts, sec_lens, sec_diams, sec_scales, topology
+    return sec_pts, sec_lens, sec_diams, topology
 
 
 def _secs_L2Pyr():
@@ -412,16 +409,7 @@ def _secs_L2Pyr():
         'basal_2': 2.72,
         'basal_3': 2.72
     }
-    sec_scales = {  # factor to scale the dipole by
-        'soma': 1.,
-        'apical_trunk': 1.,
-        'apical_oblique': 0.,
-        'apical_1': 1.,
-        'apical_tuft': 1.,
-        'basal_1': -1.,
-        'basal_2': -np.sqrt(2.) / 2.,
-        'basal_3': -np.sqrt(2.) / 2.
-    }
+
     # parent, parent_end, child, {child_start=0}
     topology = [
         # Distal (Apical)
@@ -435,7 +423,7 @@ def _secs_L2Pyr():
         ['basal_1', 1, 'basal_2', 0],
         ['basal_1', 1, 'basal_3', 0]
     ]
-    return sec_pts, sec_lens, sec_diams, sec_scales, topology
+    return sec_pts, sec_lens, sec_diams, topology
 
 
 def _secs_L5Pyr():
@@ -473,17 +461,7 @@ def _secs_L5Pyr():
         'basal_2': 8.5,
         'basal_3': 8.5
     }
-    sec_scales = {  # factor to scale the dipole by
-        'soma': 1.,
-        'apical_trunk': 1.,
-        'apical_oblique': 0.,
-        'apical_1': 1.,
-        'apical_2': 1.,
-        'apical_tuft': 1.,
-        'basal_1': -1.,
-        'basal_2': -np.sqrt(2.) / 2.,
-        'basal_3': -np.sqrt(2.) / 2.
-    }
+
     topology = [
         # Distal (Apical)
         ['soma', 1, 'apical_trunk', 0],
@@ -497,4 +475,4 @@ def _secs_L5Pyr():
         ['basal_1', 1, 'basal_2', 0],
         ['basal_1', 1, 'basal_3', 0]
     ]
-    return sec_pts, sec_lens, sec_diams, sec_scales, topology
+    return sec_pts, sec_lens, sec_diams, topology

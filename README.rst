@@ -84,7 +84,11 @@ and install Neuron using the traditional package installer available here
 Documentation and examples
 ==========================
 
-Once you have tested that ``hnn_core`` and its dependencies were installed, we recommend downloading and executing the `example scripts <https://jonescompneurolab.github.io/hnn-core/auto_examples/index.html>`_ provided on the `documentation pages <https://jonescompneurolab.github.io/hnn-core/>`_ (as well as in the `GitHub repository <https://github.com/jonescompneurolab/hnn-core>`_).
+Once you have tested that ``hnn_core`` and its dependencies were installed,
+we recommend downloading and executing the
+`example scripts <https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html>`_
+provided on the `documentation pages <https://jonescompneurolab.github.io/hnn-core/>`_
+(as well as in the `GitHub repository <https://github.com/jonescompneurolab/hnn-core>`_).
 
 Note that ``python`` plots are by default non-interactive (blocking): each plot must thus be closed before the code execution continues. We recommend using and 'interactive' python interpreter such as ``ipython``::
 
@@ -108,4 +112,4 @@ Interested in Contributing?
 
 Read our `contributing guide <https://github.com/jonescompneurolab/hnn-core/blob/master/CONTRIBUTING.rst>`_.
 
-.. _parallel_backends: https://jonescompneurolab.github.io/hnn-core/parallel.html
+.. _parallel_backends: https://jonescompneurolab.github.io/hnn-core/stable/parallel.html
