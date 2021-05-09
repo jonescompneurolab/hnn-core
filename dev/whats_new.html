@@ -3,15 +3,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>What’s new? &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -79,10 +80,10 @@
 <li><a class="reference internal" href="#api">API</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id5">0.1</a><ul>
-<li><a class="reference internal" href="#id7">Changelog</a></li>
-<li><a class="reference internal" href="#id27">Bug</a></li>
-<li><a class="reference internal" href="#id36">API</a></li>
+<li><a class="reference internal" href="#id7">0.1</a><ul>
+<li><a class="reference internal" href="#id9">Changelog</a></li>
+<li><a class="reference internal" href="#id29">Bug</a></li>
+<li><a class="reference internal" href="#id38">API</a></li>
 <li><a class="reference internal" href="#people-who-contributed-to-this-release-in-alphabetical-order">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
@@ -137,31 +138,34 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="what-s-new">
+  <section id="what-s-new">
 <span id="whats-new"></span><h1>What’s new?<a class="headerlink" href="#what-s-new" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="current">
+<section id="current">
 <span id="id1"></span><h2>Current<a class="headerlink" href="#current" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="changelog">
+<section id="changelog">
 <h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Store all connectivity information under <code class="xref py py-attr docutils literal notranslate"><span class="pre">connectivity</span></code> before building the network, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/276">#276</a></p></li>
 <li><p>Add new function <a class="reference internal" href="generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology" title="hnn_core.viz.plot_cell_morphology"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_cell_morphology()</span></code></a> to visualize cell morphology, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/319">#319</a></p></li>
+<li><p>Compute dipole component in z-direction automatically from cell morphology instead of hard coding, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in  <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/320">#327</a></p></li>
 </ul>
-</div>
-<div class="section" id="bug">
+</section>
+<section id="bug">
 <h3>Bug<a class="headerlink" href="#bug" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="api">
+</section>
+<section id="api">
 <h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>New API for defining cell-cell connections. Custom connections can be added with <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_connection" title="hnn_core.Network.add_connection"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_connection()</span></code></a>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/276">#276</a></p></li>
+<li><p>Remove <code class="xref py py-class docutils literal notranslate"><span class="pre">L2Pyr</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">L5Pyr</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">L2Basket</span></code>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">L5Basket</span></code> classes
+in favor of instantation through functions and a more consistent <a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cell</span></code></a> class by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in  <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/320">#322</a></p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="id5">
-<span id="id6"></span><h2>0.1<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id7">
-<h3>Changelog<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id7">
+<span id="id8"></span><h2>0.1<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<section id="id9">
+<h3>Changelog<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add ability to simulate multiple trials in parallel using joblibs, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/44">#44</a></p></li>
 <li><p>Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting their start times to exceed the simulation stop time, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/105">#105</a></p></li>
@@ -183,9 +187,9 @@
 <li><p>Add y-label units (nAm) to all visualisation functions involving dipole moments, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 <li><p>Add Savitzky-Golay filtering method <a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter" title="hnn_core.dipole.Dipole.savgol_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>; copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v0.24.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 </ul>
-</div>
-<div class="section" id="id27">
-<h3>Bug<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id29">
+<h3>Bug<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix missing autapses in network construction, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/50">#50</a></p></li>
 <li><p>Fix rhythmic input feed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/98">#98</a></p></li>
@@ -196,9 +200,9 @@
 <li><p>Fix bug in Poisson input where the first spike was being missed after the start time, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/204/">#204</a></p></li>
 <li><p>Fix bug in network to add empty spike when empty file is read in, by <a class="reference external" href="https://github.com/samikane">Samika Kanekar</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/207">#207</a></p></li>
 </ul>
-</div>
-<div class="section" id="id36">
-<h3>API<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id38">
+<h3>API<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Make a context manager for Network class, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/86">#86</a></p></li>
 <li><p>Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/96">#96</a></p></li>
@@ -209,8 +213,8 @@
 <li><p>Examples apply random state seeds that reproduce the output of HNN GUI documentation, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/221">#221</a></p></li>
 <li><p>Force conversion to nAm (from fAm) for output of <a class="reference internal" href="generated/hnn_core.dipole.simulate_dipole.html#hnn_core.dipole.simulate_dipole" title="hnn_core.dipole.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a> regardless of <code class="docutils literal notranslate"><span class="pre">postproc</span></code>-argument, which now only controls parameter file-based smoothing and scaling, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 </ul>
-</div>
-<div class="section" id="people-who-contributed-to-this-release-in-alphabetical-order">
+</section>
+<section id="people-who-contributed-to-this-release-in-alphabetical-order">
 <h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a></p></li>
@@ -222,9 +226,9 @@
 <li><p><a class="reference external" href="https://github.com/samikane">Samika Kanekar</a></p></li>
 <li><p><a class="reference external" href="https://github.com/stephanie-r-jones">Stephanie Jones</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
     </div>
@@ -239,7 +243,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.0.<br/>
     </p>
   </div>
 </footer>

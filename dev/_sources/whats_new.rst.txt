@@ -18,12 +18,17 @@ Changelog
 
 - Add new function :func:`~hnn_core.viz.plot_cell_morphology` to visualize cell morphology, by `Mainak Jas`_ in `#319 <https://github.com/jonescompneurolab/hnn-core/pull/319>`_
 
+- Compute dipole component in z-direction automatically from cell morphology instead of hard coding, by `Mainak Jas`_ in  `#327 <https://github.com/jonescompneurolab/hnn-core/pull/320>`_
+
 Bug
 ~~~
 
 API
 ~~~
 - New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
+
+- Remove :class:`~hnn_core.L2Pyr`, :class:`~hnn_core.L5Pyr`, :class:`~hnn_core.L2Basket`, and :class:`~hnn_core.L5Basket` classes
+  in favor of instantation through functions and a more consistent :class:`~hnn_core.Cell` class by `Mainak Jas`_ in  `#322 <https://github.com/jonescompneurolab/hnn-core/pull/320>`_
 
 .. _0.1:
 

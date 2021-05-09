@@ -5,13 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Index &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -121,6 +121,7 @@
 <div class="genindex-jumpbox">
  <a href="#_"><strong>_</strong></a>
  | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
@@ -148,11 +149,11 @@
         <li><a href="generated/hnn_core.params.Params.html#hnn_core.params.Params.__getitem__">(hnn_core.params.Params method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse.__repr__">__repr__() (hnn_core.CellResponse method)</a>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.__repr__">__repr__() (hnn_core.Cell method)</a>
 
       <ul>
+        <li><a href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse.__repr__">(hnn_core.CellResponse method)</a>
+</li>
         <li><a href="generated/hnn_core.Network.html#hnn_core.Network.__repr__">(hnn_core.Network method)</a>
 </li>
         <li><a href="generated/hnn_core.params.Params.html#hnn_core.params.Params.__repr__">(hnn_core.params.Params method)</a>
@@ -181,9 +182,19 @@
   </ul></td>
 </tr></table>
 
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.build">build() (hnn_core.Cell method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell">Cell (class in hnn_core)</a>
+</li>
       <li><a href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse">CellResponse (class in hnn_core)</a>
 </li>
       <li><a href="generated/hnn_core.params.Params.html#hnn_core.params.Params.clear">clear() (hnn_core.params.Params method)</a>
@@ -200,6 +211,8 @@
         <li><a href="generated/hnn_core.params.Params.html#hnn_core.params.Params.copy">(hnn_core.params.Params method)</a>
 </li>
       </ul></li>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias">create_tonic_bias() (hnn_core.Cell method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -234,6 +247,10 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.insert_dipole">insert_dipole() (hnn_core.Cell method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/hnn_core.params.Params.html#hnn_core.params.Params.items">items() (hnn_core.params.Params method)</a>
 </li>
   </ul></td>
@@ -262,6 +279,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.move_to_pos">move_to_pos() (hnn_core.Cell method)</a>
+</li>
       <li><a href="generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend">MPIBackend (class in hnn_core.parallel_backends)</a>
 </li>
   </ul></td>
@@ -279,6 +298,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/hnn_core.params.Params.html#hnn_core.params.Params">Params (class in hnn_core.params)</a>
+</li>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.parconnect_from_src">parconnect_from_src() (hnn_core.Cell method)</a>
 </li>
       <li><a href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot">plot() (hnn_core.dipole.Dipole method)</a>
 </li>
@@ -338,11 +359,13 @@
         <li><a href="generated/hnn_core.dipole.read_dipole.html#hnn_core.dipole.read_dipole">(in module hnn_core.dipole)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/hnn_core.params.read_params.html#hnn_core.params.read_params">read_params() (in module hnn_core.params)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes">read_spikes() (in module hnn_core)</a>
+</li>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.record_soma">record_soma() (hnn_core.Cell method)</a>
 </li>
       <li><a href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse.reset">reset() (hnn_core.CellResponse method)</a>
 </li>
@@ -357,6 +380,8 @@
       <li><a href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.scale">scale() (hnn_core.dipole.Dipole method)</a>
 </li>
       <li><a href="generated/hnn_core.params.Params.html#hnn_core.params.Params.setdefault">setdefault() (hnn_core.params.Params method)</a>
+</li>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.setup_source_netcon">setup_source_netcon() (hnn_core.Cell method)</a>
 </li>
       <li><a href="generated/hnn_core.parallel_backends.JoblibBackend.html#hnn_core.parallel_backends.JoblibBackend.simulate">simulate() (hnn_core.parallel_backends.JoblibBackend method)</a>
 
@@ -373,6 +398,8 @@
 </li>
       </ul></li>
       <li><a href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.smooth">smooth() (hnn_core.dipole.Dipole method)</a>
+</li>
+      <li><a href="generated/hnn_core.Cell.html#hnn_core.Cell.syn_create">syn_create() (hnn_core.Cell method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -433,7 +460,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.0.<br/>
     </p>
   </div>
 </footer>
