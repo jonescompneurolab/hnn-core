@@ -264,8 +264,8 @@ def pyramidal(pos, cell_name, override_params=None, gid=None):
     for sec_name in p_secs:
         p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
-    sect_loc = {'proximal': ['apicaloblique', 'basal2', 'basal3'],
-                'distal': ['apicaltuft']}
+    sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
+                'distal': ['apical_tuft']}
 
     cell = Cell(name=cell_name, pos=pos, gid=gid)
     cell.build(p_secs, p_syn, topology, sect_loc=sect_loc)

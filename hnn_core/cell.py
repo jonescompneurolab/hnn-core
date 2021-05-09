@@ -189,8 +189,7 @@ class Cell:
         """Create synapses."""
         for sec_name in p_secs:
             for receptor in p_secs[sec_name]['syns']:
-                sec_name_sanitized = sec_name.replace('_', '')
-                syn_key = f'{sec_name_sanitized}_{receptor}'
+                syn_key = f'{sec_name}_{receptor}'
                 seg = self.sections[sec_name](0.5)
                 self.synapses[syn_key] = self.syn_create(
                     seg, **p_syn[receptor])
