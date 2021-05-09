@@ -16,11 +16,11 @@ def _get_cos_theta(p_secs, sec_name_apical):
     """Get cos(theta) to compute dipole along the apical dendrite."""
     a = (np.array(p_secs[sec_name_apical]['sec_pts'][1]) -
          np.array(p_secs[sec_name_apical]['sec_pts'][0]))
-    yscales = dict()
+    cos_thetas = dict()
     for sec_name, p_sec in p_secs.items():
         b = np.array(p_sec['sec_pts'][1]) - np.array(p_sec['sec_pts'][0])
-        yscales[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
-    return yscales
+        cos_thetas[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
+    return cos_thetas
 
 
 class _ArtificialCell:
@@ -320,8 +320,7 @@ class Cell:
             mech is a dict with keys as the mechanism names. The
             values are dictionaries with properties of the mechanism.
         sec_name_apical : str
-            The name of the section along which dipole is to
-            be projected.
+            The name of the section along which dipole moment is calculated.
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
