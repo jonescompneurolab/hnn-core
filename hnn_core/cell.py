@@ -12,10 +12,10 @@ from neuron import h, nrn
 # Units for gbar: S/cm^2
 
 
-def _get_cos_theta(p_secs, dipole_sec):
-    """Get cos(theta) to compute dipole along dipole_sec."""
-    a = (np.array(p_secs[dipole_sec]['sec_pts'][1]) -
-         np.array(p_secs[dipole_sec]['sec_pts'][0]))
+def _get_cos_theta(p_secs, sec_name_apical):
+    """Get cos(theta) to compute dipole along the apical dendrite."""
+    a = (np.array(p_secs[sec_name_apical]['sec_pts'][1]) -
+         np.array(p_secs[sec_name_apical]['sec_pts'][0]))
     yscales = dict()
     for sec_name, p_sec in p_secs.items():
         b = np.array(p_sec['sec_pts'][1]) - np.array(p_sec['sec_pts'][0])
@@ -307,7 +307,7 @@ class Cell:
     # 2. a list needs to be created with a Dipole (Point Process) in each
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
-    def insert_dipole(self, p_secs, dipole_sec):
+    def insert_dipole(self, p_secs, sec_name_apical):
         """Insert dipole into each section of this cell.
 
         Parameters
@@ -320,7 +320,7 @@ class Cell:
             The properties of syn are specified in p_syn.
             mech is a dict with keys as the mechanism names. The
             values are dictionaries with properties of the mechanism.
-        dipole_sec : str
+        sec_name_apical : str
             The name of the section along which dipole is to
             be projected.
         """
@@ -342,9 +342,8 @@ class Cell:
             # gives INTERNAL segments of the section, non-endpoints
             # creating this because need multiple values simultaneously
             pos_all = np.array([seg.x for seg in sect.allseg()])
-            pos_proj = sect.L * cos_thetas[sect_name] * pos_all
-            # diff values calculate length between successive section points
-            y_diff = np.diff(pos_proj)
+            seg_lens = np.diff(pos_all) * sect.L
+            seg_lens_z = seg_lens * cos_thetas[sect_name]
 
             # alternative procedure below with y_long(itudinal)
             # y_long = (h.y3d(1, sec=sect) - h.y3d(0, sec=sect)) * pos
@@ -365,9 +364,9 @@ class Cell:
                 sect(pos).dipole._ref_Qsum = dpp._ref_Qsum
                 sect(pos).dipole._ref_Qtotal = self.dpl_ref
                 # add ztan values
-                sect(pos).dipole.ztan = y_diff[idx]
-            # set the pp dipole's ztan value to the last value from y_diff
-            dpp.ztan = y_diff[-1]
+                sect(pos).dipole.ztan = seg_lens_z[idx]
+            # set the pp dipole's ztan value to the last value from seg_lens_z
+            dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
     def create_tonic_bias(self, amplitude, t0, T, loc=0.5):
