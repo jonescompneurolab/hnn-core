@@ -44,7 +44,9 @@ net.plot_cells()
 # Electrode positions are stored under ``Network.lfp`` as a list
 # of tuples. Once we have chosen x,y,z coordinates for each electrode, we can
 # add them to the simulation.
-electrode_pos = [(2, 2, 400), (6, 6, 800)]
+
+# XXX coordinates FUBAR, cortical depth direction is Y in NEURON objects!
+electrode_pos = [(2, 400, 2), (6, 800, 6)]
 net.add_electrode(electrode_pos)
 print(net.lfp)
 net.plot_cells()

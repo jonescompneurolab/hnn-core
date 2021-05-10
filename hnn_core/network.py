@@ -1197,16 +1197,17 @@ class Network(object):
         self.external_drives = dict()
         self.connectivity = connectivity
 
-    def add_electrode(self, electrode_pos, sigma=3.0, method='psa'):
+    def add_electrode(self, electrode_pos, sigma=0.3, method='psa'):
         """Specify coordinates of electrodes for LFP recording.
 
         Parameters
         ----------
         electrode_pos : tuple | list of tuple
             Coordinates specifying the position for LFP electrodes in
-            the form of (x, y, z).
-        sigma : float | int
-            Extracellular conductivity in mS/cm (uniform for simplicity)
+            the form of (x, y, z) (in um).
+        sigma : float
+            Extracellular conductivity, in S/m, of the assumed infinite,
+            homogeneous volume conductor that the cell and electrode are in.
         method : str
             'psa' (default), i.e., point source approximation or line source
             approximation, i.e., 'lsa'
