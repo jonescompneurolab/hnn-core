@@ -42,80 +42,92 @@ def _get_all_sections(sec_type='Pyr'):
     return ls
 
 
-def _transfer_resistance(exyz, sigma, method):
-    """Transfer resistance.
+def _get_segment_counts(all_sections):
+    seg_counts = np.zeros((len(all_sections), ), dtype=np.int)
+    for ii, sec in enumerate(all_sections):
+        seg_counts[ii] = np.int(sec.nseg)
+    return seg_counts
+
+
+def _transfer_resistance(section, ele_pos, sigma, method):
+    """Transfer resistance between section and electrode position.
+
+    To arrive at the extracellular potential, the value returned by this
+    function is multiplied by the net transmembrane current flowing through all
+    segments of the section. Hence the term "resistance" (voltage equals
+    current times resistance).
 
     Parameters
     ----------
-    exyz : list (x, y, z)
-        The x, y, z coordinates of the electrode.
-    use_point : bool
-        Whether to do a point source approximation
-        for extracellular currents.
-
-    Returns
+    section : h.Section() The NEURON section. ele_pos : list (x, y, z) The x,
+        y, z coordinates of the electrode (in um) sigma : float Extracellular
+        conductivity (in S/m) method : str Approximation to use. 'psa' assigns
+        all transmembrane currents to the center point (0.5). 'lsa' treats the
+        section as a line source, but a single multiplier is calculated for
+        each section. Returns
     -------
-    vres : list
-        The resistance at each section.
+    vres : list The resistance at each section.
     """
-    vres = list()
-    exyz = np.array(exyz)  # electrode position
+    ele_pos = np.array(ele_pos)  # electrode position to Numpy
 
-    for s in _get_all_sections():
+    start = np.array([section.x3d(0), section.y3d(0), section.z3d(0)])
+    end = np.array([section.x3d(1), section.y3d(1), section.z3d(1)])
+    mid = (start + end) / 2.
 
-        start = np.array([s.x3d(0), s.y3d(0), s.z3d(0)])
-        end = np.array([s.x3d(1), s.y3d(1), s.z3d(1)])
-        mid = (start + end) / 2.
+    if method == 'psa':
 
-        if method == 'psa':
+        # distance from compartment to electrode
+        dis = norm(ele_pos - mid)
 
-            # distance from compartment to electrode
-            dis = norm(exyz - mid)
+        # setting radius limit
+        if dis < section.diam / 2.0:
+            dis = section.diam / 2.0 + 0.1
 
-            # setting radius limit
-            if dis < s.diam / 2.0:
-                dis = s.diam / 2.0 + 0.1
+        phi = 1. / dis
 
-            phi = 1. / dis
+    # XXX the 'lsa' method implementation is unverified, proceed with caution!
+    elif method == 'lsa':
+        # calculate length of the compartment
+        a = end - start
+        dis = norm(a)
 
-        elif method == 'lsa':
-            # calculate length of the compartment
-            a = end - start
-            dis = norm(a)
+        # setting radius limit
+        if dis < section.diam / 2.0:
+            dis = section.diam / 2.0 + 0.1
 
-            # setting radius limit
-            if dis < s.diam / 2.0:
-                dis = s.diam / 2.0 + 0.1
+        # if a = position vector of end with respect to start
+        #    b = position vector of electrode with respect to end
+        #
+        # we want to compute the length of projection of "a"
+        # "b".
+        # H = a.cos(theta) = a.dot(b) / |a|
+        a = end - start
+        b = ele_pos - end
+        H = a.dot(b) / dis
 
-            # if a = position vector of end with respect to start
-            #    b = position vector of electrode with respect to end
-            #
-            # we want to compute the length of projection of "a"
-            # "b".
-            # H = a.cos(theta) = a.dot(b) / |a|
-            a = end - start
-            b = exyz - end
-            H = a.dot(b) / dis
+        # total longitudinal distance from start of compartment
+        L = H + dis
 
-            # total longitudinal distance from start of compartment
-            L = H + dis
+        # if a.dot(b) < 0, projection will fall on the
+        # compartment.
+        if H < 0:
+            H = -H
 
-            # if a.dot(b) < 0, projection will fall on the
-            # compartment.
-            if H < 0:
-                H = -H
+        # distance ^ 2 of electrode to end
+        r_sq = np.linalg.norm(ele_pos - end) ** 2
 
-            # distance ^ 2 of electrode to end
-            r_sq = np.linalg.norm(exyz - end) ** 2
+        # phi
+        num = np.sqrt(H ** 2 + r_sq) - H
+        denom = np.sqrt(H ** 2 + r_sq) - L
+        phi = 1. / dis * np.log(num / denom)
 
-            # phi
-            num = np.sqrt(H ** 2 + r_sq) - H
-            denom = np.sqrt(H ** 2 + r_sq) - L
-            phi = 1. / dis * np.log(num / denom)
-
-        # x10000 for units of microV : nA/(microm*(mS/cm)) -> microV
-        vres.append(10000.0 * phi / (4.0 * np.pi * sigma))
-    return vres
+    # [dis]: um; [sigma]: S / m
+    # [phi / sigma] = [1/dis] / [sigma] = 1 / [dis] x [sigma]
+    # [dis] x [sigma] = um x (S / m) = 1e-6 S
+    # transmembrane current returned by _ref_i_membrane_ is in [nA]
+    # ==> 1e-9 A x (1 / 1e-6 S) = 1e-3 V = mV
+    # ===> multiply by 1e3 to get uV
+    return 1000.0 * phi / (4.0 * np.pi * sigma)
 
 
 class _LFPElectrode:
@@ -124,9 +136,10 @@ class _LFPElectrode:
     Parameters
     ----------
     coord : tuple
-        The (x, y, z) coordinates of the LFP electrode.
+        The (x, y, z) coordinates (in um) of the LFP electrode.
     sigma : float
-        Extracellular conductivity in mS/cm (uniform for simplicity)
+        Extracellular conductivity, in S/m, of the assumed infinite,
+        homogeneous volume conductor that the cell and electrode are in.
     pc : instance of h.ParallelContext()
         ParallelContext instance for running in parallel
     cvode : instanse of h.CVode
@@ -143,18 +156,26 @@ class _LFPElectrode:
         The LFP voltage.
     imem_vec : instance of h.Vector
         The transmembrane ionic current.
+
+    Notes
+    -----
+    See Table 5 in http://jn.physiology.org/content/104/6/3388.long for
+    measured values of sigma in rat cortex (note units there are mS / cm)
     """
 
-    def __init__(self, coord, sigma=3.0, pc=None, cvode=None, method='psa'):
+    def __init__(self, coord, sigma=0.3, pc=None, cvode=None, method='psa'):
 
-        secs = _get_all_sections()
-        n_sections = len(secs)
+        secs_in_network = _get_all_sections()  # ordered list of h.Sections
+        # np.array of number of segments for each section, ordered as above
+        self.segment_counts = _get_segment_counts(secs_in_network)
 
-        # see http://jn.physiology.org/content/104/6/3388.long shows table of
-        # values with conductivity
-
-        self.imem_ptrvec = h.PtrVector(n_sections)
-        self.imem_vec = h.Vector(n_sections)
+        # pointers assigned to _ref_i_membrane_ at each EACH segment below
+        self.imem_ptrvec = h.PtrVector(self.segment_counts.sum())
+        # placeholder into which pointer values are read on each sim step
+        self.imem_vec = h.Vector(int(self.imem_ptrvec.size()))
+        # transfer resistances, same length as membrane current pointers
+        self.r_transfer = np.empty((int(self.imem_ptrvec.size()), ),
+                                   dtype=np.int)
         self.pc = pc
         if self.pc is None:
             self.pc = h.ParallelContext()
@@ -163,15 +184,21 @@ class _LFPElectrode:
         # segment
         self.bscallback = cvode.extra_scatter_gather(0, self.callback)
 
-        # XXX: iteration over sections.
-        # more accurate to use segments and their neighbors?
-        for i, sec in enumerate(secs):
-            # for seg in sec:
-            seg = sec(0.5)
-            self.imem_ptrvec.pset(i, seg._ref_i_membrane_)
-
-        vres = _transfer_resistance(coord, sigma=sigma, method=method)
-        self.vres = h.Vector(vres)
+        xfer_resistance_list = list()
+        count = 0
+        for sec, n_segs in zip(secs_in_network, self.segment_counts):
+            this_xfer_r = _transfer_resistance(sec, coord, sigma=sigma,
+                                               method=method)
+            # the n_segs of this section get assigned the same value (e.g. in
+            # PSA, the distance is calculated for the section mid point only)
+            xfer_resistance_list.extend([this_xfer_r] * n_segs)
+            for seg in sec:  # section end points (0, 1) not included
+                # set Nth pointer to the net membrane current at this segment
+                self.imem_ptrvec.pset(count, sec(seg.x)._ref_i_membrane_)
+                count += 1
+        # convert to numpy array for speedy calculation in callback
+        self.r_transfer = np.array(xfer_resistance_list)
+        assert count == int(self.imem_ptrvec.size())  # smoke test
 
         self.lfp_t = h.Vector()
         self.lfp_v = h.Vector()
@@ -186,10 +213,9 @@ class _LFPElectrode:
         # sum up the weighted i_membrane_. Result in vx
         # rx.mulv(imem_vec, vx)
 
-        val = 0.0
-        for j in range(len(self.vres)):
-            val += self.imem_vec.x[j] * self.vres.x[j]
+        potential = np.dot(np.array(self.imem_vec.to_python()),
+                           self.r_transfer)
 
         # append to Vector
         self.lfp_t.append(self.pc.t(0))
-        self.lfp_v.append(val)
+        self.lfp_v.append(potential)
