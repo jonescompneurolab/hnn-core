@@ -201,13 +201,14 @@ else:
     filepath_prefix = 'v{}'.format(version)
 
 sphinx_gallery_conf = {
+    'doc_module': 'hnn_core',
     # path to your examples scripts
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'auto_examples',
     'backreferences_dir': 'generated',
     'reference_url': {
-        'hnn_core': 'https://jonescompneurolab.github.io/hnn-core/'
+        'hnn_core': None
     },
     'within_subsection_order': ExampleTitleSortKey,
     'binder': {'org': 'jonescompneurolab',

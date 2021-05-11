@@ -12,7 +12,7 @@ coverage
 .venv
 
 # Sphinx documentation
-doc/**
+doc/_build/**
 pip-log.txt
 .coverage
 tags
