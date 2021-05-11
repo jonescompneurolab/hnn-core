@@ -76,7 +76,6 @@
 <li><a class="reference internal" href="#">API Documentation</a><ul>
 <li><a class="reference internal" href="#simulation-hnn-core">Simulation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
 <li><a class="reference internal" href="#dipole-hnn-core-dipole">Dipole (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.dipole</span></code>):</a></li>
-<li><a class="reference internal" href="#params-hnn-core-params">Params (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.params</span></code>):</a></li>
 <li><a class="reference internal" href="#visualization-hnn-core-viz">Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):</a></li>
 <li><a class="reference internal" href="#parallel-backends-hnn-core-parallel-backends">Parallel backends (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.parallel_backends</span></code>):</a></li>
 <li><a class="reference internal" href="#input-and-output">Input and Output:</a></li>
@@ -167,31 +166,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole" title="hnn_core.dipole.Dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dipole</span></code></a>(times, data[, nave])</p></td>
 <td><p>Dipole class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.dipole.simulate_dipole.html#hnn_core.dipole.simulate_dipole" title="hnn_core.dipole.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, …])</p></td>
-<td><p>Simulate a dipole given the experiment parameters.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.dipole.read_dipole.html#hnn_core.dipole.read_dipole" title="hnn_core.dipole.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname)</p></td>
-<td><p>Read dipole values from a file and create a Dipole instance.</p></td>
-</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.dipole.average_dipoles.html#hnn_core.dipole.average_dipoles" title="hnn_core.dipole.average_dipoles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">average_dipoles</span></code></a>(dpls)</p></td>
 <td><p>Compute dipole averages over a list of Dipole objects.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="params-hnn-core-params">
-<h2>Params (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.params</span></code>):<a class="headerlink" href="#params-hnn-core-params" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.params.Params.html#hnn_core.params.Params" title="hnn_core.params.Params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Params</span></code></a>([params_input])</p></td>
-<td><p>Params object.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.params.read_params.html#hnn_core.params.read_params" title="hnn_core.params.read_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_params</span></code></a>(params_fname)</p></td>
-<td><p>Read param values from a file (.json or .param).</p></td>
 </tr>
 </tbody>
 </table>
@@ -253,10 +229,13 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_params</span></code></a>(params_fname)</p></td>
+<td><p>Read param values from a file (.json or .param).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dipole</span></code></a>(fname)</p></td>
 <td><p>Read dipole values from a file and create a Dipole instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spikes</span></code></a>(fname[, gid_ranges])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_spikes</span></code></a>(fname[, gid_ranges])</p></td>
 <td><p>Read spiking activity from a collection of spike trial files.</p></td>
 </tr>
 </tbody>
@@ -277,7 +256,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.1.<br/>
     </p>
   </div>
 </footer>
