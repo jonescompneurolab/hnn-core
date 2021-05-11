@@ -63,4 +63,6 @@ trial_idx = 0
 plt.plot(times, net.lfp[0]['data'][trial_idx])
 plt.plot(times, net.lfp[1]['data'][trial_idx])
 plt.legend([f'e_pos {electrode_pos[0]}', f'e_pos {electrode_pos[1]}'])
+plt.xlabel('Time (ms)')
+plt.ylabel(r'Potential ($\mu V$)')
 plt.show()

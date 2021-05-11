@@ -43,9 +43,10 @@ def _get_all_sections(sec_type='Pyr'):
 
 
 def _get_segment_counts(all_sections):
-    seg_counts = np.zeros((len(all_sections), ), dtype=np.int)
-    for ii, sec in enumerate(all_sections):
-        seg_counts[ii] = np.int(sec.nseg)
+    '''The segment count of a section excludes the endpoints (0, 1)'''
+    seg_counts = list()
+    for sec in all_sections:
+        seg_counts.append(sec.nseg)
     return seg_counts
 
 
@@ -131,7 +132,7 @@ def _transfer_resistance(section, ele_pos, sigma, method):
 
 
 class _LFPElectrode:
-    """LFP electrode class.
+    """Local field potential (LFP) electrode class.
 
     Parameters
     ----------
@@ -151,26 +152,24 @@ class _LFPElectrode:
     Attributes
     ----------
     lfp_t : instance of h.Vector
-        The LFP time instances.
+        The time points (in ms) at which the LFP is calculated.
     lfp_v : instance of h.Vector
-        The LFP voltage.
-    imem_vec : instance of h.Vector
-        The transmembrane ionic current.
+        The LFP voltage (in uV).
 
     Notes
     -----
     See Table 5 in http://jn.physiology.org/content/104/6/3388.long for
-    measured values of sigma in rat cortex (note units there are mS / cm)
+    measured values of sigma in rat cortex (note units there are mS/cm)
     """
 
     def __init__(self, coord, sigma=0.3, pc=None, cvode=None, method='psa'):
 
         secs_in_network = _get_all_sections()  # ordered list of h.Sections
         # np.array of number of segments for each section, ordered as above
-        self.segment_counts = _get_segment_counts(secs_in_network)
+        segment_counts = np.array(_get_segment_counts(secs_in_network))
 
-        # pointers assigned to _ref_i_membrane_ at each EACH segment below
-        self.imem_ptrvec = h.PtrVector(self.segment_counts.sum())
+        # pointers assigned to _ref_i_membrane_ at each EACH internal segment
+        self.imem_ptrvec = h.PtrVector(segment_counts.sum())
         # placeholder into which pointer values are read on each sim step
         self.imem_vec = h.Vector(int(self.imem_ptrvec.size()))
         # transfer resistances, same length as membrane current pointers
@@ -184,20 +183,20 @@ class _LFPElectrode:
         # segment
         self.bscallback = cvode.extra_scatter_gather(0, self.callback)
 
-        xfer_resistance_list = list()
+        xfer_resistance = list()
         count = 0
-        for sec, n_segs in zip(secs_in_network, self.segment_counts):
+        for sec, n_segs in zip(secs_in_network, segment_counts):
             this_xfer_r = _transfer_resistance(sec, coord, sigma=sigma,
                                                method=method)
             # the n_segs of this section get assigned the same value (e.g. in
             # PSA, the distance is calculated for the section mid point only)
-            xfer_resistance_list.extend([this_xfer_r] * n_segs)
+            xfer_resistance.extend([this_xfer_r] * n_segs)
             for seg in sec:  # section end points (0, 1) not included
                 # set Nth pointer to the net membrane current at this segment
                 self.imem_ptrvec.pset(count, sec(seg.x)._ref_i_membrane_)
                 count += 1
         # convert to numpy array for speedy calculation in callback
-        self.r_transfer = np.array(xfer_resistance_list)
+        self.r_transfer = np.array(xfer_resistance)
         assert count == int(self.imem_ptrvec.size())  # smoke test
 
         self.lfp_t = h.Vector()
