@@ -376,30 +376,24 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-        type2class = {'L2_pyramidal': pyramidal, 'L5_pyramidal': pyramidal,
-                      'L2_basket': basket, 'L5_basket': basket}
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
-
         for gid in self._gid_list:
-            src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
+            src_type = self.net.gid_to_type(gid)
+            cell = self.net._gid_to_cell(gid)
 
-            if is_cell:  # not a drive
-                # figure out which cell type is assoc with the gid
-                # create cells based on loc property
+            if cell is not None:
+                p_secs = self.net.cell_properties[src_type]['sections']
+                p_syn = self.net.cell_properties[src_type]['synapses']
+                topology = self.net.cell_properties[src_type]['topology']
+                sect_loc = self.net.cell_properties[src_type]['sect_loc']
+                # instantiate NEURON object
+                cell.build(p_secs, p_syn, topology, sect_loc=sect_loc)
+                # insert dipole in pyramidal cells
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    pyramidal_cell = type2class[src_type]
-                    # XXX Why doesn't a _Cell have a .threshold? Would make a
-                    # lot of sense to include it, as _ArtificialCells do.
-                    cell = pyramidal_cell(src_pos, override_params=None,
-                                          cell_name=_short_name(src_type),
-                                          gid=gid)
-                else:
-                    basket_cell = type2class[src_type]
-                    cell = basket_cell(src_pos,
-                                       cell_name=_short_name(src_type),
-                                       gid=gid)
+                    cell.insert_dipole(p_secs, 'apical_trunk')
+                # add tonic biases
                 if ('tonic' in self.net.external_biases and
                         src_type in self.net.external_biases['tonic']):
                     cell.create_tonic_bias(**self.net.external_biases
@@ -409,7 +403,6 @@ class NetworkBuilder(object):
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
                 _PC.cell(cell.gid, nrn_netcon)
-                self.cells.append(cell)
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
