@@ -156,8 +156,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
         drive = dict()
         drive['type'] = 'bursty'
         drive['cell_specific'] = False
-        drive['dynamics'] = {'distribution': par['distribution'],
-                             'tstart': par['t0'],
+        drive['dynamics'] = {'tstart': par['t0'],
                              'tstart_std': par['t0_stdev'],
                              'tstop': par['tstop'],
                              'burst_rate': par['f_input'],
@@ -377,7 +376,7 @@ def _validate_feed(p_ext_d, tstop):
     # if stdev is zero, increase synaptic weights 5 fold to make
     # single input equivalent to 5 simultaneous input to prevent spiking
     # <<---- SN: WHAT IS THIS RULE!?!?!?
-    if not p_ext_d['stdev'] and p_ext_d['distribution'] != 'uniform':
+    if not p_ext_d['stdev']:
         for key in p_ext_d.keys():
             if key.endswith('Pyr'):
                 p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
@@ -476,7 +475,6 @@ def create_pext(p, tstop):
                           p['input_prox_A_delay_L5']),
         'events_per_cycle': p['events_per_cycle_prox'],
         'prng_seedcore': int(p['prng_seedcore_input_prox']),
-        'distribution': p['distribution_prox'],
         'lamtha': 100.,
         'loc': 'proximal',
         'repeats': p['repeats_prox'],
@@ -507,7 +505,6 @@ def create_pext(p, tstop):
                           p['input_dist_A_delay_L2']),
         'events_per_cycle': p['events_per_cycle_dist'],
         'prng_seedcore': int(p['prng_seedcore_input_dist']),
-        'distribution': p['distribution_dist'],
         'lamtha': 100.,
         'loc': 'distal',
         'repeats': p['repeats_dist'],

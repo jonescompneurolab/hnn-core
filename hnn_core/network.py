@@ -348,8 +348,7 @@ class Network(object):
                          location, burst_rate, burst_std=0, numspikes=2,
                          spike_isi=10, repeats=1, weights_ampa=None,
                          weights_nmda=None, synaptic_delays=0.1,
-                         space_constant=100., seedcore=2,
-                         distribution='normal'):
+                         space_constant=100., seedcore=2):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
         Parameters
@@ -394,8 +393,6 @@ class Network(object):
             weights and delays within the simulated column
         seedcore : int
             Optional initial seed for random number generator (default: 2).
-        distribution : str
-            Must be 'normal' (will be deprecated in a future release).
         """
         sim_end_time = self.cell_response.times[-1]
         if tstop is None:
@@ -414,9 +411,7 @@ class Network(object):
         drive['cell_specific'] = False
         drive['seedcore'] = seedcore
 
-        # XXX distribution='uniform' should be deprecated as it is used nowhere
-        # alternatively, create a new drive-type for it
-        drive['dynamics'] = dict(distribution=distribution, tstart=tstart,
+        drive['dynamics'] = dict(tstart=tstart,
                                  tstart_std=tstart_std, tstop=tstop,
                                  burst_rate=burst_rate, burst_std=burst_std,
                                  numspikes=numspikes, spike_isi=spike_isi,
