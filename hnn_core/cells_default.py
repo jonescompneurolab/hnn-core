@@ -146,13 +146,11 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     return mech_props
 
 
-def basket(pos, cell_name='L2Basket', gid=None):
+def basket(cell_name='L2Basket', gid=None):
     """Get layer 2 / layer 5 basket cells.
 
     Parameters
     ----------
-    pos : tuple
-        Coordinates of cell soma in xyz-space
     cell_name : str
         The name of the cell.
     gid : int or None (optional)
@@ -185,13 +183,11 @@ def basket(pos, cell_name='L2Basket', gid=None):
     return p_secs, p_syn, topology, sect_loc
 
 
-def pyramidal(pos, cell_name, override_params=None, gid=None):
+def pyramidal(cell_name, override_params=None, gid=None):
     """Pyramidal neuron.
 
     Parameters
     ----------
-    pos : tuple
-        Coordinates of cell soma in xyz-space
     cell_name : str
         'L5Pyr' or 'L2Pyr'. The pyramidal cell type.
     override_params : dict or None (optional)
