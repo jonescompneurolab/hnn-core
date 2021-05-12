@@ -245,7 +245,7 @@ class Network(object):
                     else:
                         cell = basket(pos, cell_name=_short_name(cell_type),
                                       gid=gid)
-                    self.cells.append(cell)
+                    self.cells[cell_type].append(cell)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
                          sync_within_trial=False, location,
