@@ -237,16 +237,18 @@ class Network(object):
         for cell_type in self.pos_dict.keys():
             if cell_type in self.cellname_list:
                 if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    p_secs, p_syn, topology, sect_loc = pyramidal(cell_type)
+                    p_secs, p_syn, topology, sect_loc = pyramidal(
+                        cell_name=_short_name(cell_type))
                 else:
-                    p_secs, p_syn, topology, _ = basket(cell_name=cell_type)
+                    p_secs, p_syn, topology, sect_loc = basket(
+                        cell_name=_short_name(cell_type))
                 self.cell_properties[cell_type] = {'sections': p_secs,
                                                    'synapses': p_syn,
                                                    'topology': topology,
                                                    'sect_loc': sect_loc}
                 for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
                     gid = self.gid_dict[cell_type][cell_idx]
-                    cell = Cell(name=cell_type, pos=pos, gid=gid)
+                    cell = Cell(name=_short_name(cell_type), pos=pos, gid=gid)
                     self.cells[cell_type].append(cell)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
