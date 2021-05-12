@@ -63,7 +63,7 @@ def test_network():
             assert len(drive['events'][0]) == net.n_cells
 
         elif drive['type'] == 'bursty':
-            for kw in ['distribution', 'tstart', 'tstart_std', 'tstop',
+            for kw in ['tstart', 'tstart_std', 'tstop',
                        'burst_rate', 'burst_std', 'numspikes', 'repeats']:
                 assert kw in drive['dynamics'].keys()
             assert len(drive['events'][0]) == 1

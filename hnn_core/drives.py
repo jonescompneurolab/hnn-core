@@ -120,7 +120,6 @@ def _add_drives_from_params(net):
         elif specs['type'] == 'bursty':
             net.add_bursty_drive(
                 drive_name,
-                distribution=specs['dynamics']['distribution'],
                 tstart=specs['dynamics']['tstart'],
                 tstart_std=specs['dynamics']['tstart_std'],
                 tstop=specs['dynamics']['tstop'],
@@ -253,7 +252,6 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
             prng=prng)
     elif drive_type == 'bursty' and not target_syn_weights_zero:
         event_times = _create_bursty_input(
-            distribution=dynamics['distribution'],
             t0=dynamics['tstart'],
             t0_stdev=dynamics['tstart_std'],
             tstop=dynamics['tstop'],
@@ -364,7 +362,6 @@ def drive_event_times(drive_type, target_cell_type, params, gid, trial_idx=0):
             prng=prng)
     elif drive_type == 'common' and not all_syn_weights_zero:
         event_times = _create_bursty_input(
-            distribution=params['distribution'],
             t0=params['t0'],
             t0_stdev=params['t0_stdev'],
             tstop=params['tstop'],
@@ -448,7 +445,7 @@ def _create_gauss(*, mu, sigma, numspikes, prng):
     return prng.normal(mu, sigma, numspikes)
 
 
-def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
+def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
                          events_jitter_std, repeats, events_per_cycle=2,
                          cycle_events_isi=10, prng, prng2):
     """Creates the bursty ongoing external inputs.
@@ -457,8 +454,6 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
 
     Parameters
     ----------
-    distribution : str
-        The distribution for each burst. One of 'normal' or 'uniform'.
     t0 : float
         The start times. If -1, then randomize the start time
         of inputs uniformly between 25 ms and 125 ms.
@@ -471,8 +466,7 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
     f_input : float
         The frequency of input bursts.
     events_jitter_std : float
-        The standard deviation (in ms) of each burst event. Only applied for
-        'normal' distribution.
+        The standard deviation (in ms) of each burst event.
     repeats : int
         The number of (jittered) repeats for each burst cycle.
     events_per_cycle : int
@@ -490,28 +484,20 @@ def _create_bursty_input(*, distribution, t0, t0_stdev, tstop, f_input,
     event_times : array
         The event times.
     """
-    if distribution not in ('normal', 'uniform'):
-        raise ValueError("Indicated distribution not recognized. "
-                         "Not making any common drives.")
-
     if t0_stdev > 0.0:
         t0 = prng2.normal(t0, t0_stdev)
 
-    if distribution == 'normal':
-        burst_period = 1000. / f_input
-        burst_duration = (events_per_cycle - 1) * cycle_events_isi
-        if burst_duration > burst_period:
-            raise ValueError(f'Burst duration ({burst_duration}s) cannot'
-                             f' be greater than burst period ({burst_period}s)'
-                             'Consider increasing the spike ISI or burst rate')
+    burst_period = 1000. / f_input
+    burst_duration = (events_per_cycle - 1) * cycle_events_isi
+    if burst_duration > burst_period:
+        raise ValueError(f'Burst duration ({burst_duration}s) cannot'
+                         f' be greater than burst period ({burst_period}s)'
+                         'Consider increasing the spike ISI or burst rate')
 
-        # array of mean stimulus times, starts at t0
-        isi_array = np.arange(t0, tstop, burst_period)
-        # array of single stimulus times -- no doublets
-        t_array = prng.normal(np.repeat(isi_array, repeats), events_jitter_std)
-    elif distribution == 'uniform':  # XXX deprecated in #211
-        n_inputs = repeats * f_input * (tstop - t0) / 1000.
-        t_array = prng.uniform(t0, tstop, n_inputs)
+    # array of mean stimulus times, starts at t0
+    isi_array = np.arange(t0, tstop, burst_period)
+    # array of single stimulus times -- no doublets
+    t_array = prng.normal(np.repeat(isi_array, repeats), events_jitter_std)
 
     if events_per_cycle > 1:
         cycle = (np.arange(events_per_cycle) - (events_per_cycle - 1) / 2)

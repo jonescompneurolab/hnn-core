@@ -90,13 +90,8 @@ def test_external_drive_times():
     events_jitter_std = 5.
     repeats = 2
     prng, prng2 = _get_prng(seed=0, gid=5, sync_evinput=False)
-    with pytest.raises(ValueError, match='distribution not recognized'):
-        _create_bursty_input(distribution='blah', t0=t0, t0_stdev=t0_stdev,
-                             tstop=tstop, f_input=f_input,
-                             events_jitter_std=events_jitter_std,
-                             repeats=repeats, prng=prng, prng2=prng2)
     event_times = _create_bursty_input(
-        distribution='normal', t0=t0, t0_stdev=t0_stdev, tstop=tstop,
+        t0=t0, t0_stdev=t0_stdev, tstop=tstop,
         f_input=f_input, events_jitter_std=events_jitter_std,
         events_per_cycle=events_per_cycle, cycle_events_isi=cycle_events_isi,
         repeats=repeats, prng=prng, prng2=prng2)
@@ -105,7 +100,7 @@ def test_external_drive_times():
     cycle_events_isi = 20
     with pytest.raises(ValueError,
                        match=r'Burst duration (?s).* cannot be greater than'):
-        _create_bursty_input(distribution='normal', t0=t0, t0_stdev=t0_stdev,
+        _create_bursty_input(t0=t0, t0_stdev=t0_stdev,
                              tstop=tstop, f_input=f_input,
                              events_jitter_std=events_jitter_std,
                              events_per_cycle=events_per_cycle,

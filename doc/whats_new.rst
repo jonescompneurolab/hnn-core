@@ -30,6 +30,8 @@ API
 - Remove :class:`~hnn_core.L2Pyr`, :class:`~hnn_core.L5Pyr`, :class:`~hnn_core.L2Basket`, and :class:`~hnn_core.L5Basket` classes
   in favor of instantation through functions and a more consistent :class:`~hnn_core.Cell` class by `Mainak Jas`_ in  `#322 <https://github.com/jonescompneurolab/hnn-core/pull/320>`_
 
+- Remove parameter `distribution` in :func:`~hnn_core.Network.add_bursty_drive`. The distribution is now Gaussian by default, by `Mainak Jas` in `#330 <https://github.com/jonescompneurolab/hnn-core/pull/330>`_
+
 .. _0.1:
 
 0.1
