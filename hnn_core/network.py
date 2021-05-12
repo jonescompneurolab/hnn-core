@@ -13,8 +13,9 @@ from warnings import warn
 from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
+from .cells_default import pyramidal, basket
 from .cell_response import CellResponse
-from .params import _long_name
+from .params import _long_name, _short_name
 from .viz import plot_cells, plot_cell_morphology
 from .externals.mne import _validate_type, _check_option
 
@@ -186,6 +187,9 @@ class Network(object):
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
+        self.cells = dict()
+        self._create_cells()
+
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cellname_list)
@@ -224,6 +228,24 @@ class Network(object):
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
         return net_copy
+
+    def _create_cells(self):
+        '''Populate the Network instance with cell objects'''
+
+        for cell_type in self.pos_dict.keys():
+            if cell_type in self.cellname_list:
+                for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
+                    gid = self.gid_dict[cell_type][cell_idx]
+                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
+                        # XXX Why doesn't a _Cell have a .threshold? Would make
+                        # a lot of sense to include it, as _ArtificialCells do.
+                        cell = pyramidal(pos, override_params=None,
+                                         cell_name=_short_name(cell_type),
+                                         gid=gid)
+                    else:
+                        cell = basket(pos, cell_name=_short_name(cell_type),
+                                      gid=gid)
+                    self.cells.append(cell)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
                          sync_within_trial=False, location,
