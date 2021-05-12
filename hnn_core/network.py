@@ -14,6 +14,7 @@ from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
+from .cell import Cell
 from .cell_response import CellResponse
 from .params import _long_name, _short_name
 from .viz import plot_cells, plot_cell_morphology
@@ -187,6 +188,7 @@ class Network(object):
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
+        self.cell_properties = dict()
         self.cells = dict()
         self._create_cells()
 
@@ -230,21 +232,21 @@ class Network(object):
         return net_copy
 
     def _create_cells(self):
-        '''Populate the Network instance with cell objects'''
+        '''Populate the network with cell objects'''
 
         for cell_type in self.pos_dict.keys():
             if cell_type in self.cellname_list:
+                if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
+                    p_secs, p_syn, topology, sect_loc = pyramidal(cell_type)
+                else:
+                    p_secs, p_syn, topology, _ = basket(cell_type)
+                self.cell_properties[cell_type] = {'sections': p_secs,
+                                                   'synapses': p_syn,
+                                                   'topology': topology,
+                                                   'sect_loc': sect_loc}
                 for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
                     gid = self.gid_dict[cell_type][cell_idx]
-                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                        # XXX Why doesn't a _Cell have a .threshold? Would make
-                        # a lot of sense to include it, as _ArtificialCells do.
-                        cell = pyramidal(pos, override_params=None,
-                                         cell_name=_short_name(cell_type),
-                                         gid=gid)
-                    else:
-                        cell = basket(pos, cell_name=_short_name(cell_type),
-                                      gid=gid)
+                    cell = Cell(name=cell_type, pos=pos, gid=gid)
                     self.cells[cell_type].append(cell)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
