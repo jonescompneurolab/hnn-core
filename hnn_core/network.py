@@ -239,7 +239,7 @@ class Network(object):
                 if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
                     p_secs, p_syn, topology, sect_loc = pyramidal(cell_type)
                 else:
-                    p_secs, p_syn, topology, _ = basket(cell_type)
+                    p_secs, p_syn, topology, _ = basket(cell_name=cell_type)
                 self.cell_properties[cell_type] = {'sections': p_secs,
                                                    'synapses': p_syn,
                                                    'topology': topology,
