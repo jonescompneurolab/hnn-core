@@ -280,3 +280,35 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
                 topology=topology,
                 sect_loc=sect_loc,
                 gid=gid)
+
+
+def _get_g_at_dist(x, gsoma, gdend, xkink):
+    """Compute distance-dependent ionic conductance."""
+    if x > xkink:
+        return gdend
+    g = gsoma + x * (gdend - gsoma) / xkink
+    return g
+
+
+def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
+    """Calcium dynamics."""
+
+    if override_params is None:
+        override_params = dict()
+
+    def gbar_ca(x):
+        return _get_g_at_dist(
+            x,
+            gsoma=override_params['L5Pyr_soma_gbar_ca'],
+            gdend=40.,
+            xkink=1501)  # beginning of tuft
+
+    override_params['L5Pyr_soma_gkbar_hh2'] = 0.06
+    override_params['L5Pyr_soma_gnabar_hh2'] = 0.32
+    override_params['L5Pyr_soma_gbar_ca'] = 10.
+    override_params['L5Pyr_dend_gkbar_hh2'] = 1e-4
+    override_params['L5Pyr_dend_gnabar_hh2'] = 28e-4
+    override_params['L5Pyr_dend_gbar_ca'] = gbar_ca
+    cell = pyramidal(cell_name, pos, override_params=override_params,
+                     gid=gid)
+    return cell

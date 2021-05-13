@@ -7,6 +7,7 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network
 from .params import _short_name
+from .cells_default import pyramidal_ca
 
 
 def default_network(params=None, add_drives_from_params=False):
@@ -27,14 +28,15 @@ def default_network(params=None, add_drives_from_params=False):
     -------
     net : Instance of Network object
         Network object used to store the default network.
-        All connections defining the default network will be
-        appeneded to net.connectivity.
 
     Notes
     -----
-    The default network recreates the model from Jones et al. 2009.
+    The default network builds upon the model from Jones et al. 2009 by adding
+    a distance dependent distribution of calcium channels along L5 pyramidal
+    cell apical dendrites. This addition better reflects the current
+    understanding pyramidal cell electrophysiology.
     """
-    net = jones_2009_model(params, add_drives_from_params)
+    net = _calcium_model(params, add_drives_from_params)
     return net
 
 
@@ -55,9 +57,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     Returns
     -------
     net : Instance of Network object
-        Network object used to store the default network.
-        All connections defining the default network will be
-        appeneded to net.connectivity.
+        Network object used to store
 
     Notes
     -----
@@ -187,14 +187,19 @@ def law_2021_model():
     Returns
     -------
     net : Instance of Network object
-        Network object used to store the default network.
-        All connections defining the default network will be
-        appeneded to net.connectivity.
+        Network object used to store the model used in
+        Law et al. 2021.
     Notes
     -----
     Model reproduces results from Law et al. 2021
     This model differs from the default network model in several
-    parameters including: (fill in later)
+    parameters including
+    1) Increased GABAb time constants on L2/L5 pyramidal cells
+    2) Decrease L5_pyramidal -> L5_pyramidal nmda weight
+    3) Modified L5_basket -> L5_pyramidal inhibition weights
+    4) Removal of L5 pyramidal somatic and basal dendrite calcium channels
+    5) Replace L2_basket -> L5_pyramidal GABAa connection with GABAb
+    6) Addition of L5_basket -> L5_pyramidal distal connection
     """
 
     hnn_core_root = op.dirname(hnn_core.__file__)
@@ -247,5 +252,38 @@ def law_2021_model():
     weight = net._params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    return net
+
+
+# Remove params argument after updating examples
+# (only relevant for Jones 2009 model)
+def _calcium_model(params, add_drives_from_params):
+    """Instantiate the Jones 2009 model with improved calcium dynamics.
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store the Jones 2009 model with an impoved
+        calcium channel distribution.
+    Notes
+    -----
+    This model builds on the Jones 2009 model by using a more biologically
+    accurate distribution of calcium channels on L5 pyramidal cells.
+    Specifically, this model introduces a distance dependent maximum
+    conductance (gbar) on calcium channels such that the gbar linearly
+    decreases along the apical dendrite in the direction of the soma.
+    """
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+    net = jones_2009_model(params, add_drives_from_params)
+
+    # Replace L5 pyramidal cell template with updated calcium
+    cell_name = 'L5_pyramidal'
+    pos = net.cell_types[cell_name].pos
+    net.cell_types[cell_name] = pyramidal_ca(
+        cell_name=_short_name(cell_name), pos=pos)
 
     return net
