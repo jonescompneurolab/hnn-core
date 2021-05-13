@@ -12,7 +12,7 @@ from neuron import __version__
 if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
-from .cell import _ArtificialCell
+from .cell import Cell, _ArtificialCell
 from .cells_default import pyramidal, basket
 from .params import _long_name, _short_name
 from copy import deepcopy
@@ -380,16 +380,16 @@ class NetworkBuilder(object):
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
         for gid in self._gid_list:
-            src_type = self.net.gid_to_type(gid)
-            cell = self.net._gid_to_cell(gid)
+            src_type, src_pos, is_cell = self.net._get_src_type_and_pos(gid)
 
-            if cell is not None:
+            if is_cell:
+                cell = Cell(name=_short_name(src_type), pos=src_pos, gid=gid)
                 p_secs = self.net.cell_properties[src_type]['sections']
                 p_syn = self.net.cell_properties[src_type]['synapses']
                 topology = self.net.cell_properties[src_type]['topology']
                 sect_loc = self.net.cell_properties[src_type]['sect_loc']
                 # instantiate NEURON object
-                cell.build(p_secs, p_syn, topology, sect_loc=sect_loc)
+                cell.build(p_secs, p_syn, topology, sect_loc)
                 # insert dipole in pyramidal cells
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
                     cell.insert_dipole(p_secs, 'apical_trunk')
@@ -403,6 +403,7 @@ class NetworkBuilder(object):
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
                 _PC.cell(cell.gid, nrn_netcon)
+                self.cells.append(cell)
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike

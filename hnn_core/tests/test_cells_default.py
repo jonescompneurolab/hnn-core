@@ -44,4 +44,4 @@ def test_cells_default():
     assert len(times) == len(vsoma)
 
     with pytest.raises(ValueError, match='Unknown basket cell type'):
-        l5p = basket(pos=(0, 0, 0), cell_name='blah')
+        p_secs, p_syn, topology, sect_loc = basket(cell_name='blah')
