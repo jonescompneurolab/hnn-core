@@ -230,20 +230,22 @@ class Network(object):
         return net_copy
 
     def _set_cell_properties(self):
-        '''Populate the network with cell objects'''
+        '''Set cell properties by cell type
 
-        for cell_type in self.pos_dict.keys():
-            if cell_type in self.cellname_list:
-                if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    p_secs, p_syn, topology, sect_loc = pyramidal(
-                        cell_name=_short_name(cell_type))
-                else:
-                    p_secs, p_syn, topology, sect_loc = basket(
-                        cell_name=_short_name(cell_type))
-                self.cell_properties[cell_type] = {'sections': p_secs,
-                                                   'synapses': p_syn,
-                                                   'topology': topology,
-                                                   'sect_loc': sect_loc}
+        This relies on self.cellname_list and must be updated when introducting
+        new cell types to HNN.
+        '''
+        for cell_type in self.cellname_list:
+            if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
+                p_secs, p_syn, topology, sect_loc = pyramidal(
+                    cell_name=_short_name(cell_type))
+            else:
+                p_secs, p_syn, topology, sect_loc = basket(
+                    cell_name=_short_name(cell_type))
+            self.cell_properties[cell_type] = {'sections': p_secs,
+                                               'synapses': p_syn,
+                                               'topology': topology,
+                                               'sect_loc': sect_loc}
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
                          sync_within_trial=False, location,

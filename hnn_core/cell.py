@@ -160,6 +160,7 @@ class Cell:
     def _set_biophysics(self, p_secs):
         "Set the biophysics for the cell."
 
+        from .cells_default import _set_variable_mech
         # neuron syntax is used to set values for mechanisms
         # sec.gbar_mech = x sets value of gbar for mech to x for all segs
         # in a section. This method is significantly faster than using
@@ -177,10 +178,11 @@ class Cell:
             for mech_name, p_mech in p_sec['mechs'].items():
                 sec.insert(mech_name)
                 for attr, val in p_mech.items():
-                    if hasattr(val, '__call__'):
+                    if val == 'variable':
                         sec.push()
                         for seg in sec:
-                            setattr(seg, attr, val(h.distance(seg.x)))
+                            val = _set_variable_mech(h.distance(seg.x))
+                            setattr(seg, attr, val)
                         h.pop_section()
                     else:
                         setattr(sec, attr, val)
