@@ -5,8 +5,6 @@
 
 import numpy as np
 
-from .cell import Cell
-
 from .params import compare_dictionaries
 from .params_default import (get_L2Pyr_params_default,
                              get_L5Pyr_params_default,
