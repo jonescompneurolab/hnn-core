@@ -14,7 +14,6 @@ from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
-from .cell import Cell
 from .cell_response import CellResponse
 from .params import _long_name, _short_name
 from .viz import plot_cells, plot_cell_morphology
@@ -189,8 +188,7 @@ class Network(object):
         self._update_gid_ranges()
 
         self.cell_properties = dict()
-        self.cells = dict()
-        self._create_cells()
+        self._set_cell_properties()
 
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
@@ -231,7 +229,7 @@ class Network(object):
         net_copy._reset_drives()
         return net_copy
 
-    def _create_cells(self):
+    def _set_cell_properties(self):
         '''Populate the network with cell objects'''
 
         for cell_type in self.pos_dict.keys():
@@ -246,10 +244,6 @@ class Network(object):
                                                    'synapses': p_syn,
                                                    'topology': topology,
                                                    'sect_loc': sect_loc}
-                for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
-                    gid = self.gid_dict[cell_type][cell_idx]
-                    cell = Cell(name=_short_name(cell_type), pos=pos, gid=gid)
-                    self.cells[cell_type].append(cell)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
                          sync_within_trial=False, location,
