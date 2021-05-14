@@ -1075,11 +1075,63 @@ class Network(object):
             _validate_type(item, (int, float), arg_name, 'int or float')
             conn['nc_dict'][key] = item
 
+        # Probabilistically define connections
         if probability != 1.0:
-            conn.drop(probability)
-        conn['probability'] = probability
+            self.connection_probability(conn, probability)
 
         self.connectivity.append(deepcopy(conn))
+
+    def connection_probability(self, conn, probability):
+        """Remove/keep a random subset of connections.
+
+        Parameters
+        ----------
+        probability : float
+            Probability of connection between any src-target pair.
+            Defaults to 1.0 producing an all-to-all pattern.
+
+        Notes
+        -----
+        num_srcs and num_targets are not updated after pruning connections.
+        These variables are meant to describe the set of original connections
+        before they are randomly removed.
+
+        The probability attribute will store the most recent value passed to
+        this function. As such, this number does not accurately describe the
+        connections probability of the original set after successive calls.
+        """
+        _validate_type(probability, float, 'probability')
+        if probability <= 0.0 or probability >= 1.0:
+            raise ValueError('probability must be in the range (0,1)')
+        # Flatten connections into a list of targets.
+        all_connections = np.concatenate(
+            [target_src_pair for
+             target_src_pair in conn['gid_pairs'].values()])
+        n_connections = np.round(
+            len(all_connections) * probability).astype(int)
+
+        # Select a random subset of connections to retain.
+        new_connections = np.random.choice(
+            range(len(all_connections)), n_connections, replace=False)
+        remove_srcs = list()
+        connection_idx = 0
+        for src_gid, target_src_pair in conn['gid_pairs'].items():
+            target_new = list()
+            for target_gid in target_src_pair:
+                if connection_idx in new_connections:
+                    target_new.append(target_gid)
+                connection_idx += 1
+
+            # Update targets for src_gid
+            if target_new:
+                conn['gid_pairs'][src_gid] = target_new
+            else:
+                remove_srcs.append(src_gid)
+        # Remove src_gids with no targets
+        for src_gid in remove_srcs:
+            conn['gid_pairs'].pop(src_gid)
+
+        conn['probability'] = probability
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity_list"""
@@ -1188,58 +1240,6 @@ class _Connectivity(dict):
         entr += "\n "
 
         return entr
-
-    def drop(self, probability):
-        """Remove/keep a random subset of connections.
-
-        Parameters
-        ----------
-        probability : float
-            Probability of connection between any src-target pair.
-            Defaults to 1.0 producing an all-to-all pattern.
-
-        Notes
-        -----
-        num_srcs and num_targets are not updated after pruning connections.
-        These variables are meant to describe the set of original connections
-        before they are randomly removed.
-
-        The probability attribute will store the most recent value passed to
-        this function. As such, this number does not accurately describe the
-        connections probability of the original set after successive calls.
-        """
-        _validate_type(probability, float, 'probability')
-        if probability <= 0.0 or probability >= 1.0:
-            raise ValueError('probability must be in the range (0,1)')
-        # Flatten connections into a list of targets.
-        all_connections = np.concatenate(
-            [target_src_pair for
-             target_src_pair in self['gid_pairs'].values()])
-        n_connections = np.round(
-            len(all_connections) * probability).astype(int)
-
-        # Select a random subset of connections to retain.
-        new_connections = np.random.choice(
-            range(len(all_connections)), n_connections, replace=False)
-        remove_srcs = list()
-        connection_idx = 0
-        for src_gid, target_src_pair in self['gid_pairs'].items():
-            target_new = list()
-            for target_gid in target_src_pair:
-                if connection_idx in new_connections:
-                    target_new.append(target_gid)
-                connection_idx += 1
-
-            # Update targets for src_gid
-            if target_new:
-                self['gid_pairs'][src_gid] = target_new
-            else:
-                remove_srcs.append(src_gid)
-        # Remove src_gids with no targets
-        for src_gid in remove_srcs:
-            self['gid_pairs'].pop(src_gid)
-
-        self['probability'] = probability
 
     def plot(self, ax=None, show=True):
         """Plot connectivity matrix for instance of _Connectivity object.
