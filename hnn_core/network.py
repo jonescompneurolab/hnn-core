@@ -191,7 +191,7 @@ class Network(object):
         self._update_gid_ranges()
 
         self.cells = dict()
-        self.create_cells()
+        self.update_cells()
 
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
@@ -228,26 +228,22 @@ class Network(object):
             ``events`` of external drives removed.
         """
         # reset cells to avoid pickling error
-        self.create_cells()
+        self.update_cells()
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
         return net_copy
 
-    def create_cells(self):
+    def update_cells(self):
         '''Populate the network with cell objects'''
 
         for cell_type in self.pos_dict.keys():
             if cell_type in self.cell_types:
                 cells = list()
                 for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
-                    gid = self.gid_ranges[cell_type][cell_idx]
-                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                        cell = pyramidal(pos, cell_name=_short_name(cell_type),
-                                         gid=gid)
-                    else:
-                        cell = basket(pos, cell_name=_short_name(cell_type),
-                                      gid=gid)
+                    cell = deepcopy(self.cell_types[cell_type])
+                    cell.gid = self.gid_ranges[cell_type][cell_idx]
+                    cell.pos = pos
                     cells.append(cell)
                     self.cells[cell_type] = cells
 
