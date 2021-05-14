@@ -14,7 +14,7 @@ def test_cells_default():
         l5p = pyramidal(cell_name='blah')
 
     l5p = pyramidal(cell_name='L5Pyr')
-    l5p.build(align_dipole='apical_trunk')
+    l5p.build(sec_name_apical='apical_trunk')
     assert len(l5p.sections) == 9
     assert 'apical_2' in l5p.sections
 

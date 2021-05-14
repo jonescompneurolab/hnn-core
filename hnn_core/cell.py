@@ -277,12 +277,12 @@ class Cell:
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
 
-    def build(self, align_dipole=None):
+    def build(self, sec_name_apical=None):
         """Build cell in Neuron and insert dipole if applicable.
 
         Parameters
         ----------
-        align_dipole : str | None
+        sec_name_apical : str | None
             If not None, a dipole will be inserted in this cell in alignment
             with this section. The section should belong to the apical dendrite
             of a pyramidal neuron.
@@ -292,11 +292,12 @@ class Cell:
         self._create_sections(self.p_secs, self.topology)
         self._create_synapses(self.p_secs, self.p_syn)
         self._set_biophysics(self.p_secs)
-        if align_dipole in self.sections:
-            self.insert_dipole(align_dipole)
-        elif align_dipole is not None:
-            raise ValueError(f'align_dipole must be an exiting section of'
-                             f'the current cell or None. Got {align_dipole}.')
+        if sec_name_apical in self.sections:
+            self._insert_dipole(sec_name_apical)
+        elif sec_name_apical is not None:
+            raise ValueError(f'sec_name_apical must be an existing '
+                             f'section of the current cell or None. '
+                             f'Got {sec_name_apical}.')
 
     def move_to_pos(self):
         """Move cell to position."""
@@ -317,7 +318,7 @@ class Cell:
     # 2. a list needs to be created with a Dipole (Point Process) in each
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
-    def insert_dipole(self, sec_name_apical):
+    def _insert_dipole(self, sec_name_apical):
         """Insert dipole into each section of this cell.
 
         Parameters
