@@ -226,6 +226,8 @@ class Network(object):
             A copy of the instance with previous simulation results and
             ``events`` of external drives removed.
         """
+        # reset cells
+        self._create_cells()
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
@@ -237,17 +239,17 @@ class Network(object):
         for cell_type in self.pos_dict.keys():
             if cell_type in self.cellname_list:
                 cells = list()
-                if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    p_secs, p_syn, topology, sect_loc = pyramidal(
-                        cell_name=_short_name(cell_type))
-                else:
-                    p_secs, p_syn, topology, sect_loc = basket(
-                        cell_name=_short_name(cell_type))
-                self.cell_properties[cell_type] = {'sections': p_secs,
-                                                   'synapses': p_syn,
-                                                   'topology': topology,
-                                                   'sect_loc': sect_loc}
                 for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
+                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
+                        p_secs, p_syn, topology, sect_loc = pyramidal(
+                            pos, cell_name=_short_name(cell_type))
+                    else:
+                        p_secs, p_syn, topology, sect_loc = basket(
+                            pos, cell_name=_short_name(cell_type))
+                    self.cell_properties[cell_type] = {'sections': p_secs,
+                                                       'synapses': p_syn,
+                                                       'topology': topology,
+                                                       'sect_loc': sect_loc}
                     gid = self.gid_ranges[cell_type][cell_idx]
                     cells.append(Cell(name=_short_name(cell_type), pos=pos,
                                       gid=gid))
