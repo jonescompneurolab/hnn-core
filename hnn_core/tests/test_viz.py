@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Network
+from hnn_core import read_params, default_network
 from hnn_core.viz import (plot_cells, plot_dipole, plot_psd, plot_tfr_morlet,
                           plot_cell_morphology)
 from hnn_core.dipole import simulate_dipole
@@ -20,7 +20,7 @@ def test_network_visualization():
     params = read_params(params_fname)
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3})
-    net = Network(params)
+    net = default_network(params)
     plot_cells(net)
     with pytest.raises(ValueError, match='Unrecognized cell type'):
         plot_cell_morphology(cell_types='blah')
@@ -37,7 +37,7 @@ def test_dipole_visualization():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    'tstop': 100.})
-    net = Network(params)
+    net = default_network(params)
     weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 

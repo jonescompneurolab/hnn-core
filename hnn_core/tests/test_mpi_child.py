@@ -6,7 +6,7 @@ from queue import Queue
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Network
+from hnn_core import read_params, Network, default_network
 from hnn_core.mpi_child import (MPISimulation, _str_to_net, _pickle_data)
 from hnn_core.parallel_backends import (_gather_trial_data,
                                         _process_child_data,
@@ -81,7 +81,7 @@ def test_str_to_net():
     # prepare network
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    net = Network(params, add_drives_from_params=True)
+    net = default_network(params, add_drives_from_params=True)
 
     pickled_net = _pickle_data(net)
 
@@ -120,7 +120,7 @@ def test_child_run():
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
-    net_reduced = Network(params_reduced, add_drives_from_params=True)
+    net_reduced = default_network(params_reduced, add_drives_from_params=True)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):
