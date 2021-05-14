@@ -16,7 +16,7 @@ from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
 from .cell_response import CellResponse
 from .params import _long_name, _short_name
-from .viz import plot_cells, plot_cell_morphology
+from .viz import plot_cells, plot_cell_morphology, plot_connectivity_matrix
 from .externals.mne import _validate_type, _check_option
 
 
@@ -1030,6 +1030,7 @@ class Network(object):
                 raise AssertionError(
                     'All target_gids must be of the same type')
         conn['target_type'] = target_type
+        conn['target_range'] = self.gid_ranges[_long_name(target_type)]
         conn['num_targets'] = len(target_set)
 
         if len(target_gids) != len(src_gids):
@@ -1048,6 +1049,7 @@ class Network(object):
                 raise AssertionError('All src_gids must be of the same type')
             gid_pairs[src_gid] = target_src_pair
         conn['src_type'] = src_type
+        conn['src_range'] = self.gid_ranges[_long_name(src_type)]
         conn['num_srcs'] = len(src_gids)
 
         conn['gid_pairs'] = gid_pairs
@@ -1143,6 +1145,10 @@ class _Connectivity(dict):
         Number of unique source gids.
     num_targets : int
         Number of unique target gids.
+    src_range : range
+        Range of gids identified by src_type.
+    target_range : target_range
+        Range of gids identified by target_type.
     loc : str
         Location of synapse on target cell. Must be
         'proximal', 'distal', or 'soma'. Note that inhibitory synapses
@@ -1163,6 +1169,11 @@ class _Connectivity(dict):
     probability : float
         Probability of connection between any src-target pair.
         Defaults to 1.0 producing an all-to-all pattern.
+
+    Notes
+    -----
+    The len() of src_range or target_range may not match
+    num_srcs and num_targets for probability < 1.0.
     """
 
     def __repr__(self):
@@ -1229,6 +1240,22 @@ class _Connectivity(dict):
             self['gid_pairs'].pop(src_gid)
 
         self['probability'] = probability
+
+    def plot(self, ax=None, show=True):
+        """Plot connectivity matrix for instance of _Connectivity object.
+
+        Parameters
+        ----------
+        conn : Instance of _Connectivity object
+            The _Connectivity object
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+
+        return plot_connectivity_matrix(self, ax=ax, show=show)
 
 
 class _NetworkDrive(dict):
