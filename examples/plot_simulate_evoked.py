@@ -22,7 +22,7 @@ import tempfile
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network, read_spikes
+from hnn_core import simulate_dipole, read_params, default_network
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -42,7 +42,7 @@ print(params['L2Pyr_soma*'])
 ###############################################################################
 # Let us first create our network from the params file and visualize the cells
 # inside it.
-net = Network(params)
+net = default_network(params)
 net.plot_cells()
 net.plot_cell_morphology()
 
