@@ -187,7 +187,7 @@ def basket(pos, cell_name='L2Basket', gid=None):
     for sec_name in p_secs:
         p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
-    return p_secs, p_syn, topology, sect_loc
+    return Cell(cell_name, pos, p_secs, p_syn, topology, sect_loc, gid)
 
 
 def pyramidal(pos, cell_name, override_params=None, gid=None):
@@ -269,4 +269,4 @@ def pyramidal(pos, cell_name, override_params=None, gid=None):
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
                 'distal': ['apical_tuft']}
 
-    return p_secs, p_syn, topology, sect_loc
+    return Cell(cell_name, pos, p_secs, p_syn, topology, sect_loc, gid)

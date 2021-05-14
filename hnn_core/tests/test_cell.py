@@ -13,17 +13,21 @@ def test_cell():
     """Test cells object."""
     load_custom_mechanisms()
 
-    pos = (0., 0., 0.)
     name = 'test'
+    pos = (0., 0., 0.)
+    p_secs = {'blah': 1}
+    p_syn = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
+    topology = None
+    sect_loc = {'proximal': 'soma'}
     # GID is assigned exactly once for each cell, either at initialisation...
-    cell = Cell(name, pos=pos, gid=42)
+    cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc, gid=42)
     assert cell.gid == 42
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
     # ... or later
     # cells can exist fine without gid
-    cell = Cell(name, pos=pos)
+    cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc)
     assert cell.gid is None  # check that it's initialised to None
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
@@ -33,19 +37,16 @@ def test_cell():
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
         # test init checks gid
-        cell = Cell(name, pos=pos, gid='one')
+        cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc,
+                    gid='one')
 
     # test that ExpSyn always takes nrn.Segment, not float
     with pytest.raises(TypeError, match='secloc must be instance of'):
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
     pickle.dumps(cell)  # check cell object is picklable until built
-    p_secs = {'blah': 1}
-    p_syn = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
-    topology = None
-    sect_loc = {'proximal': 'soma'}
     with pytest.raises(KeyError, match='soma must be defined'):
-        cell.build(p_secs, p_syn, topology, sect_loc)
+        cell.build()
 
     p_secs = {
         'soma':
@@ -66,7 +67,8 @@ def test_cell():
             }
         }
     }
-    cell.build(p_secs, p_syn, topology, sect_loc)
+    cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc)
+    cell.build()
     assert 'soma' in cell.sections
     assert cell.sections['soma'].L == p_secs['soma']['L']
     assert cell.sections['soma'].gbar_km == p_secs[

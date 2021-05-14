@@ -13,7 +13,6 @@ if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
-from .cells_default import pyramidal, basket
 from .params import _long_name, _short_name
 from copy import deepcopy
 
@@ -384,15 +383,11 @@ class NetworkBuilder(object):
             cell = self.net._gid_to_cell(gid)
 
             if cell is not None:
-                p_secs = self.net.cell_properties[src_type]['sections']
-                p_syn = self.net.cell_properties[src_type]['synapses']
-                topology = self.net.cell_properties[src_type]['topology']
-                sect_loc = self.net.cell_properties[src_type]['sect_loc']
                 # instantiate NEURON object
-                cell.build(p_secs, p_syn, topology, sect_loc=sect_loc)
-                # insert dipole in pyramidal cells
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    cell.insert_dipole(p_secs, 'apical_trunk')
+                    cell.build(align_dipole='apical_trunk')
+                else:
+                    cell.build()
                 # add tonic biases
                 if ('tonic' in self.net.external_biases and
                         src_type in self.net.external_biases['tonic']):
