@@ -14,7 +14,6 @@ from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
-from .cell import Cell
 from .cell_response import CellResponse
 from .params import _long_name, _short_name
 from .viz import plot_cells, plot_cell_morphology
@@ -240,19 +239,14 @@ class Network(object):
             if cell_type in self.cellname_list:
                 cells = list()
                 for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
-                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                        p_secs, p_syn, topology, sect_loc = pyramidal(
-                            pos, cell_name=_short_name(cell_type))
-                    else:
-                        p_secs, p_syn, topology, sect_loc = basket(
-                            pos, cell_name=_short_name(cell_type))
-                    self.cell_properties[cell_type] = {'sections': p_secs,
-                                                       'synapses': p_syn,
-                                                       'topology': topology,
-                                                       'sect_loc': sect_loc}
                     gid = self.gid_ranges[cell_type][cell_idx]
-                    cells.append(Cell(name=_short_name(cell_type), pos=pos,
-                                      gid=gid))
+                    if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
+                        cell = pyramidal(pos, cell_name=_short_name(cell_type),
+                                         gid=gid)
+                    else:
+                        cell = basket(pos, cell_name=_short_name(cell_type),
+                                      gid=gid)
+                    cells.append(cell)
                     self.cells[cell_type] = cells
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,

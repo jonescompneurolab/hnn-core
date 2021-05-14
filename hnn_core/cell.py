@@ -91,6 +91,29 @@ class Cell:
         The name of the cell.
     pos : tuple
         The (x, y, z) coordinates.
+    p_secs : nested dict
+        Dictionary with keys as section name.
+        p_secs[sec_name] is a dictionary with keys
+        L, diam, Ra, cm, syns and mech.
+        syns is a list specifying the synapses at that section.
+        The properties of syn are specified in p_syn.
+        mech is a dict with keys as the mechanism names. The
+        values are dictionaries with properties of the mechanism.
+    p_syn : dict of dict
+        Keys are name of synaptic mechanism. Each synaptic mechanism
+        has keys for parameters of the mechanism, e.g., 'e', 'tau1',
+        'tau2'.
+    topology : list of list
+        The topology of cell sections. Each element is a list of
+        4 items in the format
+        [parent_sec, parent_loc, child_sec, child_loc] where
+        parent_sec and parent_loc are float between 0 and 1
+        specifying the location in the section to connect and
+        parent_sec and child_sec are names of the connecting
+        sections.
+    sect_loc : dict of list
+        Can have keys 'proximal' or 'distal' each containing
+        names of section locations that are proximal or distal.
     gid : int or None (optional)
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
@@ -122,15 +145,37 @@ class Cell:
     sect_loc : dict of list
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.
+
+    Examples
+    --------
+    >>> p_secs = {
+        'soma':
+        {
+            'L': 39,
+            'diam': 20,
+            'cm': 0.85,
+            'Ra': 200.,
+            'sec_pts': [[0, 0, 0], [0, 39., 0]],
+            'syns': ['ampa', 'gabaa', 'nmda'],
+            'mechs' : {
+                'ca': {
+                    'gbar_ca': 60
+                }
+            }
+        }
+    }
     """
 
-    def __init__(self, name, pos, gid=None):
+    def __init__(self, name, pos, p_secs, p_syn, topology, sect_loc, gid=None):
         self.name = name
         self.pos = pos
+        self.p_secs = p_secs
+        self.p_syn = p_syn
+        self.topology = topology
+        self.sect_loc = sect_loc
         self.sections = dict()
         self.synapses = dict()
         self.dipole_pp = list()
-        self.sect_loc = dict()
         self.rec_v = h.Vector()
         self.rec_i = dict()
         # insert iclamp
@@ -232,60 +277,26 @@ class Cell:
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
 
-    def build(self, p_secs, p_syn, topology, sect_loc):
-        """Build cell in Neuron.
+    def build(self, align_dipole=None):
+        """Build cell in Neuron and insert dipole if applicable.
 
         Parameters
         ----------
-        p_secs : nested dict
-            Dictionary with keys as section name.
-            p_secs[sec_name] is a dictionary with keys
-            L, diam, Ra, cm, syns and mech.
-            syns is a list specifying the synapses at that section.
-            The properties of syn are specified in p_syn.
-            mech is a dict with keys as the mechanism names. The
-            values are dictionaries with properties of the mechanism.
-        p_syn : dict of dict
-            Keys are name of synaptic mechanism. Each synaptic mechanism
-            has keys for parameters of the mechanism, e.g., 'e', 'tau1',
-            'tau2'.
-        topology : list of list
-            The topology of cell sections. Each element is a list of
-            4 items in the format
-            [parent_sec, parent_loc, child_sec, child_loc] where
-            parent_sec and parent_loc are float between 0 and 1
-            specifying the location in the section to connect and
-            parent_sec and child_sec are names of the connecting
-            sections.
-        sect_loc : dict of list
-            Can have keys 'proximal' or 'distal' each containing
-            names of section locations that are proximal or distal.
-
-        Examples
-        --------
-        >>> p_secs = {
-            'soma':
-            {
-                'L': 39,
-                'diam': 20,
-                'cm': 0.85,
-                'Ra': 200.,
-                'sec_pts': [[0, 0, 0], [0, 39., 0]],
-                'syns': ['ampa', 'gabaa', 'nmda'],
-                'mechs' : {
-                    'ca': {
-                        'gbar_ca': 60
-                    }
-                }
-            }
-        }
+        align_dipole : str | None
+            If not None, a dipole will be inserted in this cell in alignment
+            with this section. The section should belong to the apical dendrite
+            of a pyramidal neuron.
         """
-        if 'soma' not in p_secs:
+        if 'soma' not in self.p_secs:
             raise KeyError('soma must be defined for cell')
-        self._create_sections(p_secs, topology)
-        self._create_synapses(p_secs, p_syn)
-        self._set_biophysics(p_secs)
-        self.sect_loc = sect_loc
+        self._create_sections(self.p_secs, self.topology)
+        self._create_synapses(self.p_secs, self.p_syn)
+        self._set_biophysics(self.p_secs)
+        if align_dipole in self.sections:
+            self.insert_dipole(align_dipole)
+        elif align_dipole is not None:
+            raise ValueError(f'align_dipole must be an exiting section of'
+                             f'the current cell or None. Got {align_dipole}.')
 
     def move_to_pos(self):
         """Move cell to position."""
@@ -306,28 +317,20 @@ class Cell:
     # 2. a list needs to be created with a Dipole (Point Process) in each
     #    section at position 1
     # In Cell() and not Pyr() for future possibilities
-    def insert_dipole(self, p_secs, sec_name_apical):
+    def insert_dipole(self, sec_name_apical):
         """Insert dipole into each section of this cell.
 
         Parameters
         ----------
-        p_secs : nested dict
-            Dictionary with keys as section name.
-            p_secs[sec_name] is a dictionary with keys
-            L, diam, Ra, cm, syns and mech.
-            syns is a list specifying the synapses at that section.
-            The properties of syn are specified in p_syn.
-            mech is a dict with keys as the mechanism names. The
-            values are dictionaries with properties of the mechanism.
         sec_name_apical : str
             The name of the section along which dipole moment is calculated.
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
-        cos_thetas = _get_cos_theta(p_secs, 'apical_trunk')
+        cos_thetas = _get_cos_theta(self.p_secs, 'apical_trunk')
 
         # setting pointers and ztan values
-        for sect_name in p_secs:
+        for sect_name in self.p_secs:
             sect = self.sections[sect_name]
             sect.insert('dipole')
 
