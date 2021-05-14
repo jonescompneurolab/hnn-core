@@ -234,7 +234,7 @@ class Network(object):
         return net_copy
 
     def _update_cells(self):
-        '''Populate the network with cell objects'''
+        """Populate the network with cell objects"""
 
         for cell_type in self.pos_dict.keys():
             if cell_type in self.cell_types:
