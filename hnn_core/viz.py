@@ -593,6 +593,8 @@ def plot_cell_morphology(axes=None, cell_types=None, show=True):
     plt.tight_layout()
     plt_show(show)
     return axes
+
+
 def plot_connectivity_matrix(conn, ax=None, show=True):
     """Plot connectivity matrix for instance of _Connectivity object.
 
