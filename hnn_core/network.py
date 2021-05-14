@@ -108,12 +108,15 @@ class Network(object):
 
     Attributes
     ----------
-    cellname_list : list
-        The names of real cell types in the network (e.g. 'L2_basket')
+    cell_types : dict
+        Dictionary containing names of real cell types in the network
+        (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
+        The Cell instance associated with a given key is used as a template
+        for the other cells of its type in the population.
     gid_ranges : dict
         A dictionary of unique identifiers of each real and artificial cell
         in the network. Every cell type is represented by a key read from
-        cellname_list, followed by keys read from external_drives. The value
+        cell_types, followed by keys read from external_drives. The value
         of each key is a range of ints, one for each cell in given category.
         Examples: 'L2_basket': range(0, 270), 'evdist1': range(272, 542), etc
     pos_dict : dict
@@ -162,13 +165,13 @@ class Network(object):
         # Create CellResponse object, initialised with simulation time points
         self.cell_response = CellResponse(times=times)
 
-        # Source list of names, first real ones only!
-        self.cellname_list = [
-            'L2_basket',
-            'L2_pyramidal',
-            'L5_basket',
-            'L5_pyramidal',
-        ]
+        # Source dict of names, first real ones only!
+        self.cell_types = {
+            'L2_basket': basket((0, 0, 0), cell_name=_short_name('L2_basket')),
+            'L2_pyramidal': pyramidal((0, 0, 0), _short_name('L2_pyramidal')),
+            'L5_basket': basket((0, 0, 0), cell_name=_short_name('L5_basket')),
+            'L5_pyramidal': pyramidal((0, 0, 0), _short_name('L5_pyramidal'))
+        }
 
         # external drives and biases
         self.external_drives = dict()
@@ -187,13 +190,12 @@ class Network(object):
         # Every time pos_dict is updated, gid_ranges must be updated too
         self._update_gid_ranges()
 
-        self.cell_properties = dict()
         self.cells = dict()
-        self._create_cells()
+        self.create_cells()
 
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
-                           self.cellname_list)
+                           self.cell_types)
 
         self._set_default_connections()
 
@@ -225,18 +227,18 @@ class Network(object):
             A copy of the instance with previous simulation results and
             ``events`` of external drives removed.
         """
-        # reset cells
-        self._create_cells()
+        # reset cells to avoid pickling error
+        self.create_cells()
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
         return net_copy
 
-    def _create_cells(self):
+    def create_cells(self):
         '''Populate the network with cell objects'''
 
         for cell_type in self.pos_dict.keys():
-            if cell_type in self.cellname_list:
+            if cell_type in self.cell_types:
                 cells = list()
                 for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
                     gid = self.gid_ranges[cell_type][cell_idx]
@@ -355,7 +357,7 @@ class Network(object):
             target_populations = _get_target_populations(weights_ampa,
                                                          weights_nmda)[0]
             _check_poisson_rates(rate_constant, target_populations,
-                                 self.cellname_list)
+                                 self.cell_types.keys())
 
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
@@ -487,9 +489,9 @@ class Network(object):
             _get_target_populations(weights_ampa, weights_nmda)
 
         # weights passed must correspond to cells in the network
-        if not target_populations.issubset(set(self.cellname_list)):
+        if not target_populations.issubset(set(self.cell_types.keys())):
             raise ValueError('Allowed drive target cell types are: ',
-                             f'{self.cellname_list}')
+                             f'{self.cell_types.keys()}')
 
         weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
         if isinstance(synaptic_delays, dict):
@@ -508,7 +510,7 @@ class Network(object):
         # _connect_celltypes is hard-coded to use these implict gid ranges
         if self._legacy_mode:
             # XXX tests must match HNN GUI output
-            target_populations = self.cellname_list
+            target_populations = list(self.cell_types.keys())
         elif len(target_populations) == 0:
             warn('No AMPA or NMDA weights > 0')
 
@@ -691,7 +693,7 @@ class Network(object):
         ----------
         cell_type : str
             The cell type whose cells will get the tonic input.
-            Valid inputs are those in `net.cellname_list`.
+            Valid inputs are those in `net.cell_types`.
         amplitude : float
             The amplitude of the input.
         t0 : float
@@ -718,9 +720,10 @@ class Network(object):
         if T > tstop:
             raise ValueError(f'End time of tonic input cannot exceed '
                              f'simulation end time {tstop}. Got {T}.')
-        if cell_type not in self.cellname_list:
-            raise ValueError(f'cell_type must be one of {self.cellname_list}'
-                             f'. Got {cell_type}')
+        if cell_type not in self.cell_types:
+            raise ValueError(f'cell_type must be one of '
+                             f'{list(self.cell_types.keys())}. '
+                             f'Got {cell_type}')
         duration = T - t0
         if duration < 0.:
             raise ValueError('Duration of tonic input cannot be negative')
@@ -741,7 +744,7 @@ class Network(object):
         # if external drives dict is empty, list will also be empty
         ext_drive_names = list(self.external_drives.keys())
         gid_lims = [0]  # start and end gids per cell type
-        src_types = self.cellname_list + ext_drive_names
+        src_types = list(self.cell_types.keys()) + ext_drive_names
         for idx, src_type in enumerate(src_types):
             n_srcs = len(self.pos_dict[src_type])
             gid_lims.append(gid_lims[idx] + n_srcs)
@@ -762,7 +765,7 @@ class Network(object):
         Should only be called after self.cells is populated
         """
         src_type = self.gid_to_type(gid)
-        if src_type not in self.cellname_list:
+        if src_type not in self.cell_types:
             cell = None
         else:
             type_pos_ind = gid - self.gid_ranges[src_type][0]
@@ -777,7 +780,7 @@ class Network(object):
         type_pos_ind = gid - self.gid_ranges[src_type][0]
         src_pos = self.pos_dict[src_type][type_pos_ind]
 
-        return src_type, src_pos, src_type in self.cellname_list
+        return src_type, src_pos, src_type in self.cell_types
 
     # connections:
     # this NODE is aware of its cells as targets
@@ -1193,7 +1196,7 @@ class _NetworkDrive(dict):
         Each artificial drive cell has seed = seedcore + gid
     target_types : set or list of str
         Names of cell types targeted by this drive (must be subset of
-        net.cellname_list).
+        net.cell_types.keys()).
     dynamics : dict
         Parameters describing how the temporal dynamics of spike trains in the
         drive. The keys are specific to the type of drive ('evoked', 'bursty',
