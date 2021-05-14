@@ -11,9 +11,9 @@ def test_cells_default():
     load_custom_mechanisms()
 
     with pytest.raises(ValueError, match='Unknown pyramidal cell type'):
-        l5p = pyramidal(pos=(0, 0, 0), cell_name='blah')
+        l5p = pyramidal(cell_name='blah')
 
-    l5p = pyramidal(pos=(0, 0, 0), cell_name='L5Pyr')
+    l5p = pyramidal(cell_name='L5Pyr')
     l5p.build(align_dipole='apical_trunk')
     assert len(l5p.sections) == 9
     assert 'apical_2' in l5p.sections
