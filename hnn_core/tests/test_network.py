@@ -7,7 +7,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Network, CellResponse
+from hnn_core import read_params, default_network, CellResponse
 from hnn_core.network_builder import NetworkBuilder
 
 
@@ -23,7 +23,7 @@ def test_network():
                    'input_prox_A_weight_L2Pyr_ampa': 5.4e-5,
                    'input_prox_A_weight_L5Pyr_ampa': 5.4e-5,
                    't0_input_prox': 50})
-    net = Network(deepcopy(params), add_drives_from_params=True)
+    net = default_network(deepcopy(params), add_drives_from_params=True)
     network_builder = NetworkBuilder(net)  # needed to populate net.cells
 
     # Assert that params are conserved across Network initialization
@@ -155,7 +155,7 @@ def test_network():
     assert nc.threshold == params['threshold']
 
     # create a new connection between cell types
-    net = Network(deepcopy(params), add_drives_from_params=True)
+    net = default_network(deepcopy(params), add_drives_from_params=True)
     nc_dict = {'A_delay': 1, 'A_weight': 1e-5, 'lamtha': 20,
                'threshold': 0.5}
     net._all_to_all_connect('bursty1', 'L5_basket',
@@ -166,7 +166,7 @@ def test_network():
     assert len(network_builder.ncs['bursty1_L5Basket_gabaa']) == n_conn
 
     # try unique=True
-    net = Network(deepcopy(params), add_drives_from_params=True)
+    net = default_network(deepcopy(params), add_drives_from_params=True)
     net._all_to_all_connect('extgauss', 'L5_basket',
                             'soma', 'gabaa', nc_dict, unique=True)
     network_builder = NetworkBuilder(net)
@@ -174,7 +174,7 @@ def test_network():
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
     # Test inputs for connectivity API
-    net = Network(deepcopy(params), add_drives_from_params=True)
+    net = default_network(deepcopy(params), add_drives_from_params=True)
     n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
     kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
                           loc='soma', receptor='gabaa',

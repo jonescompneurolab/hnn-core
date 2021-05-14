@@ -12,7 +12,7 @@ import pytest
 from mne.utils import _fetch_file
 
 import hnn_core
-from hnn_core import MPIBackend, Network, read_params
+from hnn_core import MPIBackend, default_network, read_params
 from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
@@ -99,7 +99,7 @@ class TestParallelBackends():
                        't_evdist_1': 10,
                        't_evprox_2': 20,
                        'N_trials': 2})
-        net = Network(params, add_drives_from_params=True)
+        net = default_network(params, add_drives_from_params=True)
 
         with MPIBackend() as backend:
             event = Event()
@@ -137,7 +137,7 @@ class TestParallelBackends():
                        't_evdist_1': 10,
                        't_evprox_2': 20,
                        'N_trials': 2})
-        net = Network(params, add_drives_from_params=True)
+        net = default_network(params, add_drives_from_params=True)
 
         oversubscribed = round(cpu_count() * 1.5)
         with MPIBackend(n_procs=oversubscribed) as backend:
