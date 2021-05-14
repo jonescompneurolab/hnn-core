@@ -24,7 +24,7 @@ import os.path as op
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, Network
+from hnn_core import simulate_dipole, read_params, default_network
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -41,7 +41,7 @@ print(params['gbar_L*'])
 # simulate the dipole moment in a single trial (the default value used by
 # ``simulate_dipole`` is ``n_trials=params['N_trials']``).
 
-net = Network(params)
+net = default_network(params)
 
 weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
 synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}

@@ -14,7 +14,7 @@ import os.path as op
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, Network, simulate_dipole
+from hnn_core import read_params, default_network, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -30,7 +30,7 @@ params = read_params(params_fname)
 # explore how it changes with new connections. We first instantiate the
 # network. (Note: Setting ``add_drives_from_params=True`` loads a set of
 # predefined drives without the drives API shown previously).
-net = Network(params, add_drives_from_params=True)
+net = default_network(params, add_drives_from_params=True)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that
