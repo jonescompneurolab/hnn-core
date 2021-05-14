@@ -61,7 +61,7 @@ def test_cell():
                     'gbar_km': 60
                 },
                 'ca': {
-                    'gbar_ca': 'variable'
+                    'gbar_ca': lambda x: 3e-3 * x
                 }
             }
         }

@@ -14,6 +14,7 @@ from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
+from .cell import Cell
 from .cell_response import CellResponse
 from .params import _long_name, _short_name
 from .viz import plot_cells, plot_cell_morphology
@@ -188,7 +189,8 @@ class Network(object):
         self._update_gid_ranges()
 
         self.cell_properties = dict()
-        self._set_cell_properties()
+        self.cells = dict()
+        self._create_cells()
 
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
@@ -229,23 +231,25 @@ class Network(object):
         net_copy._reset_drives()
         return net_copy
 
-    def _set_cell_properties(self):
-        '''Set cell properties by cell type
+    def _create_cells(self):
+        '''Populate the network with cell objects'''
 
-        This relies on self.cellname_list and must be updated when introducting
-        new cell types to HNN.
-        '''
-        for cell_type in self.cellname_list:
-            if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
-                p_secs, p_syn, topology, sect_loc = pyramidal(
-                    cell_name=_short_name(cell_type))
-            else:
-                p_secs, p_syn, topology, sect_loc = basket(
-                    cell_name=_short_name(cell_type))
-            self.cell_properties[cell_type] = {'sections': p_secs,
-                                               'synapses': p_syn,
-                                               'topology': topology,
-                                               'sect_loc': sect_loc}
+        for cell_type in self.pos_dict.keys():
+            if cell_type in self.cellname_list:
+                if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
+                    p_secs, p_syn, topology, sect_loc = pyramidal(
+                        cell_name=_short_name(cell_type))
+                else:
+                    p_secs, p_syn, topology, sect_loc = basket(
+                        cell_name=_short_name(cell_type))
+                self.cell_properties[cell_type] = {'sections': p_secs,
+                                                   'synapses': p_syn,
+                                                   'topology': topology,
+                                                   'sect_loc': sect_loc}
+                for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
+                    gid = self.gid_dict[cell_type][cell_idx]
+                    cell = Cell(name=_short_name(cell_type), pos=pos, gid=gid)
+                    self.cells[cell_type].append(cell)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
                          sync_within_trial=False, location,
@@ -1117,6 +1121,10 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+    def set_cell_biophysics(self, property, cell_type=None, synapse=None,
+                            receptor=None):
+        pass
 
 
 class _Connectivity(dict):

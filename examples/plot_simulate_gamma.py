@@ -82,7 +82,7 @@ freqs = np.arange(20., 100., 1.)
 dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[1])
 
 ###############################################################################
-# Now, let us try to re-run the simulation with a tonic bias
+# As a final exercise, let us try to re-run the simulation with a tonic bias
 # applied to the L5 Pyramidal cells. Notice that the oscillation waveform is
 # more regular, with less noise due to the fact that the tonic depolarization
 # dominates over the influence of the Poisson drive. By default, a tonic bias
@@ -107,21 +107,6 @@ net.cell_response.plot_spikes_raster()
 # frequency is lower compared with the "weak" PING simulation above.
 from hnn_core.viz import plot_psd
 plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
-
-###############################################################################
-# Finally, we demonstrate the mechanistic link between PING and the GABAA decay
-# time constant (`tau2`). Using the same network/drive configuration as before,
-# we decrease `tau2` from 5 to 2 ms. This will shorten the effective
-# refactory period between L5 pyramidal cell spikes and increase the PING
-# frequency from ~50 to ~65 Hz.
-net.cell_properties['L5_pyramidal']['synapses']['gabaa']['tau2'] = 2
-dpls = simulate_dipole(net, n_trials=1)
-
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
-                         constrained_layout=True)
-dpls[trial_idx].plot(ax=axes[0], show=False)
-net.cell_response.plot_spikes_raster(ax=axes[1], show=False)
-dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[2])
 
 ###############################################################################
 # References
