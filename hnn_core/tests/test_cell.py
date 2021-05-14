@@ -68,11 +68,15 @@ def test_cell():
         }
     }
     cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc)
+    # test successful build
     cell.build()
     assert 'soma' in cell.sections
     assert cell.sections['soma'].L == p_secs['soma']['L']
     assert cell.sections['soma'].gbar_km == p_secs[
         'soma']['mechs']['km']['gbar_km']
+    # test building cell with a dipole oriented to a nonexitent section
+    with pytest.raises(ValueError, match='sec_name_apical must be an'):
+        cell.build(sec_name_apical='blah')
 
 
 def test_artificial_cell():
