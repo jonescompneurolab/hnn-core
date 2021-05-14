@@ -151,15 +151,15 @@ def _set_variable_mech(dist_from_soma):
     return 1e-6 * np.exp(3e-3 * dist_from_soma)
 
 
-def basket(pos, cell_name='L2Basket', gid=None):
+def basket(cell_name, pos=(0, 0, 0), gid=None):
     """Get layer 2 / layer 5 basket cells.
 
     Parameters
     ----------
-    pos : tuple
-        Coordinates of cell soma in xyz-space
     cell_name : str
         The name of the cell.
+    pos : tuple
+        Coordinates of cell soma in xyz-space
     gid : int or None (optional)
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
@@ -187,18 +187,23 @@ def basket(pos, cell_name='L2Basket', gid=None):
     for sec_name in p_secs:
         p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
-    return Cell(cell_name, pos, p_secs, p_syn, topology, sect_loc, gid)
+    return Cell(cell_name, pos,
+                p_secs=p_secs,
+                p_syn=p_syn,
+                topology=topology,
+                sect_loc=sect_loc,
+                gid=gid)
 
 
-def pyramidal(pos, cell_name, override_params=None, gid=None):
+def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
     """Pyramidal neuron.
 
     Parameters
     ----------
-    pos : tuple
-        Coordinates of cell soma in xyz-space
     cell_name : str
         'L5Pyr' or 'L2Pyr'. The pyramidal cell type.
+    pos : tuple
+        Coordinates of cell soma in xyz-space
     override_params : dict or None (optional)
         Parameters specific to L2 pyramidal neurons to override the default set
     gid : int or None (optional)
@@ -269,4 +274,9 @@ def pyramidal(pos, cell_name, override_params=None, gid=None):
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
                 'distal': ['apical_tuft']}
 
-    return Cell(cell_name, pos, p_secs, p_syn, topology, sect_loc, gid)
+    return Cell(cell_name, pos,
+                p_secs=p_secs,
+                p_syn=p_syn,
+                topology=topology,
+                sect_loc=sect_loc,
+                gid=gid)
