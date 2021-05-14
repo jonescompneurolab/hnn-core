@@ -8,7 +8,7 @@ import pytest
 
 import os.path as op
 import hnn_core
-from hnn_core import read_params, Network, simulate_dipole
+from hnn_core import read_params, default_network, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
 
 # store history of failures per test class name and per index in parametrize
@@ -89,7 +89,7 @@ def run_hnn_core_fixture():
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
-        net = Network(params, add_drives_from_params=True)
+        net = default_network(params, add_drives_from_params=True)
 
         # number of trials simulated
         for drive in net.external_drives.values():
