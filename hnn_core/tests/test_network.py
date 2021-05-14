@@ -228,15 +228,19 @@ def test_network():
             kwargs[arg] = string_arg
             net.add_connection(**kwargs)
 
+    # Check probability=0.5 produces half as many connections as default
+    net.add_connection(**kwargs_default)
+    kwargs = kwargs_default.copy()
+    kwargs['probability'] = 0.5
+    net.add_connection(**kwargs)
     n_connections = np.sum(
         [len(t_gids) for
-         t_gids in net.connectivity[0]['gid_pairs'].values()])
-    net.connectivity[0].drop(0.5)
+         t_gids in net.connectivity[-2]['gid_pairs'].values()])
     n_connections_new = np.sum(
         [len(t_gids) for
-         t_gids in net.connectivity[0]['gid_pairs'].values()])
+         t_gids in net.connectivity[-1]['gid_pairs'].values()])
     assert n_connections_new == np.round(n_connections * 0.5).astype(int)
-    assert net.connectivity[0]['probability'] == 0.5
+    assert net.connectivity[-1]['probability'] == 0.5
     with pytest.raises(ValueError, match='probability must be'):
         kwargs = kwargs_default.copy()
         kwargs['probability'] = -1.0
