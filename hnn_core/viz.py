@@ -593,3 +593,43 @@ def plot_cell_morphology(axes=None, cell_types=None, show=True):
     plt.tight_layout()
     plt_show(show)
     return axes
+def plot_connectivity_matrix(conn, ax=None, show=True):
+    """Plot connectivity matrix for instance of _Connectivity object.
+
+    Parameters
+    ----------
+    conn : Instance of _Connectivity object
+        The _Connectivity object
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+
+    """
+    import matplotlib.pyplot as plt
+    from.network import _Connectivity
+
+    if not isinstance(conn, _Connectivity):
+        raise TypeError('conn must be instance of _Connectivity')
+    if ax is None:
+        _, ax = plt.subplots(1, 1)
+
+    src_range = np.array(conn['src_range'])
+    target_range = np.array(conn['target_range'])
+    connectivity_matrix = np.zeros((len(src_range), len(target_range)))
+    for src_gid, target_src_pair in conn['gid_pairs'].items():
+        src_idx = np.where(src_range == src_gid)[0][0]
+        target_indeces = np.in1d(target_range, target_src_pair)
+        connectivity_matrix[src_idx, :] = target_indeces
+
+    ax.imshow(connectivity_matrix, cmap='Greys', interpolation='none')
+    ax.set_xlabel(f'target gids ({target_range[0]}-{target_range[-1]})')
+    ax.set_xticklabels(list())
+    ax.set_ylabel(f'source gids ({src_range[0]}-{src_range[-1]})')
+    ax.set_yticklabels(list())
+    ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
+                 f"({conn['loc']}, {conn['receptor']})")
+
+    plt_show(show)
+    return ax.get_figure()
