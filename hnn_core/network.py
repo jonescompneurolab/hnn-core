@@ -4,6 +4,7 @@
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
+#          Nick Tolley <nicholas_tolley@brown.edu>
 
 import itertools as it
 import numpy as np
@@ -89,6 +90,147 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     pos_dict['origin'] = origin
 
     return pos_dict
+
+
+# connections:
+# this NODE is aware of its cells as targets
+# for each syn, return list of source GIDs.
+# for each item in the list, do a:
+# nc = pc.gid_connect(source_gid, target_syn), weight,delay
+# Both for synapses AND for external inputs
+def default_network(params, add_drives_from_params=False):
+    """Instantiate the default all-to-all connected network.
+
+    Parameters
+    ----------
+    params : dict
+        The parameters to use for constructing the network.
+    add_drives_from_params : bool
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store the default network.
+        All connections defining the default network will be
+        appeneded to net.connectivity.
+    """
+
+    net = Network(params, add_drives_from_params=add_drives_from_params)
+
+    nc_dict = {
+        'A_delay': net.delay,
+        'threshold': net.threshold,
+    }
+
+    # source of synapse is always at soma
+
+    # layer2 Pyr -> layer2 Pyr
+    # layer5 Pyr -> layer5 Pyr
+    nc_dict['lamtha'] = 3.
+    loc = 'proximal'
+    for target_cell in ['L2Pyr', 'L5Pyr']:
+        for receptor in ['nmda', 'ampa']:
+            key = f'gbar_{target_cell}_{target_cell}_{receptor}'
+            nc_dict['A_weight'] = net._params[key]
+            net._all_to_all_connect(
+                target_cell, target_cell, loc, receptor,
+                nc_dict, allow_autapses=False)
+
+    # layer2 Basket -> layer2 Pyr
+    src_cell = 'L2Basket'
+    target_cell = 'L2Pyr'
+    nc_dict['lamtha'] = 50.
+    loc = 'soma'
+    for receptor in ['gabaa', 'gabab']:
+        key = f'gbar_L2Basket_L2Pyr_{receptor}'
+        nc_dict['A_weight'] = net._params[key]
+        net._all_to_all_connect(
+            src_cell, target_cell, loc, receptor, nc_dict)
+
+    # layer5 Basket -> layer5 Pyr
+    src_cell = 'L5Basket'
+    target_cell = 'L5Pyr'
+    nc_dict['lamtha'] = 70.
+    loc = 'soma'
+    for receptor in ['gabaa', 'gabab']:
+        key = f'gbar_L5Basket_{target_cell}_{receptor}'
+        nc_dict['A_weight'] = net._params[key]
+        net._all_to_all_connect(
+            src_cell, target_cell, loc, receptor, nc_dict)
+
+    # layer2 Pyr -> layer5 Pyr
+    src_cell = 'L2Pyr'
+    nc_dict['lamtha'] = 3.
+    receptor = 'ampa'
+    for loc in ['proximal', 'distal']:
+        key = f'gbar_L2Pyr_{target_cell}'
+        nc_dict['A_weight'] = net._params[key]
+        net._all_to_all_connect(
+            src_cell, target_cell, loc, receptor, nc_dict)
+
+    # layer2 Basket -> layer5 Pyr
+    src_cell = 'L2Basket'
+    nc_dict['lamtha'] = 50.
+    key = f'gbar_L2Basket_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'distal'
+    receptor = 'gabaa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    # xx -> layer2 Basket
+    src_cell = 'L2Pyr'
+    target_cell = 'L2Basket'
+    nc_dict['lamtha'] = 3.
+    key = f'gbar_L2Pyr_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    src_cell = 'L2Basket'
+    nc_dict['lamtha'] = 20.
+    key = f'gbar_L2Basket_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'gabaa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    # xx -> layer5 Basket
+    src_cell = 'L5Basket'
+    target_cell = 'L5Basket'
+    nc_dict['lamtha'] = 20.
+    loc = 'soma'
+    receptor = 'gabaa'
+    key = f'gbar_L5Basket_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict,
+        allow_autapses=False)
+
+    src_cell = 'L5Pyr'
+    nc_dict['lamtha'] = 3.
+    key = f'gbar_L5Pyr_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    src_cell = 'L2Pyr'
+    key = f'gbar_L2Pyr_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    return net
 
 
 class Network(object):
@@ -200,8 +342,6 @@ class Network(object):
         # set n_cells, EXCLUDING Artificial ones
         self.n_cells = sum(len(self.pos_dict[src]) for src in
                            self.cell_types)
-
-        self._set_default_connections()
 
         if add_drives_from_params:
             _add_drives_from_params(self)
@@ -774,123 +914,6 @@ class Network(object):
             cell = self.cells[src_type][type_pos_ind]
         return cell
 
-    # connections:
-    # this NODE is aware of its cells as targets
-    # for each syn, return list of source GIDs.
-    # for each item in the list, do a:
-    # nc = pc.gid_connect(source_gid, target_syn), weight,delay
-    # Both for synapses AND for external inputs
-    def _set_default_connections(self):
-        nc_dict = {
-            'A_delay': self.delay,
-            'threshold': self.threshold,
-        }
-
-        # source of synapse is always at soma
-
-        # layer2 Pyr -> layer2 Pyr
-        # layer5 Pyr -> layer5 Pyr
-        nc_dict['lamtha'] = 3.
-        loc = 'proximal'
-        for target_cell in ['L2Pyr', 'L5Pyr']:
-            for receptor in ['nmda', 'ampa']:
-                key = f'gbar_{target_cell}_{target_cell}_{receptor}'
-                nc_dict['A_weight'] = self._params[key]
-                self._all_to_all_connect(
-                    target_cell, target_cell, loc, receptor,
-                    nc_dict, allow_autapses=False)
-
-        # layer2 Basket -> layer2 Pyr
-        src_cell = 'L2Basket'
-        target_cell = 'L2Pyr'
-        nc_dict['lamtha'] = 50.
-        loc = 'soma'
-        for receptor in ['gabaa', 'gabab']:
-            key = f'gbar_L2Basket_L2Pyr_{receptor}'
-            nc_dict['A_weight'] = self._params[key]
-            self._all_to_all_connect(
-                src_cell, target_cell, loc, receptor, nc_dict)
-
-        # layer5 Basket -> layer5 Pyr
-        src_cell = 'L5Basket'
-        target_cell = 'L5Pyr'
-        nc_dict['lamtha'] = 70.
-        loc = 'soma'
-        for receptor in ['gabaa', 'gabab']:
-            key = f'gbar_L5Basket_{target_cell}_{receptor}'
-            nc_dict['A_weight'] = self._params[key]
-            self._all_to_all_connect(
-                src_cell, target_cell, loc, receptor, nc_dict)
-
-        # layer2 Pyr -> layer5 Pyr
-        src_cell = 'L2Pyr'
-        nc_dict['lamtha'] = 3.
-        receptor = 'ampa'
-        for loc in ['proximal', 'distal']:
-            key = f'gbar_L2Pyr_{target_cell}'
-            nc_dict['A_weight'] = self._params[key]
-            self._all_to_all_connect(
-                src_cell, target_cell, loc, receptor, nc_dict)
-
-        # layer2 Basket -> layer5 Pyr
-        src_cell = 'L2Basket'
-        nc_dict['lamtha'] = 50.
-        key = f'gbar_L2Basket_{target_cell}'
-        nc_dict['A_weight'] = self._params[key]
-        loc = 'distal'
-        receptor = 'gabaa'
-        self._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
-
-        # xx -> layer2 Basket
-        src_cell = 'L2Pyr'
-        target_cell = 'L2Basket'
-        nc_dict['lamtha'] = 3.
-        key = f'gbar_L2Pyr_{target_cell}'
-        nc_dict['A_weight'] = self._params[key]
-        loc = 'soma'
-        receptor = 'ampa'
-        self._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
-
-        src_cell = 'L2Basket'
-        nc_dict['lamtha'] = 20.
-        key = f'gbar_L2Basket_{target_cell}'
-        nc_dict['A_weight'] = self._params[key]
-        loc = 'soma'
-        receptor = 'gabaa'
-        self._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
-
-        # xx -> layer5 Basket
-        src_cell = 'L5Basket'
-        target_cell = 'L5Basket'
-        nc_dict['lamtha'] = 20.
-        loc = 'soma'
-        receptor = 'gabaa'
-        key = f'gbar_L5Basket_{target_cell}'
-        nc_dict['A_weight'] = self._params[key]
-        self._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict,
-            allow_autapses=False)
-
-        src_cell = 'L5Pyr'
-        nc_dict['lamtha'] = 3.
-        key = f'gbar_L5Pyr_{target_cell}'
-        nc_dict['A_weight'] = self._params[key]
-        loc = 'soma'
-        receptor = 'ampa'
-        self._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
-
-        src_cell = 'L2Pyr'
-        key = f'gbar_L2Pyr_{target_cell}'
-        nc_dict['A_weight'] = self._params[key]
-        loc = 'soma'
-        receptor = 'ampa'
-        self._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
-
     def _all_to_all_connect(self, src_cell, target_cell,
                             loc, receptor, nc_dict,
                             allow_autapses=True, unique=False):
@@ -1246,8 +1269,11 @@ class _Connectivity(dict):
 
         Parameters
         ----------
-        conn : Instance of _Connectivity object
-            The _Connectivity object
+        ax : instance of matplotlib Axes3D | None
+            An axis object from matplotlib. If None,
+            a new figure is created.
+        show : bool
+            If True, show the figure.
 
         Returns
         -------
