@@ -44,9 +44,9 @@ def _clone_and_simulate(net, trial_idx):
     neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
     dpl = _simulate_single_trial(neuron_net, trial_idx)
 
-    spikedata = neuron_net.get_data_from_neuron()
+    simdata = neuron_net.get_data_from_neuron()
 
-    return dpl, spikedata
+    return dpl, simdata
 
 
 def _gather_trial_data(sim_data, net, n_trials, postproc):
@@ -59,14 +59,14 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 
     for idx in range(n_trials):
         dpls.append(sim_data[idx][0])
-        spikedata = sim_data[idx][1]
-        net.cell_response._spike_times.append(spikedata[0])
-        net.cell_response._spike_gids.append(spikedata[1])
+        sim_data_trial = sim_data[idx][1]
+        net.cell_response._spike_times.append(sim_data_trial[0])
+        net.cell_response._spike_gids.append(sim_data_trial[1])
         net.cell_response.update_types(net.gid_ranges)
-        net.cell_response._vsoma.append(spikedata[3])
-        net.cell_response._isoma.append(spikedata[4])
+        net.cell_response._vsoma.append(sim_data_trial[3])
+        net.cell_response._isoma.append(sim_data_trial[4])
         for e_idx in range(len(net.lfp)):
-            net.lfp[e_idx]['data'].append(spikedata[5][e_idx])
+            net.lfp[e_idx]['data'].append(sim_data_trial[5][e_idx])
 
         N_pyr_x = net._params['N_pyr_x']
         N_pyr_y = net._params['N_pyr_y']

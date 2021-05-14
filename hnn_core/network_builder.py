@@ -83,7 +83,17 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
     for elec in neuron_net._lfp:
-        elec.pc.allreduce(elec.lfp_v, 1)
+        if len(elec.lfp_v) == len(times) - 1:
+            # Last value repeated, CVode doesn't update the membrane currents
+            # for the last time step.
+            elec.calc_potential_callback()
+        elif len(elec.lfp_v) == len(times):
+            pass
+        else:
+            raise RuntimeError(
+                f'Length of LFP potential vector ({len(elec.lfp_v)}) does not '
+                f'match number of time points in simulation ({len(times)})')
+        _PC.allreduce(elec.lfp_v, 1)
 
     # aggregate the currents and voltages independently on each proc
     vsoma_list = _PC.py_gather(neuron_net._vsoma, 0)
@@ -182,7 +192,7 @@ def _get_rank():
     return 0
 
 
-def _create_parallel_context(n_cores=None):
+def _create_parallel_context(n_cores=None, expose_imem=False):
     """Create parallel context.
 
     Parameters
@@ -190,6 +200,8 @@ def _create_parallel_context(n_cores=None):
     n_cores: int | None
         Number of processors to use for a simulation. A value of None will
         allow NEURON to use all available processors.
+    expose_imem : bool
+        If True, sets _CVODE.use_fast_imem(1) (default: False)
     """
 
     global _CVODE, _PC
@@ -203,16 +215,18 @@ def _create_parallel_context(n_cores=None):
 
         _CVODE = h.CVode()
 
-        # be explicit about using fixed step integration
-        _CVODE.active(0)
-        _CVODE.use_fast_imem(1)
-
         # use cache_efficient mode for allocating elements in contiguous order
         # cvode.cache_efficient(1)
     else:
         # ParallelContext() has already been called. Don't start more workers.
         # Just tell old nrniv workers to quit.
         _PC.done()
+
+    # be explicit about using fixed step integration
+    _CVODE.active(0)
+    # note that CVode seems to forget this setting in either parallel backend
+    if expose_imem:
+        _CVODE.use_fast_imem(1)
 
 
 class NetworkBuilder(object):
@@ -279,12 +293,17 @@ class NetworkBuilder(object):
 
         self.ncs = dict()
 
+        # if LFP electrodes have been included, we need to calculate
+        # transmembrane currents at each integration step
+        self._expose_imem = True if len(self.net.lfp) > 0 else False
+
         self._build()
 
     def _build(self):
         """Building the network in NEURON."""
 
-        _create_parallel_context()
+        global _CVODE, _PC
+        _create_parallel_context(expose_imem=self._expose_imem)
 
         # load mechanisms needs ParallelContext for get_rank
         load_custom_mechanisms()
@@ -323,8 +342,9 @@ class NetworkBuilder(object):
 
         self._record_spikes()
         self._connect_celltypes()
-        # Must be run after cells are moved to position for LFP calculations
-        self._record_lfp()
+
+        if len(self.net.lfp) > 0:
+            self._record_lfp()
 
         if _get_rank() == 0:
             print('[Done]')
@@ -478,12 +498,10 @@ class NetworkBuilder(object):
                         self.ncs[connection_name].append(nc)
 
     def _record_lfp(self):
-        method = 'psa'
         for e_dict in self.net.lfp:
             pos, sigma = e_dict['pos'], e_dict['sigma']
             method = e_dict['method']
-            elec = _LFPElectrode(pos, sigma=sigma, pc=_PC, cvode=_CVODE,
-                                 method=method)
+            elec = _LFPElectrode(pos, sigma=sigma, method=method, cvode=_CVODE)
             self._lfp.append(elec)
 
     # setup spike recording for this node
@@ -575,9 +593,8 @@ class NetworkBuilder(object):
 
         lfp_py = list()
         for elec in self._lfp:
-            # elec.pc.allreduce(elec.lfp_v, 1)
-            # lfp_py.append(elec_list[pos].lfp_t.to_python())
             lfp_py.append(elec.lfp_v.to_python())
+            elec.reset()
 
         from copy import deepcopy
         data = (self._all_spike_times.to_python(),
