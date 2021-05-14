@@ -146,6 +146,11 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     return mech_props
 
 
+def _set_variable_mech(dist_from_soma):
+    """Set a cell mechanism based on its distance from the soma"""
+    return 1e-6 * np.exp(3e-3 * dist_from_soma)
+
+
 def basket(cell_name='L2Basket', gid=None):
     """Get layer 2 / layer 5 basket cells.
 
@@ -251,7 +256,7 @@ def pyramidal(cell_name, override_params=None, gid=None):
             syns = list(p_syn.keys())
             if cell_name == 'L5Pyr':
                 p_secs[key]['mechs'][
-                    'ar']['gbar_ar'] = lambda x: 1e-6 * np.exp(3e-3 * x)
+                    'ar']['gbar_ar'] = _set_variable_mech
         p_secs[key]['syns'] = syns
 
     for sec_name in p_secs:

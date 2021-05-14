@@ -236,6 +236,7 @@ class Network(object):
 
         for cell_type in self.pos_dict.keys():
             if cell_type in self.cellname_list:
+                cells = list()
                 if cell_type in ('L2_pyramidal', 'L5_pyramidal'):
                     p_secs, p_syn, topology, sect_loc = pyramidal(
                         cell_name=_short_name(cell_type))
@@ -247,9 +248,10 @@ class Network(object):
                                                    'topology': topology,
                                                    'sect_loc': sect_loc}
                 for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
-                    gid = self.gid_dict[cell_type][cell_idx]
-                    cell = Cell(name=_short_name(cell_type), pos=pos, gid=gid)
-                    self.cells[cell_type].append(cell)
+                    gid = self.gid_ranges[cell_type][cell_idx]
+                    cells.append(Cell(name=_short_name(cell_type), pos=pos,
+                                      gid=gid))
+                    self.cells[cell_type] = cells
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
                          sync_within_trial=False, location,
@@ -1121,10 +1123,6 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
-
-    def set_cell_biophysics(self, property, cell_type=None, synapse=None,
-                            receptor=None):
-        pass
 
 
 class _Connectivity(dict):

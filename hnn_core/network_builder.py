@@ -403,6 +403,7 @@ class NetworkBuilder(object):
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
                 _PC.cell(cell.gid, nrn_netcon)
+                self.cells.append(cell)  # XXX fix later
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
