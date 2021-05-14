@@ -151,11 +151,13 @@ def _set_variable_mech(dist_from_soma):
     return 1e-6 * np.exp(3e-3 * dist_from_soma)
 
 
-def basket(cell_name='L2Basket', gid=None):
+def basket(pos, cell_name='L2Basket', gid=None):
     """Get layer 2 / layer 5 basket cells.
 
     Parameters
     ----------
+    pos : tuple
+        Coordinates of cell soma in xyz-space
     cell_name : str
         The name of the cell.
     gid : int or None (optional)
@@ -188,11 +190,13 @@ def basket(cell_name='L2Basket', gid=None):
     return p_secs, p_syn, topology, sect_loc
 
 
-def pyramidal(cell_name, override_params=None, gid=None):
+def pyramidal(pos, cell_name, override_params=None, gid=None):
     """Pyramidal neuron.
 
     Parameters
     ----------
+    pos : tuple
+        Coordinates of cell soma in xyz-space
     cell_name : str
         'L5Pyr' or 'L2Pyr'. The pyramidal cell type.
     override_params : dict or None (optional)
