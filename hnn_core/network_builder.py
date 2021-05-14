@@ -386,7 +386,7 @@ class NetworkBuilder(object):
             if cell is not None:
                 # instantiate NEURON object
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    cell.build(align_dipole='apical_trunk')
+                    cell.build(sec_name_apical='apical_trunk')
                 else:
                     cell.build()
                 # add tonic biases
