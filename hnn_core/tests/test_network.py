@@ -34,7 +34,7 @@ def test_network():
 
     # Assert that proper number of gids are created for Network drives
     dns_from_gids = [name for name in net.gid_ranges.keys() if
-                     name not in net.cellname_list]
+                     name not in net.cell_types]
     assert len(dns_from_gids) == len(net.external_drives)
     for dn in dns_from_gids:
         assert dn in net.external_drives.keys()

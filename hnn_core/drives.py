@@ -79,9 +79,9 @@ def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
 
 def _add_drives_from_params(net):
     drive_specs = _extract_drive_specs_from_hnn_params(
-        net._params, net.cellname_list)
+        net._params, list(net.cell_types.keys()))
     bias_specs = _extract_bias_specs_from_hnn_params(
-        net._params, net.cellname_list)
+        net._params, list(net.cell_types.keys()))
 
     for drive_name in sorted(drive_specs.keys()):  # order matters
         specs = drive_specs[drive_name]
