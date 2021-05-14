@@ -12,9 +12,11 @@ def test_cells_default():
     load_custom_mechanisms()
 
     with pytest.raises(ValueError, match='Unknown pyramidal cell type'):
-        p_secs, p_syn, topology, sect_loc = pyramidal(cell_name='blah')
+        p_secs, p_syn, topology, sect_loc = pyramidal(pos=(0, 0, 0),
+                                                      cell_name='blah')
 
-    p_secs, p_syn, topology, sect_loc = pyramidal(cell_name='L5Pyr')
+    p_secs, p_syn, topology, sect_loc = pyramidal(pos=(0, 0, 0),
+                                                  cell_name='L5Pyr')
     l5p = Cell(name='L5Pyr', pos=(0, 0, 0))
     l5p.build(p_secs, p_syn, topology, sect_loc=sect_loc)
     l5p.insert_dipole(p_secs, 'apical_trunk')
