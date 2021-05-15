@@ -1100,11 +1100,13 @@ class Network(object):
 
         # Probabilistically define connections
         if probability != 1.0:
-            self.connection_probability(conn, probability)
+            self._connection_probability(conn, probability)
+
+        conn['probability'] = probability
 
         self.connectivity.append(deepcopy(conn))
 
-    def connection_probability(self, conn, probability):
+    def _connection_probability(self, conn, probability):
         """Remove/keep a random subset of connections.
 
         Parameters
@@ -1153,8 +1155,6 @@ class Network(object):
         # Remove src_gids with no targets
         for src_gid in remove_srcs:
             conn['gid_pairs'].pop(src_gid)
-
-        conn['probability'] = probability
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity_list"""
