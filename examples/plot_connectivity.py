@@ -114,8 +114,10 @@ net_sparse.connectivity[-2].plot()
 net_sparse.connectivity[-1].plot()
 
 ###############################################################################
-# Adding a single inhibitory connection didn't completely restored the normal
-# spiking. However, layer 2 firing is interrupted at 70 and 120 ms.
+# Using the sparse connectivity pattern led produced a lot more spiking in
+# the L5 pyramidal cells. While there are less excitatory connections overall,
+# there was also a decrease in the inhibtory connections. This shift in
+# activity is often referred to as the excitatory/inhibitory (E/I) balance. 
 # As a final step, we can see how this change in spiking activity impacts
 # the aggregate current dipole.
 import matplotlib.pyplot as plt
