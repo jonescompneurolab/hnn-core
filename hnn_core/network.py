@@ -1111,6 +1111,9 @@ class Network(object):
 
         Parameters
         ----------
+        conn : Instance of _Connectivity object
+            Object specifying the biophysical parameters and src target pairs
+            of a specific connection class. Function modifies conn in place.
         probability : float
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
