@@ -117,7 +117,7 @@ net_sparse.connectivity[-1].plot()
 # Using the sparse connectivity pattern led produced a lot more spiking in
 # the L5 pyramidal cells. While there are less excitatory connections overall,
 # there was also a decrease in the inhibtory connections. This shift in
-# activity is often referred to as the excitatory/inhibitory (E/I) balance. 
+# activity is often referred to as the excitatory/inhibitory (E/I) balance.
 # As a final step, we can see how this change in spiking activity impacts
 # the aggregate current dipole.
 import matplotlib.pyplot as plt
