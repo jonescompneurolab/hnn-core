@@ -626,9 +626,11 @@ def plot_connectivity_matrix(conn, ax=None, show=True):
         connectivity_matrix[src_idx, :] = target_indeces
 
     ax.imshow(connectivity_matrix, cmap='Greys', interpolation='none')
-    ax.set_xlabel(f'target gids ({target_range[0]}-{target_range[-1]})')
+    ax.set_xlabel(f"{conn['target_type']} target gids "
+                  f"({target_range[0]}-{target_range[-1]})")
     ax.set_xticklabels(list())
-    ax.set_ylabel(f'source gids ({src_range[0]}-{src_range[-1]})')
+    ax.set_ylabel(f"{conn['src_type']} source gids "
+                  f"({src_range[0]}-{src_range[-1]})")
     ax.set_yticklabels(list())
     ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
                  f"({conn['loc']}, {conn['receptor']})")
