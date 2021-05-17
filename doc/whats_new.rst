@@ -20,7 +20,7 @@ Changelog
 
 - Compute dipole component in z-direction automatically from cell morphology instead of hard coding, by `Mainak Jas`_ in  `#327 <https://github.com/jonescompneurolab/hnn-core/pull/320>`_
 
-- Store :class:`~hnn_core.Cell` instances in :attr:`~/hnn_core.Network.cells` by `Ryan Thorpe`_ in `#321 <https://github.com/jonescompneurolab/hnn-core/pull/321>`_
+- Store :class:`~hnn_core.Cell` instances in :class:`~hnn_core.Network`'s :attr:`~/hnn_core.Network.cells` attribute by `Ryan Thorpe`_ in `#321 <https://github.com/jonescompneurolab/hnn-core/pull/321>`_
 
 Bug
 ~~~
@@ -32,7 +32,7 @@ API
 - Remove :class:`~hnn_core.L2Pyr`, :class:`~hnn_core.L5Pyr`, :class:`~hnn_core.L2Basket`, and :class:`~hnn_core.L5Basket` classes
   in favor of instantation through functions and a more consistent :class:`~hnn_core.Cell` class by `Mainak Jas`_ in  `#322 <https://github.com/jonescompneurolab/hnn-core/pull/320>`_
 
-- Remove parameter `distribution` in :func:`~hnn_core.Network.add_bursty_drive`. The distribution is now Gaussian by default, by `Mainak Jas` in `#330 <https://github.com/jonescompneurolab/hnn-core/pull/330>`_
+- Remove parameter `distribution` in :func:`~hnn_core.Network.add_bursty_drive`. The distribution is now Gaussian by default, by `Mainak Jas`_ in `#330 <https://github.com/jonescompneurolab/hnn-core/pull/330>`_
 
 - New API for accessing and modifying :class:`~hnn_core.Cell` attributes (e.g., synapse and biophysics parameters) as cells are now instantiated from template cells specified
   in a :class:`~hnn_core.Network` instance's :attr:`~/hnn_core.Network.cell_types` attribute by `Ryan Thorpe`_ in `#321 <https://github.com/jonescompneurolab/hnn-core/pull/321>`_
