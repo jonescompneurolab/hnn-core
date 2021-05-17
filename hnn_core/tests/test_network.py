@@ -44,19 +44,14 @@ def test_network():
         assert len(net.gid_ranges[dn]) == len(this_src_gids)
         assert len(net.external_drives[dn]['events']) == 1  # single trial!
 
-    # Test that a change in net.pos_dict influences the number of cells created
+    # Test succeful creation of a new cell type
     net_new = net.copy()
     n_cells_orig = net_new.n_cells
     new_cell_type = {'new_type': net_new.cell_types['L2_basket']}
     net_new.pos_dict.update({'new_type': [(0, 0, 0)]})
-    net_new._update_gid_ranges()
-    net_new._update_cells()
-    # Without also updating net_new.cell_types, no new cells are created
-    assert net_new.n_cells == n_cells_orig
     net_new.cell_types.update(new_cell_type)
     net_new._update_gid_ranges()
     net_new._update_cells()
-    # After updating net_new.cell_types, the new cell is created
     assert net_new.n_cells == n_cells_orig + 1
 
     assert len(net.gid_ranges['bursty1']) == 1
