@@ -123,6 +123,9 @@ class Network(object):
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
         or any external drive name
+    cells : list of Cell objects.
+        The list of cells of the network, each containing features used in a
+        NEURON simulation.
     cell_response : CellResponse
         An instance of the CellResponse object.
     external_drives : dict (keys: drive names) of dict (keys: parameters)
