@@ -990,6 +990,8 @@ class Network(object):
         probability : float
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
+        seed : int
+            Seed for the numpy random number generator.
 
         Notes
         -----
