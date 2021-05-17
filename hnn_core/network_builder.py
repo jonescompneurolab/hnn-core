@@ -226,8 +226,6 @@ class NetworkBuilder(object):
     ----------
     trial_idx : int
         The index number of the current trial of a simulation.
-    cells : list of Cell objects.
-        The list of cells containing features used in a NEURON simulation.
     ncs : dict of list
         A dictionary with key describing the types of cell objects connected
         and contains a list of NetCon objects.
@@ -267,8 +265,8 @@ class NetworkBuilder(object):
         # - _PC.set_gid2node(gid, rank)
         # - _PC.cell(gid, nrn_netcon) (or _PC.cell(drive_cell.gid, nrn_netcon))
 
-        # create cells (and create self.origin in create_cells_pyr())
-        self.cells = list()
+        # cells from self.net.cells assigned to the current host/thread
+        self._cells = list()
 
         # artificial cells must be appended to a list in order to preserve
         # the NEURON hoc objects and the corresonding python references
@@ -399,7 +397,7 @@ class NetworkBuilder(object):
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
                 _PC.cell(cell.gid, nrn_netcon)
-                self.cells.append(cell)  # XXX fix later
+                self._cells.append(cell)
 
             # external inputs are special types of artificial-cells
             # 'common': all cells impacted with identical TIMING of spike
@@ -418,7 +416,7 @@ class NetworkBuilder(object):
         net = self.net
         connectivity = self.net.connectivity
 
-        assert len(self.cells) == len(self._gid_list) - len(self._drive_cells)
+        assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
 
         for conn in connectivity:
             loc, receptor = conn['loc'], conn['receptor']
@@ -434,7 +432,7 @@ class NetworkBuilder(object):
                 conn['gid_pairs'][src_gid] = filtered_targets
 
             target_filter = dict()
-            for idx in range(len(self.cells)):
+            for idx in range(len(self._cells)):
                 gid = self._gid_list[idx]
                 if gid in valid_targets:
                     target_filter[gid] = idx
@@ -444,7 +442,7 @@ class NetworkBuilder(object):
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)
-                    target_cell = self.cells[target_filter[target_gid]]
+                    target_cell = self._cells[target_filter[target_gid]]
                     connection_name = f'{_short_name(src_type)}_'\
                                       f'{_short_name(target_type)}_{receptor}'
                     if connection_name not in self.ncs:
@@ -481,7 +479,7 @@ class NetworkBuilder(object):
     # aggregate recording all the somatic voltages for pyr
     def aggregate_data(self):
         """Aggregate somatic currents, voltages, and dipoles."""
-        for cell in self.cells:
+        for cell in self._cells:
             if cell.name in ('L5Pyr', 'L2Pyr'):
                 self.dipoles[_long_name(cell.name)].add(cell.dipole)
 
@@ -491,7 +489,7 @@ class NetworkBuilder(object):
     def state_init(self):
         """Initializes the state closer to baseline."""
 
-        for cell in self.cells:
+        for cell in self._cells:
             seclist = h.SectionList()
             seclist.wholetree(sec=cell.sections['soma'])
             for sect in seclist:
@@ -514,7 +512,7 @@ class NetworkBuilder(object):
 
     def move_cells_to_pos(self):
         """Move cells 3d positions to positions used for wiring."""
-        for cell in self.cells:
+        for cell in self._cells:
             cell.move_to_pos()
 
     def _clear_neuron_objects(self):
@@ -531,7 +529,7 @@ class NetworkBuilder(object):
         _PC.gid_clear()
 
         # dereference cell and NetConn objects
-        for gid, cell in zip(self._gid_list, self.cells):
+        for gid, cell in zip(self._gid_list, self._cells):
             # only work on cells on this node
             if _PC.gid_exists(gid):
                 for nc_key in self.ncs:
@@ -547,7 +545,7 @@ class NetworkBuilder(object):
                             del nc
 
         self._gid_list = list()
-        self.cells = list()
+        self._cells = list()
 
     def get_data_from_neuron(self):
         """Get copies of spike data that are pickleable"""
