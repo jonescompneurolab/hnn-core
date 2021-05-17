@@ -229,8 +229,8 @@ class Network(object):
             A copy of the instance with previous simulation results and
             ``events`` of external drives removed.
         """
-        # reset cells to avoid pickling error
-        self._update_cells()
+        # clear cells containing Neuron objects to avoid pickling error
+        self.cells = dict()
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
@@ -239,6 +239,7 @@ class Network(object):
     def _update_cells(self):
         """Populate the network with cell objects"""
 
+        self.n_cells = 0
         for cell_type in self.pos_dict.keys():
             if cell_type in self.cell_types:
                 cells = list()
@@ -248,6 +249,7 @@ class Network(object):
                     cell.pos = pos
                     cells.append(cell)
                     self.cells[cell_type] = cells
+                self.n_cells += len(cells)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
                          sync_within_trial=False, location,
