@@ -411,6 +411,12 @@ class NetworkBuilder(object):
                 _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
                 self._drive_cells.append(drive_cell)
 
+    # connections:
+    # this NODE is aware of its cells as targets
+    # for each syn, return list of source GIDs.
+    # for each item in the list, do a:
+    # nc = pc.gid_connect(source_gid, target_syn), weight,delay
+    # Both for synapses AND for external inputs
     def _connect_celltypes(self):
         """Connect two cell types for a particular receptor."""
         net = self.net
