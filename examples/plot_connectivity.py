@@ -1,6 +1,6 @@
 """
 =====================
-07. Plot Connectivity
+06. Plot Connectivity
 =====================
 
 This example demonstrates how to modify the network connectivity.
@@ -8,7 +8,7 @@ This example demonstrates how to modify the network connectivity.
 
 # Author: Nick Tolley <nicholas_tolley@brown.edu>
 
-# sphinx_gallery_thumbnail_number = 4
+# sphinx_gallery_thumbnail_number = 5
 
 from hnn_core.network import Network
 import os.path as op
@@ -68,7 +68,7 @@ net_all = Network(params, add_drives_from_params=True)
 location, receptor = 'distal', 'ampa'
 weight, delay, lamtha = 1.0, 1.0, 70
 src = 'L5_pyramidal'
-for target in ['L5_pyramidal', 'L5_pyramidal']:
+for target in ['L5_pyramidal', 'L2_basket']:
     net_all.add_connection(src, target, location, receptor,
                            delay, weight, lamtha)
 
@@ -76,7 +76,7 @@ for target in ['L5_pyramidal', 'L5_pyramidal']:
 location, receptor = 'soma', 'gabaa'
 weight, delay, lamtha = 1.0, 1.0, 70
 src = 'L2_basket'
-for target in ['L2_basket', 'L5_pyramidal']:
+for target in ['L5_pyramidal', 'L2_basket']:
     net_all.add_connection(src, target, location, receptor,
                            delay, weight, lamtha)
 
@@ -84,11 +84,14 @@ dpl_all = simulate_dipole(net_all, n_trials=1)
 net_all.cell_response.plot_spikes_raster()
 
 ###############################################################################
-# That's a lot of spiking! We can additionally use the ``probability``.
-# argument to create a sparse connectivity pattern instead of all-to-all. Let's
-# try creating the same network with a 10% change of cells connecting
-# to each other. The resulting connectivity pattern can also be visualized
-# with ``net.connectivity[idx].plot()``
+# With the previous connection pattern there appears to be synchronous rhythmic
+# firing of the L5 pyramidal cells with a period of 10 ms. The synchronous
+# activity is visible as vertical lines where several cells fire simultaneously
+# We can additionally use the ``probability``. argument to create a sparse
+# connectivity pattern instead of all-to-all. Let's try creating the same
+# network with a 10% chance of cells connecting to each other. The resulting
+# connectivity pattern can also be visualized with
+# ``net.connectivity[idx].plot()``
 probability = 0.1
 net_sparse = Network(params, add_drives_from_params=True)
 
@@ -104,7 +107,7 @@ for target in ['L5_pyramidal', 'L2_basket']:
 location, receptor = 'soma', 'gabaa'
 weight, delay, lamtha = 1.0, 1.0, 70
 src = 'L2_basket'
-for target in ['L2_basket', 'L5_pyramidal']:
+for target in ['L5_pyramidal', 'L2_basket']:
     net_sparse.add_connection(src, target, location, receptor,
                               delay, weight, lamtha, probability)
 
@@ -114,10 +117,9 @@ net_sparse.connectivity[-2].plot()
 net_sparse.connectivity[-1].plot()
 
 ###############################################################################
-# Using the sparse connectivity pattern led produced a lot more spiking in
-# the L5 pyramidal cells. While there are less excitatory connections overall,
-# there was also a decrease in the inhibtory connections. This shift in
-# activity is often referred to as the excitatory/inhibitory (E/I) balance.
+# Using the sparse connectivity pattern produced a lot more spiking in
+# the L5 pyramidal cells. Nevertheless there appears to be some rhythmicity
+# where the cells are firing synchronously with a smaller period of 4-5 ms.
 # As a final step, we can see how this change in spiking activity impacts
 # the aggregate current dipole.
 import matplotlib.pyplot as plt
