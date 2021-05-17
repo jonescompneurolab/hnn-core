@@ -15,6 +15,7 @@ Simulation (:py:mod:`hnn_core`):
    :toctree: generated/
 
    simulate_dipole
+   default_network
    Network
    Cell
    CellResponse
