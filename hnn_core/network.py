@@ -759,8 +759,8 @@ class Network(object):
     def _gid_to_cell(self, gid):
         """Reverse lookup of gid to cell.
 
-        Returns None if not a cell
-        Should only be called after self.cells is populated
+        Returns None if not a cell; should only be called after self.cells is
+        populated.
         """
         src_type = self.gid_to_type(gid)
         if src_type not in self.cell_types:
