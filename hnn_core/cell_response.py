@@ -27,6 +27,12 @@ class CellResponse(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network().gid_ranges.
+    times : numpy array | None
+        Array of time points for samples in continuous data.
+        This includes vsoma and isoma.
+    cell_type_names : list
+        List of unique cell type names that are explicitly modeled in the
+        network
 
     Attributes
     ----------
@@ -48,7 +54,6 @@ class CellResponse(object):
     isoma : list (n_trials,) of dict, shape
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing somatic currents.
-
     times : numpy array
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
@@ -70,7 +75,10 @@ class CellResponse(object):
     """
 
     def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
-                 times=None):
+                 times=None, cell_type_names=['L2_basket',
+                                              'L2_pyramidal',
+                                              'L5_basket',
+                                              'L5_pyramidal']):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
@@ -106,6 +114,7 @@ class CellResponse(object):
             if not isinstance(times, np.ndarray):
                 raise TypeError("'times' is an np.ndarray of simulation times")
         self._times = times
+        self._cell_type_names = cell_type_names
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -281,7 +290,6 @@ class CellResponse(object):
         spike_rate : dict
             Dictionary with keys 'L5_pyramidal', 'L5_basket', etc.
         """
-        cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
         spike_rates = dict()
 
         if mean_type not in ['all', 'trial', 'cell']:
@@ -295,7 +303,7 @@ class CellResponse(object):
         elif tstop <= tstart:
             raise ValueError('tstop must be greater than tstart')
 
-        for cell_type in cell_types:
+        for cell_type in self._cell_type_names:
             cell_type_gids = np.array(gid_ranges[cell_type])
             n_trials, n_cells = len(self._spike_times), len(cell_type_gids)
             gid_spike_rate = np.zeros((n_trials, n_cells))

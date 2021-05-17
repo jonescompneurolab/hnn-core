@@ -162,12 +162,6 @@ class Network(object):
         # creates nc_dict-entries for ALL cell types
         self._legacy_mode = legacy_mode
 
-        # Create array of equally sampled time points for simulating currents
-        # NB (only) used to initialise self.cell_response._times
-        times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
-        # Create CellResponse object, initialised with simulation time points
-        self.cell_response = CellResponse(times=times)
-
         # Source dict of names, first real ones only!
         self.cell_types = {
             'L2_basket': basket(cell_name=_short_name('L2_basket')),
@@ -175,6 +169,14 @@ class Network(object):
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
         }
+
+        # Create array of equally sampled time points for simulating currents
+        # NB (only) used to initialise self.cell_response._times
+        times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
+        cell_type_names = list(self.cell_types.keys())
+        # Create CellResponse object, initialised with simulation time points
+        self.cell_response = CellResponse(times=times,
+                                          cell_type_names=cell_type_names)
 
         # external drives and biases
         self.external_drives = dict()
