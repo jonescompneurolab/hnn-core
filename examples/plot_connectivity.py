@@ -45,8 +45,8 @@ print(net_erp.connectivity[0:2])
 
 ###############################################################################
 # Data recorded during simulations are stored under
-# :class:`~hnn_core.Cell_Response`. To test multiple network structures, we can
-# create a copy of the original network. The copied network is then simulated.
+# :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
+# a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 dpl_erp = simulate_dipole(net_erp, n_trials=1)
 net_erp.cell_response.plot_spikes_raster()
 
