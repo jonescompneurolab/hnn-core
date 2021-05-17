@@ -92,12 +92,6 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     return pos_dict
 
 
-# connections:
-# this NODE is aware of its cells as targets
-# for each syn, return list of source GIDs.
-# for each item in the list, do a:
-# nc = pc.gid_connect(source_gid, target_syn), weight,delay
-# Both for synapses AND for external inputs
 def default_network(params, add_drives_from_params=False):
     """Instantiate the default all-to-all connected network.
 
