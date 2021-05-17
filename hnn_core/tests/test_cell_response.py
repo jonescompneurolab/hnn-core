@@ -36,9 +36,10 @@ def test_cell_response(tmpdir):
     assert len(cell_response.times) == len(sim_times)
     sim_attributes = ['_spike_times', '_spike_gids', '_spike_types',
                       '_vsoma', '_isoma']
-    net_attributes = ['_times']  # `Network.__init__` creates these
-    # check that we always know which response attributes are simulated
-    # see #291 for discussion; objective is to keep cell_response size small
+    net_attributes = ['_times', '_cell_type_names']  # `Network.__init__`
+    # creates these check that we always know which response attributes are
+    # simulated see #291 for discussion; objective is to keep cell_response
+    # size small
     assert list(cell_response.__dict__.keys()) == \
         sim_attributes + net_attributes
     for attr in sim_attributes:  # populated by `simulate_dipole`
