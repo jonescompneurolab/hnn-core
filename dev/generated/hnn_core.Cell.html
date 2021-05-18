@@ -127,7 +127,7 @@
 <h1>hnn_core.Cell<a class="headerlink" href="#hnn-core-cell" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.Cell">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_secs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_syn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a cell object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -136,14 +136,58 @@
 </dd>
 <dt><strong>pos</strong><span class="classifier">tuple</span></dt><dd><p>The (x, y, z) coordinates.</p>
 </dd>
+<dt><strong>p_secs</strong><span class="classifier">nested dict</span></dt><dd><p>Dictionary with keys as section name.
+p_secs[sec_name] is a dictionary with keys
+L, diam, Ra, cm, syns and mech.
+syns is a list specifying the synapses at that section.
+The properties of syn are specified in p_syn.
+mech is a dict with keys as the mechanism names. The
+values are dictionaries with properties of the mechanism.</p>
+</dd>
+<dt><strong>p_syn</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
+has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
+‘tau2’.</p>
+</dd>
+<dt><strong>topology</strong><span class="classifier">list of list</span></dt><dd><p>The topology of cell sections. Each element is a list of
+4 items in the format
+[parent_sec, parent_loc, child_sec, child_loc] where
+parent_sec and parent_loc are float between 0 and 1
+specifying the location in the section to connect and
+parent_sec and child_sec are names of the connecting
+sections.</p>
+</dd>
+<dt><strong>sect_loc</strong><span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
+names of section locations that are proximal or distal.</p>
+</dd>
 <dt><strong>gid</strong><span class="classifier">int or None (optional)</span></dt><dd><p>Each cell in a network is uniquely identified by it’s “global ID”: GID.
 The GID is an integer from 0 to n_cells, or None if the cell is not
 yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Attributes</dt>
-<dd class="field-even"><dl class="simple">
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p_secs</span> <span class="o">=</span> <span class="p">{</span>
+<span class="go">    &#39;soma&#39;:</span>
+<span class="go">    {</span>
+<span class="go">        &#39;L&#39;: 39,</span>
+<span class="go">        &#39;diam&#39;: 20,</span>
+<span class="go">        &#39;cm&#39;: 0.85,</span>
+<span class="go">        &#39;Ra&#39;: 200.,</span>
+<span class="go">        &#39;sec_pts&#39;: [[0, 0, 0], [0, 39., 0]],</span>
+<span class="go">        &#39;syns&#39;: [&#39;ampa&#39;, &#39;gabaa&#39;, &#39;nmda&#39;],</span>
+<span class="go">        &#39;mechs&#39; : {</span>
+<span class="go">            &#39;ca&#39;: {</span>
+<span class="go">                &#39;gbar_ca&#39;: 60</span>
+<span class="go">            }</span>
+<span class="go">        }</span>
+<span class="go">    }</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>pos</strong><span class="classifier">list of length 3</span></dt><dd><p>The position of the cell.</p>
 </dd>
 <dt><strong>sections</strong><span class="classifier">dict</span></dt><dd><p>The sections. The key is the name of the section
@@ -178,28 +222,25 @@ names of section locations that are proximal or distal.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.build" title="hnn_core.Cell.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(p_secs, p_syn, topology, sect_loc)</p></td>
-<td><p>Build cell in Neuron.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.build" title="hnn_core.Cell.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>([sec_name_apical])</p></td>
+<td><p>Build cell in Neuron and insert dipole if applicable.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tonic_bias</span></code></a>(amplitude, t0, T[, loc])</p></td>
 <td><p>Create tonic bias at the soma.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.insert_dipole" title="hnn_core.Cell.insert_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert_dipole</span></code></a>(p_secs, sec_name_apical)</p></td>
-<td><p>Insert dipole into each section of this cell.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.move_to_pos" title="hnn_core.Cell.move_to_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.move_to_pos" title="hnn_core.Cell.move_to_pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move_to_pos</span></code></a>()</p></td>
 <td><p>Move cell to position.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, postsyn)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, postsyn)</p></td>
 <td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
 <td><p>Record current and voltage at soma.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
 <td><p>Created for _PC.cell and specifies SOURCES of spikes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
 <td><p>Create an h.Exp2Syn synapse.</p></td>
 </tr>
 </tbody>
@@ -212,56 +253,18 @@ names of section locations that are proximal or distal.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Cell.build">
-<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_secs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_syn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Cell.build" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build cell in Neuron.</p>
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sec_name_apical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Cell.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build cell in Neuron and insert dipole if applicable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>p_secs</strong><span class="classifier">nested dict</span></dt><dd><p>Dictionary with keys as section name.
-p_secs[sec_name] is a dictionary with keys
-L, diam, Ra, cm, syns and mech.
-syns is a list specifying the synapses at that section.
-The properties of syn are specified in p_syn.
-mech is a dict with keys as the mechanism names. The
-values are dictionaries with properties of the mechanism.</p>
-</dd>
-<dt><strong>p_syn</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
-has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
-‘tau2’.</p>
-</dd>
-<dt><strong>topology</strong><span class="classifier">list of list</span></dt><dd><p>The topology of cell sections. Each element is a list of
-4 items in the format
-[parent_sec, parent_loc, child_sec, child_loc] where
-parent_sec and parent_loc are float between 0 and 1
-specifying the location in the section to connect and
-parent_sec and child_sec are names of the connecting
-sections.</p>
-</dd>
-<dt><strong>sect_loc</strong><span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
-names of section locations that are proximal or distal.</p>
+<dt><strong>sec_name_apical</strong><span class="classifier">str | None</span></dt><dd><p>If not None, a dipole will be inserted in this cell in alignment
+with this section. The section should belong to the apical dendrite
+of a pyramidal neuron.</p>
 </dd>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p_secs</span> <span class="o">=</span> <span class="p">{</span>
-<span class="go">    &#39;soma&#39;:</span>
-<span class="go">    {</span>
-<span class="go">        &#39;L&#39;: 39,</span>
-<span class="go">        &#39;diam&#39;: 20,</span>
-<span class="go">        &#39;cm&#39;: 0.85,</span>
-<span class="go">        &#39;Ra&#39;: 200.,</span>
-<span class="go">        &#39;sec_pts&#39;: [[0, 0, 0], [0, 39., 0]],</span>
-<span class="go">        &#39;syns&#39;: [&#39;ampa&#39;, &#39;gabaa&#39;, &#39;nmda&#39;],</span>
-<span class="go">        &#39;mechs&#39; : {</span>
-<span class="go">            &#39;ca&#39;: {</span>
-<span class="go">                &#39;gbar_ca&#39;: 60</span>
-<span class="go">            }</span>
-<span class="go">        }</span>
-<span class="go">    }</span>
-<span class="go">}</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py method">
@@ -278,28 +281,6 @@ names of section locations that are proximal or distal.</p>
 <dt><strong>T</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms).</p>
 </dd>
 <dt><strong>loc</strong><span class="classifier">float (0 to 1)</span></dt><dd><p>The location of the input in the soma section.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.Cell.insert_dipole">
-<span class="sig-name descname"><span class="pre">insert_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_secs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sec_name_apical</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Cell.insert_dipole" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert dipole into each section of this cell.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>p_secs</strong><span class="classifier">nested dict</span></dt><dd><p>Dictionary with keys as section name.
-p_secs[sec_name] is a dictionary with keys
-L, diam, Ra, cm, syns and mech.
-syns is a list specifying the synapses at that section.
-The properties of syn are specified in p_syn.
-mech is a dict with keys as the mechanism names. The
-values are dictionaries with properties of the mechanism.</p>
-</dd>
-<dt><strong>sec_name_apical</strong><span class="classifier">str</span></dt><dd><p>The name of the section along which dipole moment is calculated.</p>
 </dd>
 </dl>
 </dd>

@@ -148,17 +148,23 @@ are added suitably. Will be deprecated in a future release.</p>
 </dd>
 <dt class="field-even">Attributes</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>cellname_list</strong><span class="classifier">list</span></dt><dd><p>The names of real cell types in the network (e.g. ‘L2_basket’)</p>
+<dt><strong>cell_types</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing names of real cell types in the network
+(e.g. ‘L2_basket’) as keys and corresponding Cell instances as values.
+The Cell instance associated with a given key is used as a template
+for the other cells of its type in the population.</p>
 </dd>
 <dt><strong>gid_ranges</strong><span class="classifier">dict</span></dt><dd><p>A dictionary of unique identifiers of each real and artificial cell
 in the network. Every cell type is represented by a key read from
-cellname_list, followed by keys read from external_drives. The value
+cell_types, followed by keys read from external_drives. The value
 of each key is a range of ints, one for each cell in given category.
 Examples: ‘L2_basket’: range(0, 270), ‘evdist1’: range(272, 542), etc</p>
 </dd>
 <dt><strong>pos_dict</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing the coordinate positions of all cells.
 Keys are ‘L2_pyramidal’, ‘L5_pyramidal’, ‘L2_basket’, ‘L5_basket’,
 or any external drive name</p>
+</dd>
+<dt><strong>cells</strong><span class="classifier">list of Cell objects.</span></dt><dd><p>The list of cells of the network, each containing features used in a
+NEURON simulation.</p>
 </dd>
 <dt><strong>cell_response</strong><span class="classifier">CellResponse</span></dt><dd><p>An instance of the CellResponse object.</p>
 </dd>
@@ -412,7 +418,7 @@ weigths and delays within the simulated column</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cell_type</strong><span class="classifier">str</span></dt><dd><p>The cell type whose cells will get the tonic input.
-Valid inputs are those in <em class="xref py py-obj">net.cellname_list</em>.</p>
+Valid inputs are those in <em class="xref py py-obj">net.cell_types</em>.</p>
 </dd>
 <dt><strong>amplitude</strong><span class="classifier">float</span></dt><dd><p>The amplitude of the input.</p>
 </dd>

@@ -262,7 +262,7 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
 .. GENERATED FROM PYTHON SOURCE LINES 85-90
 
-As a final exercise, let us try to re-run the simulation with a tonic bias
+Now, let us try to re-run the simulation with a tonic bias
 applied to the L5 Pyramidal cells. Notice that the oscillation waveform is
 more regular, with less noise due to the fact that the tonic depolarization
 dominates over the influence of the Poisson drive. By default, a tonic bias
@@ -391,7 +391,76 @@ frequency is lower compared with the "weak" PING simulation above.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-120
+.. GENERATED FROM PYTHON SOURCE LINES 112-117
+
+Finally, we demonstrate the mechanistic link between PING and the GABAA decay
+time constant (`tau2`). Using the same network/drive configuration as before,
+we decrease `tau2` from 5 to 2 ms. This will shorten the effective
+refactory period between L5 pyramidal cell spikes and increase the PING
+frequency from ~50 to ~65 Hz.
+
+.. GENERATED FROM PYTHON SOURCE LINES 117-126
+
+.. code-block:: default
+
+    net.cell_types['L5_pyramidal'].p_syn['gabaa']['tau2'] = 2
+    dpls = simulate_dipole(net, n_trials=1)
+
+    fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
+                             constrained_layout=True)
+    dpls[trial_idx].plot(ax=axes[0], show=False)
+    net.cell_response.plot_spikes_raster(ax=axes[1], show=False)
+    dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[2])
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_simulate_gamma_006.png
+    :alt: Aggregate (L2 + L5)
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    joblib will run over 1 jobs
+    Building the NEURON model
+    [Done]
+    running trial 1 on 1 cores
+    Simulation time: 0.03 ms...
+    Simulation time: 10.0 ms...
+    Simulation time: 20.0 ms...
+    Simulation time: 30.0 ms...
+    Simulation time: 40.0 ms...
+    Simulation time: 50.0 ms...
+    Simulation time: 60.0 ms...
+    Simulation time: 70.0 ms...
+    Simulation time: 80.0 ms...
+    Simulation time: 90.0 ms...
+    Simulation time: 100.0 ms...
+    Simulation time: 110.0 ms...
+    Simulation time: 120.0 ms...
+    Simulation time: 130.0 ms...
+    Simulation time: 140.0 ms...
+    Simulation time: 150.0 ms...
+    Simulation time: 160.0 ms...
+    Simulation time: 170.0 ms...
+    Simulation time: 180.0 ms...
+    Simulation time: 190.0 ms...
+    Simulation time: 200.0 ms...
+    Simulation time: 210.0 ms...
+    Simulation time: 220.0 ms...
+    Simulation time: 230.0 ms...
+    Simulation time: 240.0 ms...
+
+    <Figure size 600x600 with 4 Axes>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 127-135
 
 References
 ----------
@@ -405,7 +474,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 5 minutes  32.929 seconds)
+   **Total running time of the script:** ( 10 minutes  56.077 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_gamma.py:
