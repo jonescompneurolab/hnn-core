@@ -279,6 +279,13 @@ class Network(object):
         Firing threshold of all cells.
     delay : float
         Synaptic delay in ms.
+
+    Notes
+    ----
+    `net = default_network(params)` is the reccomended path for creating a
+    network. Instantiating the network as `net = Network(params)` will
+    produce a network with no cell to cell connections. As such,
+    connectivity information contained in `params` will be ignored.
     """
 
     def __init__(self, params, add_drives_from_params=False,
