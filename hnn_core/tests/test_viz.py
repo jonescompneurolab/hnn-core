@@ -21,6 +21,7 @@ def test_network_visualization():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3})
     net = default_network(params)
+    plot_cells(net)
     ax = net.cell_types['L2_pyramidal'].plot_morphology()
     assert len(ax.lines) == 8
 
