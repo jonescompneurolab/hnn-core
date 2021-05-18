@@ -10,7 +10,6 @@ This example demonstrates how to modify the network connectivity.
 
 # sphinx_gallery_thumbnail_number = 5
 
-from hnn_core.network import Network
 import os.path as op
 
 ###############################################################################
