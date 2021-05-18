@@ -6,8 +6,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, default_network
-from hnn_core.viz import (plot_cells, plot_dipole, plot_psd, plot_tfr_morlet,
-                          plot_cell_morphology)
+from hnn_core.viz import plot_cells, plot_dipole, plot_psd, plot_tfr_morlet
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
