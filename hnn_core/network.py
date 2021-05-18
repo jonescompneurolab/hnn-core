@@ -1166,8 +1166,22 @@ class Network(object):
             conn['gid_pairs'].pop(src_gid)
 
     def clear_connectivity(self):
-        """Remove all connections defined in Network.connectivity_list"""
-        self.connectivity = list()
+        """Remove all connections defined in Network.connectivity
+        """
+        connectivity = list()
+        for conn in self.connectivity:
+            if conn['src_type'] in self.external_drives.keys():
+                connectivity.append(conn)
+        self.connectivity = connectivity
+
+    def clear_drives(self):
+        """Remove all drives defined in Network.connectivity"""
+        connectivity = list()
+        for conn in self.connectivity:
+            if conn['src_type'] not in self.external_drives.keys():
+                connectivity.append(conn)
+        self.external_drives = dict()
+        self.connectivity = connectivity
 
     def plot_cell_morphology(self, axes=None, cell_types=None, show=True):
         """Plot the cell morphology.
