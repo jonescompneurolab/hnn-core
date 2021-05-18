@@ -774,16 +774,6 @@ class Network(object):
             cell = self.cells[src_type][type_pos_ind]
         return cell
 
-    def _get_src_type_and_pos(self, gid):
-        """Source type, position and whether it's a cell or external drive"""
-
-        # get type of cell and pos via gid
-        src_type = self.gid_to_type(gid)
-        type_pos_ind = gid - self.gid_ranges[src_type][0]
-        src_pos = self.pos_dict[src_type][type_pos_ind]
-
-        return src_type, src_pos, src_type in self.cell_types
-
     # connections:
     # this NODE is aware of its cells as targets
     # for each syn, return list of source GIDs.
