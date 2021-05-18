@@ -6,8 +6,6 @@
 import numpy as np
 from itertools import cycle
 
-from .params_default import _secs_L2Pyr, _secs_L5Pyr, _secs_Basket
-
 
 def _get_plot_data(dpl, layer, tmin, tmax):
     plot_tmin = dpl.times[0]
@@ -551,7 +549,7 @@ def plot_cell_morphology(cell, ax, show=True):
     from mpl_toolkits.mplot3d import Axes3D  # noqa
 
     if ax is None:
-        fig = plt.figure()
+        plt.figure()
         ax = plt.axes(projection='3d')
 
     ax.set_ylim((-100, 1200))
