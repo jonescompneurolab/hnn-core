@@ -17,7 +17,7 @@ from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
 from .cell_response import CellResponse
 from .params import _long_name, _short_name
-from .viz import plot_cells, plot_cell_morphology, plot_connectivity_matrix
+from .viz import plot_cells, plot_connectivity_matrix
 from .externals.mne import _validate_type, _check_option
 
 
@@ -1184,27 +1184,6 @@ class Network(object):
                 connectivity.append(conn)
         self.external_drives = dict()
         self.connectivity = connectivity
-
-    def plot_cell_morphology(self, axes=None, cell_types=None, show=True):
-        """Plot the cell morphology.
-
-        Parameters
-        ----------
-        axes : list of instance of Axes3D
-            Matplotlib 3D axis
-        cell_types : str | list of str
-            The cell types. Valid cell types are 'L2Pyr', 'L5Pyr',
-            'L2Basket', and 'L5Basket'.
-        show : bool
-            If True, show the plot
-
-        Returns
-        -------
-        axes : list of instance of Axes3D
-            The matplotlib 3D axis handle.
-        """
-        return plot_cell_morphology(axes=axes, cell_types=cell_types,
-                                    show=show)
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

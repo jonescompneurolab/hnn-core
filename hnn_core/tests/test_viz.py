@@ -21,12 +21,8 @@ def test_network_visualization():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3})
     net = default_network(params)
-    plot_cells(net)
-    with pytest.raises(ValueError, match='Unrecognized cell type'):
-        plot_cell_morphology(cell_types='blah')
-    axes = plot_cell_morphology(cell_types='L2Pyr')
-    assert len(axes) == 1
-    assert len(axes[0].lines) == 8
+    ax = net.cell_types['L2_pyramidal'].plot_morphology()
+    assert len(ax.lines) == 8
 
 
 def test_dipole_visualization():

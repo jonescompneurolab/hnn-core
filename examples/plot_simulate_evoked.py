@@ -13,10 +13,12 @@ waveforms using HNN-core.
 #          Blake Caldwell <blake_caldwell@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
-# sphinx_gallery_thumbnail_number = 2
+# sphinx_gallery_thumbnail_number = 3
 
 import os.path as op
 import tempfile
+
+import matplotlib.pyplot as plt
 
 ###############################################################################
 # Let us import hnn_core
@@ -44,7 +46,7 @@ print(params['L2Pyr_soma*'])
 # inside it.
 net = default_network(params)
 net.plot_cells()
-net.plot_cell_morphology()
+net.cell_types['L5_pyramidal'].plot_morphology()
 
 ###############################################################################
 # The network of cells is now defined, to which we add external drives as

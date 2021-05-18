@@ -366,14 +366,9 @@ def _secs_Basket():
     sec_pts = {
         'soma': [[0, 0, 0], [0, 39., 0]],
     }
-    sec_lens = {
-        'soma': 39.
-    }
-    sec_diams = {
-        'soma': 20.
-    }
+
     topology = None
-    return sec_pts, sec_lens, sec_diams, topology
+    return sec_pts, topology
 
 
 def _secs_L2Pyr():
@@ -387,27 +382,6 @@ def _secs_L2Pyr():
         'basal_1': [[-50, 765, 0], [-50, 715, 0]],
         'basal_2': [[-50, 715, 0], [-156, 609, 0]],
         'basal_3': [[-50, 715, 0], [56, 609, 0]],
-    }
-    # increased by 70% for human
-    sec_lens = {  # microns
-        'soma': 22.1,
-        'apical_trunk': 59.5,
-        'apical_oblique': 340,
-        'apical_1': 306,
-        'apical_tuft': 238,
-        'basal_1': 85,
-        'basal_2': 255,
-        'basal_3': 255
-    }
-    sec_diams = {  # microns
-        'soma': 23.4,
-        'apical_trunk': 4.25,
-        'apical_oblique': 3.91,
-        'apical_1': 4.08,
-        'apical_tuft': 3.4,
-        'basal_1': 4.25,
-        'basal_2': 2.72,
-        'basal_3': 2.72
     }
 
     # parent, parent_end, child, {child_start=0}
@@ -423,7 +397,7 @@ def _secs_L2Pyr():
         ['basal_1', 1, 'basal_2', 0],
         ['basal_1', 1, 'basal_3', 0]
     ]
-    return sec_pts, sec_lens, sec_diams, topology
+    return sec_pts, topology
 
 
 def _secs_L5Pyr():
@@ -439,28 +413,6 @@ def _secs_L5Pyr():
         'basal_2': [[0, -50, 0], [-106, -156, 0]],
         'basal_3': [[0, -50, 0], [106, -156, 0]]
     }
-    sec_lens = {  # microns
-        'soma': 39,
-        'apical_trunk': 102,
-        'apical_oblique': 255,
-        'apical_1': 680,
-        'apical_2': 680,
-        'apical_tuft': 425,
-        'basal_1': 85,
-        'basal_2': 255,
-        'basal_3': 255
-    }
-    sec_diams = {  # microns
-        'soma': 28.9,
-        'apical_trunk': 10.2,
-        'apical_oblique': 5.1,
-        'apical_1': 7.48,
-        'apical_2': 4.93,
-        'apical_tuft': 3.4,
-        'basal_1': 6.8,
-        'basal_2': 8.5,
-        'basal_3': 8.5
-    }
 
     topology = [
         # Distal (Apical)
@@ -475,4 +427,4 @@ def _secs_L5Pyr():
         ['basal_1', 1, 'basal_2', 0],
         ['basal_1', 1, 'basal_3', 0]
     ]
-    return sec_pts, sec_lens, sec_diams, topology
+    return sec_pts, topology
