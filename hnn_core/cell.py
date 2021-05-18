@@ -8,6 +8,8 @@ from numpy.linalg import norm
 
 from neuron import h, nrn
 
+from .viz import plot_cell_morphology
+
 # Units for e: mV
 # Units for gbar: S/cm^2
 
@@ -497,3 +499,20 @@ class Cell:
         dx = self.pos[0] - pos_pre[0]
         dy = self.pos[1] - pos_pre[1]
         return np.sqrt(dx**2 + dy**2)
+
+    def plot_morphology(self, ax=None, cell_types=None, show=True):
+        """Plot the cell morphology.
+
+        Parameters
+        ----------
+        ax : instance of Axes3D
+            Matplotlib 3D axis
+        show : bool
+            If True, show the plot
+
+        Returns
+        -------
+        axes : instance of Axes3D
+            The matplotlib 3D axis handle.
+        """
+        return plot_cell_morphology(self, ax=ax, show=show)

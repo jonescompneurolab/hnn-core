@@ -183,7 +183,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     p_secs['soma']['syns'] = list(p_syn.keys())
     p_secs['soma']['mechs'] = {'hh2': dict()}
 
-    sec_pts, _, _, topology = _secs_Basket()
+    sec_pts, topology = _secs_Basket()
     for sec_name in p_secs:
         p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
 
@@ -228,7 +228,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         section_names = ['apical_trunk', 'apical_1',
                          'apical_2', 'apical_tuft',
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        sec_pts, _, _, topology = _secs_L5Pyr()
+        sec_pts, topology = _secs_L5Pyr()
     elif cell_name == 'L2Pyr':
         p_all_default = get_L2Pyr_params_default()
         mechanisms = {
@@ -237,7 +237,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
                     'gl_hh2', 'el_hh2']}
         section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
                          'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        sec_pts, _, _, topology = _secs_L2Pyr()
+        sec_pts, topology = _secs_L2Pyr()
     else:
         raise ValueError(f'Unknown pyramidal cell type: {cell_name}')
 
