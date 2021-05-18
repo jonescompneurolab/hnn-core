@@ -52,17 +52,18 @@ net_erp.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can also define our own connections to test the effect of different
-# connectivity patterns. To start, an empty network is instantiated.
-# ``add_drives_from_params`` can still be used with an empty Network, but
-# all cells will start disconnected. ``net.add_connection`` is then
-# used to create a custom network. Let us first create an all-to-all
-# connectivity pattern between the L5 pyramidal cells, and L2 basket cells.
-# :meth:`hnn_core.Network.add_connection` allows connections to be specified
-# with either cell names, or the gids directly. If multiple gids are provided
-# for either the sources or the targets, they will be connected in an
-# all-to-all pattern.
+# connectivity patterns. To start, ``net.clear_connectivity()`` can be used
+# to clear all cell to cell connections. By default, previously defined drives
+# to the network are retained, but can be removed with ``net.clear_drives()``.
+# ``net.add_connection`` is then used to create a custom network. Let us first
+# create an all-to-all connectivity pattern between the L5 pyramidal cells,
+# and L2 basket cells. :meth:`hnn_core.Network.add_connection` allows
+# connections to be specified with either cell names, or the gids directly.
+# If multiple gids are provided for either the sources or the targets,
+# they will be connected in an all-to-all pattern.
 
-net_all = Network(params, add_drives_from_params=True)
+net_all = default_network(params, add_drives_from_params=True)
+net_all.clear_connectivity()
 
 # Pyramidal cell connections
 location, receptor = 'distal', 'ampa'
@@ -93,7 +94,8 @@ net_all.cell_response.plot_spikes_raster()
 # connectivity pattern can also be visualized with
 # ``net.connectivity[idx].plot()``
 probability = 0.1
-net_sparse = Network(params, add_drives_from_params=True)
+net_sparse = default_network(params, add_drives_from_params=True)
+net_sparse.clear_connectivity()
 
 # Pyramidal cell connections
 location, receptor = 'distal', 'ampa'

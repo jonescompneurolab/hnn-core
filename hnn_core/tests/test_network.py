@@ -246,7 +246,11 @@ def test_network():
         kwargs['probability'] = -1.0
         net.add_connection(**kwargs)
 
+    # Test removing connections from net.connectivity
+    # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
+    assert len(net.connectivity) == 22
+    net.clear_drives()
     assert len(net.connectivity) == 0
 
 
