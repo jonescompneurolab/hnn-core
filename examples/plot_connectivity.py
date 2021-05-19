@@ -114,6 +114,7 @@ for target in ['L5_pyramidal', 'L2_basket']:
 
 dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
 net_sparse.cell_response.plot_spikes_raster()
+
 net_sparse.connectivity[-2].plot()
 net_sparse.connectivity[-1].plot()
 
