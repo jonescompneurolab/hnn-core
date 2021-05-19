@@ -60,7 +60,7 @@ Let us import hnn_core
 
 
     import hnn_core
-    from hnn_core import simulate_dipole, read_params, Network
+    from hnn_core import simulate_dipole, read_params, default_network
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -127,7 +127,7 @@ simulate the dipole moment in a single trial (the default value used by
 .. code-block:: default
 
 
-    net = Network(params)
+    net = default_network(params)
 
     weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
     synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
@@ -474,7 +474,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 10 minutes  56.077 seconds)
+   **Total running time of the script:** ( 4 minutes  2.369 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_gamma.py:

@@ -246,7 +246,7 @@ to 1</p>
 <dt class="sig sig-object py" id="hnn_core.dipole.Dipole.plot_psd">
 <span class="sig-name descname"><span class="pre">plot_psd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.plot_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot power spectral density (PSD) of dipole time course</p>
-<p>Applies <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.periodogram.html#scipy.signal.periodogram" title="(in SciPy v1.7.0.dev0+1003.74254db)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">periodogram</span></code></a> from SciPy with
+<p>Applies <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.periodogram.html#scipy.signal.periodogram" title="(in SciPy v1.7.0.dev0+1022.7b90b3a)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">periodogram</span></code></a> from SciPy with
 <code class="docutils literal notranslate"><span class="pre">window='hamming'</span></code>.
 Note that no spectral averaging is applied across time, as most
 <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> simulations are short-duration. However, passing a list of
@@ -309,7 +309,7 @@ simulation.</p>
 <dt><strong>layer</strong><span class="classifier">str, default ‘agg’</span></dt><dd><p>The layer to plot. Can be one of ‘agg’, ‘L2’, and ‘L5’</p>
 </dd>
 <dt><strong>decim</strong><span class="classifier">int or list of int or None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole
-traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.7.0.dev0+1003.74254db)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
+traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.7.0.dev0+1022.7b90b3a)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
 which recommends values &lt;13. To achieve higher decimation factors,
 a list of ints can be provided. These are applied successively.</p>
 </dd>
@@ -345,7 +345,7 @@ limits. Possible values are: ‘zeros’ for padding with 0’s
 If you prefer a filtered copy, consider using the
 <a class="reference internal" href="#hnn_core.dipole.Dipole.copy" title="hnn_core.dipole.Dipole.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a>-method. The high-frequency cutoff
 value of a Savitzky-Golay filter is approximate; see the SciPy
-reference: <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.7.0.dev0+1003.74254db)"><code class="xref py py-func docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>.</p>
+reference: <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.7.0.dev0+1022.7b90b3a)"><code class="xref py py-func docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">

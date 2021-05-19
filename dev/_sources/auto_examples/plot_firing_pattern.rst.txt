@@ -53,7 +53,7 @@ Let us import ``hnn_core``.
 
 
     import hnn_core
-    from hnn_core import read_params, read_spikes, Network, simulate_dipole
+    from hnn_core import read_params, read_spikes, default_network, simulate_dipole
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -93,7 +93,7 @@ Now let's build the network. We have used the same weights as in the
 
     import matplotlib.pyplot as plt
 
-    net = Network(params)
+    net = default_network(params)
 
 
 
@@ -430,7 +430,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  37.823 seconds)
+   **Total running time of the script:** ( 1 minutes  3.741 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

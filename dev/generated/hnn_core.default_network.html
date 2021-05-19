@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>hnn_core.viz.plot_dipole &#8212; hnn-core  documentation</title>
+    <title>hnn_core.default_network &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -73,8 +73,8 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">hnn_core.viz.plot_dipole</a><ul>
-<li><a class="reference internal" href="#examples-using-hnn-core-viz-plot-dipole">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_dipole</span></code></a></li>
+<li><a class="reference internal" href="#">hnn_core.default_network</a><ul>
+<li><a class="reference internal" href="#examples-using-hnn-core-default-network">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.default_network</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -88,7 +88,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/generated/hnn_core.viz.plot_dipole.rst.txt"
+  <a href="../_sources/generated/hnn_core.default_network.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -126,46 +126,36 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <section id="hnn-core-viz-plot-dipole">
-<h1>hnn_core.viz.plot_dipole<a class="headerlink" href="#hnn-core-viz-plot-dipole" title="Permalink to this headline">¶</a></h1>
+  <section id="hnn-core-default-network">
+<h1>hnn_core.default_network<a class="headerlink" href="#hnn-core-default-network" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="hnn_core.viz.plot_dipole">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_dipole" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple layer-specific plot function.</p>
+<dt class="sig sig-object py" id="hnn_core.default_network">
+<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">default_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.default_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate the default all-to-all connected network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole instances</span></dt><dd><p>The Dipole object.</p>
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>The parameters to use for constructing the network.</p>
 </dd>
-<dt><strong>tmin</strong><span class="classifier">float or None</span></dt><dd><p>Start time of plot in milliseconds. If None, plot entire simulation.</p>
-</dd>
-<dt><strong>tmax</strong><span class="classifier">float or None</span></dt><dd><p>End time of plot in milliseconds. If None, plot entire simulation.</p>
-</dd>
-<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis</p>
-</dd>
-<dt><strong>layer</strong><span class="classifier">str</span></dt><dd><p>The layer to plot. Can be one of
-‘agg’, ‘L2’, and ‘L5’</p>
-</dd>
-<dt><strong>decim</strong><span class="classifier">int or list of int or None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole traces.
-The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.7.0.dev0+1022.7b90b3a)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used, which
-recommends values &lt;13. To achieve higher decimation factors, a list of
-ints can be provided. These are applied successively.</p>
-</dd>
-<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
+<dt><strong>add_drives_from_params</strong><span class="classifier">bool</span></dt><dd><p>If True, add drives as defined in the params-dict. NB this is mainly
+for backward-compatibility with HNN GUI, and will be deprecated in a
+future release. Default: False</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>fig</strong><span class="classifier">instance of plt.fig</span></dt><dd><p>The matplotlib figure handle.</p>
+<dt><strong>net</strong><span class="classifier">Instance of Network object</span></dt><dd><p>Network object used to store the default network.
+All connections defining the default network will be
+appeneded to net.connectivity.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-<section id="examples-using-hnn-core-viz-plot-dipole">
-<span id="sphx-glr-backreferences-hnn-core-viz-plot-dipole"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_dipole</span></code><a class="headerlink" href="#examples-using-hnn-core-viz-plot-dipole" title="Permalink to this headline">¶</a></h2>
+<section id="examples-using-hnn-core-default-network">
+<span id="sphx-glr-backreferences-hnn-core-default-network"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.default_network</span></code><a class="headerlink" href="#examples-using-hnn-core-default-network" title="Permalink to this headline">¶</a></h2>
 <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a dipole for evoked-like waveforms using HNN-core."><figure class="align-default" id="id1">
 <img alt="01. Simulate dipole for evoked inputs" src="../_images/sphx_glr_plot_simulate_evoked_thumb.png" />
 <figcaption>
@@ -178,10 +168,34 @@ ints can be provided. These are applied successively.</p>
 <p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_simulate_alpha.html#sphx-glr-auto-examples-plot-simulate-alpha-py"><span class="std std-ref">02. Simulate alpha and beta waves</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. "><figure class="align-default" id="id3">
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate gamma rhythms generated by the &quot;PING&quot; mechanism using..."><figure class="align-default" id="id3">
+<img alt="03. Simulate gamma rhythms" src="../_images/sphx_glr_plot_simulate_gamma_thumb.png" />
+<figcaption>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_simulate_gamma.html#sphx-glr-auto-examples-plot-simulate-gamma-py"><span class="std std-ref">03. Simulate gamma rhythms</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model. "><figure class="align-default" id="id4">
+<img alt="04. Plot firing pattern" src="../_images/sphx_glr_plot_firing_pattern_thumb.png" />
+<figcaption>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_firing_pattern.html#sphx-glr-auto-examples-plot-firing-pattern-py"><span class="std std-ref">04. Plot firing pattern</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate an inverse solution of the median nerve evoked respo..."><figure class="align-default" id="id5">
+<img alt="05. From MEG sensor-space data to HNN simulation" src="../_images/sphx_glr_plot_simulate_somato_thumb.png" />
+<figcaption>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_simulate_somato.html#sphx-glr-auto-examples-plot-simulate-somato-py"><span class="std std-ref">05. From MEG sensor-space data to HNN simulation</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. "><figure class="align-default" id="id6">
 <img alt="06. Plot Connectivity" src="../_images/sphx_glr_plot_connectivity_thumb.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_connectivity.html#sphx-glr-auto-examples-plot-connectivity-py"><span class="std std-ref">06. Plot Connectivity</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_connectivity.html#sphx-glr-auto-examples-plot-connectivity-py"><span class="std std-ref">06. Plot Connectivity</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core."><figure class="align-default" id="id7">
+<img alt="07. Use MPI backend for parallelization" src="../_images/sphx_glr_plot_simulate_mpi_backend_thumb.png" />
+<figcaption>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_simulate_mpi_backend.html#sphx-glr-auto-examples-plot-simulate-mpi-backend-py"><span class="std std-ref">07. Use MPI backend for parallelization</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </div><div class="sphx-glr-clear"></div></section>

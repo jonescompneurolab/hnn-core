@@ -58,7 +58,7 @@ Let us import hnn_core
 
 
     import hnn_core
-    from hnn_core import simulate_dipole, read_params, Network, read_spikes
+    from hnn_core import simulate_dipole, read_params, default_network
     from hnn_core.viz import plot_dipole
 
     hnn_core_root = op.dirname(hnn_core.__file__)
@@ -374,7 +374,7 @@ inside it.
 
 .. code-block:: default
 
-    net = Network(params)
+    net = default_network(params)
     net.plot_cells()
     net.plot_cell_morphology()
 
@@ -705,7 +705,7 @@ Finally, let's simulate this network.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 6 minutes  49.415 seconds)
+   **Total running time of the script:** ( 2 minutes  42.867 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_evoked.py:

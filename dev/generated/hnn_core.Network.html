@@ -183,6 +183,12 @@ connection</p>
 </dd>
 <dt><strong>delay</strong><span class="classifier">float</span></dt><dd><p>Synaptic delay in ms.</p>
 </dd>
+<dt><strong>Notes</strong></dt><dd></dd>
+<dt><strong>—-</strong></dt><dd></dd>
+<dt><strong>`net = default_network(params)` is the reccomended path for creating a</strong></dt><dd></dd>
+<dt><strong>network. Instantiating the network as `net = Network(params)` will</strong></dt><dd></dd>
+<dt><strong>produce a network with no cell to cell connections. As such,</strong></dt><dd></dd>
+<dt><strong>connectivity information contained in `params` will be ignored.</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -209,18 +215,21 @@ connection</p>
 <td><p>Attach parameters of tonic biasing input for a given cell type.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_connectivity</span></code></a>()</p></td>
-<td><p>Remove all connections defined in Network.connectivity_list</p></td>
+<td><p>Remove all connections defined in Network.connectivity</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.copy" title="hnn_core.Network.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.clear_drives" title="hnn_core.Network.clear_drives"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_drives</span></code></a>()</p></td>
+<td><p>Remove all drives defined in Network.connectivity</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.copy" title="hnn_core.Network.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return a copy of the Network instance</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
 <td><p>Reverse lookup of gid to type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cell_morphology" title="hnn_core.Network.plot_cell_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cell_morphology</span></code></a>([axes, cell_types, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cell_morphology" title="hnn_core.Network.plot_cell_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cell_morphology</span></code></a>([axes, cell_types, show])</p></td>
 <td><p>Plot the cell morphology.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show])</p></td>
 <td><p>Plot the cells using Network.pos_dict.</p></td>
 </tr>
 </tbody>
@@ -285,7 +294,7 @@ weights and delays within the simulated column</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_connection">
-<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Appends connections to connectivity list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -314,6 +323,11 @@ valid loc=’soma’.</p>
 </dd>
 <dt><strong>lamtha</strong><span class="classifier">float</span></dt><dd><p>Space constant.</p>
 </dd>
+<dt><strong>probability</strong><span class="classifier">float</span></dt><dd><p>Probability of connection between any src-target pair.
+Defaults to 1.0 producing an all-to-all pattern.</p>
+</dd>
+<dt><strong>seed</strong><span class="classifier">int</span></dt><dd><p>Seed for the numpy random number generator.</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -322,9 +336,9 @@ valid loc=’soma’.</p>
 net.connectivity[idx][‘gid_pairs’] : dict</p>
 <blockquote>
 <div><p>dict indexed by src gids with the format:
-{src_gid: [target_gids, …], …}</p>
+{src_gid: [target_gids, …], …}
+where each src_gid indexes a list of all its targets.</p>
 </div></blockquote>
-<p>where each src_gid indexes a list of all its targets.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -435,7 +449,13 @@ simulation).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.clear_connectivity">
 <span class="sig-name descname"><span class="pre">clear_connectivity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.clear_connectivity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove all connections defined in Network.connectivity_list</p>
+<dd><p>Remove all connections defined in Network.connectivity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Network.clear_drives">
+<span class="sig-name descname"><span class="pre">clear_drives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.clear_drives" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all drives defined in Network.connectivity</p>
 </dd></dl>
 
 <dl class="py method">
@@ -547,16 +567,16 @@ a new figure is created.</p>
 <p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_simulate_somato.html#sphx-glr-auto-examples-plot-simulate-somato-py"><span class="std std-ref">05. From MEG sensor-space data to HNN simulation</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core."><figure class="align-default" id="id6">
-<img alt="06. Use MPI backend for parallelization" src="../_images/sphx_glr_plot_simulate_mpi_backend_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. "><figure class="align-default" id="id6">
+<img alt="06. Plot Connectivity" src="../_images/sphx_glr_plot_connectivity_thumb.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_simulate_mpi_backend.html#sphx-glr-auto-examples-plot-simulate-mpi-backend-py"><span class="std std-ref">06. Use MPI backend for parallelization</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_connectivity.html#sphx-glr-auto-examples-plot-connectivity-py"><span class="std std-ref">06. Plot Connectivity</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. "><figure class="align-default" id="id7">
-<img alt="07. Plot Connectivity" src="../_images/sphx_glr_plot_connectivity_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core."><figure class="align-default" id="id7">
+<img alt="07. Use MPI backend for parallelization" src="../_images/sphx_glr_plot_simulate_mpi_backend_thumb.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_connectivity.html#sphx-glr-auto-examples-plot-connectivity-py"><span class="std std-ref">07. Plot Connectivity</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_simulate_mpi_backend.html#sphx-glr-auto-examples-plot-simulate-mpi-backend-py"><span class="std std-ref">07. Use MPI backend for parallelization</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </div><div class="sphx-glr-clear"></div></section>

@@ -17,7 +17,7 @@ import tempfile
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, read_spikes, Network, simulate_dipole
+from hnn_core import read_params, read_spikes, default_network, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -31,7 +31,7 @@ params = read_params(params_fname)
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 import matplotlib.pyplot as plt
 
-net = Network(params)
+net = default_network(params)
 
 ###############################################################################
 # ``net`` does not have any driving inputs and only defines the local network

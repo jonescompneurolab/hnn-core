@@ -19,7 +19,7 @@
 
 
 =======================================
-06. Use MPI backend for parallelization
+07. Use MPI backend for parallelization
 =======================================
 
 This example demonstrates how to use the MPI backend for
@@ -57,7 +57,7 @@ Let us import hnn_core
     import os.path as op
 
     import hnn_core
-    from hnn_core import simulate_dipole, read_params, Network
+    from hnn_core import simulate_dipole, read_params, default_network
 
 
 
@@ -374,7 +374,7 @@ time with unique randomization.
 
 .. code-block:: default
 
-    net = Network(params)
+    net = default_network(params)
 
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     net.add_bursty_drive(
@@ -425,7 +425,7 @@ start the simulation across the number of processors (cores) specified by
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
-    [f4988e966c9a:01658] Read -1, expected 164229, errno = 1
+    [dd409c74f641:01662] Read -1, expected 164856, errno = 1
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -462,15 +462,15 @@ start the simulation across the number of processors (cores) specified by
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    [f4988e966c9a:01658] Read -1, expected 49608, errno = 1
-    [f4988e966c9a:01657] Read -1, expected 49600, errno = 1
-    [f4988e966c9a:01658] Read -1, expected 49600, errno = 1
-    [f4988e966c9a:01657] Read -1, expected 49608, errno = 1
-    [f4988e966c9a:01658] Read -1, expected 49608, errno = 1
-    [f4988e966c9a:01657] Read -1, expected 49600, errno = 1
-    [f4988e966c9a:01658] Read -1, expected 49600, errno = 1
-    [f4988e966c9a:01657] Read -1, expected 49608, errno = 1
-    [f4988e966c9a:01657] Read -1, expected 5616, errno = 1
+    [dd409c74f641:01662] Read -1, expected 49608, errno = 1
+    [dd409c74f641:01661] Read -1, expected 49600, errno = 1
+    [dd409c74f641:01662] Read -1, expected 49600, errno = 1
+    [dd409c74f641:01661] Read -1, expected 49608, errno = 1
+    [dd409c74f641:01661] Read -1, expected 49600, errno = 1
+    [dd409c74f641:01662] Read -1, expected 49608, errno = 1
+    [dd409c74f641:01661] Read -1, expected 49608, errno = 1
+    [dd409c74f641:01662] Read -1, expected 49600, errno = 1
+    [dd409c74f641:01661] Read -1, expected 5616, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -479,7 +479,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  44.012 seconds)
+   **Total running time of the script:** ( 0 minutes  38.328 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_simulate_mpi_backend.py:

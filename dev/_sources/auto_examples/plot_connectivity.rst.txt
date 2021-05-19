@@ -19,17 +19,19 @@
 
 
 =====================
-07. Plot Connectivity
+06. Plot Connectivity
 =====================
 
 This example demonstrates how to modify the network connectivity.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-13
+.. GENERATED FROM PYTHON SOURCE LINES 8-15
 
 .. code-block:: default
 
 
     # Author: Nick Tolley <nicholas_tolley@brown.edu>
+
+    # sphinx_gallery_thumbnail_number = 5
 
     import os.path as op
 
@@ -40,17 +42,17 @@ This example demonstrates how to modify the network connectivity.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-15
+.. GENERATED FROM PYTHON SOURCE LINES 16-17
 
 Let us import ``hnn_core``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-21
+.. GENERATED FROM PYTHON SOURCE LINES 17-23
 
 .. code-block:: default
 
 
     import hnn_core
-    from hnn_core import read_params, Network, simulate_dipole
+    from hnn_core import read_params, default_network, simulate_dipole
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -61,11 +63,11 @@ Let us import ``hnn_core``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-23
+.. GENERATED FROM PYTHON SOURCE LINES 24-25
 
 Then we read the parameters file
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-26
+.. GENERATED FROM PYTHON SOURCE LINES 25-28
 
 .. code-block:: default
 
@@ -79,7 +81,7 @@ Then we read the parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-33
+.. GENERATED FROM PYTHON SOURCE LINES 29-35
 
 To explore how to modify network connectivity, we will start with simulating
 the evoked response from the
@@ -88,11 +90,11 @@ explore how it changes with new connections. We first instantiate the
 network. (Note: Setting ``add_drives_from_params=True`` loads a set of
 predefined drives without the drives API shown previously).
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-35
+.. GENERATED FROM PYTHON SOURCE LINES 35-37
 
 .. code-block:: default
 
-    net = Network(params, add_drives_from_params=True)
+    net_erp = default_network(params, add_drives_from_params=True)
 
 
 
@@ -101,19 +103,19 @@ predefined drives without the drives API shown previously).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-40
+.. GENERATED FROM PYTHON SOURCE LINES 38-42
 
 Instantiating the network comes with a predefined set of connections that
 reflect the canonical neocortical microcircuit. ``net.connectivity``
 is a list of dictionaries which detail every cell-cell, and drive-cell
 connection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-43
+.. GENERATED FROM PYTHON SOURCE LINES 42-45
 
 .. code-block:: default
 
-    print(len(net.connectivity))
-    print(net.connectivity[0:2])
+    print(len(net_erp.connectivity))
+    print(net_erp.connectivity[0:2])
 
 
 
@@ -126,30 +128,31 @@ connection.
  .. code-block:: none
 
     30
-    [L2_pyramidal -> L2_pyramidal
-    cell counts: 100 srcs, 100 targets
-    loc: 'proximal'; receptor: 'nmda'
-    weight: 0.0005; delay: 1.0; lamtha: 3.0
-     , L2_pyramidal -> L2_pyramidal
-    cell counts: 100 srcs, 100 targets
-    loc: 'proximal'; receptor: 'ampa'
-    weight: 0.0005; delay: 1.0; lamtha: 3.0
+    [evdist1 -> L2_basket
+    cell counts: 35 srcs, 35 targets
+    connection probability: 1.0 
+    loc: 'distal'; receptor: 'ampa'
+    weight: 0.006562; delay: 0.1; lamtha: 3.0
+     , evdist1 -> L2_basket
+    cell counts: 35 srcs, 35 targets
+    connection probability: 1.0 
+    loc: 'distal'; receptor: 'nmda'
+    weight: 0.019482; delay: 0.1; lamtha: 3.0
      ]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-47
+.. GENERATED FROM PYTHON SOURCE LINES 46-49
 
 Data recorded during simulations are stored under
-:class:`~hnn_core.Cell_Response`. To test multiple network structures, we can
-create a copy of the original network. The copied network is then simulated.
+:class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
+a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-51
+.. GENERATED FROM PYTHON SOURCE LINES 49-52
 
 .. code-block:: default
 
-    net_erp = net.copy()
     dpl_erp = simulate_dipole(net_erp, n_trials=1)
     net_erp.cell_response.plot_spikes_raster()
 
@@ -193,27 +196,45 @@ create a copy of the original network. The copied network is then simulated.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-59
+.. GENERATED FROM PYTHON SOURCE LINES 53-63
 
-We can modify the connectivity list to test the effect of different
-connectivity patterns. For example, we can remove all layer 2 inhibitory
-connections. In the default network, the src_gids of each connection are
-all the same cell type.. Connections are stored under ``conn['gid_pairs']``
-as a dictionary indexed by src_gid:
-``{src_gid1: [target_gid1, target_gid2], ...]``. Each src_gid indexes a
-list with its target gids
+We can also define our own connections to test the effect of different
+connectivity patterns. To start, ``net.clear_connectivity()`` can be used
+to clear all cell to cell connections. By default, previously defined drives
+to the network are retained, but can be removed with ``net.clear_drives()``.
+``net.add_connection`` is then used to create a custom network. Let us first
+create an all-to-all connectivity pattern between the L5 pyramidal cells,
+and L2 basket cells. :meth:`hnn_core.Network.add_connection` allows
+connections to be specified with either cell names, or the gids directly.
+If multiple gids are provided for either the sources or the targets,
+they will be connected in an all-to-all pattern.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-67
+.. GENERATED FROM PYTHON SOURCE LINES 63-86
 
 .. code-block:: default
 
-    new_connectivity = [conn for conn in net.connectivity
-                        if conn['src_type'] != 'L2_basket']
-    net.connectivity = new_connectivity
 
-    net_remove = net.copy()
-    dpl_remove = simulate_dipole(net_remove, n_trials=1)
-    net_remove.cell_response.plot_spikes_raster()
+    net_all = default_network(params, add_drives_from_params=True)
+    net_all.clear_connectivity()
+
+    # Pyramidal cell connections
+    location, receptor = 'distal', 'ampa'
+    weight, delay, lamtha = 1.0, 1.0, 70
+    src = 'L5_pyramidal'
+    for target in ['L5_pyramidal', 'L2_basket']:
+        net_all.add_connection(src, target, location, receptor,
+                               delay, weight, lamtha)
+
+    # Basket cell connections
+    location, receptor = 'soma', 'gabaa'
+    weight, delay, lamtha = 1.0, 1.0, 70
+    src = 'L2_basket'
+    for target in ['L5_pyramidal', 'L2_basket']:
+        net_all.add_connection(src, target, location, receptor,
+                               delay, weight, lamtha)
+
+    dpl_all = simulate_dipole(net_all, n_trials=1)
+    net_all.cell_response.plot_spikes_raster()
 
 
 
@@ -255,40 +276,70 @@ list with its target gids
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-77
+.. GENERATED FROM PYTHON SOURCE LINES 87-95
 
-That's a lot of spiking! Since basket cells are inhibitory, removing these
-connections increases network wide excitability. We can additionally add
-new connections using ``net.add_connection()``. Let's try connecting a
-single layer 2 basket cell, to every layer 2 pyramidal cell. We can utilize
-``net.gid_ranges`` to help find the gids of interest.
-:meth:`hnn_core.Network.add_connection` allows connections to be specified
-with either cell names, or the gids directly. If multiple gids are provided
-for either the sources or the targets, they will be connected in an
-all-to-all pattern.
+With the previous connection pattern there appears to be synchronous rhythmic
+firing of the L5 pyramidal cells with a period of 10 ms. The synchronous
+activity is visible as vertical lines where several cells fire simultaneously
+We can additionally use the ``probability``. argument to create a sparse
+connectivity pattern instead of all-to-all. Let's try creating the same
+network with a 10% chance of cells connecting to each other. The resulting
+connectivity pattern can also be visualized with
+``net.connectivity[idx].plot()``
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-89
+.. GENERATED FROM PYTHON SOURCE LINES 95-121
 
 .. code-block:: default
 
-    print(net.gid_ranges)
-    src_gid = net.gid_ranges['L2_basket'][0]
-    target_gids = 'L2_pyramidal'
+    probability = 0.1
+    net_sparse = default_network(params, add_drives_from_params=True)
+    net_sparse.clear_connectivity()
+
+    # Pyramidal cell connections
+    location, receptor = 'distal', 'ampa'
+    weight, delay, lamtha = 1.0, 1.0, 70
+    src = 'L5_pyramidal'
+    for target in ['L5_pyramidal', 'L2_basket']:
+        net_sparse.add_connection(src, target, location, receptor,
+                                  delay, weight, lamtha, probability)
+
+    # Basket cell connections
     location, receptor = 'soma', 'gabaa'
     weight, delay, lamtha = 1.0, 1.0, 70
-    net.add_connection(src_gid, target_gids, location, receptor,
-                       delay, weight, lamtha)
+    src = 'L2_basket'
+    for target in ['L5_pyramidal', 'L2_basket']:
+        net_sparse.add_connection(src, target, location, receptor,
+                                  delay, weight, lamtha, probability)
 
-    net_add = net.copy()
-    dpl_add = simulate_dipole(net_add, n_trials=1)
-    net_add.cell_response.plot_spikes_raster()
+    dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
+    net_sparse.cell_response.plot_spikes_raster()
+
+    net_sparse.connectivity[-2].plot()
+    net_sparse.connectivity[-1].plot()
 
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_connectivity_003.png
-    :alt: plot connectivity
-    :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_003.png
+          :alt: plot connectivity
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_004.png
+          :alt: L2_basket -> L5_pyramidal (soma, gabaa)
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_005.png
+          :alt: L2_basket -> L2_basket (soma, gabaa)
+          :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -297,7 +348,6 @@ all-to-all pattern.
 
  .. code-block:: none
 
-    {'L2_basket': range(0, 35), 'L2_pyramidal': range(35, 135), 'L5_basket': range(135, 170), 'L5_pyramidal': range(170, 270), 'bursty1': range(270, 271), 'bursty2': range(271, 272), 'evdist1': range(272, 542), 'evprox1': range(542, 812), 'evprox2': range(812, 1082), 'extgauss': range(1082, 1352), 'extpois': range(1352, 1622)}
     joblib will run over 1 jobs
     Building the NEURON model
     [Done]
@@ -324,14 +374,15 @@ all-to-all pattern.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-94
+.. GENERATED FROM PYTHON SOURCE LINES 122-127
 
-Adding more inhibitory connections did not completely restore the normal
-spiking. L2 basket and pyramidal cells rhythymically fire in the gamma
-range (30-80 Hz). As a final step, we can see how this change in spiking
-activity impacts the aggregate current dipole.
+Using the sparse connectivity pattern produced a lot more spiking in
+the L5 pyramidal cells. Nevertheless there appears to be some rhythmicity
+where the cells are firing synchronously with a smaller period of 4-5 ms.
+As a final step, we can see how this change in spiking activity impacts
+the aggregate current dipole.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-103
+.. GENERATED FROM PYTHON SOURCE LINES 127-136
 
 .. code-block:: default
 
@@ -339,15 +390,15 @@ activity impacts the aggregate current dipole.
     from hnn_core.viz import plot_dipole
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
                              constrained_layout=True)
-    dpls = [dpl_erp[0], dpl_remove[0], dpl_add[0]]
+    dpls = [dpl_erp[0], dpl_all[0], dpl_sparse[0]]
     plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
-    axes[0].legend(['Normal', 'No L2 Basket', 'Single L2 Basket'])
+    axes[0].legend(['Default', 'Custom All', 'Custom Sparse'])
     net_erp.cell_response.plot_spikes_hist(
         ax=axes[1], spike_types=['evprox', 'evdist'])
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_connectivity_004.png
+.. image:: /auto_examples/images/sphx_glr_plot_connectivity_006.png
     :alt: Aggregate (L2 + L5)
     :class: sphx-glr-single-img
 
@@ -366,7 +417,7 @@ activity impacts the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 18 minutes  51.055 seconds)
+   **Total running time of the script:** ( 7 minutes  47.834 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_connectivity.py:

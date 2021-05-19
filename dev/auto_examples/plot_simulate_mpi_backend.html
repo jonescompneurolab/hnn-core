@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>06. Use MPI backend for parallelization &#8212; hnn-core  documentation</title>
+    <title>07. Use MPI backend for parallelization &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -73,7 +73,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">06. Use MPI backend for parallelization</a></li>
+<li><a class="reference internal" href="#">07. Use MPI backend for parallelization</a></li>
 </ul>
 </ul>
 </li>
@@ -129,7 +129,7 @@
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
 <section class="sphx-glr-example-title" id="use-mpi-backend-for-parallelization">
-<span id="sphx-glr-auto-examples-plot-simulate-mpi-backend-py"></span><h1>06. Use MPI backend for parallelization<a class="headerlink" href="#use-mpi-backend-for-parallelization" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-plot-simulate-mpi-backend-py"></span><h1>07. Use MPI backend for parallelization<a class="headerlink" href="#use-mpi-backend-for-parallelization" title="Permalink to this headline">¶</a></h1>
 <p>This example demonstrates how to use the MPI backend for
 simulating dipoles using HNN-core.</p>
 <p>The MPI backend allows running the simulation in parallel across neurons in the
@@ -145,7 +145,7 @@ without the need to install and configure MPI.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 
 <span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_params</span></a><span class="p">,</span> <a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_params</span></a><span class="p">,</span> <a href="../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a>
 </pre></div>
 </div>
 <p>Then we setup the directories and Neuron</p>
@@ -405,7 +405,7 @@ simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
 The occurrence of each burst is jittered by a random, normally distributed
 amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class"><span class="n">Network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">}</span>
 <a href="../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_bursty_drive</span></a><span class="p">(</span>
@@ -433,7 +433,7 @@ start the simulation across the number of processors (cores) specified by
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
 Running 1 trials...
 numprocs=2
-[f4988e966c9a:01658] Read -1, expected 164229, errno = 1
+[dd409c74f641:01662] Read -1, expected 164856, errno = 1
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -470,20 +470,20 @@ Simulation time: 270.0 ms...
 Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
-[f4988e966c9a:01658] Read -1, expected 49608, errno = 1
-[f4988e966c9a:01657] Read -1, expected 49600, errno = 1
-[f4988e966c9a:01658] Read -1, expected 49600, errno = 1
-[f4988e966c9a:01657] Read -1, expected 49608, errno = 1
-[f4988e966c9a:01658] Read -1, expected 49608, errno = 1
-[f4988e966c9a:01657] Read -1, expected 49600, errno = 1
-[f4988e966c9a:01658] Read -1, expected 49600, errno = 1
-[f4988e966c9a:01657] Read -1, expected 49608, errno = 1
-[f4988e966c9a:01657] Read -1, expected 5616, errno = 1
+[dd409c74f641:01662] Read -1, expected 49608, errno = 1
+[dd409c74f641:01661] Read -1, expected 49600, errno = 1
+[dd409c74f641:01662] Read -1, expected 49600, errno = 1
+[dd409c74f641:01661] Read -1, expected 49608, errno = 1
+[dd409c74f641:01661] Read -1, expected 49600, errno = 1
+[dd409c74f641:01662] Read -1, expected 49608, errno = 1
+[dd409c74f641:01661] Read -1, expected 49608, errno = 1
+[dd409c74f641:01662] Read -1, expected 49600, errno = 1
+[dd409c74f641:01661] Read -1, expected 5616, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  44.012 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  38.328 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
