@@ -1122,6 +1122,7 @@ class Network(object):
             Defaults to 1.0 producing an all-to-all pattern.
         seed : int
             Seed for the numpy random number generator.
+
         Notes
         -----
         num_srcs and num_targets are not updated after pruning connections.
@@ -1245,7 +1246,7 @@ class _Connectivity(dict):
         Number of unique target gids.
     src_range : range
         Range of gids identified by src_type.
-    target_range : target_range
+    target_range : range
         Range of gids identified by target_type.
     loc : str
         Location of synapse on target cell. Must be
@@ -1270,7 +1271,7 @@ class _Connectivity(dict):
 
     Notes
     -----
-    The len() of src_range or target_range may not match
+    The len() of src_range or target_range will not match
     num_srcs and num_targets for probability < 1.0.
     """
 
