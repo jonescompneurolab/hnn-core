@@ -234,13 +234,16 @@ names of section locations that are proximal or distal.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, postsyn)</p></td>
 <td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, cell_types, show])</p></td>
+<td><p>Plot the cell morphology.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
 <td><p>Record current and voltage at soma.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
 <td><p>Created for _PC.cell and specifies SOURCES of spikes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
 <td><p>Create an h.Exp2Syn synapse.</p></td>
 </tr>
 </tbody>
@@ -315,6 +318,28 @@ Defines the connection parameters</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>nc</strong><span class="classifier">instance of h.NetCon</span></dt><dd><p>A network connection object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.plot_morphology">
+<span class="sig-name descname"><span class="pre">plot_morphology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Cell.plot_morphology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the cell morphology.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the plot</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>axes</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>The matplotlib 3D axis handle.</p>
 </dd>
 </dl>
 </dd>

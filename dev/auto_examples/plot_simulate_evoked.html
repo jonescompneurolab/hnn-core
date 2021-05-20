@@ -137,10 +137,12 @@ waveforms using HNN-core.</p>
 <span class="c1">#          Blake Caldwell &lt;blake_caldwell@brown.edu&gt;</span>
 <span class="c1">#          Christopher Bailey &lt;cjb@cfin.au.dk&gt;</span>
 
-<span class="c1"># sphinx_gallery_thumbnail_number = 2</span>
+<span class="c1"># sphinx_gallery_thumbnail_number = 3</span>
 
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
 <p>Let us import hnn_core</p>
@@ -416,17 +418,17 @@ relate to within-network connections and the cell geometry.</p>
 inside it.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <a href="../generated/hnn_core.Network.html#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">plot_cells</span></a><span class="p">()</span>
-<a href="../generated/hnn_core.Network.html#hnn_core.Network.plot_cell_morphology" title="hnn_core.Network.plot_cell_morphology" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">plot_cell_morphology</span></a><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span></a><span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot_morphology</span><span class="p">()</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
 <li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_001.png" />
 </li>
-<li><img alt="L2Pyr, L5Pyr, L2Basket, L5Basket" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
+<li><img alt="plot simulate evoked" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_simulate_evoked_002.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L2Pyr&#39;}&gt;, &lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L5Pyr&#39;}&gt;, &lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L2Basket&#39;}&gt;, &lt;Axes3DSubplot:title={&#39;center&#39;:&#39;L5Basket&#39;}&gt;]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes3DSubplot:&gt;
 </pre></div>
 </div>
 <p>The network of cells is now defined, to which we add external drives as
@@ -603,7 +605,7 @@ Simulation time: 160.0 ms...
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  0.329 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  57.050 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
