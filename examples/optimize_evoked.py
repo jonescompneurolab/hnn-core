@@ -33,10 +33,10 @@ optiter = 0
 minopterr = 1e9
 
 # From HNN, will take hours without parallelism
-# default_num_step_sims = 30
-# default_num_total_sims = 50
-default_num_step_sims = 10
-default_num_total_sims = 10
+default_num_step_sims = 30
+default_num_total_sims = 50
+# default_num_step_sims = 10
+# default_num_total_sims = 10
 
 # Assume approx timings in param file
 timing_range_multiplier = 3.0
@@ -56,6 +56,7 @@ decay_multiplier = 1.6
 
 def split_by_evinput(params):
     """ Sorts parameter ranges by evoked inputs into a dictionary
+
     Parameters
     ----------
     params: an instance of Params
@@ -226,7 +227,6 @@ def create_last_chunk(input_chunks):
         Dictionary of with parameters for combined
         chunk (final step)
     """
-    global default_num_total_sims
 
     combined_chunk = {'inputs': [],
                       'ranges': {},
@@ -241,7 +241,6 @@ def create_last_chunk(input_chunks):
 
     # wRMSE with weights of 1's is the same as regular RMSE.
     combined_chunk['weights'] = np.ones(len(input_chunks[-1]['weights']))
-    combined_chunk['num_sims'] = default_num_total_sims
 
     return combined_chunk
 
@@ -268,7 +267,6 @@ def consolidate_chunks(inputs):
     for input_name in inputs.keys():
         input_dict = inputs[input_name].copy()
         input_dict['inputs'] = [input_name]
-        input_dict['num_sims'] = default_num_step_sims
 
         if len(consolidated_chunks) > 0 and \
            (input_dict['start'] <= consolidated_chunks[-1]['end']):
@@ -353,10 +351,30 @@ def optrun(new_params, grad=0):
     return avg_rmse  # nlopt expects error
 
 
-def run_optimization(seed=0):
+def run_optimization(maxiter):
+    from scipy.optimize import fmin_cobyla
+
+    global opt_params
+
+    cons = list()
+    x0 = list()
+    for idx, param_name in enumerate(opt_params['ranges'].keys()):
+        x0.append(opt_params['ranges'][param_name]['initial'])
+        cons.append(lambda x : x[idx] <= opt_params['ranges'][param_name]['maxval'])
+        cons.append(lambda x : x[idx] >= opt_params['ranges'][param_name]['minval'])
+
+    result = fmin_cobyla(optrun, cons=cons, catol=1e-4,
+                         x0=x0, maxfun=maxiter)
+    return result
+
+
+def run_optimization_nlopt(default_num_total_sims, seed=0):
     """ Start the nlopt optimization
+
     Parameters
     ----------
+    default_num_total_sims : int
+        The number of total simulations
     seed: int | None
         Seed for RNG to make optimization results reproducible
 
@@ -394,7 +412,7 @@ def run_optimization(seed=0):
     opt.set_upper_bounds(ub)
     opt.set_min_objective(optrun)
     opt.set_xtol_rel(1e-4)
-    opt.set_maxeval(opt_params['num_sims'])
+    opt.set_maxeval(default_num_total_sims)
     opt_results = opt.optimize(params_arr)
 
     return opt_results
@@ -426,8 +444,6 @@ evinput_params = split_by_evinput(params)
 evinput_params = generate_weights(evinput_params, params, decay_multiplier)
 param_chunks = consolidate_chunks(evinput_params)
 
-sdfdfdf
-
 ###############################################################################
 # Start the optimization!
 
@@ -448,7 +464,7 @@ for step in range(len(param_chunks)):
     # opt_params is a pointer to the params for each step
     opt_params = param_chunks[step]
 
-    if opt_params['num_sims'] == 0:
+    if default_num_total_sims == 0:
         print("Skipping optimization step %d (0 simulations)" % (step + 1))
         continue
 
@@ -482,7 +498,7 @@ for step in range(len(param_chunks)):
 
     print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                 opt_params['opt_end']))
-    opt_results = run_optimization(seed=0)
+    opt_results = run_optimization(maxiter=default_num_total_sims)
 
     # update opt_params for the next round
     for var_name, value in zip(opt_params['ranges'], opt_results):
@@ -507,6 +523,6 @@ print("Final RMSE: %.2f" % avg_rmse)
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
 exp_dpl.plot(ax=axes[0], layer='agg', show=False)
-initial_dpl.plot(ax=axes[0], layer='agg', show=False)
+initial_dpl[0].plot(ax=axes[0], layer='agg', show=False)
 best_dpl.plot(ax=axes[0], layer='agg', show=False)
-net.plot_input(ax=axes[1])
+net.cell_response.plot_spikes_hist(ax=axes[1])
