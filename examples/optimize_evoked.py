@@ -316,13 +316,7 @@ def optrun(new_params, grad=0):
 
     # set parameters
     for param_name, test_value in zip(opt_params['ranges'].keys(), new_params):
-        if test_value >= opt_params['ranges'][param_name]['minval'] and \
-           test_value <= opt_params['ranges'][param_name]['maxval']:
-            params[param_name] = test_value
-        else:
-            # This test is not strictly necessary with COBYLA, but in case the
-            # algorithm is changed at some point in the future
-            return 1e9  # invalid param value -> large error
+        params[param_name] = test_value
 
     # run the simulation, but stop early if possible
     params['tstop'] = opt_params['opt_end']
@@ -363,17 +357,17 @@ def run_optimization(maxiter):
         cons.append(lambda x : x[idx] <= opt_params['ranges'][param_name]['maxval'])
         cons.append(lambda x : x[idx] >= opt_params['ranges'][param_name]['minval'])
 
-    result = fmin_cobyla(optrun, cons=cons, catol=1e-4,
+    result = fmin_cobyla(optrun, cons=cons, rhoend=1e-4,
                          x0=x0, maxfun=maxiter)
     return result
 
 
-def run_optimization_nlopt(default_num_total_sims, seed=0):
+def run_optimization_nlopt(maxiter, seed=0):
     """ Start the nlopt optimization
 
     Parameters
     ----------
-    default_num_total_sims : int
+    maxiter : int
         The number of total simulations
     seed: int | None
         Seed for RNG to make optimization results reproducible
@@ -412,7 +406,7 @@ def run_optimization_nlopt(default_num_total_sims, seed=0):
     opt.set_upper_bounds(ub)
     opt.set_min_objective(optrun)
     opt.set_xtol_rel(1e-4)
-    opt.set_maxeval(default_num_total_sims)
+    opt.set_maxeval(maxiter)
     opt_results = opt.optimize(params_arr)
 
     return opt_results
