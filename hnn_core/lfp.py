@@ -135,8 +135,182 @@ def _transfer_resistance(section, electrode_pos, sigma, method):
     return 1000.0 * phi / (4.0 * np.pi * sigma)
 
 
-class _LFPElectrode:
-    """Local field potential (LFP) electrode class.
+def _get_lfp_plot_data(times, data, tmin, tmax):
+    plot_tmin = times[0]
+    if tmin is not None:
+        plot_tmin = max(tmin, plot_tmin)
+    plot_tmax = times[-1]
+    if tmax is not None:
+        plot_tmax = min(tmax, plot_tmax)
+
+    times = np.array(times)
+    mask = np.logical_and(times >= plot_tmin, times < plot_tmax)
+    times = times[mask]
+
+    data = np.array(data)[mask]
+
+    return data, times
+
+
+class LFPArray:
+    """Local field potential (LFP) electrode array class.
+
+    Parameters
+    ----------
+    positions : tuple | list of tuple
+        The (x, y, z) coordinates (in um) of the LFP electrodes.
+    sigma : float
+        Extracellular conductivity, in S/m, of the assumed infinite,
+        homogeneous volume conductor that the cell and electrode are in.
+    method : str
+        Approximation to use. 'psa' (default) assigns all transmembrane
+        currents to the center point (0.5) (point source approximation).
+        'lsa' treats the section as a line source, and a single multiplier is
+        calculated for each section (line source approximation).
+
+    Attributes
+    ----------
+    voltages : list of float
+        The LFP voltages at the electrode positions (in uV).
+    times : list of float
+        The time points the LFP is sampled at (ms)
+    sfreq : float
+        Sampling rate of the LFP data (Hz).
+
+    Notes
+    -----
+    See Table 5 in http://jn.physiology.org/content/104/6/3388.long for
+    measured values of sigma in rat cortex (note units there are mS/cm)
+    """
+
+    def __init__(self, positions, sigma=0.3, method='psa', times=list(),
+                 voltages=list()):
+        self.positions = positions
+        self.sigma = sigma
+        self.method = method
+        self.times = times
+        self._data = voltages
+
+    def __getitem__(self, trial_no):
+        if isinstance(trial_no, int):
+            return_data = [self._data[trial_no]]
+        elif isinstance(trial_no, slice):
+            return_data = self._data[trial_no]
+        elif not isinstance(trial_no, (list, tuple)):
+            return_data = [self._data[trial] for trial in trial_no]
+
+        return LFPArray(self.positions, sigma=self.sigma, method=self.method,
+                        times=self.times, voltages=return_data)
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        msg = (f'{len(self.positions)} electrodes, sigma={self.sigma}, '
+               f'method={self.method}')
+        if len(self._data) > 0:
+            msg += f' | {len(self._data)} trials, {len(self.times)} times'
+        return f'<{class_name} | {msg}>'
+
+    def __len__(self):
+        return len(self.positions)
+
+    @property
+    def sfreq(self):
+        """Return the sampling rate of the LFP data."""
+        if len(self.times) > 1:
+            return 1000. / (self.times[1] - self.times[0])  # times in ms
+        else:
+            return None
+
+    def reset(self):
+        self._data = list()
+        self.times = list()
+
+    def get_data(self):
+        return np.array(self._data)
+
+    def plot(self, *, trial_no=None, contact_no=None, window_len=None,
+             tmin=None, tmax=None, ax=None, decim=None, color=None, show=True):
+
+        if trial_no is None:
+            plot_data = self.get_data()
+        elif isinstance(trial_no, (list, tuple, int, slice)):
+            plot_data = self.get_data()[trial_no, ]
+
+        if isinstance(contact_no, (list, tuple, int, slice)):
+            plot_data = plot_data[:, contact_no, ]
+        elif contact_no is not None:
+            raise ValueError('invalid')
+
+        for trial_data in plot_data:
+            _plot_lfp(self.times, trial_data, self.sfreq,
+                      window_len=window_len, tmin=tmin, tmax=tmax, ax=ax,
+                      decim=decim, color=color, show=show)
+
+
+def _plot_lfp(times, data, sfreq, window_len=None, tmin=None,
+              tmax=None, ax=None, decim=None, color=None, show=True):
+    """Plot LFP traces
+
+    Parameters
+    ----------
+    trial_idx : int | list of int
+        Trial number(s) to plot
+    contact_idx : int | list of int
+        Electrode contact number(s) to plot
+    window_len : float
+        If set, apply a Hamming-windowed convolution kernel of specified
+        length (in ms) to the data before plotting. Default: None
+    tmin : float or None
+        Start time of plot in milliseconds. If None, plot entire
+        simulation.
+    tmax : float or None
+        End time of plot in milliseconds. If None, plot entire simulation.
+    ax : instance of matplotlib figure | None
+        The matplotlib axis
+    decim : int or list of int or None (default)
+        Optional (integer) factor by which to decimate the raw dipole
+        traces. The SciPy function :func:`~scipy.signal.decimate` is used,
+        which recommends values <13. To achieve higher decimation factors,
+        a list of ints can be provided. These are applied successively.
+    color : tuple of float
+        RGBA value to use for plotting (optional)
+    show : bool
+        If True, show the figure
+
+    Returns
+    -------
+    fig : instance of plt.fig
+        The matplotlib figure handle.
+    """
+    import matplotlib.pyplot as plt
+    from .dipole import _hammfilt
+    from .viz import _decimate_plot_data, plt_show
+
+    if ax is None:
+        _, ax = plt.subplots(1, 1)
+
+    for contact_no, trace in enumerate(np.atleast_2d(data)):
+        plot_data, plot_times = _get_lfp_plot_data(times, trace, tmin, tmax)
+        if window_len is not None:
+            winsz = np.round(1e-3 * window_len * sfreq)
+            plot_data = _hammfilt(plot_data, winsz)
+        if decim is not None:
+            plot_data, plot_times = _decimate_plot_data(decim, plot_data,
+                                                        plot_times)
+
+        ax.plot(plot_times, plot_data, label=f'C{contact_no}', color=color)
+
+    ax.ticklabel_format(axis='both', scilimits=(-2, 3))
+    ax.set_xlabel('Time (ms)')
+    ylabel = r'Electric potential ($\mu V$)'
+    ax.set_ylabel(ylabel, multialignment='center')
+
+    plt_show(show)
+    return ax.get_figure()
+
+
+class _LFPArray:
+    """Class for electrode arrays containing NEURON objects
 
     The handler is set up to maintain a vector of membrane currents at at every
     inner segment of every section of every cell on each CVODE integration
@@ -147,66 +321,16 @@ class _LFPElectrode:
 
     Parameters
     ----------
-    coord : tuple
-        The (x, y, z) coordinates (in um) of the LFP electrode.
-    sigma : float
-        Extracellular conductivity, in S/m, of the assumed infinite,
-        homogeneous volume conductor that the cell and electrode are in.
-    method : str
-        Approximation to use. 'psa' (default) assigns all transmembrane
-        currents to the center point (0.5) (point source approximation).
-        'lsa' treats the section as a line source, and a single multiplier is
-        calculated for each section (line source approximation).
+    array : instance of LFPArray
+        Initialised, e.g., by the Network.add_electrode_array()-method
     cvode : instance of h.CVode
         Multi order variable time step integration method.
-
-    Attributes
-    ----------
-    lfp_v : instance of h.Vector
-        The LFP voltage (in uV).
-
-    Notes
-    -----
-    See Table 5 in http://jn.physiology.org/content/104/6/3388.long for
-    measured values of sigma in rat cortex (note units there are mS/cm)
     """
-
-    def __init__(self, coord, sigma=0.3, method='psa', cvode=None):
-
-        # ordered list of h.Sections on this rank (if running in parallel)
-        secs_on_rank = _get_sections_on_this_rank()
-        # np.array of number of segments for each section, ordered as above
-        segment_counts = np.array(_get_segment_counts(secs_on_rank))
-
-        # pointers assigned to _ref_i_membrane_ at each EACH internal segment
-        self.imem_ptrvec = h.PtrVector(segment_counts.sum())
-        # placeholder into which pointer values are read on each sim step
-        imem_vec_len = int(self.imem_ptrvec.size())
-        self.imem_vec = h.Vector(imem_vec_len)
-
-        transfer_resistance = list()
-        ptr_count = 0
-        for sec, n_segs in zip(secs_on_rank, segment_counts):
-            this_xfer_r = _transfer_resistance(sec, coord, sigma=sigma,
-                                               method=method)
-            # the n_segs of this section get assigned the same value (e.g. in
-            # PSA, the distance is calculated for the section mid point only)
-            transfer_resistance.extend([this_xfer_r] * n_segs)
-            for seg in sec:  # section end points (0, 1) not included
-                # set Nth pointer to the net membrane current at this segment
-                self.imem_ptrvec.pset(ptr_count, sec(seg.x)._ref_i_membrane_)
-                ptr_count += 1
-
-        if ptr_count != imem_vec_len:
-            raise RuntimeError(f'Expected {imem_vec_len} imem pointers, '
-                               'got {count}.')
-
-        # transfer resistances for each segment (keep in NEURON object)
-        self.r_transfer = h.Vector(transfer_resistance)
-
-        # contributions of all segments on this rank to total calculated
-        # potential at electrode (_PC.allreduce called in _simulate_dipole)
-        self.lfp_v = h.Vector()
+    def __init__(self, array, cvode=None):
+        self.positions = array.positions
+        self.n_contacts = len(self.positions)
+        self.sigma = array.sigma
+        self.method = array.method
 
         # Attach a callback for calculating the potentials at each time step.
         # Enables fast calculation of transmembrane current (nA) at each
@@ -215,17 +339,95 @@ class _LFPElectrode:
         # "multiple threads".
         cvode.extra_scatter_gather(0, self.calc_potential_callback)
 
+    @property
+    def n_samples(self):
+        """Return the length (in samples) of the LFP data."""
+        return int(self._lfp_v.size() / self.n_contacts)
+
+    @property
+    def voltages(self):
+        """The LFP data (n_contacts x n_samples)."""
+        if len(self._lfp_v) > 0:
+            # return as a Neuron Matrix object for efficiency
+            lfpmat = h.Matrix(self.n_contacts, self.n_samples)
+            lfpmat.from_vector(self._lfp_v)
+            return lfpmat
+        else:
+            return None  # simulation not yet run
+
+    @property
+    def times(self):
+        """The sampling time points."""
+        if self._lfp_t.size() > 0:
+            # NB _lfp_t is one sample longer than _lfp_v
+            return self._lfp_t.to_python()[:self.n_samples]
+        else:
+            return None  # simulation not yet run
+
+    def build(self):
+        """Create the Neuron objects needed to record LFPs
+
+        """
+        # ordered list of h.Sections on this rank (if running in parallel)
+        secs_on_rank = _get_sections_on_this_rank()
+        # np.array of number of segments for each section, ordered as above
+        segment_counts = np.array(_get_segment_counts(secs_on_rank))
+
+        # pointers assigned to _ref_i_membrane_ at each EACH internal segment
+        self.imem_ptrvec = h.PtrVector(segment_counts.sum())
+        # placeholder into which pointer values are read on each sim step
+        self.imem_vec_len = int(self.imem_ptrvec.size())
+        self.imem_vec = h.Vector(self.imem_vec_len)
+
+        ptr_count = 0
+        for sec in secs_on_rank:
+            for seg in sec:  # section end points (0, 1) not included
+                # set Nth pointer to the net membrane current at this segment
+                self.imem_ptrvec.pset(
+                    ptr_count, sec(seg.x)._ref_i_membrane_)
+                ptr_count += 1
+        if ptr_count != self.imem_vec_len:
+            raise RuntimeError(f'Expected {self.imem_vec_len} imem pointers, '
+                               f'got {ptr_count}.')
+
+        # transfer resistances for each segment (keep in Neuron Matrix object)
+        self.r_transfer = h.Matrix(self.n_contacts, self.imem_vec_len)
+
+        for row, pos in enumerate(self.positions):
+            transfer_resistance = list()
+            for sec, n_segs in zip(secs_on_rank, segment_counts):
+                this_xfer_r = _transfer_resistance(sec, pos,
+                                                   sigma=self.sigma,
+                                                   method=self.method)
+                # the n_segs of this section get assigned the same value (e.g.
+                # in PSA, the distance is calculated for the section mid point
+                # only)
+                transfer_resistance.extend([this_xfer_r] * n_segs)
+
+            self.r_transfer.setrow(row, h.Vector(transfer_resistance))
+
+        # record time for each array
+        self._lfp_t = h.Vector().record(h._ref_t)
+
+        # contributions of all segments on this rank to total calculated
+        # potential at electrode (_PC.allreduce called in _simulate_dipole)
+        self.reset()
+
     def reset(self):
-        self.lfp_v = h.Vector()
-        self.imem_vec = h.Vector(int(self.imem_ptrvec.size()))
+        self._lfp_v = h.Vector()
+        self.imem_vec = h.Vector(self.imem_vec_len)
 
     def calc_potential_callback(self):
+        # keep all data in Neuron objects for efficiency
 
         # 'gather' the values of seg.i_membrane_ into self.imem_vec
         self.imem_ptrvec.gather(self.imem_vec)
 
-        # multiply elementwise, then sum (dot-product): V = SUM (R_i x I_i)
-        potential = self.r_transfer.dot(self.imem_vec)
+        # r_transfer is now a Matrix. Calculate potentials by multiplying the
+        # imem_vec by the matrix. This is equivalent to a row-by-row dot-
+        # product: V_i = SUM_j (R_i,j x I_j)
 
-        # append to Vector
-        self.lfp_v.append(potential)
+        # electrode_potentials = self.r_transfer.mulv(self.imem_vec)
+
+        # append all values at current time step (must be reshaped later)
+        self._lfp_v.append(self.r_transfer.mulv(self.imem_vec))

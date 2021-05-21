@@ -63,7 +63,7 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                show=True):
+                color=None, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -84,6 +84,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
+    color : tuple of float
+        RGBA value to use for plotting (optional)
     show : bool
         If True, show the figure
 
@@ -113,7 +115,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
             if decim is not None:
                 data, times = _decimate_plot_data(decim, data, times)
 
-            ax.plot(times, data)
+            ax.plot(times, data, color=color)
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
@@ -330,11 +332,13 @@ def plot_cells(net, ax=None, show=True):
             marker = markers[cell_type]
             ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
 
-    if net.lfp:
-        x = [e_dict['pos'][0] for e_dict in net.lfp]
-        y = [e_dict['pos'][1] for e_dict in net.lfp]
-        z = [e_dict['pos'][2] for e_dict in net.lfp]
-        ax.scatter(x, y, z, c='r', s=100, marker='o', label='Electrode')
+    if net.lfp_array:
+        cols = plt.get_cmap('inferno', len(net.lfp_array) + 2)
+        for ii, (arr_name, arr) in enumerate(net.lfp_array.items()):
+            x = [p[0] for p in arr.positions]
+            y = [p[1] for p in arr.positions]
+            z = [p[2] for p in arr.positions]
+        ax.scatter(x, y, z, c=cols(ii + 1), s=100, marker='o', label=arr_name)
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
 

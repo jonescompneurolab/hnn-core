@@ -393,7 +393,7 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
-        self.lfp = list()
+        self.lfp_array = dict()
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -1197,11 +1197,14 @@ class Network(object):
         self.external_drives = dict()
         self.connectivity = connectivity
 
-    def add_electrode(self, electrode_pos, sigma=0.3, method='psa'):
-        """Specify coordinates of electrodes for LFP recording.
+    def add_electrode_array(self, name, electrode_pos, sigma=0.3,
+                            method='psa'):
+        """Specify coordinates of an electrode array for LFP recording.
 
         Parameters
         ----------
+        name : str
+            Unique name of the array.
         electrode_pos : tuple | list of tuple
             Coordinates specifying the position for LFP electrodes in
             the form of (x, y, z) (in um).
@@ -1212,6 +1215,10 @@ class Network(object):
             'psa' (default), i.e., point source approximation or line source
             approximation, i.e., 'lsa'
         """
+        from .lfp import LFPArray
+        _validate_type(name, str, 'name')
+        if name in self.lfp_array.keys():
+            raise ValueError(f'{name} already exists, use another name!')
         _validate_type(electrode_pos, (list, tuple), 'electrode_pos')
         _validate_type(sigma, (float, int), 'sigma')
         assert sigma > 0.0
@@ -1223,9 +1230,8 @@ class Network(object):
             assert len(e_pos) == 3
             for pos in e_pos:
                 _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
-            electrode_dict = {
-                'data': list(), 'pos': e_pos, 'sigma': sigma, 'method': method}
-            self.lfp.append(electrode_dict)
+        self.lfp_array.update({name: LFPArray(electrode_pos,
+                                              sigma=sigma, method=method)})
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

@@ -75,7 +75,7 @@ def run_hnn_core_fixture():
     def _run_hnn_core_fixture(backend=None, n_procs=None, n_jobs=1,
                               reduced=False, record_vsoma=False,
                               record_isoma=False, postproc=True,
-                              electrode_pos=None):
+                              electrode_array=None):
         hnn_core_root = op.dirname(hnn_core.__file__)
 
         # default params
@@ -91,8 +91,9 @@ def run_hnn_core_fixture():
                            't_evprox_2': 20,
                            'N_trials': 2})
         net = default_network(params, add_drives_from_params=True)
-        if electrode_pos is not None:
-            net.add_electrode(electrode_pos)
+        if electrode_array is not None:
+            for name, positions in electrode_array.items():
+                net.add_electrode_array(name, positions)
 
         # number of trials simulated
         for drive in net.external_drives.values():

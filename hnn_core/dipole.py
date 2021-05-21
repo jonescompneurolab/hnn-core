@@ -94,6 +94,8 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     net._params['N_trials'] = n_trials
     net._instantiate_drives(n_trials=n_trials)
     net.cell_response.reset()  # see #290 for context; relevant for MPI
+    for arr in net.lfp_array.values():
+        arr.reset()  # overwrite, not append, any previous simulation results
 
     if isinstance(record_vsoma, bool):
         net._params['record_vsoma'] = record_vsoma
@@ -333,7 +335,7 @@ class Dipole(object):
         return self
 
     def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             show=True):
+             color=None, show=True):
         """Simple layer-specific plot function.
 
         Parameters
@@ -348,6 +350,8 @@ class Dipole(object):
             Factor by which to decimate the raw dipole traces (optional)
         ax : instance of matplotlib figure | None
             The matplotlib axis
+        color : tuple of float
+            RGBA value to use for plotting (optional)
         show : bool
             If True, show the figure
 
@@ -357,7 +361,7 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         return plot_dipole(self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
-                           decim=decim, show=show)
+                           decim=decim, color=color, show=show)
 
     def plot_psd(self, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
                  ax=None, show=True):

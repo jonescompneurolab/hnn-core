@@ -15,7 +15,7 @@ if int(__version__[0]) >= 8:
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
 from copy import deepcopy
-from .lfp import _LFPElectrode
+from .lfp import _LFPArray
 
 # a few globals
 _PC = None
@@ -82,18 +82,8 @@ def _simulate_single_trial(neuron_net, trial_idx):
     neuron_net.aggregate_data()
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
-    for elec in neuron_net._lfp:
-        if len(elec.lfp_v) == len(times) - 1:
-            # Last value repeated, CVode doesn't update the membrane currents
-            # for the last time step.
-            elec.calc_potential_callback()
-        elif len(elec.lfp_v) == len(times):
-            pass
-        else:
-            raise RuntimeError(
-                f'Length of LFP potential vector ({len(elec.lfp_v)}) does not '
-                f'match number of time points in simulation ({len(times)})')
-        _PC.allreduce(elec.lfp_v, 1)
+    for nrn_arr in neuron_net._lfp_array.values():
+        _PC.allreduce(nrn_arr._lfp_v, 1)
 
     # aggregate the currents and voltages independently on each proc
     vsoma_list = _PC.py_gather(neuron_net._vsoma, 0)
@@ -295,7 +285,9 @@ class NetworkBuilder(object):
 
         # if LFP electrodes have been included, we need to calculate
         # transmembrane currents at each integration step
-        self._expose_imem = True if len(self.net.lfp) > 0 else False
+        self._expose_imem = False
+        if len(self.net.lfp_array) > 0:
+            self._expose_imem = True
 
         self._build()
 
@@ -334,7 +326,7 @@ class NetworkBuilder(object):
         self._spike_gids = h.Vector()
         self._vsoma = dict()
         self._isoma = dict()
-        self._lfp = list()
+        self._lfp_array = dict()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spike_times = h.Vector()
@@ -343,7 +335,7 @@ class NetworkBuilder(object):
         self._record_spikes()
         self._connect_celltypes()
 
-        if len(self.net.lfp) > 0:
+        if len(self.net.lfp_array) > 0:
             self._record_lfp()
 
         if _get_rank() == 0:
@@ -498,11 +490,10 @@ class NetworkBuilder(object):
                         self.ncs[connection_name].append(nc)
 
     def _record_lfp(self):
-        for e_dict in self.net.lfp:
-            pos, sigma = e_dict['pos'], e_dict['sigma']
-            method = e_dict['method']
-            elec = _LFPElectrode(pos, sigma=sigma, method=method, cvode=_CVODE)
-            self._lfp.append(elec)
+        for arr_name, arr in self.net.lfp_array.items():
+            nrn_arr = _LFPArray(arr, cvode=_CVODE)
+            nrn_arr.build()
+            self._lfp_array.update({arr_name: nrn_arr})
 
     # setup spike recording for this node
     def _record_spikes(self):
@@ -591,10 +582,14 @@ class NetworkBuilder(object):
             isoma_py[gid] = {key: rec_i.to_python()
                              for key, rec_i in rec_i.items()}
 
-        lfp_py = list()
-        for elec in self._lfp:
-            lfp_py.append(elec.lfp_v.to_python())
-            elec.reset()
+        lfp_arr_py = dict()
+        lfp_times_py = dict()
+        for arr_name, nrn_arr in self._lfp_array.items():
+            voltage_arr = [nrn_arr.voltages.getrow(ii).to_python() for
+                           ii in range(nrn_arr.voltages.nrow())]
+            lfp_arr_py.update({arr_name: voltage_arr})
+            lfp_times_py.update({arr_name: nrn_arr.times})
+            nrn_arr.reset()  # XXX needed?
 
         from copy import deepcopy
         data = (self._all_spike_times.to_python(),
@@ -602,7 +597,7 @@ class NetworkBuilder(object):
                 deepcopy(self.net.gid_ranges),
                 deepcopy(vsoma_py),
                 deepcopy(isoma_py),
-                lfp_py)
+                lfp_arr_py, lfp_times_py)
         return data
 
     def _clear_last_network_objects(self):
