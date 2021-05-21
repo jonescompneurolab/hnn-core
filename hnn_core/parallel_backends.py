@@ -65,8 +65,12 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsoma.append(sim_data_trial[3])
         net.cell_response._isoma.append(sim_data_trial[4])
-        for e_idx in range(len(net.lfp)):
-            net.lfp[e_idx]['data'].append(sim_data_trial[5][e_idx])
+        for arr_name, arr in net.lfp_array.items():
+            # voltages is a n_trials x n_contacts x n_samples array
+            net.lfp_array[
+                arr_name]._data.append(sim_data_trial[5][arr_name])
+
+            net.lfp_array[arr_name].times = sim_data_trial[6][arr_name]
 
         N_pyr_x = net._params['N_pyr_x']
         N_pyr_y = net._params['N_pyr_y']
