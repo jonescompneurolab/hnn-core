@@ -81,6 +81,7 @@ def split_by_evinput(params):
                     'maxval': 0.0915
                 }
         }
+        Elements are sorted by their start time.
     """
 
     evinput_params = {}
@@ -151,7 +152,7 @@ def generate_weights(evinput_params, params, decay_multiplier):
     Returns
     -------
     evinput_params : dict
-        Adds the key 'cdf' to evinput_params[input_name]
+        Adds the keys 'weights' and 'cdf' to evinput_params[input_name]
         and converts evinput_params['opt_start'] and evinput_params['opt_end']
         to be in multiples of 'dt'.
     """
@@ -422,9 +423,8 @@ params = read_params(params_fname)
 # timeframe to optimize. Chunks are consolidated if more than one input should
 # be optimized at a time.
 evinput_params = split_by_evinput(params)
-weighted_evinput_params = \
-    generate_weights(evinput_params, params, decay_multiplier)
-param_chunks = consolidate_chunks(weighted_evinput_params)
+evinput_params = generate_weights(evinput_params, params, decay_multiplier)
+param_chunks = consolidate_chunks(evinput_params)
 
 sdfdfdf
 
@@ -467,9 +467,8 @@ for step in range(len(param_chunks)):
         # overfitting introduced by local weighted RMSE optimization.
 
         evinput_params = split_by_evinput(params)
-        weighted_evinput_params = \
-            generate_weights(evinput_params, params, decay_multiplier)
-        param_chunks = consolidate_chunks(weighted_evinput_params)
+        evinput_params = generate_weights(evinput_params, params, decay_multiplier)
+        param_chunks = consolidate_chunks(evinput_params)
 
         # reload opt_params for the last step in case the number of
         # steps was changed by updateoptparams()
