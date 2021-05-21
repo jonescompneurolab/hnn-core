@@ -64,7 +64,23 @@ def split_by_evinput(params):
     Returns
     -------
     sorted_evinput_params: Dict
-        Dictionary with parameters grouped by evoked inputs
+        Dictionary with parameters grouped by evoked inputs.
+        Keys for each evoked input are
+        'mean', 'sigma', 'ranges', 'num_params', 'start',
+        'end', 'cdf', 'weights', 'opt_start', 'opt_end'.
+        sorted_evinput_params['evprox1']['ranges'] is a dict
+        with keys as the parameters to be optimized and values
+        indicating the ranges over which they should be
+        optimized. E.g.,
+        sorted_evinput['evprox1']['ranges'] = 
+        {
+            'gbar_evprox_1_L2Pyr_ampa':
+                {
+                    'initial': 0.05125,
+                    'minval': 0,
+                    'maxval': 0.0915
+                }
+        }
     """
 
     evinput_params = {}
@@ -130,7 +146,15 @@ def split_by_evinput(params):
 
 
 def generate_weights(evinput_params, params, decay_multiplier):
-    """ Calculation of weight function for wRMSE calcuation """
+    """Calculation of weight function for wRMSE calcuation
+
+    Returns
+    -------
+    evinput_params : dict
+        Adds the key 'cdf' to evinput_params[input_name]
+        and converts evinput_params['opt_start'] and evinput_params['opt_end']
+        to be in multiples of 'dt'.
+    """
 
     import scipy.stats as stats
     from math import ceil, floor
@@ -222,8 +246,9 @@ def create_last_chunk(input_chunks):
 
 
 def consolidate_chunks(inputs):
-    """ Consolidates inputs into optimization "chunks" defined by
+    """Consolidates inputs into optimization "chunks" defined by
     opt_start and opt_end
+
     Parameters
     ----------
     inputs: Dict
@@ -233,7 +258,8 @@ def consolidate_chunks(inputs):
     Returns
     -------
     consolidated_chunks: List
-        List of chunks corresponding to optimization steps
+        Combine the evinput_params whenever the end is overlapping
+        with the next.
     """
     global default_num_step_sims
 
@@ -399,6 +425,8 @@ evinput_params = split_by_evinput(params)
 weighted_evinput_params = \
     generate_weights(evinput_params, params, decay_multiplier)
 param_chunks = consolidate_chunks(weighted_evinput_params)
+
+sdfdfdf
 
 ###############################################################################
 # Start the optimization!
