@@ -24,6 +24,9 @@ from hnn_core import read_params, Network, Dipole, MPIBackend
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
+mpi_cmd = '/autofs/space/meghnn_001/users/mjas/opt/openmpi/bin/mpirun'
+n_procs = 10
+
 ###############################################################################
 # Set some global variables
 optiter = 0
@@ -299,7 +302,8 @@ def optrun(new_params, grad=0):
     # run the simulation, but stop early if possible
     params['tstop'] = opt_params['opt_end']
     net = Network(params, add_drives_from_params=True)
-    dpls = simulate_dipole(net, n_trials=1)
+    with MPIBackend(n_procs=n_procs, mpi_cmd=mpi_cmd):
+        dpls = simulate_dipole(net, n_trials=1)
     # avg_dpl = average_dipoles(dpls)
     avg_dpl = dpls[0].copy()
     avg_rmse = rmse(avg_dpl, exp_dpl,
@@ -401,7 +405,7 @@ param_chunks = consolidate_chunks(weighted_evinput_params)
 
 print("Running simulation with initial parameters")
 net = Network(params, add_drives_from_params=True)
-with MPIBackend(n_procs=2):
+with MPIBackend(n_procs=n_procs, mpi_cmd=mpi_cmd):
     dpls = simulate_dipole(net, n_trials=1)
 # initial_dpl = average_dipoles(dpls)
 initial_dpl = dpls.copy()
