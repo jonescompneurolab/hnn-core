@@ -362,56 +362,6 @@ def run_optimization(maxiter):
     return result
 
 
-def run_optimization_nlopt(maxiter, seed=0):
-    """ Start the nlopt optimization
-
-    Parameters
-    ----------
-    maxiter : int
-        The number of total simulations
-    seed: int | None
-        Seed for RNG to make optimization results reproducible
-
-    Returns
-    -------
-    opt_results: List
-        List with the values of the best parameters found by
-        optimization engine. Order is consistent with
-        opt_params['ranges']
-    """
-    import nlopt
-    global opt_params
-
-    nlopt.srand(seed)
-    algorithm = nlopt.LN_COBYLA
-
-    num_params = len(opt_params['ranges'])
-    opt = nlopt.opt(algorithm, num_params)
-    params_arr = np.zeros(num_params)
-    lb = np.zeros(num_params)
-    ub = np.zeros(num_params)
-
-    for idx, param_name in enumerate(opt_params['ranges'].keys()):
-        ub[idx] = opt_params['ranges'][param_name]['maxval']
-        lb[idx] = opt_params['ranges'][param_name]['minval']
-        params_arr[idx] = opt_params['ranges'][param_name]['initial']
-
-    if algorithm == nlopt.G_MLSL_LDS or algorithm == nlopt.G_MLSL:
-        # In case these mixed mode (global + local) algorithms are used in the
-        # future
-        local_opt = nlopt.opt(nlopt.LN_COBYLA, num_params)
-        opt.set_local_optimizer(local_opt)
-
-    opt.set_lower_bounds(lb)
-    opt.set_upper_bounds(ub)
-    opt.set_min_objective(optrun)
-    opt.set_xtol_rel(1e-4)
-    opt.set_maxeval(maxiter)
-    opt_results = opt.optimize(params_arr)
-
-    return opt_results
-
-
 ###############################################################################
 # Load experimental data into Dipole object. Data can be retrieved from
 # https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt
