@@ -67,7 +67,7 @@ def split_by_evinput(params):
     sorted_evinput_params: Dict
         Dictionary with parameters grouped by evoked inputs.
         Keys for each evoked input are
-        'mean', 'sigma', 'ranges', 'num_params', 'start',
+        'mean', 'sigma', 'ranges', 'start',
         'end', 'cdf', 'weights', 'opt_start', 'opt_end'.
         sorted_evinput_params['evprox1']['ranges'] is a dict
         with keys as the parameters to be optimized and values
@@ -112,7 +112,6 @@ def split_by_evinput(params):
                      (timing_sigma * sigma_range_multiplier / 100.0))
         evinput_params[id_str]['ranges']['sigma_' + evinput_t] = \
             {'initial': timing_sigma, 'minval': range_min, 'maxval': range_max}
-        evinput_params[id_str]['num_params'] = 1
 
         # calculate range for time
         timing_bound = timing_sigma * timing_range_multiplier
@@ -123,7 +122,6 @@ def split_by_evinput(params):
         evinput_params[id_str]['end'] = range_max
         evinput_params[id_str]['ranges'][evinput_t] =  \
             {'initial': value, 'minval': range_min, 'maxval': range_max}
-        evinput_params[id_str]['num_params'] += 1
 
         # calculate ranges for syn. weights
         for label in params['gbar_' + id_str + '*']:
@@ -138,7 +136,6 @@ def split_by_evinput(params):
                                      synweight_range_multiplier / 100.0)
             evinput_params[id_str]['ranges'][label] = \
                 {'initial': value, 'minval': range_min, 'maxval': range_max}
-            evinput_params[id_str]['num_params'] += 1
 
         continue
 
@@ -272,7 +269,6 @@ def consolidate_chunks(inputs):
            (input_dict['start'] <= consolidated_chunks[-1]['end']):
             # update previous chunk
             consolidated_chunks[-1]['inputs'].extend(input_dict['inputs'])
-            consolidated_chunks[-1]['num_params'] += input_dict['num_params']
             consolidated_chunks[-1]['end'] = input_dict['end']
             consolidated_chunks[-1]['ranges'].update(input_dict['ranges'])
             consolidated_chunks[-1]['opt_end'] = \
