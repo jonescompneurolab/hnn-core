@@ -54,6 +54,13 @@ decay_multiplier = 1.6
 # Functions used for optimization
 
 
+def _get_range(val, multiplier):
+    range_min = max(0, val - val * multiplier / 100.)
+    range_max = val + val * multiplier / 100.
+    ranges = {'initial': val, 'minval': range_min, 'maxval': range_max}
+    return ranges
+
+
 def split_by_evinput(params):
     """ Sorts parameter ranges by evoked inputs into a dictionary
 
@@ -88,12 +95,11 @@ def split_by_evinput(params):
     evinput_params = {}
     for evinput_t in params['t_*']:
         id_str = evinput_t.lstrip('t_')
-        value = float(params[evinput_t])
+        timing_mean = float(params[evinput_t])
 
-        evinput_params[id_str] = {}
-        try:
+        if f'sigma_{evinput_t}' in params:
             timing_sigma = float(params['sigma_' + evinput_t])
-        except KeyError:
+        else:
             timing_sigma = 3.0
             print("Couldn't fing timing_sigma. Using default %f" %
                   timing_sigma)
@@ -102,42 +108,30 @@ def split_by_evinput(params):
             # sigma of 0 will not produce a CDF
             timing_sigma = 0.01
 
-        evinput_params[id_str] = {'mean': value, 'sigma': timing_sigma,
+        evinput_params[id_str] = {'mean': timing_mean, 'sigma': timing_sigma,
                                   'ranges': {}}
 
-        # calculate range for sigma
-        range_min = max(0, timing_sigma -
-                        (timing_sigma * sigma_range_multiplier / 100.0))
-        range_max = (timing_sigma +
-                     (timing_sigma * sigma_range_multiplier / 100.0))
         evinput_params[id_str]['ranges']['sigma_' + evinput_t] = \
-            {'initial': timing_sigma, 'minval': range_min, 'maxval': range_max}
+            _get_range(timing_sigma, sigma_range_multiplier)
 
         # calculate range for time
         timing_bound = timing_sigma * timing_range_multiplier
-        range_min = max(0, value - timing_bound)
-        range_max = min(float(params['tstop']), value + timing_bound)
+        range_min = max(0, timing_mean - timing_bound)
+        range_max = min(float(params['tstop']), timing_mean + timing_bound)
 
         evinput_params[id_str]['start'] = range_min
         evinput_params[id_str]['end'] = range_max
         evinput_params[id_str]['ranges'][evinput_t] =  \
-            {'initial': value, 'minval': range_min, 'maxval': range_max}
+            {'initial': timing_mean, 'minval': range_min, 'maxval': range_max}
 
         # calculate ranges for syn. weights
-        for label in params['gbar_' + id_str + '*']:
-            value = float(params[label])
+        for label in params[f'gbar_{id_str}*']:
+            value = params[label]
+            ranges = _get_range(value, synweight_range_multiplier)    
             if value == 0.0:
-                range_min = value
-                range_max = 1.0
-            else:
-                range_min = max(0, value -
-                                (value * synweight_range_multiplier / 100.0))
-                range_max = value + (value *
-                                     synweight_range_multiplier / 100.0)
-            evinput_params[id_str]['ranges'][label] = \
-                {'initial': value, 'minval': range_min, 'maxval': range_max}
-
-        continue
+                ranges['minval'] = value
+                ranges['maxval'] = 1.0
+            evinput_params[id_str]['ranges'][label] = ranges
 
     sorted_evinput_params = OrderedDict(sorted(evinput_params.items(),
                                                key=lambda x: x[1]['start']))
