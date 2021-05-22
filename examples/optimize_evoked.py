@@ -10,6 +10,10 @@ and a simulated waveform using MNE-Neuron.
 #          Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import scipy.stats as stats
+from math import ceil, floor
+from scipy.optimize import fmin_cobyla
+
 import numpy as np
 import os.path as op
 from collections import OrderedDict
@@ -148,10 +152,6 @@ def generate_weights(evinput_params, params, decay_multiplier):
         and converts evinput_params['opt_start'] and evinput_params['opt_end']
         to be in multiples of 'dt'.
     """
-
-    import scipy.stats as stats
-    from math import ceil, floor
-
     num_step = ceil(params['tstop'] / params['dt']) + 1
     times = np.linspace(0, params['tstop'], num_step)
 
@@ -336,8 +336,6 @@ def optrun(new_params, grad=0):
 
 
 def run_optimization(maxiter):
-    from scipy.optimize import fmin_cobyla
-
     global opt_params
 
     cons = list()
