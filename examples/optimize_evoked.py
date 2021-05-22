@@ -166,14 +166,12 @@ def generate_weights(evinput_params, params, decay_multiplier):
             evinput_params[input_name]['cdf'].copy()
 
         for other_input in evinput_params:
-            if input_name == other_input:
-                # don't subtract our own cdf(s)
-                continue
-            if evinput_params[other_input]['mean'] < \
-               evinput_params[input_name]['mean']:
-                # check ordering to only use inputs after us
-                continue
-            else:
+            # check ordering to only use inputs after us
+            skip = (evinput_params[other_input]['mean'] <
+                    evinput_params[input_name]['mean'])
+            # don't subtract our own cdf(s)
+            skip = skip or (input_name == other_input)
+            if not skip:
                 decay_factor = decay_multiplier * \
                     (evinput_params[other_input]['mean'] -
                      evinput_params[input_name]['mean']) / params['tstop']
@@ -335,15 +333,16 @@ def optrun(new_params, grad=0):
     return avg_rmse  # nlopt expects error
 
 
-def run_optimization(maxiter):
-    global opt_params
+def run_optimization(maxiter, param_ranges):
 
     cons = list()
     x0 = list()
-    for idx, param_name in enumerate(opt_params['ranges'].keys()):
-        x0.append(opt_params['ranges'][param_name]['initial'])
-        cons.append(lambda x : x[idx] <= opt_params['ranges'][param_name]['maxval'])
-        cons.append(lambda x : x[idx] >= opt_params['ranges'][param_name]['minval'])
+    for idx, param_name in enumerate(param_ranges):
+        x0.append(param_ranges[param_name]['initial'])
+        cons.append(
+            lambda x: x[idx] <= param_ranges[param_name]['maxval'])
+        cons.append(
+            lambda x: x[idx] >= param_ranges[param_name]['minval'])
 
     result = fmin_cobyla(optrun, cons=cons, rhoend=1e-4,
                          x0=x0, maxfun=maxiter)
@@ -415,7 +414,8 @@ for step in range(len(param_chunks)):
         # overfitting introduced by local weighted RMSE optimization.
 
         evinput_params = split_by_evinput(params)
-        evinput_params = generate_weights(evinput_params, params, decay_multiplier)
+        evinput_params = generate_weights(evinput_params, params,
+                                          decay_multiplier)
         param_chunks = consolidate_chunks(evinput_params)
 
         # reload opt_params for the last step in case the number of
@@ -430,7 +430,8 @@ for step in range(len(param_chunks)):
 
     print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                 opt_params['opt_end']))
-    opt_results = run_optimization(maxiter=default_num_total_sims)
+    opt_results = run_optimization(maxiter=default_num_total_sims,
+                                   param_ranges=opt_params['ranges'])
 
     # update opt_params for the next round
     for var_name, value in zip(opt_params['ranges'], opt_results):
