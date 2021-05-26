@@ -635,6 +635,7 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
     ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
                  f"({conn['loc']}, {conn['receptor']})")
 
+    plt_show(show)
     return ax.get_figure()
 
 
