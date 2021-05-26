@@ -38,9 +38,15 @@ net_erp = default_network(params, add_drives_from_params=True)
 # Instantiating the network comes with a predefined set of connections that
 # reflect the canonical neocortical microcircuit. ``net.connectivity``
 # is a list of dictionaries which detail every cell-cell, and drive-cell
-# connection.
-print(len(net_erp.connectivity))
+# connection. The weights of these connections can be visualized with
+# :func:`~hnn_core.viz.plot_connectivity_weights`
+from hnn_core.viz import plot_connectivity_weights
+n_connections = len(net_erp.connectivity)
+print(n_connections)
 print(net_erp.connectivity[0:2])
+
+# Plot the last connection added to the network
+plot_connectivity_weights(net_erp, conn_idx=n_connections)
 
 ###############################################################################
 # Data recorded during simulations are stored under
@@ -117,6 +123,7 @@ net_sparse.cell_response.plot_spikes_raster()
 
 net_sparse.connectivity[-2].plot()
 net_sparse.connectivity[-1].plot()
+
 
 ###############################################################################
 # Using the sparse connectivity pattern produced a lot more spiking in
