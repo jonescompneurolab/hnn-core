@@ -8,7 +8,7 @@ This example demonstrates how to modify the network connectivity.
 
 # Author: Nick Tolley <nicholas_tolley@brown.edu>
 
-# sphinx_gallery_thumbnail_number = 5
+# sphinx_gallery_thumbnail_number = 1
 
 import os.path as op
 
@@ -41,12 +41,13 @@ net_erp = default_network(params, add_drives_from_params=True)
 # connection. The weights of these connections can be visualized with
 # :func:`~hnn_core.viz.plot_connectivity_weights`
 from hnn_core.viz import plot_connectivity_weights
-n_connections = len(net_erp.connectivity)
-print(n_connections)
-print(net_erp.connectivity[0:2])
+print(len(net_erp.connectivity))
 
-# Plot the last connection added to the network
-plot_connectivity_weights(net_erp, conn_idx=n_connections)
+print(net_erp.connectivity[15])
+plot_connectivity_weights(net_erp, conn_idx=15)
+
+print(net_erp.connectivity[20])
+plot_connectivity_weights(net_erp, conn_idx=20)
 
 ###############################################################################
 # Data recorded during simulations are stored under
