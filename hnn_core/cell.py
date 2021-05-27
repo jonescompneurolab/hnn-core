@@ -26,7 +26,7 @@ def _get_cos_theta(p_secs, sec_name_apical):
 
 
 def _calculate_gaussian(x_val, height, lamtha):
-    """Return height of gaussian at x_val.and
+    """Return height of gaussian at x_val.
 
     Parameters
     ----------
