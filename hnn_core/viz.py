@@ -570,7 +570,8 @@ def plot_cell_morphology(cell, ax, show=True):
 
 
 def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
-    """ Plot connectivity matrix with color bar for synaptic weights
+    """Plot connectivity matrix with color bar for synaptic weights
+
     Parameters
     ----------
     net : Instance of Network object
