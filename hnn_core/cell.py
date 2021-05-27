@@ -82,8 +82,8 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict):
 
     weight = _calculate_gaussian(
         cell_dist, nc_dict['A_weight'], nc_dict['lamtha'])
-    delay = _calculate_gaussian(
-        cell_dist, nc_dict['A_delay'], nc_dict['lamtha'])
+    delay = nc_dict['A_delay'] / _calculate_gaussian(
+        cell_dist, 1, nc_dict['lamtha'])
     return weight, delay
 
 
