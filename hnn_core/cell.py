@@ -52,16 +52,18 @@ def _calculate_gaussian(x_val, height, lamtha):
     return x_height
 
 
-def _get_gaussian_connection(nc_dict, target_pos):
+def _get_gaussian_connection(src_pos, target_pos, nc_dict):
     """Calculate distance dependent connection properties.
 
     Parameters
     ----------
+    src_pos : float
+        Position of source cell.
+    target_pos : float
+        Position of target cell.
     nc_dict : dict
         Dictionary with keys: pos_src, A_weight, A_delay, lamtha
         Defines the connection parameters
-    target_pos : float
-        Position of target cell.
 
     Returns
     -------
@@ -74,8 +76,8 @@ def _get_gaussian_connection(nc_dict, target_pos):
     -----
     Distance in xy plane is used for gaussian decay.
     """
-    x_dist = target_pos[0] - nc_dict['pos_src'][0]
-    y_dist = target_pos[1] - nc_dict['pos_src'][1]
+    x_dist = target_pos[0] - src_pos[0]
+    y_dist = target_pos[1] - src_pos[1]
     cell_dist = np.sqrt(x_dist**2 + y_dist**2)
 
     weight = _calculate_gaussian(
@@ -540,7 +542,8 @@ class Cell:
 
         # set props here.
         nc.threshold = nc_dict['threshold']
-        nc.weight[0], nc.delay = _get_gaussian_connection(nc_dict, self.pos)
+        nc.weight[0], nc.delay = _get_gaussian_connection(
+            nc_dict['pos_src'], self.pos, nc_dict)
 
         return nc
 

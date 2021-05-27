@@ -577,7 +577,7 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
     net : Instance of Network object
         The Network object
     conn_idx : int
-        Index of _Connectivity object to be visualized
+        Index of connection to be visualized
         from `net.connectivity`
     ax : instance of Axes3D
         Matplotlib 3D axis
@@ -591,6 +591,7 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
     """
     import matplotlib.pyplot as plt
     from .network import Network
+    from .cell import _get_gaussian_connection
 
     if not isinstance(net, Network):
         raise TypeError('conn must be instance of _Connectivity')
@@ -617,12 +618,7 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
             target_pos = target_type_pos[target_idx]
 
             # Identical calculation used in Cell.par_connect_from_src()
-            dx = src_pos[0] - target_pos[0]
-            dy = src_pos[1] - target_pos[1]
-            d = np.sqrt(dx**2 + dy**2)
-
-            weight = nc_dict['A_weight'] * \
-                np.exp(-(d**2) / (nc_dict['lamtha']**2))
+            weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
 
             connectivity_matrix[src_idx, target_idx] = weight
 
