@@ -25,6 +25,66 @@ def _get_cos_theta(p_secs, sec_name_apical):
     return cos_thetas
 
 
+def _calculate_gaussian(x_val, height, lamtha):
+    """Return height of gaussian at x_val.and
+
+    Parameters
+    ----------
+    x_val : float
+        Value on x-axis to query height of gaussian curve.
+    height : float
+        Height of the gaussian curve at zero.
+    lamtha : float
+        Space constant.
+
+    Returns
+    -------
+    x_height : float
+        Height of gaussian at x_val.
+
+    Notes
+    -----
+    Gaussian curve is centered at zero and has a fixed peak height
+    such the _calculate_gaussian(0, lamtha) returns 1 for all lamtha.
+    """
+    x_height = height * np.exp(-(x_val**2) / (lamtha**2))
+
+    return x_height
+
+
+def _get_gaussian_connection(nc_dict, target_pos):
+    """Calculate distance dependent connection properties.
+
+    Parameters
+    ----------
+    nc_dict : dict
+        Dictionary with keys: pos_src, A_weight, A_delay, lamtha
+        Defines the connection parameters
+    target_pos : float
+        Position of target cell.
+
+    Returns
+    -------
+    weight : float
+        Weight of the synaptic connection.
+    delay : float
+        Delay of synaptic connection.
+
+    Notes
+    -----
+    Distance in xy plane is used for gaussian decay.
+    """
+    x_dist = target_pos[0] - nc_dict['pos_src'][0]
+    y_dist = target_pos[1] - nc_dict['pos_src'][1]
+    cell_dist = np.sqrt(x_dist**2 + y_dist**2)
+
+    weight = _calculate_gaussian(
+        cell_dist, nc_dict['A_weight'], nc_dict['lamtha'])
+    delay = _calculate_gaussian(
+        cell_dist, nc_dict['A_delay'], nc_dict['lamtha'])
+    return weight, delay
+
+
 class _ArtificialCell:
     """The ArtificialCell class for initializing a NEURON feed source.
 
@@ -477,23 +537,12 @@ class Cell:
         from .network_builder import _PC
 
         nc = _PC.gid_connect(gid_presyn, postsyn)
-        # calculate distance between cell positions with pardistance()
-        d = self._pardistance(nc_dict['pos_src'])
-        # set props here
+
+        # set props here.
         nc.threshold = nc_dict['threshold']
-        nc.weight[0] = nc_dict['A_weight'] * \
-            np.exp(-(d**2) / (nc_dict['lamtha']**2))
-        nc.delay = nc_dict['A_delay'] / \
-            (np.exp(-(d**2) / (nc_dict['lamtha']**2)))
+        nc.weight[0], nc.delay = _get_gaussian_connection(nc_dict, self.pos)
 
         return nc
-
-    # pardistance function requires pre position, since it is
-    # calculated on POST cell
-    def _pardistance(self, pos_pre):
-        dx = self.pos[0] - pos_pre[0]
-        dy = self.pos[1] - pos_pre[1]
-        return np.sqrt(dx**2 + dy**2)
 
     def plot_morphology(self, ax=None, cell_types=None, show=True):
         """Plot the cell morphology.
