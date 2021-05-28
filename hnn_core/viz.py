@@ -5,6 +5,7 @@
 
 import numpy as np
 from itertools import cycle
+from .externals.mne import _validate_type
 
 
 def _get_plot_data(dpl, layer, tmin, tmax):
@@ -593,8 +594,8 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
     from .network import Network
     from .cell import _get_gaussian_connection
 
-    if not isinstance(net, Network):
-        raise TypeError('conn must be instance of _Connectivity')
+    _validate_type(net, Network, 'net', 'Network')
+    _validate_type(conn_idx, int, 'conn_idx', 'int')
     if ax is None:
         _, ax = plt.subplots(1, 1)
 
@@ -657,8 +658,7 @@ def plot_connectivity_matrix(conn, ax=None, show=True):
     import matplotlib.pyplot as plt
     from.network import _Connectivity
 
-    if not isinstance(conn, _Connectivity):
-        raise TypeError('conn must be instance of _Connectivity')
+    _validate_type(conn, _Connectivity, 'conn', '_Connectivity')
     if ax is None:
         _, ax = plt.subplots(1, 1)
 
@@ -679,6 +679,58 @@ def plot_connectivity_matrix(conn, ax=None, show=True):
     ax.set_yticklabels(list())
     ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
                  f"({conn['loc']}, {conn['receptor']})")
+
+    plt_show(show)
+    return ax.get_figure()
+
+
+def plot_cell_connectivity(net, conn_idx, gid, ax=None, show=True):
+    """Plot synaptic weight
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        The Network object
+    conn_idx : int
+        Index of connection to be visualized
+        from `net.connectivity`
+    gid : int
+        Each cell in a network is uniquely identified by it's "global ID": GID.
+    ax : instance of Axes3D
+        Matplotlib 3D axis
+    show : bool
+        If True, show the plot
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+    """
+    import matplotlib.pyplot as plt
+    from .network import Network
+    from .cell import _get_gaussian_connection
+
+    _validate_type(net, Network, 'net', 'Network')
+    _validate_type(conn_idx, int, 'conn_idx', 'int')
+    _validate_type(gid, int, 'gid', 'int')
+    if ax is None:
+        _, ax = plt.subplots(1, 1)
+
+    # Load objects for distance calculation
+    conn = net.connectivity[conn_idx]
+    nc_dict = conn['nc_dict']
+    src_type = conn['src_type']
+    target_type = conn['target_type']
+    src_type_pos = net.pos_dict[src_type]
+    target_type_pos = net.pos_dict[target_type]
+
+    # Assumes min/max values occur in the first/last pos_dict items.
+
+    src_range = np.array(conn['src_range'])
+    target_range = np.array(conn['target_range'])
+    connectivity_matrix = np.zeros((len(src_range), len(target_range)))
+
+
 
     plt_show(show)
     return ax.get_figure()
