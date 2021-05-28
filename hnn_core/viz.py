@@ -724,13 +724,15 @@ def plot_cell_connectivity(net, conn_idx, gid, ax=None, show=True):
     src_type_pos = net.pos_dict[src_type]
     target_type_pos = net.pos_dict[target_type]
 
-    # Assumes min/max values occur in the first/last pos_dict items.
-
+    # Assumes max value occurs in the last pos_dict items.
     src_range = np.array(conn['src_range'])
     target_range = np.array(conn['target_range'])
-    connectivity_matrix = np.zeros((len(src_range), len(target_range)))
+    connectivity_matrix = np.zeros((target_type_pos[-1][1],
+                                    (target_type_pos[-1][0])))
 
+    # src_idx = np.where()
 
+    # conn['gid_pairs']
 
-    plt_show(show)
-    return ax.get_figure()
+    # plt_show(show)
+    # return ax.get_figure()
