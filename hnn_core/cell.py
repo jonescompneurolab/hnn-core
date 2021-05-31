@@ -251,6 +251,8 @@ class Cell:
         whole, but convention is followed in this function ease use of gui.
         """
         # distance from initial to final root postion
+        # Resolve: y-coordinate here corresponds to the z-coordinate in
+        # self.pos[2]
         dx = self.pos[0] - self.p_secs['soma']['sec_pts'][0][0]
         dy = self.pos[2] - self.p_secs['soma']['sec_pts'][0][1]
         dz = self.pos[1] - self.p_secs['soma']['sec_pts'][0][2]

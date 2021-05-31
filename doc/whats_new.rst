@@ -27,7 +27,7 @@ Changelog
 Bug
 ~~~
 
-- Remove repositioning of cells which moves x and z coordinates of all sections slightly, by `Mainak Jas`_ in `#314 <https://github.com/jonescompneurolab/hnn-core/pull/314>`_
+- Remove rounding error caused by repositioning of NEURON cell sections, by `Mainak Jas`_ and `Ryan Thorpe`_ in `#314 <https://github.com/jonescompneurolab/hnn-core/pull/314>`_
 
 API
 ~~~
