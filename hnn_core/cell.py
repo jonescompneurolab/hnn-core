@@ -250,13 +250,20 @@ class Cell:
         for height and xz plane for depth. This is opposite for model as a
         whole, but convention is followed in this function ease use of gui.
         """
+        # distance from initial to final root postion
+        dx = self.pos[0] - self.p_secs['soma']['sec_pts'][0][0]
+        dy = self.pos[2] - self.p_secs['soma']['sec_pts'][0][1]
+        dz = self.pos[1] - self.p_secs['soma']['sec_pts'][0][2]
+
         for sec_name in p_secs:
             sec = h.Section(name=f'{self.name}_{sec_name}')
             self.sections[sec_name] = sec
 
             h.pt3dclear(sec=sec)
             for pt in p_secs[sec_name]['sec_pts']:
-                h.pt3dadd(pt[0], pt[1], pt[2], 1, sec=sec)
+                h.pt3dadd(pt[0] + dx,
+                          pt[1] + dy,
+                          pt[2] + dz, 1, sec=sec)
             sec.L = p_secs[sec_name]['L']
             sec.diam = p_secs[sec_name]['diam']
             sec.Ra = p_secs[sec_name]['Ra']
@@ -300,23 +307,6 @@ class Cell:
             raise ValueError(f'sec_name_apical must be an existing '
                              f'section of the current cell or None. '
                              f'Got {sec_name_apical}.')
-
-    def move_to_pos(self):
-        """Move cell to position."""
-        x0 = self.soma.x3d(0)
-        y0 = self.soma.y3d(0)
-        z0 = self.soma.z3d(0)
-        dx = self.pos[0] * 100 - x0
-        dy = self.pos[2] - y0
-        dz = self.pos[1] * 100 - z0
-
-        # dummy comment
-        for s in self.get_sections():
-            for i in range(s.n3d()):
-                h.pt3dchange(i, s.x3d(i) + dx, s.y3d(i) + dy,
-                             s.z3d(i) + dz, s.diam3d(i), sec=s)
-                h.pt3dchange(i, s.x3d(i) - dx, s.y3d(i) - dy,
-                             s.z3d(i) - dz, s.diam3d(i), sec=s)
 
     # two things need to happen here for h:
     # 1. dipole needs to be inserted into each section
