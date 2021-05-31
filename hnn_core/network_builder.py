@@ -317,7 +317,6 @@ class NetworkBuilder(object):
         self._all_spike_gids = h.Vector()
 
         self._record_spikes()
-        self.move_cells_to_pos()
         self._connect_celltypes()
 
         if _get_rank() == 0:
@@ -513,11 +512,6 @@ class NetworkBuilder(object):
                         seg.v = -64.9737
                     elif cell.name == 'L5Basket':
                         seg.v = -64.9737
-
-    def move_cells_to_pos(self):
-        """Move cells 3d positions to positions used for wiring."""
-        for cell in self._cells:
-            cell.move_to_pos()
 
     def _clear_neuron_objects(self):
         """Clear up NEURON internal gid information.
