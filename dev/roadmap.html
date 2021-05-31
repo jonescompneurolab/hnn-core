@@ -78,6 +78,7 @@
 <li><a class="reference internal" href="#timeline-overview">Timeline Overview</a></li>
 <li><a class="reference internal" href="#short-term-goals">Short-Term Goals</a></li>
 <li><a class="reference internal" href="#modularize-hnn-code-to-simplify-installation-development-and-maintenance">Modularize HNN code to simplify installation, development and maintenance</a></li>
+<li><a class="reference internal" href="#develop-a-new-hnn-gui">Develop a New HNN GUI</a></li>
 <li><a class="reference internal" href="#lfp-csd-simulation-visualization-and-data-comparison">LFP/CSD Simulation, Visualization and Data Comparison</a></li>
 <li><a class="reference internal" href="#parameter-estimation-expansion">Parameter Estimation Expansion</a></li>
 <li><a class="reference internal" href="#different-cortical-model-template-choices">Different Cortical Model Template Choices</a></li>
@@ -148,14 +149,18 @@ units that are directly comparable to source localized data (Ampere-meters, Am),
 the details in
 HNN enable interpretation of multi-scale activity including layer specific and
 individual cell activity. HNN was designed based on workflows to simulate the most
-commonly measured signals including ERPs and low frequency brain rhythms based on
+commonly measured signals, including ERPs and low frequency brain rhythms based on
 <a class="reference external" href="https://hnn.brown.edu/index.php/publications/">prior studies</a>.</p>
 <p>A main goal of HNN is to create a user-friendly interactive interface and
 tutorials to teach to the MEG/EEG community how to interact with the model to
 study the neural origin of  these signals, without needing to access the
-underlying complex neural modeling code. To this end, HNN was constructed with a GUI
-and corresponding tutorials of use for commonly measured signals is distributed on
-the HNN website (<a class="reference external" href="https:/hnn.brown.edu">https:/hnn.brown.edu</a>). An equal goal is to enable the neural
+underlying complex neural modeling code. To this end, HNN was constructed with a
+graphical user interface (GUI) and corresponding tutorials of use for commonly measured signals,
+which are distributed on the HNN website (<a class="reference external" href="https:/hnn.brown.edu">https:/hnn.brown.edu</a>).
+Our philosophy is that the interactive GUI is essential for all new users of HNN to develop an intuition
+on how to interact with the large-scale computational model to study the multi-scale neural dynamics underlying
+their MEG/EEG data. Once this intuition is gained, users who chose to can dive into the computational neural
+modeling code, where further command line utily can be developed. As such, an equal goal is to enable the neural
 modeling and coding community to participate in HNN development. We are prioritizing
 best practices in open-source software design and the development of a documented API
 for interoperability and to facilitate integration with other relevant open-source
@@ -167,9 +172,7 @@ transformational software specific to interpreting the neural origin of MEG/EEG.
 <p>This roadmap timeline outlines the major short-term and longer-term
 goals for HNNs. The short term goals will entail a substantial reorganization of the
 HNN code and creation of an API to facilitate HNN expansions, community contribution,
-and integration with other relevant open-source platforms (e.g. MNE-Python, NetPyNE). To this end, in March 2021, we released the first version of the HNN-core repository. HNN-core contains improved versions of HNN’s non-GUI components following best practices in open-source software design, with unit testing and continuous integration, along with initial API and documentation for command-line coding. We will adopt similar best practices to develop a new HNN-GUI and several new HNN features, including the ability to simulate and visualize LFP/CSD and to use improved parameter estimation procedures.</p>
-<p>Our process will be to develop all new features in HNN-core, with  API and examples of use, followed, when applicable, by integration into the HNN-GUI with correspoding GUI-based tutorials on our website. Our philosophy is that the interactive HNN-GUI is essential for all new users of HNN to develop an intuition on how to interact with the large-scale computational model to study the multi-scale neural dynamics underlying their MEG/EEG data. Once this intuition is gained, users who chose to can dive into the computational neural modeling in HNN-core, where further command line utily can be developed.</p>
-<p>Longer-term goals include integration with the related modeling software MNE-Python and NetPyNe, the development of a web-based interface with ability for simultaneous GUI and Command Line Interface (CLI), and extension to multi-area simulations.</p>
+and integration with other relevant open-source platforms (e.g. MNE-Python, NetPyNE). To this end, in March 2021, we released the first version of the HNN-core repository. HNN-core contains improved versions of HNN’s non-GUI components following best practices in open-source software design, with unit testing and continuous integration, along with initial API and documentation for command-line coding. We will adopt similar best practices to develop a new HNN-GUI and several new HNN features, including the ability to simulate and visualize LFP/CSD and to use improved parameter estimation procedures. Our process will be to develop all new features in HNN-core, with  API and examples of use followed, when applicable, by integration into the HNN-GUI with correspoding GUI-based tutorials on our website. Longer-term goals include integration with the related modeling software MNE-Python and NetPyNe, the development of a web-based interface with ability for simultaneous GUI and Command Line Interface (CLI), and extension to multi-area simulations.</p>
 </section>
 <section id="short-term-goals">
 <h2>Short-Term Goals<a class="headerlink" href="#short-term-goals" title="Permalink to this headline">¶</a></h2>
@@ -180,37 +183,44 @@ and integration with other relevant open-source platforms (e.g. MNE-Python, NetP
 underlying code that defines the current distribution of HNN to facilitate
 expansion and community engagement in its use and development. To minimize the
 dependencies that are required to install before contributing to HNN development
-and maintenance, all of the non-GUI components of HNN’s code are being organized into a new repository HNN-core (initial release March 2021). A new HNN-GUI will be developed following similar best-practices in open source software design, at which time the current HNN-GUI repository will be deprecated.</p>
-<p>This reorganization will entail improvements within
-the HNN-core repository, along with API development and examples of use, and development of a new HNN-GUI with corresponding updateds to the GUI-based tutorials on the HNN website, in the  following steps:</p>
+and maintenance, all of the non-GUI components of HNN’s code are being organized into a new repository HNN-core (initial release March 2021).
+This reorganization will entail continued improvements within the HNN-core repository, along with API development and examples of use, in the following steps:</p>
 <ul class="simple">
 <li><p>Following best practices in open-source software design, including continuous integration testing,
 to develop HNN-core. HNN-core will contain clean and reorganized code, and separate all components that
 interact directly with the NEURON simulator (e.g. cell and network intantiation, external drives, etc..),
 from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis).
 <strong>COMPLETED FEB 2021</strong></p></li>
-<li><p>Convert installation procedures to PIP <strong>COMPLETED FEB 2021</strong></p></li>
+<li><p>Convert installation procedures to PIP. <strong>COMPLETED FEB 2021</strong></p></li>
 <li><p>Parallelization of the simulations in HNN-core via MPI or Joblib. <strong>COMPLETED SEP 2020</strong></p></li>
 <li><p>Reorganization of the Network class within HNN-core module
 to separate cortical column model from exogenous drive, and optimization routines.
 See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a>, <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/129">gh-124</a>, and <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/124">gh-129</a> for related discussions.
 <strong>COMPLETED FEB 2021</strong></p></li>
 <li><p>Develop initial HNN-core documentation and example simulations following those
-detailed in the HNN-GUI tutorials <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">https://jonescompneurolab.github.io/hnn-core/stable/index.html</a>
+detailed in the HNN-GUI tutorials <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">https://jonescompneurolab.github.io/hnn-core/stable/index.html</a>.
 <strong>COMPLETED MARCH 2021</strong></p></li>
 <li><p>First release of HNN-Core 0.1 to the community <strong>COMPLETED MARCH 2021</strong></p></li>
 <li><p>Make HNN-Core compatible for windows including installation,  testing and
-continuous integration</p></li>
+continuous integration.</p></li>
 <li><p>Reorganization of Param.py file within HNN-core to multiple files that
 contain smaller dictionaries of parameters related to different modules of the code.
 See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a> for related discussions.</p></li>
-<li><p>Expand details in HNN-core examples to follow HNN-GUI based tutorials</p></li>
+<li><p>Expand details in HNN-core examples to follow HNN-GUI based tutorials.</p></li>
+</ul>
+</section>
+<section id="develop-a-new-hnn-gui">
+<h2>Develop a New HNN GUI<a class="headerlink" href="#develop-a-new-hnn-gui" title="Permalink to this headline">¶</a></h2>
+<p>A new HNN-GUI will be developed following similar best-practices in open source software design, as employed in HNN-core.
+The first step will be to ensure all of the functionality of the current GUI distribution is developed in HNN-Core, followed by
+integration into a new HNN-GUI, with corresponding GUI-based tutorials on the HNN website. Once complete, the current HNN-GUI repository will be deprecated.</p>
+<ul class="simple">
 <li><p>Development of optimization routines in HNN-core that have the current functionality
-in HNN-GUI</p></li>
+in HNN-GUI.</p></li>
 <li><p>Develop a new HNN-GUI using ipywidgets in HNN-core that has all of the functionality
-of the current HNN-GUI</p></li>
+of the current HNN-GUI.</p></li>
 <li><p>Rename HNN to HNN-GUI and release updated version to the community and deprecate
-original HNN repository</p></li>
+original HNN repository.</p></li>
 </ul>
 </section>
 <section id="lfp-csd-simulation-visualization-and-data-comparison">
@@ -240,8 +250,8 @@ to an ERP. New methods have been recently developed that apply a machine learnin
 approach to parameter estimation, namely Sequential Neural Parameter Estimation (SNPE)
 (Gonçalves et al Elife 2020: DOI: 10.7554/eLife.56261). We will adapt this method for parameter
 estimation to work with HNN-core, enabling estimation of a distribution of parameters
-that could account for empirical data, and then integrate it into the HNN-GUI with
-GUI-based tutorials for the following tasks:</p>
+that could account for empirical data, and then integrate it into the HNN-GUI, with
+GUI-based tutorials, in the following steps:</p>
 <ul class="simple">
 <li><p>Extending HNN-core to run batch simulations that enable parameter sweeps.</p></li>
 <li><p>Development of functions in HNN-GUI to enable parameter sweeps via the GUI.</p></li>
@@ -253,19 +263,19 @@ GUI-based tutorials for the following tasks:</p>
 <h2>Different Cortical Model Template Choices<a class="headerlink" href="#different-cortical-model-template-choices" title="Permalink to this headline">¶</a></h2>
 <p>HNN is distributed with a cortical column model template that represents
 generalizable features of cortical circuitry based on prior studies. Updates to
-this model are being made by the HNN team including a model with alternate pyramidal
+this model are being made by the HNN team, including a model with alternate pyramidal
 neuron calcium dynamics, and an updated inhibitory connectivity architecture. We will
-expand HNN-ccore to enable a choice of template models, beginning
+expand HNN-core to enable a choice of template models, beginning
 with those developed by the HNN team and ultimately expanding to model development
 in other platforms (e.g. NetPyNE), see Longer-Term goals. These models will first be
 developed in HNN-core, with corresponding API and examples of use, followed by integration
-into HNN-GUI with GUI-based tutorials.</p>
+into HNN-GUI, with GUI-based tutorials.</p>
 <ul class="simple">
 <li><p>Develop new cortical column template models with pyramidal neuron
 calcium dynamics, in HNN-core.</p></li>
-<li><p>Create flexibility to change local connectivity and to visualize connectivity in HNN-core</p></li>
-<li><p>Create flexibility to change exogenous connectivity and to visualize connectivity in HHN-core</p></li>
-<li><p>Develop functionality in HNN-GUI to chose amng different template models, Update examples and HNN-GUI tutorials to include description of network with updated calcium dynamics.</p></li>
+<li><p>Create flexibility to change local connectivity and to visualize connectivity in HNN-core.</p></li>
+<li><p>Create flexibility to change exogenous connectivity and to visualize connectivity in HHN-core.</p></li>
+<li><p>Develop functionality in HNN-GUI to chose amng different template models.</p></li>
 <li><p>Develop function in HNN-GUI to choose among different template models in the GUI.</p></li>
 </ul>
 <p>See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/111">gh-111</a> for more discussions.</p>
@@ -278,7 +288,7 @@ A primary goal of HNN is to facilitate this interpretation with a clear API and 
 of use in HNN-core, and interative GUI-based tutorals for all HNN-GUI functionality on our HNN website.
 Following the process for creating new featuers in HNN, the process for documenting
 new features will be to first develop them with API and examples of use in HNN-core, followed
-by integration into the HNN-GUI with corresponding GUI-based tutorials on the HNN-website.
+by integration into the HNN-GUI, with corresponding GUI-based tutorials on the HNN-website.
 Developmental goals are only complete once the corresponding documentation is available.</p>
 </section>
 <section id="longer-term-goals">
@@ -297,7 +307,7 @@ the HNN cortical column model and exogenous drives into the full NetPyNE
 platform (<a class="reference external" href="https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne">https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne</a>).
 See also update from <strong>MARCH 2021</strong> <a class="reference external" href="https://github.com/jonescompneurolab/hnn/tree/hnn2">https://github.com/jonescompneurolab/hnn/tree/hnn2</a> .</p>
 <p>To limit the scope of this effort to HNN-specific goals, i.e. neural modeling
-designed for interpretation of human EEG/MEG signals, we will Wwrk with NetPyNE team
+designed for interpretation of human EEG/MEG signals, we will work with NetPyNE team
 to develop clean modularized framework for integrating NetPyNe developed cortical models
 that have laminar structure and multicompartment pyramidal neurons into HNN design and workflows
 of use to simulate ERPs and low frequency brain rhythms work.</p>
