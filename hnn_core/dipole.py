@@ -94,7 +94,7 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     net._params['N_trials'] = n_trials
     net._instantiate_drives(n_trials=n_trials)
     net.cell_response.reset()  # see #290 for context; relevant for MPI
-    for arr in net.lfp_array.values():
+    for arr in net.rec_array.values():
         arr.reset()  # overwrite, not append, any previous simulation results
 
     if isinstance(record_vsoma, bool):

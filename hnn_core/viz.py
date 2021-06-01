@@ -8,7 +8,7 @@ from itertools import cycle
 from .externals.mne import _validate_type
 
 
-def _get_plot_data(dpl, layer, tmin, tmax):
+def _get_dpl_plot_data(dpl, layer, tmin, tmax):
     plot_tmin = dpl.times[0]
     if tmin is not None:
         plot_tmin = max(tmin, plot_tmin)
@@ -19,6 +19,23 @@ def _get_plot_data(dpl, layer, tmin, tmax):
     mask = np.logical_and(dpl.times >= plot_tmin, dpl.times < plot_tmax)
     times = dpl.times[mask]
     data = dpl.data[layer][mask]
+
+    return data, times
+
+
+def _get_ext_plot_data(times, data, tmin, tmax):
+    plot_tmin = times[0]
+    if tmin is not None:
+        plot_tmin = max(tmin, plot_tmin)
+    plot_tmax = times[-1]
+    if tmax is not None:
+        plot_tmax = min(tmax, plot_tmax)
+
+    times = np.array(times)
+    mask = np.logical_and(times >= plot_tmin, times < plot_tmax)
+    times = times[mask]
+
+    data = np.array(data)[mask]
 
     return data, times
 
@@ -60,6 +77,35 @@ def plt_show(show=True, fig=None, **kwargs):
     import matplotlib.pyplot as plt
     if show and get_backend() != 'agg':
         (fig or plt).show(**kwargs)
+
+
+def _plot_ext(times, data, sfreq, window_len=None, tmin=None,
+              tmax=None, ax=None, decim=None, color=None, show=True):
+    """Helper function for ExtracellularArray.plot()"""
+    import matplotlib.pyplot as plt
+    from .dipole import _hammfilt
+
+    if ax is None:
+        _, ax = plt.subplots(1, 1)
+
+    for contact_no, trace in enumerate(np.atleast_2d(data)):
+        plot_data, plot_times = _get_ext_plot_data(times, trace, tmin, tmax)
+        if window_len is not None:
+            winsz = np.round(1e-3 * window_len * sfreq)
+            plot_data = _hammfilt(plot_data, winsz)
+        if decim is not None:
+            plot_data, plot_times = _decimate_plot_data(decim, plot_data,
+                                                        plot_times)
+
+        ax.plot(plot_times, plot_data, label=f'C{contact_no}', color=color)
+
+    ax.ticklabel_format(axis='both', scilimits=(-2, 3))
+    ax.set_xlabel('Time (ms)')
+    ylabel = r'Electric potential ($\mu V$)'
+    ax.set_ylabel(ylabel, multialignment='center')
+
+    plt_show(show)
+    return ax.get_figure()
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
@@ -111,7 +157,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         if layer in dpl_trial.data.keys():
 
             # extract scaled data and times
-            data, times = _get_plot_data(dpl_trial, layer, tmin, tmax)
+            data, times = _get_dpl_plot_data(dpl_trial, layer, tmin, tmax)
             if decim is not None:
                 data, times = _decimate_plot_data(decim, data, times)
 
@@ -332,13 +378,14 @@ def plot_cells(net, ax=None, show=True):
             marker = markers[cell_type]
             ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
 
-    if net.lfp_array:
-        cols = plt.get_cmap('inferno', len(net.lfp_array) + 2)
-        for ii, (arr_name, arr) in enumerate(net.lfp_array.items()):
+    if net.rec_array:
+        cols = plt.get_cmap('inferno', len(net.rec_array) + 2)
+        for ii, (arr_name, arr) in enumerate(net.rec_array.items()):
             x = [p[0] for p in arr.positions]
-            y = [p[1] for p in arr.positions]
-            z = [p[2] for p in arr.positions]
-        ax.scatter(x, y, z, c=cols(ii + 1), s=100, marker='o', label=arr_name)
+            y = [p[2] for p in arr.positions]  # XXX flipped YZ until
+            z = [p[1] for p in arr.positions]  # coordinates made consistent
+            ax.scatter(x, y, z, color=cols(ii + 1), s=100, marker='o',
+                       label=arr_name)
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
 
@@ -409,7 +456,7 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         if dpl_trial.sfreq != sfreq:
             raise RuntimeError('All dipoles must be sampled equally!')
 
-        data, times = _get_plot_data(dpl_trial, layer, tmin, tmax)
+        data, times = _get_dpl_plot_data(dpl_trial, layer, tmin, tmax)
 
         sfreq = dpl_trial.sfreq
         if decim is not None:
@@ -507,7 +554,7 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         if dpl_trial.sfreq != sfreq:
             raise RuntimeError('All dipoles must be sampled equally!')
 
-        data, _ = _get_plot_data(dpl_trial, layer, tmin, tmax)
+        data, _ = _get_dpl_plot_data(dpl_trial, layer, tmin, tmax)
 
         freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
         trial_power.append(Pxx)

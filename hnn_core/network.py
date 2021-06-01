@@ -19,6 +19,7 @@ from .cell_response import CellResponse
 from .params import _long_name, _short_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
+from .extracellular import ExtracellularArray
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
@@ -333,15 +334,15 @@ class Network(object):
     connectivity : list of dict
         List of dictionaries specifying each cell-cell and drive-cell
         connection
+    rec_array : dict
+        Stores electrode position information and voltages recorded by them
+        for extracellular potential measurements. Multiple electrode arrays
+        may be defined as unique keys. The values of the dictionary are
+        instances of :class:`hnn_core.extracellular.ExtracellularArray`.
     threshold : float
         Firing threshold of all cells.
     delay : float
         Synaptic delay in ms.
-    lfp : list of dict
-        Stores local field potential recordings. Each list element is a
-        dictionary containing the LFP recording (after a simulation is run)
-        as well as information for each electrode. Keys include:
-        'pos', 'sigma', 'method', and 'lfp'.
 
     Notes
     ----
@@ -393,7 +394,7 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
-        self.lfp_array = dict()
+        self.rec_array = dict()
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -445,7 +446,7 @@ class Network(object):
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
-        net_copy.lfp = list()
+        net_copy.rec_array = dict()
         return net_copy
 
     def _update_cells(self):
@@ -1199,14 +1200,14 @@ class Network(object):
 
     def add_electrode_array(self, name, electrode_pos, sigma=0.3,
                             method='psa'):
-        """Specify coordinates of an electrode array for LFP recording.
+        """Specify coordinates of electrode array for extracellular recording.
 
         Parameters
         ----------
         name : str
             Unique name of the array.
         electrode_pos : tuple | list of tuple
-            Coordinates specifying the position for LFP electrodes in
+            Coordinates specifying the position for extracellular electrodes in
             the form of (x, y, z) (in um).
         sigma : float
             Extracellular conductivity, in S/m, of the assumed infinite,
@@ -1215,23 +1216,29 @@ class Network(object):
             'psa' (default), i.e., point source approximation or line source
             approximation, i.e., 'lsa'
         """
-        from .lfp import LFPArray
         _validate_type(name, str, 'name')
-        if name in self.lfp_array.keys():
+        if name in self.rec_array.keys():
             raise ValueError(f'{name} already exists, use another name!')
         _validate_type(electrode_pos, (list, tuple), 'electrode_pos')
         _validate_type(sigma, (float, int), 'sigma')
         assert sigma > 0.0
-        _validate_type(method, str, 'method')
-        _check_option('method', method, ['psa', 'lsa'])
+        try:  # allow None, but for testing only
+            _validate_type(method, str, 'method')
+            _check_option('method', method, ['psa', 'lsa'])
+        except (TypeError, ValueError) as e:
+            if method is None:
+                pass
+            else:
+                raise e
         if isinstance(electrode_pos, tuple):
             electrode_pos = [electrode_pos]
         for e_pos in electrode_pos:
             assert len(e_pos) == 3
             for pos in e_pos:
                 _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
-        self.lfp_array.update({name: LFPArray(electrode_pos,
-                                              sigma=sigma, method=method)})
+        self.rec_array.update({
+            name: ExtracellularArray(electrode_pos, sigma=sigma,
+                                     method=method)})
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
