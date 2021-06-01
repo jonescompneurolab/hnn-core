@@ -31,6 +31,16 @@ Dipole (:py:mod:`hnn_core.dipole`):
    Dipole
    average_dipoles
 
+ExtracellularArray (:py:mod:`hnn_core.extracellular`):
+------------------------------------------------------
+   
+   .. currentmodule:: hnn_core.extracellular
+   
+   .. autosummary::
+      :toctree: generated/
+   
+      ExtracellularArray
+
 Visualization (:py:mod:`hnn_core.viz`):
 ---------------------------------------
 

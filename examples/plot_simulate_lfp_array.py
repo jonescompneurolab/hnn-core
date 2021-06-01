@@ -18,7 +18,7 @@ import os.path as op
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, Network, simulate_dipole
+from hnn_core import read_params, default_network, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -34,7 +34,7 @@ params['tstop'] = 250
 # We first instantiate the network.
 # (Note: Setting ``add_drives_from_params=True`` loads a set of predefined
 # drives without the drives API shown previously).
-net = Network(params)
+net = default_network(params)
 weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
 synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
 rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
@@ -55,13 +55,13 @@ net.plot_cells()
 
 # XXX coordinates FUBAR, cortical depth direction is Y in NEURON objects!
 # electrode_pos = [(2, 400, 2), (6, 800, 6)]
-depths = list(range(-400, 1900, 200))
-electrode_pos = [(45, dep, 45) for dep in depths]
-net.add_electrode_array('shank1', electrode_pos)
-print(net.lfp_array)
+depths = list(range(-412, 1900, 200))
+electrode_pos = [(4.5, dep, 4.5) for dep in depths]
+net.add_electrode_array('shank1_psa', electrode_pos, method='psa')
+net.add_electrode_array('shank1_lsa', electrode_pos, method='lsa')
+print(net.rec_array)
 net.plot_cells()
 
-# with MPIBackend(n_procs=4):
 dpl = simulate_dipole(net)
 ###############################################################################
 # Now that our electrodes are specified, we can run the simulation. The LFP
@@ -70,7 +70,7 @@ import matplotlib.pyplot as plt
 
 plt.figure()
 trial_idx = 0
-net.lfp_array['shank1'][trial_idx].plot(contact_no=[1, -2], show=False)
+net.rec_array['shank1_psa'][trial_idx].plot(contact_no=[1, -2], show=False)
 plt.legend([f'e_pos {electrode_pos[1]}', f'e_pos {electrode_pos[-2]}'])
 plt.xlabel('Time (ms)')
 plt.ylabel(r'Potential ($\mu V$)')
@@ -78,7 +78,7 @@ plt.show()
 
 ###############################################################################
 # We can compare the dipole current wave form to that of a single LFP channel.
-show_electrodes = [6, 10]
+show_electrodes = [8, 10]
 tmin, tmax = 50, 225
 window_len = 10  # ms
 decimate = [5, 4]  # from 40k to 8k to 2k
@@ -89,7 +89,7 @@ dpl[trial_idx].copy().smooth(
     window_len=window_len).plot(ax=ax, decim=decimate, tmin=tmin, tmax=tmax,
                                 color='k', show=False)
 
-net.lfp_array['shank1'][trial_idx].plot(
+net.rec_array['shank1_psa'][trial_idx].plot(
     contact_no=show_electrodes, window_len=window_len, tmin=tmin, tmax=tmax,
     decim=decimate, ax=lfp_ax, show=False)
 
@@ -99,4 +99,17 @@ lfp_ax.legend([depths[show_electrodes[0]], depths[show_electrodes[1]]],
               loc='lower center')
 lfp_ax.yaxis.label.set_color('#1f77b4')
 
+plt.show()
+
+# For comparing PSA and LSA outputs (TEMPORARY!)
+fig, axs = plt.subplots(3, 4, sharex=True, sharey=False, figsize=(10, 8))
+for idx, ax in enumerate(axs.ravel()):
+    net.rec_array['shank1_psa'][trial_idx].plot(contact_no=idx, ax=ax,
+                                                tmin=60, tmax=180,
+                                                window_len=5,
+                                                show=False)
+    net.rec_array['shank1_lsa'][trial_idx].plot(contact_no=idx, ax=ax,
+                                                tmin=60, tmax=180,
+                                                window_len=5,
+                                                show=False)
 plt.show()

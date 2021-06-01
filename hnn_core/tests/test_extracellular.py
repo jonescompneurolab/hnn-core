@@ -10,12 +10,13 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, default_network, simulate_dipole, Network
+from hnn_core.extracellular import ExtracellularArray
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from hnn_core.parallel_backends import MPIBackend
 
 
-def test_lfp_api():
-    """Test LFP recording API."""
+def test_extracellular_api():
+    """Test extracellular recording API."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
@@ -27,8 +28,8 @@ def test_lfp_api():
     net.add_electrode_array('el1', electrode_pos, sigma, method)
     electrode_pos = [(2, 400, 2), (6, 800, 6)]
     net.add_electrode_array('arr1', electrode_pos, sigma, method)
-    assert len(net.lfp_array) == 2
-    assert len(net.lfp_array['arr1']) == 2  # length == n.o. electrodes
+    assert len(net.rec_array) == 2
+    assert len(net.rec_array['arr1'].positions) == 2
 
     pytest.raises(ValueError, net.add_electrode_array,
                   'arr1', [(6, 6, 800)], sigma, method)
@@ -51,11 +52,62 @@ def test_lfp_api():
     pytest.raises(TypeError, net.add_electrode_array,
                   'arr2', electrode_pos, sigma, 3.0)
 
+    rec_arr = ExtracellularArray(electrode_pos, sigma, method)
+    with pytest.raises(AttributeError, match="can't set attribute"):
+        rec_arr.times = [1, 2, 3]
+    with pytest.raises(TypeError, match="trial index must be int"):
+        _ = rec_arr['0']
+    with pytest.raises(IndexError, match="the data contain"):
+        _ = rec_arr[42]
+
+    pytest.raises(ValueError, ExtracellularArray,
+                  [(2, 2), (6, 6, 800)], sigma, method)
+    pytest.raises(TypeError, ExtracellularArray,
+                  [42, (6, 6, 800)], sigma, method)
+    pytest.raises(TypeError, ExtracellularArray,
+                  [(2, 2, 2), (6, 6, 800)], [0.3], method)
+    pytest.raises(ValueError, ExtracellularArray,
+                  [(2, 2, 2), (6, 6, 800)], sigma, 'foo')
+    pytest.raises(ValueError, ExtracellularArray,  # more chans than voltages
+                  [(2, 2, 2), (6, 6, 800)], sigma, method,
+                  times=[1], voltages=[[[42]]])
+    pytest.raises(ValueError, ExtracellularArray,  # less times than voltages
+                  [(2, 2, 2), (6, 6, 800)], sigma, method,
+                  times=[1], voltages=[[[42, 42], [84, 84]]])
+
+    rec_arr = ExtracellularArray(electrode_pos, sigma, method,
+                                 times=[0, 0.1, 0.21, 0.3],  # uneven sampling
+                                 voltages=[[[0, 0, 0, 0], [0, 0, 0, 0]]])
+    with pytest.raises(RuntimeError, match="Extracellular sampling times"):
+        _ = rec_arr.sfreq
+
+
+def test_transmembrane_currents():
+    """Test that net transmembrane current is zero at all times."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3,
+                   'tstop': 40,
+                   't_evprox_1': 5,
+                   't_evdist_1': 10,
+                   't_evprox_2': 20,
+                   'N_trials': 1})
+    net = default_network(params, add_drives_from_params=True)
+    depths = list(range(-400, 1900, 200))
+    electrode_pos = [(1.5, dep, 1.5) for dep in depths]
+    # all transfer resistances set to unity
+    net.add_electrode_array('net_Im', electrode_pos, method=None)
+    _ = simulate_dipole(net, postproc=False)
+    currents = net.rec_array['net_Im'].get_data()
+    assert_allclose(currents, 0, rtol=1e-10, atol=1e-10)
+
 
 @requires_mpi4py
 @requires_psutil
-def test_lfp_backends(run_hnn_core_fixture):
-    """Test lfp outputs across backends."""
+def test_extracellular_backends(run_hnn_core_fixture):
+    """Test extracellular outputs across backends."""
 
     electrode_array = {'arr1': [(2, 400, 2), (6, 800, 6)]}
     _, joblib_net = run_hnn_core_fixture(
@@ -66,20 +118,28 @@ def test_lfp_backends(run_hnn_core_fixture):
         record_vsoma=True, electrode_array=electrode_array)
 
     assert (len(electrode_array['arr1']) ==
-            len(joblib_net.lfp_array['arr1']) ==
-            len(mpi_net.lfp_array['arr1']))
+            len(joblib_net.rec_array['arr1'].positions) ==
+            len(mpi_net.rec_array['arr1'].positions))
+    assert (len(joblib_net.rec_array['arr1']) ==
+            len(mpi_net.rec_array['arr1']) ==
+            2)  # length == n.o. trials
 
     # reduced simulation has n_trials=2
     # trial_idx, n_trials = 0, 2
     for tr_idx, el_idx in zip([0, 1], [0, 1]):
-        assert_allclose(joblib_net.lfp_array['arr1']._data[tr_idx][el_idx],
-                        mpi_net.lfp_array['arr1']._data[tr_idx][el_idx])
+        assert_allclose(joblib_net.rec_array['arr1']._data[tr_idx][el_idx],
+                        mpi_net.rec_array['arr1']._data[tr_idx][el_idx])
 
-    assert isinstance(joblib_net.lfp_array['arr1'].get_data(), np.ndarray)
-    assert_array_equal(joblib_net.lfp_array['arr1'].get_data().shape,
-                       [len(joblib_net.lfp_array['arr1']._data),
-                        len(joblib_net.lfp_array['arr1']._data[0]),
-                        len(joblib_net.lfp_array['arr1']._data[0][0])])
+    assert isinstance(joblib_net.rec_array['arr1'].get_data(), np.ndarray)
+    assert_array_equal(joblib_net.rec_array['arr1'].get_data().shape,
+                       [len(joblib_net.rec_array['arr1']._data),
+                        len(joblib_net.rec_array['arr1']._data[0]),
+                        len(joblib_net.rec_array['arr1']._data[0][0])])
+
+    # make sure sampling rate is fixed (raises RuntimeError if not)
+    _ = joblib_net.rec_array['arr1'].sfreq
+    # check plotting works
+    joblib_net.rec_array['arr1'].plot(show=False)
 
 
 def _mathematical_dipole(e_pos, d_pos, d_Q):
@@ -90,7 +150,7 @@ def _mathematical_dipole(e_pos, d_pos, d_Q):
     return (Q * cosT) / (4 * np.pi * R ** 2)
 
 
-# require MPI to speed up due to large number of LFP electrodes
+# require MPI to speed up due to large number of extracellular electrodes
 @requires_mpi4py
 def test_dipolar_far_field():
     """Test that LFP in the far field is dipolar when expected."""
@@ -113,7 +173,7 @@ def test_dipolar_far_field():
                          sync_within_trial=True, weights_nmda=weights_nmda)
 
     sigma = 0.3
-    method = 'psa'  # at these distances, psa and lsa are identical
+    method = 'psa'  # at these distances psa and lsa are identical, psa faster
 
     # create far-field grid of LFP electrodes; note that cells are assumed
     # to lie in the XY-plane
@@ -154,7 +214,7 @@ def test_dipolar_far_field():
                 phi_p_theory[ii][jj] = 0
                 continue
 
-            phi_p[ii][jj] = net.lfp_array['grid']._data[0][
+            phi_p[ii][jj] = net.rec_array['grid']._data[0][
                 ii * len(X_p) + jj][idt] * 1e3
             phi_p_theory[ii][jj] = \
                 _mathematical_dipole(e_pos, d_pos, d_Q) / sigma
@@ -179,7 +239,7 @@ def test_dipolar_far_field():
     # plt.show()
 
 
-def test_lfp_array_calculation():
+def test_rec_array_calculation():
     """Test LFP calculation."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -187,7 +247,6 @@ def test_lfp_array_calculation():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    'tstop': 25,
-                   'dipole_smooth_win': 5,
                    't_evprox_1': 7,
                    't_evdist_1': 17})
     net = default_network(params, add_drives_from_params=True)
@@ -195,36 +254,25 @@ def test_lfp_array_calculation():
     sigma, method = 0.3, 'psa'
     electrode_pos = [(2, 400, 2), (6, 800, 6)]  # one inside, one outside net
     net.add_electrode_array('arr1', electrode_pos, sigma, method)
-    _ = simulate_dipole(net, n_trials=1)
-    assert len(net.lfp_array['arr1']._data) == 1  # n_trials
-    assert len(net.lfp_array['arr1']._data[0]) == 2  # n_contacts
-    assert (len(net.lfp_array['arr1']._data[0][0]) ==
-            len(net.lfp_array['arr1'].times))
-    # temporary, while working on PSA and LSA implementations
-    # "gold standard" data are based on the output of c75cf239 (PSA)
-    # Note that the lfp calculation was since extended by 1 data sample
-    # (to match the length of Dipole); the first N-1 samples are compared
-    test_data = np.load(op.join(op.dirname(__file__),
-                                'temp_lfp_test_data.npy'))
-    trial_idx = 0
-    for ele_idx in range(len(electrode_pos)):
-        sim_data = net.lfp_array['arr1']._data[trial_idx][ele_idx]
-        assert_allclose(test_data[:, ele_idx], sim_data)
-        assert (len(sim_data) == len(net.lfp_array['arr1'].times))
+    _ = simulate_dipole(net, n_trials=1, postproc=False)
+    assert len(net.rec_array['arr1']._data) == 1  # n_trials
+    assert len(net.rec_array['arr1']._data[0]) == 2  # n_contacts
+    assert (len(net.rec_array['arr1']._data[0][0]) ==
+            len(net.rec_array['arr1'].times))
 
-    sigma, method = 0.3, 'lsa'
-    electrode_pos = [(6, 800, 6)]  # same as 2nd contact in 'arr1'
-    net.add_electrode_array('arr2', electrode_pos, sigma, method)
+    # using the same electrode positions, but a different method: LSA
+    net.add_electrode_array('arr2', electrode_pos, sigma, method='lsa')
 
     # make sure no sinister segfaults are triggered when running mult. trials
-    n_trials = 10  # NB 10 trials!
-    _ = simulate_dipole(net, n_trials=n_trials)
+    n_trials = 5  # NB 5 trials!
+    _ = simulate_dipole(net, n_trials=n_trials, postproc=False)
 
-    # simulate_dipole is run twice above, first 1 then 10 trials.
+    # simulate_dipole is run twice above, first 1 then 5 trials.
     # Make sure that previous results are discarded on each run
-    assert len(net.lfp_array['arr1']._data) == n_trials
+    assert len(net.rec_array['arr1']._data) == n_trials
 
-    # LSA and PSA should agree far away
-    assert_allclose(net.lfp_array['arr1']._data[trial_idx][1],
-                    net.lfp_array['arr2']._data[trial_idx][0],
-                    rtol=1e-1, atol=1e-1)
+    for trial_idx in range(n_trials):
+        # LSA and PSA should agree far away (second electrode)
+        assert_allclose(net.rec_array['arr1']._data[trial_idx][1],
+                        net.rec_array['arr2']._data[trial_idx][1],
+                        rtol=1e-3, atol=1e-3)
