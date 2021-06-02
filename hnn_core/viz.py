@@ -750,8 +750,8 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, show=True):
     ax.scatter(src_pos[0], src_pos[1], color='red', s=100)
     ax.set_ylabel('Y Position')
     ax.set_xlabel('X Position')
-    ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
-                 f"({conn['loc']}, {conn['receptor']})")
+    ax.set_title(f"{conn['src_type']} (gid={src_gid}) -> {conn['target_type']}"
+                 f" ({conn['loc']}, {conn['receptor']})")
 
     plt_show(show)
     return ax.get_figure(), ax
