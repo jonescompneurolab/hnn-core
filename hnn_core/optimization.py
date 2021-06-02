@@ -144,9 +144,9 @@ def _generate_weights(evinput_params, params, decay_multiplier):
 
         # convert to multiples of dt
         evinput_this['opt_start'] = floor(
-            (evinput_this['opt_start'] / params['dt']) * params['dt'])
+            evinput_this['opt_start'] / params['dt']) * params['dt']
         evinput_params[input_name]['opt_end'] = ceil(
-            (evinput_this['opt_end'] / params['dt']) * params['dt'])
+            evinput_this['opt_end'] / params['dt']) * params['dt']
 
     return evinput_params
 
