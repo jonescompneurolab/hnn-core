@@ -39,15 +39,18 @@ net_erp = default_network(params, add_drives_from_params=True)
 # reflect the canonical neocortical microcircuit. ``net.connectivity``
 # is a list of dictionaries which detail every cell-cell, and drive-cell
 # connection. The weights of these connections can be visualized with
-# :func:`~hnn_core.viz.plot_connectivity_weights`
-from hnn_core.viz import plot_connectivity_weights
+# :func:`~hnn_core.viz.plot_connectivity_weights` as well as
+# :func:`~hnn_core.viz.plot_cell_connectivity`
+from hnn_core.viz import plot_connectivity_weights, plot_cell_connectivity
 print(len(net_erp.connectivity))
 
-print(net_erp.connectivity[15])
-plot_connectivity_weights(net_erp, conn_idx=15)
+conn_idx = 15
+print(net_erp.connectivity[conn_idx])
+plot_connectivity_weights(net_erp, conn_idx)
 
-print(net_erp.connectivity[20])
-plot_connectivity_weights(net_erp, conn_idx=20)
+conn_idx, gid_idx = 20, 11
+src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 ###############################################################################
 # Data recorded during simulations are stored under
