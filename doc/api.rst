@@ -39,6 +39,10 @@ Unpublished Models (:py:mod:`hnn_core`):
 
    calcium_model
 
+Optimization (:py:mod:`hnn_core`):
+----------------------------------
+   optimize_evoked
+
 Dipole (:py:mod:`hnn_core.dipole`):
 -----------------------------------
 

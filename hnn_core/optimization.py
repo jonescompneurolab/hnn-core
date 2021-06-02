@@ -106,8 +106,8 @@ def _generate_weights(evinput_params, params, decay_multiplier):
     -------
     evinput_params : dict
         Adds the keys 'weights' and 'cdf' to evinput_params[input_name]
-        and converts evinput_params['opt_start'] and evinput_params['opt_end']
-        to be in multiples of 'dt'.
+        and find evinput_params['opt_start'] and evinput_params['opt_end']
+        based on weights.
     """
     num_step = ceil(params['tstop'] / params['dt']) + 1
     times = np.linspace(0, params['tstop'], num_step)
