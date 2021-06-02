@@ -75,5 +75,5 @@ fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
 exp_dpl.plot(ax=axes[0], layer='agg', show=False)
 initial_dpl[0].plot(ax=axes[0], layer='agg', show=False)
-best_dpl.plot(ax=axes[0], layer='agg', show=False)
+best_dpl[0].plot(ax=axes[0], layer='agg', show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1])

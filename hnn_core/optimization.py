@@ -162,26 +162,23 @@ def create_last_chunk(input_chunks):
 
     Returns
     -------
-    combined_chunk: Dict
+    chunk: dict
         Dictionary of with parameters for combined
         chunk (final step)
     """
-
-    combined_chunk = {'inputs': [],
-                      'ranges': {},
-                      'opt_start': 0.0,
-                      'opt_end': 0.0}
+    chunk = {'inputs': [], 'ranges': {}, 'opt_start': 0.0,
+             'opt_end': 0.0}
 
     for evinput in input_chunks:
-        combined_chunk['inputs'].extend(evinput['inputs'])
-        combined_chunk['ranges'].update(evinput['ranges'])
-        if evinput['opt_end'] > combined_chunk['opt_end']:
-            combined_chunk['opt_end'] = evinput['opt_end']
+        chunk['inputs'].extend(evinput['inputs'])
+        chunk['ranges'].update(evinput['ranges'])
+        if evinput['opt_end'] > chunk['opt_end']:
+            chunk['opt_end'] = evinput['opt_end']
 
     # wRMSE with weights of 1's is the same as regular RMSE.
-    combined_chunk['weights'] = np.ones(len(input_chunks[-1]['weights']))
+    chunk['weights'] = np.ones(len(input_chunks[-1]['weights']))
 
-    return combined_chunk
+    return chunk
 
 
 def consolidate_chunks(inputs):
@@ -196,37 +193,36 @@ def consolidate_chunks(inputs):
 
     Returns
     -------
-    consolidated_chunks: List
+    chunks: list
         Combine the evinput_params whenever the end is overlapping
         with the next.
     """
-    consolidated_chunks = []
-    for input_name in inputs.keys():
+    chunks = list()
+    for input_name in inputs:
         input_dict = inputs[input_name].copy()
         input_dict['inputs'] = [input_name]
 
-        if len(consolidated_chunks) > 0 and \
-           (input_dict['start'] <= consolidated_chunks[-1]['end']):
+        if (len(chunks) > 0 and
+                input_dict['start'] <= chunks[-1]['end']):
             # update previous chunk
-            consolidated_chunks[-1]['inputs'].extend(input_dict['inputs'])
-            consolidated_chunks[-1]['end'] = input_dict['end']
-            consolidated_chunks[-1]['ranges'].update(input_dict['ranges'])
-            consolidated_chunks[-1]['opt_end'] = \
-                max(consolidated_chunks[-1]['opt_end'], input_dict['opt_end'])
+            chunks[-1]['inputs'].extend(input_dict['inputs'])
+            chunks[-1]['end'] = input_dict['end']
+            chunks[-1]['ranges'].update(input_dict['ranges'])
+            chunks[-1]['opt_end'] = max(chunks[-1]['opt_end'],
+                                        input_dict['opt_end'])
             # average the weights
-            consolidated_chunks[-1]['weights'] = \
-                (consolidated_chunks[-1]['weights'] +
-                 input_dict['weights']) / 2
+            chunks[-1]['weights'] = (chunks[-1]['weights'] +
+                                     input_dict['weights']) / 2
         else:
             # new chunk
-            consolidated_chunks.append(input_dict)
+            chunks.append(input_dict)
 
     # add one last chunk to the end
-    if len(consolidated_chunks) > 1:
-        last_chunk = create_last_chunk(consolidated_chunks)
-        consolidated_chunks.append(last_chunk)
+    if len(chunks) > 1:
+        last_chunk = create_last_chunk(chunks)
+        chunks.append(last_chunk)
 
-    return consolidated_chunks
+    return chunks
 
 
 def optrun(new_params, opt_params, params, opt_dpls):
@@ -276,7 +272,7 @@ def optrun(new_params, opt_params, params, opt_dpls):
     if avg_rmse < opt_params['stepminopterr']:
         best = "[best] "
         opt_params['stepminopterr'] = avg_rmse
-        opt_dpls['best'] = avg_dpl
+        opt_dpls['best_dpl'] = avg_dpl
     else:
         best = ""
 
