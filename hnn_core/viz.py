@@ -684,8 +684,8 @@ def plot_connectivity_matrix(conn, ax=None, show=True):
     return ax.get_figure()
 
 
-def plot_cell_connectivity(net, conn_idx, gid, ax=None, show=True):
-    """Plot synaptic weight
+def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, show=True):
+    """Plot synaptic weight of connections from a src_gid.
 
     Parameters
     ----------
@@ -694,7 +694,7 @@ def plot_cell_connectivity(net, conn_idx, gid, ax=None, show=True):
     conn_idx : int
         Index of connection to be visualized
         from `net.connectivity`
-    gid : int
+    src_gid : int
         Each cell in a network is uniquely identified by it's "global ID": GID.
     ax : instance of Axes3D
         Matplotlib 3D axis
@@ -705,6 +705,8 @@ def plot_cell_connectivity(net, conn_idx, gid, ax=None, show=True):
     -------
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
+    im : Instance of matplotlib AxesImage
+        The matplotlib AxesImage handle.
     """
     import matplotlib.pyplot as plt
     from .network import Network
@@ -712,7 +714,7 @@ def plot_cell_connectivity(net, conn_idx, gid, ax=None, show=True):
 
     _validate_type(net, Network, 'net', 'Network')
     _validate_type(conn_idx, int, 'conn_idx', 'int')
-    _validate_type(gid, int, 'gid', 'int')
+    _validate_type(src_gid, int, 'src_gid', 'int')
     if ax is None:
         _, ax = plt.subplots(1, 1)
 
@@ -724,15 +726,32 @@ def plot_cell_connectivity(net, conn_idx, gid, ax=None, show=True):
     src_type_pos = net.pos_dict[src_type]
     target_type_pos = net.pos_dict[target_type]
 
-    # Assumes max value occurs in the last pos_dict items.
     src_range = np.array(conn['src_range'])
     target_range = np.array(conn['target_range'])
-    connectivity_matrix = np.zeros((target_type_pos[-1][1],
-                                    (target_type_pos[-1][0])))
 
-    # src_idx = np.where()
+    # Extract indeces to get position in network
+    # Index in gid range aligns with net.pos_dict
+    target_src_pair = conn['gid_pairs'][src_gid]
+    target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
 
-    # conn['gid_pairs']
+    src_idx = np.where(src_range == src_gid)[0][0]
+    src_pos = src_type_pos[src_idx]
 
-    # plt_show(show)
-    # return ax.get_figure()
+    weights, x_pos, y_pos = list(), list(), list()
+    for target_idx in target_indeces:
+        target_pos = target_type_pos[target_idx]
+        x_pos.append(target_pos[0])
+        y_pos.append(target_pos[1])
+        weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
+        weights.append(weight)
+
+    ax.scatter(x_pos, y_pos, c=weights)
+
+    ax.scatter(src_pos[0], src_pos[1], color='red', s=100)
+    ax.set_ylabel('Y Position')
+    ax.set_xlabel('X Position')
+    ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
+                 f"({conn['loc']}, {conn['receptor']})")
+
+    plt_show(show)
+    return ax.get_figure(), ax
