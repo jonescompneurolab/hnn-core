@@ -99,7 +99,7 @@ def split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
     return sorted_evinput_params
 
 
-def generate_weights(evinput_params, params, decay_multiplier):
+def _generate_weights(evinput_params, params, decay_multiplier):
     """Calculation of weight function for wRMSE calcuation
 
     Returns
@@ -112,48 +112,41 @@ def generate_weights(evinput_params, params, decay_multiplier):
     num_step = ceil(params['tstop'] / params['dt']) + 1
     times = np.linspace(0, params['tstop'], num_step)
 
-    for input_name in evinput_params.keys():
+    for evinput_this in evinput_params.values():
         # calculate cdf using start time (minival of optimization range)
-        cdf = stats.norm.cdf(times, evinput_params[input_name]['start'],
-                             evinput_params[input_name]['sigma'])
-        evinput_params[input_name]['cdf'] = cdf.copy()
+        evinput_this['cdf'] = stats.norm.cdf(
+            times, evinput_this['start'], evinput_this['sigma'])
 
-    for input_name in evinput_params.keys():
-        evinput_params[input_name]['weights'] = \
-            evinput_params[input_name]['cdf'].copy()
+    for input_name, evinput_this in evinput_params.items():
+        evinput_this['weights'] = evinput_this['cdf'].copy()
 
-        for other_input in evinput_params:
+        for other_input, evinput_other in evinput_params.items():
             # check ordering to only use inputs after us
-            skip = (evinput_params[other_input]['mean'] <
-                    evinput_params[input_name]['mean'])
-            # don't subtract our own cdf(s)
-            skip = skip or (input_name == other_input)
-            if not skip:
-                decay_factor = decay_multiplier * \
-                    (evinput_params[other_input]['mean'] -
-                     evinput_params[input_name]['mean']) / params['tstop']
-                evinput_params[input_name]['weights'] -= \
-                    evinput_params[other_input]['cdf'] * decay_factor
+            # and don't subtract our own cdf(s)
+            if (evinput_other['mean'] < evinput_this['mean'] or
+                    input_name == other_input):
+                continue
+
+            decay_factor = decay_multiplier * \
+                (evinput_other['mean'] - evinput_this['mean']) / params['tstop']
+            evinput_this['weights'] -= evinput_other['cdf'] * decay_factor
 
         # weights should not drop below 0
-        evinput_params[input_name]['weights'] = \
-            np.clip(evinput_params[input_name]['weights'], a_min=0, a_max=None)
+        np.clip(evinput_this['weights'], a_min=0, a_max=None,
+                out=evinput_this['weights'])
 
         # start and stop optimization where the weights are insignificant
-        indices = np.where(evinput_params[input_name]['weights'] > 0.01)
-        evinput_params[input_name]['opt_start'] = \
-            min(evinput_params[input_name]['start'],
-                times[indices][0])
-        evinput_params[input_name]['opt_end'] = \
-            max(evinput_params[input_name]['end'], times[indices][-1])
+        indices = np.where(evinput_this['weights'] > 0.01)
+        evinput_this['opt_start'] = min(evinput_this['start'],
+                                        times[indices][0])
+        evinput_this['opt_end'] = max(evinput_this['end'],
+                                      times[indices][-1])
 
         # convert to multiples of dt
-        evinput_params[input_name]['opt_start'] = \
-            floor((evinput_params[input_name]['opt_start'] / params['dt']) *
-                  params['dt'])
-        evinput_params[input_name]['opt_end'] = \
-            ceil((evinput_params[input_name]['opt_end'] / params['dt']) *
-                 params['dt'])
+        evinput_this['opt_start'] = floor(
+            (evinput_this['opt_start'] / params['dt']) * params['dt'])
+        evinput_params[input_name]['opt_end'] = ceil(
+            (evinput_this['opt_end'] / params['dt']) * params['dt'])
 
     return evinput_params
 
@@ -360,7 +353,8 @@ def optimize_evoked(params, exp_dpl, maxiter,
     evinput_params = split_by_evinput(params, sigma_range_multiplier,
                                       timing_range_multiplier,
                                       synweight_range_multiplier)
-    evinput_params = generate_weights(evinput_params, params, decay_multiplier)
+    evinput_params = _generate_weights(evinput_params, params,
+                                       decay_multiplier)
     param_chunks = consolidate_chunks(evinput_params)
 
     avg_rmse = rmse(initial_dpl[0], exp_dpl, tstop=params['tstop'])
@@ -397,8 +391,8 @@ def optimize_evoked(params, exp_dpl, maxiter,
             evinput_params = split_by_evinput(params, sigma_range_multiplier,
                                               timing_range_multiplier,
                                               synweight_range_multiplier)
-            evinput_params = generate_weights(evinput_params, params,
-                                              decay_multiplier)
+            evinput_params = _generate_weights(evinput_params, params,
+                                               decay_multiplier)
             param_chunks = consolidate_chunks(evinput_params)
 
             # reload opt_params for the last step in case the number of
