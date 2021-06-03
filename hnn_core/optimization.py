@@ -32,11 +32,11 @@ def split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
 
     Returns
     -------
-    sorted_evinput_params: Dict
+    sorted_evinput_params: dict
         Dictionary with parameters grouped by evoked inputs.
         Keys for each evoked input are
         'mean', 'sigma', 'ranges', 'start',
-        'end', 'cdf', 'weights', 'opt_start', 'opt_end'.
+        'end'.
         sorted_evinput_params['evprox1']['ranges'] is a dict
         with keys as the parameters to be optimized and values
         indicating the ranges over which they should be
@@ -105,9 +105,9 @@ def _generate_weights(evinput_params, params, decay_multiplier):
     Returns
     -------
     evinput_params : dict
-        Adds the keys 'weights' and 'cdf' to evinput_params[input_name]
-        and find evinput_params['opt_start'] and evinput_params['opt_end']
-        based on weights.
+        Adds the keys 'weights', 'opt_start', 'opt_end'
+        to evinput_params[input_name] and removes 'mean'
+        and 'sigma' which were needed to compute 'weights'.
     """
     num_step = ceil(params['tstop'] / params['dt']) + 1
     times = np.linspace(0, params['tstop'], num_step)
@@ -148,6 +148,9 @@ def _generate_weights(evinput_params, params, decay_multiplier):
         evinput_params[input_name]['opt_end'] = ceil(
             evinput_this['opt_end'] / params['dt']) * params['dt']
 
+    for evinput_this in evinput_params.values():
+        del evinput_this['mean'], evinput_this['sigma'], evinput_this['cdf']
+
     return evinput_params
 
 
@@ -176,7 +179,7 @@ def create_last_chunk(input_chunks):
             chunk['opt_end'] = evinput['opt_end']
 
     # wRMSE with weights of 1's is the same as regular RMSE.
-    chunk['weights'] = np.ones(len(input_chunks[-1]['weights']))
+    chunk['weights'] = np.ones_like(input_chunks[-1]['weights'])
 
     return chunk
 
@@ -187,7 +190,7 @@ def consolidate_chunks(inputs):
 
     Parameters
     ----------
-    inputs: Dict
+    inputs: dict
         Sorted dictionary of inputs with their parameters
         and weight functions
 
