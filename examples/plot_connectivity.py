@@ -8,7 +8,7 @@ This example demonstrates how to modify the network connectivity.
 
 # Author: Nick Tolley <nicholas_tolley@brown.edu>
 
-# sphinx_gallery_thumbnail_number = 1
+# sphinx_gallery_thumbnail_number = 2
 
 import os.path as op
 
