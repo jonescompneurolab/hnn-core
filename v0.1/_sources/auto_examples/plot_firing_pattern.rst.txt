@@ -380,9 +380,9 @@ specifying a time window with ``tstart`` and ``tstop``.
  .. code-block:: none
 
     Mean spike rates across trials:
-    {'L5_pyramidal': 23.29411764705883, 'L5_basket': 14.453781512605042, 'L2_pyramidal': 6.705882352941176, 'L2_basket': 9.243697478991596}
+    {'L5_pyramidal': 23.29411764705883, 'L5_basket': 14.285714285714285, 'L2_pyramidal': 6.705882352941176, 'L2_basket': 9.243697478991596}
     Mean spike rates for individual trials:
-    {'L5_pyramidal': [23.29411764705883], 'L5_basket': [14.453781512605042], 'L2_pyramidal': [6.705882352941176], 'L2_basket': [9.243697478991596]}
+    {'L5_pyramidal': [23.29411764705883], 'L5_basket': [14.285714285714285], 'L2_pyramidal': [6.705882352941176], 'L2_basket': [9.243697478991596]}
 
 
 
@@ -430,7 +430,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  48.287 seconds)
+   **Total running time of the script:** ( 0 minutes  43.284 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_firing_pattern.py:

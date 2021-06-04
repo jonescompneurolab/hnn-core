@@ -3,15 +3,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>hnn_core.L2Basket &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -49,7 +50,7 @@
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-                <li><a href="../roadmap.html">Roadmap</a></li>
+                <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/roadmap.html">Roadmap</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -122,11 +123,11 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="hnn-core-l2basket">
+  <section id="hnn-core-l2basket">
 <h1>hnn_core.L2Basket<a class="headerlink" href="#hnn-core-l2basket" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="hnn_core.L2Basket">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">hnn_core.</span></code><code class="sig-name descname"><span class="pre">L2Basket</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">L2Basket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for layer 2 basket cells.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -141,20 +142,20 @@ yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="hnn_core.L2Basket.__repr__">
-<code class="sig-name descname"><span class="pre">__repr__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.__repr__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.create_soma">
-<code class="sig-name descname"><span class="pre">create_soma</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.create_soma" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.create_soma">
+<span class="sig-name descname"><span class="pre">create_soma</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.create_soma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create soma and set geometry.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.create_tonic_bias">
-<code class="sig-name descname"><span class="pre">create_tonic_bias</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.create_tonic_bias" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.create_tonic_bias">
+<span class="sig-name descname"><span class="pre">create_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.create_tonic_bias" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create tonic bias at the soma.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -173,14 +174,14 @@ yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.get_sections">
-<code class="sig-name descname"><span class="pre">get_sections</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.get_sections" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.get_sections">
+<span class="sig-name descname"><span class="pre">get_sections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.get_sections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get sections.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.insert_dipole">
-<code class="sig-name descname"><span class="pre">insert_dipole</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yscale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.insert_dipole" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.insert_dipole">
+<span class="sig-name descname"><span class="pre">insert_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yscale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.insert_dipole" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert dipole into each section of this cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -194,14 +195,14 @@ yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.move_to_pos">
-<code class="sig-name descname"><span class="pre">move_to_pos</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.move_to_pos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.move_to_pos">
+<span class="sig-name descname"><span class="pre">move_to_pos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.move_to_pos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move cell to position.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.parconnect_from_src">
-<code class="sig-name descname"><span class="pre">parconnect_from_src</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_presyn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nc_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postsyn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.parconnect_from_src" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.parconnect_from_src">
+<span class="sig-name descname"><span class="pre">parconnect_from_src</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_presyn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nc_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postsyn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.parconnect_from_src" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Parallel receptor-centric connect FROM presyn TO this cell,</dt><dd><p>based on GID.</p>
 </dd>
@@ -228,8 +229,8 @@ Defines the connection parameters</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.record_soma">
-<code class="sig-name descname"><span class="pre">record_soma</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.record_soma" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.record_soma">
+<span class="sig-name descname"><span class="pre">record_soma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.record_soma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record current and voltage at soma.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -244,8 +245,8 @@ Defines the connection parameters</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.setup_source_netcon">
-<code class="sig-name descname"><span class="pre">setup_source_netcon</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.setup_source_netcon" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.setup_source_netcon">
+<span class="sig-name descname"><span class="pre">setup_source_netcon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.setup_source_netcon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Created for _PC.cell and specifies SOURCES of spikes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -258,8 +259,8 @@ Defines the connection parameters</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.shape_soma">
-<code class="sig-name descname"><span class="pre">shape_soma</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.shape_soma" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.shape_soma">
+<span class="sig-name descname"><span class="pre">shape_soma</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.shape_soma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Define 3D shape of soma.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -269,8 +270,8 @@ DO NOT need to call h.define_shape() explicitly!</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="hnn_core.L2Basket.syn_create">
-<code class="sig-name descname"><span class="pre">syn_create</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.syn_create" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hnn_core.L2Basket.syn_create">
+<span class="sig-name descname"><span class="pre">syn_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.L2Basket.syn_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an h.Exp2Syn synapse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -296,7 +297,7 @@ DO NOT need to call h.define_shape() explicitly!</p>
 
 </dd></dl>
 
-</div>
+</section>
 
 
     </div>
@@ -311,7 +312,7 @@ DO NOT need to call h.define_shape() explicitly!</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

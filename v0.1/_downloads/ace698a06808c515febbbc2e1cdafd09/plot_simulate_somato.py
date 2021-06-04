@@ -3,9 +3,16 @@
 05. From MEG sensor-space data to HNN simulation
 ================================================
 
-This example demonstrates how to calculate the inverse solution of the median
-nerve evoked response in S1 from the MNE somatosensory dataset, and then
-simulate a biophysical model network that reproduces the observed dynamics.
+This example demonstrates how to calculate an inverse solution of the median
+nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset,
+and then simulate a biophysical model network that reproduces the observed
+dynamics. Note that we do not expound on how we came up with the sequence of
+evoked drives used in this example, rather, we only demonstrate its
+implementation. For those who want more background on the HNN model and the
+process used to articulate the proximal and distal drives needed to simulate
+evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives
+presented here is not part of a current publication but is motivated by prior
+studies [1]_, [2]_.
 """
 
 # Authors: Mainak Jas <mainakjas@gmail.com>
@@ -149,11 +156,14 @@ net = Network(params)
 ###############################################################################
 # To simulate the source of the median nerve evoked response, we add a
 # sequence of synchronous evoked drives: 1 proximal, 2 distal, and 1 final
-# proximal drive. Note that setting ``sync_within_trial=True`` creates drives
-# with synchronous input (arriving to and transmitted by hypothetical granular
-# cells at the center of the network) to all pyramidal and basket cells that
-# receive distal drive. Note that granule cells are not explicitly modelled
-# within HNN.
+# proximal drive. In order to understand the physiological implications of
+# proximal and distal drive as well as the general process used to articulate
+# a sequence of exogenous drive for simulating evoked responses, see the
+# `HNN ERP tutorial`_. Note that setting ``sync_within_trial=True`` creates
+# drives with synchronous input (arriving to and transmitted by hypothetical
+# granular cells at the center of the network) to all pyramidal and basket
+# cells that receive distal drive. Note that granule cells are not explicitly
+# modelled within HNN.
 
 # Early proximal drive
 weights_ampa_p = {'L2_basket': 0.0036, 'L2_pyramidal': 0.0039,
@@ -214,7 +224,21 @@ net.add_evoked_drive(
 n_trials = 2
 # n_trials = 25
 with JoblibBackend(n_jobs=2):
-    dpls = simulate_dipole(net, n_trials=n_trials)
+    dpls = simulate_dipole(net, n_trials=n_trials, postproc=False)
+
+###############################################################################
+# Since the model is a reduced representation of the larger network
+# contributing to the response, the model response is noisier than it would be
+# in the net activity from a larger network where these effects are averaged
+# out, and the dipole amplitude is smaller than the recorded data. The
+# post-processing steps of smoothing and scaling the simulated dipole response
+# allow us to more accurately approximate the true signal responsible for the
+# recorded macroscopic evoked response [1]_, [2]_.
+dpl_smooth_win = 20
+dpl_scalefctr = 12
+for dpl in dpls:
+    dpl.smooth(dpl_smooth_win)
+    dpl.scale(dpl_scalefctr)
 
 ###############################################################################
 # Finally, we plot the driving spike histogram, empirical and simulated median
@@ -232,10 +256,24 @@ axes[1].set_ylabel('Current Dipole (nAm)')
 net.cell_response.plot_spikes_raster(ax=axes[2])
 
 ###############################################################################
+# References
+# ----------
+# .. [1] Jones, S. R., Pritchett, D. L., Stufflebeam, S. M., Hämäläinen, M.
+#    & Moore, C. I. Neural correlates of tactile detection: a combined
+#    magnetoencephalography and biophysically based computational modeling
+#    study. J. Neurosci. 27, 10751–10764 (2007).
+# .. [2] Neymotin SA, Daniels DS, Caldwell B, McDougal RA, Carnevale NT,
+#    Jas M, Moore CI, Hines ML, Hämäläinen M, Jones SR. Human Neocortical
+#    Neurosolver (HNN), a new software tool for interpreting the cellular and
+#    network origin of human MEG/EEG data. eLife 9, e51214 (2020).
+#    https://doi.org/10.7554/eLife.51214
+
+###############################################################################
 # .. LINKS
 #
 # .. _MNE: https://mne.tools/
-# .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py # noqa
+# .. _HNN ERP tutorial: https://jonescompneurolab.github.io/hnn-tutorials/erp/erp
+# .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py
 # .. |mne_label_fig| image:: https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png # noqa
 #   :width: 400
 # .. |mne_activity_fig| image:: https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png # noqa
