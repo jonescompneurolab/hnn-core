@@ -7,6 +7,7 @@ import pytest
 import hnn_core
 from hnn_core import read_params, default_network
 from hnn_core.viz import plot_cells, plot_dipole, plot_psd, plot_tfr_morlet
+from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
@@ -23,6 +24,26 @@ def test_network_visualization():
     plot_cells(net)
     ax = net.cell_types['L2_pyramidal'].plot_morphology()
     assert len(ax.lines) == 8
+
+    conn_idx = 0
+    with pytest.raises(TypeError, match='net must be an instance of'):
+        plot_connectivity_matrix('blah', conn_idx, show_weight=False)
+
+    with pytest.raises(TypeError, match='conn_idx must be an instance of'):
+        plot_connectivity_matrix(net, 'blah', show_weight=False)
+
+    with pytest.raises(TypeError, match='show_weight must be an instance of'):
+        plot_connectivity_matrix(net, conn_idx, show_weight='blah')
+
+    src_gid = 5
+    with pytest.raises(TypeError, match='net must be an instance of'):
+        plot_cell_connectivity('blah', conn_idx, src_gid=src_gid)
+
+    with pytest.raises(TypeError, match='conn_idx must be an instance of'):
+        plot_cell_connectivity(net, 'blah', src_gid=src_gid)
+
+    with pytest.raises(TypeError, match='src_gid must be an instance of'):
+        plot_cell_connectivity(net, conn_idx, src_gid='blah')
 
 
 def test_dipole_visualization():
