@@ -3,15 +3,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>The HNN Roadmap &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -49,7 +50,7 @@
                 <li><a href="api.html">API</a></li>
                 <li><a href="whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-                <li><a href="#">Roadmap</a></li>
+                <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/roadmap.html">Roadmap</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -133,9 +134,9 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="the-hnn-roadmap">
+  <section id="the-hnn-roadmap">
 <h1>The HNN Roadmap<a class="headerlink" href="#the-hnn-roadmap" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="project-vision">
+<section id="project-vision">
 <h2>Project Vision<a class="headerlink" href="#project-vision" title="Permalink to this headline">¶</a></h2>
 <p>HNN was created as a resource for the MEG/EEG community to develop and
 test hypotheses on the neural origin of their human data. The foundation of
@@ -158,8 +159,8 @@ best practices in open-source software design and the development of a documente
 for interoperability and to facilitate integration with other relevant open-source
 platforms (e.g. MNE-Python, NetPyNE). Our vision is to create a unique
 transformational software specific to interpreting the neural origin of MEG/EEG.</p>
-</div>
-<div class="section" id="timeline-overview">
+</section>
+<section id="timeline-overview">
 <h2>Timeline Overview<a class="headerlink" href="#timeline-overview" title="Permalink to this headline">¶</a></h2>
 <p>This roadmap timeline outlines the major short-term (1-year) and longer-term (5-year)
 goals for HNNs. The 1-year goal will entail a substantial reorganization of the
@@ -171,11 +172,11 @@ code for post processing data analysis and plotting, and GUI components.
 Additionally, HNN will be expanded to include the ability to simulate and
 visualize LFP/CSD and updated with new parameter estimation procedures, with
 corresponding tutorials.</p>
-</div>
-<div class="section" id="one-year-plan-through-2021">
+</section>
+<section id="one-year-plan-through-2021">
 <h2>One Year Plan Through 2021<a class="headerlink" href="#one-year-plan-through-2021" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="modularize-hnn-code-to-simplify-installation-development-and-maintenance">
+</section>
+<section id="modularize-hnn-code-to-simplify-installation-development-and-maintenance">
 <h2>Modularize HNN code to simplify installation, development and maintenance<a class="headerlink" href="#modularize-hnn-code-to-simplify-installation-development-and-maintenance" title="Permalink to this headline">¶</a></h2>
 <p>Over the past year, we have been cleaning up and re-organizing the
 underlying code that defines the current distribution of HNN to facilitate
@@ -213,8 +214,8 @@ See <a class="reference external" href="https://github.com/jonescompneurolab/hnn
 contain smaller dictionaries of parameters related to different modules of the code.
 See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/104">gh-104</a> for related discussions.</p></li>
 </ul>
-</div>
-<div class="section" id="lfp-csd-simulation-visualization-and-data-comparison">
+</section>
+<section id="lfp-csd-simulation-visualization-and-data-comparison">
 <h2>LFP/CSD Simulation, Visualization and Data Comparison<a class="headerlink" href="#lfp-csd-simulation-visualization-and-data-comparison" title="Permalink to this headline">¶</a></h2>
 <p>Essential to testing circuit-level predictions developed in HNN is the ability to
 test the predictions with invasive recordings in animals or humans.  The most fundamental
@@ -232,8 +233,8 @@ LFP/CSD to invasive animal data.</p></li>
 <li><p>Develop functions in HNN-GUI to enable simulation, visualization and data comparison
 in the GUI.</p></li>
 </ul>
-</div>
-<div class="section" id="parameter-estimation-expansion">
+</section>
+<section id="parameter-estimation-expansion">
 <h2>Parameter Estimation Expansion<a class="headerlink" href="#parameter-estimation-expansion" title="Permalink to this headline">¶</a></h2>
 <p>Parameter estimation is an inherent difficulty in neural model simulation.
 HNN currently enables some parameter estimation, focussing on parameters relevant
@@ -248,8 +249,8 @@ example tutorials for the following tasks:</p>
 <li><p>Develop code for SNPE parameter estimation and visualization in <code class="docutils literal notranslate"><span class="pre">hnn_core.analysis</span></code>.</p></li>
 <li><p>Develop functions in HNN-GUI to enable SNPE estimation in the GUI.</p></li>
 </ul>
-</div>
-<div class="section" id="different-cortical-model-template-choices">
+</section>
+<section id="different-cortical-model-template-choices">
 <h2>Different Cortical Model Template Choices<a class="headerlink" href="#different-cortical-model-template-choices" title="Permalink to this headline">¶</a></h2>
 <p>HNN is distributed with a cortical column model template that represents
 generalizable features of cortical circuitry based on prior studies. Updates to
@@ -265,8 +266,8 @@ as part of the  <code class="docutils literal notranslate"><span class="pre">hnn
 <li><p>Develop function in HNN-GUI to choose among different template models in the GUI</p></li>
 </ul>
 <p>See <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/111">gh-111</a> for more discussions.</p>
-</div>
-<div class="section" id="api-and-tutorial-development">
+</section>
+<section id="api-and-tutorial-development">
 <h2>API and Tutorial development<a class="headerlink" href="#api-and-tutorial-development" title="Permalink to this headline">¶</a></h2>
 <p>The ability to interpret the neural origin of macroscale MEG/EEG signals in a
 complex high-dimensional non-linear computational neural model is challenging.
@@ -291,8 +292,8 @@ include,</p>
 <li><p>Applying updated parameter estimation methods (SNPE)</p></li>
 <li><p>Choosing among different HNN cortical template models</p></li>
 </ul>
-</div>
-<div class="section" id="five-year-plan-to-2025">
+</section>
+<section id="five-year-plan-to-2025">
 <h2>Five-Year Plan to 2025<a class="headerlink" href="#five-year-plan-to-2025" title="Permalink to this headline">¶</a></h2>
 <p><strong>Develop a framework to import cortical column models developed in NetPyNE or
 other modeling platforms into HNN:</strong>
@@ -346,8 +347,8 @@ rather that there is a baseline of knowledge to build from and that HNN provides
 framework for further investigation.</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -362,7 +363,7 @@ framework for further investigation.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

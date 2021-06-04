@@ -3,15 +3,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>01. Simulate dipole for evoked inputs &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -49,7 +50,7 @@
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-                <li><a href="../roadmap.html">Roadmap</a></li>
+                <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/roadmap.html">Roadmap</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -127,7 +128,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-evoked-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<div class="sphx-glr-example-title section" id="simulate-dipole-for-evoked-inputs">
+<section class="sphx-glr-example-title" id="simulate-dipole-for-evoked-inputs">
 <span id="sphx-glr-auto-examples-plot-simulate-evoked-py"></span><h1>01. Simulate dipole for evoked inputs<a class="headerlink" href="#simulate-dipole-for-evoked-inputs" title="Permalink to this headline">¶</a></h1>
 <p>This example demonstrates how to simulate a dipole for evoked-like
 waveforms using HNN-core.</p>
@@ -432,7 +433,7 @@ drive types include the following (click on the links for documentation):</p>
 <li><p><a class="reference internal" href="../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hnn_core.Network.add_bursty_drive()</span></code></a></p></li>
 </ul>
 <p>First, we add a distal evoked drive</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_d1</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.006562</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="o">.</span><span class="mi">000007</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa_d1</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.006562</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">.000007</span><span class="p">,</span>
                    <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.142300</span><span class="p">}</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_nmda_d1</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.019482</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.004317</span><span class="p">,</span>
                    <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.080074</span><span class="p">}</span>
@@ -478,7 +479,7 @@ across trials.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
-Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 [Done]
 running trial 1 on 1 cores
@@ -524,7 +525,7 @@ Simulation time: 160.0 ms...
 <p>and then plot the amplitudes of the simulated aggregate dipole moments over
 time</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<a href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a> <span class="o">=</span> <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+<a href="https://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a> <span class="o">=</span> <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
                          <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">plot_dipole</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_hist</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
@@ -596,7 +597,7 @@ Simulation time: 160.0 ms...
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  18.669 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  1.084 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.1/notebooks/auto_examples/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
@@ -609,7 +610,7 @@ Simulation time: 160.0 ms...
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
+</section>
 
 
     </div>
@@ -624,7 +625,7 @@ Simulation time: 160.0 ms...
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

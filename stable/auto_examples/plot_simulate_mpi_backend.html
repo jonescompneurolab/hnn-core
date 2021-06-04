@@ -3,15 +3,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>06. Use MPI backend for parallelization &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -49,7 +50,7 @@
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-                <li><a href="../roadmap.html">Roadmap</a></li>
+                <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/roadmap.html">Roadmap</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -127,7 +128,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-simulate-mpi-backend-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<div class="sphx-glr-example-title section" id="use-mpi-backend-for-parallelization">
+<section class="sphx-glr-example-title" id="use-mpi-backend-for-parallelization">
 <span id="sphx-glr-auto-examples-plot-simulate-mpi-backend-py"></span><h1>06. Use MPI backend for parallelization<a class="headerlink" href="#use-mpi-backend-for-parallelization" title="Permalink to this headline">¶</a></h1>
 <p>This example demonstrates how to use the MPI backend for
 simulating dipoles using HNN-core.</p>
@@ -432,10 +433,10 @@ start the simulation across the number of processors (cores) specified by
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
 Running 1 trials...
 numprocs=2
-[702c6dbcf2b1:01501] Read -1, expected 58804, errno = 1
-Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+[1d68482510bd:01667] Read -1, expected 58804, errno = 1
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
-Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.1-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 [Done]
 running trial 1 on 2 cores
 Simulation time: 0.03 ms...
@@ -469,20 +470,20 @@ Simulation time: 270.0 ms...
 Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
-[702c6dbcf2b1:01501] Read -1, expected 49608, errno = 1
-[702c6dbcf2b1:01500] Read -1, expected 49600, errno = 1
-[702c6dbcf2b1:01501] Read -1, expected 49600, errno = 1
-[702c6dbcf2b1:01500] Read -1, expected 49608, errno = 1
-[702c6dbcf2b1:01501] Read -1, expected 49608, errno = 1
-[702c6dbcf2b1:01500] Read -1, expected 49600, errno = 1
-[702c6dbcf2b1:01501] Read -1, expected 49600, errno = 1
-[702c6dbcf2b1:01500] Read -1, expected 49608, errno = 1
-[702c6dbcf2b1:01500] Read -1, expected 5616, errno = 1
+[1d68482510bd:01667] Read -1, expected 49608, errno = 1
+[1d68482510bd:01666] Read -1, expected 49600, errno = 1
+[1d68482510bd:01667] Read -1, expected 49600, errno = 1
+[1d68482510bd:01666] Read -1, expected 49608, errno = 1
+[1d68482510bd:01667] Read -1, expected 49608, errno = 1
+[1d68482510bd:01666] Read -1, expected 49600, errno = 1
+[1d68482510bd:01667] Read -1, expected 49600, errno = 1
+[1d68482510bd:01666] Read -1, expected 49608, errno = 1
+[1d68482510bd:01666] Read -1, expected 5616, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  41.694 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  35.615 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.1/notebooks/auto_examples/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
@@ -495,7 +496,7 @@ Simulation time: 300.0 ms...
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
+</section>
 
 
     </div>
@@ -510,7 +511,7 @@ Simulation time: 300.0 ms...
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>
