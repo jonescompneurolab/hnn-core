@@ -571,7 +571,7 @@ def plot_cell_morphology(cell, ax, show=True):
 
 
 def plot_connectivity_matrix(net, conn_idx, show_weight=True,
-                             ax=None, show=True):
+                             colorbar=True, ax=None, show=True):
     """Plot connectivity matrix with color bar for synaptic weights
 
     Parameters
@@ -595,6 +595,7 @@ def plot_connectivity_matrix(net, conn_idx, show_weight=True,
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
+    from matplotlib.ticker import ScalarFormatter
     from .network import Network
     from .cell import _get_gaussian_connection
 
@@ -632,7 +633,19 @@ def plot_connectivity_matrix(net, conn_idx, show_weight=True,
 
             connectivity_matrix[src_idx, target_idx] = weight
 
-    ax.imshow(connectivity_matrix, cmap='Greys', interpolation='none')
+    im = ax.imshow(connectivity_matrix, cmap='Greys', interpolation='none')
+
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylabel('Frequency (Hz)')
+
+    if colorbar:
+        fig = ax.get_figure()
+        xfmt = ScalarFormatter()
+        xfmt.set_powerlimits((-2, 2))
+        cbar = fig.colorbar(im, ax=ax, format=xfmt)
+        cbar.ax.yaxis.set_ticks_position('right')
+        cbar.ax.set_ylabel('Weight', rotation=-90, va="bottom")
+
     ax.set_xlabel(f"{conn['target_type']} target gids "
                   f"({target_range[0]}-{target_range[-1]})")
     ax.set_xticklabels(list())
@@ -642,11 +655,13 @@ def plot_connectivity_matrix(net, conn_idx, show_weight=True,
     ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
                  f"({conn['loc']}, {conn['receptor']})")
 
+    plt.tight_layout()
     plt_show(show)
     return ax.get_figure()
 
 
-def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, show=True):
+def plot_cell_connectivity(net, conn_idx, src_gid, colorbar=True,
+                           ax=None, show=True):
     """Plot synaptic weight of connections from a src_gid.
 
     Parameters
@@ -667,12 +682,12 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, show=True):
     -------
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
-    im : Instance of matplotlib AxesImage
-        The matplotlib AxesImage handle.
+
     """
     import matplotlib.pyplot as plt
     from .network import Network
     from .cell import _get_gaussian_connection
+    from matplotlib.ticker import ScalarFormatter
 
     _validate_type(net, Network, 'net', 'Network')
     _validate_type(conn_idx, int, 'conn_idx', 'int')
@@ -707,13 +722,22 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, show=True):
         weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
         weights.append(weight)
 
-    ax.scatter(x_pos, y_pos, c=weights)
+    im = ax.scatter(x_pos, y_pos, c=weights)
 
     ax.scatter(src_pos[0], src_pos[1], color='red', s=100)
     ax.set_ylabel('Y Position')
     ax.set_xlabel('X Position')
-    ax.set_title(f"{conn['src_type']} (gid={src_gid}) -> {conn['target_type']}"
+    ax.set_title(f"{conn['src_type']}-> {conn['target_type']}"
                  f" ({conn['loc']}, {conn['receptor']})")
 
+    if colorbar:
+        fig = ax.get_figure()
+        xfmt = ScalarFormatter()
+        xfmt.set_powerlimits((-2, 2))
+        cbar = fig.colorbar(im, ax=ax, format=xfmt)
+        cbar.ax.yaxis.set_ticks_position('right')
+        cbar.ax.set_ylabel('Weight', rotation=-90, va="bottom")
+
+    plt.tight_layout()
     plt_show(show)
     return ax.get_figure(), ax
