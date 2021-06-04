@@ -41,14 +41,14 @@ net_erp = default_network(params, add_drives_from_params=True)
 # connection. The weights of these connections can be visualized with
 # :func:`~hnn_core.viz.plot_connectivity_weights` as well as
 # :func:`~hnn_core.viz.plot_cell_connectivity`
-from hnn_core.viz import plot_connectivity_weights, plot_cell_connectivity
+from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 print(len(net_erp.connectivity))
 
-conn_idx = 15
+conn_idx = 20
 print(net_erp.connectivity[conn_idx])
-plot_connectivity_weights(net_erp, conn_idx)
+plot_connectivity_matrix(net_erp, conn_idx)
 
-conn_idx, gid_idx = 20, 11
+gid_idx = 11
 src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
 fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
@@ -99,9 +99,7 @@ net_all.cell_response.plot_spikes_raster()
 # activity is visible as vertical lines where several cells fire simultaneously
 # We can additionally use the ``probability``. argument to create a sparse
 # connectivity pattern instead of all-to-all. Let's try creating the same
-# network with a 10% chance of cells connecting to each other. The resulting
-# connectivity pattern can also be visualized with
-# ``net.connectivity[idx].plot()``
+# network with a 10% chance of cells connecting to each other.
 probability = 0.1
 net_sparse = default_network(params, add_drives_from_params=True)
 net_sparse.clear_connectivity()
@@ -125,9 +123,10 @@ for target in ['L5_pyramidal', 'L2_basket']:
 dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
 net_sparse.cell_response.plot_spikes_raster()
 
-net_sparse.connectivity[-2].plot()
-net_sparse.connectivity[-1].plot()
-
+# Get index of most recently added connection
+conn_idx = len(net_sparse.connectivity)
+plot_connectivity_matrix(net_sparse, conn_idx, show_weight=False)
+plot_connectivity_matrix(net_sparse, conn_idx - 1, show_weight=False)
 
 ###############################################################################
 # Using the sparse connectivity pattern produced a lot more spiking in
