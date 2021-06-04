@@ -125,12 +125,12 @@ net_sparse.cell_response.plot_spikes_raster()
 
 # Get index of most recently added connection, and a src_gid in src_range.
 conn_idx, gid_idx = len(net_sparse.connectivity) - 1, 5
-src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
 plot_connectivity_matrix(net_sparse, conn_idx)
 plot_cell_connectivity(net_sparse, conn_idx, src_gid)
 
 conn_idx, gid_idx = len(net_sparse.connectivity) - 2, 5
-src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
 plot_connectivity_matrix(net_sparse, conn_idx)
 plot_cell_connectivity(net_sparse, conn_idx, src_gid)
 
