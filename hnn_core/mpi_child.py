@@ -33,9 +33,9 @@ def _str_to_net(input_str):
             raise ValueError("Got incorrect network size: %d bytes " %
                              len(data_str) + "expected length: %d" % net_size)
         # unpickle the net
-        net = pickle.loads(base64.b64decode(data_str.encode(),
-                                            validate=True))
-    return net
+        obj = pickle.loads(base64.b64decode(data_str.encode(),
+                           validate=True))
+    return obj
 
 
 class MPISimulation(object):
@@ -85,12 +85,11 @@ class MPISimulation(object):
                 if end_match is not None:
                     break
 
-            net = _str_to_net(input_str)
+            obj = _str_to_net(input_str)
         else:
-            net = None
+            obj = None
 
-        net = self.comm.bcast(net, root=0)
-        return net
+        return obj
 
     def _wait_for_exit_signal(self):
         # read from stdin
@@ -120,7 +119,7 @@ class MPISimulation(object):
         sys.stderr.write('@end_of_data:%d@\n' % len(pickled_bytes))
         sys.stderr.flush()  # flush to ensure signal is not buffered
 
-    def run(self, net):
+    def run(self, net, tstop, dt):
         """Run MPI simulation(s) and write results to stderr"""
 
         from hnn_core.parallel_backends import _clone_and_simulate
@@ -149,8 +148,11 @@ if __name__ == '__main__':
 
     try:
         with MPISimulation() as mpi_sim:
-            net = mpi_sim._read_net()
-            sim_data = mpi_sim.run(net)
+            obj = mpi_sim._read_net()
+            if mpi_sim.rank == 0:
+                net, tstop, dt = obj
+            net = mpi_sim.comm.bcast(net, root=0)
+            sim_data = mpi_sim.run(net, tstop, dt)
             mpi_sim._write_data_stderr(sim_data)
             mpi_sim._wait_for_exit_signal()
     except Exception:
