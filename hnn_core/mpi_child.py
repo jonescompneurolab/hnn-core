@@ -125,7 +125,7 @@ class MPISimulation(object):
         from hnn_core.parallel_backends import _clone_and_simulate
 
         sim_data = []
-        for trial_idx in range(net.params['N_trials']):
+        for trial_idx in range(net._params['N_trials']):
             single_sim_data = _clone_and_simulate(net, tstop=tstop, dt=dt,
                                                   trial_idx=trial_idx)
 

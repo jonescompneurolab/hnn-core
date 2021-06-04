@@ -115,16 +115,16 @@ def test_child_run():
     params_reduced = params.copy()
     params_reduced.update({'N_pyr_x': 3,
                            'N_pyr_y': 3,
-                           'tstop': 25,
                            't_evprox_1': 5,
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
     net_reduced = default_network(params_reduced, add_drives_from_params=True)
 
+    tstop, dt = 25, params_reduced['dt']
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):
-            sim_data = mpi_sim.run(net_reduced)
+            sim_data = mpi_sim.run(net_reduced, tstop=tstop, dt=dt)
             stdout = buf.getvalue()
         assert "Simulation time:" in stdout
 
