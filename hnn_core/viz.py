@@ -746,16 +746,16 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, colorbar=True,
         weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
         weights.append(weight)
 
-    im = ax.scatter(target_x_pos, target_y_pos, c=weights, cmap=colormap)
+    im = ax.scatter(target_x_pos, target_y_pos, c=weights, s=50, cmap=colormap)
 
     # Gather positions of all gids in target_type.
     x_pos = [target_type_pos[idx][0] for idx in range(len(target_type_pos))]
     y_pos = [target_type_pos[idx][1] for idx in range(len(target_type_pos))]
-    ax.scatter(x_pos, y_pos, color='k', zorder=-1, s=4)
+    ax.scatter(x_pos, y_pos, color='k', marker='x', zorder=-1, s=20)
 
     # Only plot src_gid if proper cell type.
     if src_type in net.cell_types:
-        ax.scatter(src_pos[0], src_pos[1], color='red', s=100)
+        ax.scatter(src_pos[0], src_pos[1], marker='s', color='red', s=150)
     ax.set_ylabel('Y Position')
     ax.set_xlabel('X Position')
     ax.set_title(f"{conn['src_type']}-> {conn['target_type']}"
