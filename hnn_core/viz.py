@@ -570,8 +570,9 @@ def plot_cell_morphology(cell, ax, show=True):
     return ax
 
 
-def plot_connectivity_matrix(net, conn_idx, show_weight=True,
-                             colorbar=True, ax=None, show=True):
+def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
+                             colorbar=True, colormap='Greys',
+                             show=True):
     """Plot connectivity matrix with color bar for synaptic weights
 
     Parameters
@@ -581,11 +582,15 @@ def plot_connectivity_matrix(net, conn_idx, show_weight=True,
     conn_idx : int
         Index of connection to be visualized
         from `net.connectivity`
-    show_weight : bool
-        If True, visualize connectivity weights as gradient.
-        If False, each connection is visualized with a black square.
     ax : instance of Axes3D
         Matplotlib 3D axis
+    show_weight : bool
+        If True, visualize connectivity weights as gradient.
+        If False, all weights set to constant value.
+    colormap : str
+        The name of a matplotlib colormap. Default: 'Greys'
+    colorbar : bool
+        If True (default), adjust figure to include colorbar.
     show : bool
         If True, show the plot
 
@@ -633,7 +638,7 @@ def plot_connectivity_matrix(net, conn_idx, show_weight=True,
 
             connectivity_matrix[src_idx, target_idx] = weight
 
-    im = ax.imshow(connectivity_matrix, cmap='Greys', interpolation='none')
+    im = ax.imshow(connectivity_matrix, cmap=colormap, interpolation='none')
 
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Frequency (Hz)')
@@ -660,9 +665,9 @@ def plot_connectivity_matrix(net, conn_idx, show_weight=True,
     return ax.get_figure()
 
 
-def plot_cell_connectivity(net, conn_idx, src_gid, colorbar=True,
-                           ax=None, show=True):
-    """Plot synaptic weight of connections from a src_gid.
+def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, colorbar=True,
+                           colormap='viridis', show=True):
+    """Plot synaptic weight of connections originating from src_gid.
 
     Parameters
     ----------
@@ -675,6 +680,10 @@ def plot_cell_connectivity(net, conn_idx, src_gid, colorbar=True,
         Each cell in a network is uniquely identified by it's "global ID": GID.
     ax : instance of Axes3D
         Matplotlib 3D axis
+    colormap : str
+        The name of a matplotlib colormap. Default: 'viridis'
+    colorbar : bool
+        If True (default), adjust figure to include colorbar.
     show : bool
         If True, show the plot
 
@@ -682,6 +691,15 @@ def plot_cell_connectivity(net, conn_idx, src_gid, colorbar=True,
     -------
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
+
+    Notes
+    -----
+    Target cells will be determined by the connection class given by
+    net.connectivity[conn_idx].
+    If the target cell is not connected to src_gid, it will appear as a
+    smaller black circle.
+    src_gid is plotted as a red circle. src_gid will not be plotted if
+    the connection corresponds to a drive, ex: poisson, bursty, etc.
 
     """
     import matplotlib.pyplot as plt
@@ -704,6 +722,11 @@ def plot_cell_connectivity(net, conn_idx, src_gid, colorbar=True,
     target_type_pos = net.pos_dict[target_type]
 
     src_range = np.array(conn['src_range'])
+    if src_gid not in src_range:
+        raise ValueError(f'src_gid not in the src type range of {src_type} '
+                         f'gids. Valid gids include {src_range[0]} -> '
+                         f'{src_range[-1]}')
+
     target_range = np.array(conn['target_range'])
 
     # Extract indeces to get position in network
@@ -714,17 +737,25 @@ def plot_cell_connectivity(net, conn_idx, src_gid, colorbar=True,
     src_idx = np.where(src_range == src_gid)[0][0]
     src_pos = src_type_pos[src_idx]
 
-    weights, x_pos, y_pos = list(), list(), list()
+    # Aggregate positions and weight of each connected target
+    weights, target_x_pos, target_y_pos = list(), list(), list()
     for target_idx in target_indeces:
         target_pos = target_type_pos[target_idx]
-        x_pos.append(target_pos[0])
-        y_pos.append(target_pos[1])
+        target_x_pos.append(target_pos[0])
+        target_y_pos.append(target_pos[1])
         weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
         weights.append(weight)
 
-    im = ax.scatter(x_pos, y_pos, c=weights)
+    im = ax.scatter(target_x_pos, target_y_pos, c=weights, cmap=colormap)
 
-    ax.scatter(src_pos[0], src_pos[1], color='red', s=100)
+    # Gather positions of all gids in target_type.
+    x_pos = [target_type_pos[idx][0] for idx in range(len(target_type_pos))]
+    y_pos = [target_type_pos[idx][1] for idx in range(len(target_type_pos))]
+    ax.scatter(x_pos, y_pos, color='k', zorder=-1, s=4)
+
+    # Only plot src_gid if proper cell type.
+    if src_type in net.cell_types:
+        ax.scatter(src_pos[0], src_pos[1], color='red', s=100)
     ax.set_ylabel('Y Position')
     ax.set_xlabel('X Position')
     ax.set_title(f"{conn['src_type']}-> {conn['target_type']}"
