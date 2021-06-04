@@ -101,4 +101,4 @@ workflows:
             - build_docs
           filters:
             branches:
-              only: master
+              only: maint/0.1
