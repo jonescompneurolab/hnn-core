@@ -49,6 +49,8 @@ API
 
 - Replace parameter `T` with `tstop` in :func:`~hnn_core.Network.add_tonic_bias` and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and improve readability, by `Kenneth Loi`_ in `#354 <https://github.com/jonescompneurolab/hnn-core/pull/354>`_
 
+- New API for calculating extracellular potentials using electrode arrays, created using :func:`~hnn_core.Network.add_electrode_array` and stored under ``net.rec_array`` as a dictionary of :class:`hnn_core.extracellular.ExtracellularArray` containers, by `Mainak Jas`_, `Nick Tolley`_ and `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
+
 .. _0.1:
 
 0.1
