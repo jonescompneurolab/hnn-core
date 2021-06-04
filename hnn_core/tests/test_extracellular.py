@@ -104,6 +104,52 @@ def test_transmembrane_currents():
     assert_allclose(currents, 0, rtol=1e-10, atol=1e-10)
 
 
+def test_transfer_resistance():
+    """Test transfer resistances calculated correctly"""
+    from neuron import h
+    from hnn_core.extracellular import _transfer_resistance
+    sec = h.Section(name='dend')
+    h.pt3dclear(sec=sec)
+    h.pt3dadd(0, 0, 0, 1, sec=sec)
+    h.pt3dadd(0, 1, 0, 1, sec=sec)  # section oriented along y-axis
+    sec.L = 300
+    sec.diam = 8
+    sec.nseg = 5
+    # NB segment lengths aren't equal! First/last segment center point is
+    # closer to respective end point than to next/previous segment!
+    seg_ctr_pts = [0]
+    seg_ctr_pts.extend([seg.x * sec.L for seg in sec])
+    seg_ctr_pts.append(sec.L)
+    seg_lens = np.diff(seg_ctr_pts)
+    first_len = seg_lens[0]
+    seg_lens = np.array([first_len] + list(seg_lens[2:]))
+    seg_ctr_pts = seg_ctr_pts[1:-1]  # remove end points again
+
+    sigma = 0.3
+
+    elec_pos = (10, 150, 0)
+    target_vals = {'psa': list(), 'lsa': list()}
+    for seg_idx in range(sec.nseg):
+        # PSA: distance to middle segment == electrode x-position
+        var_r_psa = np.sqrt(elec_pos[0] ** 2 +
+                            (elec_pos[1] - seg_ctr_pts[seg_idx]) ** 2)
+        target_vals['psa'].append(1000 / (4. * np.pi * sigma * var_r_psa))
+
+        # LSA: calculate L and H variables relative to segment endpoints
+        var_l = elec_pos[1] - (seg_ctr_pts[seg_idx] - seg_lens[seg_idx])
+        var_h = elec_pos[1] - (seg_ctr_pts[seg_idx] + seg_lens[seg_idx])
+        var_r_lsa = elec_pos[0]  # just use the axial distance
+        target_vals['lsa'].append(
+            1000 * np.log(np.abs(
+                (np.sqrt(var_h ** 2 + var_r_lsa ** 2) - var_h) /
+                (np.sqrt(var_l ** 2 + var_r_lsa ** 2) - var_l)
+            )) / (4. * np.pi * sigma * 2 * seg_lens[seg_idx]))
+
+    for method in ['psa', 'lsa']:
+        res = _transfer_resistance(sec, elec_pos, sigma, method)
+        assert_allclose(res, target_vals[method])
+
+
 @requires_mpi4py
 @requires_psutil
 def test_extracellular_backends(run_hnn_core_fixture):
@@ -173,7 +219,6 @@ def test_dipolar_far_field():
                          sync_within_trial=True, weights_nmda=weights_nmda)
 
     sigma = 0.3
-    method = 'psa'  # at these distances psa and lsa are identical, psa faster
 
     # create far-field grid of LFP electrodes; note that cells are assumed
     # to lie in the XY-plane
@@ -185,7 +230,10 @@ def test_dipolar_far_field():
     for posx in np.arange(xmin, xmax, step):
         for posy in np.arange(ymin, ymax, step):
             electrode_pos.append((posx, posy, posz))
-    net.add_electrode_array('grid', electrode_pos, sigma=sigma, method=method)
+    net.add_electrode_array('grid_psa', electrode_pos, sigma=sigma,
+                            method='psa')
+    net.add_electrode_array('grid_lsa', electrode_pos, sigma=sigma,
+                            method='lsa')
 
     with MPIBackend(n_procs=2):
         dpl = simulate_dipole(net, postproc=False)
@@ -194,7 +242,8 @@ def test_dipolar_far_field():
     Y_p = np.arange(ymin, ymax, step) / 1000
     Z_p = posz / 1000
     idt = np.argmin(np.abs(dpl[0].times - 15.))
-    phi_p = np.zeros((len(X_p), len(Y_p)))
+    phi_p_psa = np.zeros((len(X_p), len(Y_p)))
+    phi_p_lsa = np.zeros((len(X_p), len(Y_p)))
     phi_p_theory = np.zeros((len(X_p), len(Y_p)))
 
     # location of equivalent current dipole for this stimulation (manual)
@@ -210,22 +259,25 @@ def test_dipolar_far_field():
 
             # ignore 10 mm radius closest to dipole
             if norm(e_pos - d_pos) < 10:
-                phi_p[ii][jj] = 0
+                phi_p_psa[ii][jj] = 0
+                phi_p_lsa[ii][jj] = 0
                 phi_p_theory[ii][jj] = 0
                 continue
 
-            phi_p[ii][jj] = net.rec_array['grid']._data[0][
+            phi_p_psa[ii][jj] = net.rec_array['grid_psa']._data[0][
+                ii * len(X_p) + jj][idt] * 1e3
+            phi_p_lsa[ii][jj] = net.rec_array['grid_lsa']._data[0][
                 ii * len(X_p) + jj][idt] * 1e3
             phi_p_theory[ii][jj] = \
                 _mathematical_dipole(e_pos, d_pos, d_Q) / sigma
 
     # compare the shape of the far fields
-    cosT = np.dot(phi_p.ravel(), phi_p_theory.ravel()) / (
-        norm(phi_p.ravel()) * norm(phi_p_theory.ravel()))
-
-    # the far field should be very close to dipolar, though threshold may need
-    # adjusting when new mechanisms are included in the cells
-    assert 1 - cosT < 1e-3
+    for phi_p in [phi_p_psa, phi_p_lsa]:
+        cosT = np.dot(phi_p.ravel(), phi_p_theory.ravel()) / (
+            norm(phi_p.ravel()) * norm(phi_p_theory.ravel()))
+        # the far field should be very close to dipolar, though threshold may
+        # need adjusting when new mechanisms are included in the cells
+        assert 1 - cosT < 1e-3
 
     # for diagnostic plots, uncomment the following:
     # import matplotlib.pyplot as plt
@@ -275,4 +327,4 @@ def test_rec_array_calculation():
         # LSA and PSA should agree far away (second electrode)
         assert_allclose(net.rec_array['arr1']._data[trial_idx][1],
                         net.rec_array['arr2']._data[trial_idx][1],
-                        rtol=1e-3, atol=1e-3)
+                        rtol=1e-1, atol=1e-1)

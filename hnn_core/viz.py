@@ -80,13 +80,20 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def _plot_ext(times, data, sfreq, window_len=None, tmin=None,
-              tmax=None, ax=None, decim=None, color=None, show=True):
+              tmax=None, ax=None, decim=None, color=None,
+              voltage_offset=None, voltage_scalebar=None,
+              contact_labels=None, show=True):
     """Helper function for ExtracellularArray.plot()"""
     import matplotlib.pyplot as plt
     from .dipole import _hammfilt
 
     if ax is None:
         _, ax = plt.subplots(1, 1)
+
+    n_offsets = data.shape[0]
+    trace_offsets = np.zeros((n_offsets, 1))
+    if voltage_offset is not None:
+        trace_offsets = np.arange(n_offsets)[:, np.newaxis] * voltage_offset
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
         plot_data, plot_times = _get_ext_plot_data(times, trace, tmin, tmax)
@@ -97,12 +104,47 @@ def _plot_ext(times, data, sfreq, window_len=None, tmin=None,
             plot_data, plot_times = _decimate_plot_data(decim, plot_data,
                                                         plot_times)
 
-        ax.plot(plot_times, plot_data, label=f'C{contact_no}', color=color)
+        if isinstance(color, np.ndarray):
+            col = color[contact_no]
+        else:
+            col = color
+        ax.plot(plot_times, plot_data + trace_offsets[contact_no],
+                label=f'C{contact_no}', color=col)
 
-    ax.ticklabel_format(axis='both', scilimits=(-2, 3))
-    ax.set_xlabel('Time (ms)')
-    ylabel = r'Electric potential ($\mu V$)'
+    if voltage_offset is not None:
+        ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
+        ylabel = 'Individual contact traces'
+        if contact_labels is None:
+            ax.set_yticks([])
+        elif len(contact_labels) != n_offsets:
+            raise ValueError(f'contact_labels is length {len(contact_labels)},'
+                             f' but {n_offsets} contacts to be plotted')
+        else:
+            trace_ticks = np.arange(0, len(contact_labels) * voltage_offset,
+                                    voltage_offset)
+            ax.set_yticks(trace_ticks)
+            ax.set_yticklabels(contact_labels)
+
+        if voltage_scalebar is None:
+            voltage_scalebar = voltage_offset
+
+    if voltage_scalebar is not None:
+        from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+        scalebar = AnchoredSizeBar(ax.transData, 1,
+                                   f'{voltage_scalebar:.0f} ' + r'$\mu V$',
+                                   'upper left',
+                                   size_vertical=voltage_scalebar,
+                                   pad=0.1,
+                                   color='black',
+                                   label_top=False,
+                                   frameon=False)
+        ax.add_artist(scalebar)
+    else:
+        ylabel = r'Electric potential ($\mu V$)'
+        ax.ticklabel_format(axis='both', scilimits=(-2, 3))
+
     ax.set_ylabel(ylabel, multialignment='center')
+    ax.set_xlabel('Time (ms)')
 
     plt_show(show)
     return ax.get_figure()

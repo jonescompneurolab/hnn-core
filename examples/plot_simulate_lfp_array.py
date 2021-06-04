@@ -10,7 +10,7 @@ This example demonstrates how to record local field potentials (LFPs).
 #          Mainak Jas <mainakjas@gmail.com>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
-# sphinx_gallery_thumbnail_number = 3
+# sphinx_gallery_thumbnail_number = 4
 
 import os.path as op
 
@@ -68,13 +68,8 @@ dpl = simulate_dipole(net)
 # recordings are stored under ``Network.lfp_array``.
 import matplotlib.pyplot as plt
 
-plt.figure()
 trial_idx = 0
-net.rec_array['shank1_psa'][trial_idx].plot(contact_no=[1, -2], show=False)
-plt.legend([f'e_pos {electrode_pos[1]}', f'e_pos {electrode_pos[-2]}'])
-plt.xlabel('Time (ms)')
-plt.ylabel(r'Potential ($\mu V$)')
-plt.show()
+net.rec_array['shank1_psa'][trial_idx].plot(contact_no=[1, -2])
 
 ###############################################################################
 # We can compare the dipole current wave form to that of a single LFP channel.
