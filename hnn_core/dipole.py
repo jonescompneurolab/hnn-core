@@ -112,7 +112,8 @@ def simulate_dipole(net, tstop, dt, n_trials=None,
         raise TypeError("record_isoma must be bool, got %s"
                         % type(record_isoma).__name__)
 
-    dpls = _BACKEND.simulate(net, n_trials, postproc)
+    dpls = _BACKEND.simulate(net, n_trials=n_trials, postproc=postproc,
+                             tstop=tstop, dt=dt)
 
     return dpls
 

@@ -515,6 +515,10 @@ class JoblibBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
+        tstop : float
+            The stop time (ms)
+        dt : float
+            The sampling time (s)
         n_trials : int
             Number of trials to simulate.
         postproc : bool
@@ -526,7 +530,8 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
         parallel, myfunc = self._parallel_func(_clone_and_simulate)
-        sim_data = parallel(myfunc(net, tstop, dt, idx) for idx in range(n_trials))
+        sim_data = parallel(myfunc(net, tstop, dt, idx) for idx
+                            in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
                                   postproc=postproc)

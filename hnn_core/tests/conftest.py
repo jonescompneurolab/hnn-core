@@ -81,14 +81,16 @@ def run_hnn_core_fixture():
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
 
+        tstop, dt = params['tstop'], params['dt']
+
         if reduced:
             params.update({'N_pyr_x': 3,
                            'N_pyr_y': 3,
-                           'tstop': 40,
                            't_evprox_1': 5,
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
+            tstop = 40
         net = default_network(params, add_drives_from_params=True)
 
         # number of trials simulated
@@ -99,16 +101,19 @@ def run_hnn_core_fixture():
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                        record_isoma=record_vsoma,
-                                       postproc=postproc)
+                                       postproc=postproc,
+                                       tstop=tstop, dt=dt)
         elif backend == 'joblib':
             with JoblibBackend(n_jobs=n_jobs):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                        record_isoma=record_vsoma,
-                                       postproc=postproc)
+                                       postproc=postproc,
+                                       tstop=tstop, dt=dt)
         else:
             dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                    record_isoma=record_vsoma,
-                                   postproc=postproc)
+                                   postproc=postproc,
+                                   tstop=tstop, dt=dt)
 
         return dpls, net
     return _run_hnn_core_fixture

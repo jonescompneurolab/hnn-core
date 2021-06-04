@@ -31,8 +31,7 @@ def test_dipole_visualization():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   'tstop': 100.})
+                   'N_pyr_y': 3})
     net = default_network(params)
     weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
@@ -42,7 +41,8 @@ def test_dipole_visualization():
         numspikes=1, spike_isi=0, repeats=11, location='proximal',
         weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p, seedcore=14)
 
-    dpls = simulate_dipole(net, n_trials=2, postproc=False)
+    dpls = simulate_dipole(net, tstop=100, dt=params['dt'], n_trials=2,
+                           postproc=False)
     fig = dpls[0].plot()  # plot the first dipole alone
     axes = fig.get_axes()[0]
     dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
