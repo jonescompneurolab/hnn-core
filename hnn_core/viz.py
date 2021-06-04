@@ -570,7 +570,8 @@ def plot_cell_morphology(cell, ax, show=True):
     return ax
 
 
-def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
+def plot_connectivity_matrix(net, conn_idx, show_weight=True,
+                             ax=None, show=True):
     """Plot connectivity matrix with color bar for synaptic weights
 
     Parameters
@@ -580,6 +581,9 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
     conn_idx : int
         Index of connection to be visualized
         from `net.connectivity`
+    show_weight : bool
+        If True, visualize connectivity weights as gradient.
+        If False, each connection is visualized with a black square.
     ax : instance of Axes3D
         Matplotlib 3D axis
     show : bool
@@ -596,6 +600,7 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
 
     _validate_type(net, Network, 'net', 'Network')
     _validate_type(conn_idx, int, 'conn_idx', 'int')
+    _validate_type(show_weight, bool, 'show_weight', 'bool')
     if ax is None:
         _, ax = plt.subplots(1, 1)
 
@@ -619,56 +624,13 @@ def plot_connectivity_weights(net, conn_idx, ax=None, show=True):
             target_pos = target_type_pos[target_idx]
 
             # Identical calculation used in Cell.par_connect_from_src()
-            weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
+            if show_weight:
+                weight, _ = _get_gaussian_connection(
+                    src_pos, target_pos, nc_dict)
+            else:
+                weight = 1.0
 
             connectivity_matrix[src_idx, target_idx] = weight
-
-    ax.imshow(connectivity_matrix, cmap='Greys', interpolation='none')
-    ax.set_xlabel(f"{conn['target_type']} target gids "
-                  f"({target_range[0]}-{target_range[-1]})")
-    ax.set_xticklabels(list())
-    ax.set_ylabel(f"{conn['src_type']} source gids "
-                  f"({src_range[0]}-{src_range[-1]})")
-    ax.set_yticklabels(list())
-    ax.set_title(f"{conn['src_type']} -> {conn['target_type']} "
-                 f"({conn['loc']}, {conn['receptor']})")
-
-    plt_show(show)
-    return ax.get_figure()
-
-
-def plot_connectivity_matrix(conn, ax=None, show=True):
-    """Plot connectivity matrix for instance of _Connectivity object.
-
-    Parameters
-    ----------
-    conn : Instance of _Connectivity object
-        The _Connectivity object
-    ax : instance of Axes3D
-        Matplotlib 3D axis
-    show : bool
-        If True, show the plot
-
-    Returns
-    -------
-    fig : instance of matplotlib Figure
-        The matplotlib figure handle.
-
-    """
-    import matplotlib.pyplot as plt
-    from.network import _Connectivity
-
-    _validate_type(conn, _Connectivity, 'conn', '_Connectivity')
-    if ax is None:
-        _, ax = plt.subplots(1, 1)
-
-    src_range = np.array(conn['src_range'])
-    target_range = np.array(conn['target_range'])
-    connectivity_matrix = np.zeros((len(src_range), len(target_range)))
-    for src_gid, target_src_pair in conn['gid_pairs'].items():
-        src_idx = np.where(src_range == src_gid)[0][0]
-        target_indeces = np.in1d(target_range, target_src_pair)
-        connectivity_matrix[src_idx, :] = target_indeces
 
     ax.imshow(connectivity_matrix, cmap='Greys', interpolation='none')
     ax.set_xlabel(f"{conn['target_type']} target gids "

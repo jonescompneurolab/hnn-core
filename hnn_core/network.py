@@ -17,7 +17,7 @@ from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
 from .cell_response import CellResponse
 from .params import _long_name, _short_name
-from .viz import plot_cells, plot_connectivity_matrix
+from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 
 
@@ -1267,25 +1267,6 @@ class _Connectivity(dict):
         entr += "\n "
 
         return entr
-
-    def plot(self, ax=None, show=True):
-        """Plot connectivity matrix for instance of _Connectivity object.
-
-        Parameters
-        ----------
-        ax : instance of matplotlib Axes3D | None
-            An axis object from matplotlib. If None,
-            a new figure is created.
-        show : bool
-            If True, show the figure.
-
-        Returns
-        -------
-        fig : instance of matplotlib Figure
-            The matplotlib figure handle.
-        """
-
-        return plot_connectivity_matrix(self, ax=ax, show=show)
 
 
 class _NetworkDrive(dict):
