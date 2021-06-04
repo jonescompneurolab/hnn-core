@@ -26,6 +26,7 @@ def test_network_visualization():
     assert len(ax.lines) == 8
 
     conn_idx = 0
+    plot_connectivity_matrix(net, conn_idx, show=False)
     with pytest.raises(TypeError, match='net must be an instance of'):
         plot_connectivity_matrix('blah', conn_idx, show_weight=False)
 
@@ -36,14 +37,18 @@ def test_network_visualization():
         plot_connectivity_matrix(net, conn_idx, show_weight='blah')
 
     src_gid = 5
+    plot_cell_connectivity(net, conn_idx, src_gid, show=False)
     with pytest.raises(TypeError, match='net must be an instance of'):
         plot_cell_connectivity('blah', conn_idx, src_gid=src_gid)
 
     with pytest.raises(TypeError, match='conn_idx must be an instance of'):
-        plot_cell_connectivity(net, 'blah', src_gid=src_gid)
+        plot_cell_connectivity(net, 'blah', src_gid)
 
     with pytest.raises(TypeError, match='src_gid must be an instance of'):
         plot_cell_connectivity(net, conn_idx, src_gid='blah')
+
+    with pytest.raises(ValueError, match='src_gid not in the'):
+        plot_cell_connectivity(net, conn_idx, src_gid=-1)
 
 
 def test_dipole_visualization():
