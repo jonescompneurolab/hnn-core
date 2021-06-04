@@ -123,10 +123,16 @@ for target in ['L5_pyramidal', 'L2_basket']:
 dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
 net_sparse.cell_response.plot_spikes_raster()
 
-# Get index of most recently added connection
-conn_idx = len(net_sparse.connectivity)
-plot_connectivity_matrix(net_sparse, conn_idx, show_weight=False)
-plot_connectivity_matrix(net_sparse, conn_idx - 1, show_weight=False)
+# Get index of most recently added connection, and a src_gid in src_range.
+conn_idx, gid_idx = len(net_sparse.connectivity) - 1, 5
+src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+plot_connectivity_matrix(net_sparse, conn_idx)
+plot_cell_connectivity(net_sparse, conn_idx, src_gid)
+
+conn_idx, gid_idx = len(net_sparse.connectivity) - 2, 5
+src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+plot_connectivity_matrix(net_sparse, conn_idx)
+plot_cell_connectivity(net_sparse, conn_idx, src_gid)
 
 ###############################################################################
 # Using the sparse connectivity pattern produced a lot more spiking in
