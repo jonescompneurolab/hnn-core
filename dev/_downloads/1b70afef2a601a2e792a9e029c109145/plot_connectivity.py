@@ -8,7 +8,7 @@ This example demonstrates how to modify the network connectivity.
 
 # Author: Nick Tolley <nicholas_tolley@brown.edu>
 
-# sphinx_gallery_thumbnail_number = 5
+# sphinx_gallery_thumbnail_number = 2
 
 import os.path as op
 
@@ -38,9 +38,19 @@ net_erp = default_network(params, add_drives_from_params=True)
 # Instantiating the network comes with a predefined set of connections that
 # reflect the canonical neocortical microcircuit. ``net.connectivity``
 # is a list of dictionaries which detail every cell-cell, and drive-cell
-# connection.
+# connection. The weights of these connections can be visualized with
+# :func:`~hnn_core.viz.plot_connectivity_weights` as well as
+# :func:`~hnn_core.viz.plot_cell_connectivity`
+from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 print(len(net_erp.connectivity))
-print(net_erp.connectivity[0:2])
+
+conn_idx = 20
+print(net_erp.connectivity[conn_idx])
+plot_connectivity_matrix(net_erp, conn_idx)
+
+gid_idx = 11
+src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 ###############################################################################
 # Data recorded during simulations are stored under
@@ -89,9 +99,7 @@ net_all.cell_response.plot_spikes_raster()
 # activity is visible as vertical lines where several cells fire simultaneously
 # We can additionally use the ``probability``. argument to create a sparse
 # connectivity pattern instead of all-to-all. Let's try creating the same
-# network with a 10% chance of cells connecting to each other. The resulting
-# connectivity pattern can also be visualized with
-# ``net.connectivity[idx].plot()``
+# network with a 10% chance of cells connecting to each other.
 probability = 0.1
 net_sparse = default_network(params, add_drives_from_params=True)
 net_sparse.clear_connectivity()
@@ -115,8 +123,16 @@ for target in ['L5_pyramidal', 'L2_basket']:
 dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
 net_sparse.cell_response.plot_spikes_raster()
 
-net_sparse.connectivity[-2].plot()
-net_sparse.connectivity[-1].plot()
+# Get index of most recently added connection, and a src_gid in src_range.
+conn_idx, gid_idx = len(net_sparse.connectivity) - 1, 5
+src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+plot_connectivity_matrix(net_sparse, conn_idx)
+plot_cell_connectivity(net_sparse, conn_idx, src_gid)
+
+conn_idx, gid_idx = len(net_sparse.connectivity) - 2, 5
+src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+plot_connectivity_matrix(net_sparse, conn_idx)
+plot_cell_connectivity(net_sparse, conn_idx, src_gid)
 
 ###############################################################################
 # Using the sparse connectivity pattern produced a lot more spiking in

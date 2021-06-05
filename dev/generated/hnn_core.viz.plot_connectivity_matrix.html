@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>hnn_core.viz.plot_tfr_morlet &#8212; hnn-core  documentation</title>
+    <title>hnn_core.viz.plot_connectivity_matrix &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -73,7 +73,10 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">hnn_core.viz.plot_tfr_morlet</a></li>
+<li><a class="reference internal" href="#">hnn_core.viz.plot_connectivity_matrix</a><ul>
+<li><a class="reference internal" href="#examples-using-hnn-core-viz-plot-connectivity-matrix">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_connectivity_matrix</span></code></a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -85,7 +88,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="../_sources/generated/hnn_core.viz.plot_tfr_morlet.rst.txt"
+  <a href="../_sources/generated/hnn_core.viz.plot_connectivity_matrix.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -123,44 +126,30 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <section id="hnn-core-viz-plot-tfr-morlet">
-<h1>hnn_core.viz.plot_tfr_morlet<a class="headerlink" href="#hnn-core-viz-plot-tfr-morlet" title="Permalink to this headline">¶</a></h1>
+  <section id="hnn-core-viz-plot-connectivity-matrix">
+<h1>hnn_core.viz.plot_connectivity_matrix<a class="headerlink" href="#hnn-core-viz-plot-connectivity-matrix" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="hnn_core.viz.plot_tfr_morlet">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_tfr_morlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freqs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cycles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zeros'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_tfr_morlet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot Morlet time-frequency representation of dipole time course</p>
+<dt class="sig sig-object py" id="hnn_core.viz.plot_connectivity_matrix">
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_connectivity_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Greys'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.viz.plot_connectivity_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot connectivity matrix with color bar for synaptic weights</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole instances</span></dt><dd><p>The Dipole object. If a list of dipoles is given, the power is
-calculated separately for each trial, then averaged.</p>
+<dt><strong>net</strong><span class="classifier">Instance of Network object</span></dt><dd><p>The Network object</p>
 </dd>
-<dt><strong>freqs</strong><span class="classifier">array</span></dt><dd><p>Frequency range of interest.</p>
+<dt><strong>conn_idx</strong><span class="classifier">int</span></dt><dd><p>Index of connection to be visualized
+from <em class="xref py py-obj">net.connectivity</em></p>
 </dd>
-<dt><strong>n_cycles</strong><span class="classifier">float or array of float, default 7.0</span></dt><dd><p>Number of cycles. Fixed number or one per frequency.</p>
+<dt><strong>ax</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
 </dd>
-<dt><strong>tmin</strong><span class="classifier">float or None</span></dt><dd><p>Start time of plot in milliseconds. If None, plot entire simulation.</p>
+<dt><strong>show_weight</strong><span class="classifier">bool</span></dt><dd><p>If True, visualize connectivity weights as gradient.
+If False, all weights set to constant value.</p>
 </dd>
-<dt><strong>tmax</strong><span class="classifier">float or None</span></dt><dd><p>End time of plot in milliseconds. If None, plot entire simulation.</p>
-</dd>
-<dt><strong>layer</strong><span class="classifier">str, default ‘agg’</span></dt><dd><p>The layer to plot. Can be one of ‘agg’, ‘L2’, and ‘L5’</p>
-</dd>
-<dt><strong>decim</strong><span class="classifier">int or list of int or None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole traces.
-The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.8.0.dev0+0.f89d399)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used, which
-recommends values &lt;13. To achieve higher decimation factors, a list of
-ints can be provided. These are applied successively.</p>
-</dd>
-<dt><strong>padding</strong><span class="classifier">str or None</span></dt><dd><p>Optional padding of the dipole time course beyond the plotting limits.
-Possible values are: ‘zeros’ for padding with 0’s (default), ‘mirror’
-for mirror-image padding.</p>
-</dd>
-<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis</p>
-</dd>
-<dt><strong>colormap</strong><span class="classifier">str</span></dt><dd><p>The name of a matplotlib colormap, e.g., ‘viridis’. Default: ‘inferno’</p>
+<dt><strong>colormap</strong><span class="classifier">str</span></dt><dd><p>The name of a matplotlib colormap. Default: ‘Greys’</p>
 </dd>
 <dt><strong>colorbar</strong><span class="classifier">bool</span></dt><dd><p>If True (default), adjust figure to include colorbar.</p>
 </dd>
-<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the plot</p>
 </dd>
 </dl>
 </dd>
@@ -173,7 +162,16 @@ for mirror-image padding.</p>
 </dl>
 </dd></dl>
 
-<span class="target" id="sphx-glr-backreferences-hnn-core-viz-plot-tfr-morlet"></span></section>
+<section id="examples-using-hnn-core-viz-plot-connectivity-matrix">
+<span id="sphx-glr-backreferences-hnn-core-viz-plot-connectivity-matrix"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_connectivity_matrix</span></code><a class="headerlink" href="#examples-using-hnn-core-viz-plot-connectivity-matrix" title="Permalink to this headline">¶</a></h2>
+<div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. "><figure class="align-default" id="id1">
+<img alt="06. Plot Connectivity" src="../_images/sphx_glr_plot_connectivity_thumb.png" />
+<figcaption>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_connectivity.html#sphx-glr-auto-examples-plot-connectivity-py"><span class="std std-ref">06. Plot Connectivity</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</div><div class="sphx-glr-clear"></div></section>
+</section>
 
 
     </div>

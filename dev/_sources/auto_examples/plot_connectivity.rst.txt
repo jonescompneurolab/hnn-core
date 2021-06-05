@@ -31,7 +31,7 @@ This example demonstrates how to modify the network connectivity.
 
     # Author: Nick Tolley <nicholas_tolley@brown.edu>
 
-    # sphinx_gallery_thumbnail_number = 5
+    # sphinx_gallery_thumbnail_number = 2
 
     import os.path as op
 
@@ -103,22 +103,47 @@ predefined drives without the drives API shown previously).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-42
+.. GENERATED FROM PYTHON SOURCE LINES 38-44
 
 Instantiating the network comes with a predefined set of connections that
 reflect the canonical neocortical microcircuit. ``net.connectivity``
 is a list of dictionaries which detail every cell-cell, and drive-cell
-connection.
+connection. The weights of these connections can be visualized with
+:func:`~hnn_core.viz.plot_connectivity_weights` as well as
+:func:`~hnn_core.viz.plot_cell_connectivity`
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-45
+.. GENERATED FROM PYTHON SOURCE LINES 44-55
 
 .. code-block:: default
 
+    from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
     print(len(net_erp.connectivity))
-    print(net_erp.connectivity[0:2])
+
+    conn_idx = 20
+    print(net_erp.connectivity[conn_idx])
+    plot_connectivity_matrix(net_erp, conn_idx)
+
+    gid_idx = 11
+    src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+    fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 
 
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_001.png
+          :alt: L5_basket -> L5_pyramidal (soma, gabaa)
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_002.png
+          :alt: L5_basket-> L5_pyramidal (soma, gabaa)
+          :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -128,28 +153,23 @@ connection.
  .. code-block:: none
 
     30
-    [evdist1 -> L2_basket
-    cell counts: 35 srcs, 35 targets
+    L5_basket -> L5_pyramidal
+    cell counts: 35 srcs, 100 targets
     connection probability: 1.0 
-    loc: 'distal'; receptor: 'ampa'
-    weight: 0.006562; delay: 0.1; lamtha: 3.0
-     , evdist1 -> L2_basket
-    cell counts: 35 srcs, 35 targets
-    connection probability: 1.0 
-    loc: 'distal'; receptor: 'nmda'
-    weight: 0.019482; delay: 0.1; lamtha: 3.0
-     ]
+    loc: 'soma'; receptor: 'gabaa'
+    weight: 0.025; delay: 1.0; lamtha: 70.0
+ 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-49
+.. GENERATED FROM PYTHON SOURCE LINES 56-59
 
 Data recorded during simulations are stored under
 :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
 a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-52
+.. GENERATED FROM PYTHON SOURCE LINES 59-62
 
 .. code-block:: default
 
@@ -159,7 +179,7 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_connectivity_001.png
+.. image:: /auto_examples/images/sphx_glr_plot_connectivity_003.png
     :alt: plot connectivity
     :class: sphx-glr-single-img
 
@@ -196,7 +216,7 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-63
+.. GENERATED FROM PYTHON SOURCE LINES 63-73
 
 We can also define our own connections to test the effect of different
 connectivity patterns. To start, ``net.clear_connectivity()`` can be used
@@ -209,7 +229,7 @@ connections to be specified with either cell names, or the gids directly.
 If multiple gids are provided for either the sources or the targets,
 they will be connected in an all-to-all pattern.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-86
+.. GENERATED FROM PYTHON SOURCE LINES 73-96
 
 .. code-block:: default
 
@@ -239,7 +259,7 @@ they will be connected in an all-to-all pattern.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_connectivity_002.png
+.. image:: /auto_examples/images/sphx_glr_plot_connectivity_004.png
     :alt: plot connectivity
     :class: sphx-glr-single-img
 
@@ -276,18 +296,16 @@ they will be connected in an all-to-all pattern.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-95
+.. GENERATED FROM PYTHON SOURCE LINES 97-103
 
 With the previous connection pattern there appears to be synchronous rhythmic
 firing of the L5 pyramidal cells with a period of 10 ms. The synchronous
 activity is visible as vertical lines where several cells fire simultaneously
 We can additionally use the ``probability``. argument to create a sparse
 connectivity pattern instead of all-to-all. Let's try creating the same
-network with a 10% chance of cells connecting to each other. The resulting
-connectivity pattern can also be visualized with
-``net.connectivity[idx].plot()``
+network with a 10% chance of cells connecting to each other.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-121
+.. GENERATED FROM PYTHON SOURCE LINES 103-137
 
 .. code-block:: default
 
@@ -314,8 +332,16 @@ connectivity pattern can also be visualized with
     dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
     net_sparse.cell_response.plot_spikes_raster()
 
-    net_sparse.connectivity[-2].plot()
-    net_sparse.connectivity[-1].plot()
+    # Get index of most recently added connection, and a src_gid in src_range.
+    conn_idx, gid_idx = len(net_sparse.connectivity) - 1, 5
+    src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+    plot_connectivity_matrix(net_sparse, conn_idx)
+    plot_cell_connectivity(net_sparse, conn_idx, src_gid)
+
+    conn_idx, gid_idx = len(net_sparse.connectivity) - 2, 5
+    src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+    plot_connectivity_matrix(net_sparse, conn_idx)
+    plot_cell_connectivity(net_sparse, conn_idx, src_gid)
 
 
 
@@ -325,20 +351,32 @@ connectivity pattern can also be visualized with
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_003.png
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_005.png
           :alt: plot connectivity
           :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_004.png
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_006.png
+          :alt: L2_basket -> L2_basket (soma, gabaa)
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_007.png
+          :alt: L2_basket-> L2_basket (soma, gabaa)
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_008.png
           :alt: L2_basket -> L5_pyramidal (soma, gabaa)
           :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_005.png
-          :alt: L2_basket -> L2_basket (soma, gabaa)
+      .. image:: /auto_examples/images/sphx_glr_plot_connectivity_009.png
+          :alt: L2_basket-> L5_pyramidal (soma, gabaa)
           :class: sphx-glr-multi-img
 
 
@@ -370,11 +408,11 @@ connectivity pattern can also be visualized with
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
 
-    <Figure size 640x480 with 1 Axes>
+    (<Figure size 640x480 with 2 Axes>, <AxesSubplot:title={'center':'L2_basket-> L5_pyramidal (soma, gabaa)'}, xlabel='X Position', ylabel='Y Position'>)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-127
+.. GENERATED FROM PYTHON SOURCE LINES 138-143
 
 Using the sparse connectivity pattern produced a lot more spiking in
 the L5 pyramidal cells. Nevertheless there appears to be some rhythmicity
@@ -382,7 +420,7 @@ where the cells are firing synchronously with a smaller period of 4-5 ms.
 As a final step, we can see how this change in spiking activity impacts
 the aggregate current dipole.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-136
+.. GENERATED FROM PYTHON SOURCE LINES 143-152
 
 .. code-block:: default
 
@@ -398,7 +436,7 @@ the aggregate current dipole.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_connectivity_006.png
+.. image:: /auto_examples/images/sphx_glr_plot_connectivity_010.png
     :alt: Aggregate (L2 + L5)
     :class: sphx-glr-single-img
 
@@ -417,7 +455,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 11 minutes  55.373 seconds)
+   **Total running time of the script:** ( 7 minutes  53.708 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_connectivity.py:

@@ -24,6 +24,8 @@ Changelog
 
 - Add probability argument to :func:`~hnn_core.Network.add_connection`. Connectivity patterns can also be visualized with :func:`~hnn_core.viz.plot_connectivity_matrix`, by `Nick Tolley`_ in `#318 <https://github.com/jonescompneurolab/hnn-core/pull/318>`_
 
+- Add function to visualize connections originating from individual cells :func:`~hnn_core.viz.plot_cell_connectivity`, by `Nick Tolley`_ in `#339 <https://github.com/jonescompneurolab/hnn-core/pull/339>`_
+
 Bug
 ~~~
 

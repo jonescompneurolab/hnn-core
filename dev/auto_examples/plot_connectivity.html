@@ -133,7 +133,7 @@ to download the full example code or to run this example in your browser via Bin
 <p>This example demonstrates how to modify the network connectivity.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Author: Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
 
-<span class="c1"># sphinx_gallery_thumbnail_number = 5</span>
+<span class="c1"># sphinx_gallery_thumbnail_number = 2</span>
 
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 </pre></div>
@@ -162,24 +162,34 @@ predefined drives without the drives API shown previously).</p>
 <p>Instantiating the network comes with a predefined set of connections that
 reflect the canonical neocortical microcircuit. <code class="docutils literal notranslate"><span class="pre">net.connectivity</span></code>
 is a list of dictionaries which detail every cell-cell, and drive-cell
-connection.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+connection. The weights of these connections can be visualized with
+<code class="xref py py-func docutils literal notranslate"><span class="pre">plot_connectivity_weights()</span></code> as well as
+<a class="reference internal" href="../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_cell_connectivity()</span></code></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core.viz</span> <span class="kn">import</span> <a href="../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix" title="hnn_core.viz.plot_connectivity_matrix" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_connectivity_matrix</span></a><span class="p">,</span> <a href="../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_cell_connectivity</span></a>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">))</span>
+
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a> <span class="o">=</span> <span class="mi">20</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">])</span>
+<a href="../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix" title="hnn_core.viz.plot_connectivity_matrix" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_connectivity_matrix</span></a><span class="p">(</span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gid_idx</span></a> <span class="o">=</span> <span class="mi">11</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_gid</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">][</span><span class="s1">&#39;src_range&#39;</span><span class="p">][</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gid_idx</span></a><span class="p">]</span>
+<a href="https://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <a href="../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_cell_connectivity</span></a><span class="p">(</span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_gid</span></a><span class="p">)</span>
 </pre></div>
 </div>
+<ul class="sphx-glr-horizontal">
+<li><img alt="L5_basket -&gt; L5_pyramidal (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_001.png" />
+</li>
+<li><img alt="L5_basket-&gt; L5_pyramidal (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_002.png" />
+</li>
+</ul>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>30
-[evdist1 -&gt; L2_basket
-cell counts: 35 srcs, 35 targets
+L5_basket -&gt; L5_pyramidal
+cell counts: 35 srcs, 100 targets
 connection probability: 1.0
-loc: &#39;distal&#39;; receptor: &#39;ampa&#39;
-weight: 0.006562; delay: 0.1; lamtha: 3.0
- , evdist1 -&gt; L2_basket
-cell counts: 35 srcs, 35 targets
-connection probability: 1.0
-loc: &#39;distal&#39;; receptor: &#39;nmda&#39;
-weight: 0.019482; delay: 0.1; lamtha: 3.0
- ]
+loc: &#39;soma&#39;; receptor: &#39;gabaa&#39;
+weight: 0.025; delay: 1.0; lamtha: 70.0
 </pre></div>
 </div>
 <p>Data recorded during simulations are stored under
@@ -189,7 +199,7 @@ a simulation is using <code class="xref py py-meth docutils literal notranslate"
 <a href="../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_erp</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="plot connectivity" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_connectivity_001.png" />
+<img alt="plot connectivity" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_connectivity_003.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
 Building the NEURON model
@@ -249,7 +259,7 @@ they will be connected in an all-to-all pattern.</p>
 <a href="../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_all</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="plot connectivity" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_connectivity_002.png" />
+<img alt="plot connectivity" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_connectivity_004.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
 Building the NEURON model
@@ -281,9 +291,7 @@ firing of the L5 pyramidal cells with a period of 10 ms. The synchronous
 activity is visible as vertical lines where several cells fire simultaneously
 We can additionally use the <code class="docutils literal notranslate"><span class="pre">probability</span></code>. argument to create a sparse
 connectivity pattern instead of all-to-all. Let’s try creating the same
-network with a 10% chance of cells connecting to each other. The resulting
-connectivity pattern can also be visualized with
-<code class="docutils literal notranslate"><span class="pre">net.connectivity[idx].plot()</span></code></p>
+network with a 10% chance of cells connecting to each other.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">probability</span></a> <span class="o">=</span> <span class="mf">0.1</span>
 <a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span></a> <span class="o">=</span> <a href="../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a href="../generated/hnn_core.Network.html#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_sparse</span><span class="o">.</span><span class="n">clear_connectivity</span></a><span class="p">()</span>
@@ -307,16 +315,28 @@ connectivity pattern can also be visualized with
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl_sparse</span></a> <span class="o">=</span> <a href="../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span></a><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <a href="../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_sparse</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">()</span>
 
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="c1"># Get index of most recently added connection, and a src_gid in src_range.</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gid_idx</span></a> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_gid</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">][</span><span class="s1">&#39;src_range&#39;</span><span class="p">][</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gid_idx</span></a><span class="p">]</span>
+<a href="../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix" title="hnn_core.viz.plot_connectivity_matrix" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_connectivity_matrix</span></a><span class="p">(</span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">)</span>
+<a href="../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_cell_connectivity</span></a><span class="p">(</span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_gid</span></a><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gid_idx</span></a> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_gid</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">][</span><span class="s1">&#39;src_range&#39;</span><span class="p">][</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gid_idx</span></a><span class="p">]</span>
+<a href="../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix" title="hnn_core.viz.plot_connectivity_matrix" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_connectivity_matrix</span></a><span class="p">(</span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">)</span>
+<a href="../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_cell_connectivity</span></a><span class="p">(</span><a href="../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sparse</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_gid</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="plot connectivity" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_003.png" />
+<li><img alt="plot connectivity" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_005.png" />
 </li>
-<li><img alt="L2_basket -&gt; L5_pyramidal (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_004.png" />
+<li><img alt="L2_basket -&gt; L2_basket (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_006.png" />
 </li>
-<li><img alt="L2_basket -&gt; L2_basket (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_005.png" />
+<li><img alt="L2_basket-&gt; L2_basket (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_007.png" />
+</li>
+<li><img alt="L2_basket -&gt; L5_pyramidal (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_008.png" />
+</li>
+<li><img alt="L2_basket-&gt; L5_pyramidal (soma, gabaa)" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_connectivity_009.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
@@ -342,7 +362,7 @@ Simulation time: 140.0 ms...
 Simulation time: 150.0 ms...
 Simulation time: 160.0 ms...
 
-&lt;Figure size 640x480 with 1 Axes&gt;
+(&lt;Figure size 640x480 with 2 Axes&gt;, &lt;AxesSubplot:title={&#39;center&#39;:&#39;L2_basket-&gt; L5_pyramidal (soma, gabaa)&#39;}, xlabel=&#39;X Position&#39;, ylabel=&#39;Y Position&#39;&gt;)
 </pre></div>
 </div>
 <p>Using the sparse connectivity pattern produced a lot more spiking in
@@ -361,12 +381,12 @@ the aggregate current dipole.</p>
     <span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;evprox&#39;</span><span class="p">,</span> <span class="s1">&#39;evdist&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_connectivity_006.png" />
+<img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_connectivity_010.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 11 minutes  55.373 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 7 minutes  53.708 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-connectivity-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/plot_connectivity.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo.svg" width="150px" /></a>
