@@ -160,7 +160,9 @@ def test_network():
                'threshold': 0.5}
     net._all_to_all_connect('bursty1', 'L5_basket',
                             'soma', 'gabaa', nc_dict, unique=False)
-    network_builder = NetworkBuilder(net)
+    tstop, dt = params['tstop'], params['dt']
+    times = np.arange(0, tstop + dt, dt)
+    network_builder = NetworkBuilder(net, times)
     assert 'bursty1_L5Basket_gabaa' in network_builder.ncs
     n_conn = len(net.gid_ranges['bursty1']) * len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['bursty1_L5Basket_gabaa']) == n_conn
@@ -169,7 +171,7 @@ def test_network():
     net = default_network(deepcopy(params), add_drives_from_params=True)
     net._all_to_all_connect('extgauss', 'L5_basket',
                             'soma', 'gabaa', nc_dict, unique=True)
-    network_builder = NetworkBuilder(net)
+    network_builder = NetworkBuilder(net, times)
     n_conn = len(net.gid_ranges['L5_basket'])
     assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
@@ -181,7 +183,7 @@ def test_network():
                           weight=5e-4, delay=1.0, lamtha=1e9,
                           probability=1.0)
     net.add_connection(**kwargs_default)  # smoke test
-    network_builder = NetworkBuilder(net)
+    network_builder = NetworkBuilder(net, times)
     assert len(network_builder.ncs['L2Basket_L2Pyr_gabaa']) == n_conn + 4
     nc = network_builder.ncs['L2Basket_L2Pyr_gabaa'][-1]
     assert_allclose(nc.weight[0], kwargs_default['weight'])
@@ -300,7 +302,8 @@ def test_tonic_biases():
 
     # new API
     net = hnn_core.Network(params)
-    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+                       tstop=params['tstop'])
     assert 'tonic' in net.external_biases
     assert 'L5_pyramidal' not in net.external_biases['tonic']
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0

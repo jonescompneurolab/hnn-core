@@ -4,6 +4,7 @@ from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
 
 import pytest
+import numpy as np
 
 import hnn_core
 from hnn_core import read_params, Network, default_network
@@ -143,7 +144,10 @@ def test_child_run():
         sim_data = _process_child_data(data, data_len)
         n_trials = 1
         postproc = False
-        dpls = _gather_trial_data(sim_data, net_reduced, n_trials, postproc)
+        times = np.arange(0, tstop + dt, dt)
+        dpls = _gather_trial_data(sim_data, net=net_reduced,
+                                  n_trials=n_trials, postproc=postproc,
+                                  times=times)
         assert len(dpls) == 1
 
 
