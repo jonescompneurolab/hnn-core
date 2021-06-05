@@ -47,11 +47,11 @@ def _simulate_single_trial(neuron_net, tstop, dt, trial_idx):
               (trial_idx + 1, nhosts))
 
     # Set tstop before instantiating any classes
-    h.tstop = neuron_net.net._params['tstop']
-    h.dt = neuron_net.net._params['dt']  # simulation duration and time-step
+    h.tstop = tstop
+    h.dt = dt  # simulation duration and time-step
     h.celsius = neuron_net.net._params['celsius']  # 37.0 - set temperature
 
-    times = neuron_net.net.cell_response.times
+    times = np.arange(0., tstop + dt, dt)
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
