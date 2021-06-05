@@ -249,9 +249,10 @@ class NetworkBuilder(object):
     `self.net._params` and the network is ready for another simulation.
     """
 
-    def __init__(self, net, trial_idx=0):
+    def __init__(self, net, times, trial_idx=0):
         self.net = net
         self.trial_idx = trial_idx
+        self.times = times
 
         # When computing the network dynamics in parallel, the nodes of the
         # network (real and artificial cells) potentially get distributed
@@ -292,8 +293,8 @@ class NetworkBuilder(object):
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.dipoles = {
-            'L5_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
-            'L2_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
+            'L5_pyramidal': h.Vector(self.times.size, 0),
+            'L2_pyramidal': h.Vector(self.times.size, 0),
         }
 
         self._gid_assign()

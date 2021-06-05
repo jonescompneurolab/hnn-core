@@ -18,6 +18,10 @@ from threading import Thread, Event
 
 from psutil import wait_procs, process_iter, NoSuchProcess
 
+import numpy as np
+
+from .cell_response import CellResponse
+
 _BACKEND = None
 
 
@@ -41,7 +45,8 @@ def _clone_and_simulate(net, tstop, dt, trial_idx):
     from hnn_core.network_builder import NetworkBuilder
     from hnn_core.network_builder import _simulate_single_trial
 
-    neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
+    times = np.arange(0., tstop + dt, dt)
+    neuron_net = NetworkBuilder(net, times=times, trial_idx=trial_idx)
     dpl = _simulate_single_trial(neuron_net, tstop, dt, trial_idx)
 
     spikedata = neuron_net.get_data_from_neuron()
@@ -49,13 +54,18 @@ def _clone_and_simulate(net, tstop, dt, trial_idx):
     return dpl, spikedata
 
 
-def _gather_trial_data(sim_data, net, n_trials, postproc):
+def _gather_trial_data(sim_data, net, times, n_trials, postproc):
     """Arrange data by trial
 
     To be called after simulate(). Returns list of Dipoles, one for each trial,
     and saves spiking info in net (instance of Network).
     """
     dpls = []
+
+    cell_type_names = list(net.cell_types.keys())
+    # Create CellResponse object, initialised with simulation time points
+    net.cell_response = CellResponse(
+        times=times, cell_type_names=cell_type_names)
 
     for idx in range(n_trials):
         dpls.append(sim_data[idx][0])
@@ -532,9 +542,10 @@ class JoblibBackend(object):
         parallel, myfunc = self._parallel_func(_clone_and_simulate)
         sim_data = parallel(myfunc(net, tstop, dt, idx) for idx
                             in range(n_trials))
+        times = np.arange(0., tstop + dt, dt)
 
         dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
-                                  postproc=postproc)
+                                  postproc=postproc, times=times)
 
         return dpls
 
@@ -671,7 +682,6 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-
         # just use the joblib backend for a single core
         if self.n_procs == 1:
             return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
@@ -688,7 +698,9 @@ class MPIBackend(object):
             proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
             universal_newlines=True)
 
-        dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
+        times = np.arange(0., tstop + dt, dt)
+        dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
+                                  postproc=postproc, times=times)
         return dpls
 
     def terminate(self):

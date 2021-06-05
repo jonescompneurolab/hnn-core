@@ -15,7 +15,6 @@ from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
-from .cell_response import CellResponse
 from .params import _long_name, _short_name
 from .viz import plot_cells, plot_connectivity_matrix
 from .externals.mne import _validate_type, _check_option
@@ -320,8 +319,6 @@ class Network(object):
     cells : list of Cell objects.
         The list of cells of the network, each containing features used in a
         NEURON simulation.
-    cell_response : CellResponse
-        An instance of the CellResponse object.
     external_drives : dict (keys: drive names) of dict (keys: parameters)
         The external driving inputs to the network. Drives are added by
         defining their spike-time dynamics, and their connectivity to the real
@@ -370,14 +367,6 @@ class Network(object):
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
         }
-
-        # Create array of equally sampled time points for simulating currents
-        # NB (only) used to initialise self.cell_response._times
-        times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
-        cell_type_names = list(self.cell_types.keys())
-        # Create CellResponse object, initialised with simulation time points
-        self.cell_response = CellResponse(times=times,
-                                          cell_type_names=cell_type_names)
 
         # external drives and biases
         self.external_drives = dict()
@@ -433,7 +422,6 @@ class Network(object):
         # clear cells containing Neuron objects to avoid pickling error
         self.cells = dict()
         net_copy = deepcopy(self)
-        net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
         return net_copy
 
@@ -547,14 +535,10 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        sim_end_time = self.cell_response.times[-1]
-        if tstop is None:
-            tstop = sim_end_time
-
         if not self._legacy_mode:
             _check_drive_parameter_values('Poisson', tstart=tstart,
                                           tstop=tstop,
-                                          sim_end_time=sim_end_time)
+                                          sim_end_time=tstop)
             target_populations = _get_target_populations(weights_ampa,
                                                          weights_nmda)[0]
             _check_poisson_rates(rate_constant, target_populations,
@@ -621,12 +605,9 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        sim_end_time = self.cell_response.times[-1]
-        if tstop is None:
-            tstop = sim_end_time
         if not self._legacy_mode:
             _check_drive_parameter_values('bursty', tstart=tstart, tstop=tstop,
-                                          sim_end_time=sim_end_time,
+                                          sim_end_time=tstop,
                                           sigma=tstart_std, location=location)
             _check_drive_parameter_values('bursty', sigma=burst_std,
                                           numspikes=numspikes,
@@ -913,14 +894,8 @@ class Network(object):
 
         if t0 is None:
             t0 = 0
-        tstop = self.cell_response.times[-1]
-        if T is None:
-            T = tstop
         if T < 0.:
             raise ValueError('End time of tonic input cannot be negative')
-        if T > tstop:
-            raise ValueError(f'End time of tonic input cannot exceed '
-                             f'simulation end time {tstop}. Got {T}.')
         if cell_type not in self.cell_types:
             raise ValueError(f'cell_type must be one of '
                              f'{list(self.cell_types.keys())}. '
