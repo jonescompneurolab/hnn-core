@@ -34,7 +34,7 @@ def default_network(params=None, add_drives_from_params=False):
     Model reproduces results from Jones et al. 2009.
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'beta_erp.json')
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
     if params is None:
         params = read_params(params_fname)
 
@@ -200,6 +200,11 @@ def beta_erp_network(params=None, add_drives_from_params=False):
     net.connectivity[6]['nc_dict']['A_weight'] = 0.02  # gabaa
     net.connectivity[7]['nc_dict']['A_weight'] = 0.005  # gabab
 
+    # Remove L5 pyramidal somatic and basal dendrite calcium channels
+    for sec in ['soma', 'basal_1', 'basal_2', 'basal_3']:
+        net.cell_types['L5_pyramidal'].p_secs[
+            sec]['mechs']['ca']['gbar_ca'] = 0.0
+
     # Remove L2_basket -> L5_pyramidal gabaa connection
     del net.connectivity[10]  # Original paper simply sets gbar to 0.0
 
@@ -216,5 +221,17 @@ def beta_erp_network(params=None, add_drives_from_params=False):
     receptor = 'gabab'
     net._all_to_all_connect(
         src_cell, target_cell, loc, receptor, nc_dict)
+
+    # Add L5_basket -> L5_pyramidal distal connection
+    # ("Martinotti-like recurrent tuft connection")
+    src_cell = 'L5Basket'
+    target_cell = 'L5Pyr'
+    nc_dict['lamtha'] = 70.  # The parameter values here need checking
+    loc = 'distal'
+    for receptor in ['gabaa', 'gabab']:  # Both receptors? or just gabaa
+        key = f'gbar_L5Basket_{target_cell}_{receptor}'
+        nc_dict['A_weight'] = net._params[key]
+        net._all_to_all_connect(
+            src_cell, target_cell, loc, receptor, nc_dict)
 
     return net
