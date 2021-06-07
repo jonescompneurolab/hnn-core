@@ -7,7 +7,7 @@ This example demonstrates how event related potentials (ERP) are modulated
 by prestimulus beta events.
 """
 
-# Authors: Nick Tolley <nicholas_tolley@brown.edu
+# Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
 import os.path as op
 
