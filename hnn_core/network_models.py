@@ -209,29 +209,26 @@ def beta_erp_network(params=None, add_drives_from_params=False):
     del net.connectivity[10]  # Original paper simply sets gbar to 0.0
 
     # Add L2_basket -> L5_pyramidal gabab connection
-    nc_dict = {
-        'A_delay': net.delay,
-        'threshold': net.threshold,
-    }
-    src_cell = 'L2Basket'
-    target_cell = 'L5Pyr'
-    nc_dict['lamtha'] = 50.
-    nc_dict['A_weight'] = 0.0002
+    delay = net.delay
+    src_cell = 'L2_basket'
+    target_cell = 'L5_pyramidal'
+    lamtha = 50.
+    weight = 0.0002
     loc = 'distal'
     receptor = 'gabab'
-    net._all_to_all_connect(
-        src_cell, target_cell, loc, receptor, nc_dict)
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # Add L5_basket -> L5_pyramidal distal connection
     # ("Martinotti-like recurrent tuft connection")
-    src_cell = 'L5Basket'
-    target_cell = 'L5Pyr'
-    nc_dict['lamtha'] = 70.  # The parameter values here need checking
+    src_cell = 'L5_basket'
+    target_cell = 'L5_pyramidal'
+    lamtha = 70.  # The parameter values here need checking
     loc = 'distal'
     for receptor in ['gabaa', 'gabab']:  # Both receptors? or just gabaa
-        key = f'gbar_L5Basket_{target_cell}_{receptor}'
-        nc_dict['A_weight'] = net._params[key]
-        net._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
+        key = f'gbar_L5Basket_L5Pyr_{receptor}'
+        weight = net._params[key]
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     return net
