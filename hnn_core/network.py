@@ -897,6 +897,11 @@ class Network(object):
                                 seedcore=drive['seedcore']))
                             break
 
+                    # Handles edge case where common gid exists,
+                    # but no events are created
+                    if not event_times:
+                        event_times.append([])
+
                 # 'events': list (trials) of list (cells) of list (events)
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
