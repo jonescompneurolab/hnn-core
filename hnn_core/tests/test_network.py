@@ -77,7 +77,7 @@ def test_network():
             for kw in ['tstart', 'tstart_std', 'tstop',
                        'burst_rate', 'burst_std', 'numspikes', 'repeats']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == 1
+            assert len(drive['events'][0]) == 2
             n_events = (
                 drive['dynamics']['numspikes'] *  # 2
                 drive['dynamics']['repeats'] *  # 10
@@ -249,7 +249,7 @@ def test_network():
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
-    assert len(net.connectivity) == 22
+    assert len(net.connectivity) == 18
     net.clear_drives()
     assert len(net.connectivity) == 0
 
