@@ -881,6 +881,8 @@ class Network(object):
                             )
                 else:
                     for this_cell_drive_conn in drive['conn'].values():
+                        # Only create one set of event times
+                        # Exit on fist target cell type with non-zero weight
                         has_weight = np.logical_or(
                             this_cell_drive_conn['ampa'],
                             this_cell_drive_conn['nmda'])

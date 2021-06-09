@@ -31,6 +31,8 @@ Bug
 
 - Remove rounding error caused by repositioning of NEURON cell sections, by `Mainak Jas`_ and `Ryan Thorpe`_ in `#314 <https://github.com/jonescompneurolab/hnn-core/pull/314>`_
 
+- Fix issue where common drives use the same parameters for all cell types, by `Nick Tolley`_ in `#350 <https://github.com/jonescompneurolab/hnn-core/pull/350>`_
+
 API
 ~~~
 - New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
