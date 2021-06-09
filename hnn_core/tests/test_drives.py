@@ -121,7 +121,7 @@ def test_add_drives():
     weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 3.0,
                     'L5_basket': 2.0, 'L5_pyramidal': 4.0}
     syn_delays = {'L2_basket': 1.0, 'L2_pyramidal': 2.0,
-                    'L5_basket': 3.0, 'L5_pyramidal': 4.0}
+                  'L5_basket': 3.0, 'L5_pyramidal': 4.0}
     net.add_bursty_drive(
         'ex_drive', location='distal', burst_rate=10,
         weights_ampa=weights_ampa, synaptic_delays=syn_delays, seedcore=14)
