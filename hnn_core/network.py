@@ -823,7 +823,7 @@ class Network(object):
 
             drive_conn['target_gids'] = list()  # fill in below
             for cellname in target_populations:
-                drive_conn['target_gids'].extend(self.gid_ranges[cellname])
+                drive_conn['target_gids'] = self.gid_ranges[cellname]
                 drive_conn['target_type'] = cellname
                 drive_conn_by_cell[cellname] = drive_conn.copy()
 
@@ -870,17 +870,26 @@ class Network(object):
                 event_times = list()  # new list for each trial and drive
 
                 # loop over drive 'cells' and create event times for each
-                for this_cell_drive_conn in drive['conn'].values():
-                    for drive_cell_gid in this_cell_drive_conn['src_gids']:
-                        event_times.append(_drive_cell_event_times(
-                            drive['type'], this_cell_drive_conn,
-                            drive['dynamics'], trial_idx=trial_idx,
-                            drive_cell_gid=drive_cell_gid,
-                            seedcore=drive['seedcore'])
-                        )
-                    # only create one event_times list for globals
-                    if not drive['cell_specific']:
-                        break  # loop over drive['conn'].values
+                if drive['cell_specific']:
+                    for this_cell_drive_conn in drive['conn'].values():
+                        for drive_cell_gid in this_cell_drive_conn['src_gids']:
+                            event_times.append(_drive_cell_event_times(
+                                drive['type'], this_cell_drive_conn,
+                                drive['dynamics'], trial_idx=trial_idx,
+                                drive_cell_gid=drive_cell_gid,
+                                seedcore=drive['seedcore'])
+                            )
+                else:
+                    for this_cell_drive_conn in drive['conn'].values():
+                        for drive_cell_gid in this_cell_drive_conn['src_gids']:
+                            event_ts = _drive_cell_event_times(
+                                drive['type'], this_cell_drive_conn,
+                                drive['dynamics'], trial_idx=trial_idx,
+                                drive_cell_gid=drive_cell_gid,
+                                seedcore=drive['seedcore'])
+                            if event_ts:
+                                event_times.append(event_ts)
+                                break
 
                 # 'events': list (trials) of list (cells) of list (events)
                 self.external_drives[
