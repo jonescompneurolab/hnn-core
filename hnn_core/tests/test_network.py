@@ -17,11 +17,11 @@ def test_network():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     # add rhythmic inputs (i.e., a type of common input)
-    params.update({'input_dist_A_weight_L2Pyr_ampa': 5.4e-5,
-                   'input_dist_A_weight_L5Pyr_ampa': 5.4e-5,
+    params.update({'input_dist_A_weight_L2Pyr_ampa': 1.4e-5,
+                   'input_dist_A_weight_L5Pyr_ampa': 2.4e-5,
                    't0_input_dist': 50,
-                   'input_prox_A_weight_L2Pyr_ampa': 5.4e-5,
-                   'input_prox_A_weight_L5Pyr_ampa': 5.4e-5,
+                   'input_prox_A_weight_L2Pyr_ampa': 3.4e-5,
+                   'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
                    't0_input_prox': 50})
     net = default_network(deepcopy(params), add_drives_from_params=True)
     network_builder = NetworkBuilder(net)  # needed to populate net.cells
@@ -101,7 +101,12 @@ def test_network():
                       'evprox1': {'L2_basket': 0.08831,
                                   'L5_pyramidal': 0.00865},
                       'evprox2': {'L2_basket': 0.000003,
-                                  'L5_pyramidal': 0.684013}}
+                                  'L5_pyramidal': 0.684013},
+                      'bursty1': {'L2_pyramidal': 0.000034,
+                                  'L5_pyramidal': 0.000044},
+                      'bursty2': {'L2_pyramidal': 0.000014,
+                                  'L5_pyramidal': 0.000024}
+                      }
     for drive_name in target_weights:
         for cellname in target_weights[drive_name]:
             assert_allclose(
