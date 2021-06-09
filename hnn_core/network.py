@@ -881,15 +881,21 @@ class Network(object):
                             )
                 else:
                     for this_cell_drive_conn in drive['conn'].values():
-                        for drive_cell_gid in this_cell_drive_conn['src_gids']:
-                            event_ts = _drive_cell_event_times(
+                        has_weight = np.logical_or(
+                            this_cell_drive_conn['ampa'],
+                            this_cell_drive_conn['nmda'])
+
+                        # cell_specific=False should only have one src_gid
+                        if has_weight:
+                            assert len(this_cell_drive_conn['src_gids']) == 1
+                            drive_cell_gid = this_cell_drive_conn[
+                                'src_gids'][0]
+                            event_times.append(_drive_cell_event_times(
                                 drive['type'], this_cell_drive_conn,
                                 drive['dynamics'], trial_idx=trial_idx,
                                 drive_cell_gid=drive_cell_gid,
-                                seedcore=drive['seedcore'])
-                            if event_ts:
-                                event_times.append(event_ts)
-                                break
+                                seedcore=drive['seedcore']))
+                            break
 
                 # 'events': list (trials) of list (cells) of list (events)
                 self.external_drives[
