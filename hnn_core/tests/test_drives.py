@@ -123,10 +123,26 @@ def test_add_drives():
     syn_delays = {'L2_basket': 1.0, 'L2_pyramidal': 2.0,
                   'L5_basket': 3.0, 'L5_pyramidal': 4.0}
     net.add_bursty_drive(
-        'ex_drive', location='distal', burst_rate=10,
-        weights_ampa=weights_ampa, synaptic_delays=syn_delays, seedcore=14)
+        'bursty', location='distal', burst_rate=10,
+        weights_ampa=weights_ampa, synaptic_delays=syn_delays)
 
-    for type_name, drive in net.external_drives['ex_drive']['conn'].items():
+    for type_name, drive in net.external_drives['bursty']['conn'].items():
+        assert drive['ampa']['A_weight'] == weights_ampa[type_name]
+        assert drive['ampa']['A_delay'] == syn_delays[type_name]
+
+    net.add_evoked_drive(
+        'evoked', mu=1.0, sigma=1.0, numspikes=1.0, weights_ampa=weights_ampa,
+        location='distal', synaptic_delays=syn_delays)
+
+    for type_name, drive in net.external_drives['evoked']['conn'].items():
+        assert drive['ampa']['A_weight'] == weights_ampa[type_name]
+        assert drive['ampa']['A_delay'] == syn_delays[type_name]
+
+    net.add_poisson_drive(
+        'poisson', rate_constant=1.0, weights_ampa=weights_ampa,
+        location='distal', synaptic_delays=syn_delays)
+
+    for type_name, drive in net.external_drives['poisson']['conn'].items():
         assert drive['ampa']['A_weight'] == weights_ampa[type_name]
         assert drive['ampa']['A_delay'] == syn_delays[type_name]
 
