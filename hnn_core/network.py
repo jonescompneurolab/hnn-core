@@ -825,7 +825,7 @@ class Network(object):
             for cellname in target_populations:
                 drive_conn['target_gids'].extend(self.gid_ranges[cellname])
                 drive_conn['target_type'] = cellname
-                drive_conn_by_cell[cellname] = drive_conn
+                drive_conn_by_cell[cellname] = drive_conn.copy()
 
         for cellname in target_populations:
             for receptor, weights in weights_by_receptor.items():
