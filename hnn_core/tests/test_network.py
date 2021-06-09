@@ -77,7 +77,7 @@ def test_network():
             for kw in ['tstart', 'tstart_std', 'tstop',
                        'burst_rate', 'burst_std', 'numspikes', 'repeats']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == 2
+            assert len(drive['events'][0]) == 1
             n_events = (
                 drive['dynamics']['numspikes'] *  # 2
                 drive['dynamics']['repeats'] *  # 10
