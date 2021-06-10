@@ -553,16 +553,16 @@ def plot_cell_morphology(cell, ax, show=True):
         plt.figure()
         ax = plt.axes(projection='3d')
 
-    ax.set_ylim((-100, 1200))
-    ax.set_xlim((-250, 150))
+    ax.set_xlim((cell.pos[1] - 250, cell.pos[1] + 150))
+    ax.set_ylim((cell.pos[2] - 100, cell.pos[2] + 1200))
     for sec_name, p_sec in cell.p_secs.items():
         linewidth = _linewidth_from_data_units(ax, p_sec['diam'])
         sec_pts = p_sec['sec_pts']
-        xs = [pt[0] for pt in sec_pts]
-        ys = [pt[1] for pt in sec_pts]
-        zs = [pt[2] for pt in sec_pts]
+        xs = [pt[0] + cell.pos[0] for pt in sec_pts]
+        ys = [pt[2] + cell.pos[1] for pt in sec_pts]
+        zs = [pt[1] + cell.pos[2] for pt in sec_pts]
         ax.plot(xs, ys, zs, 'b-', linewidth=linewidth)
-    ax.view_init(90, -90)
+    ax.view_init(0, -90)
     ax.axis('off')
 
     plt.tight_layout()
