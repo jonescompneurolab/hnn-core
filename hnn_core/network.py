@@ -32,9 +32,9 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
         The number of Pyramidal cells in y direction.
 
     zdiff : float
-        Expressed as a positive DEPTH of L5 relative to L2
-        This is a deviation from the original, where L5 was defined at 0
-        This should not change interlaminar weight/delay calculations.
+        Expressed as a positive DEPTH of L2 relative to L5, where L5 is defined
+        to lie at z==0. Interlaminar weight/delay calculations (lamtha) are not
+        affected.
 
     Returns
     -------
@@ -54,9 +54,9 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     xxrange = np.arange(n_pyr_x)
     yyrange = np.arange(n_pyr_y)
 
-    pos_dict['L2_pyramidal'] = [
-        pos for pos in it.product(xxrange, yyrange, [0])]
     pos_dict['L5_pyramidal'] = [
+        pos for pos in it.product(xxrange, yyrange, [0])]
+    pos_dict['L2_pyramidal'] = [
         pos for pos in it.product(xxrange, yyrange, [zdiff])]
 
     # BASKET CELLS
@@ -72,9 +72,9 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     # append the z value for position for L2 and L5
     # print(len(coords_sorted))
 
-    pos_dict['L2_basket'] = [pos_xy + (0,) for
+    pos_dict['L5_basket'] = [pos_xy + (0,) for
                              pos_xy in coords_sorted]
-    pos_dict['L5_basket'] = [
+    pos_dict['L2_basket'] = [
         pos_xy + (zdiff,) for pos_xy in coords_sorted]
 
     # ORIGIN
