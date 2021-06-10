@@ -1198,8 +1198,8 @@ class Network(object):
         self.external_drives = dict()
         self.connectivity = connectivity
 
-    def add_electrode_array(self, name, electrode_pos, sigma=0.3,
-                            method='psa'):
+    def add_electrode_array(self, name, electrode_pos, *, sigma=0.3,
+                            method='psa', min_distance=0.5):
         """Specify coordinates of electrode array for extracellular recording.
 
         Parameters
@@ -1213,8 +1213,17 @@ class Network(object):
             Extracellular conductivity, in S/m, of the assumed infinite,
             homogeneous volume conductor that the cell and electrode are in.
         method : str
-            'psa' (default), i.e., point source approximation or line source
-            approximation, i.e., 'lsa'
+            Approximation to use. ``'psa'`` (point source approximation) treats
+            each segment junction as a point extracellular current source.
+            ``'lsa'`` (line source approximation) treats each segment as a line
+            source of current, which extends from the previous to the next
+            segment center point: |---x---|, where x is the current segment
+            flanked by |.
+        min_distance : float (default: 0.5; unit: um)
+            To avoid numerical errors in calculating potentials, apply a
+            minimum distance limit between the electrode contacts and the
+            active neuronal membrane elements that act as sources of current.
+            The default value of 0.5 um corresponds to 1 um diameter dendrites.
         """
         _validate_type(name, str, 'name')
         if name in self.rec_array.keys():
@@ -1222,6 +1231,8 @@ class Network(object):
         _validate_type(electrode_pos, (list, tuple), 'electrode_pos')
         _validate_type(sigma, (float, int), 'sigma')
         assert sigma > 0.0
+        _validate_type(min_distance, float, 'min_distance')
+        assert min_distance > 0.0
         try:  # allow None, but for testing only
             _validate_type(method, str, 'method')
             _check_option('method', method, ['psa', 'lsa'])
@@ -1236,9 +1247,12 @@ class Network(object):
             assert len(e_pos) == 3
             for pos in e_pos:
                 _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
+
+        # XXX swap Z and Y coordinates! Needs to be consolidated and fixed!
+        swapped_pos = [(e[0], e[2], e[1]) for e in electrode_pos]
         self.rec_array.update({
-            name: ExtracellularArray(electrode_pos, sigma=sigma,
-                                     method=method)})
+            name: ExtracellularArray(swapped_pos, sigma=sigma, method=method,
+                                     min_distance=min_distance)})
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

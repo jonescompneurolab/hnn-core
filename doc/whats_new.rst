@@ -26,12 +26,16 @@ Changelog
 
 - Add function to visualize connections originating from individual cells :func:`~hnn_core.viz.plot_cell_connectivity`, by `Nick Tolley`_ in `#339 <https://github.com/jonescompneurolab/hnn-core/pull/339>`_
 
+- Add function to visualize extracellular potentials from laminar array simulations, by `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
+
 Bug
 ~~~
 
 - Remove rounding error caused by repositioning of NEURON cell sections, by `Mainak Jas`_ and `Ryan Thorpe`_ in `#314 <https://github.com/jonescompneurolab/hnn-core/pull/314>`_
 
 - Fix issue where common drives use the same parameters for all cell types, by `Nick Tolley`_ in `#350 <https://github.com/jonescompneurolab/hnn-core/pull/350>`_
+
+- Fix bug where depth of L5 and L2 cells were swapped, by `Christopher Bailey`_ in `#352 <https://github.com/jonescompneurolab/hnn-core/pull/352>`_
 
 API
 ~~~
