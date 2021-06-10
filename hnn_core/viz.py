@@ -8,22 +8,12 @@ from itertools import cycle
 from .externals.mne import _validate_type
 
 
-def _get_dpl_plot_data(dpl, layer, tmin, tmax):
-    plot_tmin = dpl.times[0]
-    if tmin is not None:
-        plot_tmin = max(tmin, plot_tmin)
-    plot_tmax = dpl.times[-1]
-    if tmax is not None:
-        plot_tmax = min(tmax, plot_tmax)
-
-    mask = np.logical_and(dpl.times >= plot_tmin, dpl.times < plot_tmax)
-    times = dpl.times[mask]
-    data = dpl.data[layer][mask]
-
-    return data, times
-
-
-def _get_ext_plot_data(times, data, tmin, tmax):
+def _get_plot_data_trange(times, data, tmin, tmax):
+    """Get slices of times and data based on tmin and tmax"""
+    if isinstance(times, list):
+        times = np.array(times)
+    if isinstance(data, list):
+        data = np.array(data)
     plot_tmin = times[0]
     if tmin is not None:
         plot_tmin = max(tmin, plot_tmin)
@@ -31,13 +21,9 @@ def _get_ext_plot_data(times, data, tmin, tmax):
     if tmax is not None:
         plot_tmax = min(tmax, plot_tmax)
 
-    times = np.array(times)
     mask = np.logical_and(times >= plot_tmin, times < plot_tmax)
-    times = times[mask]
 
-    data = np.array(data)[mask]
-
-    return data, times
+    return data[mask], times[mask]
 
 
 def _decimate_plot_data(decim, data, times, sfreq=None):
@@ -79,13 +65,91 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def _plot_ext(times, data, sfreq, window_len=None, tmin=None,
-              tmax=None, ax=None, decim=None, color=None,
-              voltage_offset=None, voltage_scalebar=None,
-              contact_labels=None, show=True):
-    """Helper function for ExtracellularArray.plot()"""
+def plot_extracellular(times, data, sfreq, window_len=None, tmin=None,
+                       tmax=None, ax=None, decim=None, color=None,
+                       voltage_offset=None, voltage_scalebar=None,
+                       contact_labels=None, show=True):
+    """Plot extracellular electrode array voltage time series.
+
+    Parameters
+    ----------
+    times : list | Numpy array
+        Sampling times (in ms).
+    data : Two-dimensional Numpy array
+        The extracellular voltages as an (n_contacts, n_times) array.
+    sfreq : float
+        Data sampling rate (in Hz).
+    window_len : float
+        If set, apply a Hamming-windowed convolution kernel of specified length
+        (in ms) to the data before plotting. Default: None
+    tmin : float | None
+        Start time of plot in milliseconds. If None, plot entire simulation.
+    tmax : float | None
+        End time of plot in milliseconds. If None, plot entire simulation.
+    ax : instance of matplotlib figure | None
+        The matplotlib axis
+    decim : int | list of int | None (default)
+        Optional (integer) factor by which to decimate the raw dipole traces.
+        The SciPy function :func:`~scipy.signal.decimate` is used, which
+        recommends values <13. To achieve higher decimation factors, a list of
+        ints can be provided. These are applied successively.
+    color : string | array of floats | ``matplotlib.colors.ListedColormap``
+        The color to use for plotting (optional). The usual Matplotlib standard
+        color strings may be used (e.g., 'b' for blue). A color can also be
+        defined as an RGBA-quadruplet, or an array of RGBA-values (one for each
+        electrode contact trace to plot). An instance of
+        :class:`~matplotlib.colors.ListedColormap` may also be provided.
+    voltage_offset : float | None (optional)
+        Amount to offset traces by on the voltage-axis. Useful for plotting
+        laminar arrays.
+    voltage_scalebar : float | None (optional)
+        Height, in units of uV, of a scale bar to plot in the top-left corner
+        of the plot.
+    contact_labels : list (optional)
+        Labels associated with the contacts to plot. Passed as-is to
+        :func:`~matplotlib.axes.Axes.set_yticklabels`.
+    show : bool
+        If True, show the figure
+
+    Returns
+    -------
+    fig : instance of plt.fig
+        The matplotlib figure handle into which time series were plotted.
+    """
     import matplotlib.pyplot as plt
+    from matplotlib.colors import ListedColormap
     from .dipole import _hammfilt
+    _validate_type(times, (list, np.ndarray), 'times')
+    _validate_type(data, (list, np.ndarray), 'data')
+    if isinstance(times, list):
+        times = np.array(times)
+    if isinstance(data, list):
+        data = np.array(data)
+    if data.ndim != 2:
+        raise ValueError(f'data must be 2D, got shape {data.shape}')
+    if len(times) != data.shape[1]:
+        raise ValueError(f'length of times ({len(times)}) and data '
+                         f'({len(data)}) do not match')
+
+    n_contacts = data.shape[0]
+    if color is not None:
+        _validate_type(color,
+                       (str, tuple, list, np.ndarray, ListedColormap),
+                       'color')
+        if isinstance(color, (tuple, list)):
+            if (not np.all([isinstance(c, float) for c in color]) or
+                    len(color) < 3 or len(color) > 4):
+                raise ValueError(
+                    f'color must be length 3 or 4, got {color}')
+        elif isinstance(color, np.ndarray):
+            if (color.shape[0] != n_contacts or
+                    (color.shape[1] < 3 or color.shape[1] > 4)):
+                raise ValueError(
+                    f'color must be n_contacts x (3 or 4), got {color}')
+        elif isinstance(color, ListedColormap):
+            if color.N != n_contacts:
+                raise ValueError(f'ListedColormap has N={color.N}, but '
+                                 f'there are {n_contacts} contacts')
 
     if ax is None:
         _, ax = plt.subplots(1, 1)
@@ -96,7 +160,7 @@ def _plot_ext(times, data, sfreq, window_len=None, tmin=None,
         trace_offsets = np.arange(n_offsets)[:, np.newaxis] * voltage_offset
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
-        plot_data, plot_times = _get_ext_plot_data(times, trace, tmin, tmax)
+        plot_data, plot_times = _get_plot_data_trange(times, trace, tmin, tmax)
         if window_len is not None:
             winsz = np.round(1e-3 * window_len * sfreq)
             plot_data = _hammfilt(plot_data, winsz)
@@ -106,6 +170,8 @@ def _plot_ext(times, data, sfreq, window_len=None, tmin=None,
 
         if isinstance(color, np.ndarray):
             col = color[contact_no]
+        elif isinstance(color, ListedColormap):
+            col = color(contact_no)
         else:
             col = color
         ax.plot(plot_times, plot_data + trace_offsets[contact_no],
@@ -199,7 +265,9 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         if layer in dpl_trial.data.keys():
 
             # extract scaled data and times
-            data, times = _get_dpl_plot_data(dpl_trial, layer, tmin, tmax)
+            data, times = _get_plot_data_trange(dpl_trial.times,
+                                                dpl_trial.data[layer],
+                                                tmin, tmax)
             if decim is not None:
                 data, times = _decimate_plot_data(decim, data, times)
 
@@ -424,8 +492,8 @@ def plot_cells(net, ax=None, show=True):
         cols = plt.get_cmap('inferno', len(net.rec_array) + 2)
         for ii, (arr_name, arr) in enumerate(net.rec_array.items()):
             x = [p[0] for p in arr.positions]
-            y = [p[2] for p in arr.positions]  # XXX flipped YZ until
-            z = [p[1] for p in arr.positions]  # coordinates made consistent
+            y = [p[2] for p in arr.positions]  # NB! assumes cells defined
+            z = [p[1] for p in arr.positions]  # with apical dendrites along y!
             ax.scatter(x, y, z, color=cols(ii + 1), s=100, marker='o',
                        label=arr_name)
 
@@ -498,7 +566,9 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         if dpl_trial.sfreq != sfreq:
             raise RuntimeError('All dipoles must be sampled equally!')
 
-        data, times = _get_dpl_plot_data(dpl_trial, layer, tmin, tmax)
+        data, times = _get_plot_data_trange(dpl_trial.times,
+                                            dpl_trial.data[layer],
+                                            tmin, tmax)
 
         sfreq = dpl_trial.sfreq
         if decim is not None:
@@ -596,7 +666,9 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         if dpl_trial.sfreq != sfreq:
             raise RuntimeError('All dipoles must be sampled equally!')
 
-        data, _ = _get_dpl_plot_data(dpl_trial, layer, tmin, tmax)
+        data, _ = _get_plot_data_trange(dpl_trial.times,
+                                        dpl_trial.data[layer],
+                                        tmin, tmax)
 
         freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
         trial_power.append(Pxx)

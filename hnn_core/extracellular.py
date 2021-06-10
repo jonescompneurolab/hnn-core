@@ -41,7 +41,8 @@ def _get_segment_counts(all_sections):
     return seg_counts
 
 
-def _transfer_resistance(section, electrode_pos, sigma, method):
+def _transfer_resistance(section, electrode_pos, sigma, method,
+                         min_distance=0.5):
     """Transfer resistance between section and electrode position.
 
     To arrive at the extracellular potential, the value returned by this
@@ -53,15 +54,23 @@ def _transfer_resistance(section, electrode_pos, sigma, method):
     ----------
     section : h.Section()
         The NEURON section.
-    ele_pos : list (x, y, z)
+    electrode_pos : list (x, y, z)
         The x, y, z coordinates of the electrode (in um)
     sigma : float
         Extracellular conductivity (in S/m)
     method : str
-        Approximation to use. 'psa' assigns all transmembrane currents to the
-        center point (0.5) (point source approximation). 'lsa' treats the
-        section as a line source, but a single multiplier is calculated for
-        each section (line source approximation).
+        Approximation to use. ``'psa'`` (point source approximation) treats
+        each segment junction as a point extracellular current source.
+        ``'lsa'`` (line source approximation) treats each segment as a line
+        source of current, which extends from the previous to the next segment
+        center point: |---x---|, where x is the current segment flanked by |.
+    min_distance : float (default: 0.5)
+        To avoid numerical errors in the 1/R calculation, we'll by default
+        limit the distance to 0.5 um, corresponding to 1 um diameter dendrites.
+        NB: LFPy uses section.diam / 2.0, i.e., whatever the closest section
+        radius happens to be. This may not make sense for HNN model neurons, in
+        which dendrite diameters have been adjusted to represent the entire
+        tree (Bush & Sejnowski, 1993).
 
     Returns
     -------
@@ -76,6 +85,7 @@ def _transfer_resistance(section, electrode_pos, sigma, method):
 
     # NB segment lengths aren't equal! First/last segment center point is
     # closer to respective end point than to next/previous segment!
+    # for nseg == 5, the segment centers are: [0.1, 0.3, 0.5, 0.7, 0.9]
     seg_ctr = np.zeros((section.nseg, 3))
     line_lens = np.zeros((section.nseg + 2))
     for ii, seg in enumerate(section):
@@ -94,7 +104,7 @@ def _transfer_resistance(section, electrode_pos, sigma, method):
 
         # To avoid very large values when electrode is placed close to a
         # segment junction, enforce minimal radial distance
-        dis = np.maximum(dis, section.diam / 2.0)
+        dis = np.maximum(dis, min_distance)
 
         phi = 1. / dis
 
@@ -130,7 +140,7 @@ def _transfer_resistance(section, electrode_pos, sigma, method):
 
             # To avoid very large values when electrode is placed (anywhere) on
             # the section axis, enforce minimal perpendicular distance
-            R2 = np.maximum(R2, (section.diam / 2.0) ** 2)
+            R2 = np.maximum(R2, min_distance ** 2)
 
             if L < 0 and H < 0:  # electrode is "behind" line segment
                 num = np.sqrt(H ** 2 + R2) - H  # == norm(b) - H
@@ -171,10 +181,16 @@ class ExtracellularArray:
         Extracellular conductivity, in S/m, of the assumed infinite,
         homogeneous volume conductor that the cell and electrode are in.
     method : str
-        Approximation to use. 'psa' (default) assigns all transmembrane
-        currents to the center point (0.5) (point source approximation).
-        'lsa' treats the section as a line source, and a single multiplier is
-        calculated for each section (line source approximation).
+        Approximation to use. ``'psa'`` (point source approximation) treats
+        each segment junction as a point extracellular current source.
+        ``'lsa'`` (line source approximation) treats each segment as a line
+        source of current, which extends from the previous to the next segment
+        center point: |---x---|, where x is the current segment flanked by |.
+    min_distance : float (default: 0.5; unit: um)
+        To avoid numerical errors in calculating potentials, apply a minimum
+        distance limit between the electrode contacts and the active neuronal
+        membrane elements that act as sources of current. The default value of
+        0.5 um corresponds to 1 um diameter dendrites.
     times : None | list of float
         Optionally, provide precomputed voltage sampling times for electrodes
         at `positions`.
@@ -187,6 +203,9 @@ class ExtracellularArray:
     ----------
     times : list of float
         The time points the extracellular voltages are sampled at (ms)
+    voltages : list of list of list of float
+        A three-dimensional list with dimensions: (n_trials, n_electrodes,
+        n_times).
     sfreq : float
         Sampling rate of the extracellular data (Hz).
 
@@ -196,8 +215,8 @@ class ExtracellularArray:
     measured values of sigma in rat cortex (note units there are mS/cm)
     """
 
-    def __init__(self, positions, sigma=0.3, method='psa', times=None,
-                 voltages=None):
+    def __init__(self, positions, *, sigma=0.3, method='psa',
+                 min_distance=0.5, times=None, voltages=None):
         _validate_type(positions, (tuple, list), 'positions')
         if isinstance(positions, tuple):
             positions = [positions]
@@ -207,6 +226,8 @@ class ExtracellularArray:
                                  f'coordinate triplets, got: {positions}')
         _validate_type(sigma, float, 'sigma')
         assert sigma > 0.0
+        _validate_type(min_distance, float, 'min_distance')
+        assert min_distance > 0.0
         try:  # allow None, but for testing only
             _validate_type(method, str, 'method')
             _check_option('method', method, ['psa', 'lsa'])
@@ -236,6 +257,7 @@ class ExtracellularArray:
         self.positions = positions
         self.sigma = sigma
         self.method = method
+        self.min_distance = min_distance
 
         self._times = times
         self._data = voltages
@@ -264,6 +286,8 @@ class ExtracellularArray:
                f'method={self.method}')
         if len(self._data) > 0:
             msg += f' | {len(self._data)} trials, {len(self.times)} times'
+        else:
+            msg += ' (no data recorded yet)'
         return f'<{class_name} | {msg}>'
 
     def __len__(self):
@@ -272,6 +296,10 @@ class ExtracellularArray:
     @property
     def times(self):
         return self._times
+
+    @property
+    def voltages(self):
+        return self._data
 
     @property
     def sfreq(self):
@@ -288,29 +316,42 @@ class ExtracellularArray:
         else:
             return None
 
-    def reset(self):
+    def _reset(self):
         self._data = list()
         self._times = list()
 
-    def get_data(self):
-        """Get a copy of extracellular electrode voltages after simulation
+    def get_data(self, return_times=False):
+        """Get extracellular electrode voltages as a Numpy array
 
-        The data are returned as as a 3D Numpy array with exactly 3 dimensions:
-        [trials, channels, times], where 'channels' are in the same order as
-        defined in the positions-argument.
+        The data are returned as as a Numpy array with exactly 3 dimensions:
+        (n_trials, n_channels, n_times), where ``n_channels`` are in the same
+        order as defined in the positions-argument.
+
+        Parameters
+        ----------
+        return_times : bool (default: False)
+            If True, also return the sample times.
 
         Returns
         -------
-        data : array of shape (n_trials, n_channels, n_times)
-            A copy of the electrode voltages
+        data : np.ndarray of shape (n_trials, n_channels, n_times)
+            The electrode voltages
+        times : np.ndarray of shape (n_times, )
+            The sampling times
         """
-        return np.array(self._data)
+        if return_times:
+            return np.array(self._data), np.array(self._times)
+        else:
+            return np.array(self._data)
 
     def plot(self, *, trial_no=None, contact_no=None, window_len=None,
              tmin=None, tmax=None, ax=None, decim=None, color=None,
              voltage_offset=None, voltage_scalebar=None, contact_labels=None,
              show=True):
-        """Plot electrode voltage time series.
+        """Plot extracellular electrode array voltage time series.
+
+        One plot is created for each trial. Multiple trials can be overlaid
+        with or without (default) and offset.
 
         Parameters
         ----------
@@ -321,23 +362,25 @@ class ExtracellularArray:
         window_len : float
             If set, apply a Hamming-windowed convolution kernel of specified
             length (in ms) to the data before plotting. Default: None
-        tmin : float or None
+        tmin : float | None
             Start time of plot in milliseconds. If None, plot entire
             simulation.
-        tmax : float or None
+        tmax : float | None
             End time of plot in milliseconds. If None, plot entire simulation.
         ax : instance of matplotlib figure | None
             The matplotlib axis
-        decim : int or list of int or None (default)
+        decim : int | list of int | None (default)
             Optional (integer) factor by which to decimate the raw dipole
             traces. The SciPy function :func:`~scipy.signal.decimate` is used,
             which recommends values <13. To achieve higher decimation factors,
             a list of ints can be provided. These are applied successively.
-        color : string, tuple of float or array of floats (optional)
-            The color to use for plotting. The usual Matplotlib standard color
-            strings may be used (e.g., 'b' for blue). A color can also be
-            defined as an RGBA-quadruplet, or an array of RGBA-values (one for
-            each electrode contact trace to plot).`
+        color : string | array of floats | ``matplotlib.colors.ListedColormap``
+            The color to use for plotting (optional). The usual Matplotlib
+            standard color strings may be used (e.g., 'b' for blue). A color
+            can also be defined as an RGBA-quadruplet, or an array of
+            RGBA-values (one for each electrode contact trace to plot). An
+            instance of :class:`~matplotlib.colors.ListedColormap` may also be
+            provided.
         voltage_offset : float | None (optional)
             Amount to offset traces by on the voltage-axis. Useful for plotting
             laminar arrays.
@@ -355,7 +398,7 @@ class ExtracellularArray:
         fig : instance of plt.fig
             The matplotlib figure handle into which time series were plotted.
         """
-        from .viz import _plot_ext
+        from .viz import plot_extracellular
 
         if trial_no is None:
             plot_data = self.get_data()
@@ -369,26 +412,14 @@ class ExtracellularArray:
         elif contact_no is not None:
             raise ValueError(f'unkown contact number type, got {contact_no}')
 
-        if color is not None:
-            _validate_type(color, (str, tuple, list, np.ndarray), 'color')
-            if isinstance(color, (tuple, list)):
-                if (not np.all([isinstance(c, float) for c in color]) or
-                        len(color) < 3 or len(color) > 4):
-                    raise ValueError(
-                        f'color must be length 3 or 4, got {color}')
-            elif isinstance(color, np.ndarray):
-                if (color.shape[0] != plot_data.shape[1] or
-                        (color.shape[1] < 3 or color.shape[1] > 4)):
-                    raise ValueError(
-                        f'color must be n_contacts x (3 or 4), got {color}')
-
         for trial_data in plot_data:
-            fig = _plot_ext(self.times, trial_data, self.sfreq,
-                            window_len=window_len, tmin=tmin, tmax=tmax, ax=ax,
-                            decim=decim, color=color,
-                            voltage_offset=voltage_offset,
-                            voltage_scalebar=voltage_scalebar,
-                            contact_labels=contact_labels, show=show)
+            fig = plot_extracellular(
+                self.times, trial_data, self.sfreq, window_len=window_len,
+                tmin=tmin, tmax=tmax, ax=ax, decim=decim, color=color,
+                voltage_offset=voltage_offset,
+                voltage_scalebar=voltage_scalebar,
+                contact_labels=contact_labels,
+                show=show)
         return fig
 
 
@@ -413,6 +444,7 @@ class _ExtracellularArray:
         self.positions = array.positions
         self.n_contacts = len(self.positions)
         self.sigma = array.sigma
+        self.min_distance = array.min_distance
         self.method = array.method
 
         # Create the Neuron objects needed to record extracellular voltages
@@ -446,9 +478,9 @@ class _ExtracellularArray:
             if self.method is not None:
                 transfer_resistance = list()
                 for sec, n_segs in zip(secs_on_rank, segment_counts):
-                    this_xfer_r = _transfer_resistance(sec, pos,
-                                                       sigma=self.sigma,
-                                                       method=self.method)
+                    this_xfer_r = _transfer_resistance(
+                        sec, pos, sigma=self.sigma, method=self.method,
+                        min_distance=self.min_distance)
                     transfer_resistance.extend(this_xfer_r)
 
                 self.r_transfer.setrow(row, h.Vector(transfer_resistance))

@@ -25,34 +25,38 @@ def test_extracellular_api():
     # Test LFP electrodes
     electrode_pos = (2, 400, 2)
     sigma, method = 0.3, 'psa'
-    net.add_electrode_array('el1', electrode_pos, sigma, method)
+    net.add_electrode_array('el1', electrode_pos, sigma=sigma, method=method)
     electrode_pos = [(2, 400, 2), (6, 800, 6)]
-    net.add_electrode_array('arr1', electrode_pos, sigma, method)
+    net.add_electrode_array('arr1', electrode_pos, sigma=sigma, method=method)
     assert len(net.rec_array) == 2
     assert len(net.rec_array['arr1'].positions) == 2
 
     pytest.raises(ValueError, net.add_electrode_array,
-                  'arr1', [(6, 6, 800)], sigma, method)
+                  'arr1', [(6, 6, 800)], sigma=sigma, method=method)
     pytest.raises(TypeError, net.add_electrode_array,
-                  42, [(6, 6, 800)], sigma, method)
+                  42, [(6, 6, 800)], sigma=sigma, method=method)
     pytest.raises(AssertionError, net.add_electrode_array,
-                  'arr2', [(2, 2), (6, 6, 800)], sigma, method)
+                  'arr2', [(2, 2), (6, 6, 800)], sigma=sigma, method=method)
     pytest.raises(AssertionError, net.add_electrode_array,
-                  'arr2', electrode_pos, -1.0, method)
+                  'arr2', electrode_pos, sigma=-1.0, method=method)
 
     pytest.raises(ValueError, net.add_electrode_array,
-                  'arr2', electrode_pos, sigma, 'LSA')
+                  'arr2', electrode_pos, sigma=sigma, method='LSA')
 
     pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', '(2, 2, 400)', sigma, method)
+                  'arr2', '(2, 2, 400)', sigma=sigma, method=method)
     pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', (2, '2', 400), sigma, method)
+                  'arr2', (2, '2', 400), sigma=sigma, method=method)
     pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', electrode_pos, '0.3', method)
+                  'arr2', electrode_pos, sigma='0.3', method=method)
     pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', electrode_pos, sigma, 3.0)
+                  'arr2', electrode_pos, sigma=sigma, method=3.0)
+    pytest.raises(TypeError, net.add_electrode_array,
+                  'arr2', electrode_pos, min_distance=None)
+    pytest.raises(AssertionError, net.add_electrode_array,
+                  'arr2', electrode_pos, min_distance=-1.)
 
-    rec_arr = ExtracellularArray(electrode_pos, sigma, method)
+    rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method)
     with pytest.raises(AttributeError, match="can't set attribute"):
         rec_arr.times = [1, 2, 3]
     with pytest.raises(TypeError, match="trial index must be int"):
@@ -61,21 +65,21 @@ def test_extracellular_api():
         _ = rec_arr[42]
 
     pytest.raises(ValueError, ExtracellularArray,
-                  [(2, 2), (6, 6, 800)], sigma, method)
+                  [(2, 2), (6, 6, 800)], sigma=sigma, method=method)
     pytest.raises(TypeError, ExtracellularArray,
-                  [42, (6, 6, 800)], sigma, method)
+                  [42, (6, 6, 800)], sigma=sigma, method=method)
     pytest.raises(TypeError, ExtracellularArray,
-                  [(2, 2, 2), (6, 6, 800)], [0.3], method)
+                  [(2, 2, 2), (6, 6, 800)], sigma=[0.3], method=method)
     pytest.raises(ValueError, ExtracellularArray,
-                  [(2, 2, 2), (6, 6, 800)], sigma, 'foo')
+                  [(2, 2, 2), (6, 6, 800)], sigma=sigma, method='foo')
     pytest.raises(ValueError, ExtracellularArray,  # more chans than voltages
-                  [(2, 2, 2), (6, 6, 800)], sigma, method,
+                  [(2, 2, 2), (6, 6, 800)], sigma=sigma, method=method,
                   times=[1], voltages=[[[42]]])
     pytest.raises(ValueError, ExtracellularArray,  # less times than voltages
-                  [(2, 2, 2), (6, 6, 800)], sigma, method,
+                  [(2, 2, 2), (6, 6, 800)], sigma=sigma, method=method,
                   times=[1], voltages=[[[42, 42], [84, 84]]])
 
-    rec_arr = ExtracellularArray(electrode_pos, sigma, method,
+    rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method,
                                  times=[0, 0.1, 0.21, 0.3],  # uneven sampling
                                  voltages=[[[0, 0, 0, 0], [0, 0, 0, 0]]])
     with pytest.raises(RuntimeError, match="Extracellular sampling times"):
@@ -95,8 +99,7 @@ def test_transmembrane_currents():
                    't_evprox_2': 20,
                    'N_trials': 1})
     net = default_network(params, add_drives_from_params=True)
-    depths = list(range(-400, 1900, 200))
-    electrode_pos = [(1.5, dep, 1.5) for dep in depths]
+    electrode_pos = (0, 0, 0)  # irrelevant where electrode is
     # all transfer resistances set to unity
     net.add_electrode_array('net_Im', electrode_pos, method=None)
     _ = simulate_dipole(net, postproc=False)
@@ -155,7 +158,7 @@ def test_transfer_resistance():
 def test_extracellular_backends(run_hnn_core_fixture):
     """Test extracellular outputs across backends."""
 
-    electrode_array = {'arr1': [(2, 400, 2), (6, 800, 6)]}
+    electrode_array = {'arr1': [(2, 2, 400), (6, 6, 800)]}
     _, joblib_net = run_hnn_core_fixture(
         backend='joblib', n_jobs=1, reduced=True, record_isoma=True,
         record_vsoma=True, electrode_array=electrode_array)
@@ -221,14 +224,14 @@ def test_dipolar_far_field():
     sigma = 0.3
 
     # create far-field grid of LFP electrodes; note that cells are assumed
-    # to lie in the XY-plane
+    # to lie in the XZ-plane
     xmin, xmax = -5e4, 5e4
-    ymin, ymax = -5e4, 5e4
+    zmin, zmax = -5e4, 5e4
     step = 5e3
-    posz = 1e2  # out-of-plane
+    posy = 1e2  # out-of-plane
     electrode_pos = list()
     for posx in np.arange(xmin, xmax, step):
-        for posy in np.arange(ymin, ymax, step):
+        for posz in np.arange(zmin, zmax, step):
             electrode_pos.append((posx, posy, posz))
     net.add_electrode_array('grid_psa', electrode_pos, sigma=sigma,
                             method='psa')
@@ -239,15 +242,16 @@ def test_dipolar_far_field():
         dpl = simulate_dipole(net, postproc=False)
 
     X_p = np.arange(xmin, xmax, step) / 1000
-    Y_p = np.arange(ymin, ymax, step) / 1000
-    Z_p = posz / 1000
+    Y_p = np.arange(zmin, zmax, step) / 1000
+    Z_p = posy / 1000
     idt = np.argmin(np.abs(dpl[0].times - 15.))
     phi_p_psa = np.zeros((len(X_p), len(Y_p)))
     phi_p_lsa = np.zeros((len(X_p), len(Y_p)))
     phi_p_theory = np.zeros((len(X_p), len(Y_p)))
 
     # location of equivalent current dipole for this stimulation (manual)
-    d_pos = np.array((0, 1600, 0)) / 1000  # um -> mm
+    # XXX this still assumes apical dendrites aligned with Y in Neuron
+    d_pos = np.array((0, 800, 0)) / 1000  # um -> mm
     # dipole orientation is along the apical dendrite, towards the soma
     # the amplitude is really irrelevant, only shape is compared
     d_Q = 5e2 * np.array((0, -1, 0))
@@ -304,16 +308,26 @@ def test_rec_array_calculation():
     net = default_network(params, add_drives_from_params=True)
 
     sigma, method = 0.3, 'psa'
-    electrode_pos = [(2, 400, 2), (6, 800, 6)]  # one inside, one outside net
-    net.add_electrode_array('arr1', electrode_pos, sigma, method)
+    # one electrode inside, one above the active elements of the network
+    electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]
+    net.add_electrode_array('arr1', electrode_pos, sigma=sigma, method=method)
     _ = simulate_dipole(net, n_trials=1, postproc=False)
-    assert len(net.rec_array['arr1']._data) == 1  # n_trials
-    assert len(net.rec_array['arr1']._data[0]) == 2  # n_contacts
-    assert (len(net.rec_array['arr1']._data[0][0]) ==
+
+    # test accessing simulated voltages
+    assert (len(net.rec_array['arr1']) ==
+            len(net.rec_array['arr1'].voltages) == 1)  # n_trials
+    assert len(net.rec_array['arr1'].voltages[0]) == 2  # n_contacts
+    assert (len(net.rec_array['arr1'].voltages[0][0]) ==
             len(net.rec_array['arr1'].times))
 
+    data, times = net.rec_array['arr1'].get_data(return_times=True)
+    assert isinstance(data, np.ndarray)
+    assert isinstance(times, np.ndarray)
+    data_only = net.rec_array['arr1'].get_data()
+    assert_allclose(data, data_only)
+
     # using the same electrode positions, but a different method: LSA
-    net.add_electrode_array('arr2', electrode_pos, sigma, method='lsa')
+    net.add_electrode_array('arr2', electrode_pos, sigma=sigma, method='lsa')
 
     # make sure no sinister segfaults are triggered when running mult. trials
     n_trials = 5  # NB 5 trials!
@@ -327,4 +341,4 @@ def test_rec_array_calculation():
         # LSA and PSA should agree far away (second electrode)
         assert_allclose(net.rec_array['arr1']._data[trial_idx][1],
                         net.rec_array['arr2']._data[trial_idx][1],
-                        rtol=1e-1, atol=1e-1)
+                        rtol=1e-3, atol=1e-3)
