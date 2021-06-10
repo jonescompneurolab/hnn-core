@@ -312,12 +312,11 @@ class Cell:
         for height and xz plane for depth. This is opposite for model as a
         whole, but convention is followed in this function ease use of gui.
         """
-        # distance from initial to final root postion
-        # Resolve: y-coordinate here corresponds to the z-coordinate in
-        # self.pos[2]
+        # shift cell to self.pos and reorient apical dendrite
+        # along z direction of self.pos
         dx = self.pos[0] - self.p_secs['soma']['sec_pts'][0][0]
-        dy = self.pos[2] - self.p_secs['soma']['sec_pts'][0][1]
-        dz = self.pos[1] - self.p_secs['soma']['sec_pts'][0][2]
+        dy = self.pos[1] - self.p_secs['soma']['sec_pts'][0][2]
+        dz = self.pos[2] - self.p_secs['soma']['sec_pts'][0][1]
 
         for sec_name in p_secs:
             sec = h.Section(name=f'{self.name}_{sec_name}')
