@@ -563,11 +563,11 @@ def plot_cell_morphology(cell, ax, show=True):
         xs, ys, zs = list(), list(), list()
         for pt in sec_pts:
             dx = cell.pos[0] - cell.p_secs['soma']['sec_pts'][0][0]
-            dy = cell.pos[1] - cell.p_secs['soma']['sec_pts'][0][2]
-            dz = cell.pos[2] - cell.p_secs['soma']['sec_pts'][0][1]
+            dy = cell.pos[1] - cell.p_secs['soma']['sec_pts'][0][1]
+            dz = cell.pos[2] - cell.p_secs['soma']['sec_pts'][0][2]
             xs.append(pt[0] + dx)
-            ys.append(pt[2] + dz)
-            zs.append(pt[1] + dy)
+            ys.append(pt[1] + dz)
+            zs.append(pt[2] + dy)
         ax.plot(xs, ys, zs, 'b-', linewidth=linewidth)
     ax.view_init(0, -90)
     ax.axis('off')
