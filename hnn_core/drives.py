@@ -141,7 +141,7 @@ def _add_drives_from_params(net):
             cell_type=cellname,
             amplitude=bias_specs['tonic'][cellname]['amplitude'],
             t0=bias_specs['tonic'][cellname]['t0'],
-            T=bias_specs['tonic'][cellname]['T'])
+            tstop=bias_specs['tonic'][cellname]['tstop'])
 
     net._instantiate_drives(n_trials=net._params['N_trials'])
 
