@@ -185,6 +185,7 @@ def beta_erp_network(params=None, add_drives_from_params=False):
     if params is None:
         params = read_params(params_fname)
 
+    params['tstop'] = 300.0
     net = default_network(params)
 
     # Update biophysics (increase gabab duration of inhibition)
