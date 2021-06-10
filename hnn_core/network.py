@@ -887,7 +887,7 @@ class Network(object):
                     drive['name']]['events'].append(event_times)
 
     def add_tonic_bias(self, *, cell_type=None, amplitude=None,
-                       t0=None, T=None):
+                       t0=None, tstop=None):
         """Attach parameters of tonic biasing input for a given cell type.
 
         Parameters
@@ -900,7 +900,7 @@ class Network(object):
         t0 : float
             The start time of tonic input (in ms). Default: 0 (beginning of
             simulation).
-        T : float
+        tstop : float
             The end time of tonic input (in ms). Default: end of simulation.
         """
         if (cell_type is None or amplitude is None):
@@ -913,26 +913,25 @@ class Network(object):
 
         if t0 is None:
             t0 = 0
-        tstop = self.cell_response.times[-1]
-        if T is None:
-            T = tstop
-        if T < 0.:
+        if tstop is None:
+            tstop = self.cell_response.times[-1]
+        if tstop < 0.:
             raise ValueError('End time of tonic input cannot be negative')
-        if T > tstop:
+        if tstop > self.cell_response.times[-1]:
             raise ValueError(f'End time of tonic input cannot exceed '
-                             f'simulation end time {tstop}. Got {T}.')
+                             f'simulation end time {self.cell_response.times[-1]}. Got {tstop}.')
         if cell_type not in self.cell_types:
             raise ValueError(f'cell_type must be one of '
                              f'{list(self.cell_types.keys())}. '
                              f'Got {cell_type}')
-        duration = T - t0
+        duration = tstop - t0
         if duration < 0.:
             raise ValueError('Duration of tonic input cannot be negative')
 
         self.external_biases['tonic'][cell_type] = {
             'amplitude': amplitude,
             't0': t0,
-            'T': T
+            'tstop': tstop
         }
 
     def _update_gid_ranges(self):
