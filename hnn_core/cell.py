@@ -315,8 +315,8 @@ class Cell:
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
         dx = self.pos[0] - self.p_secs['soma']['sec_pts'][0][0]
-        dy = self.pos[1] - self.p_secs['soma']['sec_pts'][0][2]
-        dz = self.pos[2] - self.p_secs['soma']['sec_pts'][0][1]
+        dy = self.pos[1] - self.p_secs['soma']['sec_pts'][0][1]
+        dz = self.pos[2] - self.p_secs['soma']['sec_pts'][0][2]
 
         for sec_name in p_secs:
             sec = h.Section(name=f'{self.name}_{sec_name}')
@@ -325,9 +325,8 @@ class Cell:
             h.pt3dclear(sec=sec)
             for pt in p_secs[sec_name]['sec_pts']:
                 h.pt3dadd(pt[0] + dx,
-                          pt[2] + dz,
                           pt[1] + dy,
-                          1, sec=sec)
+                          pt[2] + dz, 1, sec=sec)
             sec.L = p_secs[sec_name]['L']
             sec.diam = p_secs[sec_name]['diam']
             sec.Ra = p_secs[sec_name]['Ra']
