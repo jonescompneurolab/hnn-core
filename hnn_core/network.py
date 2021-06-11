@@ -1228,30 +1228,10 @@ class Network(object):
         _validate_type(name, str, 'name')
         if name in self.rec_array.keys():
             raise ValueError(f'{name} already exists, use another name!')
-        _validate_type(electrode_pos, (list, tuple), 'electrode_pos')
-        _validate_type(sigma, (float, int), 'sigma')
-        assert sigma > 0.0
-        _validate_type(min_distance, float, 'min_distance')
-        assert min_distance > 0.0
-        try:  # allow None, but for testing only
-            _validate_type(method, str, 'method')
-            _check_option('method', method, ['psa', 'lsa'])
-        except (TypeError, ValueError) as e:
-            if method is None:
-                pass
-            else:
-                raise e
-        if isinstance(electrode_pos, tuple):
-            electrode_pos = [electrode_pos]
-        for e_pos in electrode_pos:
-            assert len(e_pos) == 3
-            for pos in e_pos:
-                _validate_type(pos, (int, float), 'electrode_pos[idx][pos]')
 
-        # XXX swap Z and Y coordinates! Needs to be consolidated and fixed!
-        swapped_pos = [(e[0], e[2], e[1]) for e in electrode_pos]
+        # let ExtracellularArray perform all remaining argument checks
         self.rec_array.update({
-            name: ExtracellularArray(swapped_pos, sigma=sigma, method=method,
+            name: ExtracellularArray(electrode_pos, sigma=sigma, method=method,
                                      min_distance=min_distance)})
 
     def plot_cells(self, ax=None, show=True):

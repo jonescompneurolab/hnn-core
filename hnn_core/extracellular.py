@@ -195,9 +195,9 @@ class ExtracellularArray:
         Optionally, provide precomputed voltage sampling times for electrodes
         at `positions`.
     voltages : None | list of list of list of float (3D)
-        Optionally, provide precomputed voltages for electrodes at `positions`.
-        Note that the size of `voltages` must be: (n_trials, n_electrodes,
-        n_times), i.e., three-dimensional.
+        Optionally, provide precomputed voltages for electrodes at
+        ``positions``. Note that the size of `voltages` must be:
+        ``(n_trials, n_electrodes, n_times)``, i.e., three-dimensional.
 
     Attributes
     ----------
@@ -217,13 +217,16 @@ class ExtracellularArray:
 
     def __init__(self, positions, *, sigma=0.3, method='psa',
                  min_distance=0.5, times=None, voltages=None):
+
         _validate_type(positions, (tuple, list), 'positions')
-        if isinstance(positions, tuple):
+        if len(positions) == 3:  # a single coordinate given
             positions = [positions]
         for pos in positions:
+            _validate_type(pos, (tuple, list), 'positions')
             if len(pos) != 3:
                 raise ValueError('positions should be provided as xyz '
                                  f'coordinate triplets, got: {positions}')
+
         _validate_type(sigma, float, 'sigma')
         assert sigma > 0.0
         _validate_type(min_distance, float, 'min_distance')
@@ -236,10 +239,12 @@ class ExtracellularArray:
                 pass
             else:
                 raise e
+
         if times is None:
             times = list()
         if voltages is None:
             voltages = list()
+
         _validate_type(times, list, 'times')
         _validate_type(voltages, list, 'voltages')
         for ii in range(len(voltages)):
@@ -255,6 +260,7 @@ class ExtracellularArray:
                                      f'channel {jj}')
 
         self.positions = positions
+        self.n_contacts = len(self.positions)
         self.sigma = sigma
         self.method = method
         self.min_distance = min_distance
@@ -282,7 +288,7 @@ class ExtracellularArray:
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        msg = (f'{len(self.positions)} electrodes, sigma={self.sigma}, '
+        msg = (f'{self.n_contacts} electrodes, sigma={self.sigma}, '
                f'method={self.method}')
         if len(self._data) > 0:
             msg += f' | {len(self._data)} trials, {len(self.times)} times'
@@ -291,7 +297,7 @@ class ExtracellularArray:
         return f'<{class_name} | {msg}>'
 
     def __len__(self):
-        return len(self._data)
+        return len(self._data)  # length == number of trials
 
     @property
     def times(self):
@@ -304,6 +310,11 @@ class ExtracellularArray:
     @property
     def sfreq(self):
         """Return the sampling rate of the extracellular data."""
+        if len(self.times) == 0:
+            return None
+        elif len(self.times) == 1:
+            raise RuntimeError('Sampling rate is not defined for one sample')
+
         dT = np.diff(self.times)
         Tsamp = np.median(dT)
         if np.abs(dT.max() - Tsamp) > 1e-3 or np.abs(dT.min() - Tsamp) > 1e-3:
@@ -311,10 +322,7 @@ class ExtracellularArray:
                 'Extracellular sampling times vary by more than 1 us. Check '
                 'times-attribute for errors.')
 
-        if len(self.times) > 1:
-            return 1000. / Tsamp  # times are in in ms
-        else:
-            return None
+        return 1000. / Tsamp  # times are in in ms
 
     def _reset(self):
         self._data = list()
@@ -374,7 +382,7 @@ class ExtracellularArray:
             traces. The SciPy function :func:`~scipy.signal.decimate` is used,
             which recommends values <13. To achieve higher decimation factors,
             a list of ints can be provided. These are applied successively.
-        color : string | array of floats | ``matplotlib.colors.ListedColormap``
+        color : string | array of floats | matplotlib.colors.ListedColormap
             The color to use for plotting (optional). The usual Matplotlib
             standard color strings may be used (e.g., 'b' for blue). A color
             can also be defined as an RGBA-quadruplet, or an array of
@@ -389,7 +397,7 @@ class ExtracellularArray:
             corner of the plot.
         contact_labels : list (optional)
             Labels associated with the contacts to plot. Passed as-is to
-            :func:`~matplotlib.axes.Axes.set_yticklabels`.
+            :meth:`~matplotlib.axes.Axes.set_yticklabels`.
         show : bool
             If True, show the figure
 
@@ -423,122 +431,136 @@ class ExtracellularArray:
         return fig
 
 
-class _ExtracellularArray:
-    """Class for electrode arrays containing NEURON objects
-
-    The handler is set up to maintain a vector of membrane currents at at every
-    inner segment of every section of every cell on each CVODE integration
-    step. In addition, it records a time vector of sample times. This class
-    must be instantiated and attached to the network during the building
-    process. It is used in conjunction with the calculation of extracellular
-    potentials.
+class ExtracellularArrayBuilder(object):
+    """The ExtracellularArrayBuilder class
 
     Parameters
     ----------
-    array : instance of ExtracellularArray
-        Initialised, e.g., by the `Network.add_electrode_array()`-method
-    cvode : instance of h.CVode
-        Multi order variable time step integration method.
+    array : ExtracellularArray object
+        The instance of :class:`hnn_core.extracellular.ExtracellularArray` to
+        build in NEURON-Python
     """
-    def __init__(self, array, cvode=None):
-        self.positions = array.positions
-        self.n_contacts = len(self.positions)
-        self.sigma = array.sigma
-        self.min_distance = array.min_distance
-        self.method = array.method
+    def __init__(self, array):
+        self.array = array
+        self.n_contacts = array.n_contacts
+        self._nrn_imem_ptrvec = None
+        self._nrn_imem_vec = None
+        self._nrn_r_transfer = None
+        self._nrn_times = None
+        self._nrn_voltages = None
 
-        # Create the Neuron objects needed to record extracellular voltages
+    def _build(self, cvode=None):
+        """Assemble NEURON objects for calculating extracellular potentials.
 
+        The handler is set up to maintain a vector of membrane currents at at
+        every inner segment of every section of every cell on each CVODE
+        integration step. In addition, it records a time vector of sample
+        times.
+
+        Parameters
+        ----------
+        cvode : instance of h.CVode
+            Multi order variable time step integration method.
+        """
         # ordered list of h.Sections on this rank (if running in parallel)
         secs_on_rank = _get_sections_on_this_rank()
         # np.array of number of segments for each section, ordered as above
         segment_counts = np.array(_get_segment_counts(secs_on_rank))
+        n_total_segments = segment_counts.sum()
 
         # pointers assigned to _ref_i_membrane_ at each EACH internal segment
-        self.imem_ptrvec = h.PtrVector(segment_counts.sum())
-        # placeholder into which pointer values are read on each sim step
-        self.imem_vec_len = int(self.imem_ptrvec.size())
-        self.imem_vec = h.Vector(self.imem_vec_len)
+        self._nrn_imem_ptrvec = h.PtrVector(n_total_segments)
+        # placeholder into which pointer values are read on each sim time step
+        self._nrn_imem_vec = h.Vector(n_total_segments)
 
         ptr_count = 0
         for sec in secs_on_rank:
             for seg in sec:  # section end points (0, 1) not included
                 # set Nth pointer to the net membrane current at this segment
-                self.imem_ptrvec.pset(
+                self._nrn_imem_ptrvec.pset(
                     ptr_count, sec(seg.x)._ref_i_membrane_)
                 ptr_count += 1
-        if ptr_count != self.imem_vec_len:
-            raise RuntimeError(f'Expected {self.imem_vec_len} imem pointers, '
+        if ptr_count != n_total_segments:
+            raise RuntimeError(f'Expected {n_total_segments} imem pointers, '
                                f'got {ptr_count}.')
 
         # transfer resistances for each segment (keep in Neuron Matrix object)
-        self.r_transfer = h.Matrix(self.n_contacts, self.imem_vec_len)
+        self._nrn_r_transfer = h.Matrix(self.n_contacts, n_total_segments)
 
-        for row, pos in enumerate(self.positions):
-            if self.method is not None:
+        for row, pos in enumerate(self.array.positions):
+            if self.array.method is not None:
                 transfer_resistance = list()
-                for sec, n_segs in zip(secs_on_rank, segment_counts):
+                for sec in secs_on_rank:
                     this_xfer_r = _transfer_resistance(
-                        sec, pos, sigma=self.sigma, method=self.method,
-                        min_distance=self.min_distance)
+                        sec, pos, sigma=self.array.sigma,
+                        method=self.array.method,
+                        min_distance=self.array.min_distance)
                     transfer_resistance.extend(this_xfer_r)
 
-                self.r_transfer.setrow(row, h.Vector(transfer_resistance))
+                self._nrn_r_transfer.setrow(row, h.Vector(transfer_resistance))
             else:
                 # for testing, make a matrix of ones
-                self.r_transfer.setrow(row, h.Vector(segment_counts.sum(), 1.))
+                self._nrn_r_transfer.setrow(row,
+                                            h.Vector(segment_counts.sum(), 1.))
 
         # record time for each array
-        self._ext_t = h.Vector().record(h._ref_t)
+        self._nrn_times = h.Vector().record(h._ref_t)
 
         # contributions of all segments on this rank to total calculated
         # potential at electrode (_PC.allreduce called in _simulate_dipole)
-        self._ext_v = h.Vector()
-        self.imem_vec = h.Vector(self.imem_vec_len)
+        self._nrn_voltages = h.Vector()
+        self._nrn_imem_vec = h.Vector(n_total_segments)
 
         # Attach a callback for calculating the potentials at each time step.
         # Enables fast calculation of transmembrane current (nA) at each
         # segment. Note that this will run on each rank, so it is safe to use
         # the extra_scatter_gather-method, which docs say doesn't support
         # "multiple threads".
-        cvode.extra_scatter_gather(0, self.calc_potential_callback)
+        cvode.extra_scatter_gather(0, self._calc_potentials_callback)
 
     @property
-    def n_samples(self):
+    def _nrn_n_samples(self):
         """Return the length (in samples) of the extracellular data."""
-        return int(self._ext_v.size() / self.n_contacts)
+        if self._nrn_voltages.size() % self.n_contacts != 0:
+            raise RuntimeError('Something went wrong: have {self.n_contacts}'
+                               f', but {self._nrn_voltages.size()} samples')
+        return int(self._nrn_voltages.size() / self.n_contacts)
 
-    @property
-    def voltages(self):
+    def _get_nrn_voltages(self):
         """The extracellular data (n_contacts x n_samples)."""
-        if len(self._ext_v) > 0:
-            # return as a Neuron Matrix object for efficiency
-            extmat = h.Matrix(self.n_contacts, self.n_samples)
-            extmat.from_vector(self._ext_v)
-            return extmat
+        if len(self._nrn_voltages) > 0:
+            assert (self._nrn_voltages.size() ==
+                    self.n_contacts * self._nrn_n_samples)
+
+            # first reshape to a Neuron Matrix object
+            extmat = h.Matrix(self.n_contacts, self._nrn_n_samples)
+            extmat.from_vector(self._nrn_voltages)
+
+            # then unpack into 2D python list and return
+            return [extmat.getrow(ii).to_python() for
+                    ii in range(extmat.nrow())]
         else:
             raise RuntimeError('Simulation not yet run!')
 
-    @property
-    def times(self):
+    def _get_nrn_times(self):
         """The sampling time points."""
-        if self._ext_t.size() > 0:
-            # NB _ext_t is one sample longer than _ext_v
-            return self._ext_t.to_python()[:self.n_samples]
+        if self._nrn_times.size() > 0:
+            # NB _nrn_times is one sample longer than _nrn_voltages
+            return self._nrn_times.to_python()[:self._nrn_n_samples]
         else:
-            return None  # simulation not yet run
+            raise RuntimeError('Simulation not yet run!')
 
-    def calc_potential_callback(self):
+    def _calc_potentials_callback(self):
         # keep all data in Neuron objects for efficiency
 
         # 'gather' the values of seg.i_membrane_ into self.imem_vec
-        self.imem_ptrvec.gather(self.imem_vec)
+        self._nrn_imem_ptrvec.gather(self._nrn_imem_vec)
 
-        # r_transfer is now a Matrix. Calculate potentials by multiplying the
-        # imem_vec by the matrix. This is equivalent to a row-by-row dot-
-        # product: V_i = SUM_j (R_i,j x I_j)
-
-        # electrode_potentials = self.r_transfer.mulv(self.imem_vec)
-
-        # append all values at current time step (must be reshaped later)
-        self._ext_v.append(self.r_transfer.mulv(self.imem_vec))
+        # Calculate potentials by multiplying the _nrn_imem_vec by the matrix
+        # _nrn_r_transfer. This is equivalent to a row-by-row dot-product:
+        # V_i = SUM_j (R_i,j x I_j)
+        self._nrn_voltages.append(
+            self._nrn_r_transfer.mulv(self._nrn_imem_vec))
+        # NB all values appended to the h.Vector _nrn_voltages at current time
+        # step. The vector will have sixe (n_contacts x n_samples, 1), which
+        # will be reshaped later to (n_contacts, n_samples).

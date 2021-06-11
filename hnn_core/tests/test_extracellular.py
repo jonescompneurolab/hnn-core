@@ -31,58 +31,53 @@ def test_extracellular_api():
     assert len(net.rec_array) == 2
     assert len(net.rec_array['arr1'].positions) == 2
 
-    pytest.raises(ValueError, net.add_electrode_array,
-                  'arr1', [(6, 6, 800)], sigma=sigma, method=method)
-    pytest.raises(TypeError, net.add_electrode_array,
-                  42, [(6, 6, 800)], sigma=sigma, method=method)
-    pytest.raises(AssertionError, net.add_electrode_array,
-                  'arr2', [(2, 2), (6, 6, 800)], sigma=sigma, method=method)
-    pytest.raises(AssertionError, net.add_electrode_array,
-                  'arr2', electrode_pos, sigma=-1.0, method=method)
-
-    pytest.raises(ValueError, net.add_electrode_array,
-                  'arr2', electrode_pos, sigma=sigma, method='LSA')
-
-    pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', '(2, 2, 400)', sigma=sigma, method=method)
-    pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', (2, '2', 400), sigma=sigma, method=method)
-    pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', electrode_pos, sigma='0.3', method=method)
-    pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', electrode_pos, sigma=sigma, method=3.0)
-    pytest.raises(TypeError, net.add_electrode_array,
-                  'arr2', electrode_pos, min_distance=None)
-    pytest.raises(AssertionError, net.add_electrode_array,
-                  'arr2', electrode_pos, min_distance=-1.)
+    # ensure unique names
+    pytest.raises(ValueError, net.add_electrode_array, 'arr1', [(6, 6, 800)])
+    # all remaining input arguments checked by ExtracellularArray
 
     rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method)
     with pytest.raises(AttributeError, match="can't set attribute"):
         rec_arr.times = [1, 2, 3]
+    with pytest.raises(AttributeError, match="can't set attribute"):
+        rec_arr.voltages = [1, 2, 3]
     with pytest.raises(TypeError, match="trial index must be int"):
         _ = rec_arr['0']
     with pytest.raises(IndexError, match="the data contain"):
         _ = rec_arr[42]
 
     pytest.raises(ValueError, ExtracellularArray,
-                  [(2, 2), (6, 6, 800)], sigma=sigma, method=method)
+                  [(2, 2), (6, 6, 800)])  # positions are 3-tuples
     pytest.raises(TypeError, ExtracellularArray,
-                  [42, (6, 6, 800)], sigma=sigma, method=method)
-    pytest.raises(TypeError, ExtracellularArray,
-                  [(2, 2, 2), (6, 6, 800)], sigma=[0.3], method=method)
-    pytest.raises(ValueError, ExtracellularArray,
-                  [(2, 2, 2), (6, 6, 800)], sigma=sigma, method='foo')
+                  [42, (6, 6, 800)])  # positions are 3-tuples
+    for sig in ['0.3', [0.3], -1]:  # sigma is positive float
+        pytest.raises((TypeError, AssertionError), ExtracellularArray,
+                      [(2, 2, 2), (6, 6, 800)], sigma=sig)
+    for meth in ['foo', 0.3]:  # method is 'psa' or 'lsa' (or None for test)
+        pytest.raises((TypeError, AssertionError, ValueError),
+                      ExtracellularArray, [(2, 2, 2), (6, 6, 800)],
+                      method=meth)
+    for mind in ['foo', -1, None]:  # minimum distance to segment boundary
+        pytest.raises((TypeError, AssertionError), ExtracellularArray,
+                      [(2, 2, 2), (6, 6, 800)], min_distance=mind)
+
     pytest.raises(ValueError, ExtracellularArray,  # more chans than voltages
-                  [(2, 2, 2), (6, 6, 800)], sigma=sigma, method=method,
+                  [(2, 2, 2), (6, 6, 800)],
                   times=[1], voltages=[[[42]]])
     pytest.raises(ValueError, ExtracellularArray,  # less times than voltages
-                  [(2, 2, 2), (6, 6, 800)], sigma=sigma, method=method,
+                  [(2, 2, 2), (6, 6, 800)],
                   times=[1], voltages=[[[42, 42], [84, 84]]])
 
     rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method,
                                  times=[0, 0.1, 0.21, 0.3],  # uneven sampling
                                  voltages=[[[0, 0, 0, 0], [0, 0, 0, 0]]])
     with pytest.raises(RuntimeError, match="Extracellular sampling times"):
+        _ = rec_arr.sfreq
+    rec_arr._reset()
+    assert len(rec_arr.times) == len(rec_arr.voltages) == 0
+    assert rec_arr.sfreq is None
+    rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method,
+                                 times=[0], voltages=[[[0], [0]]])
+    with pytest.raises(RuntimeError, match="Sampling rate is not defined"):
         _ = rec_arr.sfreq
 
 
@@ -242,24 +237,24 @@ def test_dipolar_far_field():
         dpl = simulate_dipole(net, postproc=False)
 
     X_p = np.arange(xmin, xmax, step) / 1000
-    Y_p = np.arange(zmin, zmax, step) / 1000
-    Z_p = posy / 1000
+    Z_p = np.arange(zmin, zmax, step) / 1000
+    Y_p = posy / 1000
     idt = np.argmin(np.abs(dpl[0].times - 15.))
-    phi_p_psa = np.zeros((len(X_p), len(Y_p)))
-    phi_p_lsa = np.zeros((len(X_p), len(Y_p)))
-    phi_p_theory = np.zeros((len(X_p), len(Y_p)))
+    phi_p_psa = np.zeros((len(X_p), len(Z_p)))
+    phi_p_lsa = np.zeros((len(X_p), len(Z_p)))
+    phi_p_theory = np.zeros((len(X_p), len(Z_p)))
 
     # location of equivalent current dipole for this stimulation (manual)
     # XXX this still assumes apical dendrites aligned with Y in Neuron
-    d_pos = np.array((0, 800, 0)) / 1000  # um -> mm
+    d_pos = np.array((0, 0, 800)) / 1000  # um -> mm
     # dipole orientation is along the apical dendrite, towards the soma
     # the amplitude is really irrelevant, only shape is compared
-    d_Q = 5e2 * np.array((0, -1, 0))
+    d_Q = 5e2 * np.array((0, 0, -1))
 
     for ii, row in enumerate(X_p):
-        for jj, col in enumerate(Y_p):
+        for jj, col in enumerate(Z_p):
 
-            e_pos = np.array((row, col, Z_p))
+            e_pos = np.array((row, Y_p, col))
 
             # ignore 10 mm radius closest to dipole
             if norm(e_pos - d_pos) < 10:
