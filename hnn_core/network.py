@@ -910,7 +910,6 @@ class Network(object):
             self.external_biases['tonic'] = dict()
         if cell_type in self.external_biases['tonic']:
             raise ValueError(f'Tonic bias already defined for {cell_type}')
-
         if t0 is None:
             t0 = 0
         if tstop is None:
