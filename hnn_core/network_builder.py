@@ -15,7 +15,7 @@ if int(__version__[0]) >= 8:
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
 from copy import deepcopy
-from .extracellular import _ExtracellularArray
+from .extracellular import ExtracellularArrayBuilder
 
 # a few globals
 _PC = None
@@ -83,7 +83,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
     for nrn_arr in neuron_net._rec_array.values():
-        _PC.allreduce(nrn_arr._ext_v, 1)
+        _PC.allreduce(nrn_arr._nrn_voltages, 1)
 
     # aggregate the currents and voltages independently on each proc
     vsoma_list = _PC.py_gather(neuron_net._vsoma, 0)
@@ -491,7 +491,8 @@ class NetworkBuilder(object):
 
     def _record_extracellular(self):
         for arr_name, arr in self.net.rec_array.items():
-            nrn_arr = _ExtracellularArray(arr, cvode=_CVODE)
+            nrn_arr = ExtracellularArrayBuilder(arr)
+            nrn_arr._build(cvode=_CVODE)
             self._rec_array.update({arr_name: nrn_arr})
 
     # setup spike recording for this node
@@ -584,10 +585,10 @@ class NetworkBuilder(object):
         rec_arr_py = dict()
         rec_times_py = dict()
         for arr_name, nrn_arr in self._rec_array.items():
-            voltage_arr = [nrn_arr.voltages.getrow(ii).to_python() for
-                           ii in range(nrn_arr.voltages.nrow())]
-            rec_arr_py.update({arr_name: voltage_arr})
-            rec_times_py.update({arr_name: nrn_arr.times})
+            # voltage_arr = [nrn_arr.voltages.getrow(ii).to_python() for
+            #                ii in range(nrn_arr.voltages.nrow())]
+            rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
+            rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
         from copy import deepcopy
         data = (self._all_spike_times.to_python(),

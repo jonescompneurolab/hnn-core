@@ -2,6 +2,7 @@
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
+#          Christopher Bailey <cjb@cfin.au.dk>
 
 import numpy as np
 from itertools import cycle
@@ -486,15 +487,15 @@ def plot_cells(net, ax=None, show=True):
         if cell_type in colors:
             color = colors[cell_type]
             marker = markers[cell_type]
-            ax.scatter(x, y, z, c=color, marker=marker, label=cell_type)
+            ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_array:
         cols = plt.get_cmap('inferno', len(net.rec_array) + 2)
         for ii, (arr_name, arr) in enumerate(net.rec_array.items()):
             x = [p[0] for p in arr.positions]
-            y = [p[2] for p in arr.positions]  # NB! assumes cells defined
-            z = [p[1] for p in arr.positions]  # with apical dendrites along y!
-            ax.scatter(x, y, z, color=cols(ii + 1), s=100, marker='o',
+            y = [p[1] for p in arr.positions]
+            z = [p[2] for p in arr.positions]
+            ax.scatter(x, y, z, color=cols(ii + 1), s=25, marker='o',
                        label=arr_name)
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
