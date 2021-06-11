@@ -429,7 +429,7 @@ class Cell:
             dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_tonic_bias(self, amplitude, t0, T, loc=0.5):
+    def create_tonic_bias(self, amplitude, t0, tstop, loc=0.5):
         """Create tonic bias at the soma.
 
         Parameters
@@ -438,14 +438,14 @@ class Cell:
             The amplitude of the input.
         t0 : float
             The start time of tonic input (in ms).
-        T : float
+        tstop : float
             The end time of tonic input (in ms).
         loc : float (0 to 1)
             The location of the input in the soma section.
         """
         stim = h.IClamp(self.sections['soma'](loc))
         stim.delay = t0
-        stim.dur = T - t0
+        stim.dur = tstop - t0
         stim.amp = amplitude
         self.tonic_biases.append(stim)
 

@@ -269,17 +269,17 @@ def test_tonic_biases():
     net = hnn_core.Network(params, add_drives_from_params=True)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
-                           t0=0.0, T=4.0)
+                           t0=0.0, tstop=4.0)
 
     with pytest.raises(ValueError, match='Duration of tonic input cannot be'
                        ' negative'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
-                           t0=5.0, T=4.0)
+                           t0=5.0, tstop=4.0)
 
     with pytest.raises(ValueError, match='End time of tonic input cannot be'
                        ' negative'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
-                           t0=5.0, T=-1.)
+                           t0=5.0, tstop=-1.)
 
     with pytest.raises(ValueError, match='parameter may be missing'):
         params['Itonic_T_L2Pyr_soma'] = 5.0
@@ -309,6 +309,6 @@ def test_tonic_biases():
     assert 'L5_pyramidal' not in net.external_biases['tonic']
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
     assert net.external_biases[
-        'tonic']['L2_pyramidal']['T'] == net._params['tstop']
+        'tonic']['L2_pyramidal']['tstop'] == net._params['tstop']
     with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
