@@ -884,6 +884,8 @@ class Network(object):
                         # cell_specific=False should only have one src_gid
                         assert len(this_cell_drive_conn['src_gids']) == 1
 
+                        # Only return empty event times if all cells have
+                        # no events
                         drive_cell_gid = this_cell_drive_conn[
                             'src_gids'][0]
                         event_times = [_drive_cell_event_times(
@@ -891,7 +893,7 @@ class Network(object):
                             drive['dynamics'], trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid,
                             seedcore=drive['seedcore'])]
-                        # only one event_id list for one src_gid
+                        # only one event times list for one src_gid
                         if len(event_times[0]) > 0:
                             break
 
