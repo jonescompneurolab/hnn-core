@@ -919,7 +919,8 @@ class Network(object):
         if tstop > self.cell_response.times[-1]:
             raise ValueError(
                 f'End time of tonic input cannot exceed '
-                f'simulation end time {self.cell_response.times[-1]}. Got {tstop}.')
+                f'simulation end time {self.cell_response.times[-1]}. '
+                f'Got {tstop}.')
         if cell_type not in self.cell_types:
             raise ValueError(f'cell_type must be one of '
                              f'{list(self.cell_types.keys())}. '
