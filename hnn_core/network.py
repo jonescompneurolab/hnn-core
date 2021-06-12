@@ -932,8 +932,9 @@ class Network(object):
         if tstop < 0.:
             raise ValueError('End time of tonic input cannot be negative')
         if tstop > self.cell_response.times[-1]:
-            raise ValueError(f'End time of tonic input cannot exceed '
-                             f'simulation end time {self.cell_response.times[-1]}. Got {tstop}.')
+            raise ValueError(
+                f'End time of tonic input cannot exceed '
+                f'simulation end time {self.cell_response.times[-1]}. Got {tstop}.')
         if cell_type not in self.cell_types:
             raise ValueError(f'cell_type must be one of '
                              f'{list(self.cell_types.keys())}. '
@@ -1322,6 +1323,7 @@ class _NetworkDrive(dict):
                     'lamtha': float
                         Space constant
     """
+
     def __repr__(self):
         entr = f"<External drive '{self['name']}'"
         if 'type' in self.keys():
