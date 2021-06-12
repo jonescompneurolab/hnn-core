@@ -884,25 +884,16 @@ class Network(object):
                         # cell_specific=False should only have one src_gid
                         assert len(this_cell_drive_conn['src_gids']) == 1
 
-                        # Only create one set of event times
-                        # Exit on first target cell type with non-zero weight
-                        has_weight = (len(this_cell_drive_conn['ampa']) > 0 or
-                                      len(this_cell_drive_conn['nmda']) > 0)
-
-                        if has_weight:
-                            drive_cell_gid = this_cell_drive_conn[
-                                'src_gids'][0]
-                            event_times.append(_drive_cell_event_times(
-                                drive['type'], this_cell_drive_conn,
-                                drive['dynamics'], trial_idx=trial_idx,
-                                drive_cell_gid=drive_cell_gid,
-                                seedcore=drive['seedcore']))
+                        drive_cell_gid = this_cell_drive_conn[
+                            'src_gids'][0]
+                        event_times = [_drive_cell_event_times(
+                            drive['type'], this_cell_drive_conn,
+                            drive['dynamics'], trial_idx=trial_idx,
+                            drive_cell_gid=drive_cell_gid,
+                            seedcore=drive['seedcore'])]
+                        # only one event_id list for one src_gid
+                        if len(event_times[0]) > 0:
                             break
-
-                # Handles edge case where common gid exists,
-                # but no events are created
-                if len(event_times) == 0:
-                    event_times.append([])
 
                 # 'events': nested list (n_trials x n_drive_cells x n_events)
                 self.external_drives[
