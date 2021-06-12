@@ -869,9 +869,10 @@ class Network(object):
             for drive in self.external_drives.values():
                 event_times = list()  # new list for each trial and drive
 
-                # loop over drive 'cells' and create event times for each
-                if drive['cell_specific']:
-                    for this_cell_drive_conn in drive['conn'].values():
+                # loop over drives (one for each target cell population)
+                # and create event times
+                for this_cell_drive_conn in drive['conn'].values():
+                    if drive['cell_specific']:
                         for drive_cell_gid in this_cell_drive_conn['src_gids']:
                             event_times.append(_drive_cell_event_times(
                                 drive['type'], this_cell_drive_conn,
@@ -879,16 +880,16 @@ class Network(object):
                                 drive_cell_gid=drive_cell_gid,
                                 seedcore=drive['seedcore'])
                             )
-                else:
-                    for this_cell_drive_conn in drive['conn'].values():
-                        # Only create one set of event times
-                        # Exit on fist target cell type with non-zero weight
-                        has_weight = (len(this_cell_drive_conn['ampa']) > 0
-                                      or len(this_cell_drive_conn['nmda']) > 0)
-
+                    else:
                         # cell_specific=False should only have one src_gid
+                        assert len(this_cell_drive_conn['src_gids']) == 1
+
+                        # Only create one set of event times
+                        # Exit on first target cell type with non-zero weight
+                        has_weight = (len(this_cell_drive_conn['ampa']) > 0 or
+                                      len(this_cell_drive_conn['nmda']) > 0)
+
                         if has_weight:
-                            assert len(this_cell_drive_conn['src_gids']) == 1
                             drive_cell_gid = this_cell_drive_conn[
                                 'src_gids'][0]
                             event_times.append(_drive_cell_event_times(
@@ -898,12 +899,12 @@ class Network(object):
                                 seedcore=drive['seedcore']))
                             break
 
-                    # Handles edge case where common gid exists,
-                    # but no events are created
-                    if not event_times:
-                        event_times.append([])
+                # Handles edge case where common gid exists,
+                # but no events are created
+                if len(event_times) == 0:
+                    event_times.append([])
 
-                # 'events': list (trials) of list (cells) of list (events)
+                # 'events': nested list (n_trials x n_drive_cells x n_events)
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
