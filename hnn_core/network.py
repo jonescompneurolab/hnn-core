@@ -883,9 +883,8 @@ class Network(object):
                     for this_cell_drive_conn in drive['conn'].values():
                         # Only create one set of event times
                         # Exit on fist target cell type with non-zero weight
-                        has_weight = np.logical_or(
-                            this_cell_drive_conn['ampa'],
-                            this_cell_drive_conn['nmda'])
+                        has_weight = (len(this_cell_drive_conn['ampa']) > 0
+                                      or len(this_cell_drive_conn['nmda']) > 0)
 
                         # cell_specific=False should only have one src_gid
                         if has_weight:
