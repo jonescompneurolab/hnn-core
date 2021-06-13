@@ -725,13 +725,10 @@ class Network(object):
             target_populations, weights_by_receptor, location,
             space_constant, synaptic_delays, cell_specific=cell_specific)
 
-        # Must remember to update the GID ranges based on pos_dict!
-        self.pos_dict[name] = [self.pos_dict['origin'] for _ in src_gid_ran]
-
-        # NB _update_gid_ranges checks external_drives[name] for drives!
         self.external_drives[name] = drive
-        # Every time pos_dict is updated, gid_ranges must be updated too
-        self._update_gid_ranges()
+
+        pos = [self.pos_dict['origin'] for _ in src_gid_ran]
+        self._add_cell_type(name, pos)
 
         # Update connectivity_list
         nc_dict = {
