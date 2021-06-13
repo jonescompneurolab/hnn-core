@@ -211,7 +211,7 @@ connection</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_poisson_drive" title="hnn_core.Network.add_poisson_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_poisson_drive</span></code></a>(name, *[, tstart, tstop, …])</p></td>
 <td><p>Add a Poisson-distributed external drive to the network</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, amplitude, t0, T])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, amplitude, …])</p></td>
 <td><p>Attach parameters of tonic biasing input for a given cell type.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_connectivity</span></code></a>()</p></td>
@@ -423,7 +423,7 @@ weigths and delays within the simulated column</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_tonic_bias">
-<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attach parameters of tonic biasing input for a given cell type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -436,7 +436,7 @@ Valid inputs are those in <em class="xref py py-obj">net.cell_types</em>.</p>
 <dt><strong>t0</strong><span class="classifier">float</span></dt><dd><p>The start time of tonic input (in ms). Default: 0 (beginning of
 simulation).</p>
 </dd>
-<dt><strong>T</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms). Default: end of simulation.</p>
+<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms). Default: end of simulation.</p>
 </dd>
 </dl>
 </dd>
