@@ -137,7 +137,6 @@ People who contributed to this release (in alphabetical order):
 - `Blake Caldwell`_
 - `Christopher Bailey`_
 - `Carmen Kohl`_
-- `Kenneth Loi`_
 - `Mainak Jas`_
 - `Nick Tolley`_
 - `Ryan Thorpe`_
