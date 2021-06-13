@@ -390,11 +390,14 @@ class Network(object):
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
-        self.pos_dict = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
-                                            n_pyr_y=self._params['N_pyr_y'],
-                                            zdiff=1307.4)
+        self.pos_dict = dict()
+        pos = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
+                                  n_pyr_y=self._params['N_pyr_y'],
+                                  zdiff=1307.4)
+        self.pos_dict['origin'] = pos['origin']
         # Every time pos_dict is updated, gid_ranges must be updated too
-        self._update_gid_ranges()
+        for cell_name in self.cell_types:
+            self._add_cell_type(cell_name, pos[cell_name])
 
         self.cells = dict()
 
@@ -722,13 +725,10 @@ class Network(object):
             target_populations, weights_by_receptor, location,
             space_constant, synaptic_delays, cell_specific=cell_specific)
 
-        # Must remember to update the GID ranges based on pos_dict!
-        self.pos_dict[name] = [self.pos_dict['origin'] for _ in src_gid_ran]
-
-        # NB _update_gid_ranges checks external_drives[name] for drives!
         self.external_drives[name] = drive
-        # Every time pos_dict is updated, gid_ranges must be updated too
-        self._update_gid_ranges()
+
+        pos = [self.pos_dict['origin'] for _ in src_gid_ran]
+        self._add_cell_type(name, pos)
 
         # Update connectivity_list
         nc_dict = {
@@ -798,7 +798,7 @@ class Network(object):
                 'lamtha': space constant
         """
         drive_conn_by_cell = dict()
-        src_gid_ran_begin = self._n_gids
+        src_gid_curr = self._n_gids
 
         if cell_specific:
             for cellname in target_populations:
@@ -809,17 +809,17 @@ class Network(object):
                 # NB list! This is used later in _parnet_connect
                 drive_conn['target_type'] = cellname
                 drive_conn['src_gids'] = range(
-                    self._n_gids,
-                    self._n_gids + len(drive_conn['target_gids']))
-                self._n_gids += len(drive_conn['target_gids'])
+                    src_gid_curr,
+                    src_gid_curr + len(drive_conn['target_gids']))
+                src_gid_curr += len(drive_conn['target_gids'])
                 drive_conn_by_cell[cellname] = drive_conn
         else:
             drive_conn = dict()
             drive_conn['location'] = location
 
             # NB list! This is used later in _parnet_connect
-            drive_conn['src_gids'] = [self._n_gids]
-            self._n_gids += 1
+            drive_conn['src_gids'] = [src_gid_curr]
+            src_gid_curr += 1
 
             drive_conn['target_gids'] = list()  # fill in below
             for cellname in target_populations:
@@ -842,7 +842,7 @@ class Network(object):
                     drive_conn_by_cell[cellname][receptor][
                         'A_weight'] = weights[cellname]
 
-        return drive_conn_by_cell, range(src_gid_ran_begin, self._n_gids)
+        return drive_conn_by_cell, range(self._n_gids, src_gid_curr)
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
@@ -950,23 +950,12 @@ class Network(object):
             'T': T
         }
 
-    def _update_gid_ranges(self):
-        """Creates gid ranges from scratch every time called.
-
-        Any method that adds real or artificial cells to the network must
-        call this to update the list of GIDs. Note that it's based on the
-        content of pos_dict and the lists of real and artificial cell names.
-        """
-        # if external drives dict is empty, list will also be empty
-        ext_drive_names = list(self.external_drives.keys())
-        gid_lims = [0]  # start and end gids per cell type
-        src_types = list(self.cell_types.keys()) + ext_drive_names
-        for idx, src_type in enumerate(src_types):
-            n_srcs = len(self.pos_dict[src_type])
-            gid_lims.append(gid_lims[idx] + n_srcs)
-            self.gid_ranges[src_type] = range(gid_lims[idx],
-                                              gid_lims[idx + 1])
-        self._n_gids = gid_lims[idx + 1]
+    def _add_cell_type(self, cell_name, pos):
+        """Add cell type by updating pos_dict and gid_ranges."""
+        ll = self._n_gids
+        self._n_gids = ll + len(pos)
+        self.gid_ranges[cell_name] = range(ll, self._n_gids)
+        self.pos_dict[cell_name] = pos
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
