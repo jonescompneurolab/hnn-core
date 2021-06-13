@@ -47,7 +47,7 @@ API
 
 - New API for network creation. The default network is now created with ``net = default_network(params)``, by `Nick Tolley`_ in `#318 <https://github.com/jonescompneurolab/hnn-core/pull/318>`_
 
-- Replace parameter `T` with `tstop` in :func:`~hnn_core.Network.add_tonic_bias` and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and improve readability, by `Kenneth Loi`_ in `#354 <https://github.com/jonescompneurolab/hnn-core/pull/354>`_
+- Parameter `T` replaced with `tstop` in :func:`~hnn_core.Network.add_tonic_bias` and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and improve readability, by `Kenneth Loi`_ in `#354 <https://github.com/jonescompneurolab/hnn-core/pull/354>`_
 
 .. _0.1:
 
