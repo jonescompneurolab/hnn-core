@@ -390,11 +390,14 @@ class Network(object):
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
-        self.pos_dict = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
-                                            n_pyr_y=self._params['N_pyr_y'],
-                                            zdiff=1307.4)
+        self.pos_dict = dict()
+        pos = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
+                                  n_pyr_y=self._params['N_pyr_y'],
+                                  zdiff=1307.4)
+        self.pos_dict['origin'] = pos['origin']
         # Every time pos_dict is updated, gid_ranges must be updated too
-        self._update_gid_ranges()
+        for cell_name in self.cell_types:
+            self._add_cell_type(cell_name, pos[cell_name])
 
         self.cells = dict()
 
@@ -934,6 +937,14 @@ class Network(object):
             't0': t0,
             'T': T
         }
+
+    def _add_cell_type(self, cell_name, pos):
+        """Add cell type consistently."""
+        ll = self._n_gids
+        ul = ll + len(pos)
+        self.gid_ranges[cell_name] = range(ll, ul)
+        self.pos_dict[cell_name] = pos
+        self._n_gids = ul
 
     def _update_gid_ranges(self):
         """Creates gid ranges from scratch every time called.
