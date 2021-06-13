@@ -49,9 +49,8 @@ def test_network():
     net_new = net.copy()
     n_cells_orig = net_new.n_cells
     new_cell_type = {'new_type': net_new.cell_types['L2_basket']}
-    net_new.pos_dict.update({'new_type': [(0, 0, 0)]})
     net_new.cell_types.update(new_cell_type)
-    net_new._update_gid_ranges()
+    net_new._add_cell_type('new_type', pos=[(0, 0, 0)])
     net_new._update_cells()
     assert net_new.n_cells == n_cells_orig + 1
 

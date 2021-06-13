@@ -936,30 +936,11 @@ class Network(object):
         }
 
     def _add_cell_type(self, cell_name, pos):
-        """Add cell type consistently."""
+        """Add cell type by updating pos_dict and gid_ranges."""
         ll = self._n_gids
-        ul = ll + len(pos)
-        self.gid_ranges[cell_name] = range(ll, ul)
+        self._n_gids = ll + len(pos)
+        self.gid_ranges[cell_name] = range(ll, self._n_gids)
         self.pos_dict[cell_name] = pos
-        self._n_gids = ul
-
-    def _update_gid_ranges(self):
-        """Creates gid ranges from scratch every time called.
-
-        Any method that adds real or artificial cells to the network must
-        call this to update the list of GIDs. Note that it's based on the
-        content of pos_dict and the lists of real and artificial cell names.
-        """
-        # if external drives dict is empty, list will also be empty
-        ext_drive_names = list(self.external_drives.keys())
-        gid_lims = [0]  # start and end gids per cell type
-        src_types = list(self.cell_types.keys()) + ext_drive_names
-        for idx, src_type in enumerate(src_types):
-            n_srcs = len(self.pos_dict[src_type])
-            gid_lims.append(gid_lims[idx] + n_srcs)
-            self.gid_ranges[src_type] = range(gid_lims[idx],
-                                              gid_lims[idx + 1])
-        self._n_gids = gid_lims[idx + 1]
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
