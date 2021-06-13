@@ -801,7 +801,7 @@ class Network(object):
                 'lamtha': space constant
         """
         drive_conn_by_cell = dict()
-        src_gid_ran_begin = self._n_gids
+        src_gid_curr = self._n_gids
 
         if cell_specific:
             for cellname in target_populations:
@@ -812,17 +812,17 @@ class Network(object):
                 # NB list! This is used later in _parnet_connect
                 drive_conn['target_type'] = cellname
                 drive_conn['src_gids'] = range(
-                    self._n_gids,
-                    self._n_gids + len(drive_conn['target_gids']))
-                self._n_gids += len(drive_conn['target_gids'])
+                    src_gid_curr,
+                    src_gid_curr + len(drive_conn['target_gids']))
+                src_gid_curr += len(drive_conn['target_gids'])
                 drive_conn_by_cell[cellname] = drive_conn
         else:
             drive_conn = dict()
             drive_conn['location'] = location
 
             # NB list! This is used later in _parnet_connect
-            drive_conn['src_gids'] = [self._n_gids]
-            self._n_gids += 1
+            drive_conn['src_gids'] = [src_gid_curr]
+            src_gid_curr += 1
 
             drive_conn['target_gids'] = list()  # fill in below
             for cellname in target_populations:
@@ -845,7 +845,7 @@ class Network(object):
                     drive_conn_by_cell[cellname][receptor][
                         'A_weight'] = weights[cellname]
 
-        return drive_conn_by_cell, range(src_gid_ran_begin, self._n_gids)
+        return drive_conn_by_cell, range(self._n_gids, src_gid_curr)
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
