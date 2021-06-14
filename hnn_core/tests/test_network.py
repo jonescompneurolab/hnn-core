@@ -1,6 +1,7 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
 from copy import deepcopy
+from hnn_core.dipole import simulate_dipole
 import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose
@@ -254,6 +255,7 @@ def test_network():
 def test_add_cell_type():
     """Test adding a new cell type."""
     params = read_params(params_fname)
+    params['tstop'] = 30.
     net = default_network(params)
 
     n_total_cells = net.n_cells
@@ -279,6 +281,9 @@ def test_add_cell_type():
     assert len(network_builder.ncs['new_type_L2Basket_ampa']) == n_connections
     nc = network_builder.ncs['new_type_L2Basket_ampa'][0]
     assert nc.syn().tau1 == tau1
+
+    dpls = simulate_dipole(net)
+    assert 'new_type' in net.cell_response._cell_type_names
 
 
 def test_tonic_biases():
