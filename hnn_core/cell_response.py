@@ -75,16 +75,17 @@ class CellResponse(object):
     """
 
     def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
-                 times=None, cell_type_names=['L2_basket',
-                                              'L2_pyramidal',
-                                              'L5_basket',
-                                              'L5_pyramidal']):
+                 times=None, cell_type_names=None):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
             spike_gids = list()
         if spike_types is None:
             spike_types = list()
+
+        if cell_type_names is None:
+            cell_type_names = ['L2_basket', 'L2_pyramidal',
+                               'L5_basket', 'L5_pyramidal']
 
         # Validate arguments
         arg_names = ['spike_times', 'spike_gids', 'spike_types']
@@ -225,13 +226,15 @@ class CellResponse(object):
     def times(self):
         return self._times
 
-    def reset(self):
+    def reset(self, cell_type_names=None):
         """Reset all recorded attributes to empty lists."""
         self._spike_times = list()
         self._spike_gids = list()
         self._spike_types = list()
         self._vsoma = list()
         self._isoma = list()
+        if cell_type_names is not None:
+            self._cell_type_names = cell_type_names
 
     def update_types(self, gid_ranges):
         """Update spike types in the current instance of CellResponse.
