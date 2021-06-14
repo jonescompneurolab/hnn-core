@@ -9,12 +9,14 @@ import pytest
 import hnn_core
 from hnn_core import read_params, default_network, CellResponse
 from hnn_core.network_builder import NetworkBuilder
+from hnn_core.cells_default import basket
+
+hnn_core_root = op.dirname(hnn_core.__file__)
+params_fname = op.join(hnn_core_root, 'param', 'default.json')
 
 
 def test_network():
     """Test network object."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     # add rhythmic inputs (i.e., a type of common input)
     params.update({'input_dist_A_weight_L2Pyr_ampa': 1.4e-5,
@@ -44,15 +46,6 @@ def test_network():
                              gid in drive_conn['src_gids']])  # NB set: globals
         assert len(net.gid_ranges[dn]) == len(this_src_gids)
         assert len(net.external_drives[dn]['events']) == 1  # single trial!
-
-    # Test succeful creation of a new cell type
-    net_new = net.copy()
-    n_cells_orig = net_new.n_cells
-    new_cell_type = {'new_type': net_new.cell_types['L2_basket']}
-    net_new.cell_types.update(new_cell_type)
-    net_new._add_cell_type('new_type', pos=[(0, 0, 0)])
-    net_new._update_cells()
-    assert net_new.n_cells == n_cells_orig + 1
 
     assert len(net.gid_ranges['bursty1']) == 1
     for drive in net.external_drives.values():
@@ -256,6 +249,38 @@ def test_network():
     assert len(net.connectivity) == 18
     net.clear_drives()
     assert len(net.connectivity) == 0
+
+
+def test_add_cell_type():
+    """Test adding a new cell type."""
+    from copy import deepcopy
+
+    params = read_params(params_fname)
+    net = default_network(params)
+
+    n_total_cells = net.n_cells
+    pos = [(0, idx, 0) for idx in range(10)]
+    tau1 = 0.6
+
+    new_cell = deepcopy(net.cell_types['L2_basket'])
+    net._add_cell_type('new_type', pos=pos, cell_template=new_cell)
+    net.cell_types['new_type'].p_syn['ampa']['tau1'] = tau1
+
+    n_new_type = len(net.gid_ranges['new_type'])
+    assert n_new_type == len(pos)
+    # xxx: why can't I do L2_basket -> new_type ?
+    # no key for network_builder.ncs
+    net.add_connection('new_type', 'L2_basket', loc='proximal',
+                       receptor='ampa', weight=8e-3, delay=1,
+                       lamtha=2)
+
+    network_builder = NetworkBuilder(net)
+    assert net.n_cells == n_total_cells + len(pos)
+    n_basket = len(net.gid_ranges['L2_basket'])
+    n_connections = n_basket * n_new_type
+    assert len(network_builder.ncs['new_type_L2Basket_ampa']) == n_connections
+    nc = network_builder.ncs['new_type_L2Basket_ampa'][0]
+    assert nc.syn().tau1 == tau1
 
 
 def test_tonic_biases():

@@ -370,7 +370,7 @@ class Network(object):
         self._legacy_mode = legacy_mode
 
         # Source dict of names, first real ones only!
-        self.cell_types = {
+        cell_types = {
             'L2_basket': basket(cell_name=_short_name('L2_basket')),
             'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
@@ -380,7 +380,7 @@ class Network(object):
         # Create array of equally sampled time points for simulating currents
         # NB (only) used to initialise self.cell_response._times
         times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
-        cell_type_names = list(self.cell_types.keys())
+        cell_type_names = list(cell_types.keys())
         # Create CellResponse object, initialised with simulation time points
         self.cell_response = CellResponse(times=times,
                                           cell_type_names=cell_type_names)
@@ -400,13 +400,15 @@ class Network(object):
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self.pos_dict = dict()
+        self.cell_types = dict()
         pos = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
                                   n_pyr_y=self._params['N_pyr_y'],
                                   zdiff=1307.4)
         self.pos_dict['origin'] = pos['origin']
-        # Every time pos_dict is updated, gid_ranges must be updated too
-        for cell_name in self.cell_types:
-            self._add_cell_type(cell_name, pos[cell_name])
+
+        for cell_name in cell_types:
+            self._add_cell_type(cell_name, pos[cell_name],
+                                cell_template=cell_types[cell_name])
 
         self.cells = dict()
 
@@ -966,12 +968,15 @@ class Network(object):
             'tstop': tstop
         }
 
-    def _add_cell_type(self, cell_name, pos):
+    def _add_cell_type(self, cell_name, pos, cell_template=None):
         """Add cell type by updating pos_dict and gid_ranges."""
         ll = self._n_gids
         self._n_gids = ll + len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
+
         self.pos_dict[cell_name] = pos
+        if cell_template is not None:
+            self.cell_types.update({cell_name: cell_template})
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
@@ -1092,8 +1097,7 @@ class Network(object):
                        'int list, range, or str')
         _validate_type(target_gids, (int, list, range, str), 'target_gids',
                        'int list, range or str')
-        valid_cells = [
-            'L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket']
+        valid_cells = list(self.cell_types.keys())
         # Convert src_gids to list
         if isinstance(src_gids, int):
             src_gids = [src_gids]
