@@ -13,9 +13,9 @@ simplifying assumptions, we may approximate the LFP at virtual electrodes
 placed in and around the HNN network model.
 """
 
-# Authors: Nick Tolley <nicholas_tolley@brown.edu>
+# Authors: Christopher Bailey <cjb@cfin.au.dk>
 #          Mainak Jas <mainakjas@gmail.com>
-#          Christopher Bailey <cjb@cfin.au.dk>
+#          Nick Tolley <nicholas_tolley@brown.edu>
 
 # sphinx_gallery_thumbnail_number = 3
 
@@ -43,16 +43,16 @@ net = default_network(params, add_drives_from_params=True)
 net.plot_cells()
 
 ###############################################################################
-# The default network consists of an L5 and an L2 layer, within which the cell
+# The default network consists of 2 layers (L2 and L5), within which the cell
 # somas are arranged in a regular grid, and apical dendrites are aligned along
-# the z-axis. We can simulate a linear array multielectrode with 100 um
+# the z-axis. We can simulate a linear multielectrode array with 100 um
 # intercontact spacing [1]_ by specifying a list of (x, y, z) coordinate
 # triplets. The L5 pyramidal cell somas are at z=0 um, with apical dendrites
 # extending up to approximately z=2000 um. L2 pyramidal cell somas reside at
 # z=1300 um, and have apical dendrites extending to z=2300 um. We'll place the
 # recording array in the center of the network. By default, a value of
 # 0.3 S/m is used for the constant extracellular conductivity. We'll use the
-# point source approximation method for calculations.
+# point source approximation ``'psa'`` method for calculations.
 
 depths = list(range(-525, 2750, 100))
 electrode_pos = [(4.5, 4.5, dep) for dep in depths]
