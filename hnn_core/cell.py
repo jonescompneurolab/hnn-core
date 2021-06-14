@@ -3,6 +3,8 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
+from copy import deepcopy
+
 import numpy as np
 from numpy.linalg import norm
 
@@ -370,6 +372,10 @@ class Cell:
             raise ValueError(f'sec_name_apical must be an existing '
                              f'section of the current cell or None. '
                              f'Got {sec_name_apical}.')
+
+    def copy(self):
+        """Return copy of instance."""
+        return deepcopy(self)
 
     # two things need to happen here for h:
     # 1. dipole needs to be inserted into each section

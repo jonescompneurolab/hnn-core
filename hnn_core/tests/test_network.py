@@ -253,8 +253,6 @@ def test_network():
 
 def test_add_cell_type():
     """Test adding a new cell type."""
-    from copy import deepcopy
-
     params = read_params(params_fname)
     net = default_network(params)
 
@@ -262,7 +260,7 @@ def test_add_cell_type():
     pos = [(0, idx, 0) for idx in range(10)]
     tau1 = 0.6
 
-    new_cell = deepcopy(net.cell_types['L2_basket'])
+    new_cell = net.cell_types['L2_basket'].copy()
     net._add_cell_type('new_type', pos=pos, cell_template=new_cell)
     net.cell_types['new_type'].p_syn['ampa']['tau1'] = tau1
 
