@@ -66,8 +66,8 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def plot_extracellular(times, data, sfreq, window_len=None, tmin=None,
-                       tmax=None, ax=None, decim=None, color=None,
+def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
+                       decim=None, color=None,
                        voltage_offset=None, voltage_scalebar=None,
                        contact_labels=None, show=True):
     """Plot extracellular electrode array voltage time series.
@@ -78,11 +78,6 @@ def plot_extracellular(times, data, sfreq, window_len=None, tmin=None,
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
-    sfreq : float
-        Data sampling rate (in Hz).
-    window_len : float
-        If set, apply a Hamming-windowed convolution kernel of specified length
-        (in ms) to the data before plotting. Default: None
     tmin : float | None
         Start time of plot in milliseconds. If None, plot entire simulation.
     tmax : float | None
@@ -119,7 +114,6 @@ def plot_extracellular(times, data, sfreq, window_len=None, tmin=None,
     """
     import matplotlib.pyplot as plt
     from matplotlib.colors import ListedColormap
-    from .dipole import _hammfilt
     _validate_type(times, (list, np.ndarray), 'times')
     _validate_type(data, (list, np.ndarray), 'data')
     if isinstance(times, list):
@@ -162,9 +156,7 @@ def plot_extracellular(times, data, sfreq, window_len=None, tmin=None,
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
         plot_data, plot_times = _get_plot_data_trange(times, trace, tmin, tmax)
-        if window_len is not None:
-            winsz = np.round(1e-3 * window_len * sfreq)
-            plot_data = _hammfilt(plot_data, winsz)
+
         if decim is not None:
             plot_data, plot_times = _decimate_plot_data(decim, plot_data,
                                                         plot_times)

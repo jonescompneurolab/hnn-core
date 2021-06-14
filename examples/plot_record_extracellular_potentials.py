@@ -93,13 +93,11 @@ voltage_offset = 300  # the spacing between individual traces
 voltage_scalebar = 500  # can be different from offset
 # we can assign each electrode a unique color using a linear colormap
 colors = plt.get_cmap('cividis', len(electrode_pos))
-net.rec_array['shank1'][trial_idx].plot(ax=axs[1],
-                                        voltage_offset=voltage_offset,
-                                        voltage_scalebar=voltage_scalebar,
-                                        contact_labels=depths,
-                                        color=colors,
-                                        window_len=window_len,
-                                        decim=decimate, show=False)
+# use the same smoothing window on the LFP traces to allow comparison to dipole
+net.rec_array['shank1'][trial_idx].smooth(window_len=window_len).plot(
+    ax=axs[1], contact_labels=depths, color=colors, decim=decimate, show=False,
+    voltage_offset=voltage_offset, voltage_scalebar=voltage_scalebar)
+
 axs[1].grid(True, which='major', axis='x')
 axs[1].set_xlabel('')
 # Finally, add the spike raster to the bottom subplot
