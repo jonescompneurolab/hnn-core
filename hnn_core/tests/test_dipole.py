@@ -27,19 +27,6 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     dipole._baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
     dipole._convert_fAm_to_nAm()
     dipole.scale(params['dipole_scalefctr'])
-
-    # test smoothing logic
-    with pytest.raises(ValueError,
-                       match='Window length must be a non-negative number'):
-        dipole.smooth(window_len=None)
-    with pytest.raises(ValueError,
-                       match='Window length must be a non-negative number'):
-        dipole.smooth(window_len=-1)
-
-    with pytest.raises(ValueError, match='Window length too long:'):
-        dipole.smooth(window_len=1e6)
-    with pytest.raises(ValueError, match='Window length less than 1 ms'):
-        dipole.smooth(window_len=1e-1)
     dipole.smooth(window_len=params['dipole_smooth_win'])
 
     dipole.plot(show=False)

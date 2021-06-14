@@ -22,6 +22,7 @@ Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65.
 
 from neuron import h
 
+from copy import deepcopy
 import numpy as np
 from .externals.mne import _validate_type, _check_option
 from numpy.linalg import norm
@@ -299,6 +300,16 @@ class ExtracellularArray:
     def __len__(self):
         return len(self._data)  # length == number of trials
 
+    def copy(self):
+        """Return a copy of the ExtracellularArray instance
+
+        Returns
+        -------
+        array_copy : instance of ExtracellularArray
+            A copy of the array instance.
+        """
+        return deepcopy(self)
+
     @property
     def times(self):
         return self._times
@@ -352,10 +363,37 @@ class ExtracellularArray:
         else:
             return np.array(self._data)
 
-    def plot(self, *, trial_no=None, contact_no=None, window_len=None,
-             tmin=None, tmax=None, ax=None, decim=None, color=None,
-             voltage_offset=None, voltage_scalebar=None, contact_labels=None,
-             show=True):
+    def smooth(self, window_len):
+        """Smooth extracellular waveforms using Hamming-windowed convolution
+
+        Note that this method operates in-place, i.e., it will alter the data.
+        If you prefer a filtered copy, consider using the
+        :meth:`~hnn_core.extracellular.ExtracellularArray.copy`-method.
+
+        Parameters
+        ----------
+        window_len : float
+            The length (in ms) of a `~numpy.hamming` window to convolve the
+            data with.
+
+        Returns
+        -------
+        dpl_copy : instance of Dipole
+            The modified Dipole instance.
+        """
+        from .utils import smooth_waveform
+
+        for n_trial in range(len(self)):
+            for n_contact in range(self.n_contacts):
+                self._data[n_trial][n_contact] = smooth_waveform(
+                    self._data[n_trial][n_contact], window_len,
+                    self.sfreq).tolist()  # XXX smooth_waveform returns ndarray
+
+        return self
+
+    def plot(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
+             ax=None, decim=None, color=None, voltage_offset=None,
+             voltage_scalebar=None, contact_labels=None, show=True):
         """Plot extracellular electrode array voltage time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
@@ -367,9 +405,6 @@ class ExtracellularArray:
             Trial number(s) to plot
         contact_no : int | list of int | slice
             Electrode contact number(s) to plot
-        window_len : float
-            If set, apply a Hamming-windowed convolution kernel of specified
-            length (in ms) to the data before plotting. Default: None
         tmin : float | None
             Start time of plot in milliseconds. If None, plot entire
             simulation.
@@ -422,8 +457,8 @@ class ExtracellularArray:
 
         for trial_data in plot_data:
             fig = plot_extracellular(
-                self.times, trial_data, self.sfreq, window_len=window_len,
-                tmin=tmin, tmax=tmax, ax=ax, decim=decim, color=color,
+                self.times, trial_data, tmin=tmin, tmax=tmax, ax=ax,
+                decim=decim, color=color,
                 voltage_offset=voltage_offset,
                 voltage_scalebar=voltage_scalebar,
                 contact_labels=contact_labels,
