@@ -20,26 +20,12 @@ Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65.
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
+import numpy as np
+from copy import deepcopy
+from numpy.linalg import norm
 from neuron import h
 
-from copy import deepcopy
-import numpy as np
 from .externals.mne import _validate_type, _check_option
-from numpy.linalg import norm
-
-
-def _get_sections_on_this_rank(sec_type='Pyr'):
-    ls = h.allsec()
-    ls = [s for s in ls if sec_type in s.name()]
-    return ls
-
-
-def _get_segment_counts(all_sections):
-    """The segment count of a section excludes the endpoints (0, 1)"""
-    seg_counts = list()
-    for sec in all_sections:
-        seg_counts.append(sec.nseg)
-    return seg_counts
 
 
 def _transfer_resistance(section, electrode_pos, conductivity, method,
@@ -234,14 +220,9 @@ class ExtracellularArray:
         _validate_type(min_distance, float, 'min_distance')
         if not min_distance > 0.:
             raise ValueError('min_distance must be a positive number')
-        try:  # allow None, but for testing only
+        if method is not None:  # method allowed to be None for testing
             _validate_type(method, str, 'method')
             _check_option('method', method, ['psa', 'lsa'])
-        except (TypeError, ValueError) as e:
-            if method is None:
-                pass
-            else:
-                raise e
 
         if times is None:
             times = list()
@@ -501,27 +482,28 @@ class ExtracellularArrayBuilder(object):
         cvode : instance of h.CVode
             Multi order variable time step integration method.
         """
-        # ordered list of h.Sections on this rank (if running in parallel)
-        secs_on_rank = _get_sections_on_this_rank()
-        # np.array of number of segments for each section, ordered as above
-        segment_counts = np.array(_get_segment_counts(secs_on_rank))
-        n_total_segments = segment_counts.sum()
+        secs_on_rank = h.allsec()  # get all h.Sections known to this MPI rank
+        # filter list to include pyramidal cells ('Pyr') only
+        secs_on_rank = [s for s in secs_on_rank if 'Pyr' in s.name()]
+
+        segment_counts = [sec.nseg for sec in secs_on_rank]
+        n_total_segments = np.sum(segment_counts)
 
         # pointers assigned to _ref_i_membrane_ at each EACH internal segment
         self._nrn_imem_ptrvec = h.PtrVector(n_total_segments)
         # placeholder into which pointer values are read on each sim time step
         self._nrn_imem_vec = h.Vector(n_total_segments)
 
-        ptr_count = 0
+        ptr_idx = 0
         for sec in secs_on_rank:
             for seg in sec:  # section end points (0, 1) not included
                 # set Nth pointer to the net membrane current at this segment
                 self._nrn_imem_ptrvec.pset(
-                    ptr_count, sec(seg.x)._ref_i_membrane_)
-                ptr_count += 1
-        if ptr_count != n_total_segments:
+                    ptr_idx, sec(seg.x)._ref_i_membrane_)
+                ptr_idx += 1
+        if ptr_idx != n_total_segments:
             raise RuntimeError(f'Expected {n_total_segments} imem pointers, '
-                               f'got {ptr_count}.')
+                               f'got {ptr_idx}.')
 
         # transfer resistances for each segment (keep in Neuron Matrix object)
         self._nrn_r_transfer = h.Matrix(self.n_contacts, n_total_segments)
@@ -540,7 +522,7 @@ class ExtracellularArrayBuilder(object):
             else:
                 # for testing, make a matrix of ones
                 self._nrn_r_transfer.setrow(row,
-                                            h.Vector(segment_counts.sum(), 1.))
+                                            h.Vector(n_total_segments, 1.))
 
         # record time for each array
         self._nrn_times = h.Vector().record(h._ref_t)
@@ -597,9 +579,9 @@ class ExtracellularArrayBuilder(object):
 
         # Calculate potentials by multiplying the _nrn_imem_vec by the matrix
         # _nrn_r_transfer. This is equivalent to a row-by-row dot-product:
-        # V_i = SUM_j (R_i,j x I_j)
+        # V_i(t) = SUM_j ( R_i,j x I_j (t) )
         self._nrn_voltages.append(
             self._nrn_r_transfer.mulv(self._nrn_imem_vec))
         # NB all values appended to the h.Vector _nrn_voltages at current time
-        # step. The vector will have sixe (n_contacts x n_samples, 1), which
+        # step. The vector will have size (n_contacts x n_samples, 1), which
         # will be reshaped later to (n_contacts, n_samples).

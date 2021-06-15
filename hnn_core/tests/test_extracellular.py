@@ -245,7 +245,6 @@ def test_dipolar_far_field():
     phi_p_theory = np.zeros((len(X_p), len(Z_p)))
 
     # location of equivalent current dipole for this stimulation (manual)
-    # XXX this still assumes apical dendrites aligned with Y in Neuron
     d_pos = np.array((0, 0, 800)) / 1000  # um -> mm
     # dipole orientation is along the apical dendrite, towards the soma
     # the amplitude is really irrelevant, only shape is compared
