@@ -30,6 +30,8 @@ jobs:
     - name: Install ubuntu dependencies
       run: |
         if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
           sudo apt-get install libopenmpi-dev openmpi-bin
         fi;
 
@@ -47,7 +49,8 @@ jobs:
 
     - name: Install HNN-core
       run: |
-        python setup.py install
+        python setup.py build_mod
+        python setup.py develop
     - name: Lint with flake8
       run: |
         flake8 --count hnn_core
