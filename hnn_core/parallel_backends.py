@@ -44,9 +44,9 @@ def _clone_and_simulate(net, trial_idx):
     neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
     dpl = _simulate_single_trial(neuron_net, trial_idx)
 
-    simdata = neuron_net.get_data_from_neuron()
+    sim_data = neuron_net.get_data_from_neuron()
 
-    return dpl, simdata
+    return dpl, sim_data
 
 
 def _gather_trial_data(sim_data, net, n_trials, postproc):
