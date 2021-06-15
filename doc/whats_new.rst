@@ -26,6 +26,8 @@ Changelog
 
 - Add function to visualize connections originating from individual cells :func:`~hnn_core.viz.plot_cell_connectivity`, by `Nick Tolley`_ in `#339 <https://github.com/jonescompneurolab/hnn-core/pull/339>`_
 
+- Add method for calculating extracellular potentials using electrode arrays :func:`~hnn_core.Network.add_electrode_array` that are stored under ``net.rec_array`` as a dictionary of :class:`hnn_core.extracellular.ExtracellularArray` containers, by `Mainak Jas`_, `Nick Tolley`_ and `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
+
 - Add function to visualize extracellular potentials from laminar array simulations, by `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
 
 Bug
@@ -52,8 +54,6 @@ API
 - New API for network creation. The default network is now created with ``net = default_network(params)``, by `Nick Tolley`_ in `#318 <https://github.com/jonescompneurolab/hnn-core/pull/318>`_
 
 - Replace parameter `T` with `tstop` in :func:`~hnn_core.Network.add_tonic_bias` and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and improve readability, by `Kenneth Loi`_ in `#354 <https://github.com/jonescompneurolab/hnn-core/pull/354>`_
-
-- New API for calculating extracellular potentials using electrode arrays, created using :func:`~hnn_core.Network.add_electrode_array` and stored under ``net.rec_array`` as a dictionary of :class:`hnn_core.extracellular.ExtracellularArray` containers, by `Mainak Jas`_, `Nick Tolley`_ and `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
 
 .. _0.1:
 
