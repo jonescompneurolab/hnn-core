@@ -356,6 +356,8 @@ class NetworkBuilder(object):
     # creates self._gid_list for THIS node
     def _gid_assign(self):
 
+        self.net._update_cells()  # updates net.n_cells
+
         rank = _get_rank()
         nhosts = _get_nhosts()
 
@@ -390,7 +392,6 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
-        self.net._update_cells()
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
