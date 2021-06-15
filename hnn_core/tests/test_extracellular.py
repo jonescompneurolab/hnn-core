@@ -24,10 +24,9 @@ def test_extracellular_api():
 
     # Test LFP electrodes
     electrode_pos = (2, 400, 2)
-    sigma, method = 0.3, 'psa'
-    net.add_electrode_array('el1', electrode_pos, sigma=sigma, method=method)
+    net.add_electrode_array('el1', electrode_pos)
     electrode_pos = [(2, 400, 2), (6, 800, 6)]
-    net.add_electrode_array('arr1', electrode_pos, sigma=sigma, method=method)
+    net.add_electrode_array('arr1', electrode_pos)
     assert len(net.rec_array) == 2
     assert len(net.rec_array['arr1'].positions) == 2
 
@@ -35,7 +34,7 @@ def test_extracellular_api():
     pytest.raises(ValueError, net.add_electrode_array, 'arr1', [(6, 6, 800)])
     # all remaining input arguments checked by ExtracellularArray
 
-    rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method)
+    rec_arr = ExtracellularArray(electrode_pos)
     with pytest.raises(AttributeError, match="can't set attribute"):
         rec_arr.times = [1, 2, 3]
     with pytest.raises(AttributeError, match="can't set attribute"):
@@ -45,13 +44,13 @@ def test_extracellular_api():
     with pytest.raises(IndexError, match="the data contain"):
         _ = rec_arr[42]
 
-    pytest.raises(ValueError, ExtracellularArray,
-                  [(2, 2), (6, 6, 800)])  # positions are 3-tuples
-    pytest.raises(TypeError, ExtracellularArray,
-                  [42, (6, 6, 800)])  # positions are 3-tuples
-    for sig in ['0.3', [0.3], -1]:  # sigma is positive float
+    # positions are 3-tuples
+    for bogus_pos in [[(2, 2), (6, 6, 800)], [42, (6, 6, 800)]]:
+        pytest.raises((ValueError, TypeError), ExtracellularArray, bogus_pos)
+
+    for cond in ['0.3', [0.3], -1]:  # conductivity is positive float
         pytest.raises((TypeError, AssertionError), ExtracellularArray,
-                      [(2, 2, 2), (6, 6, 800)], sigma=sig)
+                      [(2, 2, 2), (6, 6, 800)], conductivity=cond)
     for meth in ['foo', 0.3]:  # method is 'psa' or 'lsa' (or None for test)
         pytest.raises((TypeError, AssertionError, ValueError),
                       ExtracellularArray, [(2, 2, 2), (6, 6, 800)],
@@ -67,7 +66,7 @@ def test_extracellular_api():
                   [(2, 2, 2), (6, 6, 800)],
                   times=[1], voltages=[[[42, 42], [84, 84]]])
 
-    rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method,
+    rec_arr = ExtracellularArray(electrode_pos,
                                  times=[0, 0.1, 0.21, 0.3],  # uneven sampling
                                  voltages=[[[0, 0, 0, 0], [0, 0, 0, 0]]])
     with pytest.raises(RuntimeError, match="Extracellular sampling times"):
@@ -75,7 +74,7 @@ def test_extracellular_api():
     rec_arr._reset()
     assert len(rec_arr.times) == len(rec_arr.voltages) == 0
     assert rec_arr.sfreq is None
-    rec_arr = ExtracellularArray(electrode_pos, sigma=sigma, method=method,
+    rec_arr = ExtracellularArray(electrode_pos,
                                  times=[0], voltages=[[[0], [0]]])
     with pytest.raises(RuntimeError, match="Sampling rate is not defined"):
         _ = rec_arr.sfreq
@@ -123,7 +122,7 @@ def test_transfer_resistance():
     seg_lens = np.array([first_len] + list(seg_lens[2:]))
     seg_ctr_pts = seg_ctr_pts[1:-1]  # remove end points again
 
-    sigma = 0.3
+    conductivity = 0.3
 
     elec_pos = (10, 150, 0)
     target_vals = {'psa': list(), 'lsa': list()}
@@ -131,7 +130,8 @@ def test_transfer_resistance():
         # PSA: distance to middle segment == electrode x-position
         var_r_psa = np.sqrt(elec_pos[0] ** 2 +
                             (elec_pos[1] - seg_ctr_pts[seg_idx]) ** 2)
-        target_vals['psa'].append(1000 / (4. * np.pi * sigma * var_r_psa))
+        target_vals['psa'].append(
+            1000 / (4. * np.pi * conductivity * var_r_psa))
 
         # LSA: calculate L and H variables relative to segment endpoints
         var_l = elec_pos[1] - (seg_ctr_pts[seg_idx] - seg_lens[seg_idx])
@@ -141,10 +141,10 @@ def test_transfer_resistance():
             1000 * np.log(np.abs(
                 (np.sqrt(var_h ** 2 + var_r_lsa ** 2) - var_h) /
                 (np.sqrt(var_l ** 2 + var_r_lsa ** 2) - var_l)
-            )) / (4. * np.pi * sigma * 2 * seg_lens[seg_idx]))
+            )) / (4. * np.pi * conductivity * 2 * seg_lens[seg_idx]))
 
     for method in ['psa', 'lsa']:
-        res = _transfer_resistance(sec, elec_pos, sigma, method)
+        res = _transfer_resistance(sec, elec_pos, conductivity, method)
         assert_allclose(res, target_vals[method])
 
 
@@ -216,7 +216,7 @@ def test_dipolar_far_field():
     net.add_evoked_drive('d', mu=10., sigma=0., numspikes=1, location='distal',
                          sync_within_trial=True, weights_nmda=weights_nmda)
 
-    sigma = 0.3
+    conductivity = 0.3
 
     # create far-field grid of LFP electrodes; note that cells are assumed
     # to lie in the XZ-plane
@@ -228,10 +228,10 @@ def test_dipolar_far_field():
     for posx in np.arange(xmin, xmax, step):
         for posz in np.arange(zmin, zmax, step):
             electrode_pos.append((posx, posy, posz))
-    net.add_electrode_array('grid_psa', electrode_pos, sigma=sigma,
-                            method='psa')
-    net.add_electrode_array('grid_lsa', electrode_pos, sigma=sigma,
-                            method='lsa')
+    net.add_electrode_array('grid_psa', electrode_pos,
+                            conductivity=conductivity, method='psa')
+    net.add_electrode_array('grid_lsa', electrode_pos,
+                            conductivity=conductivity, method='lsa')
 
     with MPIBackend(n_procs=2):
         dpl = simulate_dipole(net, postproc=False)
@@ -268,7 +268,7 @@ def test_dipolar_far_field():
             phi_p_lsa[ii][jj] = net.rec_array['grid_lsa']._data[0][
                 ii * len(X_p) + jj][idt] * 1e3
             phi_p_theory[ii][jj] = \
-                _mathematical_dipole(e_pos, d_pos, d_Q) / sigma
+                _mathematical_dipole(e_pos, d_pos, d_Q) / conductivity
 
     # compare the shape of the far fields
     for phi_p in [phi_p_psa, phi_p_lsa]:
@@ -302,10 +302,9 @@ def test_rec_array_calculation():
                    't_evdist_1': 17})
     net = default_network(params, add_drives_from_params=True)
 
-    sigma, method = 0.3, 'psa'
     # one electrode inside, one above the active elements of the network
     electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]
-    net.add_electrode_array('arr1', electrode_pos, sigma=sigma, method=method)
+    net.add_electrode_array('arr1', electrode_pos)
     _ = simulate_dipole(net, n_trials=1, postproc=False)
 
     # test accessing simulated voltages
@@ -322,7 +321,7 @@ def test_rec_array_calculation():
     assert_allclose(data, data_only)
 
     # using the same electrode positions, but a different method: LSA
-    net.add_electrode_array('arr2', electrode_pos, sigma=sigma, method='lsa')
+    net.add_electrode_array('arr2', electrode_pos, method='lsa')
 
     # make sure no sinister segfaults are triggered when running mult. trials
     n_trials = 5  # NB 5 trials!

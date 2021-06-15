@@ -585,8 +585,6 @@ class NetworkBuilder(object):
         rec_arr_py = dict()
         rec_times_py = dict()
         for arr_name, nrn_arr in self._rec_array.items():
-            # voltage_arr = [nrn_arr.voltages.getrow(ii).to_python() for
-            #                ii in range(nrn_arr.voltages.nrow())]
             rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
             rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
