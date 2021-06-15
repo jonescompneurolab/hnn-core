@@ -264,22 +264,20 @@ def test_add_cell_type():
 
     new_cell = net.cell_types['L2_basket'].copy()
     net._add_cell_type('new_type', pos=pos, cell_template=new_cell)
-    net.cell_types['new_type'].p_syn['ampa']['tau1'] = tau1
+    net.cell_types['new_type'].p_syn['gabaa']['tau1'] = tau1
 
     n_new_type = len(net.gid_ranges['new_type'])
     assert n_new_type == len(pos)
-    # xxx: why can't I do L2_basket -> new_type ?
-    # no key for network_builder.ncs
-    net.add_connection('new_type', 'L2_basket', loc='proximal',
-                       receptor='ampa', weight=8e-3, delay=1,
+    net.add_connection('L2_basket', 'new_type', loc='proximal',
+                       receptor='gabaa', weight=8e-3, delay=1,
                        lamtha=2)
 
     network_builder = NetworkBuilder(net)
     assert net.n_cells == n_total_cells + len(pos)
     n_basket = len(net.gid_ranges['L2_basket'])
     n_connections = n_basket * n_new_type
-    assert len(network_builder.ncs['new_type_L2Basket_ampa']) == n_connections
-    nc = network_builder.ncs['new_type_L2Basket_ampa'][0]
+    assert len(network_builder.ncs['L2Basket_new_type_gabaa']) == n_connections
+    nc = network_builder.ncs['L2Basket_new_type_gabaa'][0]
     assert nc.syn().tau1 == tau1
 
     dpls = simulate_dipole(net)
