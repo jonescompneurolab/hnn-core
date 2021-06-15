@@ -51,13 +51,13 @@ net.plot_cells()
 # extending up to approximately z=2000 um. L2 pyramidal cell somas reside at
 # z=1300 um, and have apical dendrites extending to z=2300 um. We'll place the
 # recording array in the center of the network. By default, a value of
-# 0.3 S/m is used for the constant extracellular conductivity. We'll use the
-# point source approximation ``'psa'`` method for calculations.
+# 0.3 S/m is used for the constant extracellular conductivity and the
+# 'point source approximation' for calculations; see
+# :meth:`hnn_core.Network.add_electrode_array` for details.
 
 depths = list(range(-525, 2750, 100))
 electrode_pos = [(4.5, 4.5, dep) for dep in depths]
-sigma, method = 0.3, 'psa'
-net.add_electrode_array('shank1', electrode_pos, sigma=sigma)
+net.add_electrode_array('shank1', electrode_pos)
 
 ###############################################################################
 # The electrode arrays are stored under ``Network.rec_array`` as a dictionary
