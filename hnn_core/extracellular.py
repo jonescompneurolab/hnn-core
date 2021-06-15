@@ -42,7 +42,7 @@ def _get_segment_counts(all_sections):
     return seg_counts
 
 
-def _transfer_resistance(section, electrode_pos, sigma, method,
+def _transfer_resistance(section, electrode_pos, conductivity, method,
                          min_distance=0.5):
     """Transfer resistance between section and electrode position.
 
@@ -57,7 +57,7 @@ def _transfer_resistance(section, electrode_pos, sigma, method,
         The NEURON section.
     electrode_pos : list (x, y, z)
         The x, y, z coordinates of the electrode (in um)
-    sigma : float
+    conductivity : float
         Extracellular conductivity (in S/m)
     method : str
         Approximation to use. ``'psa'`` (point source approximation) treats
@@ -155,13 +155,13 @@ def _transfer_resistance(section, electrode_pos, sigma, method,
 
             phi[idx] = np.log(num / denom) / norm_a
 
-    # [dis]: um; [sigma]: S / m
-    # [phi / sigma] = [1/dis] / [sigma] = 1 / [dis] x [sigma]
-    # [dis] x [sigma] = um x (S / m) = 1e-6 S
+    # [dis]: um; [conductivity]: S / m
+    # [phi / conductivity] = [1/dis] / [conductivity] = 1 / [dis] x [conduct'y]
+    # [dis] x [conductivity] = um x (S / m) = 1e-6 S
     # transmembrane current returned by _ref_i_membrane_ is in [nA]
     # ==> 1e-9 A x (1 / 1e-6 S) = 1e-3 V = mV
     # ===> multiply by 1e3 to get uV
-    return 1000.0 * phi / (4.0 * np.pi * sigma)
+    return 1000.0 * phi / (4.0 * np.pi * conductivity)
 
 
 class ExtracellularArray:
@@ -178,7 +178,7 @@ class ExtracellularArray:
     ----------
     positions : tuple | list of tuple
         The (x, y, z) coordinates (in um) of the extracellular electrodes.
-    sigma : float
+    conductivity : float
         Extracellular conductivity, in S/m, of the assumed infinite,
         homogeneous volume conductor that the cell and electrode are in.
     method : str
@@ -213,10 +213,10 @@ class ExtracellularArray:
     Notes
     -----
     See Table 5 in http://jn.physiology.org/content/104/6/3388.long for
-    measured values of sigma in rat cortex (note units there are mS/cm)
+    measured values of conductivity in rat cortex (note units there are mS/cm)
     """
 
-    def __init__(self, positions, *, sigma=0.3, method='psa',
+    def __init__(self, positions, *, conductivity=0.3, method='psa',
                  min_distance=0.5, times=None, voltages=None):
 
         _validate_type(positions, (tuple, list), 'positions')
@@ -228,10 +228,12 @@ class ExtracellularArray:
                 raise ValueError('positions should be provided as xyz '
                                  f'coordinate triplets, got: {positions}')
 
-        _validate_type(sigma, float, 'sigma')
-        assert sigma > 0.0
+        _validate_type(conductivity, float, 'conductivity')
+        if not conductivity > 0.:
+            raise ValueError('conductivity must be a positive number')
         _validate_type(min_distance, float, 'min_distance')
-        assert min_distance > 0.0
+        if not min_distance > 0.:
+            raise ValueError('min_distance must be a positive number')
         try:  # allow None, but for testing only
             _validate_type(method, str, 'method')
             _check_option('method', method, ['psa', 'lsa'])
@@ -262,7 +264,7 @@ class ExtracellularArray:
 
         self.positions = positions
         self.n_contacts = len(self.positions)
-        self.sigma = sigma
+        self.conductivity = conductivity
         self.method = method
         self.min_distance = min_distance
 
@@ -283,14 +285,16 @@ class ExtracellularArray:
         except IndexError:
             raise IndexError(f'the data contain {len(self)} trials, the '
                              f'indices provided are out of range: {trial_no}')
-        return ExtracellularArray(self.positions, sigma=self.sigma,
-                                  method=self.method, times=self.times,
+        return ExtracellularArray(self.positions,
+                                  conductivity=self.conductivity,
+                                  method=self.method,
+                                  times=self.times,
                                   voltages=return_data)
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        msg = (f'{self.n_contacts} electrodes, sigma={self.sigma}, '
-               f'method={self.method}')
+        msg = (f'{self.n_contacts} electrodes, '
+               f'conductivity={self.conductivity}, method={self.method}')
         if len(self._data) > 0:
             msg += f' | {len(self._data)} trials, {len(self.times)} times'
         else:
@@ -527,7 +531,7 @@ class ExtracellularArrayBuilder(object):
                 transfer_resistance = list()
                 for sec in secs_on_rank:
                     this_xfer_r = _transfer_resistance(
-                        sec, pos, sigma=self.array.sigma,
+                        sec, pos, conductivity=self.array.conductivity,
                         method=self.array.method,
                         min_distance=self.array.min_distance)
                     transfer_resistance.extend(this_xfer_r)

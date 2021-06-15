@@ -394,6 +394,7 @@ class Network(object):
         self.threshold = self._params['threshold']
         self.delay = 1.0
 
+        # extracellular recordings (if applicable)
         self.rec_array = dict()
 
         # contents of pos_dict determines all downstream inferences of
@@ -1198,7 +1199,7 @@ class Network(object):
         self.external_drives = dict()
         self.connectivity = connectivity
 
-    def add_electrode_array(self, name, electrode_pos, *, sigma=0.3,
+    def add_electrode_array(self, name, electrode_pos, *, conductivity=0.3,
                             method='psa', min_distance=0.5):
         """Specify coordinates of electrode array for extracellular recording.
 
@@ -1209,7 +1210,7 @@ class Network(object):
         electrode_pos : tuple | list of tuple
             Coordinates specifying the position for extracellular electrodes in
             the form of (x, y, z) (in um).
-        sigma : float
+        conductivity : float
             Extracellular conductivity, in S/m, of the assumed infinite,
             homogeneous volume conductor that the cell and electrode are in.
         method : str
@@ -1231,7 +1232,9 @@ class Network(object):
 
         # let ExtracellularArray perform all remaining argument checks
         self.rec_array.update({
-            name: ExtracellularArray(electrode_pos, sigma=sigma, method=method,
+            name: ExtracellularArray(electrode_pos,
+                                     conductivity=conductivity,
+                                     method=method,
                                      min_distance=min_distance)})
 
     def plot_cells(self, ax=None, show=True):
