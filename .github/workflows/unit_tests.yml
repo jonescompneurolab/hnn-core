@@ -29,9 +29,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov mne
-        pip install hnn_core
-    - name: Install HNN
+        pip install flake8 pytest pytest-cov
+        pip install mne psutil joblib
+        pip install NEURON
+    - name: Install HNN-core
       run: |
         python setup.py install
     - name: Lint with flake8
