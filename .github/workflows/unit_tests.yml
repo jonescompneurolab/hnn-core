@@ -23,22 +23,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install anaconda
+    - name: Install ubuntu dependencies
       run: |
         if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
           sudo apt-get install libopenmpi-dev openmpi-bin
-          wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-        else
-          wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
         fi;
-        chmod +x miniconda.sh
-        ./miniconda.sh -b -p ${HOME}/miniconda
-        export PATH=${HOME}/miniconda/bin:$PATH
-        conda update --yes --quiet conda
 
     - name: Install dependencies
       run: |
