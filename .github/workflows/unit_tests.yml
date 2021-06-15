@@ -36,7 +36,7 @@ jobs:
         python setup.py install
     - name: Lint with flake8
       run: |
-        flake8 --count hnn
+        flake8 --count hnn_core
     - name: Test with pytest
       run: |
-        python -m py.test .  --cov=hnn hnn/tests/ --cov-report=xml
+        python -m py.test .  --cov=hnn_core hnn_core/tests/ --cov-report=xml
