@@ -26,6 +26,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Install anaconda
+      run: |
+        wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+        chmod +x miniconda.sh
+        ./miniconda.sh -b -p ${HOME}/miniconda
+        export PATH=${HOME}/miniconda/bin:$PATH
+        conda update --yes --quiet conda
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
