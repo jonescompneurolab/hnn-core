@@ -312,6 +312,10 @@ def test_rec_array_calculation():
     assert len(net.rec_array['arr1'].voltages[0]) == 2  # n_contacts
     assert (len(net.rec_array['arr1'].voltages[0][0]) ==
             len(net.rec_array['arr1'].times))
+    # ensure copy drops data (but retains electrode position information etc.)
+    net_copy = net.copy()
+    assert isinstance(net_copy.rec_array['arr1'], ExtracellularArray)
+    assert len(net_copy.rec_array['arr1'].voltages) == 0
 
     data, times = net.rec_array['arr1'].get_data(return_times=True)
     assert isinstance(data, np.ndarray)

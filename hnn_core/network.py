@@ -434,7 +434,8 @@ class Network(object):
         The parameters of drive dynamics are also retained, but the
         instantiated ``events`` of the drives are cleared. This allows
         iterating over the values defining drive dynamics, without the need to
-        re-define connectivity.
+        re-define connectivity. Extracellular recording arrays are retained in
+        the network, but cleared of existing data.
 
         Returns
         -------
@@ -447,7 +448,7 @@ class Network(object):
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
-        net_copy.rec_array = dict()
+        net_copy._reset_rec_array()
         return net_copy
 
     def _update_cells(self):
@@ -858,6 +859,11 @@ class Network(object):
         # reset every time called again, e.g., from dipole.py or in self.copy()
         for drive_name in self.external_drives.keys():
             self.external_drives[drive_name]['events'] = list()
+
+    def _reset_rec_array(self):
+        # clear the data in rec_array
+        for arr in self.rec_array.values():
+            arr._reset()
 
     def _instantiate_drives(self, n_trials=1):
         """Creates drive_event_times vectors for all drives and all trials
