@@ -977,6 +977,7 @@ class Network(object):
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
+            self.cell_response._cell_type_names.append(cell_name)
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
