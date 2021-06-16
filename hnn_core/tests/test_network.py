@@ -142,12 +142,35 @@ def test_network():
         net.n_cells + n_bursty_sources
 
     # Assert that netcons are created properly
-    # proximal
-    assert 'L2Pyr_L2Pyr_nmda' in network_builder.ncs
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
+    n_basket = len(net.gid_ranges['L2_basket'])
+
+    # Check basket-basket connection where allow_autapses=False
+    assert 'L2Pyr_L2Pyr_nmda' in network_builder.ncs
     n_connections = 3 * (n_pyr ** 2 - n_pyr)  # 3 synapses / cell
     assert len(network_builder.ncs['L2Pyr_L2Pyr_nmda']) == n_connections
     nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
+    assert nc.threshold == params['threshold']
+
+    # Check bursty drives which use cell_specific=False
+    assert 'bursty1_L2Pyr_ampa' in network_builder.ncs
+    n_connections = 3 * n_pyr  # 3 synapses / cell
+    assert len(network_builder.ncs['bursty1_L2Pyr_ampa']) == n_connections
+    nc = network_builder.ncs['bursty1_L2Pyr_ampa'][0]
+    assert nc.threshold == params['threshold']
+
+    # Check basket-basket connection where allow_autapses=True
+    assert 'L2Basket_L2Basket_gabaa' in network_builder.ncs
+    n_connections = n_basket ** 2  # 1 synapse / cell
+    assert len(network_builder.ncs['L2Basket_L2Basket_gabaa']) == n_connections
+    nc = network_builder.ncs['L2Basket_L2Basket_gabaa'][0]
+    assert nc.threshold == params['threshold']
+
+    # Check evoked drives which use cell_specific=True
+    assert 'evdist1_L2Basket_nmda' in network_builder.ncs
+    n_connections = n_basket  # 1 synapse / cell
+    assert len(network_builder.ncs['evdist1_L2Basket_nmda']) == n_connections
+    nc = network_builder.ncs['evdist1_L2Basket_nmda'][0]
     assert nc.threshold == params['threshold']
 
     # # create a new connection between cell types
