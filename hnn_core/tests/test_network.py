@@ -150,24 +150,25 @@ def test_network():
     nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
     assert nc.threshold == params['threshold']
 
-    # create a new connection between cell types
-    net = default_network(deepcopy(params), add_drives_from_params=True)
-    nc_dict = {'A_delay': 1, 'A_weight': 1e-5, 'lamtha': 20,
-               'threshold': 0.5}
-    net._all_to_all_connect('bursty1', 'L5_basket',
-                            'soma', 'gabaa', nc_dict, unique=False)
-    network_builder = NetworkBuilder(net)
-    assert 'bursty1_L5Basket_gabaa' in network_builder.ncs
-    n_conn = len(net.gid_ranges['bursty1']) * len(net.gid_ranges['L5_basket'])
-    assert len(network_builder.ncs['bursty1_L5Basket_gabaa']) == n_conn
+    # # create a new connection between cell types
+    # net = default_network(deepcopy(params), add_drives_from_params=True)
+    # nc_dict = {'A_delay': 1, 'A_weight': 1e-5, 'lamtha': 20,
+    #            'threshold': 0.5}
+    # net._all_to_all_connect('bursty1', 'L5_basket',
+    #                         'soma', 'gabaa', nc_dict, unique=False)
+    # network_builder = NetworkBuilder(net)
+    # assert 'bursty1_L5Basket_gabaa' in network_builder.ncs
+    # n_conn = len(
+    #     net.gid_ranges['bursty1']) * len(net.gid_ranges['L5_basket'])
+    # assert len(network_builder.ncs['bursty1_L5Basket_gabaa']) == n_conn
 
-    # try unique=True
-    net = default_network(deepcopy(params), add_drives_from_params=True)
-    net._all_to_all_connect('extgauss', 'L5_basket',
-                            'soma', 'gabaa', nc_dict, unique=True)
-    network_builder = NetworkBuilder(net)
-    n_conn = len(net.gid_ranges['L5_basket'])
-    assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
+    # # try unique=True
+    # net = default_network(deepcopy(params), add_drives_from_params=True)
+    # net._all_to_all_connect('extgauss', 'L5_basket',
+    #                         'soma', 'gabaa', nc_dict, unique=True)
+    # network_builder = NetworkBuilder(net)
+    # n_conn = len(net.gid_ranges['L5_basket'])
+    # assert len(network_builder.ncs['extgauss_L5Basket_gabaa']) == n_conn
 
     # Test inputs for connectivity API
     net = default_network(deepcopy(params), add_drives_from_params=True)
