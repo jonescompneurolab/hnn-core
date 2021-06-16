@@ -55,15 +55,14 @@ class BuildMod(Command):
             mod_path = op.join(op.dirname(__file__), 'mod')
             shell = True
         else:
-            mod_path = op.join(op.dirname(op.abspath(__file__)), 'hnn_core', 'mod')
+            mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
             shell = False
 
-        print(mod_path)
         process = subprocess.Popen(['nrnivmodl'], cwd=mod_path,
-                                   shell=shell)
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE, shell=shell)
         outs, errs = process.communicate()
         print(outs)
-        print(errs)
 
 
 class build_py_mod(build_py):

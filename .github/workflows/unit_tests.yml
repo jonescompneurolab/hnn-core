@@ -5,18 +5,12 @@ on:
     branches: ['**']
   pull_request:
     branches: ['**']
-  create:
-    branches: [main]
-    tags: ['**']
-  schedule:
-    - cron: "0 4 * * *"
 
 jobs:
   build:
 
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest]
         python-version: [3.7, 3.8]
@@ -50,13 +44,6 @@ jobs:
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
-          echo $PWD
-          which nrnivmodl
-          yourfilenames=`ls`
-          for eachfile in $yourfilenames
-          do
-            echo $eachfile
-          done
           python setup.py --verbose install
       - name: Lint with flake8
         shell: bash -el {0}
