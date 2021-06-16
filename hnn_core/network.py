@@ -631,7 +631,8 @@ class Network(object):
                     self.add_connection(
                         src_gids, target_gids, drive_conn['location'],
                         receptor, drive_conn[receptor]['A_weight'],
-                        self.delay, drive_conn[receptor]['lamtha'])
+                        drive_conn[receptor]['A_delay'],
+                        drive_conn[receptor]['lamtha'])
 
     def _create_drive_conns(self, target_populations, weights_by_receptor,
                             location, space_constant, synaptic_delays,
