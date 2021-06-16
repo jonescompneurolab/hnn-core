@@ -64,95 +64,114 @@ def default_network(params=None, add_drives_from_params=False):
                 delay, lamtha, allow_autapses=False)
 
     # layer2 Basket -> layer2 Pyr
-    src_cell = 'L2Basket'
-    target_cell = 'L2Pyr'
-    nc_dict['lamtha'] = 50.
+    src_cell = 'L2_basket'
+    target_cell = 'L2_pyramidal'
+    lamtha = 50.
     loc = 'soma'
     for receptor in ['gabaa', 'gabab']:
         key = f'gbar_L2Basket_L2Pyr_{receptor}'
-        nc_dict['A_weight'] = net._params[key]
-        net._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
+        weight = net._params[key]
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        # net._all_to_all_connect(
+        #     src_cell, target_cell, loc, receptor, nc_dict)
 
     # layer5 Basket -> layer5 Pyr
-    src_cell = 'L5Basket'
-    target_cell = 'L5Pyr'
-    nc_dict['lamtha'] = 70.
+    src_cell = 'L5_basket'
+    target_cell = 'L5_pyramidal'
+    lamtha = 70.
     loc = 'soma'
     for receptor in ['gabaa', 'gabab']:
-        key = f'gbar_L5Basket_{target_cell}_{receptor}'
-        nc_dict['A_weight'] = net._params[key]
-        net._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
+        key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+        weight = net._params[key]
+        # net._all_to_all_connect(
+        #     src_cell, target_cell, loc, receptor, nc_dict)
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha) 
 
     # layer2 Pyr -> layer5 Pyr
-    src_cell = 'L2Pyr'
-    nc_dict['lamtha'] = 3.
+    src_cell = 'L2_pyramidal'
+    lamtha = 3.
     receptor = 'ampa'
     for loc in ['proximal', 'distal']:
-        key = f'gbar_L2Pyr_{target_cell}'
-        nc_dict['A_weight'] = net._params[key]
-        net._all_to_all_connect(
-            src_cell, target_cell, loc, receptor, nc_dict)
+        key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+        weight = net._params[key]
+        # net._all_to_all_connect(
+        #     src_cell, target_cell, loc, receptor, nc_dict)
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Basket -> layer5 Pyr
-    src_cell = 'L2Basket'
-    nc_dict['lamtha'] = 50.
-    key = f'gbar_L2Basket_{target_cell}'
-    nc_dict['A_weight'] = net._params[key]
+    src_cell = 'L2_basket'
+    lamtha = 50.
+    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    weight = net._params[key]
     loc = 'distal'
     receptor = 'gabaa'
-    net._all_to_all_connect(
-        src_cell, target_cell, loc, receptor, nc_dict)
+    # net._all_to_all_connect(
+    #     src_cell, target_cell, loc, receptor, nc_dict)
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # xx -> layer2 Basket
-    src_cell = 'L2Pyr'
-    target_cell = 'L2Basket'
-    nc_dict['lamtha'] = 3.
-    key = f'gbar_L2Pyr_{target_cell}'
-    nc_dict['A_weight'] = net._params[key]
+    src_cell = 'L2_pyramidal'
+    target_cell = 'L2_basket'
+    lamtha = 3.
+    key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+    weight = net._params[key]
     loc = 'soma'
     receptor = 'ampa'
-    net._all_to_all_connect(
-        src_cell, target_cell, loc, receptor, nc_dict)
+    # net._all_to_all_connect(
+    #     src_cell, target_cell, loc, receptor, nc_dict)
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = 'L2Basket'
-    nc_dict['lamtha'] = 20.
-    key = f'gbar_L2Basket_{target_cell}'
-    nc_dict['A_weight'] = net._params[key]
+    src_cell = 'L2_basket'
+    lamtha = 20.
+    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    weight = net._params[key]
     loc = 'soma'
     receptor = 'gabaa'
-    net._all_to_all_connect(
-        src_cell, target_cell, loc, receptor, nc_dict)
+    # net._all_to_all_connect(
+    #     src_cell, target_cell, loc, receptor, nc_dict)
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # xx -> layer5 Basket
-    src_cell = 'L5Basket'
-    target_cell = 'L5Basket'
-    nc_dict['lamtha'] = 20.
+    src_cell = 'L5_basket'
+    target_cell = 'L5_basket'
+    lamtha = 20.
     loc = 'soma'
     receptor = 'gabaa'
-    key = f'gbar_L5Basket_{target_cell}'
-    nc_dict['A_weight'] = net._params[key]
-    net._all_to_all_connect(
-        src_cell, target_cell, loc, receptor, nc_dict,
+    key = f'gbar_L5Basket_{_short_name(target_cell)}'
+    weight = net._params[key]
+    # net._all_to_all_connect(
+    #     src_cell, target_cell, loc, receptor, nc_dict,
+    #     allow_autapses=False)
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
         allow_autapses=False)
 
-    src_cell = 'L5Pyr'
-    nc_dict['lamtha'] = 3.
-    key = f'gbar_L5Pyr_{target_cell}'
-    nc_dict['A_weight'] = net._params[key]
+    src_cell = 'L5_pyramidal'
+    lamtha = 3.
+    key = f'gbar_L5Pyr_{_short_name(target_cell)}'
+    weight = net._params[key]
     loc = 'soma'
     receptor = 'ampa'
-    net._all_to_all_connect(
-        src_cell, target_cell, loc, receptor, nc_dict)
+    # net._all_to_all_connect(
+    #     src_cell, target_cell, loc, receptor, nc_dict)
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = 'L2Pyr'
-    key = f'gbar_L2Pyr_{target_cell}'
-    nc_dict['A_weight'] = net._params[key]
+    src_cell = 'L2_pyramidal'
+    key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+    weight = net._params[key]
     loc = 'soma'
     receptor = 'ampa'
-    net._all_to_all_connect(
-        src_cell, target_cell, loc, receptor, nc_dict)
+    # net._all_to_all_connect(
+    #     src_cell, target_cell, loc, receptor, nc_dict)
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     return net
 
