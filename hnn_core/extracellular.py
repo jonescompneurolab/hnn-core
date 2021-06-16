@@ -198,6 +198,10 @@ class ExtracellularArray:
 
     Notes
     -----
+    The length of an ``ExtracellularArray`` is equal to the number of trials of
+    data it contains. Slicing an ``ExtracellularArray`` returns a `copy` of the
+    corresponding trials: ``array[:5]`` returns a new array of length 5, etc.
+
     See Table 5 in http://jn.physiology.org/content/104/6/3388.long for
     measured values of conductivity in rat cortex (note units there are mS/cm)
     """
@@ -433,12 +437,12 @@ class ExtracellularArray:
         elif isinstance(trial_no, (list, tuple, int, slice)):
             plot_data = self.get_data()[trial_no, ]
         else:
-            raise ValueError(f'unkown trial number type, got {trial_no}')
+            raise ValueError(f'unknown trial number type, got {trial_no}')
 
         if isinstance(contact_no, (list, tuple, int, slice)):
             plot_data = plot_data[:, contact_no, ]
         elif contact_no is not None:
-            raise ValueError(f'unkown contact number type, got {contact_no}')
+            raise ValueError(f'unknown contact number type, got {contact_no}')
 
         for trial_data in plot_data:
             fig = plot_extracellular(
