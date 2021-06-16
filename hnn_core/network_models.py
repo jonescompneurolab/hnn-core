@@ -41,11 +41,6 @@ def default_network(params=None, add_drives_from_params=False):
 
     net = Network(params, add_drives_from_params=add_drives_from_params)
 
-    nc_dict = {
-        'A_delay': net.delay,
-        'threshold': net.threshold,
-    }
-
     delay = net.delay
 
     # source of synapse is always at soma
@@ -73,8 +68,6 @@ def default_network(params=None, add_drives_from_params=False):
         weight = net._params[key]
         net.add_connection(
             src_cell, target_cell, loc, receptor, weight, delay, lamtha)
-        # net._all_to_all_connect(
-        #     src_cell, target_cell, loc, receptor, nc_dict)
 
     # layer5 Basket -> layer5 Pyr
     src_cell = 'L5_basket'
@@ -84,10 +77,8 @@ def default_network(params=None, add_drives_from_params=False):
     for receptor in ['gabaa', 'gabab']:
         key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
         weight = net._params[key]
-        # net._all_to_all_connect(
-        #     src_cell, target_cell, loc, receptor, nc_dict)
         net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha) 
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
     src_cell = 'L2_pyramidal'
@@ -96,8 +87,6 @@ def default_network(params=None, add_drives_from_params=False):
     for loc in ['proximal', 'distal']:
         key = f'gbar_L2Pyr_{_short_name(target_cell)}'
         weight = net._params[key]
-        # net._all_to_all_connect(
-        #     src_cell, target_cell, loc, receptor, nc_dict)
         net.add_connection(
             src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -108,8 +97,6 @@ def default_network(params=None, add_drives_from_params=False):
     weight = net._params[key]
     loc = 'distal'
     receptor = 'gabaa'
-    # net._all_to_all_connect(
-    #     src_cell, target_cell, loc, receptor, nc_dict)
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -121,8 +108,6 @@ def default_network(params=None, add_drives_from_params=False):
     weight = net._params[key]
     loc = 'soma'
     receptor = 'ampa'
-    # net._all_to_all_connect(
-    #     src_cell, target_cell, loc, receptor, nc_dict)
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -132,8 +117,6 @@ def default_network(params=None, add_drives_from_params=False):
     weight = net._params[key]
     loc = 'soma'
     receptor = 'gabaa'
-    # net._all_to_all_connect(
-    #     src_cell, target_cell, loc, receptor, nc_dict)
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -145,9 +128,6 @@ def default_network(params=None, add_drives_from_params=False):
     receptor = 'gabaa'
     key = f'gbar_L5Basket_{_short_name(target_cell)}'
     weight = net._params[key]
-    # net._all_to_all_connect(
-    #     src_cell, target_cell, loc, receptor, nc_dict,
-    #     allow_autapses=False)
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha,
         allow_autapses=False)
@@ -158,8 +138,6 @@ def default_network(params=None, add_drives_from_params=False):
     weight = net._params[key]
     loc = 'soma'
     receptor = 'ampa'
-    # net._all_to_all_connect(
-    #     src_cell, target_cell, loc, receptor, nc_dict)
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -168,8 +146,6 @@ def default_network(params=None, add_drives_from_params=False):
     weight = net._params[key]
     loc = 'soma'
     receptor = 'ampa'
-    # net._all_to_all_connect(
-    #     src_cell, target_cell, loc, receptor, nc_dict)
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
