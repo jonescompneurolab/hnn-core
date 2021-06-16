@@ -82,7 +82,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
     neuron_net.aggregate_data()
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
-    for nrn_arr in neuron_net._rec_array.values():
+    for nrn_arr in neuron_net._nrn_rec_array.values():
         _PC.allreduce(nrn_arr._nrn_voltages, 1)
 
     # aggregate the currents and voltages independently on each proc
@@ -326,7 +326,7 @@ class NetworkBuilder(object):
         self._spike_gids = h.Vector()
         self._vsoma = dict()
         self._isoma = dict()
-        self._rec_array = dict()
+        self._nrn_rec_array = dict()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spike_times = h.Vector()
@@ -493,7 +493,7 @@ class NetworkBuilder(object):
         for arr_name, arr in self.net.rec_array.items():
             nrn_arr = ExtracellularArrayBuilder(arr)
             nrn_arr._build(cvode=_CVODE)
-            self._rec_array.update({arr_name: nrn_arr})
+            self._nrn_rec_array.update({arr_name: nrn_arr})
 
     # setup spike recording for this node
     def _record_spikes(self):
@@ -584,7 +584,7 @@ class NetworkBuilder(object):
 
         rec_arr_py = dict()
         rec_times_py = dict()
-        for arr_name, nrn_arr in self._rec_array.items():
+        for arr_name, nrn_arr in self._nrn_rec_array.items():
             rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
             rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
