@@ -364,7 +364,7 @@ def get_L5Pyr_params_default():
 def _secs_Basket():
     """The geometry of default sections in L2/L5 Basket neuron."""
     sec_pts = {
-        'soma': [[0, 0, 0], [0, 39., 0]],
+        'soma': [[0, 0, 0], [0, 0, 39.]],
     }
 
     topology = None
