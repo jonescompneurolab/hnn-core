@@ -1026,10 +1026,10 @@ class Network(object):
                     f'src_gid {src_gid} not in net.gid_ranges')
             elif gid_type != src_type:
                 raise AssertionError('All src_gids must be of the same type')
-            gid_pairs[src_gid] = target_src_pair
             if not allow_autapses:
                 mask = np.in1d(target_src_pair, src_gid, invert=True)
-                target_src_pair = target_src_pair[mask]
+                target_src_pair = np.array(target_src_pair)[mask].tolist()
+            gid_pairs[src_gid] = target_src_pair
 
         conn['src_type'] = src_type
         conn['src_range'] = self.gid_ranges[_long_name(src_type)]

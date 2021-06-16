@@ -6,6 +6,7 @@ import os.path as op
 import hnn_core
 from hnn_core import read_params
 from .network import Network
+from .params import _short_name
 
 
 def default_network(params=None, add_drives_from_params=False):
@@ -45,19 +46,22 @@ def default_network(params=None, add_drives_from_params=False):
         'threshold': net.threshold,
     }
 
+    delay = net.delay
+
     # source of synapse is always at soma
 
     # layer2 Pyr -> layer2 Pyr
     # layer5 Pyr -> layer5 Pyr
-    nc_dict['lamtha'] = 3.
+    lamtha = 3.0
     loc = 'proximal'
-    for target_cell in ['L2Pyr', 'L5Pyr']:
+    for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
         for receptor in ['nmda', 'ampa']:
-            key = f'gbar_{target_cell}_{target_cell}_{receptor}'
-            nc_dict['A_weight'] = net._params[key]
-            net._all_to_all_connect(
-                target_cell, target_cell, loc, receptor,
-                nc_dict, allow_autapses=False)
+            key = f'gbar_{_short_name(target_cell)}_'\
+                  f'{_short_name(target_cell)}_{receptor}'
+            weight = net._params[key]
+            net.add_connection(
+                target_cell, target_cell, loc, receptor, weight,
+                delay, lamtha, allow_autapses=False)
 
     # layer2 Basket -> layer2 Pyr
     src_cell = 'L2Basket'
