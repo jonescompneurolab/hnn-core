@@ -867,55 +867,6 @@ class Network(object):
             cell = self.cells[src_type][type_pos_ind]
         return cell
 
-    # def _all_to_all_connect(self, src_cell, target_cell,
-    #                         loc, receptor, nc_dict,
-    #                         allow_autapses=True, unique=False):
-    #     """Generate connectivity list given lists of sources and targets.
-
-    #     Parameters
-    #     ----------
-    #     src_cell : str
-    #         Source cell type.
-    #     target_cell : str
-    #         Target cell type.
-    #     loc : str
-    #         Location of synapse on target cell. Must be
-    #         'proximal', 'distal', or 'soma'.
-    #     receptor : str
-    #         Synaptic receptor of connection. Must be one of:
-    #         'ampa', 'nmda', 'gabaa', or 'gabab'.
-    #     nc_dict : dict
-    #         The connection dictionary containing keys
-    #         A_delay, A_weight, lamtha, and threshold.
-    #     allow_autapses : bool
-    #         If True, allow connecting neuron to itself.
-    #     unique : bool
-    #         If True, each target cell gets one "unique" feed.
-    #         If False, all src_type cells are connected to
-    #         all target_type cells.
-    #     """
-    #     src_gids = self.gid_ranges[_long_name(src_cell)]
-    #     target_range = self.gid_ranges[_long_name(target_cell)]
-
-    #     src_start = src_gids[0]  # Necessary for unique feeds
-
-    #     if unique:
-    #         src_gids = [src_gid + src_start for src_gid in target_range]
-    #         target_gids = [[target_gid] for target_gid in target_range]
-    #     else:
-    #         target_gids = list()
-    #         for src_gid in src_gids:
-    #             target_src_pair = list()
-    #             for target_gid in target_range:
-    #                 if not allow_autapses and src_gid == target_gid:
-    #                     continue
-    #                 target_src_pair.append(target_gid)
-    #             target_gids.append(target_src_pair)
-
-    #     self.add_connection(
-    #         src_gids, target_gids, loc, receptor,
-    #         nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
-
     def add_connection(self, src_gids, target_gids, loc, receptor,
                        weight, delay, lamtha, allow_autapses=True,
                        probability=1.0, seed=0):
