@@ -226,15 +226,13 @@ class CellResponse(object):
     def times(self):
         return self._times
 
-    def reset(self, cell_type_names=None):
+    def reset(self):
         """Reset all recorded attributes to empty lists."""
         self._spike_times = list()
         self._spike_gids = list()
         self._spike_types = list()
         self._vsoma = list()
         self._isoma = list()
-        if cell_type_names is not None:
-            self._cell_type_names = cell_type_names
 
     def update_types(self, gid_ranges):
         """Update spike types in the current instance of CellResponse.
