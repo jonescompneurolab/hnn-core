@@ -10,7 +10,6 @@ import pytest
 import hnn_core
 from hnn_core import read_params, default_network, CellResponse
 from hnn_core.network_builder import NetworkBuilder
-from hnn_core.cells_default import basket
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -280,7 +279,7 @@ def test_add_cell_type():
     nc = network_builder.ncs['L2Basket_new_type_gabaa'][0]
     assert nc.syn().tau1 == tau1
 
-    dpls = simulate_dipole(net)
+    simulate_dipole(net)
     assert 'new_type' in net.cell_response._cell_type_names
 
 
