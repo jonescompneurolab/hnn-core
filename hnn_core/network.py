@@ -608,28 +608,30 @@ class Network(object):
         pos = [self.pos_dict['origin'] for _ in src_gid_ran]
         self._add_cell_type(name, pos)
 
-        # Update connectivity_list
-        nc_dict = {
-            'A_delay': self.delay,
-            'threshold': self.threshold,
-        }
         receptors = ['ampa', 'nmda']
         if drive['type'] == 'gaussian':
             receptors = ['ampa']
+
+        src_range = self.gid_ranges[_long_name(drive['name'])]
         # conn-parameters are for each target cell type
         for target_cell, drive_conn in drive['conn'].items():
+            target_range = self.gid_ranges[_long_name(target_cell)]
             for receptor in receptors:
                 if len(drive_conn[receptor]) > 0:
-                    nc_dict['lamtha'] = drive_conn[
-                        receptor]['lamtha']
-                    nc_dict['A_delay'] = drive_conn[
-                        receptor]['A_delay']
-                    nc_dict['A_weight'] = drive_conn[
-                        receptor]['A_weight']
-                    loc = drive_conn['location']
-                    self._all_to_all_connect(
-                        drive['name'], target_cell, loc, receptor,
-                        deepcopy(nc_dict), unique=drive['cell_specific'])
+                    if drive['cell_specific']:
+                        src_gids = self.gid_ranges[_long_name(drive['name'])]
+                        src_start = src_gids[0]  # Necessary for unique feeds
+                        src_gids = [src_gid + src_start for
+                                    src_gid in target_range]
+                        target_gids = [[target_gid] for
+                                       target_gid in target_range]
+                    else:
+                        src_gids = list(src_range)
+                        target_gids = list(target_range)
+                    self.add_connection(
+                        src_gids, target_gids, drive_conn['location'],
+                        receptor, drive_conn[receptor]['A_weight'],
+                        self.delay, drive_conn[receptor]['lamtha'])
 
     def _create_drive_conns(self, target_populations, weights_by_receptor,
                             location, space_constant, synaptic_delays,
@@ -914,7 +916,8 @@ class Network(object):
             nc_dict['A_weight'], nc_dict['A_delay'], nc_dict['lamtha'])
 
     def add_connection(self, src_gids, target_gids, loc, receptor,
-                       weight, delay, lamtha, probability=1.0, seed=0):
+                       weight, delay, lamtha, allow_autapses=True,
+                       probability=1.0, seed=0):
         """Appends connections to connectivity list
 
         Parameters
@@ -943,6 +946,8 @@ class Network(object):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+        allow_autapses : bool
+            If True, allow connecting neuron to itself.
         probability : float
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
@@ -1022,6 +1027,10 @@ class Network(object):
             elif gid_type != src_type:
                 raise AssertionError('All src_gids must be of the same type')
             gid_pairs[src_gid] = target_src_pair
+            if not allow_autapses:
+                mask = np.in1d(target_src_pair, src_gid, invert=True)
+                target_src_pair = target_src_pair[mask]
+
         conn['src_type'] = src_type
         conn['src_range'] = self.gid_ranges[_long_name(src_type)]
         conn['num_srcs'] = len(src_gids)
