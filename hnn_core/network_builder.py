@@ -82,7 +82,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
     neuron_net.aggregate_data()
     _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
     _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
-    for nrn_arr in neuron_net._nrn_rec_array.values():
+    for nrn_arr in neuron_net._nrn_rec_arrays.values():
         _PC.allreduce(nrn_arr._nrn_voltages, 1)
 
     # aggregate the currents and voltages independently on each proc
@@ -286,7 +286,7 @@ class NetworkBuilder(object):
         # if extracellular electrodes have been included, we need to calculate
         # transmembrane currents at each integration step
         self._expose_imem = False
-        if len(self.net.rec_array) > 0:
+        if len(self.net.rec_arrays) > 0:
             self._expose_imem = True
 
         self._build()
@@ -326,7 +326,7 @@ class NetworkBuilder(object):
         self._spike_gids = h.Vector()
         self._vsoma = dict()
         self._isoma = dict()
-        self._nrn_rec_array = dict()
+        self._nrn_rec_arrays = dict()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spike_times = h.Vector()
@@ -335,7 +335,7 @@ class NetworkBuilder(object):
         self._record_spikes()
         self._connect_celltypes()
 
-        if len(self.net.rec_array) > 0:
+        if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
         if _get_rank() == 0:
@@ -490,10 +490,10 @@ class NetworkBuilder(object):
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
-        for arr_name, arr in self.net.rec_array.items():
+        for arr_name, arr in self.net.rec_arrays.items():
             nrn_arr = ExtracellularArrayBuilder(arr)
             nrn_arr._build(cvode=_CVODE)
-            self._nrn_rec_array.update({arr_name: nrn_arr})
+            self._nrn_rec_arrays.update({arr_name: nrn_arr})
 
     # setup spike recording for this node
     def _record_spikes(self):
@@ -584,7 +584,7 @@ class NetworkBuilder(object):
 
         rec_arr_py = dict()
         rec_times_py = dict()
-        for arr_name, nrn_arr in self._nrn_rec_array.items():
+        for arr_name, nrn_arr in self._nrn_rec_arrays.items():
             rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
             rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 

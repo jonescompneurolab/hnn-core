@@ -481,9 +481,9 @@ def plot_cells(net, ax=None, show=True):
             marker = markers[cell_type]
             ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
-    if net.rec_array:
-        cols = plt.get_cmap('inferno', len(net.rec_array) + 2)
-        for ii, (arr_name, arr) in enumerate(net.rec_array.items()):
+    if net.rec_arrays:
+        cols = plt.get_cmap('inferno', len(net.rec_arrays) + 2)
+        for ii, (arr_name, arr) in enumerate(net.rec_arrays.items()):
             x = [p[0] for p in arr.positions]
             y = [p[1] for p in arr.positions]
             z = [p[2] for p in arr.positions]

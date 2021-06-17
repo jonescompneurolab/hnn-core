@@ -334,7 +334,7 @@ class Network(object):
     connectivity : list of dict
         List of dictionaries specifying each cell-cell and drive-cell
         connection
-    rec_array : dict
+    rec_arrays : dict
         Stores electrode position information and voltages recorded by them
         for extracellular potential measurements. Multiple electrode arrays
         may be defined as unique keys. The values of the dictionary are
@@ -395,7 +395,7 @@ class Network(object):
         self.delay = 1.0
 
         # extracellular recordings (if applicable)
-        self.rec_array = dict()
+        self.rec_arrays = dict()
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
@@ -448,7 +448,7 @@ class Network(object):
         net_copy = deepcopy(self)
         net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
-        net_copy._reset_rec_array()
+        net_copy._reset_rec_arrays()
         return net_copy
 
     def _update_cells(self):
@@ -860,9 +860,9 @@ class Network(object):
         for drive_name in self.external_drives.keys():
             self.external_drives[drive_name]['events'] = list()
 
-    def _reset_rec_array(self):
-        # clear the data in rec_array
-        for arr in self.rec_array.values():
+    def _reset_rec_arrays(self):
+        # clear the data in rec_arrays
+        for arr in self.rec_arrays.values():
             arr._reset()
 
     def _instantiate_drives(self, n_trials=1):
@@ -1233,11 +1233,11 @@ class Network(object):
             The default value of 0.5 um corresponds to 1 um diameter dendrites.
         """
         _validate_type(name, str, 'name')
-        if name in self.rec_array.keys():
+        if name in self.rec_arrays.keys():
             raise ValueError(f'{name} already exists, use another name!')
 
         # let ExtracellularArray perform all remaining argument checks
-        self.rec_array.update({
+        self.rec_arrays.update({
             name: ExtracellularArray(electrode_pos,
                                      conductivity=conductivity,
                                      method=method,

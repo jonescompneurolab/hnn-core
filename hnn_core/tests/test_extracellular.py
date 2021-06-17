@@ -27,8 +27,8 @@ def test_extracellular_api():
     net.add_electrode_array('el1', electrode_pos)
     electrode_pos = [(2, 400, 2), (6, 800, 6)]
     net.add_electrode_array('arr1', electrode_pos)
-    assert len(net.rec_array) == 2
-    assert len(net.rec_array['arr1'].positions) == 2
+    assert len(net.rec_arrays) == 2
+    assert len(net.rec_arrays['arr1'].positions) == 2
 
     # ensure unique names
     pytest.raises(ValueError, net.add_electrode_array, 'arr1', [(6, 6, 800)])
@@ -97,7 +97,7 @@ def test_transmembrane_currents():
     # all transfer resistances set to unity
     net.add_electrode_array('net_Im', electrode_pos, method=None)
     _ = simulate_dipole(net, postproc=False)
-    currents = net.rec_array['net_Im'].get_data()
+    currents = net.rec_arrays['net_Im'].get_data()
     assert_allclose(currents, 0, rtol=1e-10, atol=1e-10)
 
 
@@ -162,28 +162,28 @@ def test_extracellular_backends(run_hnn_core_fixture):
         record_vsoma=True, electrode_array=electrode_array)
 
     assert (len(electrode_array['arr1']) ==
-            len(joblib_net.rec_array['arr1'].positions) ==
-            len(mpi_net.rec_array['arr1'].positions))
-    assert (len(joblib_net.rec_array['arr1']) ==
-            len(mpi_net.rec_array['arr1']) ==
+            len(joblib_net.rec_arrays['arr1'].positions) ==
+            len(mpi_net.rec_arrays['arr1'].positions))
+    assert (len(joblib_net.rec_arrays['arr1']) ==
+            len(mpi_net.rec_arrays['arr1']) ==
             2)  # length == n.o. trials
 
     # reduced simulation has n_trials=2
     # trial_idx, n_trials = 0, 2
     for tr_idx, el_idx in zip([0, 1], [0, 1]):
-        assert_allclose(joblib_net.rec_array['arr1']._data[tr_idx][el_idx],
-                        mpi_net.rec_array['arr1']._data[tr_idx][el_idx])
+        assert_allclose(joblib_net.rec_arrays['arr1']._data[tr_idx][el_idx],
+                        mpi_net.rec_arrays['arr1']._data[tr_idx][el_idx])
 
-    assert isinstance(joblib_net.rec_array['arr1'].get_data(), np.ndarray)
-    assert_array_equal(joblib_net.rec_array['arr1'].get_data().shape,
-                       [len(joblib_net.rec_array['arr1']._data),
-                        len(joblib_net.rec_array['arr1']._data[0]),
-                        len(joblib_net.rec_array['arr1']._data[0][0])])
+    assert isinstance(joblib_net.rec_arrays['arr1'].get_data(), np.ndarray)
+    assert_array_equal(joblib_net.rec_arrays['arr1'].get_data().shape,
+                       [len(joblib_net.rec_arrays['arr1']._data),
+                        len(joblib_net.rec_arrays['arr1']._data[0]),
+                        len(joblib_net.rec_arrays['arr1']._data[0][0])])
 
     # make sure sampling rate is fixed (raises RuntimeError if not)
-    _ = joblib_net.rec_array['arr1'].sfreq
+    _ = joblib_net.rec_arrays['arr1'].sfreq
     # check plotting works
-    joblib_net.rec_array['arr1'].plot(show=False)
+    joblib_net.rec_arrays['arr1'].plot(show=False)
 
 
 def _mathematical_dipole(e_pos, d_pos, d_Q):
@@ -262,9 +262,9 @@ def test_dipolar_far_field():
                 phi_p_theory[ii][jj] = 0
                 continue
 
-            phi_p_psa[ii][jj] = net.rec_array['grid_psa']._data[0][
+            phi_p_psa[ii][jj] = net.rec_arrays['grid_psa']._data[0][
                 ii * len(X_p) + jj][idt] * 1e3
-            phi_p_lsa[ii][jj] = net.rec_array['grid_lsa']._data[0][
+            phi_p_lsa[ii][jj] = net.rec_arrays['grid_lsa']._data[0][
                 ii * len(X_p) + jj][idt] * 1e3
             phi_p_theory[ii][jj] = \
                 _mathematical_dipole(e_pos, d_pos, d_Q) / conductivity
@@ -307,20 +307,20 @@ def test_rec_array_calculation():
     _ = simulate_dipole(net, n_trials=1, postproc=False)
 
     # test accessing simulated voltages
-    assert (len(net.rec_array['arr1']) ==
-            len(net.rec_array['arr1'].voltages) == 1)  # n_trials
-    assert len(net.rec_array['arr1'].voltages[0]) == 2  # n_contacts
-    assert (len(net.rec_array['arr1'].voltages[0][0]) ==
-            len(net.rec_array['arr1'].times))
+    assert (len(net.rec_arrays['arr1']) ==
+            len(net.rec_arrays['arr1'].voltages) == 1)  # n_trials
+    assert len(net.rec_arrays['arr1'].voltages[0]) == 2  # n_contacts
+    assert (len(net.rec_arrays['arr1'].voltages[0][0]) ==
+            len(net.rec_arrays['arr1'].times))
     # ensure copy drops data (but retains electrode position information etc.)
     net_copy = net.copy()
-    assert isinstance(net_copy.rec_array['arr1'], ExtracellularArray)
-    assert len(net_copy.rec_array['arr1'].voltages) == 0
+    assert isinstance(net_copy.rec_arrays['arr1'], ExtracellularArray)
+    assert len(net_copy.rec_arrays['arr1'].voltages) == 0
 
-    data, times = net.rec_array['arr1'].get_data(return_times=True)
+    data, times = net.rec_arrays['arr1'].get_data(return_times=True)
     assert isinstance(data, np.ndarray)
     assert isinstance(times, np.ndarray)
-    data_only = net.rec_array['arr1'].get_data()
+    data_only = net.rec_arrays['arr1'].get_data()
     assert_allclose(data, data_only)
 
     # using the same electrode positions, but a different method: LSA
@@ -332,10 +332,10 @@ def test_rec_array_calculation():
 
     # simulate_dipole is run twice above, first 1 then 5 trials.
     # Make sure that previous results are discarded on each run
-    assert len(net.rec_array['arr1']._data) == n_trials
+    assert len(net.rec_arrays['arr1']._data) == n_trials
 
     for trial_idx in range(n_trials):
         # LSA and PSA should agree far away (second electrode)
-        assert_allclose(net.rec_array['arr1']._data[trial_idx][1],
-                        net.rec_array['arr2']._data[trial_idx][1],
+        assert_allclose(net.rec_arrays['arr1']._data[trial_idx][1],
+                        net.rec_arrays['arr2']._data[trial_idx][1],
                         rtol=1e-3, atol=1e-3)
