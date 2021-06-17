@@ -10,7 +10,7 @@ from .params import _short_name
 
 
 def default_network(params=None, add_drives_from_params=False):
-    """Instantiate the default all-to-all connected network.
+    """Instantiate the default network.
 
     Parameters
     ----------
@@ -32,7 +32,36 @@ def default_network(params=None, add_drives_from_params=False):
 
     Notes
     -----
-    Model reproduces results from Jones et al. 2009.
+    The default network recreates the model from Jones et al. 2009.
+    """
+    net = jones_2009_model(params, add_drives_from_params)
+    return net
+
+
+def jones_2009_model(params=None, add_drives_from_params=False):
+    """Instantiate the Jones et al. 2009 model.
+
+    Parameters
+    ----------
+    params : dict | None
+        The parameters to use for constructing the network.
+        If None, parameters loaded from default.json
+        Default: None
+    add_drives_from_params : bool
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store the default network.
+        All connections defining the default network will be
+        appeneded to net.connectivity.
+
+    Notes
+    -----
+    Network is composed of an all-to-all connectivity pattern between cells.
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -152,7 +181,7 @@ def default_network(params=None, add_drives_from_params=False):
     return net
 
 
-def beta_erp_network(params=None, add_drives_from_params=False):
+def law_model(params=None, add_drives_from_params=False):
     """Instantiate the beta modulated ERP network model.
 
     Parameters
@@ -185,7 +214,7 @@ def beta_erp_network(params=None, add_drives_from_params=False):
         params = read_params(params_fname)
 
     params['tstop'] = 300.0
-    net = default_network(params)
+    net = jones_2009_model(params)
 
     # Update biophysics (increase gabab duration of inhibition)
     net.cell_types['L2_pyramidal'].p_syn['gabab']['tau1'] = 45.0

@@ -12,12 +12,12 @@ by prestimulus beta events.
 ###############################################################################
 # Let us import hnn_core
 import hnn_core
-from hnn_core import simulate_dipole, beta_erp_network
+from hnn_core import simulate_dipole, law_model
 from hnn_core.viz import plot_dipole
 
 ###############################################################################
 # We begin by instantiating the network model described in Law et al. 2021.
-net = beta_erp_network()
+net = law_model()
 
 ###############################################################################
 # Next a beta event is created by inducing simultaneous proximal
@@ -29,8 +29,8 @@ syn_delays_p1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                  'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
 net.add_bursty_drive(
-    'beta_prox', tstart=beta_start, burst_rate=1e-10, burst_std=20., numspikes=2,
-    spike_isi=10, repeats=10, location='proximal',
+    'beta_prox', tstart=beta_start, burst_rate=1e-10, burst_std=20.,
+    numspikes=2, spike_isi=10, repeats=10, location='proximal',
     weights_ampa=weights_ampa_p1, synaptic_delays=syn_delays_p1, seedcore=14)
 
 # Distal Drive
@@ -41,9 +41,9 @@ syn_delays_d1 = {'L2_basket': 0.5, 'L2_pyramidal': 0.5,
 
 
 net.add_bursty_drive(
-    'beta_dist', tstart=beta_start + 5.0, burst_rate=1e-10, burst_std=10., numspikes=2,
-    spike_isi=10, repeats=10, location='distal', weights_ampa=weights_ampa_d1,
-    synaptic_delays=syn_delays_d1, seedcore=14)
+    'beta_dist', tstart=beta_start + 5.0, burst_rate=1e-10, burst_std=10.,
+    numspikes=2, spike_isi=10, repeats=10, location='distal',
+    weights_ampa=weights_ampa_d1, synaptic_delays=syn_delays_d1, seedcore=14)
 
 ###############################################################################
 # And finally we simulate
