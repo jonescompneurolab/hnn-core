@@ -24,6 +24,7 @@ help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html-noplot to make standalone HTML files, without plotting anything"
 	@echo "  html       to make standalone HTML files"
+	@echo "  html_dev-pattern to make standalone HTML files for one example dir (dev version)"
 
 .PHONY: clean
 
@@ -43,3 +44,8 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+html_dev-pattern:
+	BUILD_DEV_HTML=1 $(SPHINXBUILD) -D sphinx_gallery_conf.filename_pattern=$(PATTERN) -D sphinx_gallery_conf.run_stale_examples=True -b html $(ALLSPHINXOPTS) _build/html
+	@echo
+	@echo "Build finished. The HTML pages are in _build/html"
