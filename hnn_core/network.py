@@ -1009,7 +1009,7 @@ class Network(object):
                 raise AssertionError(
                     'All target_gids must be of the same type')
         conn['target_type'] = target_type
-        conn['target_range'] = self.gid_ranges[_long_name(target_type)]
+        conn['target_gids'] = list(target_set)
         conn['num_targets'] = len(target_set)
 
         if len(target_gids) != len(src_gids):
@@ -1032,7 +1032,7 @@ class Network(object):
             gid_pairs[src_gid] = target_src_pair
 
         conn['src_type'] = src_type
-        conn['src_range'] = self.gid_ranges[_long_name(src_type)]
+        conn['src_gids'] = list(set(src_gids))
         conn['num_srcs'] = len(src_gids)
 
         conn['gid_pairs'] = gid_pairs
@@ -1065,6 +1065,142 @@ class Network(object):
         conn['probability'] = probability
 
         self.connectivity.append(deepcopy(conn))
+
+    def pick_connection(self, src_gids=None, target_gids=None,
+                        loc=None, receptor=None):
+        """Returns indices of connections that match search parameters.
+
+        Parameters
+        ----------
+        src_gids : str | int | range | list of int | None
+            Identifier for source cells. Passing str arguments
+            ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
+            equivalent to passing a list of gids for the relvant cell type.
+            source - target connections are made in an all-to-all pattern.
+        target_gids : str | int | range | list of int | None
+            Identifer for targets of source cells. Passing str arguments
+            ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
+            equivalent to passing a list of gids for the relvant cell type.
+            source - target connections are made in an all-to-all pattern.
+        loc : str | list of str | None
+            Location of synapse on target cell. Must be
+            'proximal', 'distal', or 'soma'. Note that inhibitory synapses
+            (receptor='gabaa' or 'gabab') of L2 pyramidal neurons are only
+            valid loc='soma'.
+        receptor : str | list of str | None
+            Synaptic receptor of connection. Must be one of:
+            'ampa', 'nmda', 'gabaa', or 'gabab'.
+
+        Returns
+        -------
+        conn_indices : list of int
+            List of indices corresponding to items in net.connectivity.
+            Connecion indices are added if any of the provided parameter
+            values are present in a connection.
+        """
+
+        _validate_type(src_gids, (int, list, range, str, None), 'src_gids',
+                       'int list, range, str, or None')
+        _validate_type(target_gids, (int, list, range, str, None),
+                       'target_gids', 'int list, range or str')
+        _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
+        _validate_type(receptor, (str, list, None), 'receptor',
+                       'str, list, or None')
+
+        valid_cells = [
+            'L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket']
+        valid_loc = ['proximal', 'distal', 'soma']
+        valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
+
+        # Convert src_gids to list
+        if src_gids is None:
+            src_gids = list()
+        elif isinstance(src_gids, int):
+            src_gids = [src_gids]
+        elif isinstance(src_gids, str):
+            _check_option('src_gids', src_gids, valid_cells)
+            src_gids = self.gid_ranges[_long_name(src_gids)]
+        for src_gid in src_gids:
+            _validate_type(src_gid, int, 'src_gid')
+            gid_type = self.gid_to_type(src_gid)
+            if gid_type is None:
+                raise AssertionError(
+                    f'src_gid {src_gid} not in net.gid_ranges')
+
+        # Convert target_gids to list
+        if target_gids is None:
+            target_gids = list()
+        elif isinstance(src_gids, int):
+            src_gids = [src_gids]
+        elif isinstance(src_gids, str):
+            _check_option('src_gids', src_gids, valid_cells)
+            src_gids = self.gid_ranges[_long_name(src_gids)]
+        for target_gid in target_gids:
+            _validate_type(target_gid, int, 'target_gid')
+            gid_type = self.gid_to_type(target_gid)
+            if gid_type is None:
+                raise AssertionError(
+                    f'target_gid {src_gid} not in net.gid_ranges')
+
+        # Convert loc to list
+        if loc is None:
+            loc = list()
+        elif isinstance(loc, str):
+            loc = [loc]
+        for loc_item in loc:
+            _check_option('loc', loc_item, valid_loc)
+
+        # Convert receptor to list
+        if receptor is None:
+            receptor = list()
+        elif isinstance(receptor, str):
+            receptor = [receptor]
+        for receptor_item in receptor:
+            _check_option('receptor', receptor_item, valid_receptor)
+
+        # Create lookup dictionaries
+        src_dict, target_dict = dict(), dict()
+        loc_dict, receptor_dict = dict(), dict()
+        for conn_idx, conn in enumerate(self.connectivity):
+            # Store connections matching each src_gid
+            for src_gid in conn['src_gids']:
+                if src_gid in src_dict:
+                    src_dict[src_gid].append(conn_idx)
+                else:
+                    src_dict[src_gid] = [conn_idx]
+            # Store connections matching each target_gid
+            for target_gid in conn['target_gids']:
+                if target_gid in target_dict:
+                    target_dict[target_gid].append(conn_idx)
+                else:
+                    target_dict[target_gid] = [conn_idx]
+            # Store connections matching each location
+            if conn['loc'] in loc_dict:
+                loc_dict[conn['loc']].append(conn_idx)
+            else:
+                loc_dict[conn['loc']] = [conn_idx]
+            # Store connections matching each receptor
+            if conn['receptor'] in receptor_dict:
+                receptor_dict[conn['receptor']].append(conn_idx)
+            else:
+                receptor_dict[conn['receptor']] = [conn_idx]
+
+        # Look up conn indeces that match search terms and add to set.
+        conn_set = set()
+        search_pairs = [(src_gids, src_dict), (target_gids, target_dict),
+                        (loc, loc_dict), (receptor, receptor_dict)]
+        for search_terms, search_dict in search_pairs:
+            inner_set = set()
+            # Union of indices which match inputs for single parameter
+            for term in search_terms:
+                inner_set = inner_set.union(search_dict[term])
+            # Intersection across parameters
+            if conn_set:
+                conn_set = conn_set.intersection(inner_set)
+            else:
+                conn_set = conn_set.union(inner_set)
+
+        return list(conn_set)
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity
@@ -1161,10 +1297,10 @@ class _Connectivity(dict):
         Number of unique source gids.
     num_targets : int
         Number of unique target gids.
-    src_range : range
-        Range of gids identified by src_type.
-    target_range : range
-        Range of gids identified by target_type.
+    src_gids : list of int
+        List of unique source gids in connection.
+    target_gidst : list of int
+        List of unique target gids in connection.
     loc : str
         Location of synapse on target cell. Must be
         'proximal', 'distal', or 'soma'. Note that inhibitory synapses
