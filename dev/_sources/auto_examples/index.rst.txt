@@ -158,6 +158,27 @@ Some introductory examples to get started with hnn-core
    :hidden:
 
    /auto_examples/plot_simulate_mpi_backend
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular curren...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
+     :alt: 08. Record extracellular potentials
+
+     :ref:`sphx_glr_auto_examples_plot_record_extracellular_potentials.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_record_extracellular_potentials
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

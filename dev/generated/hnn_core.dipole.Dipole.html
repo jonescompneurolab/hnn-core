@@ -187,7 +187,7 @@ to 1</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.dipole.Dipole.copy" title="hnn_core.dipole.Dipole.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return a copy of the Dipole instance</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.dipole.Dipole.plot" title="hnn_core.dipole.Dipole.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([tmin, tmax, layer, decim, ax, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.dipole.Dipole.plot" title="hnn_core.dipole.Dipole.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([tmin, tmax, layer, decim, ax, color, show])</p></td>
 <td><p>Simple layer-specific plot function.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.dipole.Dipole.plot_psd" title="hnn_core.dipole.Dipole.plot_psd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_psd</span></code></a>([fmin, fmax, tmin, tmax, layer, …])</p></td>
@@ -226,7 +226,7 @@ to 1</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.dipole.Dipole.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.plot" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hnn_core.dipole.Dipole.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple layer-specific plot function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -240,6 +240,8 @@ to 1</p>
 <dt><strong>decimate</strong><span class="classifier">int</span></dt><dd><p>Factor by which to decimate the raw dipole traces (optional)</p>
 </dd>
 <dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis</p>
+</dd>
+<dt><strong>color</strong><span class="classifier">tuple of float</span></dt><dd><p>RGBA value to use for plotting (optional)</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
 </dd>
