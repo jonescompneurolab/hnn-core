@@ -44,6 +44,7 @@ release = ''
 # ones.
 extensions = [
     'sphinx_gallery.gen_gallery',
+    'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
