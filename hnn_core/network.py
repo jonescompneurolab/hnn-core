@@ -1170,11 +1170,11 @@ class Network(object):
         # Convert target_gids to list
         if target_gids is None:
             target_gids = list()
-        elif isinstance(src_gids, int):
-            src_gids = [src_gids]
-        elif isinstance(src_gids, str):
-            _check_option('src_gids', src_gids, valid_cells)
-            src_gids = self.gid_ranges[_long_name(src_gids)]
+        elif isinstance(target_gids, int):
+            target_gids = [target_gids]
+        elif isinstance(target_gids, str):
+            _check_option('target_gids', target_gids, valid_cells)
+            target_gids = self.gid_ranges[_long_name(target_gids)]
         for target_gid in target_gids:
             _validate_type(target_gid, int, 'target_gid')
             gid_type = self.gid_to_type(target_gid)
@@ -1235,12 +1235,16 @@ class Network(object):
             for term in search_terms:
                 inner_set = inner_set.union(search_dict[term])
             # Intersection across parameters
-            if conn_set:
+            if conn_set and inner_set:
                 conn_set = conn_set.intersection(inner_set)
+                if not conn_set:  # Exit if both are non empty disjoint sets
+                    break
             else:
                 conn_set = conn_set.union(inner_set)
 
-        return list(conn_set)
+        conn_set = list(conn_set)
+        conn_set.sort()
+        return conn_set
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity
