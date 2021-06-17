@@ -53,8 +53,13 @@ print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
 gid_idx = 11
+<<<<<<< HEAD:examples/howto/plot_connectivity.py
 src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
 fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
+=======
+src_gid = net_erp.connectivity[conn_idx]['src_gids'][gid_idx]
+fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
+>>>>>>> Fix conn attribute:examples/plot_connectivity.py
 
 ###############################################################################
 # Data recorded during simulations are stored under
@@ -119,11 +124,11 @@ net_sparse.cell_response.plot_spikes_raster()
 # Get index of most recently added connection, and a src_gid in src_range.
 gid_idx = 5
 conn_idx = net_sparse.pick_connection(src_gids='L2_basket')[-1]
-src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+src_gid = net_sparse.connectivity[conn_idx]['src_gids'][gid_idx]
 plot_connectivity_matrix(net_sparse, conn_idx)
 
 conn_idx -= 1
-src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+src_gid = net_sparse.connectivity[conn_idx]['src_gids'][gid_idx]
 plot_connectivity_matrix(net_sparse, conn_idx)
 
 ###############################################################################
