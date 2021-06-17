@@ -789,14 +789,14 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
     src_type_pos = net.pos_dict[src_type]
     target_type_pos = net.pos_dict[target_type]
 
-    src_range = np.array(conn['src_range'])
-    target_range = np.array(conn['target_range'])
+    src_range = np.array(net.gid_ranges[conn['src_type']])
+    target_range = np.array(net.gid_ranges[conn['target_type']])
     connectivity_matrix = np.zeros((len(src_range), len(target_range)))
 
     for src_gid, target_src_pair in conn['gid_pairs'].items():
         src_idx = np.where(src_range == src_gid)[0][0]
-        target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
-        for target_idx in target_indeces:
+        target_indices = np.where(np.in1d(target_range, target_src_pair))[0]
+        for target_idx in target_indices:
             src_pos = src_type_pos[src_idx]
             target_pos = target_type_pos[target_idx]
 
@@ -924,22 +924,38 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     nc_dict = conn['nc_dict']
     src_type = conn['src_type']
     target_type = conn['target_type']
-    src_type_pos = np.array(net.pos_dict[src_type])
-    target_type_pos = np.array(net.pos_dict[target_type])
-    src_range = np.array(conn['src_range'])
+    src_type_pos = net.pos_dict[src_type]
+    target_type_pos = net.pos_dict[target_type]
 
-    valid_src_gids = list(net.connectivity[conn_idx]['gid_pairs'].keys())
-    src_pos_valid = src_type_pos[np.in1d(src_range, valid_src_gids)]
+    src_range = np.array(net.gid_ranges[conn['src_type']])
+    if src_gid not in src_range:
+        raise ValueError(f'src_gid not in the src type range of {src_type} '
+                         f'gids. Valid gids include {src_range[0]} -> '
+                         f'{src_range[-1]}')
 
-    if src_gid is None:
-        src_gid = valid_src_gids[0]
-    _validate_type(src_gid, int, 'src_gid', 'int')
+    target_range = np.array(net.gid_ranges[conn['target_type']])
+
+    # Extract indices to get position in network
+    # Index in gid range aligns with net.pos_dict
+    target_src_pair = conn['gid_pairs'][src_gid]
+    target_indices = np.where(np.in1d(target_range, target_src_pair))[0]
 
     if src_gid not in valid_src_gids:
         raise ValueError(f'src_gid {src_gid} not a valid cell ID for this '
                          f'connection. Please select one of {valid_src_gids}')
 
+<<<<<<< HEAD
     target_range = np.array(conn['target_range'])
+=======
+    # Aggregate positions and weight of each connected target
+    weights, target_x_pos, target_y_pos = list(), list(), list()
+    for target_idx in target_indices:
+        target_pos = target_type_pos[target_idx]
+        target_x_pos.append(target_pos[0])
+        target_y_pos.append(target_pos[1])
+        weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
+        weights.append(weight)
+>>>>>>> Look up range from net in viz.py
 
     if axes is None:
         if src_type in net.cell_types:
