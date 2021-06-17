@@ -1125,6 +1125,18 @@ class Network(object):
             List of indices corresponding to items in net.connectivity.
             Connecion indices are added if any of the provided parameter
             values are present in a connection.
+
+        Notes
+        -----
+        Passing a list of values to a single parameter corresponds to a
+        logical OR operation across indices. For example,
+        loc=['distal', 'proximal'] returns all connections that target
+        distal or proximal dendrites.
+
+        Passing  multiple parameters corresponds to a logical AND operation.
+        For example, net.pick_connection(loc='distal', receptor='ampa')
+        returns only the indices of connections that target the distal
+        dendrites and have ampa receptors.
         """
 
         _validate_type(src_gids, (int, list, range, str, None), 'src_gids',
