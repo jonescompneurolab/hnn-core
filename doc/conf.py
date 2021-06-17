@@ -105,7 +105,7 @@ html_theme_options = {
         ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True),
         ("Roadmap", "roadmap")
     ],
-    'bootswatch_theme': "united"
+    'bootswatch_theme': "yeti"
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
