@@ -296,25 +296,28 @@ def test_network():
         net.add_connection(**kwargs)
 
     # Test net.pick_connection
-    kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
+    kwargs_default = dict(src_gids=[0, 1], target_gids=[0, 1],
                           loc=['soma', 'distal'], receptor=['ampa', 'gabaa'])
+    # List of tuples with (arg, item, correct_indices)
     kwargs_good = [
-        ('src_gids', 0, []),
-        ('src_gids', 'L2_pyramidal', []),
-        ('src_gids', range(2), []),
-        ('src_gids', None, [])
-        ('target_gids', 35, []),
-        ('target_gids', range(2), []),
-        ('target_gids', 'L2_pyramidal'),
-        ('target_gids', None, []),
-        ('loc', 'proximal', []),
-        ('loc', None, []),
-        ('receptor', 'nmda', []),
-        ('loc', None, [])]
+        ('src_gids', 0, [30, 39]),
+        ('src_gids', 'L2_pyramidal', [29]),
+        ('src_gids', range(2), [30, 39]),
+        ('src_gids', None, [4, 29, 30, 39]),
+        ('target_gids', 35, [22, 34, 35, 37, 38, 40, 41, 42, 43, 44]),
+        ('target_gids', range(2), [30, 39]),
+        ('target_gids', 'L2_pyramidal',
+         [22, 34, 35, 37, 38, 40, 41, 42, 43, 44]),
+        ('target_gids', None,
+         [22, 28, 30, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44]),
+        ('loc', 'soma', [30, 39]),
+        ('loc', None, [30, 39]),
+        ('receptor', 'gabaa', [30, 39]),
+        ('receptor', None, [30, 39])]
     for arg, item, indices in kwargs_good:
         kwargs = kwargs_default.copy()
         kwargs[arg] = item
-        net.add_connection(**kwargs)
+        assert indices == net.pick_connection(**kwargs)
 
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
