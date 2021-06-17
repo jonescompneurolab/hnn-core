@@ -40,12 +40,15 @@ net_erp = jones_2009_model(params, add_drives_from_params=True)
 # is a list of dictionaries which detail every cell-cell, and drive-cell
 # connection. The weights of these connections can be visualized with
 # :func:`~hnn_core.viz.plot_connectivity_weights` as well as
-# :func:`~hnn_core.viz.plot_cell_connectivity`
+# :func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
+# connections using ``net.pick_connection`` which returns the indices
+# of ``net.connectivity`` that match the provided parameters.
 from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 
 print(len(net_erp.connectivity))
 
-conn_idx = 6
+conn_idx = net_erp.pick_connection(
+    src_gids='L5_pyramidal', target_gids='L5_pyramidal', receptor='nmda')[0]
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
@@ -113,12 +116,14 @@ dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
 net_all.cell_response.plot_spikes_raster()
 net_sparse.cell_response.plot_spikes_raster()
 
-###############################################################################
-# We can plot the sparse connectivity pattern between cell populations.
-conn_idx = len(net_sparse.connectivity) - 1
+# Get index of most recently added connection, and a src_gid in src_range.
+gid_idx = 5
+conn_idx = net_sparse.pick_connection(src_gids='L2_basket')[-1]
+src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
 plot_connectivity_matrix(net_sparse, conn_idx)
 
-conn_idx = len(net_sparse.connectivity) - 2
+conn_idx -= 1
+src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
 plot_connectivity_matrix(net_sparse, conn_idx)
 
 ###############################################################################
