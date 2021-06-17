@@ -1119,8 +1119,8 @@ class Network(object):
         _validate_type(receptor, (str, list, None), 'receptor',
                        'str, list, or None')
 
-        valid_cells = [
-            'L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket']
+        valid_srcs = list(self.gid_ranges.keys())  # includes drives as srcs
+        valid_targets = list(self.cell_types.keys())
         valid_loc = ['proximal', 'distal', 'soma']
         valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
 
@@ -1130,7 +1130,7 @@ class Network(object):
         elif isinstance(src_gids, int):
             src_gids = [src_gids]
         elif isinstance(src_gids, str):
-            _check_option('src_gids', src_gids, valid_cells)
+            _check_option('src_gids', src_gids, valid_srcs)
             src_gids = self.gid_ranges[_long_name(src_gids)]
         for src_gid in src_gids:
             _validate_type(src_gid, int, 'src_gid')
@@ -1145,7 +1145,7 @@ class Network(object):
         elif isinstance(target_gids, int):
             target_gids = [target_gids]
         elif isinstance(target_gids, str):
-            _check_option('target_gids', target_gids, valid_cells)
+            _check_option('target_gids', target_gids, valid_targets)
             target_gids = self.gid_ranges[_long_name(target_gids)]
         for target_gid in target_gids:
             _validate_type(target_gid, int, 'target_gid')
@@ -1210,6 +1210,8 @@ class Network(object):
             if conn_set and inner_set:
                 conn_set = conn_set.intersection(inner_set)
                 if not conn_set:  # Exit if both are non empty disjoint sets
+                    raise Warning('No connections match search parameters.'
+                                  'Try changing or excluding parameters.')
                     break
             else:
                 conn_set = conn_set.union(inner_set)

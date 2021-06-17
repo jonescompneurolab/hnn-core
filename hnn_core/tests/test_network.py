@@ -295,9 +295,10 @@ def test_network():
         kwargs['probability'] = -1.0
         net.add_connection(**kwargs)
 
-    # Test net.pick_connection
+    # Test net.pick_connection()
     kwargs_default = dict(src_gids=[0, 1], target_gids=[0, 1],
                           loc=['soma', 'distal'], receptor=['ampa', 'gabaa'])
+
     # List of tuples with (arg, item, correct_indices)
     kwargs_good = [
         ('src_gids', 0, [30, 39]),
@@ -318,6 +319,40 @@ def test_network():
         kwargs = kwargs_default.copy()
         kwargs[arg] = item
         assert indices == net.pick_connection(**kwargs)
+
+    # Check condition where not connections match
+    with pytest.raises(Warning, match='No connections match search'):
+        net.pick_connection(loc='distal', receptor='gabab')
+
+    kwargs_bad = [
+        ('src_gids', 0.0), ('src_gids', [0.0]),
+        ('target_gids', 35.0), ('target_gids', [35.0]),
+        ('target_gids', [35, [36.0]]), ('loc', 1.0),
+        ('receptor', 1.0)]
+    for arg, item in kwargs_bad:
+        match = ('must be an instance of')
+        with pytest.raises(TypeError, match=match):
+            kwargs = kwargs_default.copy()
+            kwargs[arg] = item
+            net.pick_connection(**kwargs)
+
+    kwargs_bad = [
+        ('src_gids', -1), ('src_gids', [-1]),
+        ('target_gids', -1), ('target_gids', [-1]),
+        ('src_gids', [35, -1]), ('target_gids', [35, -1])]
+    for arg, item in kwargs_bad:
+        with pytest.raises(AssertionError):
+            kwargs = kwargs_default.copy()
+            kwargs[arg] = item
+            net.pick_connection(**kwargs)
+
+    for arg in ['src_gids', 'target_gids', 'loc', 'receptor']:
+        string_arg = 'invalid_string'
+        match = f"Invalid value for the '{arg}' parameter"
+        with pytest.raises(ValueError, match=match):
+            kwargs = kwargs_default.copy()
+            kwargs[arg] = string_arg
+            net.pick_connection(**kwargs)
 
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
