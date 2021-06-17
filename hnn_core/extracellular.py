@@ -156,7 +156,7 @@ class ExtracellularArray:
     Note that to add an electrode array to a simulation, you should use the
     :meth:`hnn_core.Network.add_electrode_array`-method. After simulation,
     the network will contain a dictionary of `ExtracellularArray`-objects
-    in ``net.rec_array`` (each array must be added with a unique name). An
+    in ``net.rec_arrays`` (each array must be added with a unique name). An
     `ExtracellularArray` contains the voltages at each electrode contact,
     along with the time points at which the voltages were sampled.
 
