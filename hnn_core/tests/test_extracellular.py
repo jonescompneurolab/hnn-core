@@ -15,17 +15,19 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from hnn_core.parallel_backends import MPIBackend
 
 
+hnn_core_root = op.dirname(hnn_core.__file__)
+params_fname = op.join(hnn_core_root, 'param', 'default.json')
+params = read_params(params_fname)
+
+
 def test_extracellular_api():
     """Test extracellular recording API."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
     net = default_network(deepcopy(params), add_drives_from_params=True)
 
     # Test LFP electrodes
-    electrode_pos = (2, 400, 2)
+    electrode_pos = (1, 2, 3)
     net.add_electrode_array('el1', electrode_pos)
-    electrode_pos = [(2, 400, 2), (6, 800, 6)]
+    electrode_pos = [(1, 2, 3), (-1, -2, -3)]
     net.add_electrode_array('arr1', electrode_pos)
     assert len(net.rec_arrays) == 2
     assert len(net.rec_arrays['arr1'].positions) == 2
@@ -45,28 +47,27 @@ def test_extracellular_api():
         _ = rec_arr[42]
 
     # positions are 3-tuples
-    for bogus_pos in [[(2, 2), (6, 6, 800)], [42, (6, 6, 800)]]:
+    bad_positions = [[(1, 2), (1, 2, 3)], [42, (1, 2, 3)]]
+    for bogus_pos in bad_positions:
         pytest.raises((ValueError, TypeError), ExtracellularArray, bogus_pos)
 
+    good_positions = [(1, 2, 3), (100, 200, 300)]
     for cond in ['0.3', [0.3], -1]:  # conductivity is positive float
         pytest.raises((TypeError, AssertionError), ExtracellularArray,
-                      [(2, 2, 2), (6, 6, 800)], conductivity=cond)
+                      good_positions, conductivity=cond)
     for meth in ['foo', 0.3]:  # method is 'psa' or 'lsa' (or None for test)
         pytest.raises((TypeError, AssertionError, ValueError),
-                      ExtracellularArray, [(2, 2, 2), (6, 6, 800)],
-                      method=meth)
+                      ExtracellularArray, good_positions, method=meth)
     for mind in ['foo', -1, None]:  # minimum distance to segment boundary
         pytest.raises((TypeError, AssertionError), ExtracellularArray,
-                      [(2, 2, 2), (6, 6, 800)], min_distance=mind)
+                      good_positions, min_distance=mind)
 
     pytest.raises(ValueError, ExtracellularArray,  # more chans than voltages
-                  [(2, 2, 2), (6, 6, 800)],
-                  times=[1], voltages=[[[42]]])
+                  good_positions, times=[1], voltages=[[[42]]])
     pytest.raises(ValueError, ExtracellularArray,  # less times than voltages
-                  [(2, 2, 2), (6, 6, 800)],
-                  times=[1], voltages=[[[42, 42], [84, 84]]])
+                  good_positions, times=[1], voltages=[[[42, 42], [84, 84]]])
 
-    rec_arr = ExtracellularArray(electrode_pos,
+    rec_arr = ExtracellularArray(good_positions,
                                  times=[0, 0.1, 0.21, 0.3],  # uneven sampling
                                  voltages=[[[0, 0, 0, 0], [0, 0, 0, 0]]])
     with pytest.raises(RuntimeError, match="Extracellular sampling times"):
@@ -74,7 +75,7 @@ def test_extracellular_api():
     rec_arr._reset()
     assert len(rec_arr.times) == len(rec_arr.voltages) == 0
     assert rec_arr.sfreq is None
-    rec_arr = ExtracellularArray(electrode_pos,
+    rec_arr = ExtracellularArray(good_positions,
                                  times=[0], voltages=[[[0], [0]]])
     with pytest.raises(RuntimeError, match="Sampling rate is not defined"):
         _ = rec_arr.sfreq
@@ -82,9 +83,6 @@ def test_extracellular_api():
 
 def test_transmembrane_currents():
     """Test that net transmembrane current is zero at all times."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    'tstop': 40,
@@ -145,7 +143,7 @@ def test_transfer_resistance():
 
     for method in ['psa', 'lsa']:
         res = _transfer_resistance(sec, elec_pos, conductivity, method)
-        assert_allclose(res, target_vals[method])
+        assert_allclose(res, target_vals[method], rtol=1e-12, atol=0.)
 
 
 @requires_mpi4py
@@ -198,9 +196,6 @@ def _mathematical_dipole(e_pos, d_pos, d_Q):
 @requires_mpi4py
 def test_dipolar_far_field():
     """Test that LFP in the far field is dipolar when expected."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    'tstop': 25,
