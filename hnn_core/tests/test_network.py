@@ -295,6 +295,27 @@ def test_network():
         kwargs['probability'] = -1.0
         net.add_connection(**kwargs)
 
+    # Test net.pick_connection
+    kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
+                          loc=['soma', 'distal'], receptor=['ampa', 'gabaa'])
+    kwargs_good = [
+        ('src_gids', 0, []),
+        ('src_gids', 'L2_pyramidal', []),
+        ('src_gids', range(2), []),
+        ('src_gids', None, [])
+        ('target_gids', 35, []),
+        ('target_gids', range(2), []),
+        ('target_gids', 'L2_pyramidal'),
+        ('target_gids', None, []),
+        ('loc', 'proximal', []),
+        ('loc', None, []),
+        ('receptor', 'nmda', []),
+        ('loc', None, [])]
+    for arg, item, indices in kwargs_good:
+        kwargs = kwargs_default.copy()
+        kwargs[arg] = item
+        net.add_connection(**kwargs)
+
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
