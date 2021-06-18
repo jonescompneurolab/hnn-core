@@ -764,136 +764,36 @@ class Network(object):
         drive['target_types'] = target_populations  # for _connect_celltypes
         drive['cell_specific'] = cell_specific
 
-        drive['conn'], src_gid_ran = self._create_drive_conns(
-            target_populations, weights_by_receptor, location,
-            space_constant, synaptic_delays, n_drive_cells,
-            cell_specific)
+        if cell_specific:
+            n_drive_cells = 0
+            for cell_type in target_populations:
+                n_drive_cells += len(self.gid_ranges[cell_type])
 
-        drive['n_drive_cells'] = len(src_gid_ran)
+        drive['n_drive_cells'] = n_drive_cells
         self.external_drives[name] = drive
 
-        pos = [self.pos_dict['origin'] for _ in src_gid_ran]
+        pos = [self.pos_dict['origin'] for _ in n_drive_cells]
         self._add_cell_type(name, pos)
 
         receptors = ['ampa', 'nmda']
         if drive['type'] == 'gaussian':
             receptors = ['ampa']
 
-        src_range = self.gid_ranges[_long_name(drive['name'])]
-        # conn-parameters are for each target cell type
-        for target_cell, drive_conn in drive['conn'].items():
-            target_range = self.gid_ranges[_long_name(target_cell)]
-            for receptor in receptors:
-                if len(drive_conn[receptor]) > 0:
-                    if drive['cell_specific']:
-                        src_gids = drive_conn['src_gids']
-                        target_gids = [[target_gid] for
-                                       target_gid in target_range]
-                    else:
-                        src_gids = list(src_range)
-                        target_gids = list(target_range)
-                    self.add_connection(
-                        src_gids, target_gids, drive_conn['location'],
-                        receptor, drive_conn[receptor]['A_weight'],
-                        drive_conn[receptor]['A_delay'],
-                        drive_conn[receptor]['lamtha'])
-
-    def _create_drive_conns(self, target_populations, weights_by_receptor,
-                            location, space_constant, synaptic_delays,
-                            n_drive_cells, cell_specific):
-        """Create parameter dictionary defining how drive connects to network
-
-        Parameters
-        ----------
-        target_populations : list
-            Cell names/types to attach the drive to
-        weights_by_receptor : dict (keys: 'ampa' and 'nmda')
-            Synaptic weights (in uS) for each receptor type
-        location : str
-            Target location of synapses ('distal' or 'proximal')
-        space_constant : float
-            Describes lateral dispersion (from column origin) of synaptic
-            weights and delays within the simulated column
-        synaptic_delays : dict or float
-            Synaptic delay (in ms) at the column origin, dispersed laterally as
-            a function of the space_constant
-        n_drive_cells : int
-            The number of drive cells (i.e., ArtificialCell objects) that
-            contribute to this drive. If you wish to synchronize the timing of
-            this evoked drive across the network in a given trial with one
-            spike, set n_drive_cells=1 and cell_specific=False.
-        cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
-            (False) connection parameters. Note that 1-to-1 connectivity
-            requires that n_drive_cells equals the number of cells that this
-            drive targets in the network.
-
-        Returns
-        -------
-        drive_conn_by_cell : dict
-            Keys are target_populations, each item is itself a dict with keys
-            relevant to how the drive connects to the rest of the network.
-        src_gid_ran : range
-            For convenience, return back the range of GIDs associated with
-            all the driving units (they become _ArtificialCells later)
-
-        Note
-        ----
-        drive_conn : dict
-            'target_gids': range of target cell GIDs
-            'target_type': target cell type (e.g. 'L2_basket')
-            'src_gids': range of source (artificial) cell GIDs
-            'location': 'distal' or 'proximal'
-            'ampa' and 'nmda': dict
-                'A_weight': synaptic weight
-                'A_delay':  synaptic delay (used with space constant)
-                'lamtha': space constant
-        """
-        drive_conn_by_cell = dict()
-        src_gid_curr = self._n_gids
-
-        if cell_specific:
-            for cellname in target_populations:
-                drive_conn = dict()  # NB created inside target_pop-loop
-                drive_conn['location'] = location
-                drive_conn['target_gids'] = self.gid_ranges[cellname]
-                # NB list! This is used later in _parnet_connect
-                drive_conn['target_type'] = cellname
-                drive_conn['src_gids'] = range(
-                    src_gid_curr,
-                    src_gid_curr + len(drive_conn['target_gids']))
-                src_gid_curr += len(drive_conn['target_gids'])
-                drive_conn_by_cell[cellname] = drive_conn
-        else:
-            drive_conn = dict()
-            drive_conn['location'] = location
-
-            # NB list! This is used later in _parnet_connect
-            drive_conn['src_gids'] = range(src_gid_curr,
-                                           src_gid_curr + n_drive_cells)
-            src_gid_curr += n_drive_cells
-            drive_conn['target_gids'] = list()  # fill in below
-            for cellname in target_populations:
-                drive_conn['target_gids'] = self.gid_ranges[cellname]
-                drive_conn['target_type'] = cellname
-                drive_conn_by_cell[cellname] = drive_conn.copy()
-
-        for cellname in target_populations:
-            for receptor, weights in weights_by_receptor.items():
-                drive_conn_by_cell[cellname][receptor] = dict()
-                if cellname in weights:
-                    drive_conn_by_cell[cellname][receptor][
-                        'lamtha'] = space_constant
-                    if isinstance(synaptic_delays, float):
-                        drive_conn_by_cell[cellname][receptor][
-                            'A_delay'] = synaptic_delays
-                    elif isinstance(synaptic_delays, dict):
-                        drive_conn_by_cell[cellname][receptor][
-                            'A_delay'] = synaptic_delays[cellname]
-                    drive_conn_by_cell[cellname][receptor][
-                        'A_weight'] = weights[cellname]
-
-        return drive_conn_by_cell, range(self._n_gids, src_gid_curr)
+        for receptor in receptors:
+            for target_cell_type in weights_by_receptor[receptor]:
+                target_gids = list(self.gid_ranges[target_cell_type])
+                if drive['cell_specific']:
+                    gid_idxs = np.array(target_gids) - target_gids[0]
+                    src_gids_list = (list(self.gid_ranges[name])
+                                     [gid_idxs[0]:gid_idxs[-1]])
+                    src_gids = [[src_gid] for src_gid in src_gids_list]
+                    target_gids = [[target_gid] for target_gid in target_gids]
+                else:
+                    src_gids = list(self.gid_ranges[name])
+                weights = weights_by_receptor[receptor][target_cell_type]
+                delays = synaptic_delays[target_cell_type]
+                self.add_connection(name, src_gids, target_gids, location,
+                                    receptor, weights, delays, space_constant)
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
@@ -1334,27 +1234,6 @@ class _NetworkDrive(dict):
         Parameters describing how the temporal dynamics of spike trains in the
         drive. The keys are specific to the type of drive ('evoked', 'bursty',
         etc.). See the drive add-methods in Network for details.
-    conn : dict
-        Parameters describing how the drive connects to the network.
-        Valid keys are 'L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal'
-        conn['L2_basket'] is a dict with the following keys:
-            'target_gids' : range
-                Range of target cell GIDs;
-            'target_type' : str
-                Target cell type (e.g. 'L2_basket');
-            'src_gids' : range
-                Source (artificial) cell GIDs;
-            'location' : str
-                Valid values are 'distal' or 'proximal'
-            'nmda' or 'ampa' : dict
-                Connectivity parameters for each receptor type
-                specifying the synaptic weights. Valid keys are:
-                    'A_weight': float
-                        Synaptic weight
-                    'A_delay': float
-                        Synaptic delay at d=0 (used with space constant)
-                    'lamtha': float
-                        Space constant
     """
 
     def __repr__(self):
