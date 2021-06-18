@@ -213,7 +213,7 @@ def law_model(params=None, add_drives_from_params=False):
     if params is None:
         params = read_params(params_fname)
 
-    params['tstop'] = 300.0
+    params['tstop'] = 600.0
     net = jones_2009_model(params)
 
     # Update biophysics (increase gabab duration of inhibition)
