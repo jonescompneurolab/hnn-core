@@ -113,9 +113,13 @@ def average_dipoles(dpls):
         average over the same components in the input list
     """
     # need at least one Dipole to get times
-    if len(dpls) < 2:
-        raise ValueError("Need at least two dipole object to compute an"
-                         " average")
+    if len(dpls) == 1:
+        print('Only one dipole passed in. '
+              'Consider at least two dipole objects to compute an average.')
+        return dpls[0]
+    elif not dpls:
+        raise ValueError("Need at least one dipole object to return a"
+                         " dipole")
 
     for dpl_idx, dpl in enumerate(dpls):
         if dpl.nave > 1:
