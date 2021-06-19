@@ -619,10 +619,7 @@ class Network(object):
             for receptor in receptors:
                 if len(drive_conn[receptor]) > 0:
                     if drive['cell_specific']:
-                        src_gids = self.gid_ranges[_long_name(drive['name'])]
-                        src_start = src_gids[0]  # Necessary for unique feeds
-                        src_gids = [src_gid + src_start for
-                                    src_gid in target_range]
+                        src_gids = drive_conn['src_gids']
                         target_gids = [[target_gid] for
                                        target_gid in target_range]
                     else:
