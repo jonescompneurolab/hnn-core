@@ -16,6 +16,8 @@ Simulation (:py:mod:`hnn_core`):
 
    simulate_dipole
    default_network
+   jones_2009_model
+   law_model
    Network
    Cell
    CellResponse

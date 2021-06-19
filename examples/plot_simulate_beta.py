@@ -108,7 +108,7 @@ dpls_beta = simulate_dipole(net_beta, postproc=False)
 # By inspecting the activity during the beta event, we can see that spiking
 # occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
 # and distal inputs. This spiking activity leads to sustained GABAb mediated
-# inhibition of the L5 pyrmaidal cells.
+# inhibition of the L2 and L5 pyrmaidal cells.
 import matplotlib.pyplot as plt
 dpls_beta_orig = dpls_beta[0].copy()
 dpls_beta_smooth = dpls_beta[0].smooth(45)
