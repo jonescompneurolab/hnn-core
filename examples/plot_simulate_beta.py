@@ -101,30 +101,32 @@ net_beta = net.copy()
 
 ###############################################################################
 # And finally we simulate.
-import matplotlib.pyplot as plt
 dpls_erp = simulate_dipole(net_erp, postproc=False)
-dpls_beta = simulate_dipole(net_erp, postproc=False)
+dpls_beta = simulate_dipole(net_beta, postproc=False)
 
 ###############################################################################
 # By inspecting the activity during the beta event, we can see that spiking
 # occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
 # and distal inputs. This spiking activity leads to sustained GABAb mediated
 # inhibition of the L5 pyrmaidal cells.
+import matplotlib.pyplot as plt
 dpls_beta_orig = dpls_beta[0].copy()
 dpls_beta_smooth = dpls_beta[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(10, 10),
                          constrained_layout=True)
 plot_dipole(dpls_beta_orig, ax=axes[0], layer='agg', tmin=1.0, show=False)
 plot_dipole(dpls_beta_smooth, ax=axes[0], layer='agg', tmin=1.0, show=False)
-net.cell_response.plot_spikes_hist(ax=axes[1], show=False)
-net.cell_response.plot_spikes_raster(ax=axes[2], show=False)
+net_beta.cell_response.plot_spikes_hist(ax=axes[1], show=False)
+net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
+axes[0].legend(['Original', 'Smoothed'])
 
 ###############################################################################
 # One effect of this inhibition is an assymetric beta event with a long
 # positive tail. The sustained inhibition of the network ultimately depressing
 # the sensory response which is assoicated with a reduced ERP amplitude
 dpls_erp_smooth = dpls_erp[0].smooth(45)
-fig, axes = plt.subplots(1, 1, sharex=True, figsize=(6, 6),
-                         constrained_layout=True)
-plot_dipole(dpls_beta_smooth, ax=axes[0], layer='agg', tmin=1.0, show=False)
-plot_dipole(dpls_erp_smooth, ax=axes[0], layer='agg', tmin=1.0, show=False)
+fig, ax = plt.subplots(1, 1, sharex=True, figsize=(8, 4),
+                       constrained_layout=True)
+plot_dipole(dpls_beta_smooth, ax=ax, layer='agg', tmin=1.0, show=False)
+plot_dipole(dpls_erp_smooth, ax=ax, layer='agg', tmin=1.0, show=False)
+ax.legend(['ERP + Beta', 'ERP'])
