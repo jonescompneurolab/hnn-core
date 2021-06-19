@@ -23,7 +23,8 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4,
+                        inplane_distance=1.):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -37,6 +38,8 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
         Expressed as a positive DEPTH of L2 relative to L5, where L5 is defined
         to lie at z==0. Interlaminar weight/delay calculations (lamtha) are not
         affected.
+    inplane_distance : float
+        The grid spacing in um
 
     Returns
     -------
@@ -53,8 +56,8 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     pos_dict = dict()
 
     # PYRAMIDAL CELLS
-    xxrange = np.arange(n_pyr_x)
-    yyrange = np.arange(n_pyr_y)
+    xxrange = np.arange(n_pyr_x) * inplane_distance
+    yyrange = np.arange(n_pyr_y) * inplane_distance
 
     pos_dict['L5_pyramidal'] = [
         pos for pos in it.product(xxrange, yyrange, [0])]
@@ -62,11 +65,11 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
         pos for pos in it.product(xxrange, yyrange, [zdiff])]
 
     # BASKET CELLS
-    xzero = np.arange(0, n_pyr_x, 3)
-    xone = np.arange(1, n_pyr_x, 3)
+    xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
+    xone = np.arange(1, n_pyr_x, 3) * inplane_distance
     # split even and odd y vals
-    yeven = np.arange(0, n_pyr_y, 2)
-    yodd = np.arange(1, n_pyr_y, 2)
+    yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
+    yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
     # create general list of x,y coords and sort it
     coords = [pos for pos in it.product(
         xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
@@ -92,6 +95,148 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
     pos_dict['origin'] = origin
 
     return pos_dict
+
+
+def default_network(params, add_drives_from_params=False,
+                    inplane_distance=1.):
+    """Instantiate the default all-to-all connected network.
+
+    Parameters
+    ----------
+    params : dict
+        The parameters to use for constructing the network.
+    add_drives_from_params : bool
+        If True, add drives as defined in the params-dict. NB this is mainly
+        for backward-compatibility with HNN GUI, and will be deprecated in a
+        future release. Default: False
+    inplane_distance : float
+        The in plane-distance (in um) between pyramidal cell somas in the
+        square grid. Note that this parameter does not affect the amplitude of
+        the dipole moment. Default: 1.0 um
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object used to store the default network.
+        All connections defining the default network will be
+        appeneded to net.connectivity.
+    """
+
+    net = Network(params, add_drives_from_params=add_drives_from_params,
+                  inplane_distance=inplane_distance)
+
+    nc_dict = {
+        'A_delay': net.delay,
+        'threshold': net.threshold,
+    }
+
+    # source of synapse is always at soma
+
+    # layer2 Pyr -> layer2 Pyr
+    # layer5 Pyr -> layer5 Pyr
+    nc_dict['lamtha'] = 3. * inplane_distance
+    loc = 'proximal'
+    for target_cell in ['L2Pyr', 'L5Pyr']:
+        for receptor in ['nmda', 'ampa']:
+            key = f'gbar_{target_cell}_{target_cell}_{receptor}'
+            nc_dict['A_weight'] = net._params[key]
+            net._all_to_all_connect(
+                target_cell, target_cell, loc, receptor,
+                nc_dict, allow_autapses=False)
+
+    # layer2 Basket -> layer2 Pyr
+    src_cell = 'L2Basket'
+    target_cell = 'L2Pyr'
+    nc_dict['lamtha'] = 50. * inplane_distance
+    loc = 'soma'
+    for receptor in ['gabaa', 'gabab']:
+        key = f'gbar_L2Basket_L2Pyr_{receptor}'
+        nc_dict['A_weight'] = net._params[key]
+        net._all_to_all_connect(
+            src_cell, target_cell, loc, receptor, nc_dict)
+
+    # layer5 Basket -> layer5 Pyr
+    src_cell = 'L5Basket'
+    target_cell = 'L5Pyr'
+    nc_dict['lamtha'] = 70. * inplane_distance
+    loc = 'soma'
+    for receptor in ['gabaa', 'gabab']:
+        key = f'gbar_L5Basket_{target_cell}_{receptor}'
+        nc_dict['A_weight'] = net._params[key]
+        net._all_to_all_connect(
+            src_cell, target_cell, loc, receptor, nc_dict)
+
+    # layer2 Pyr -> layer5 Pyr
+    src_cell = 'L2Pyr'
+    nc_dict['lamtha'] = 3. * inplane_distance
+    receptor = 'ampa'
+    for loc in ['proximal', 'distal']:
+        key = f'gbar_L2Pyr_{target_cell}'
+        nc_dict['A_weight'] = net._params[key]
+        net._all_to_all_connect(
+            src_cell, target_cell, loc, receptor, nc_dict)
+
+    # layer2 Basket -> layer5 Pyr
+    src_cell = 'L2Basket'
+    nc_dict['lamtha'] = 50. * inplane_distance
+    key = f'gbar_L2Basket_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'distal'
+    receptor = 'gabaa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    # xx -> layer2 Basket
+    src_cell = 'L2Pyr'
+    target_cell = 'L2Basket'
+    nc_dict['lamtha'] = 3. * inplane_distance
+    key = f'gbar_L2Pyr_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    src_cell = 'L2Basket'
+    nc_dict['lamtha'] = 20. * inplane_distance
+    key = f'gbar_L2Basket_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'gabaa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    # xx -> layer5 Basket
+    src_cell = 'L5Basket'
+    target_cell = 'L5Basket'
+    nc_dict['lamtha'] = 20. * inplane_distance
+    loc = 'soma'
+    receptor = 'gabaa'
+    key = f'gbar_L5Basket_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict,
+        allow_autapses=False)
+
+    src_cell = 'L5Pyr'
+    nc_dict['lamtha'] = 3. * inplane_distance
+    key = f'gbar_L5Pyr_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    src_cell = 'L2Pyr'
+    nc_dict['lamtha'] = 3. * inplane_distance
+    key = f'gbar_L2Pyr_{target_cell}'
+    nc_dict['A_weight'] = net._params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net._all_to_all_connect(
+        src_cell, target_cell, loc, receptor, nc_dict)
+
+    return net
 
 
 def _connection_probability(conn, probability, seed=0):
@@ -276,6 +421,10 @@ class Network(object):
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
+    inplane_distance : float
+        The in plane-distance (in um) between pyramidal cell somas in the
+        square grid. Note that this parameter does not affect the amplitude of
+        the dipole moment. Default: 1.0 um
     legacy_mode : bool
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
@@ -332,7 +481,7 @@ class Network(object):
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=True):
+                 inplane_distance=1., legacy_mode=True):
         # Save the parameters used to create the Network
         self._params = params
         # Initialise a dictionary of cell ID's, which get used when the
@@ -373,9 +522,11 @@ class Network(object):
         # cell counts, real and artificial
         self.pos_dict = dict()
         self.cell_types = dict()
+        self._inplane_distance = inplane_distance
         pos = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
                                   n_pyr_y=self._params['N_pyr_y'],
-                                  zdiff=1307.4)
+                                  zdiff=1307.4,
+                                  inplane_distance=self._inplane_distance)
         self.pos_dict['origin'] = pos['origin']
 
         for cell_name in cell_types:
@@ -772,6 +923,9 @@ class Network(object):
         pos = [self.pos_dict['origin']] * n_drive_cells
         self._add_cell_type(name, pos)
 
+        # space_constant is unitless, scale here to reflect in-plance dist.
+        scaled_space_constant = space_constant * self._inplane_distance
+
         # Set the starting index for cell-specific source gids
         # This will be updated depending on the number of target cells
         # of each cell type
@@ -790,13 +944,13 @@ class Network(object):
                     weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(src_gids, target_gids_nested,
                                         location, receptor, weights, delays,
-                                        space_constant)
+                                        scaled_space_constant)
             else:
                 for receptor in weights_by_type[target_cell_type]:
                     weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(name, target_gids, location,
                                         receptor, weights, delays,
-                                        space_constant)
+                                        scaled_space_constant)
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()

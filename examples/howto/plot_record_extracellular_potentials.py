@@ -55,8 +55,8 @@ net.plot_cells()
 # 'point source approximation' for calculations; see
 # :meth:`hnn_core.Network.add_electrode_array` for details.
 
-depths = list(range(-525, 2750, 100))
-electrode_pos = [(4.5, 4.5, dep) for dep in depths]
+depths = list(range(-325, 2150, 25))
+electrode_pos = [(135, 135, dep) for dep in depths]
 net.add_electrode_array('shank1', electrode_pos)
 
 ###############################################################################
@@ -89,13 +89,18 @@ dpl[trial_idx].copy().smooth(
     window_len=window_len).plot(ax=axs[0], decim=decimate,
                                 show=False)
 
-voltage_offset = 300  # the spacing between individual traces
-voltage_scalebar = 500  # can be different from offset
+voltage_offset = 50  # the spacing between individual traces
+voltage_scalebar = 200  # can be different from offset
 # we can assign each electrode a unique color using a linear colormap
 colors = plt.get_cmap('cividis', len(electrode_pos))
+# --> XXX just temporary!
+labels = []
+for lidx, dep in enumerate(depths):
+    labels += [dep] if not lidx % 4 else ['']
+# <-- XXX
 # use the same smoothing window on the LFP traces to allow comparison to dipole
 net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
-    ax=axs[1], contact_labels=depths, color=colors, decim=decimate, show=False,
+    ax=axs[1], contact_labels=labels, color=colors, decim=decimate, show=False,
     voltage_offset=voltage_offset, voltage_scalebar=voltage_scalebar)
 
 axs[1].grid(True, which='major', axis='x')
