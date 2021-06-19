@@ -1,7 +1,7 @@
 """
-=====================
-06. Plot Connectivity
-=====================
+================================
+06. Modifying local connectivity
+================================
 
 This example demonstrates how to modify the network connectivity.
 """
@@ -42,6 +42,7 @@ net_erp = default_network(params, add_drives_from_params=True)
 # :func:`~hnn_core.viz.plot_connectivity_weights` as well as
 # :func:`~hnn_core.viz.plot_cell_connectivity`
 from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+
 print(len(net_erp.connectivity))
 
 conn_idx = 20
@@ -62,81 +63,72 @@ net_erp.cell_response.plot_spikes_raster()
 ###############################################################################
 # We can also define our own connections to test the effect of different
 # connectivity patterns. To start, ``net.clear_connectivity()`` can be used
-# to clear all cell to cell connections. By default, previously defined drives
+# to clear all cell-to-cell connections. By default, previously defined drives
 # to the network are retained, but can be removed with ``net.clear_drives()``.
 # ``net.add_connection`` is then used to create a custom network. Let us first
 # create an all-to-all connectivity pattern between the L5 pyramidal cells,
 # and L2 basket cells. :meth:`hnn_core.Network.add_connection` allows
-# connections to be specified with either cell names, or the gids directly.
-# If multiple gids are provided for either the sources or the targets,
-# they will be connected in an all-to-all pattern.
+# connections to be specified with either cell names, or the cell IDs (gids)
+# directly.
 
-net_all = default_network(params, add_drives_from_params=True)
-net_all.clear_connectivity()
 
-# Pyramidal cell connections
-location, receptor = 'distal', 'ampa'
-weight, delay, lamtha = 1.0, 1.0, 70
-src = 'L5_pyramidal'
-for target in ['L5_pyramidal', 'L2_basket']:
-    net_all.add_connection(src, target, location, receptor,
-                           delay, weight, lamtha)
+def get_network(probability=1.0):
+    net = default_network(params, add_drives_from_params=True)
+    net.clear_connectivity()
 
-# Basket cell connections
-location, receptor = 'soma', 'gabaa'
-weight, delay, lamtha = 1.0, 1.0, 70
-src = 'L2_basket'
-for target in ['L5_pyramidal', 'L2_basket']:
-    net_all.add_connection(src, target, location, receptor,
-                           delay, weight, lamtha)
+    # Pyramidal cell connections
+    location, receptor = 'distal', 'ampa'
+    weight, delay, lamtha = 1.0, 1.0, 70
+    src = 'L5_pyramidal'
+    for target in ['L5_pyramidal', 'L2_basket']:
+        net.add_connection(src, target, location, receptor,
+                           delay, weight, lamtha, probability=probability)
 
+    # Basket cell connections
+    location, receptor = 'soma', 'gabaa'
+    weight, delay, lamtha = 1.0, 1.0, 70
+    src = 'L2_basket'
+    for target in ['L5_pyramidal', 'L2_basket']:
+        net.add_connection(src, target, location, receptor,
+                           delay, weight, lamtha, probability=probability)
+    return net
+
+
+net_all = get_network()
 dpl_all = simulate_dipole(net_all, n_trials=1)
-net_all.cell_response.plot_spikes_raster()
+
+###############################################################################
+# We can additionally use the ``probability`` argument to create a sparse
+# connectivity pattern instead of all-to-all. Let's try creating the same
+# network with a 10% chance of cells connecting to each other.
+net_sparse = get_network(probability=0.1)
+dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
 
 ###############################################################################
 # With the previous connection pattern there appears to be synchronous rhythmic
 # firing of the L5 pyramidal cells with a period of 10 ms. The synchronous
 # activity is visible as vertical lines where several cells fire simultaneously
-# We can additionally use the ``probability``. argument to create a sparse
-# connectivity pattern instead of all-to-all. Let's try creating the same
-# network with a 10% chance of cells connecting to each other.
-probability = 0.1
-net_sparse = default_network(params, add_drives_from_params=True)
-net_sparse.clear_connectivity()
-
-# Pyramidal cell connections
-location, receptor = 'distal', 'ampa'
-weight, delay, lamtha = 1.0, 1.0, 70
-src = 'L5_pyramidal'
-for target in ['L5_pyramidal', 'L2_basket']:
-    net_sparse.add_connection(src, target, location, receptor,
-                              delay, weight, lamtha, probability)
-
-# Basket cell connections
-location, receptor = 'soma', 'gabaa'
-weight, delay, lamtha = 1.0, 1.0, 70
-src = 'L2_basket'
-for target in ['L5_pyramidal', 'L2_basket']:
-    net_sparse.add_connection(src, target, location, receptor,
-                              delay, weight, lamtha, probability)
-
-dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
+# Using the sparse connectivity pattern produced a lot more spiking in
+# the L5 pyramidal cells.
+net_all.cell_response.plot_spikes_raster()
 net_sparse.cell_response.plot_spikes_raster()
 
-# Get index of most recently added connection, and a src_gid in src_range.
-conn_idx, gid_idx = len(net_sparse.connectivity) - 1, 5
-src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+###############################################################################
+# We can plot the sparse connectivity pattern between cell populations.
+conn_idx = len(net_sparse.connectivity) - 1
 plot_connectivity_matrix(net_sparse, conn_idx)
-plot_cell_connectivity(net_sparse, conn_idx, src_gid)
 
-conn_idx, gid_idx = len(net_sparse.connectivity) - 2, 5
-src_gid = net_sparse.connectivity[conn_idx]['src_range'][gid_idx]
+conn_idx = len(net_sparse.connectivity) - 2
 plot_connectivity_matrix(net_sparse, conn_idx)
-plot_cell_connectivity(net_sparse, conn_idx, src_gid)
 
 ###############################################################################
-# Using the sparse connectivity pattern produced a lot more spiking in
-# the L5 pyramidal cells. Nevertheless there appears to be some rhythmicity
+# Note that the sparsity is in addition to the weight decay with distance
+# from the source cell.
+src_gid = net_sparse.connectivity[conn_idx]['src_range'][5]
+plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
+
+###############################################################################
+# In the sparse network, there still appears to be some rhythmicity
 # where the cells are firing synchronously with a smaller period of 4-5 ms.
 # As a final step, we can see how this change in spiking activity impacts
 # the aggregate current dipole.

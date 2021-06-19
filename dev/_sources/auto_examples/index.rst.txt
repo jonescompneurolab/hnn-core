@@ -124,7 +124,7 @@ Some introductory examples to get started with hnn-core
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_connectivity_thumb.png
-     :alt: 06. Plot Connectivity
+     :alt: 06. Modifying local connectivity
 
      :ref:`sphx_glr_auto_examples_plot_connectivity.py`
 
