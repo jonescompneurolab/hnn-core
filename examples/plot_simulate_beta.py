@@ -23,37 +23,6 @@ from hnn_core.viz import plot_dipole
 net = law_model()
 
 ###############################################################################
-# Next a beta event is created by inducing simultaneous proximal and distal
-# drives. The input is just strong enough to evoke spiking in the
-# L2 basket cells. This spiking causes GABAb mediated inhibition
-# inhibition of the network, and ultimately suppressing sensory detection.
-beta_start = 50.0
-
-# Distal Drive
-weights_ampa_d1 = {'L2_basket': 0.00032, 'L2_pyramidal': 0.00008,
-                   'L5_pyramidal': 0.00004}
-syn_delays_d1 = {'L2_basket': 0.5, 'L2_pyramidal': 0.5,
-                 'L5_pyramidal': 0.5}
-net.add_bursty_drive(
-    'beta_dist', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-    burst_rate=1e-10, burst_std=10., numspikes=2, spike_isi=10, repeats=10,
-    location='distal', weights_ampa=weights_ampa_d1,
-    synaptic_delays=syn_delays_d1, seedcore=2)
-
-# Proximal Drive
-weights_ampa_p1 = {'L2_basket': 0.00004, 'L2_pyramidal': 0.00002,
-                   'L5_basket': 0.00002, 'L5_pyramidal': 0.00002}
-syn_delays_p1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                 'L5_basket': 1.0, 'L5_pyramidal': 1.0}
-
-net.add_bursty_drive(
-    'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-    burst_rate=1e-10, burst_std=20., numspikes=2, spike_isi=10, repeats=10,
-    location='proximal', weights_ampa=weights_ampa_p1,
-    synaptic_delays=syn_delays_p1, seedcore=8)
-
-
-###############################################################################
 # To demonstrate sensory depression, we will add an ERP similar to
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 # but modified to reflect that parameters used in Law et al. 2021.
@@ -95,25 +64,67 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p2, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 
+# Save current state of network with just ERP drives.
+net_erp = net.copy()
+
+###############################################################################
+# Next a beta event is created by inducing simultaneous proximal and distal
+# drives. The input is just strong enough to evoke spiking in the
+# L2 basket cells. This spiking causes GABAb mediated inhibition
+# inhibition of the network, and ultimately suppressing sensory detection.
+beta_start = 50.0
+
+# Distal Drive
+weights_ampa_d1 = {'L2_basket': 0.00032, 'L2_pyramidal': 0.00008,
+                   'L5_pyramidal': 0.00004}
+syn_delays_d1 = {'L2_basket': 0.5, 'L2_pyramidal': 0.5,
+                 'L5_pyramidal': 0.5}
+net.add_bursty_drive(
+    'beta_dist', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
+    burst_rate=1e-10, burst_std=10., numspikes=2, spike_isi=10, repeats=10,
+    location='distal', weights_ampa=weights_ampa_d1,
+    synaptic_delays=syn_delays_d1, seedcore=2)
+
+# Proximal Drive
+weights_ampa_p1 = {'L2_basket': 0.00004, 'L2_pyramidal': 0.00002,
+                   'L5_basket': 0.00002, 'L5_pyramidal': 0.00002}
+syn_delays_p1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                 'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+
+net.add_bursty_drive(
+    'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
+    burst_rate=1e-10, burst_std=20., numspikes=2, spike_isi=10, repeats=10,
+    location='proximal', weights_ampa=weights_ampa_p1,
+    synaptic_delays=syn_delays_p1, seedcore=8)
+
+net_beta = net.copy()
 
 ###############################################################################
 # And finally we simulate.
 import matplotlib.pyplot as plt
-dpls = simulate_dipole(net, postproc=False)
+dpls_erp = simulate_dipole(net_erp, postproc=False)
+dpls_beta = simulate_dipole(net_erp, postproc=False)
 
 ###############################################################################
 # By inspecting the activity during the beta event, we can see that spiking
 # occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
 # and distal inputs. This spiking activity leads to sustained GABAb mediated
-# inhibition of the L5 pyrmaidal cells. One effect of this inhibition is an
-# assymetric beta event with a long positive tail.
-# The sustained inhibition of the network ultimately depresses the sensory
-# response which reduces the amplitude of the event related potential.
-dpls_orig = dpls[0].copy()
-dpls_smooth = dpls[0].smooth(45)
+# inhibition of the L5 pyrmaidal cells.
+dpls_beta_orig = dpls_beta[0].copy()
+dpls_beta_smooth = dpls_beta[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(10, 10),
                          constrained_layout=True)
-plot_dipole(dpls_orig, ax=axes[0], layer='agg', tmin=1.0, show=False)
-plot_dipole(dpls_smooth, ax=axes[0], layer='agg', tmin=1.0, show=False)
+plot_dipole(dpls_beta_orig, ax=axes[0], layer='agg', tmin=1.0, show=False)
+plot_dipole(dpls_beta_smooth, ax=axes[0], layer='agg', tmin=1.0, show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1], show=False)
 net.cell_response.plot_spikes_raster(ax=axes[2], show=False)
+
+###############################################################################
+# One effect of this inhibition is an assymetric beta event with a long
+# positive tail. The sustained inhibition of the network ultimately depressing
+# the sensory response which is assoicated with a reduced ERP amplitude
+dpls_erp_smooth = dpls_erp[0].smooth(45)
+fig, axes = plt.subplots(1, 1, sharex=True, figsize=(6, 6),
+                         constrained_layout=True)
+plot_dipole(dpls_beta_smooth, ax=axes[0], layer='agg', tmin=1.0, show=False)
+plot_dipole(dpls_erp_smooth, ax=axes[0], layer='agg', tmin=1.0, show=False)
