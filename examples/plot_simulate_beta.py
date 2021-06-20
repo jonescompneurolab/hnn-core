@@ -10,7 +10,7 @@ by prestimulus beta events.
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
 ###############################################################################
-# Let us import hnn_core
+Importing the needed functions
 import hnn_core
 from hnn_core import simulate_dipole, law_model
 from hnn_core.viz import plot_dipole
@@ -24,8 +24,8 @@ net = law_model()
 
 ###############################################################################
 # To demonstrate sensory depression, we will add an ERP similar to
-# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
-# but modified to reflect that parameters used in Law et al. 2021.
+# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`,
+# but modified to reflect the parameters used in Law et al. 2021.
 # Specifically, we are considering the case where a tactile stimulus is
 # delivered at 150 ms. 25 ms later, the first input to sensory cortex arrives
 # as a proximal drive, followed by one distal and a final late proximal drive.
@@ -71,7 +71,7 @@ net_erp = net.copy()
 # Next a beta event is created by inducing simultaneous proximal and distal
 # drives. The input is just strong enough to evoke spiking in the
 # L2 basket cells. This spiking causes GABAb mediated inhibition
-# inhibition of the network, and ultimately suppressing sensory detection.
+# of the network, and ultimately suppressed sensory detection.
 beta_start = 50.0
 
 # Distal Drive
