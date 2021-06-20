@@ -56,7 +56,27 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
                        "average of 2 trials"):
         dipole_avg = average_dipoles([dipole_avg, dipole_read])
 
+    # average an n_of_1 dipole list
+    single_dpl_avg = average_dipoles([dipole])
+    for dpl_key in single_dpl_avg.data.keys():
+        assert_allclose((
+            dipole_read.data[dpl_key],
+            single_dpl_avg.data[dpl_key],
+            rtol=0,
+            atol=0.000051)
+
+    # average dipole list with one dipole object and a zero dipole object
+    n_times = len(dipole_read.data['agg'])
+    dpl_null = Dipole(np.zeros(n_times, ), np.zeros((n_times, 3)))
+    dpl_1 = [dipole, dpl_null]
+    dpl_avg = average_dipoles(dpl_1)
+    for dpl_key in dpl_avg.data.keys():
+        assert_allclose(dpl_1[0].data[dpl_key] / 2., dpl_avg.data[dpl_key])
+
+    # test postproc
+
     # XXX all below to be deprecated in 0.3
+
     dpls_raw, net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
                                          reduced=True, record_isoma=True,
                                          record_vsoma=True)

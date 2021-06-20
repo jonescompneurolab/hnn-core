@@ -41,6 +41,8 @@ Bug
 
 - Fix bug where depth of L5 and L2 cells were swapped, by `Christopher Bailey`_ in `#352 <https://github.com/jonescompneurolab/hnn-core/pull/352>`_
 
+- Fix bug where :func:`~hnn_core.average_dipole` failed when there were less than two dipoles in the input dipole list, by `Kenneth Loi`_ in `#368 <https://github.com/jonescompneurolab/hnn-core/pull/368>`_
+
 API
 ~~~
 - New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
