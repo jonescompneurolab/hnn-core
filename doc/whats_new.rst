@@ -30,7 +30,7 @@ Changelog
 
 - Add function to visualize extracellular potentials from laminar array simulations, by `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
 
-- Add example demonstrating beta event modulation of ERPs from Law et al. 2021, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/348>`_
+- Previously published models can now be loaded via ``net=law_2021_model()`` and ``jones_2009_model()``, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/348>`_
 
 Bug
 ~~~
@@ -56,8 +56,6 @@ API
 - New API for network creation. The default network is now created with ``net = default_network(params)``, by `Nick Tolley`_ in `#318 <https://github.com/jonescompneurolab/hnn-core/pull/318>`_
 
 - Replace parameter `T` with `tstop` in :func:`~hnn_core.Network.add_tonic_bias` and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and improve readability, by `Kenneth Loi`_ in `#354 <https://github.com/jonescompneurolab/hnn-core/pull/354>`_
-
-- Previously published models can now be loaded via ``net=law_model()`` and ``jones_2009_model()``, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/348>`_
 
 .. _0.1:
 

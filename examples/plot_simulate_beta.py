@@ -11,7 +11,7 @@ by prestimulus beta events.
 
 ###############################################################################
 # Importing the needed functions
-from hnn_core import simulate_dipole, law_model
+from hnn_core import simulate_dipole, law_2021_model
 from hnn_core.viz import plot_dipole
 
 ###############################################################################
@@ -24,7 +24,7 @@ from hnn_core.viz import plot_dipole
 #   pyramidal cells are _greatly_ increased
 # - several synaptic weights are adjusted
 # - the total simulation is extended to 400 ms
-net = law_model()
+net = law_2021_model()
 
 ###############################################################################
 # To demonstrate sensory depression, we will add an ERP similar to

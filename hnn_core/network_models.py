@@ -181,7 +181,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     return net
 
 
-def law_model(params=None, add_drives_from_params=False):
+def law_2021_model(params=None, add_drives_from_params=False):
     """Instantiate the beta modulated ERP network model.
 
     Parameters
