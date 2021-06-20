@@ -10,8 +10,7 @@ by prestimulus beta events.
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
 ###############################################################################
-Importing the needed functions
-import hnn_core
+# Importing the needed functions
 from hnn_core import simulate_dipole, law_model
 from hnn_core.viz import plot_dipole
 
@@ -20,7 +19,7 @@ from hnn_core.viz import plot_dipole
 # The model can be instantiated in the same pattern as ``default_network``
 # using ``law_model(params)`` as in previous exmaples. Leaving the arguments
 # empty loads the default parameter set ``default.json``, and modifies it
-# according to Law et al. (2021):
+# according to Law et al. 2021 [1]_ :
 # - the rise and fall time constants of GABAB-conductances on L2 and L5
 #   pyramidal cells are _greatly_ increased
 # - several synaptic weights are adjusted
@@ -136,3 +135,12 @@ fig, ax = plt.subplots(1, 1, sharex=True, figsize=(8, 4),
 plot_dipole(dpls_beta_smooth, ax=ax, layer='agg', tmin=1.0, show=False)
 plot_dipole(dpls_erp_smooth, ax=ax, layer='agg', tmin=1.0, show=False)
 ax.legend(['ERP + Beta', 'ERP'])
+
+###############################################################################
+# References
+# ----------
+# .. [1] Law, R. G., Pugliese, S., Shin, H., Sliva, D. D., Lee, S.,
+#        Neymotin, S., Moore, C., & Jones, S. R. (2021). Thalamocortical
+#        mechanisms regulating the relationship between transient beta events
+#        and human tactile perception. BioRxiv, 2021.04.16.440210.
+#        https://doi.org/10.1101/2021.04.16.440210
