@@ -19,7 +19,12 @@ from hnn_core.viz import plot_dipole
 # We begin by instantiating the network model described in Law et al. 2021.
 # The model can be instantiated in the same pattern as ``default_network``
 # using ``law_model(params)`` as in previous exmaples. Leaving the arguments
-# empty loads the default parameter set default.json.
+# empty loads the default parameter set ``default.json``, and modifies it
+# according to Law et al. (2021):
+# - the rise and fall time constants of GABAB-conductances on L2 and L5
+#   pyramidal cells are _greatly_ increased
+# - several synaptic weights are adjusted
+# - the total simulation is extended to 400 ms
 net = law_model()
 
 ###############################################################################
@@ -55,6 +60,7 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p1, weights_nmda=None,
     location='proximal', synaptic_delays=synaptic_delays_prox, seedcore=4)
 
+###############################################################################
 # Second proximal evoked drive. NB: only AMPA weights differ from first
 weights_ampa_p2 = {'L2_basket': 0.005, 'L2_pyramidal': 0.005,
                    'L5_basket': 0.01, 'L5_pyramidal': 0.01}
