@@ -639,9 +639,11 @@ class Network(object):
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : int | float
             Describes lateral dispersion (from column origin) of synaptic
-            weights and delays within the simulated column
+            weights and delays within the simulated column. The constant is
+            measured in integer steps on the regular grid of the network
+            (unitless).
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -710,9 +712,11 @@ class Network(object):
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : int | float
             Describes lateral dispersion (from column origin) of synaptic
-            weigths and delays within the simulated column
+            weights and delays within the simulated column. The constant is
+            measured in integer steps on the regular grid of the network
+            (unitless).
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -801,9 +805,11 @@ class Network(object):
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : int | float
             Describes lateral dispersion (from column origin) of synaptic
-            weights and delays within the simulated column
+            weights and delays within the simulated column. The constant is
+            measured in integer steps on the regular grid of the network
+            (unitless).
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -848,10 +854,12 @@ class Network(object):
             type (dict keys). Cell types omitted from the dict are set to zero.
         location : str
             Target location of synapses ('distal' or 'proximal')
-        space_constant : float
+        space_constant : int | float
             Describes lateral dispersion (from column origin) of synaptic
-            weights and delays within the simulated column
-        synaptic_delays : dict or float
+            weights and delays within the simulated column. The constant is
+            measured in integer steps on the regular grid of the network
+            (unitless).
+        synaptic_delays : dict
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
         n_drive_cells : int | 'n_cells'
