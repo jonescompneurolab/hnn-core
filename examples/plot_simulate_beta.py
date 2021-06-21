@@ -67,6 +67,8 @@ def add_erp_drives(net, stimulus_start):
         weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=syn_delays_prox, seedcore=4)
 
+    return net
+
 ###############################################################################
 # Next a beta event is created by inducing simultaneous proximal and distal
 # drives. The input is just strong enough to evoke spiking in the
@@ -96,6 +98,8 @@ def add_beta_drives(net, beta_start):
         location='proximal', weights_ampa=weights_ampa_p1,
         synaptic_delays=syn_delays_p1, seedcore=8)
 
+    return net
+
 ###############################################################################
 # We can now use our functions to create three distinct simulations:
 # 1) beta event only, 2) ERP only, and 3) beta event + ERP.
@@ -107,7 +111,7 @@ net_erp = net.copy()
 net_erp = add_erp_drives(net_erp, stimulus_start)
 
 net_beta_erp = net_beta.copy()
-net_beta_erp = add_erp_drives(net_erp, stimulus_start)
+net_beta_erp = add_erp_drives(net_beta_erp, stimulus_start)
 
 ###############################################################################
 # And finally we simulate.
@@ -121,11 +125,13 @@ dpls_beta_erp = simulate_dipole(net_beta_erp, postproc=False)
 # and distal inputs. This spiking activity leads to sustained GABAb mediated
 # inhibition of the L2 and L5 pyrmaidal cells.
 import matplotlib.pyplot as plt
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(10, 10),
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
-plot_dipole(dpls_beta, ax=axes[0], layer='agg', tmin=1.0, show=False)
-net_beta.cell_response.plot_spikes_hist(ax=axes[1], show=False)
+net_beta.cell_response.plot_spikes_hist(ax=axes[0], show=False)
+axes[0].set_title('Beta Event Generation')
+plot_dipole(dpls_beta, ax=axes[1], layer='agg', tmin=1.0, show=False)
 net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
+axes[2].set_title('Spike Raster')
 
 ###############################################################################
 # By inspecting the activity during the beta event, we can see that spiking
@@ -133,25 +139,30 @@ net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 # and distal inputs. This spiking activity leads to sustained GABAb mediated
 # inhibition of the L2 and L5 pyrmaidal cells.
 dpls_beta_erp[0].smooth(45)
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(10, 10),
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
 plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, show=False)
+axes[0].set_title('Beta Event + ERP')
 net_beta_erp.cell_response.plot_spikes_hist(ax=axes[1], show=False)
+axes[1].set_title('Input Drives Histogram')
 net_beta_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
-axes[0].legend(['Original', 'Smoothed'])
+axes[2].set_title('Spike Raster')
 
 ###############################################################################
 # One effect of this inhibition is an assymetric beta event with a long
 # positive tail. The sustained inhibition of the network ultimately depressing
 # the sensory response which is assoicated with a reduced ERP amplitude
 dpls_erp[0].smooth(45)
-fig, ax = plt.subplots(3, 1, sharex=True, figsize=(8, 4),
-                       constrained_layout=True)
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
+                         constrained_layout=True)
 plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, show=False)
 plot_dipole(dpls_erp, ax=axes[0], layer='agg', tmin=1.0, show=False)
+axes[0].set_title('Beta ERP Comparison')
 axes[0].legend(['ERP + Beta', 'ERP'])
 net_beta_erp.cell_response.plot_spikes_raster(ax=axes[1], show=False)
+axes[1].set_title('Beta + ERP Spike Raster')
 net_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
+axes[2].set_title('ERP Spike Raster')
 
 ###############################################################################
 # References
