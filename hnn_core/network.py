@@ -425,6 +425,10 @@ class Network(object):
         The in plane-distance (in um) between pyramidal cell somas in the
         square grid. Note that this parameter does not affect the amplitude of
         the dipole moment. Default: 1.0 um
+    layer_separation : float
+        The default separation of pyramidal cell somas in layers 2/3 and 5
+        is 1307.4 um. Note that this parameter does not affect the amplitude of
+        the dipole moment.
     legacy_mode : bool
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
@@ -481,7 +485,8 @@ class Network(object):
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 inplane_distance=1., legacy_mode=True):
+                 inplane_distance=1., layer_separation=1307.4,
+                 legacy_mode=True):
         # Save the parameters used to create the Network
         self._params = params
         # Initialise a dictionary of cell ID's, which get used when the
@@ -525,7 +530,7 @@ class Network(object):
         self._inplane_distance = inplane_distance
         pos = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
                                   n_pyr_y=self._params['N_pyr_y'],
-                                  zdiff=1307.4,
+                                  zdiff=layer_separation,
                                   inplane_distance=self._inplane_distance)
         self.pos_dict['origin'] = pos['origin']
 
