@@ -57,7 +57,7 @@ fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 # Data recorded during simulations are stored under
 # :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
 # a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
-dpl_erp = simulate_dipole(net_erp, n_trials=1)
+dpl_erp = simulate_dipole(net_erp, n_trials=1, postproc=True)
 net_erp.cell_response.plot_spikes_raster()
 
 ###############################################################################

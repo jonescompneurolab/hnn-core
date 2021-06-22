@@ -68,7 +68,7 @@ def test_dipole_visualization():
         numspikes=1, spike_isi=0, repeats=11, location='proximal',
         weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p, seedcore=14)
 
-    dpls = simulate_dipole(net, n_trials=2, postproc=False)
+    dpls = simulate_dipole(net, n_trials=2)
     fig = dpls[0].plot()  # plot the first dipole alone
     axes = fig.get_axes()[0]
     dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions

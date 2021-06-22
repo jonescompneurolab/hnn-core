@@ -132,7 +132,7 @@ print(net_sync.external_drives['evdist1']['dynamics'])
 
 ###############################################################################
 # Finally, let's simulate this network.
-dpls_sync = simulate_dipole(net_sync, n_trials=1)
+dpls_sync = simulate_dipole(net_sync, n_trials=1, postproc=True)
 
 trial_idx = 0
 dpls_sync[trial_idx].plot()

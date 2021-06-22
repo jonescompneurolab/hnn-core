@@ -92,7 +92,7 @@ def test_transmembrane_currents():
     electrode_pos = (0, 0, 0)  # irrelevant where electrode is
     # all transfer resistances set to unity
     net.add_electrode_array('net_Im', electrode_pos, method=None)
-    _ = simulate_dipole(net, postproc=False)
+    _ = simulate_dipole(net)
     currents = net.rec_arrays['net_Im'].get_data()
     assert_allclose(currents, 0, rtol=1e-10, atol=1e-10)
 
@@ -197,7 +197,7 @@ def test_rec_array_calculation():
     # one electrode inside, one above the active elements of the network
     electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]
     net.add_electrode_array('arr1', electrode_pos)
-    _ = simulate_dipole(net, n_trials=1, postproc=False)
+    _ = simulate_dipole(net, n_trials=1)
 
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
@@ -221,7 +221,7 @@ def test_rec_array_calculation():
 
     # make sure no sinister segfaults are triggered when running mult. trials
     n_trials = 5  # NB 5 trials!
-    _ = simulate_dipole(net, n_trials=n_trials, postproc=False)
+    _ = simulate_dipole(net, n_trials=n_trials)
 
     # simulate_dipole is run twice above, first 1 then 5 trials.
     # Make sure that previous results are discarded on each run
