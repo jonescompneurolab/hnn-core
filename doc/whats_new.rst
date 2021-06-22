@@ -57,6 +57,8 @@ API
 
 - Replace parameter `T` with `tstop` in :func:`~hnn_core.Network.add_tonic_bias` and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and improve readability, by `Kenneth Loi`_ in `#354 <https://github.com/jonescompneurolab/hnn-core/pull/354>`_
 
+- Set `postproc` argument in :func:`~hnn_core.dipole.simulate_dipole` to `False` by default, whereby user should explicitly smooth and scale resulting dipoles, by `Christopher Bailey`_ in `#372 <https://github.com/jonescompneurolab/hnn-core/pull/372>`_
+
 .. _0.1:
 
 0.1

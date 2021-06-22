@@ -64,7 +64,7 @@ net.add_bursty_drive(
 from hnn_core import MPIBackend
 
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-    dpls = simulate_dipole(net, n_trials=1, postproc=False)
+    dpls = simulate_dipole(net, n_trials=1)
 
 trial_idx = 0
 dpls[trial_idx].plot()

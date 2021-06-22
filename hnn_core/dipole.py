@@ -11,7 +11,7 @@ from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
 def simulate_dipole(net, n_trials=None, record_vsoma=False,
-                    record_isoma=False, postproc=True):
+                    record_isoma=False, postproc=False):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -27,7 +27,9 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     record_isoma : bool
         Option to record somatic currents from cells
     postproc : bool
-        If False, no postprocessing applied to the dipole
+        If True, smoothing (``dipole_smooth_win``) and scaling
+        (``dipole_scalefctr``) values are read from the parameter file, and
+        applied to the dipole objects before returning. Default: False.
 
     Returns
     -------
