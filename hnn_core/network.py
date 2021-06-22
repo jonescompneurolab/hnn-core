@@ -480,7 +480,7 @@ class Network(object):
     ----
     `net = jones_2009_model(params)` is the reccomended path for creating a
     network. Instantiating the network as `net = Network(params)` will
-    produce a network with no cell to cell connections. As such,
+    produce a network with no cell-to-cell connections. As such,
     connectivity information contained in `params` will be ignored.
     """
 
@@ -639,11 +639,15 @@ class Network(object):
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : int | float
-            Describes lateral dispersion (from column origin) of synaptic
+        space_constant : float
+            Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
-            measured in integer steps on the regular grid of the network
-            (unitless).
+            measured in the units of ``inplane_distance`` of
+            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,
+            the weights and delays are modulated by the factor
+            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
+            physical distance (in um) between the connected cells in the xy
+            plane.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -712,11 +716,15 @@ class Network(object):
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : int | float
-            Describes lateral dispersion (from column origin) of synaptic
+        space_constant : float
+            Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
-            measured in integer steps on the regular grid of the network
-            (unitless).
+            measured in the units of ``inplane_distance`` of
+            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,
+            the weights and delays are modulated by the factor
+            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
+            physical distance (in um) between the connected cells in the xy
+            plane.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -805,11 +813,15 @@ class Network(object):
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : int | float
-            Describes lateral dispersion (from column origin) of synaptic
+        space_constant : float
+            Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
-            measured in integer steps on the regular grid of the network
-            (unitless).
+            measured in the units of ``inplane_distance`` of
+            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,
+            the weights and delays are modulated by the factor
+            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
+            physical distance (in um) between the connected cells in the xy
+            plane.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -854,11 +866,15 @@ class Network(object):
             type (dict keys). Cell types omitted from the dict are set to zero.
         location : str
             Target location of synapses ('distal' or 'proximal')
-        space_constant : int | float
-            Describes lateral dispersion (from column origin) of synaptic
+        space_constant : float
+            Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
-            measured in integer steps on the regular grid of the network
-            (unitless).
+            measured in the units of ``inplane_distance`` of
+            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,
+            the weights and delays are modulated by the factor
+            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
+            physical distance (in um) between the connected cells in the xy
+            plane.
         synaptic_delays : dict
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
