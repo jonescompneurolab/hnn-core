@@ -1,6 +1,6 @@
 """
 ===================================
-08. Record extracellular potentials
+02. Record extracellular potentials
 ===================================
 
 The main output of HNN simulations is the 'dipole' waveform, i.e., the net
