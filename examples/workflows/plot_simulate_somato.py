@@ -1,6 +1,6 @@
 """
 ================================================
-05. From MEG sensor-space data to HNN simulation
+04. From MEG sensor-space data to HNN simulation
 ================================================
 
 This example demonstrates how to calculate an inverse solution of the median

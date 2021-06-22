@@ -1,6 +1,6 @@
 """
 =======================
-04. Plot firing pattern
+01. Plot firing pattern
 =======================
 
 This example demonstrates how to inspect the firing

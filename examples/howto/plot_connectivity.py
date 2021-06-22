@@ -1,6 +1,6 @@
 """
 ================================
-06. Modifying local connectivity
+03. Modifying local connectivity
 ================================
 
 This example demonstrates how to modify the network connectivity.

@@ -16,7 +16,7 @@ import os
 import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_gallery
-from sphinx_gallery.sorting import ExampleTitleSortKey
+from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
 
 import sphinx_bootstrap_theme
 
@@ -212,6 +212,8 @@ sphinx_gallery_conf = {
         'hnn_core': None
     },
     'within_subsection_order': ExampleTitleSortKey,
+    'subsection_order': ExplicitOrder(['../examples/workflows/',
+                                       '../examples/howto/']),
     'binder': {'org': 'jonescompneurolab',
                'repo': 'hnn-core',
                'branch': 'gh-pages',

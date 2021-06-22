@@ -1,6 +1,6 @@
 """
 =======================================
-07. Use MPI backend for parallelization
+04. Use MPI backend for parallelization
 =======================================
 
 This example demonstrates how to use the MPI backend for
