@@ -7,11 +7,27 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, default_network, CellResponse
+from hnn_core import read_params, CellResponse
+from hnn_core import default_network, jones_2009_model, law_2021_model
 from hnn_core.network_builder import NetworkBuilder
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
+
+
+def test_network_models():
+    """"Test instantiations of the network object"""
+    # Default network should match Jones et al. 2009 model
+    net_default = default_network(add_drives_from_params=True)
+    net_jones = jones_2009_model(add_drives_from_params=True)
+    assert net_default.connectivity == net_jones.connectivity
+    assert net_default.external_drives == net_jones.external_drives
+
+    # Make sure critical biophysics for Law model are updated
+    net_law = law_2021_model()
+    for cell_name in ['L5_pyramidal', 'L2_pyramidal']:
+        assert net_law.cell_types[cell_name].p_syn['gabab']['tau1'] == 45.0
+        assert net_law.cell_types[cell_name].p_syn['gabab']['tau2'] == 200.0
 
 
 def test_network():
