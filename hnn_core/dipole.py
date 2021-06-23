@@ -113,7 +113,7 @@ def average_dipoles(dpls):
         average over the same components in the input list
     """
     for dpl_idx, dpl in enumerate(dpls):
-        if not dpls:
+        if not isinstance(dpl, Dipole):
             raise ValueError("Need at least one dipole object to return a"
                              " dipole")
         if dpl.nave > 1:
