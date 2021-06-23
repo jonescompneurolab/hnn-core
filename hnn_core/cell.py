@@ -325,10 +325,12 @@ class Cell:
             self.sections[sec_name] = sec
 
             h.pt3dclear(sec=sec)
+            h.pt3dconst(0, sec=sec)  # be explicit, see documentation
             for pt in p_secs[sec_name]['sec_pts']:
                 h.pt3dadd(pt[0] + dx,
                           pt[1] + dy,
                           pt[2] + dz, 1, sec=sec)
+            # with pt3dconst==0, these will alter the 3d points defined above!
             sec.L = p_secs[sec_name]['L']
             sec.diam = p_secs[sec_name]['diam']
             sec.Ra = p_secs[sec_name]['Ra']
@@ -350,6 +352,11 @@ class Cell:
             parent_loc = connection[1]
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
+
+        # be explicit about letting sec.L dominate over the 3d points used by
+        # h.pt3dadd(); see
+        # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html?highlight=pt3dadd#pt3dadd  # noqa
+        h.define_shape()
 
     def build(self, sec_name_apical=None):
         """Build cell in Neuron and insert dipole if applicable.
