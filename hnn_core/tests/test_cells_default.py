@@ -1,6 +1,7 @@
 import pytest
 
 from neuron import h
+from numpy import allclose, abs
 
 from hnn_core.cells_default import pyramidal, basket
 from hnn_core.network_builder import load_custom_mechanisms
@@ -17,6 +18,17 @@ def test_cells_default():
     l5p.build(sec_name_apical='apical_trunk')
     assert len(l5p.sections) == 9
     assert 'apical_2' in l5p.sections
+
+    # check that after building, the vertical sections have the length
+    # specified in get_L5Pyr_params_default (or overriden in a params file).
+    # Note that the lengths implied by _secs_L5Pyr are completely ignored:
+    # NEURON extends the sections as needed to match the sec.L 's
+    vertical_secs = ['basal_1', 'soma', 'apical_trunk', 'apical_1', 'apical_2',
+                     'apical_tuft']
+    for sec_name in vertical_secs:
+        sec = l5p.sections[sec_name]
+        vert_len = abs(sec.z3d(1) - sec.z3d(0))
+        assert allclose(vert_len, sec.L)
 
     # smoke test to check if cell can be used in simulation
     h.load_file("stdrun.hoc")
