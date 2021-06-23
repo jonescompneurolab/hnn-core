@@ -50,6 +50,9 @@ net.add_poisson_drive(
     'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
     location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
 
+###############################################################################
+# Note that in the current example, we apply smoothing and scaling to the
+# dipoles as defined in the parameter file (``postproc=True``).
 dpls = simulate_dipole(net, postproc=True)
 
 ###############################################################################
