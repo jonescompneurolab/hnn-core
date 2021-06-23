@@ -15,12 +15,21 @@ Simulation (:py:mod:`hnn_core`):
    :toctree: generated/
 
    simulate_dipole
-   default_network
-   jones_2009_model
-   law_model
    Network
    Cell
    CellResponse
+
+Published Models (:py:mod:`hnn_core`):
+--------------------------------------
+
+.. currentmodule:: hnn_core
+
+.. autosummary::
+   :toctree: generated/
+
+   default_network
+   jones_2009_model
+   law_2021_model
 
 Dipole (:py:mod:`hnn_core.dipole`):
 -----------------------------------
