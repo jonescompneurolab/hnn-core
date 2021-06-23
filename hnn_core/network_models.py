@@ -181,19 +181,8 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     return net
 
 
-def law_2021_model(params=None, add_drives_from_params=False):
+def law_2021_model():
     """Instantiate the beta modulated ERP network model.
-
-    Parameters
-    ----------
-    params : dict | None
-        The parameters to use for constructing the network.
-        If None, parameters loaded from beta_erp.json
-        Default: None
-    add_drives_from_params : bool
-        If True, add drives as defined in the params-dict. NB this is mainly
-        for backward-compatibility with HNN GUI, and will be deprecated in a
-        future release. Default: False
 
     Returns
     -------
@@ -210,8 +199,7 @@ def law_2021_model(params=None, add_drives_from_params=False):
 
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    if params is None:
-        params = read_params(params_fname)
+    params = read_params(params_fname)
 
     params['tstop'] = 400.0
     net = jones_2009_model(params)
@@ -231,8 +219,8 @@ def law_2021_model(params=None, add_drives_from_params=False):
 
     # Remove L5 pyramidal somatic and basal dendrite calcium channels
     for sec in ['soma', 'basal_1', 'basal_2', 'basal_3']:
-        net.cell_types['L5_pyramidal'].p_secs[
-            sec]['mechs']['ca']['gbar_ca'] = 0.0
+        del net.cell_types['L5_pyramidal'].p_secs[
+            sec]['mechs']['ca']
 
     # Remove L2_basket -> L5_pyramidal gabaa connection
     del net.connectivity[10]  # Original paper simply sets gbar to 0.0
@@ -254,10 +242,10 @@ def law_2021_model(params=None, add_drives_from_params=False):
     target_cell = 'L5_pyramidal'
     lamtha = 70.
     loc = 'distal'
-    for receptor in ['gabaa', 'gabab']:  # Both receptors? or just gabaa
-        key = f'gbar_L5Basket_L5Pyr_{receptor}'
-        weight = net._params[key]
-        net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    receptor = 'gabaa'
+    key = f'gbar_L5Basket_L5Pyr_{receptor}'
+    weight = net._params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     return net
