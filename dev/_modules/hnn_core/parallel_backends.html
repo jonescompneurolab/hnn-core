@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn_core.parallel_backends &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../auto_examples/index.html">Examples</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.2.dev0
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hnn_core.parallel_backends</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Parallel backends&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Blake Caldwell &lt;blake_caldwell@brown.edu&gt;</span>
+<span class="c1">#          Mainak Jas &lt;mainakjas@gmail.com&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">TimeoutExpired</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
+<span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Event</span>
+
+<span class="kn">from</span> <span class="nn">psutil</span> <span class="kn">import</span> <span class="n">wait_procs</span><span class="p">,</span> <span class="n">process_iter</span><span class="p">,</span> <span class="n">NoSuchProcess</span>
+
+<span class="n">_BACKEND</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_thread_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">queue</span><span class="p">):</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">isSet</span><span class="p">():</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_clone_and_simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run a simulation including building the network</span>
+
+<span class="sd">    This is used by both backends. MPIBackend calls this in mpi_child.py, once</span>
+<span class="sd">    for each trial (blocking), and JoblibBackend calls this for each trial</span>
+<span class="sd">    (non-blocking)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># avoid relative lookups after being forked (Joblib)</span>
+    <span class="kn">from</span> <span class="nn">hnn_core.network_builder</span> <span class="kn">import</span> <span class="n">NetworkBuilder</span>
+    <span class="kn">from</span> <span class="nn">hnn_core.network_builder</span> <span class="kn">import</span> <span class="n">_simulate_single_trial</span>
+
+    <span class="n">neuron_net</span> <span class="o">=</span> <span class="n">NetworkBuilder</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">)</span>
+    <span class="n">dpl</span> <span class="o">=</span> <span class="n">_simulate_single_trial</span><span class="p">(</span><span class="n">neuron_net</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span>
+
+    <span class="n">sim_data</span> <span class="o">=</span> <span class="n">neuron_net</span><span class="o">.</span><span class="n">get_data_from_neuron</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">dpl</span><span class="p">,</span> <span class="n">sim_data</span>
+
+
+<span class="k">def</span> <span class="nf">_gather_trial_data</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Arrange data by trial</span>
+
+<span class="sd">    To be called after simulate(). Returns list of Dipoles, one for each trial,</span>
+<span class="sd">    and saves spiking info in net (instance of Network).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dpls</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">dpls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">sim_data_trial</span> <span class="o">=</span> <span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_gids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">update_types</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">)</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_vsoma</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_isoma</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">arr_name</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># voltages is a n_trials x n_contacts x n_samples array</span>
+            <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="p">[</span>
+                <span class="n">arr_name</span><span class="p">]</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="n">arr_name</span><span class="p">])</span>
+
+            <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="p">[</span><span class="n">arr_name</span><span class="p">]</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="n">arr_name</span><span class="p">]</span>
+
+        <span class="n">N_pyr_x</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_x&#39;</span><span class="p">]</span>
+        <span class="n">N_pyr_y</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_y&#39;</span><span class="p">]</span>
+        <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_baseline_renormalize</span><span class="p">(</span><span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">)</span>  <span class="c1"># XXX cf. #270</span>
+        <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_convert_fAm_to_nAm</span><span class="p">()</span>  <span class="c1"># always applied, cf. #264</span>
+        <span class="k">if</span> <span class="n">postproc</span><span class="p">:</span>
+            <span class="n">window_len</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;dipole_smooth_win&#39;</span><span class="p">]</span>  <span class="c1"># specified in ms</span>
+            <span class="n">fctr</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;dipole_scalefctr&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">window_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># param files set this to zero for no smoothing</span>
+                <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">window_len</span><span class="o">=</span><span class="n">window_len</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fctr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">fctr</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dpls</span>
+
+
+<span class="k">def</span> <span class="nf">_get_mpi_env</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Set some MPI environment variables.&quot;&quot;&quot;</span>
+    <span class="n">my_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s1">&#39;win&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="n">my_env</span><span class="p">[</span><span class="s2">&quot;OMPI_MCA_btl_base_warn_component_unused&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;darwin&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="n">my_env</span><span class="p">[</span><span class="s2">&quot;PMIX_MCA_gds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;^ds12&quot;</span>  <span class="c1"># open-mpi/ompi/issues/7516</span>
+        <span class="n">my_env</span><span class="p">[</span><span class="s2">&quot;TMPDIR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/tmp&quot;</span>  <span class="c1"># open-mpi/ompi/issues/2956</span>
+    <span class="k">return</span> <span class="n">my_env</span>
+
+
+<span class="k">def</span> <span class="nf">run_subprocess</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">proc_queue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run process and communicate with it.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    command : list of str | str</span>
+<span class="sd">        Command to run as subprocess (see subprocess.Popen documentation).</span>
+<span class="sd">    obj : object</span>
+<span class="sd">        The object to write to stdin after starting child process</span>
+<span class="sd">        with MPI command.</span>
+<span class="sd">    timeout : float</span>
+<span class="sd">        The number of seconds to wait for a process without output.</span>
+<span class="sd">    *args, **kwargs : arguments</span>
+<span class="sd">        Additional arguments to pass to subprocess.Popen.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    child_data : object</span>
+<span class="sd">        The data returned by the child process.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">proc_data_bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+    <span class="c1"># each loop while waiting will involve two Queue.get() timeouts, each</span>
+    <span class="c1"># 0.01s. This caclulation will error on the side of a longer timeout</span>
+    <span class="c1"># than is specified because more is done each loop that just Queue.get()</span>
+    <span class="n">timeout_cycles</span> <span class="o">=</span> <span class="n">timeout</span> <span class="o">/</span> <span class="mf">0.02</span>
+
+    <span class="n">pickled_obj</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="c1"># non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501</span>
+    <span class="n">out_q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+    <span class="n">err_q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+
+    <span class="n">threads_started</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># now that the process has started, add it to the queue</span>
+        <span class="c1"># used by MPIBackend.terminate()</span>
+        <span class="k">if</span> <span class="n">proc_queue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">proc_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">proc</span><span class="p">)</span>
+
+        <span class="c1"># set up polling first so all of child&#39;s stdout/stderr</span>
+        <span class="c1"># gets captured</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+        <span class="n">out_t</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_thread_handler</span><span class="p">,</span>
+                       <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">out_q</span><span class="p">))</span>
+        <span class="n">err_t</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_thread_handler</span><span class="p">,</span>
+                       <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">err_q</span><span class="p">))</span>
+        <span class="n">out_t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">err_t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">threads_started</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">data_received</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">sent_network</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">count_since_last_output</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># loop while the process is running the simulation</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">child_terminated</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">data_received</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_echo_child_output</span><span class="p">(</span><span class="n">out_q</span><span class="p">):</span>
+                    <span class="n">count_since_last_output</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">count_since_last_output</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># look for data in stderr and print child stdout</span>
+                <span class="n">data_len</span><span class="p">,</span> <span class="n">proc_data_bytes</span> <span class="o">=</span> <span class="n">_get_data_from_child_err</span><span class="p">(</span><span class="n">err_q</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">data_received</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">_write_child_exit_signal</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">child_terminated</span><span class="p">:</span>
+                    <span class="c1"># child terminated early, and we already</span>
+                    <span class="c1"># captured output left in queues</span>
+                    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Child process failed unexpectedly&quot;</span><span class="p">)</span>
+                    <span class="n">kill_proc_name</span><span class="p">(</span><span class="s1">&#39;nrniv&#39;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sent_network</span><span class="p">:</span>
+                <span class="c1"># Send network object to child so it can start</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">_write_net</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span> <span class="n">pickled_obj</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">BrokenPipeError</span><span class="p">:</span>
+                    <span class="c1"># child failed during _write_net(). get the</span>
+                    <span class="c1"># output and break out of loop on the next</span>
+                    <span class="c1"># iteration</span>
+                    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Received BrokenPipeError exception. &quot;</span>
+                         <span class="s2">&quot;Child process failed unexpectedly&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sent_network</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="c1"># This is not the same as &quot;network received&quot;, but we</span>
+                    <span class="c1"># assume it was successful and move on to waiting for</span>
+                    <span class="c1"># data in the next loop iteration.</span>
+
+            <span class="k">if</span> <span class="n">child_terminated</span> <span class="ow">and</span> <span class="n">data_received</span><span class="p">:</span>
+                <span class="c1"># both exit conditions have been met (also we know that</span>
+                <span class="c1"># the network has been sent)</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">child_terminated</span> <span class="ow">and</span> \
+                    <span class="n">count_since_last_output</span> <span class="o">&gt;</span> <span class="n">timeout_cycles</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Timeout exceeded while waiting for child process output&quot;</span>
+                     <span class="s2">&quot;. Terminating...&quot;</span><span class="p">)</span>
+                <span class="n">kill_proc_name</span><span class="p">(</span><span class="s1">&#39;nrniv&#39;</span><span class="p">)</span>
+                <span class="k">break</span>
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Received KeyboardInterrupt. Stopping simulation process...&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">threads_started</span><span class="p">:</span>
+        <span class="c1"># stop the threads</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>  <span class="c1"># close signal</span>
+        <span class="n">out_t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">err_t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="c1"># wait for the process to terminate. we need use proc.communicate to</span>
+    <span class="c1"># read any output at its end of life.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">outs</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TimeoutExpired</span><span class="p">:</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="c1"># wait for output again after kill signal</span>
+        <span class="n">outs</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">errs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># It&#39;s theoretically possible that we have received data</span>
+        <span class="c1"># and exited the loop above, but the child process has not</span>
+        <span class="c1"># yet terminated. This is unexpected unless KeyboarInterrupt</span>
+        <span class="c1"># is caught</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># wait maximum of 1s</span>
+        <span class="k">except</span> <span class="n">TimeoutExpired</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not kill python subprocess: PID </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># simulation failed with a numeric return code</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MPI simulation failed. Return code: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
+                           <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">)</span>
+
+    <span class="n">child_data</span> <span class="o">=</span> <span class="n">_process_child_data</span><span class="p">(</span><span class="n">proc_data_bytes</span><span class="p">,</span> <span class="n">data_len</span><span class="p">)</span>
+
+    <span class="c1"># clean up the queue</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">proc_queue</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">proc</span><span class="p">,</span> <span class="n">child_data</span>
+
+
+<span class="k">def</span> <span class="nf">_process_child_data</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">data_len</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Process the data returned by child process.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_bytes : str</span>
+<span class="sd">        The data bytes</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data_unpickled : object</span>
+<span class="sd">        The unpickled data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_len</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">):</span>
+        <span class="c1"># This is indicative of a failure. For debugging purposes.</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Length of received data unexpected. Expecting </span><span class="si">%d</span><span class="s2"> bytes, &quot;</span>
+             <span class="s2">&quot;got </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MPI simulation didn&#39;t return any data&quot;</span><span class="p">)</span>
+
+    <span class="c1"># decode base64 byte string</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data_pickled</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">binascii</span><span class="o">.</span><span class="n">Error</span><span class="p">:</span>
+        <span class="c1"># This is here for future debugging purposes. Unit tests can&#39;t</span>
+        <span class="c1"># reproduce an incorrectly padded string, but this has been an</span>
+        <span class="c1"># issue before</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect padding for data length </span><span class="si">%d</span><span class="s2"> bytes&quot;</span> <span class="o">%</span>
+                         <span class="nb">len</span><span class="p">(</span><span class="n">data_len</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; (mod 4 = </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_len</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span>
+
+    <span class="c1"># unpickle the data</span>
+    <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data_pickled</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_echo_child_output</span><span class="p">(</span><span class="n">out_q</span><span class="p">):</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">out_q</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_get_data_from_child_err</span><span class="p">(</span><span class="n">err_q</span><span class="p">):</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">data_length</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">data_bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">err</span> <span class="o">+=</span> <span class="n">err_q</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="c1"># check for data signal</span>
+    <span class="n">extracted_data</span> <span class="o">=</span> <span class="n">_extract_data</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extracted_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># _extract_data only returns data when signals on</span>
+        <span class="c1"># both sides were seen</span>
+
+        <span class="n">err</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;@start_of_data@&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">extracted_data</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">data_length</span> <span class="o">=</span> <span class="n">_extract_data_length</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;@end_of_data:</span><span class="si">%d</span><span class="s1">@</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">data_length</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">data_bytes</span> <span class="o">=</span> <span class="n">extracted_data</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+
+    <span class="c1"># print the rest of the child&#39;s stderr to our stdout</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_length</span><span class="p">,</span> <span class="n">data_bytes</span>
+
+
+<span class="k">def</span> <span class="nf">requires_mpi4py</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decorator for testing functions that require MPI.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pytest</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">mpi4py</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mpi4py</span><span class="p">,</span> <span class="s1">&#39;__version__&#39;</span><span class="p">)</span>
+        <span class="n">skip</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;TRAVIS_OS_NAME&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">skip</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="n">reason</span> <span class="o">=</span> <span class="s1">&#39;mpi4py not available&#39;</span>
+    <span class="k">return</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">skipif</span><span class="p">(</span><span class="n">skip</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">)(</span><span class="n">function</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">requires_psutil</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decorator for testing functions that require psutil.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pytest</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">psutil</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">psutil</span><span class="p">,</span> <span class="s1">&#39;__version__&#39;</span><span class="p">)</span>
+        <span class="n">skip</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;TRAVIS_OS_NAME&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">skip</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="n">reason</span> <span class="o">=</span> <span class="s1">&#39;psutil not available&#39;</span>
+    <span class="k">return</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">skipif</span><span class="p">(</span><span class="n">skip</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">)(</span><span class="n">function</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_extract_data_length</span><span class="p">(</span><span class="n">data_str</span><span class="p">,</span> <span class="n">object_name</span><span class="p">):</span>
+    <span class="n">data_len_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;@end_of_</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">object_name</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;(\d+)@&#39;</span><span class="p">,</span>
+                               <span class="n">data_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data_len_match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_len_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find data length in string&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_extract_data</span><span class="p">(</span><span class="n">data_str</span><span class="p">,</span> <span class="n">object_name</span><span class="p">):</span>
+    <span class="n">start_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">end_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">start_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;@start_of_</span><span class="si">%s</span><span class="s1">@&#39;</span> <span class="o">%</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">data_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">start_match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="n">start_match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># need start signal</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">end_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;@end_of_</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">object_name</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\d+@&#39;</span><span class="p">,</span> <span class="n">data_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">end_match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">end_idx</span> <span class="o">=</span> <span class="n">end_match</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">data_str</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">end_idx</span><span class="p">]</span>
+
+
+<span class="c1"># Next 3 functions are from HNN. Will move here. They require psutil</span>
+<span class="k">def</span> <span class="nf">_kill_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tries to terminate processes in a list before sending kill signal&quot;&quot;&quot;</span>
+    <span class="c1"># try terminate first</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">NoSuchProcess</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">alive</span> <span class="o">=</span> <span class="n">wait_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># now try kill</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">alive</span><span class="p">:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">alive</span> <span class="o">=</span> <span class="n">wait_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">alive</span>
+
+
+<span class="k">def</span> <span class="nf">_get_procs_running</span><span class="p">(</span><span class="n">proc_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a list of processes currently running&quot;&quot;&quot;</span>
+    <span class="n">process_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">process_iter</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;exe&quot;</span><span class="p">,</span> <span class="s2">&quot;cmdline&quot;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">proc_name</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">or</span> \
+                <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;exe&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;exe&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">proc_name</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;cmdline&#39;</span><span class="p">]</span> <span class="ow">and</span>
+                 <span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;cmdline&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">proc_name</span><span class="p">):</span>
+            <span class="n">process_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">process_list</span>
+
+
+<span class="k">def</span> <span class="nf">kill_proc_name</span><span class="p">(</span><span class="n">proc_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make best effort to kill processes</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    proc_name : str</span>
+<span class="sd">        A string to match process names against and kill all matches</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    killed_procs : bool</span>
+<span class="sd">        True if any processes were killed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">killed_procs</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">procs</span> <span class="o">=</span> <span class="n">_get_procs_running</span><span class="p">(</span><span class="n">proc_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">procs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">running</span> <span class="o">=</span> <span class="n">_kill_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">running</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">running</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">procs</span><span class="p">):</span>
+                <span class="n">killed_procs</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">pids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="n">running</span><span class="p">]</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Failed to kill nrniv process(es) </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                 <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pids</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">killed_procs</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">killed_procs</span>
+
+
+<span class="k">def</span> <span class="nf">_write_net</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">pickled_net</span><span class="p">):</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@start_of_net@&#39;</span><span class="p">)</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pickled_net</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@end_of_net:</span><span class="si">%d</span><span class="s1">@</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">pickled_net</span><span class="p">))</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_write_child_exit_signal</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@data_received@</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="JoblibBackend"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.JoblibBackend.html#hnn_core.parallel_backends.JoblibBackend">[docs]</a><span class="k">class</span> <span class="nc">JoblibBackend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The JoblibBackend class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_jobs : int | None</span>
+<span class="sd">        The number of jobs to start in parallel. If None, then 1 trial will be</span>
+<span class="sd">        started without parallelism</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_jobs : int</span>
+<span class="sd">        The number of jobs to start in parallel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="n">n_jobs</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;joblib will run over </span><span class="si">%d</span><span class="s2"> jobs&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_parallel_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;joblib not installed. Cannot run in parallel.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">my_func</span> <span class="o">=</span> <span class="n">func</span>
+            <span class="n">parallel</span> <span class="o">=</span> <span class="nb">list</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parallel</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">)</span>
+            <span class="n">my_func</span> <span class="o">=</span> <span class="n">delayed</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">parallel</span><span class="p">,</span> <span class="n">my_func</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">_BACKEND</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_old_backend</span> <span class="o">=</span> <span class="n">_BACKEND</span>
+        <span class="n">_BACKEND</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">_BACKEND</span>
+
+        <span class="n">_BACKEND</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_backend</span>
+
+<div class="viewcode-block" id="JoblibBackend.simulate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.JoblibBackend.html#hnn_core.parallel_backends.JoblibBackend.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simulate the HNN model</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        net : Network object</span>
+<span class="sd">            The Network object specifying how cells are</span>
+<span class="sd">            connected.</span>
+<span class="sd">        n_trials : int</span>
+<span class="sd">            Number of trials to simulate.</span>
+<span class="sd">        postproc : bool</span>
+<span class="sd">            If False, no postprocessing applied to the dipole</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dpl: list of Dipole</span>
+<span class="sd">            The Dipole results from each simulation trial</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parallel</span><span class="p">,</span> <span class="n">myfunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_func</span><span class="p">(</span><span class="n">_clone_and_simulate</span><span class="p">)</span>
+        <span class="n">sim_data</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span><span class="n">myfunc</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
+
+        <span class="n">dpls</span> <span class="o">=</span> <span class="n">_gather_trial_data</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
+                                  <span class="n">postproc</span><span class="o">=</span><span class="n">postproc</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dpls</span></div></div>
+
+
+<div class="viewcode-block" id="MPIBackend"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend">[docs]</a><span class="k">class</span> <span class="nc">MPIBackend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The MPIBackend class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_procs : int | None</span>
+<span class="sd">        The number of MPI processes requested by the user. If None, then will</span>
+<span class="sd">        attempt to detect number of cores (including hyperthreads) and start</span>
+<span class="sd">        parallel simulation over all of them.</span>
+<span class="sd">    mpi_cmd : str</span>
+<span class="sd">        The name of the mpi launcher executable. Will use &#39;mpiexec&#39;</span>
+<span class="sd">        (openmpi) by default.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    n_procs : int</span>
+<span class="sd">        The number of processes MPI will actually use (spread over cores). If 1</span>
+<span class="sd">        is specified or mpi4py could not be loaded, the simulation will be run</span>
+<span class="sd">        with the JoblibBackend</span>
+<span class="sd">    mpi_cmd : list of str</span>
+<span class="sd">        The mpi command with number of procs and options to be passed to Popen</span>
+<span class="sd">    expected_data_length : int</span>
+<span class="sd">        Used to check consistency between data that was sent and what</span>
+<span class="sd">        MPIBackend received.</span>
+<span class="sd">    proc_queue : threading.Queue</span>
+<span class="sd">        A Queue object to hold process handles from Popen in a thread-safe way.</span>
+<span class="sd">        There will be a valid process handle present the queue when a MPI</span>
+<span class="sd">        åsimulation is running.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_procs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected_data_length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+
+        <span class="n">n_logical_cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">n_procs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="n">n_logical_cores</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="n">n_procs</span>
+
+        <span class="c1"># did user try to force running on more cores than available?</span>
+        <span class="n">oversubscribe</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_logical_cores</span><span class="p">:</span>
+            <span class="n">oversubscribe</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">mpi4py</span>
+            <span class="n">mpi4py</span><span class="o">.</span><span class="n">__version__</span>  <span class="c1"># for flake8 test</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">psutil</span>
+
+                <span class="n">n_physical_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="c1"># detect if we need to use hwthread-cpus with mpiexec</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_physical_cores</span><span class="p">:</span>
+                    <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;psutil not installed, so cannot detect if hyperthreading&#39;</span>
+                     <span class="s1">&#39;is enabled, assuming yes.&#39;</span><span class="p">)</span>
+                <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;mpi4py not installed. will run on single processor&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">=</span> <span class="n">mpi_cmd</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Backend will use 1 core. Running simulation without MPI&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MPI will run over </span><span class="si">%d</span><span class="s2"> processes&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">hyperthreading</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; --use-hwthread-cpus&#39;</span>
+
+        <span class="k">if</span> <span class="n">oversubscribe</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; --oversubscribe&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; -np &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; nrniv -python -mpi -nobanner &#39;</span> <span class="o">+</span> \
+            <span class="n">sys</span><span class="o">.</span><span class="n">executable</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> \
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span>
+                         <span class="s1">&#39;mpi_child.py&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Split the command into shell arguments for passing to Popen</span>
+        <span class="k">if</span> <span class="s1">&#39;win&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+            <span class="n">use_posix</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">use_posix</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">posix</span><span class="o">=</span><span class="n">use_posix</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">_BACKEND</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_old_backend</span> <span class="o">=</span> <span class="n">_BACKEND</span>
+        <span class="n">_BACKEND</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">_BACKEND</span>
+
+        <span class="n">_BACKEND</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_backend</span>
+
+        <span class="c1"># always kill nrniv processes for good measure</span>
+        <span class="n">kill_proc_name</span><span class="p">(</span><span class="s1">&#39;nrniv&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MPIBackend.simulate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simulate the HNN model in parallel on all cores</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        net : Network object</span>
+<span class="sd">            The Network object specifying how cells are</span>
+<span class="sd">            connected.</span>
+<span class="sd">        n_trials : int</span>
+<span class="sd">            Number of trials to simulate.</span>
+<span class="sd">        postproc: bool</span>
+<span class="sd">            If False, no postprocessing applied to the dipole</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dpl: list of Dipole</span>
+<span class="sd">            The Dipole results from each simulation trial</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># just use the joblib backend for a single core</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
+                                                    <span class="n">postproc</span><span class="o">=</span><span class="n">postproc</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running </span><span class="si">%d</span><span class="s2"> trials...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
+        <span class="n">dpls</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">env</span> <span class="o">=</span> <span class="n">_get_mpi_env</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="p">,</span> <span class="n">sim_data</span> <span class="o">=</span> <span class="n">run_subprocess</span><span class="p">(</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+            <span class="n">proc_queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+            <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dpls</span> <span class="o">=</span> <span class="n">_gather_trial_data</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dpls</span></div>
+
+<div class="viewcode-block" id="MPIBackend.terminate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Terminate running simulation on this MPIBackend</span>
+
+<span class="sd">        Safe to call from another thread from the one `simulate_dipole`</span>
+<span class="sd">        was called from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No currently running process to terminate&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">proc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># wait maximum of 5s</span>
+            <span class="k">except</span> <span class="n">TimeoutExpired</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not kill python subprocess: PID </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
+                     <span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

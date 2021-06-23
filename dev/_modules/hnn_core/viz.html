@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn_core.viz &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../auto_examples/index.html">Examples</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.2.dev0
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hnn_core.viz</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Visualization functions.&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Mainak Jas &lt;mainak.jas@telecom-paristech.fr&gt;</span>
+<span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
+<span class="c1">#          Christopher Bailey &lt;cjb@cfin.au.dk&gt;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
+<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span>
+
+
+<span class="k">def</span> <span class="nf">_get_plot_data_trange</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get slices of times and data based on tmin and tmax&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">plot_tmin</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">tmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plot_tmin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">tmin</span><span class="p">,</span> <span class="n">plot_tmin</span><span class="p">)</span>
+    <span class="n">plot_tmax</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">tmax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plot_tmax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">tmax</span><span class="p">,</span> <span class="n">plot_tmax</span><span class="p">)</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">times</span> <span class="o">&gt;=</span> <span class="n">plot_tmin</span><span class="p">,</span> <span class="n">times</span> <span class="o">&lt;</span> <span class="n">plot_tmax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_decimate_plot_data</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">decimate</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">decim</span> <span class="o">=</span> <span class="p">[</span><span class="n">decim</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">dec</span> <span class="ow">in</span> <span class="n">decim</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dec</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;each decimation factor must be a positive int, &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;but </span><span class="si">{</span><span class="n">dec</span><span class="si">}</span><span class="s1"> is a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">decimate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dec</span><span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[::</span><span class="n">dec</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">sfreq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sfreq</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">decim</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">sfreq</span>
+
+
+<span class="k">def</span> <span class="nf">plt_show</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show a figure while suppressing warnings.</span>
+
+<span class="sd">    NB copied from :func:`mne.viz.utils.plt_show`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        Show the figure.</span>
+<span class="sd">    fig : instance of Figure | None</span>
+<span class="sd">        If non-None, use fig.show().</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Extra arguments for :func:`matplotlib.pyplot.show`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">get_backend</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="k">if</span> <span class="n">show</span> <span class="ow">and</span> <span class="n">get_backend</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;agg&#39;</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">fig</span> <span class="ow">or</span> <span class="n">plt</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_extracellular</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">voltage_offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voltage_scalebar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">contact_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot extracellular electrode array voltage time series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    times : list | Numpy array</span>
+<span class="sd">        Sampling times (in ms).</span>
+<span class="sd">    data : Two-dimensional Numpy array</span>
+<span class="sd">        The extracellular voltages as an (n_contacts, n_times) array.</span>
+<span class="sd">    tmin : float | None</span>
+<span class="sd">        Start time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">    tmax : float | None</span>
+<span class="sd">        End time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">    ax : instance of matplotlib figure | None</span>
+<span class="sd">        The matplotlib axis</span>
+<span class="sd">    decim : int | list of int | None (default)</span>
+<span class="sd">        Optional (integer) factor by which to decimate the raw dipole traces.</span>
+<span class="sd">        The SciPy function :func:`~scipy.signal.decimate` is used, which</span>
+<span class="sd">        recommends values &lt;13. To achieve higher decimation factors, a list of</span>
+<span class="sd">        ints can be provided. These are applied successively.</span>
+<span class="sd">    color : string | array of floats | ``matplotlib.colors.ListedColormap``</span>
+<span class="sd">        The color to use for plotting (optional). The usual Matplotlib standard</span>
+<span class="sd">        color strings may be used (e.g., &#39;b&#39; for blue). A color can also be</span>
+<span class="sd">        defined as an RGBA-quadruplet, or an array of RGBA-values (one for each</span>
+<span class="sd">        electrode contact trace to plot). An instance of</span>
+<span class="sd">        :class:`~matplotlib.colors.ListedColormap` may also be provided.</span>
+<span class="sd">    voltage_offset : float | None (optional)</span>
+<span class="sd">        Amount to offset traces by on the voltage-axis. Useful for plotting</span>
+<span class="sd">        laminar arrays.</span>
+<span class="sd">    voltage_scalebar : float | None (optional)</span>
+<span class="sd">        Height, in units of uV, of a scale bar to plot in the top-left corner</span>
+<span class="sd">        of the plot.</span>
+<span class="sd">    contact_labels : list (optional)</span>
+<span class="sd">        Labels associated with the contacts to plot. Passed as-is to</span>
+<span class="sd">        :func:`~matplotlib.axes.Axes.set_yticklabels`.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the figure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of plt.fig</span>
+<span class="sd">        The matplotlib figure handle into which time series were plotted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s1">&#39;times&#39;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data must be 2D, got shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;length of times (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s1">) and data &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s1">) do not match&#39;</span><span class="p">)</span>
+
+    <span class="n">n_contacts</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">color</span><span class="p">,</span>
+                       <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ListedColormap</span><span class="p">),</span>
+                       <span class="s1">&#39;color&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">color</span><span class="p">])</span> <span class="ow">or</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;color must be length 3 or 4, got </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">color</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_contacts</span> <span class="ow">or</span>
+                    <span class="p">(</span><span class="n">color</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">color</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;color must be n_contacts x (3 or 4), got </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">ListedColormap</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">color</span><span class="o">.</span><span class="n">N</span> <span class="o">!=</span> <span class="n">n_contacts</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ListedColormap has N=</span><span class="si">{</span><span class="n">color</span><span class="o">.</span><span class="n">N</span><span class="si">}</span><span class="s1">, but &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;there are </span><span class="si">{</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1"> contacts&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">n_offsets</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">trace_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_offsets</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">voltage_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">trace_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_offsets</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">voltage_offset</span>
+
+    <span class="k">for</span> <span class="n">contact_no</span><span class="p">,</span> <span class="n">trace</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+        <span class="n">plot_data</span><span class="p">,</span> <span class="n">plot_times</span> <span class="o">=</span> <span class="n">_get_plot_data_trange</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">decim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plot_data</span><span class="p">,</span> <span class="n">plot_times</span> <span class="o">=</span> <span class="n">_decimate_plot_data</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="n">plot_data</span><span class="p">,</span>
+                                                        <span class="n">plot_times</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">contact_no</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">ListedColormap</span><span class="p">):</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">color</span><span class="p">(</span><span class="n">contact_no</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_times</span><span class="p">,</span> <span class="n">plot_data</span> <span class="o">+</span> <span class="n">trace_offsets</span><span class="p">[</span><span class="n">contact_no</span><span class="p">],</span>
+                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">contact_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">voltage_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">voltage_offset</span><span class="p">,</span> <span class="n">n_offsets</span> <span class="o">*</span> <span class="n">voltage_offset</span><span class="p">)</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Individual contact traces&#39;</span>
+        <span class="k">if</span> <span class="n">contact_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_offsets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;contact_labels is length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">)</span><span class="si">}</span><span class="s1">,&#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39; but </span><span class="si">{</span><span class="n">n_offsets</span><span class="si">}</span><span class="s1"> contacts to be plotted&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trace_ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">)</span> <span class="o">*</span> <span class="n">voltage_offset</span><span class="p">,</span>
+                                    <span class="n">voltage_offset</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">trace_ticks</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">voltage_scalebar</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">voltage_scalebar</span> <span class="o">=</span> <span class="n">voltage_offset</span>
+
+    <span class="k">if</span> <span class="n">voltage_scalebar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1.anchored_artists</span> <span class="kn">import</span> <span class="n">AnchoredSizeBar</span>
+        <span class="n">scalebar</span> <span class="o">=</span> <span class="n">AnchoredSizeBar</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+                                   <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">voltage_scalebar</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1"> &#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;$\mu V$&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;upper left&#39;</span><span class="p">,</span>
+                                   <span class="n">size_vertical</span><span class="o">=</span><span class="n">voltage_scalebar</span><span class="p">,</span>
+                                   <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                                   <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span>
+                                   <span class="n">label_top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                   <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">scalebar</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Electric potential ($\mu V$)&#39;</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">multialignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="plot_dipole"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole">[docs]</a><span class="k">def</span> <span class="nf">plot_dipole</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simple layer-specific plot function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dpl : instance of Dipole | list of Dipole instances</span>
+<span class="sd">        The Dipole object.</span>
+<span class="sd">    tmin : float or None</span>
+<span class="sd">        Start time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">    tmax : float or None</span>
+<span class="sd">        End time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">    ax : instance of matplotlib figure | None</span>
+<span class="sd">        The matplotlib axis</span>
+<span class="sd">    layer : str</span>
+<span class="sd">        The layer to plot. Can be one of</span>
+<span class="sd">        &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
+<span class="sd">    decim : int or list of int or None (default)</span>
+<span class="sd">        Optional (integer) factor by which to decimate the raw dipole traces.</span>
+<span class="sd">        The SciPy function :func:`~scipy.signal.decimate` is used, which</span>
+<span class="sd">        recommends values &lt;13. To achieve higher decimation factors, a list of</span>
+<span class="sd">        ints can be provided. These are applied successively.</span>
+<span class="sd">    color : tuple of float</span>
+<span class="sd">        RGBA value to use for plotting (optional)</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the figure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of plt.fig</span>
+<span class="sd">        The matplotlib figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
+        <span class="n">dpl</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpl</span><span class="p">]</span>
+
+    <span class="n">scale_applied</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scale_applied</span>
+    <span class="k">for</span> <span class="n">dpl_trial</span> <span class="ow">in</span> <span class="n">dpl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dpl_trial</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">!=</span> <span class="n">scale_applied</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;All dipoles must be scaled equally!&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">dpl_trial</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+            <span class="c1"># extract scaled data and times</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">_get_plot_data_trange</span><span class="p">(</span><span class="n">dpl_trial</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
+                                                <span class="n">dpl_trial</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">layer</span><span class="p">],</span>
+                                                <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">decim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">_decimate_plot_data</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scale_applied</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Dipole moment (nAm)&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Dipole moment</span><span class="se">\n</span><span class="s1">(nAm &#39;</span> <span class="o">+</span>\
+            <span class="sa">r</span><span class="s1">&#39;$\times$ </span><span class="si">{:.0f}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale_applied</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">multialignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">layer</span> <span class="o">==</span> <span class="s1">&#39;agg&#39;</span><span class="p">:</span>
+        <span class="n">title_str</span> <span class="o">=</span> <span class="s1">&#39;Aggregate (L2 + L5)&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">title_str</span> <span class="o">=</span> <span class="n">layer</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title_str</span><span class="p">)</span>
+
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist">[docs]</a><span class="k">def</span> <span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot the histogram of spiking activity across trials.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cell_response : instance of CellResponse</span>
+<span class="sd">        The CellResponse object from net.cell_response</span>
+<span class="sd">    ax : instance of matplotlib axis | None</span>
+<span class="sd">        An axis object from matplotlib. If None,</span>
+<span class="sd">        a new figure is created.</span>
+<span class="sd">    spike_types: string | list | dictionary | None</span>
+<span class="sd">        String input of a valid spike type is plotted individually.</span>
+<span class="sd">            Ex: &#39;poisson&#39;, &#39;evdist&#39;, &#39;evprox&#39;, ...</span>
+<span class="sd">        List of valid string inputs will plot each spike type individually.</span>
+<span class="sd">            Ex: [&#39;poisson&#39;, &#39;evdist&#39;]</span>
+<span class="sd">        Dictionary of valid lists will plot list elements as a group.</span>
+<span class="sd">            Ex: {&#39;Evoked&#39;: [&#39;evdist&#39;, &#39;evprox&#39;], &#39;Tonic&#39;: [&#39;poisson&#39;]}</span>
+<span class="sd">        If None, all input spike types are plotted individually if any</span>
+<span class="sd">        are present. Otherwise spikes from all cells are plotted.</span>
+<span class="sd">        Valid strings also include leading characters of spike types</span>
+<span class="sd">            Example: &#39;ev&#39; is equivalent to [&#39;evdist&#39;, &#39;evprox&#39;]</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the figure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">spike_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="n">spike_types_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">,</span> <span class="p">[]))</span>
+
+    <span class="n">unique_types</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">spike_types_data</span><span class="p">)</span>
+    <span class="n">spike_types_mask</span> <span class="o">=</span> <span class="p">{</span><span class="n">s_type</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">spike_types_data</span><span class="p">,</span> <span class="n">s_type</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">s_type</span> <span class="ow">in</span> <span class="n">unique_types</span><span class="p">}</span>
+    <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">]</span>
+    <span class="n">input_types</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">unique_types</span><span class="p">,</span> <span class="n">cell_types</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_types</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">spike_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">spike_types</span><span class="p">:</span> <span class="p">[</span><span class="n">spike_types</span><span class="p">]}</span>
+
+    <span class="k">if</span> <span class="n">spike_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">input_types</span><span class="p">):</span>
+            <span class="n">spike_types</span> <span class="o">=</span> <span class="n">input_types</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spike_types</span> <span class="o">=</span> <span class="n">unique_types</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_types</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">spike_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">s_type</span><span class="p">:</span> <span class="p">[</span><span class="n">s_type</span><span class="p">]</span> <span class="k">for</span> <span class="n">s_type</span> <span class="ow">in</span> <span class="n">spike_types</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_types</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">spike_label</span> <span class="ow">in</span> <span class="n">spike_types</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_types</span><span class="p">[</span><span class="n">spike_label</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;spike_types[</span><span class="si">{</span><span class="n">spike_label</span><span class="si">}</span><span class="s1">] must be a list. &#39;</span>
+                                <span class="sa">f</span><span class="s1">&#39;Got &#39;</span>
+                                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">spike_types</span><span class="p">[</span><span class="n">spike_label</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_types</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;spike_types should be str, list, dict, or None&#39;</span><span class="p">)</span>
+
+    <span class="n">spike_labels</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">spike_label</span><span class="p">,</span> <span class="n">spike_type_list</span> <span class="ow">in</span> <span class="n">spike_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">spike_type</span> <span class="ow">in</span> <span class="n">spike_type_list</span><span class="p">:</span>
+            <span class="n">n_found</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">unique_type</span> <span class="ow">in</span> <span class="n">unique_types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">unique_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">spike_type</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">unique_type</span> <span class="ow">in</span> <span class="n">spike_labels</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Elements of spike_types must map to&#39;</span>
+                                         <span class="sa">f</span><span class="s1">&#39; mutually exclusive input types.&#39;</span>
+                                         <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">unique_type</span><span class="si">}</span><span class="s1"> is found more than&#39;</span>
+                                         <span class="sa">f</span><span class="s1">&#39; once.&#39;</span><span class="p">)</span>
+                    <span class="n">spike_labels</span><span class="p">[</span><span class="n">unique_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">spike_label</span>
+                    <span class="n">n_found</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">n_found</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No input types found for </span><span class="si">{</span><span class="n">spike_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">color_cycle</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">])</span>
+
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="n">spike_color</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">spike_type</span><span class="p">,</span> <span class="n">spike_label</span> <span class="ow">in</span> <span class="n">spike_labels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;_nolegend_&quot;</span>
+        <span class="k">if</span> <span class="n">spike_label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spike_color</span><span class="p">:</span>
+            <span class="n">spike_color</span><span class="p">[</span><span class="n">spike_label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">color_cycle</span><span class="p">)</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">spike_label</span>
+
+        <span class="n">color</span> <span class="o">=</span> <span class="n">spike_color</span><span class="p">[</span><span class="n">spike_label</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">spike_times</span><span class="p">[</span><span class="n">spike_types_mask</span><span class="p">[</span><span class="n">spike_type</span><span class="p">]],</span> <span class="n">bins</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Counts&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster">[docs]</a><span class="k">def</span> <span class="nf">plot_spikes_raster</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot the aggregate spiking activity according to cell type.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cell_response : instance of CellResponse</span>
+<span class="sd">        The CellResponse object from net.cell_response</span>
+<span class="sd">    ax : instance of matplotlib axis | None</span>
+<span class="sd">        An axis object from matplotlib. If None,</span>
+<span class="sd">        a new figure is created.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the figure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">spike_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="n">spike_types</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="n">spike_gids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span>
+    <span class="n">cell_type_colors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="s1">&#39;w&#39;</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">ypos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
+        <span class="n">cell_type_gids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">spike_gids</span><span class="p">[</span><span class="n">spike_types</span> <span class="o">==</span> <span class="n">cell_type</span><span class="p">])</span>
+        <span class="n">cell_type_times</span><span class="p">,</span> <span class="n">cell_type_ypos</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">cell_type_gids</span><span class="p">:</span>
+            <span class="n">gid_time</span> <span class="o">=</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">spike_gids</span> <span class="o">==</span> <span class="n">gid</span><span class="p">]</span>
+            <span class="n">cell_type_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gid_time</span><span class="p">)</span>
+            <span class="n">cell_type_ypos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">ypos</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gid_time</span><span class="p">)))</span>
+            <span class="n">ypos</span> <span class="o">=</span> <span class="n">ypos</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">cell_type_times</span><span class="p">:</span>
+            <span class="n">cell_type_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">cell_type_times</span><span class="p">)</span>
+            <span class="n">cell_type_ypos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">cell_type_ypos</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cell_type_times</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cell_type_ypos</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">cell_type_times</span><span class="p">,</span> <span class="n">cell_type_ypos</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span>
+                   <span class="n">color</span><span class="o">=</span><span class="n">cell_type_colors</span><span class="p">[</span><span class="n">cell_type</span><span class="p">])</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_cells"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cells.html#hnn_core.viz.plot_cells">[docs]</a><span class="k">def</span> <span class="nf">plot_cells</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot the cells using Network.pos_dict.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : instance of NetworkBuilder</span>
+<span class="sd">        The NetworkBuilder object.</span>
+<span class="sd">    ax : instance of matplotlib Axes3D | None</span>
+<span class="sd">        An axis object from matplotlib. If None,</span>
+<span class="sd">        a new figure is created.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the figure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># noqa: F401 unused import</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="s1">&#39;m&#39;</span><span class="p">}</span>
+    <span class="n">markers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="s1">&#39;x&#39;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
+            <span class="n">marker</span> <span class="o">=</span> <span class="n">markers</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">cell_type</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="p">(</span><span class="n">arr_name</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">positions</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">positions</span><span class="p">]</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">positions</span><span class="p">]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">(</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
+                       <span class="n">label</span><span class="o">=</span><span class="n">arr_name</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">1.025</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_tfr_morlet"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_tfr_morlet.html#hnn_core.viz.plot_tfr_morlet">[docs]</a><span class="k">def</span> <span class="nf">plot_tfr_morlet</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mf">7.</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot Morlet time-frequency representation of dipole time course</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dpl : instance of Dipole | list of Dipole instances</span>
+<span class="sd">        The Dipole object. If a list of dipoles is given, the power is</span>
+<span class="sd">        calculated separately for each trial, then averaged.</span>
+<span class="sd">    freqs : array</span>
+<span class="sd">        Frequency range of interest.</span>
+<span class="sd">    n_cycles : float or array of float, default 7.0</span>
+<span class="sd">        Number of cycles. Fixed number or one per frequency.</span>
+<span class="sd">    tmin : float or None</span>
+<span class="sd">        Start time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">    tmax : float or None</span>
+<span class="sd">        End time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">    layer : str, default &#39;agg&#39;</span>
+<span class="sd">        The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
+<span class="sd">    decim : int or list of int or None (default)</span>
+<span class="sd">        Optional (integer) factor by which to decimate the raw dipole traces.</span>
+<span class="sd">        The SciPy function :func:`~scipy.signal.decimate` is used, which</span>
+<span class="sd">        recommends values &lt;13. To achieve higher decimation factors, a list of</span>
+<span class="sd">        ints can be provided. These are applied successively.</span>
+<span class="sd">    padding : str or None</span>
+<span class="sd">        Optional padding of the dipole time course beyond the plotting limits.</span>
+<span class="sd">        Possible values are: &#39;zeros&#39; for padding with 0&#39;s (default), &#39;mirror&#39;</span>
+<span class="sd">        for mirror-image padding.</span>
+<span class="sd">    ax : instance of matplotlib figure | None</span>
+<span class="sd">        The matplotlib axis</span>
+<span class="sd">    colormap : str</span>
+<span class="sd">        The name of a matplotlib colormap, e.g., &#39;viridis&#39;. Default: &#39;inferno&#39;</span>
+<span class="sd">    colorbar : bool</span>
+<span class="sd">        If True (default), adjust figure to include colorbar.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the figure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">ScalarFormatter</span>
+    <span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">tfr_array_morlet</span>
+    <span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
+        <span class="n">dpl</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpl</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">scale_applied</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scale_applied</span>
+    <span class="n">sfreq</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sfreq</span>
+    <span class="n">trial_power</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dpl_trial</span> <span class="ow">in</span> <span class="n">dpl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dpl_trial</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">!=</span> <span class="n">scale_applied</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;All dipoles must be scaled equally!&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dpl_trial</span><span class="o">.</span><span class="n">sfreq</span> <span class="o">!=</span> <span class="n">sfreq</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;All dipoles must be sampled equally!&#39;</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">_get_plot_data_trange</span><span class="p">(</span><span class="n">dpl_trial</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
+                                            <span class="n">dpl_trial</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">layer</span><span class="p">],</span>
+                                            <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+
+        <span class="n">sfreq</span> <span class="o">=</span> <span class="n">dpl_trial</span><span class="o">.</span><span class="n">sfreq</span>
+        <span class="k">if</span> <span class="n">decim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">sfreq</span> <span class="o">=</span> <span class="n">_decimate_plot_data</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span>
+                                                     <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;padding must be a string (or None)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">padding</span> <span class="o">==</span> <span class="s1">&#39;zeros&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,)),</span> <span class="n">data</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,))]</span>
+            <span class="k">elif</span> <span class="n">padding</span> <span class="o">==</span> <span class="s1">&#39;mirror&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="c1"># MNE expects an array of shape (n_trials, n_channels, n_times)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="n">tfr_array_morlet</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
+                                 <span class="n">n_cycles</span><span class="o">=</span><span class="n">n_cycles</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;power&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># get the middle portion after padding</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="n">power</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">times</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">times</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">trial_power</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
+
+    <span class="n">power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trial_power</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+                       <span class="n">shading</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+        <span class="n">xfmt</span> <span class="o">=</span> <span class="n">ScalarFormatter</span><span class="p">()</span>
+        <span class="n">xfmt</span><span class="o">.</span><span class="n">set_powerlimits</span><span class="p">((</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">xfmt</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Power ([nAm $\times$ </span><span class="si">{:.0f}</span><span class="s1">]$^2$)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">scale_applied</span><span class="p">),</span> <span class="n">rotation</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">)</span>
+
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_psd"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_psd.html#hnn_core.viz.plot_psd">[docs]</a><span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span>
+             <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot power spectral density (PSD) of dipole time course</span>
+
+<span class="sd">    Applies `~scipy.signal.periodogram` from SciPy with ``window=&#39;hamming&#39;``.</span>
+<span class="sd">    Note that no spectral averaging is applied across time, as most</span>
+<span class="sd">    ``hnn_core`` simulations are short-duration. However, passing a list of</span>
+<span class="sd">    `Dipole` instances will plot their average (Hamming-windowed) power, which</span>
+<span class="sd">    resembles the `Welch`-method applied over time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dpl : instance of Dipole | list of Dipole instances</span>
+<span class="sd">        The Dipole object.</span>
+<span class="sd">    fmin : float</span>
+<span class="sd">        Minimum frequency to plot (in Hz). Default: 0 Hz</span>
+<span class="sd">    fmax : float</span>
+<span class="sd">        Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)</span>
+<span class="sd">    tmin : float or None</span>
+<span class="sd">        Start time of data to include (in ms). If None, use entire simulation.</span>
+<span class="sd">    tmax : float or None</span>
+<span class="sd">        End time of data to include (in ms). If None, use entire simulation.</span>
+<span class="sd">    layer : str, default &#39;agg&#39;</span>
+<span class="sd">        The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
+<span class="sd">    ax : instance of matplotlib figure | None</span>
+<span class="sd">        The matplotlib axis.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the figure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">periodogram</span>
+    <span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
+        <span class="n">dpl</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpl</span><span class="p">]</span>
+
+    <span class="n">scale_applied</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scale_applied</span>
+    <span class="n">sfreq</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sfreq</span>
+    <span class="n">trial_power</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dpl_trial</span> <span class="ow">in</span> <span class="n">dpl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dpl_trial</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">!=</span> <span class="n">scale_applied</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;All dipoles must be scaled equally!&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dpl_trial</span><span class="o">.</span><span class="n">sfreq</span> <span class="o">!=</span> <span class="n">sfreq</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;All dipoles must be sampled equally!&#39;</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_plot_data_trange</span><span class="p">(</span><span class="n">dpl_trial</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
+                                        <span class="n">dpl_trial</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">layer</span><span class="p">],</span>
+                                        <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">)</span>
+
+        <span class="n">freqs</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">periodogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sfreq</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">trial_power</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Pxx</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Pxx</span><span class="p">,</span> <span class="n">ndmin</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">fmax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scale_applied</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Power spectral density</span><span class="se">\n</span><span class="s1">(nAm&#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;$^2 \ Hz^{-1}$)&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Power spectral density</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>\
+            <span class="sa">r</span><span class="s1">&#39;([nAm$\times$ </span><span class="si">{:.0f}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale_applied</span><span class="p">)</span> <span class="o">+</span>\
+            <span class="sa">r</span><span class="s1">&#39;$^2 \ Hz^{-1}$)&#39;</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">multialignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">_linewidth_from_data_units</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="p">):</span>
+    <span class="c1"># see: https://stackoverflow.com/a/35501485</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">bbox_inches</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">width</span>
+    <span class="n">value_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">length</span> <span class="o">*=</span> <span class="mi">72</span>  <span class="c1"># Convert length to points</span>
+    <span class="c1"># Scale linewidth to value range</span>
+    <span class="k">return</span> <span class="n">linewidth</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="n">value_range</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="plot_cell_morphology"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_morphology</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cell : instance of Cell</span>
+<span class="sd">        The cell object</span>
+<span class="sd">    ax : instance of Axes3D</span>
+<span class="sd">        Matplotlib 3D axis</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the plot</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    axes : list of instance of Axes3D</span>
+<span class="sd">        The matplotlib 3D axis handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># noqa</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Cell is in XZ plane</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">250</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">150</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">((</span><span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">100</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1200</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">p_sec</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">p_secs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">linewidth</span> <span class="o">=</span> <span class="n">_linewidth_from_data_units</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">p_sec</span><span class="p">[</span><span class="s1">&#39;diam&#39;</span><span class="p">])</span>
+        <span class="n">sec_pts</span> <span class="o">=</span> <span class="n">p_sec</span><span class="p">[</span><span class="s1">&#39;sec_pts&#39;</span><span class="p">]</span>
+        <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">sec_pts</span><span class="p">:</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">p_secs</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">][</span><span class="s1">&#39;sec_pts&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">p_secs</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">][</span><span class="s1">&#39;sec_pts&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dz</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">p_secs</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">][</span><span class="s1">&#39;sec_pts&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
+            <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dz</span><span class="p">)</span>
+            <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">dy</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="plot_connectivity_matrix"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix">[docs]</a><span class="k">def</span> <span class="nf">plot_connectivity_matrix</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">conn_idx</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;Greys&#39;</span><span class="p">,</span>
+                             <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot connectivity matrix with color bar for synaptic weights</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : Instance of Network object</span>
+<span class="sd">        The Network object</span>
+<span class="sd">    conn_idx : int</span>
+<span class="sd">        Index of connection to be visualized</span>
+<span class="sd">        from `net.connectivity`</span>
+<span class="sd">    ax : instance of Axes3D</span>
+<span class="sd">        Matplotlib 3D axis</span>
+<span class="sd">    show_weight : bool</span>
+<span class="sd">        If True, visualize connectivity weights as gradient.</span>
+<span class="sd">        If False, all weights set to constant value.</span>
+<span class="sd">    colormap : str</span>
+<span class="sd">        The name of a matplotlib colormap. Default: &#39;Greys&#39;</span>
+<span class="sd">    colorbar : bool</span>
+<span class="sd">        If True (default), adjust figure to include colorbar.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the plot</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">ScalarFormatter</span>
+    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
+    <span class="kn">from</span> <span class="nn">.cell</span> <span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
+
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s1">&#39;net&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">conn_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;conn_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">show_weight</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s1">&#39;show_weight&#39;</span><span class="p">,</span> <span class="s1">&#39;bool&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Load objects for distance calculation</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">]</span>
+    <span class="n">nc_dict</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">]</span>
+    <span class="n">src_type</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span>
+    <span class="n">target_type</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span>
+    <span class="n">src_type_pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">src_type</span><span class="p">]</span>
+    <span class="n">target_type_pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">target_type</span><span class="p">]</span>
+
+    <span class="n">src_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_range&#39;</span><span class="p">])</span>
+    <span class="n">target_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_range&#39;</span><span class="p">])</span>
+    <span class="n">connectivity_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">src_range</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_range</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">src_gid</span><span class="p">,</span> <span class="n">target_src_pair</span> <span class="ow">in</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;gid_pairs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">src_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">src_range</span> <span class="o">==</span> <span class="n">src_gid</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">target_indeces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">target_range</span><span class="p">,</span> <span class="n">target_src_pair</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">target_idx</span> <span class="ow">in</span> <span class="n">target_indeces</span><span class="p">:</span>
+            <span class="n">src_pos</span> <span class="o">=</span> <span class="n">src_type_pos</span><span class="p">[</span><span class="n">src_idx</span><span class="p">]</span>
+            <span class="n">target_pos</span> <span class="o">=</span> <span class="n">target_type_pos</span><span class="p">[</span><span class="n">target_idx</span><span class="p">]</span>
+
+            <span class="c1"># Identical calculation used in Cell.par_connect_from_src()</span>
+            <span class="k">if</span> <span class="n">show_weight</span><span class="p">:</span>
+                <span class="n">weight</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_gaussian_connection</span><span class="p">(</span>
+                    <span class="n">src_pos</span><span class="p">,</span> <span class="n">target_pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+            <span class="n">connectivity_matrix</span><span class="p">[</span><span class="n">src_idx</span><span class="p">,</span> <span class="n">target_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight</span>
+
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">connectivity_matrix</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+        <span class="n">xfmt</span> <span class="o">=</span> <span class="n">ScalarFormatter</span><span class="p">()</span>
+        <span class="n">xfmt</span><span class="o">.</span><span class="n">set_powerlimits</span><span class="p">((</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">xfmt</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Weight&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> target gids &quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">target_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">target_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> source gids &quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">src_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">src_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_cell_connectivity"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_connectivity</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">conn_idx</span><span class="p">,</span> <span class="n">src_gid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot synaptic weight of connections originating from src_gid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : Instance of Network object</span>
+<span class="sd">        The Network object</span>
+<span class="sd">    conn_idx : int</span>
+<span class="sd">        Index of connection to be visualized</span>
+<span class="sd">        from `net.connectivity`</span>
+<span class="sd">    src_gid : int</span>
+<span class="sd">        Each cell in a network is uniquely identified by it&#39;s &quot;global ID&quot;: GID.</span>
+<span class="sd">    ax : instance of Axes3D</span>
+<span class="sd">        Matplotlib 3D axis</span>
+<span class="sd">    colormap : str</span>
+<span class="sd">        The name of a matplotlib colormap. Default: &#39;viridis&#39;</span>
+<span class="sd">    colorbar : bool</span>
+<span class="sd">        If True (default), adjust figure to include colorbar.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the plot</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure handle.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Target cells will be determined by the connection class given by</span>
+<span class="sd">    net.connectivity[conn_idx].</span>
+<span class="sd">    If the target cell is not connected to src_gid, it will appear as a</span>
+<span class="sd">    smaller black circle.</span>
+<span class="sd">    src_gid is plotted as a red circle. src_gid will not be plotted if</span>
+<span class="sd">    the connection corresponds to a drive, ex: poisson, bursty, etc.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
+    <span class="kn">from</span> <span class="nn">.cell</span> <span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">ScalarFormatter</span>
+
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s1">&#39;net&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">conn_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;conn_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">src_gid</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;src_gid&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Load objects for distance calculation</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">]</span>
+    <span class="n">nc_dict</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">]</span>
+    <span class="n">src_type</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span>
+    <span class="n">target_type</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span>
+    <span class="n">src_type_pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">src_type</span><span class="p">]</span>
+    <span class="n">target_type_pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">target_type</span><span class="p">]</span>
+
+    <span class="n">src_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_range&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">src_gid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">src_range</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;src_gid not in the src type range of </span><span class="si">{</span><span class="n">src_type</span><span class="si">}</span><span class="s1"> &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;gids. Valid gids include </span><span class="si">{</span><span class="n">src_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> -&gt; &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">src_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">target_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_range&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Extract indeces to get position in network</span>
+    <span class="c1"># Index in gid range aligns with net.pos_dict</span>
+    <span class="n">target_src_pair</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;gid_pairs&#39;</span><span class="p">][</span><span class="n">src_gid</span><span class="p">]</span>
+    <span class="n">target_indeces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">target_range</span><span class="p">,</span> <span class="n">target_src_pair</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">src_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">src_range</span> <span class="o">==</span> <span class="n">src_gid</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">src_pos</span> <span class="o">=</span> <span class="n">src_type_pos</span><span class="p">[</span><span class="n">src_idx</span><span class="p">]</span>
+
+    <span class="c1"># Aggregate positions and weight of each connected target</span>
+    <span class="n">weights</span><span class="p">,</span> <span class="n">target_x_pos</span><span class="p">,</span> <span class="n">target_y_pos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">target_idx</span> <span class="ow">in</span> <span class="n">target_indeces</span><span class="p">:</span>
+        <span class="n">target_pos</span> <span class="o">=</span> <span class="n">target_type_pos</span><span class="p">[</span><span class="n">target_idx</span><span class="p">]</span>
+        <span class="n">target_x_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">target_y_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">weight</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_gaussian_connection</span><span class="p">(</span><span class="n">src_pos</span><span class="p">,</span> <span class="n">target_pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">)</span>
+        <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">target_x_pos</span><span class="p">,</span> <span class="n">target_y_pos</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">)</span>
+
+    <span class="c1"># Gather positions of all gids in target_type.</span>
+    <span class="n">x_pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_type_pos</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_type_pos</span><span class="p">))]</span>
+    <span class="n">y_pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_type_pos</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_type_pos</span><span class="p">))]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">y_pos</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="c1"># Only plot src_gid if proper cell type.</span>
+    <span class="k">if</span> <span class="n">src_type</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">src_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">src_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Y Position&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;X Position&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">-&gt; </span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+        <span class="n">xfmt</span> <span class="o">=</span> <span class="n">ScalarFormatter</span><span class="p">()</span>
+        <span class="n">xfmt</span><span class="o">.</span><span class="n">set_powerlimits</span><span class="p">((</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">xfmt</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Weight&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">(),</span> <span class="n">ax</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

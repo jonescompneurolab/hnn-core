@@ -4,10 +4,22 @@
 
 .. _sphx_glr_auto_examples:
 
-hnn-core examples
--------------------
 
-Some introductory examples to get started with hnn-core
+
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_auto_examples_workflows:
+
+Tutorials
+---------
+
+These are detailed tutorials describing the rationale and background on
+how to use HNN.
+
 
 
 
@@ -18,10 +30,10 @@ Some introductory examples to get started with hnn-core
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+ .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
      :alt: 01. Simulate dipole for evoked inputs
 
-     :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`
+     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
 
 .. raw:: html
 
@@ -31,7 +43,7 @@ Some introductory examples to get started with hnn-core
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_simulate_evoked
+   /auto_examples/workflows/plot_simulate_evoked
 
 .. raw:: html
 
@@ -39,10 +51,10 @@ Some introductory examples to get started with hnn-core
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
+ .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
      :alt: 02. Simulate alpha and beta waves
 
-     :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`
+     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`
 
 .. raw:: html
 
@@ -52,7 +64,7 @@ Some introductory examples to get started with hnn-core
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_simulate_alpha
+   /auto_examples/workflows/plot_simulate_alpha
 
 .. raw:: html
 
@@ -60,10 +72,10 @@ Some introductory examples to get started with hnn-core
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
+ .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
      :alt: 03. Simulate gamma rhythms
 
-     :ref:`sphx_glr_auto_examples_plot_simulate_gamma.py`
+     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py`
 
 .. raw:: html
 
@@ -73,28 +85,7 @@ Some introductory examples to get started with hnn-core
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_simulate_gamma
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model. ">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
-     :alt: 04. Plot firing pattern
-
-     :ref:`sphx_glr_auto_examples_plot_firing_pattern.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_firing_pattern
+   /auto_examples/workflows/plot_simulate_gamma
 
 .. raw:: html
 
@@ -102,10 +93,10 @@ Some introductory examples to get started with hnn-core
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
-     :alt: 05. From MEG sensor-space data to HNN simulation
+ .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
+     :alt: 04. From MEG sensor-space data to HNN simulation
 
-     :ref:`sphx_glr_auto_examples_plot_simulate_somato.py`
+     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py`
 
 .. raw:: html
 
@@ -115,39 +106,33 @@ Some introductory examples to get started with hnn-core
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_simulate_somato
+   /auto_examples/workflows/plot_simulate_somato
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr_auto_examples_howto:
+
+How to
+------
+
+These are short examples that show how to use HNN-core API to accomplish specific
+tasks.
+
+
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. ">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model. ">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_connectivity_thumb.png
-     :alt: 06. Modifying local connectivity
+ .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
+     :alt: 01. Plot firing pattern
 
-     :ref:`sphx_glr_auto_examples_plot_connectivity.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_connectivity
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_simulate_mpi_backend_thumb.png
-     :alt: 07. Use MPI backend for parallelization
-
-     :ref:`sphx_glr_auto_examples_plot_simulate_mpi_backend.py`
+     :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py`
 
 .. raw:: html
 
@@ -157,7 +142,7 @@ Some introductory examples to get started with hnn-core
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_simulate_mpi_backend
+   /auto_examples/howto/plot_firing_pattern
 
 .. raw:: html
 
@@ -165,10 +150,10 @@ Some introductory examples to get started with hnn-core
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
-     :alt: 08. Record extracellular potentials
+ .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
+     :alt: 02. Record extracellular potentials
 
-     :ref:`sphx_glr_auto_examples_plot_record_extracellular_potentials.py`
+     :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py`
 
 .. raw:: html
 
@@ -178,7 +163,49 @@ Some introductory examples to get started with hnn-core
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_record_extracellular_potentials
+   /auto_examples/howto/plot_record_extracellular_potentials
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. ">
+
+.. only:: html
+
+ .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_connectivity_thumb.png
+     :alt: 03. Modifying local connectivity
+
+     :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/howto/plot_connectivity
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_simulate_mpi_backend_thumb.png
+     :alt: 04. Use MPI backend for parallelization
+
+     :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/howto/plot_simulate_mpi_backend
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
