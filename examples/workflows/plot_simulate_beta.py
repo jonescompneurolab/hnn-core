@@ -1,6 +1,6 @@
 """
 ===============================
-09. Simulate beta modulated ERP
+06. Simulate beta modulated ERP
 ===============================
 
 This example demonstrates how event related potentials (ERP) are modulated
@@ -144,13 +144,18 @@ dpls_beta_erp = simulate_dipole(net_beta_erp, postproc=False)
 # inhibition of the L2 and L5 pyrmaidal cells. One effect of this inhibition
 # is an assymetric beta event with a long positive tail.
 import matplotlib.pyplot as plt
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
+import numpy as np
+fig, axes = plt.subplots(4, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
 net_beta.cell_response.plot_spikes_hist(ax=axes[0], show=False)
 axes[0].set_title('Beta Event Generation')
 plot_dipole(dpls_beta, ax=axes[1], layer='agg', tmin=1.0, show=False)
 net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('Spike Raster')
+
+# Create an fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz
+freqs = np.arange(10., 60., 1.)
+dpls_beta[0].plot_tfr_morlet(freqs, n_cycles=7, ax=axes[3])
 
 ###############################################################################
 # Next we will inspect what happens when a sensory stimulus is delivered 75 ms
