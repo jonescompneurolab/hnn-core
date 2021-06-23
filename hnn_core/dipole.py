@@ -29,7 +29,11 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     postproc : bool
         If True, smoothing (``dipole_smooth_win``) and scaling
         (``dipole_scalefctr``) values are read from the parameter file, and
-        applied to the dipole objects before returning. Default: False.
+        applied to the dipole objects before returning. Note that this setting
+        only affects the dipole waveforms, and not somatic voltages, possible
+        extracellular recordings etc. The preferred way is to use the
+        :meth:`~hnn_core.dipole.Dipole.smooth` and
+        :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
 
     Returns
     -------

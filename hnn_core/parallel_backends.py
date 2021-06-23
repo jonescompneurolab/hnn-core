@@ -513,7 +513,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, n_trials, postproc=True):
+    def simulate(self, net, n_trials, postproc=False):
         """Simulate the HNN model
 
         Parameters
@@ -654,7 +654,7 @@ class MPIBackend(object):
         # always kill nrniv processes for good measure
         kill_proc_name('nrniv')
 
-    def simulate(self, net, n_trials, postproc=True):
+    def simulate(self, net, n_trials, postproc=False):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
