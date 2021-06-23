@@ -37,10 +37,9 @@ print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}')
 ###############################################################################
 # Another major change to the Jones 2009 model is the addition of a
 # Martinotti-like recurrent tuft connection [3]_. This new connection
-# originates from L5 basket cells, and provides GABAa and GABAb inhibition on
+# originates from L5 basket cells, and provides GABAa inhibition on
 # the distal dendrites of L5 basket cells.
 print(net.connectivity[16])
-print(net.connectivity[17])
 
 ###############################################################################
 # To demonstrate sensory depression, we will add an ERP similar to
