@@ -9,22 +9,38 @@ by prestimulus beta events.
 
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 
-###############################################################################
-# Importing the needed functions
-from hnn_core import simulate_dipole, law_2021_model
+from hnn_core import simulate_dipole, law_2021_model, jones_2009_model
 from hnn_core.viz import plot_dipole
 
 ###############################################################################
-# We begin by instantiating the network model described in Law et al. 2021.
-# The model can be instantiated in the same pattern as ``default_network``
-# using ``law_model(params)`` as in previous exmaples. Leaving the arguments
-# empty loads the default parameter set ``default.json``, and modifies it
-# according to Law et al. 2021 [1]_ :
-# - the rise and fall time constants of GABAB-conductances on L2 and L5
-#   pyramidal cells are _greatly_ increased
-# - several synaptic weights are adjusted
-# - the total simulation is extended to 400 ms
+# We begin by instantiating the network model from Law et al. 2021 [1]_.
 net = law_2021_model()
+
+###############################################################################
+# The Law 2021 model is based on the network model described in
+# Jones et al. 2009 [2]_ with several important modifications. One of the most
+# significant changes is substantially increasing the rise and fall time
+# constants of GABAb-conductances on L2 and L5 pyramidal. We can inspect
+# these properties with the ``net.cell_types`` attribute which contains
+# information on the biophysics and geometry of each cell.
+net_jones = jones_2009_model()
+
+jones_rise = net_jones.cell_types['L5_pyramidal'].p_syn['gabab']['tau1']
+law_rise = net.cell_types['L5_pyramidal'].p_syn['gabab']['tau1']
+print(f'GABAb Rise (ms): {jones_rise} -> {law_rise}')
+
+jones_fall = net_jones.cell_types['L5_pyramidal'].p_syn['gabab']['tau2']
+law_fall = net.cell_types['L5_pyramidal'].p_syn['gabab']['tau2']
+print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}')
+
+
+###############################################################################
+# Another major change to the Jones 2009 model is the addition of a
+# Martinotti-like recurrent tuft connection [3]_. This new connection
+# originates from L5 basket cells, and provides GABAa and GABAb inhibition on
+# the distal dendrites of L5 basket cells.
+print(net.connectivity[16])
+print(net.connectivity[17])
 
 ###############################################################################
 # To demonstrate sensory depression, we will add an ERP similar to
@@ -90,7 +106,7 @@ def add_beta_drives(net, beta_start):
     weights_ampa_p1 = {'L2_basket': 0.00004, 'L2_pyramidal': 0.00002,
                        'L5_basket': 0.00002, 'L5_pyramidal': 0.00002}
     syn_delays_p1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+                     'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
     net.add_bursty_drive(
         'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
@@ -114,7 +130,9 @@ net_beta_erp = net_beta.copy()
 net_beta_erp = add_erp_drives(net_beta_erp, stimulus_start)
 
 ###############################################################################
-# And finally we simulate.
+# And finally we simulate. Note that the default simulation time has been
+# increased to 400 ms to observe the long time course over which beta events
+# can influence sensory input to the cortical column.
 dpls_beta = simulate_dipole(net_beta, postproc=False)
 dpls_erp = simulate_dipole(net_erp, postproc=False)
 dpls_beta_erp = simulate_dipole(net_beta_erp, postproc=False)
@@ -123,7 +141,8 @@ dpls_beta_erp = simulate_dipole(net_beta_erp, postproc=False)
 # By inspecting the activity during the beta event, we can see that spiking
 # occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
 # and distal inputs. This spiking activity leads to sustained GABAb mediated
-# inhibition of the L2 and L5 pyrmaidal cells.
+# inhibition of the L2 and L5 pyrmaidal cells. One effect of this inhibition
+# is an assymetric beta event with a long positive tail.
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
@@ -134,10 +153,10 @@ net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('Spike Raster')
 
 ###############################################################################
-# By inspecting the activity during the beta event, we can see that spiking
-# occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
-# and distal inputs. This spiking activity leads to sustained GABAb mediated
-# inhibition of the L2 and L5 pyrmaidal cells.
+# Next we will inspect what happens when a sensory stimulus is delivered 75 ms
+# after a beta event. Note that the delay time for a tactile stimulus at the
+# hand to arrive at the cortex is roughly 25 ms, which means the first proximal
+# input to thecortical column occurs ~100 ms after the beta event.
 dpls_beta_erp[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
@@ -149,8 +168,10 @@ net_beta_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('Spike Raster')
 
 ###############################################################################
-# One effect of this inhibition is an assymetric beta event with a long
-# positive tail. The sustained inhibition of the network ultimately depressing
+# To help understand the effect of beta mediated inhibition of the response to
+# incoming sensory stimuli, we can compare the ERP and spiking activity due to
+# sensory input with and without a beta event.
+# The sustained inhibition of the network ultimately depressing
 # the sensory response which is assoicated with a reduced ERP amplitude
 dpls_erp[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
@@ -172,3 +193,12 @@ axes[2].set_title('ERP Spike Raster')
 #        mechanisms regulating the relationship between transient beta events
 #        and human tactile perception. BioRxiv, 2021.04.16.440210.
 #        https://doi.org/10.1101/2021.04.16.440210
+# .. [2] Jones, S. R., Pritchett, D. L., Sikora, M. A., Stufflebeam, S. M.,
+#        Hämäläinen, M., & Moore, C. I. (2009). Quantitative Analysis and
+#        Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
+#        Rhythmogenesis and Modulation of Sensory-Evoked Responses. Journal of
+#        Neurophysiology, 102(6), 3554–3572.
+#        https://doi.org/10.1152/jn.00535.2009
+# .. [3] Silberberg, G., & Markram, H. (2007). Disynaptic Inhibition between
+#        Neocortical Pyramidal Cells Mediated by Martinotti Cells. Neuron,
+#        53(5), 735–746. https://doi.org/10.1016/j.neuron.2007.02.012
