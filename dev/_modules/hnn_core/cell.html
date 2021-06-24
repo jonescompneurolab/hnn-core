@@ -455,10 +455,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sec</span>
 
             <span class="n">h</span><span class="o">.</span><span class="n">pt3dclear</span><span class="p">(</span><span class="n">sec</span><span class="o">=</span><span class="n">sec</span><span class="p">)</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">pt3dconst</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="n">sec</span><span class="p">)</span>  <span class="c1"># be explicit, see documentation</span>
             <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">p_secs</span><span class="p">[</span><span class="n">sec_name</span><span class="p">][</span><span class="s1">&#39;sec_pts&#39;</span><span class="p">]:</span>
                 <span class="n">h</span><span class="o">.</span><span class="n">pt3dadd</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span>
                           <span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dy</span><span class="p">,</span>
                           <span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">dz</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="n">sec</span><span class="p">)</span>
+            <span class="c1"># with pt3dconst==0, these will alter the 3d points defined above!</span>
             <span class="n">sec</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">p_secs</span><span class="p">[</span><span class="n">sec_name</span><span class="p">][</span><span class="s1">&#39;L&#39;</span><span class="p">]</span>
             <span class="n">sec</span><span class="o">.</span><span class="n">diam</span> <span class="o">=</span> <span class="n">p_secs</span><span class="p">[</span><span class="n">sec_name</span><span class="p">][</span><span class="s1">&#39;diam&#39;</span><span class="p">]</span>
             <span class="n">sec</span><span class="o">.</span><span class="n">Ra</span> <span class="o">=</span> <span class="n">p_secs</span><span class="p">[</span><span class="n">sec_name</span><span class="p">][</span><span class="s1">&#39;Ra&#39;</span><span class="p">]</span>
@@ -480,6 +482,11 @@
             <span class="n">parent_loc</span> <span class="o">=</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">child_loc</span> <span class="o">=</span> <span class="n">connection</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
             <span class="n">child_sec</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">parent_sec</span><span class="p">,</span> <span class="n">parent_loc</span><span class="p">,</span> <span class="n">child_loc</span><span class="p">)</span>
+
+        <span class="c1"># be explicit about letting sec.L dominate over the 3d points used by</span>
+        <span class="c1"># h.pt3dadd(); see</span>
+        <span class="c1"># https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html?highlight=pt3dadd#pt3dadd  # noqa</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">define_shape</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Cell.build"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build cell in Neuron and insert dipole if applicable.</span>
