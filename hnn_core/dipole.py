@@ -69,6 +69,11 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
         raise TypeError("record_isoma must be bool, got %s"
                         % type(record_isoma).__name__)
 
+    if postproc:
+        warnings.warn('The postproc-argument is deprecated and will be removed'
+                      ' in a future release of hnn-core. Please define '
+                      'smoothing and scaling explicitly using Dipole methods.',
+                      DeprecationWarning)
     dpls = _BACKEND.simulate(net, n_trials, postproc)
 
     return dpls
