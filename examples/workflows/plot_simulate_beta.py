@@ -4,7 +4,11 @@
 ===============================
 
 This example demonstrates how event related potentials (ERP) are modulated
-by prestimulus beta events.
+by prestimulus beta events. Transient beta activity in the neocortex has
+been shown to suppress the perceptibility of sensory input. This suppression
+depends on the timing of the beta event, and the incoming sensory
+information. The following example demonstrates the biophysical mechansisms
+underlying beta mediated sensory suppression.
 """
 
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
@@ -20,9 +24,11 @@ net = law_2021_model()
 # The Law 2021 model is based on the network model described in
 # Jones et al. 2009 [2]_ with several important modifications. One of the most
 # significant changes is substantially increasing the rise and fall time
-# constants of GABAb-conductances on L2 and L5 pyramidal. We can inspect
-# these properties with the ``net.cell_types`` attribute which contains
-# information on the biophysics and geometry of each cell.
+# constants of GABAb-conductances on L2 and L5 pyramidal. Another important
+# change is the removal of calcium channels from basal dendrites and soma of
+# L5 pyramidal cells specifically.
+# We can inspect these properties with the ``net.cell_types`` attribute which
+# contains information on the biophysics and geometry of each cell.
 net_jones = jones_2009_model()
 
 jones_rise = net_jones.cell_types['L5_pyramidal'].p_syn['gabab']['tau1']
@@ -31,23 +37,43 @@ print(f'GABAb Rise (ms): {jones_rise} -> {law_rise}')
 
 jones_fall = net_jones.cell_types['L5_pyramidal'].p_syn['gabab']['tau2']
 law_fall = net.cell_types['L5_pyramidal'].p_syn['gabab']['tau2']
-print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}')
+print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}\n')
 
+print('Apical Dendrite Channels:')
+print(net.cell_types['L5_pyramidal'].p_secs['apical_1']['mechs'].keys())
+print("\nBasal Dendrite Channels ('ca' missing):")
+print(net.cell_types['L5_pyramidal'].p_secs['basal_1']['mechs'].keys())
 
 ###############################################################################
-# Another major change to the Jones 2009 model is the addition of a
+# A major change to the Jones 2009 model is the addition of a
 # Martinotti-like recurrent tuft connection [3]_. This new connection
 # originates from L5 basket cells, and provides GABAa inhibition on
 # the distal dendrites of L5 basket cells.
+print('Recurrent Tuft Connection')
 print(net.connectivity[16])
 
 ###############################################################################
-# To demonstrate sensory depression, we will add an ERP similar to
+# The remaining changes to the connectivity was the removal of an
+# L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
+print('New GABAb connection')
+print(net.connectivity[15])
+
+print('\nConnection Removed from Law Model')
+print(net_jones.connectivity[10])
+
+###############################################################################
+# To demonstrate sensory depression, we will add the drives necessary to
+# generate and ERP similar to
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`,
 # but modified to reflect the parameters used in Law et al. 2021.
 # Specifically, we are considering the case where a tactile stimulus is
 # delivered at 150 ms. 25 ms later, the first input to sensory cortex arrives
-# as a proximal drive, followed by one distal and a final late proximal drive.
+# as at the proximal drive to the cortical column. Proximal drive corresponds
+# projects from the direct thalamic nuclei. This is followed by one distal
+# representing projections from indirect thalamic nuclei, and a final late
+# proximal drive. It is important to note that the parameter values for each
+# are different from previous examples of the evoekd response. This reflects
+# the altered network dynamics due to the changes described above.
 def add_erp_drives(net, stimulus_start):
     # Distal evoked drive
     weights_ampa_d1 = {'L2_basket': 0.0005, 'L2_pyramidal': 0.004,
@@ -85,7 +111,7 @@ def add_erp_drives(net, stimulus_start):
     return net
 
 ###############################################################################
-# Next a beta event is created by inducing simultaneous proximal and distal
+# A beta event is created by inducing simultaneous proximal and distal
 # drives. The input is just strong enough to evoke spiking in the
 # L2 basket cells. This spiking causes GABAb mediated inhibition
 # of the network, and ultimately suppressed sensory detection.
