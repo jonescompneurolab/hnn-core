@@ -62,15 +62,6 @@ def test_network():
         assert len(net.gid_ranges[dn]) == len(this_src_gids)
         assert len(net.external_drives[dn]['events']) == 1  # single trial!
 
-    # Test succeful creation of a new cell type
-    net_new = net.copy()
-    n_cells_orig = net_new.n_cells
-    new_cell_type = {'new_type': net_new.cell_types['L2_basket']}
-    net_new.cell_types.update(new_cell_type)
-    net_new._add_cell_type('new_type', pos=[(0, 0, 0)])
-    net_new._update_cells()
-    assert net_new.n_cells == n_cells_orig + 1
-
     # Check src_gids match between drives/connections
     for conn in net.connectivity:
         src_type = conn['src_type']
