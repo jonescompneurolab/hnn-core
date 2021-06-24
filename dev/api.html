@@ -87,6 +87,7 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">API Documentation</a><ul>
 <li><a class="reference internal" href="#simulation-hnn-core">Simulation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
+<li><a class="reference internal" href="#published-models-hnn-core">Published Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
 <li><a class="reference internal" href="#dipole-hnn-core-dipole">Dipole (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.dipole</span></code>):</a></li>
 <li><a class="reference internal" href="#extracellulararray-hnn-core-extracellular">ExtracellularArray (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.extracellular</span></code>):</a></li>
 <li><a class="reference internal" href="#visualization-hnn-core-viz">Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):</a></li>
@@ -156,17 +157,34 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_dipole</span></code></a>(net[, n_trials, …])</p></td>
 <td><p>Simulate a dipole given the experiment parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_network</span></code></a>(params[, add_drives_from_params])</p></td>
-<td><p>Instantiate the default all-to-all connected network.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a>(params[, add_drives_from_params, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a>(params[, add_drives_from_params, …])</p></td>
 <td><p>The Network class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cell</span></code></a>(name, pos, p_secs, p_syn, topology, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cell</span></code></a>(name, pos, p_secs, p_syn, topology, …)</p></td>
 <td><p>Create a cell object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CellResponse</span></code></a>([spike_times, spike_gids, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CellResponse</span></code></a>([spike_times, spike_gids, …])</p></td>
 <td><p>The CellResponse class.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="published-models-hnn-core">
+<h2>Published Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):<a class="headerlink" href="#published-models-hnn-core" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_network</span></code></a>([params, add_drives_from_params])</p></td>
+<td><p>Instantiate the default network.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jones_2009_model</span></code></a>([params, …])</p></td>
+<td><p>Instantiate the Jones et al. 2009 model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model" title="hnn_core.law_2021_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">law_2021_model</span></code></a>()</p></td>
+<td><p>Instantiate the beta modulated ERP network model.</p></td>
 </tr>
 </tbody>
 </table>

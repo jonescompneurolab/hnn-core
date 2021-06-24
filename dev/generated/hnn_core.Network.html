@@ -311,7 +311,7 @@ weights and delays within the simulated column</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_connection">
-<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_autapses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Appends connections to connectivity list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -339,6 +339,8 @@ valid loc=’soma’.</p>
 <dt><strong>delay</strong><span class="classifier">float</span></dt><dd><p>Synaptic delay in ms.</p>
 </dd>
 <dt><strong>lamtha</strong><span class="classifier">float</span></dt><dd><p>Space constant.</p>
+</dd>
+<dt><strong>allow_autapses</strong><span class="classifier">bool</span></dt><dd><p>If True, allow connecting neuron to itself.</p>
 </dd>
 <dt><strong>probability</strong><span class="classifier">float</span></dt><dd><p>Probability of connection between any src-target pair.
 Defaults to 1.0 producing an all-to-all pattern.</p>
@@ -377,7 +379,7 @@ homogeneous volume conductor that the cell and electrode are in.</p>
 each segment junction as a point extracellular current source.
 <code class="docutils literal notranslate"><span class="pre">'lsa'</span></code> (line source approximation) treats each segment as a line
 source of current, which extends from the previous to the next
-segment center point: <a href="#id11"><span class="problematic" id="id12">|---x---|</span></a>, where x is the current segment
+segment center point: <a href="#id12"><span class="problematic" id="id13">|---x---|</span></a>, where x is the current segment
 flanked by <a href="#id1"><span class="problematic" id="id2">|</span></a>.</p>
 </dd>
 <dt><strong>min_distance</strong><span class="classifier">float (default: 0.5; unit: um)</span></dt><dd><p>To avoid numerical errors in calculating potentials, apply a
@@ -586,28 +588,34 @@ a new figure is created.</p>
 <p><span class="caption-text"><a class="reference internal" href="../auto_examples/workflows/plot_simulate_somato.html#sphx-glr-auto-examples-workflows-plot-simulate-somato-py"><span class="std std-ref">04. From MEG sensor-space data to HNN simulation</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model. "><figure class="align-default" id="id7">
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta ..."><figure class="align-default" id="id7">
+<img alt="06. Simulate beta modulated ERP" src="../_images/sphx_glr_plot_simulate_beta_thumb.png" />
+<figcaption>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/workflows/plot_simulate_beta.html#sphx-glr-auto-examples-workflows-plot-simulate-beta-py"><span class="std std-ref">06. Simulate beta modulated ERP</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model. "><figure class="align-default" id="id8">
 <img alt="01. Plot firing pattern" src="../_images/sphx_glr_plot_firing_pattern_thumb.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_firing_pattern.html#sphx-glr-auto-examples-howto-plot-firing-pattern-py"><span class="std std-ref">01. Plot firing pattern</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_firing_pattern.html#sphx-glr-auto-examples-howto-plot-firing-pattern-py"><span class="std std-ref">01. Plot firing pattern</span></a></span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular curren..."><figure class="align-default" id="id8">
+</div><div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular curren..."><figure class="align-default" id="id9">
 <img alt="02. Record extracellular potentials" src="../_images/sphx_glr_plot_record_extracellular_potentials_thumb.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_record_extracellular_potentials.html#sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"><span class="std std-ref">02. Record extracellular potentials</span></a></span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_record_extracellular_potentials.html#sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"><span class="std std-ref">02. Record extracellular potentials</span></a></span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. "><figure class="align-default" id="id9">
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity. "><figure class="align-default" id="id10">
 <img alt="03. Modifying local connectivity" src="../_images/sphx_glr_plot_connectivity_thumb.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_connectivity.html#sphx-glr-auto-examples-howto-plot-connectivity-py"><span class="std std-ref">03. Modifying local connectivity</span></a></span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_connectivity.html#sphx-glr-auto-examples-howto-plot-connectivity-py"><span class="std std-ref">03. Modifying local connectivity</span></a></span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core."><figure class="align-default" id="id10">
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core."><figure class="align-default" id="id11">
 <img alt="04. Use MPI backend for parallelization" src="../_images/sphx_glr_plot_simulate_mpi_backend_thumb.png" />
 <figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_simulate_mpi_backend.html#sphx-glr-auto-examples-howto-plot-simulate-mpi-backend-py"><span class="std std-ref">04. Use MPI backend for parallelization</span></a></span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_simulate_mpi_backend.html#sphx-glr-auto-examples-howto-plot-simulate-mpi-backend-py"><span class="std std-ref">04. Use MPI backend for parallelization</span></a></span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </div><div class="sphx-glr-clear"></div></section>

@@ -107,6 +107,27 @@ how to use HNN.
    :hidden:
 
    /auto_examples/workflows/plot_simulate_somato
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta ...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_beta_thumb.png
+     :alt: 06. Simulate beta modulated ERP
+
+     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/workflows/plot_simulate_beta
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

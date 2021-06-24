@@ -142,12 +142,14 @@
 <h1>hnn_core.default_network<a class="headerlink" href="#hnn-core-default-network" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.default_network">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">default_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#default_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.default_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiate the default all-to-all connected network.</p>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">default_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network_models.html#default_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.default_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate the default network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>The parameters to use for constructing the network.</p>
+<dt><strong>params</strong><span class="classifier">dict | None</span></dt><dd><p>The parameters to use for constructing the network.
+If None, parameters loaded from default.json
+Default: None</p>
 </dd>
 <dt><strong>add_drives_from_params</strong><span class="classifier">bool</span></dt><dd><p>If True, add drives as defined in the params-dict. NB this is mainly
 for backward-compatibility with HNN GUI, and will be deprecated in a
@@ -164,6 +166,8 @@ appeneded to net.connectivity.</p>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The default network recreates the model from Jones et al. 2009.</p>
 </dd></dl>
 
 <section id="examples-using-hnn-core-default-network">

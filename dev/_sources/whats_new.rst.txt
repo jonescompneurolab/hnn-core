@@ -30,6 +30,8 @@ Changelog
 
 - Add function to visualize extracellular potentials from laminar array simulations, by `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
 
+- Previously published models can now be loaded via ``net=law_2021_model()`` and ``jones_2009_model()``, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/348>`_
+
 Bug
 ~~~
 
