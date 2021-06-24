@@ -1,7 +1,7 @@
 import pytest
 
 from neuron import h
-from numpy import allclose, abs
+import numpy as np
 
 from hnn_core.cells_default import pyramidal, basket
 from hnn_core.network_builder import load_custom_mechanisms
@@ -27,8 +27,8 @@ def test_cells_default():
                      'apical_tuft']
     for sec_name in vertical_secs:
         sec = l5p.sections[sec_name]
-        vert_len = abs(sec.z3d(1) - sec.z3d(0))
-        assert allclose(vert_len, sec.L)
+        vert_len = np.abs(sec.z3d(1) - sec.z3d(0))
+        assert np.allclose(vert_len, sec.L)
 
     # smoke test to check if cell can be used in simulation
     h.load_file("stdrun.hoc")
