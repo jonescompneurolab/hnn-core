@@ -69,12 +69,13 @@ print(net_jones.connectivity[10])
 # but modified to reflect the parameters used in Law et al. 2021.
 # Specifically, we are considering the case where a tactile stimulus is
 # delivered at 150 ms. 25 ms later, the first input to sensory cortex arrives
-# as at the proximal drive to the cortical column. Proximal drive corresponds
-# projects from the direct thalamic nuclei. This is followed by one distal
-# representing projections from indirect thalamic nuclei, and a final late
-# proximal drive. It is important to note that the parameter values for each
-# are different from previous examples of the evoekd response. This reflects
-# the altered network dynamics due to the changes described above.
+# as a proximal drive to the cortical column. Proximal drive corresponds to
+# projections from the direct thalamic nuclei. This is followed by one distal
+# drive representing projections from indirect thalamic nuclei, and a final
+# late proximal drive. It is important to note that the parameter values for
+# each are different from previous examples of the evoked response.
+# This reflects the altered network dynamics due to the changes described
+# above.
 def add_erp_drives(net, stimulus_start):
     # Distal evoked drive
     weights_ampa_d1 = {'L2_basket': 0.0005, 'L2_pyramidal': 0.004,
@@ -189,7 +190,7 @@ dpls_beta[0].plot_tfr_morlet(freqs, n_cycles=7, ax=axes[3])
 # Next we will inspect what happens when a sensory stimulus is delivered 75 ms
 # after a beta event. Note that the delay time for a tactile stimulus at the
 # hand to arrive at the cortex is roughly 25 ms, which means the first proximal
-# input to thecortical column occurs ~100 ms after the beta event.
+# input to the cortical column occurs ~100 ms after the beta event.
 dpls_beta_erp[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
@@ -201,10 +202,10 @@ net_beta_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('Spike Raster')
 
 ###############################################################################
-# To help understand the effect of beta mediated inhibition of the response to
+# To help understand the effect of beta mediated inhibition on the response to
 # incoming sensory stimuli, we can compare the ERP and spiking activity due to
 # sensory input with and without a beta event.
-# The sustained inhibition of the network ultimately depressing
+# The sustained inhibition of the network ultimately depresses
 # the sensory response which is assoicated with a reduced ERP amplitude
 dpls_erp[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
