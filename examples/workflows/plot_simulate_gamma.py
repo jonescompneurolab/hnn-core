@@ -15,6 +15,7 @@ of the GUI tutorial, and strong gamma rhythms similar to Figure 12 and 13
 in the GUI tutorial.
 """
 
+# **REMOVE BEFORE MERGE: Updated according gamma_L5weak_L2weak_new5.param
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
@@ -46,7 +47,7 @@ print(params['gbar_L*'])
 
 net = default_network(params)
 
-weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
+weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0045}
 synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
 rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
 net.add_poisson_drive(

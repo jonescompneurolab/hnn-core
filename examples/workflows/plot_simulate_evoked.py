@@ -14,6 +14,7 @@ evoked response, as observed in Jones et al. J. Neuroscience 2007 [1]_
 to the recorded data.
 """
 
+# **REMOVE BEFORE MERGE: Updated according to ERPYesSupraT_up.param
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
@@ -66,35 +67,35 @@ net.cell_types['L5_pyramidal'].plot_morphology()
 
 ###############################################################################
 # First, we add a distal evoked drive
-weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
-                   'L5_pyramidal': 0.142300}
-weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
-                   'L5_pyramidal': 0.080074}
+weights_ampa_d1 = {'L2_basket': 0.061, 'L2_pyramidal': 1.155,
+                   'L5_pyramidal': 1.004}
+weights_nmda_d1 = {'L2_basket': 0.021, 'L2_pyramidal': 0.299,
+                   'L5_pyramidal': 0.579}
 synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                       'L5_pyramidal': 0.1}
 net.add_evoked_drive(
-    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
+    'evdist1', mu=65.69, sigma=3.81, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal',
     synaptic_delays=synaptic_delays_d1, seedcore=4)
 
 ###############################################################################
 # Then, we add two proximal drives
-weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
-                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+weights_ampa_p1 = {'L2_basket': 0.2, 'L2_pyramidal': 0.25,
+                   'L5_basket': 0.411, 'L5_pyramidal': 0.014}
 synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                         'L5_basket': 1., 'L5_pyramidal': 1.}
 # all NMDA weights are zero; pass None explicitly
 net.add_evoked_drive(
-    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
+    'evprox1', mu=19.64, sigma=2.52, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 
 # Second proximal evoked drive. NB: only AMPA weights differ from first
-weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+weights_ampa_p2 = {'L2_basket': 0.00006, 'L2_pyramidal': 48.23,
+                   'L5_basket': 0.0179, 'L5_pyramidal': 49.87}
 # all NMDA weights are zero; omit weights_nmda (defaults to None)
 net.add_evoked_drive(
-    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+    'evprox2', mu=90.53, sigma=10.38, numspikes=1,
     weights_ampa=weights_ampa_p2, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 

@@ -7,6 +7,7 @@ This example demonstrates how to inspect the firing
 pattern of cells in the HNN model.
 """
 
+# **REMOVE BEFORE MERGE: Updated according to ERPYesSupraT_up.param
 # Authors: Mainak Jas <mjas@harvard.mgh.edu>
 #          Nick Tolley <nick nicholas_tolley@brown.edu>
 
@@ -39,15 +40,14 @@ net = default_network(params)
 # We need to define the AMPA and NMDA weights for the connections. An
 # "evoked drive" defines inputs that are normally distributed with a certain
 # mean and standard deviation.
-
-weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': 7e-6,
-                   'L5_pyramidal': 0.142300}
-weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
-                   'L5_pyramidal': 0.080074}
+weights_ampa_d1 = {'L2_basket': 0.061, 'L2_pyramidal': 1.155,
+                   'L5_pyramidal': 1.004}
+weights_nmda_d1 = {'L2_basket': 0.021, 'L2_pyramidal': 0.299,
+                   'L5_pyramidal': 0.579}
 synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                       'L5_pyramidal': 0.1}
 net.add_evoked_drive(
-    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
+    'evdist1', mu=65.69, sigma=3.81, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal',
     synaptic_delays=synaptic_delays_d1, seedcore=4)
 
@@ -56,14 +56,14 @@ net.add_evoked_drive(
 # waveforms resembling evoked responses. Here, we show how to do it with two
 # proximal drives which drive current up the dendrite and one distal drive
 # which drives current down the dendrite producing the negative deflection.
-weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
-                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
+weights_ampa_p1 = {'L2_basket': 0.2, 'L2_pyramidal': 0.25,
+                   'L5_basket': 0.411, 'L5_pyramidal': 0.014}
 synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                         'L5_basket': 1., 'L5_pyramidal': 1.}
 
 # all NMDA weights are zero; pass None explicitly
 net.add_evoked_drive(
-    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
+    'evprox1', mu=19.64, sigma=2.52, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 
@@ -71,15 +71,14 @@ net.add_evoked_drive(
 # Now we add the second proximal evoked drive and simulate the network
 # dynamics with somatic voltage recordings enabled. Note: only AMPA weights
 # differ from first.
-weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+weights_ampa_p2 = {'L2_basket': 0.00006, 'L2_pyramidal': 48.23,
+                   'L5_basket': 0.0179, 'L5_pyramidal': 49.87}
+
 # all NMDA weights are zero; omit weights_nmda (defaults to None)
 net.add_evoked_drive(
-    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+    'evprox2', mu=90.53, sigma=10.38, numspikes=1,
     weights_ampa=weights_ampa_p2, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
-
-dpls = simulate_dipole(net, record_vsoma=True)
 
 ###############################################################################
 # Here, we explain more details about the data structures and how they can

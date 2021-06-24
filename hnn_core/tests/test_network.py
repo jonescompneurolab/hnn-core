@@ -9,6 +9,7 @@ import pytest
 import hnn_core
 from hnn_core import read_params, CellResponse
 from hnn_core import default_network, jones_2009_model, law_2021_model
+from hnn_core.network_models import add_default_ERP
 from hnn_core.network_builder import NetworkBuilder
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -28,6 +29,18 @@ def test_network_models():
     for cell_name in ['L5_pyramidal', 'L2_pyramidal']:
         assert net_law.cell_types[cell_name].p_syn['gabab']['tau1'] == 45.0
         assert net_law.cell_types[cell_name].p_syn['gabab']['tau2'] == 200.0
+
+    # Check add_default_erp()
+    net_default = default_network()
+    with pytest.raises(TypeError, match='net must be'):
+        add_default_ERP(net='invalid_input')
+    with pytest.raises(TypeError, match='tstart must be'):
+        add_default_ERP(net=net_default, tstart='invalid_input')
+    n_conn = len(net_default.connectivity)
+    add_default_ERP(net_default)
+    for drive_name in['evdist1', 'evprox1', 'evprox2']:
+        assert drive_name in net_default.external_drives.keys()
+    assert len(net_default.connectivity) == n_conn + 14
 
 
 def test_network():

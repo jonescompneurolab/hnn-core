@@ -8,7 +8,7 @@ from hnn_core import read_params
 from .network import Network
 from .params import _short_name
 from .cells_default import pyramidal_ca
-
+from .externals.mne import _validate_type
 
 def default_network(params=None, add_drives_from_params=False):
     """Instantiate the default network.
@@ -276,7 +276,8 @@ def _calcium_model(params, add_drives_from_params):
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
+    if params is None:
+        params = read_params(params_fname)
 
     net = jones_2009_model(params, add_drives_from_params)
 
@@ -287,3 +288,56 @@ def _calcium_model(params, add_drives_from_params):
         cell_name=_short_name(cell_name), pos=pos)
 
     return net
+
+
+def add_default_ERP(net, tstart=0.0):
+    """Add drives necessary for an event related potential (ERP)
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        Network object that will be updated with ERP drives.
+        Drives are updated in place.
+    tstart : float | int
+        Start time of sensory input in ms. (Default 0.0 ms)
+
+    Notes
+    -----
+    The first proximal input arrives at cortex ~20 ms after sensory
+    stimulus. The exact delay depends random number generator due to
+    random sampling of times from a gaussian.
+    """
+    _validate_type(net, Network, 'net', 'Network')
+    _validate_type(tstart, (float, int), 'tstart', 'float or int')
+
+    # Add distal drive
+    weights_ampa_d1 = {'L2_basket': 0.061, 'L2_pyramidal': 1.155,
+                       'L5_pyramidal': 1.004}
+    weights_nmda_d1 = {'L2_basket': 0.021, 'L2_pyramidal': 0.299,
+                       'L5_pyramidal': 0.579}
+    synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                          'L5_pyramidal': 0.1}
+    net.add_evoked_drive(
+        'evdist1', mu=65.69 + tstart, sigma=3.81, numspikes=1,
+        weights_ampa=weights_ampa_d1, weights_nmda=weights_nmda_d1,
+        location='distal', synaptic_delays=synaptic_delays_d1, seedcore=4)
+
+    # Add proximal drives
+    weights_ampa_p1 = {'L2_basket': 0.2, 'L2_pyramidal': 0.25,
+                       'L5_basket': 0.411, 'L5_pyramidal': 0.014}
+    synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                            'L5_basket': 1., 'L5_pyramidal': 1.}
+
+    net.add_evoked_drive(
+        'evprox1', mu=19.64 + tstart, sigma=2.52, numspikes=1,
+        weights_ampa=weights_ampa_p1, weights_nmda=None, location='proximal',
+        synaptic_delays=synaptic_delays_prox, seedcore=4)
+
+    weights_ampa_p2 = {'L2_basket': 0.00006, 'L2_pyramidal': 48.23,
+                       'L5_basket': 0.0179, 'L5_pyramidal': 49.87}
+
+    # all NMDA weights are zero; omit weights_nmda (defaults to None)
+    net.add_evoked_drive(
+        'evprox2', mu=90.53 + tstart, sigma=10.38, numspikes=1,
+        weights_ampa=weights_ampa_p2, weights_nmda=None, location='proximal',
+        synaptic_delays=synaptic_delays_prox, seedcore=4)
