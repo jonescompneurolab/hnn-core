@@ -204,7 +204,7 @@ def test_mpi_failure(run_hnn_core_fixture):
     assert "MPI processes are unable to reach each other" in stdout
 
     expected_string = "Child process failed unexpectedly"
-    assert len(record) == 1
-    assert record[0].message.args[0] == expected_string
+    # last warning is the expected one, earlier ones DeprecationWarnings
+    assert record[-1].message.args[-1] == expected_string
 
     del environ["OMPI_MCA_btl"]
