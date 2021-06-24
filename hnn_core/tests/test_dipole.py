@@ -52,9 +52,12 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     dpls_raw, net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
                                          reduced=True, record_isoma=True,
                                          record_vsoma=True, postproc=False)
-    dpls, _ = run_hnn_core_fixture(backend='joblib', n_jobs=1, reduced=True,
-                                   record_isoma=True, record_vsoma=True,
-                                   postproc=True)
+    # test deprecation of postproc
+    with pytest.warns(DeprecationWarning,
+                      match='The postproc-argument is deprecated'):
+        dpls, _ = run_hnn_core_fixture(backend='joblib', n_jobs=1,
+                                       reduced=True, record_isoma=True,
+                                       record_vsoma=True, postproc=True)
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
 
