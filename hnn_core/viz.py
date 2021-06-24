@@ -836,7 +836,41 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
     return ax.get_figure()
 
 
-def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, colorbar=True,
+def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
+                        src_range, target_range, nc_dict, colormap):
+    from .cell import _get_gaussian_connection
+
+    # Extract indeces to get position in network
+    # Index in gid range aligns with net.pos_dict
+    target_src_pair = conn['gid_pairs'][src_gid]
+    target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
+
+    src_idx = np.where(src_range == src_gid)[0][0]
+    src_pos = src_type_pos[src_idx]
+
+    # Aggregate positions and weight of each connected target
+    weights, target_x_pos, target_y_pos = list(), list(), list()
+    for target_idx in target_indeces:
+        target_pos = target_type_pos[target_idx]
+        target_x_pos.append(target_pos[0])
+        target_y_pos.append(target_pos[1])
+        weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
+        weights.append(weight)
+
+    ax.clear()
+    im = ax.scatter(target_x_pos, target_y_pos, c=weights, s=50,
+                    cmap=colormap)
+    x_pos = [target_type_pos[idx][0] for idx in range(len(target_type_pos))]
+    y_pos = [target_type_pos[idx][1] for idx in range(len(target_type_pos))]
+
+    ax.scatter(x_pos, y_pos, color='k', marker='x', zorder=-1, s=20)
+    ax.scatter(src_pos[0], src_pos[1], marker='s', color='red', s=150)
+    ax.set_ylabel('Y Position')
+    ax.set_xlabel('X Position')
+    return im
+
+
+def plot_cell_connectivity(net, conn_idx, src_gid, axes=None, colorbar=True,
                            colormap='viridis', show=True):
     """Plot synaptic weight of connections originating from src_gid.
 
@@ -849,7 +883,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, colorbar=True,
         from `net.connectivity`
     src_gid : int
         Each cell in a network is uniquely identified by it's "global ID": GID.
-    ax : instance of Axes3D
+    axes : instance of Axes3D
         Matplotlib 3D axis
     colormap : str
         The name of a matplotlib colormap. Default: 'viridis'
@@ -881,8 +915,6 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, colorbar=True,
     _validate_type(net, Network, 'net', 'Network')
     _validate_type(conn_idx, int, 'conn_idx', 'int')
     _validate_type(src_gid, int, 'src_gid', 'int')
-    if ax is None:
-        _, ax = plt.subplots(1, 1)
 
     # Load objects for distance calculation
     conn = net.connectivity[conn_idx]
@@ -900,37 +932,45 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, colorbar=True,
 
     target_range = np.array(conn['target_range'])
 
-    # Extract indeces to get position in network
-    # Index in gid range aligns with net.pos_dict
-    target_src_pair = conn['gid_pairs'][src_gid]
-    target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
+    if axes is None:
+        if src_type in net.cell_types:
+            fig, axes = plt.subplots(1, 2, sharex=True, sharey=True)
+        else:
+            fig, axes = plt.subplots(1, 1, sharex=True, sharey=True)
+            axes = [axes]
 
-    src_idx = np.where(src_range == src_gid)[0][0]
-    src_pos = src_type_pos[src_idx]
+    if len(axes) == 2:
+        ax_src, ax = axes
+    else:
+        ax = axes[0]
 
-    # Aggregate positions and weight of each connected target
-    weights, target_x_pos, target_y_pos = list(), list(), list()
-    for target_idx in target_indeces:
-        target_pos = target_type_pos[target_idx]
-        target_x_pos.append(target_pos[0])
-        target_y_pos.append(target_pos[1])
-        weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
-        weights.append(weight)
+    im = _update_target_plot(ax, conn, src_gid, src_type_pos,
+                             target_type_pos, src_range,
+                             target_range, nc_dict, colormap)
 
-    im = ax.scatter(target_x_pos, target_y_pos, c=weights, s=50, cmap=colormap)
-
-    # Gather positions of all gids in target_type.
-    x_pos = [target_type_pos[idx][0] for idx in range(len(target_type_pos))]
-    y_pos = [target_type_pos[idx][1] for idx in range(len(target_type_pos))]
-    ax.scatter(x_pos, y_pos, color='k', marker='x', zorder=-1, s=20)
-
-    # Only plot src_gid if proper cell type.
+    x_src = [src_pos[0] for src_pos in src_type_pos]
+    y_src = [src_pos[1] for src_pos in src_type_pos]
     if src_type in net.cell_types:
-        ax.scatter(src_pos[0], src_pos[1], marker='s', color='red', s=150)
-    ax.set_ylabel('Y Position')
-    ax.set_xlabel('X Position')
-    ax.set_title(f"{conn['src_type']}-> {conn['target_type']}"
+        ax_src.scatter(x_src, y_src, marker='s', color='red', s=50)
+
+    plt.suptitle(f"{conn['src_type']}-> {conn['target_type']}"
                  f" ({conn['loc']}, {conn['receptor']})")
+
+    def _onclick(event):
+        if event.inaxes in [ax]:
+            return
+
+        dist = np.linalg.norm(np.array(src_type_pos)[:, :2] -
+                              np.array([event.xdata, event.ydata]),
+                              axis=1)
+        src_idx = np.argmin(dist)
+
+        src_gid = src_range[src_idx]
+        _update_target_plot(ax, conn, src_gid, src_type_pos,
+                            target_type_pos, src_range, target_range,
+                            nc_dict, colormap)
+
+        fig.canvas.draw()
 
     if colorbar:
         fig = ax.get_figure()
@@ -941,5 +981,8 @@ def plot_cell_connectivity(net, conn_idx, src_gid, ax=None, colorbar=True,
         cbar.ax.set_ylabel('Weight', rotation=-90, va="bottom")
 
     plt.tight_layout()
+
+    fig.canvas.mpl_connect('button_press_event', _onclick)
+
     plt_show(show)
     return ax.get_figure(), ax
