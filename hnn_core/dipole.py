@@ -114,8 +114,9 @@ def average_dipoles(dpls):
     """
     for dpl_idx, dpl in enumerate(dpls):
         if not isinstance(dpl, Dipole):
-            raise ValueError("Need at least one dipole object to return a"
-                             " dipole")
+            raise ValueError(
+                f"All elements in the list should be instances of "
+                f"Dipole. Got {type(dpl)}")
         if dpl.nave > 1:
             raise ValueError("Dipole at index %d was already an average of %d"
                              " trials. Cannot reaverage" %
