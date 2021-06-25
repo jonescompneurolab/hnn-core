@@ -17,6 +17,7 @@ import os.path as op
 
 import hnn_core
 from hnn_core import read_params, default_network, simulate_dipole
+from hnn_core.network_models import add_erp_drives_to_default_network
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -30,9 +31,10 @@ params = read_params(params_fname)
 # the evoked response from the
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`, and
 # explore how it changes with new connections. We first instantiate the
-# network. (Note: Setting ``add_drives_from_params=True`` loads a set of
+# network. (Note: ``using add_erp_drives_to_default_network()`` loads a set of
 # predefined drives without the drives API shown previously).
-net_erp = default_network(params, add_drives_from_params=True)
+net_erp = default_network(params)
+add_erp_drives_to_default_network(net_erp)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that

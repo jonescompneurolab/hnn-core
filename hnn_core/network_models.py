@@ -10,6 +10,7 @@ from .params import _short_name
 from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
 
+
 def default_network(params=None, add_drives_from_params=False):
     """Instantiate the default network.
 
@@ -290,7 +291,7 @@ def _calcium_model(params, add_drives_from_params):
     return net
 
 
-def add_default_ERP(net, tstart=0.0):
+def add_erp_drives_to_default_network(net, tstart=0.0):
     """Add drives necessary for an event related potential (ERP)
 
     Parameters

@@ -1,14 +1,15 @@
 """
 ===============================
-06. Simulate beta modulated ERP
+05. Simulate beta modulated ERP
 ===============================
 
 This example demonstrates how event related potentials (ERP) are modulated
-by prestimulus beta events. Transient beta activity in the neocortex has
-been shown to suppress the perceptibility of sensory input. This suppression
-depends on the timing of the beta event, and the incoming sensory
-information. The following example demonstrates the biophysical mechansisms
-underlying beta mediated sensory suppression.
+by prestimulus beta events. Specifically, this example reproduces Figure 5
+from Law et al. 2021 [1]_. To be consistent with the publication, the default
+network connectivity is altered. These modfications demonstrate a potential
+mechanism by which transient beta activity in the neocortex can suppress
+the perceptibility of sensory input. This suppression depends on the timing
+of the beta event, and the incoming sensory information.
 """
 
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
@@ -48,7 +49,7 @@ print(net.cell_types['L5_pyramidal'].p_secs['basal_1']['mechs'].keys())
 # A major change to the Jones 2009 model is the addition of a
 # Martinotti-like recurrent tuft connection [3]_. This new connection
 # originates from L5 basket cells, and provides GABAa inhibition on
-# the distal dendrites of L5 basket cells.
+# the distal dendrites of L5 pyramidal cells.
 print('Recurrent Tuft Connection')
 print(net.connectivity[16])
 
@@ -182,7 +183,7 @@ plot_dipole(dpls_beta, ax=axes[1], layer='agg', tmin=1.0, show=False)
 net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('Spike Raster')
 
-# Create an fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz
+# Create a fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz
 freqs = np.arange(10., 60., 1.)
 dpls_beta[0].plot_tfr_morlet(freqs, n_cycles=7, ax=axes[3])
 
@@ -206,7 +207,7 @@ axes[2].set_title('Spike Raster')
 # incoming sensory stimuli, we can compare the ERP and spiking activity due to
 # sensory input with and without a beta event.
 # The sustained inhibition of the network ultimately depresses
-# the sensory response which is assoicated with a reduced ERP amplitude
+# the sensory response which is associated with a reduced ERP amplitude
 dpls_erp[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
