@@ -59,13 +59,11 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     # average an n_of_1 dipole list
     single_dpl_avg = average_dipoles([dipole])
     for dpl_key in single_dpl_avg.data.keys():
-        assert_allclose((
+        np.testing.assert_allclose(
             dipole_read.data[dpl_key],
             single_dpl_avg.data[dpl_key],
             rtol=0,
             atol=0.000051)
-        np.testing.assert_allclose(dipole_read.data[dpl_key],
-                    single_dpl_avg.data[dpl_key], rtol=0, atol=0.000051)
 
     # average dipole list with one dipole object and a zero dipole object
     n_times = len(dipole_read.data['agg'])
