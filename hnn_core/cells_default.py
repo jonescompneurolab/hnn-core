@@ -283,11 +283,14 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
 
 
 def _get_g_at_dist(x, gsoma, gdend, xkink):
-    """Compute distance-dependent ionic conductance."""
-    if x > xkink:
-        return gdend
-    g = gsoma + x * (gdend - gsoma) / xkink
-    return g
+    """Compute distance-dependent ionic conductance.
+
+    Notes
+    -----
+    Linearly scales conductance along dendrite.
+    Returns gdend when x > xkink.
+    """
+    return gsoma + np.min([xkink, x]) * (gdend - gsoma) / xkink
 
 
 def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
@@ -298,12 +301,11 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 
     override_params['L5Pyr_soma_gkbar_hh2'] = 0.06
     override_params['L5Pyr_soma_gnabar_hh2'] = 0.32
-    override_params['L5Pyr_soma_gbar_ca'] = 10.
     override_params['L5Pyr_dend_gkbar_hh2'] = 1e-4
     override_params['L5Pyr_dend_gnabar_hh2'] = 28e-4
 
     gbar_ca = partial(_get_g_at_dist,
-                      gsoma=override_params['L5Pyr_soma_gbar_ca'],
+                      gsoma=10.,
                       gdend=40.,
                       xkink=1501)
     override_params['L5Pyr_dend_gbar_ca'] = gbar_ca

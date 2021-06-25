@@ -9,7 +9,7 @@ import pytest
 import hnn_core
 from hnn_core import read_params, CellResponse
 from hnn_core import default_network, jones_2009_model, law_2021_model
-from hnn_core.network_models import add_default_ERP
+from hnn_core.network_models import add_erp_drives_to_default_network
 from hnn_core.network_builder import NetworkBuilder
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -33,12 +33,13 @@ def test_network_models():
     # Check add_default_erp()
     net_default = default_network()
     with pytest.raises(TypeError, match='net must be'):
-        add_default_ERP(net='invalid_input')
+        add_erp_drives_to_default_network(net='invalid_input')
     with pytest.raises(TypeError, match='tstart must be'):
-        add_default_ERP(net=net_default, tstart='invalid_input')
+        add_erp_drives_to_default_network(net=net_default,
+                                          tstart='invalid_input')
     n_conn = len(net_default.connectivity)
-    add_default_ERP(net_default)
-    for drive_name in['evdist1', 'evprox1', 'evprox2']:
+    add_erp_drives_to_default_network(net_default)
+    for drive_name in ['evdist1', 'evprox1', 'evprox2']:
         assert drive_name in net_default.external_drives.keys()
     assert len(net_default.connectivity) == n_conn + 14
 
