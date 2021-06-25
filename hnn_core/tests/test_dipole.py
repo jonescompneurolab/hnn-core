@@ -71,8 +71,8 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     dpl_1 = [dipole, dpl_null]
     dpl_avg = average_dipoles(dpl_1)
     for dpl_key in dpl_avg.data.keys():
-        np.allclose(dpl_1[0].data[dpl_key],
-                    dpl_avg.data[dpl_key])
+        assert np.allclose([data / 2 for data in dpl_1[0].data[dpl_key]],
+                           dpl_avg.data[dpl_key])
 
     # test postproc
 
