@@ -198,13 +198,14 @@ def test_mpi_failure(run_hnn_core_fixture):
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
             with pytest.raises(RuntimeError, match="MPI simulation failed"):
-                run_hnn_core_fixture(backend='mpi', reduced=True)
+                run_hnn_core_fixture(backend='mpi', reduced=True,
+                                     postproc=False)
             stdout = buf.getvalue()
 
     assert "MPI processes are unable to reach each other" in stdout
 
     expected_string = "Child process failed unexpectedly"
-    # last warning is the expected one, earlier ones DeprecationWarnings
-    assert record[-1].message.args[-1] == expected_string
+    assert len(record) == 1
+    assert record[0].message.args[0] == expected_string
 
     del environ["OMPI_MCA_btl"]
