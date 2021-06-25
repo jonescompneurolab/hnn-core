@@ -157,7 +157,7 @@ class TestParallelBackends():
         dpl_master = loadtxt('dpl.txt')
 
         dpls, net = run_hnn_core_fixture(backend=backend)
-        dpl = dpls[0]
+        dpl = dpls[0].smooth(30).scale(3000)
 
         # write the dipole to a file and compare
         fname = './dpl2.txt'

@@ -74,7 +74,7 @@ def pytest_runtest_setup(item):
 def run_hnn_core_fixture():
     def _run_hnn_core_fixture(backend=None, n_procs=None, n_jobs=1,
                               reduced=False, record_vsoma=False,
-                              record_isoma=False, postproc=True,
+                              record_isoma=False, postproc=False,
                               electrode_array=None):
         hnn_core_root = op.dirname(hnn_core.__file__)
 
