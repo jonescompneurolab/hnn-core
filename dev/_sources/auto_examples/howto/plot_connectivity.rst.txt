@@ -470,7 +470,7 @@ where the cells are firing synchronously with a smaller period of 4-5 ms.
 As a final step, we can see how this change in spiking activity impacts
 the aggregate current dipole.
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-144
+.. GENERATED FROM PYTHON SOURCE LINES 135-150
 
 .. code-block:: default
 
@@ -478,7 +478,13 @@ the aggregate current dipole.
     from hnn_core.viz import plot_dipole
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
                              constrained_layout=True)
-    dpls = [dpl_erp[0], dpl_all[0], dpl_sparse[0]]
+
+    window_len = 30  # ms
+    scaling_factor = 3000
+    dpls = [dpl_erp[0].smooth(window_len).scale(scaling_factor),
+            dpl_all[0].smooth(window_len).scale(scaling_factor),
+            dpl_sparse[0].smooth(window_len).scale(scaling_factor)]
+
     plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
     axes[0].legend(['Default', 'Custom All', 'Custom Sparse'])
     net_erp.cell_response.plot_spikes_hist(
@@ -505,7 +511,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 10 minutes  22.535 seconds)
+   **Total running time of the script:** ( 21 minutes  10.090 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

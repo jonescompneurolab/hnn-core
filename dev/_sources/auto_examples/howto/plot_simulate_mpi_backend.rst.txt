@@ -404,7 +404,7 @@ start the simulation across the number of processors (cores) specified by
     from hnn_core import MPIBackend
 
     with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-        dpls = simulate_dipole(net, n_trials=1, postproc=False)
+        dpls = simulate_dipole(net, n_trials=1)
 
     trial_idx = 0
     dpls[trial_idx].plot()
@@ -425,7 +425,7 @@ start the simulation across the number of processors (cores) specified by
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
-    [6f21bb3cafd4:01742] Read -1, expected 164416, errno = 1
+    [460c28157e99:01752] Read -1, expected 164416, errno = 1
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -462,15 +462,15 @@ start the simulation across the number of processors (cores) specified by
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    [6f21bb3cafd4:01742] Read -1, expected 49608, errno = 1
-    [6f21bb3cafd4:01741] Read -1, expected 49600, errno = 1
-    [6f21bb3cafd4:01741] Read -1, expected 49608, errno = 1
-    [6f21bb3cafd4:01742] Read -1, expected 49600, errno = 1
-    [6f21bb3cafd4:01741] Read -1, expected 49600, errno = 1
-    [6f21bb3cafd4:01742] Read -1, expected 49608, errno = 1
-    [6f21bb3cafd4:01741] Read -1, expected 49608, errno = 1
-    [6f21bb3cafd4:01742] Read -1, expected 49600, errno = 1
-    [6f21bb3cafd4:01741] Read -1, expected 5616, errno = 1
+    [460c28157e99:01752] Read -1, expected 49608, errno = 1
+    [460c28157e99:01751] Read -1, expected 49600, errno = 1
+    [460c28157e99:01752] Read -1, expected 49600, errno = 1
+    [460c28157e99:01751] Read -1, expected 49608, errno = 1
+    [460c28157e99:01752] Read -1, expected 49608, errno = 1
+    [460c28157e99:01751] Read -1, expected 49600, errno = 1
+    [460c28157e99:01752] Read -1, expected 49600, errno = 1
+    [460c28157e99:01751] Read -1, expected 49608, errno = 1
+    [460c28157e99:01751] Read -1, expected 5616, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -479,7 +479,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  35.785 seconds)
+   **Total running time of the script:** ( 2 minutes  0.849 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

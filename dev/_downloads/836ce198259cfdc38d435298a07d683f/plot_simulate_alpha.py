@@ -51,7 +51,7 @@ net.add_bursty_drive(
     synaptic_delays=syn_delays_p, seedcore=14)
 
 # simulate the dipole, but do not automatically scale or smooth the result
-dpl = simulate_dipole(net, n_trials=1, postproc=False)
+dpl = simulate_dipole(net, n_trials=1)
 
 trial_idx = 0  # single trial simulated, choose the first index
 # to emulate a larger patch of cortex, we can apply a simple scaling factor
@@ -99,7 +99,7 @@ net.add_bursty_drive(
     spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_d,
     synaptic_delays=syn_delays_d, seedcore=16)
 
-dpl = simulate_dipole(net, n_trials=1, postproc=False)
+dpl = simulate_dipole(net, n_trials=1)
 
 ###############################################################################
 # We can verify that beta frequency activity was produced by inspecting the PSD

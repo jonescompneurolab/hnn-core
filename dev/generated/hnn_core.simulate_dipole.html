@@ -142,7 +142,7 @@
 <h1>hnn_core.simulate_dipole<a class="headerlink" href="#hnn-core-simulate-dipole" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.simulate_dipole">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">simulate_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_vsoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/dipole.html#simulate_dipole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.simulate_dipole" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">simulate_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_vsoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/dipole.html#simulate_dipole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.simulate_dipole" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simulate a dipole given the experiment parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -157,7 +157,13 @@ of the <code class="docutils literal notranslate"><span class="pre">params</span
 </dd>
 <dt><strong>record_isoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic currents from cells</p>
 </dd>
-<dt><strong>postproc</strong><span class="classifier">bool</span></dt><dd><p>If False, no postprocessing applied to the dipole</p>
+<dt><strong>postproc</strong><span class="classifier">bool</span></dt><dd><p>If True, smoothing (<code class="docutils literal notranslate"><span class="pre">dipole_smooth_win</span></code>) and scaling
+(<code class="docutils literal notranslate"><span class="pre">dipole_scalefctr</span></code>) values are read from the parameter file, and
+applied to the dipole objects before returning. Note that this setting
+only affects the dipole waveforms, and not somatic voltages, possible
+extracellular recordings etc. The preferred way is to use the
+<a class="reference internal" href="hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.smooth" title="hnn_core.dipole.Dipole.smooth"><code class="xref py py-meth docutils literal notranslate"><span class="pre">smooth()</span></code></a> and
+<a class="reference internal" href="hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.scale" title="hnn_core.dipole.Dipole.scale"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scale()</span></code></a> methods instead. Default: False.</p>
 </dd>
 </dl>
 </dd>

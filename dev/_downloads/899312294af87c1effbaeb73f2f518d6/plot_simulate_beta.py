@@ -61,6 +61,7 @@ print(net.connectivity[15])
 print('\nConnection Removed from Law Model')
 print(net_jones.connectivity[10])
 
+
 ###############################################################################
 # To demonstrate sensory depression, we will add the drives necessary to
 # generate and ERP similar to
@@ -110,6 +111,7 @@ def add_erp_drives(net, stimulus_start):
 
     return net
 
+
 ###############################################################################
 # A beta event is created by inducing simultaneous proximal and distal
 # drives. The input is just strong enough to evoke spiking in the
@@ -141,6 +143,7 @@ def add_beta_drives(net, beta_start):
 
     return net
 
+
 ###############################################################################
 # We can now use our functions to create three distinct simulations:
 # 1) beta event only, 2) ERP only, and 3) beta event + ERP.
@@ -158,9 +161,9 @@ net_beta_erp = add_erp_drives(net_beta_erp, stimulus_start)
 # And finally we simulate. Note that the default simulation time has been
 # increased to 400 ms to observe the long time course over which beta events
 # can influence sensory input to the cortical column.
-dpls_beta = simulate_dipole(net_beta, postproc=False)
-dpls_erp = simulate_dipole(net_erp, postproc=False)
-dpls_beta_erp = simulate_dipole(net_beta_erp, postproc=False)
+dpls_beta = simulate_dipole(net_beta)
+dpls_erp = simulate_dipole(net_erp)
+dpls_beta_erp = simulate_dipole(net_beta_erp)
 
 ###############################################################################
 # By inspecting the activity during the beta event, we can see that spiking

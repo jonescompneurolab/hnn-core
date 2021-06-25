@@ -495,11 +495,162 @@ across trials.
 
     from hnn_core import JoblibBackend
 
-    with JoblibBackend(n_jobs=1):
-        dpls = simulate_dipole(net, n_trials=2, postproc=True)
+    with JoblibBackend(n_jobs=2):
+        dpls = simulate_dipole(net, n_trials=2)
 
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    joblib will run over 2 jobs
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 107-111
+
+Rather than reading smoothing and scaling parameters from file, we recommend
+explicit use of the :meth:`~hnn_core.dipole.Dipole.smooth` and
+:meth:`~hnn_core.dipole.Dipole.scale` methods instead. Note that both methods
+operate in-place, i.e., the objects are modified.
+
+.. GENERATED FROM PYTHON SOURCE LINES 111-115
+
+.. code-block:: default
+
+    window_len, scaling_factor = 30, 3000
+    for dpl in dpls:
+        dpl.smooth(window_len).scale(scaling_factor)
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 116-117
+
+Plot the amplitudes of the simulated aggregate dipole moments over time
+
+.. GENERATED FROM PYTHON SOURCE LINES 117-124
+
+.. code-block:: default
+
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
+                             constrained_layout=True)
+    plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
+    net.cell_response.plot_spikes_hist(ax=axes[1],
+                                       spike_types=['evprox', 'evdist'])
+
+
+
+
+.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_003.png
+    :alt: Aggregate (L2 + L5)
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <Figure size 600x600 with 2 Axes>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 125-131
+
+Now, let us try to make the exogenous driving inputs to the cells
+synchronous and see what happens. This is achieved by setting the parameter
+``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
+a clone of the network defined above, and then modify the drive dynamics for
+each drive. Making a copy removes any existing outputs from the network
+such as spiking information and voltages at the soma.
+
+.. GENERATED FROM PYTHON SOURCE LINES 131-137
+
+.. code-block:: default
+
+
+    net_sync = net.copy()
+    net_sync.external_drives['evdist1']['dynamics']['sync_within_trial'] = True
+    net_sync.external_drives['evprox1']['dynamics']['sync_within_trial'] = True
+    net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 138-139
+
+You may interrogate current values defining the spike event time dynamics by
+
+.. GENERATED FROM PYTHON SOURCE LINES 139-141
+
+.. code-block:: default
+
+    print(net_sync.external_drives['evdist1']['dynamics'])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    {'mu': 63.53, 'sigma': 3.85, 'numspikes': 1, 'sync_within_trial': True}
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 142-144
+
+Finally, let's simulate this network. Rather than modifying the dipole
+object, this time we make a copy of it before smoothing and scaling.
+
+.. GENERATED FROM PYTHON SOURCE LINES 144-149
+
+.. code-block:: default
+
+    dpls_sync = simulate_dipole(net_sync, n_trials=1)
+
+    trial_idx = 0
+    dpls_sync[trial_idx].copy().smooth(window_len).scale(scaling_factor).plot()
+    net_sync.cell_response.plot_spikes_hist()
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
+          :alt: Aggregate (L2 + L5)
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
+          :alt: plot simulate evoked
+          :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -530,175 +681,6 @@ across trials.
     Simulation time: 140.0 ms...
     Simulation time: 150.0 ms...
     Simulation time: 160.0 ms...
-    Building the NEURON model
-    [Done]
-    running trial 2 on 1 cores
-    Simulation time: 0.03 ms...
-    Simulation time: 10.0 ms...
-    Simulation time: 20.0 ms...
-    Simulation time: 30.0 ms...
-    Simulation time: 40.0 ms...
-    Simulation time: 50.0 ms...
-    Simulation time: 60.0 ms...
-    Simulation time: 70.0 ms...
-    Simulation time: 80.0 ms...
-    Simulation time: 90.0 ms...
-    Simulation time: 100.0 ms...
-    Simulation time: 110.0 ms...
-    Simulation time: 120.0 ms...
-    Simulation time: 130.0 ms...
-    Simulation time: 140.0 ms...
-    Simulation time: 150.0 ms...
-    Simulation time: 160.0 ms...
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 107-109
-
-and then plot the amplitudes of the simulated aggregate dipole moments over
-time
-
-.. GENERATED FROM PYTHON SOURCE LINES 109-116
-
-.. code-block:: default
-
-    import matplotlib.pyplot as plt
-    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
-                             constrained_layout=True)
-    plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
-    net.cell_response.plot_spikes_hist(ax=axes[1],
-                                       spike_types=['evprox', 'evdist'])
-
-
-
-
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_003.png
-    :alt: Aggregate (L2 + L5)
-    :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-
-    <Figure size 600x600 with 2 Axes>
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 117-123
-
-Now, let us try to make the exogenous driving inputs to the cells
-synchronous and see what happens. This is achieved by setting the parameter
-``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
-a clone of the network defined above, and then modify the drive dynamics for
-each drive. Making a copy removes any existing outputs from the network
-such as spiking information and voltages at the soma.
-
-.. GENERATED FROM PYTHON SOURCE LINES 123-129
-
-.. code-block:: default
-
-
-    net_sync = net.copy()
-    net_sync.external_drives['evdist1']['dynamics']['sync_within_trial'] = True
-    net_sync.external_drives['evprox1']['dynamics']['sync_within_trial'] = True
-    net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 130-131
-
-You may interrogate current values defining the spike event time dynamics by
-
-.. GENERATED FROM PYTHON SOURCE LINES 131-133
-
-.. code-block:: default
-
-    print(net_sync.external_drives['evdist1']['dynamics'])
-
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    {'mu': 63.53, 'sigma': 3.85, 'numspikes': 1, 'sync_within_trial': True}
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 134-135
-
-Finally, let's simulate this network.
-
-.. GENERATED FROM PYTHON SOURCE LINES 135-140
-
-.. code-block:: default
-
-    dpls_sync = simulate_dipole(net_sync, n_trials=1)
-
-    trial_idx = 0
-    dpls_sync[trial_idx].plot()
-    net_sync.cell_response.plot_spikes_hist()
-
-
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
-          :alt: Aggregate (L2 + L5)
-          :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
-          :alt: plot simulate evoked
-          :class: sphx-glr-multi-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    joblib will run over 1 jobs
-    Building the NEURON model
-    [Done]
-    running trial 1 on 1 cores
-    Simulation time: 0.03 ms...
-    Simulation time: 10.0 ms...
-    Simulation time: 20.0 ms...
-    Simulation time: 30.0 ms...
-    Simulation time: 40.0 ms...
-    Simulation time: 50.0 ms...
-    Simulation time: 60.0 ms...
-    Simulation time: 70.0 ms...
-    Simulation time: 80.0 ms...
-    Simulation time: 90.0 ms...
-    Simulation time: 100.0 ms...
-    Simulation time: 110.0 ms...
-    Simulation time: 120.0 ms...
-    Simulation time: 130.0 ms...
-    Simulation time: 140.0 ms...
-    Simulation time: 150.0 ms...
-    Simulation time: 160.0 ms...
 
     <Figure size 640x480 with 1 Axes>
 
@@ -707,7 +689,7 @@ Finally, let's simulate this network.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  17.394 seconds)
+   **Total running time of the script:** ( 2 minutes  42.327 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

@@ -100,12 +100,20 @@ net.add_evoked_drive(
 # across trials.
 from hnn_core import JoblibBackend
 
-with JoblibBackend(n_jobs=1):
-    dpls = simulate_dipole(net, n_trials=2, postproc=True)
+with JoblibBackend(n_jobs=2):
+    dpls = simulate_dipole(net, n_trials=2)
 
 ###############################################################################
-# and then plot the amplitudes of the simulated aggregate dipole moments over
-# time
+# Rather than reading smoothing and scaling parameters from file, we recommend
+# explicit use of the :meth:`~hnn_core.dipole.Dipole.smooth` and
+# :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Note that both methods
+# operate in-place, i.e., the objects are modified.
+window_len, scaling_factor = 30, 3000
+for dpl in dpls:
+    dpl.smooth(window_len).scale(scaling_factor)
+
+###############################################################################
+# Plot the amplitudes of the simulated aggregate dipole moments over time
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
                          constrained_layout=True)
@@ -131,9 +139,10 @@ net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
 print(net_sync.external_drives['evdist1']['dynamics'])
 
 ###############################################################################
-# Finally, let's simulate this network.
+# Finally, let's simulate this network. Rather than modifying the dipole
+# object, this time we make a copy of it before smoothing and scaling.
 dpls_sync = simulate_dipole(net_sync, n_trials=1)
 
 trial_idx = 0
-dpls_sync[trial_idx].plot()
+dpls_sync[trial_idx].copy().smooth(window_len).scale(scaling_factor).plot()
 net_sync.cell_response.plot_spikes_hist()

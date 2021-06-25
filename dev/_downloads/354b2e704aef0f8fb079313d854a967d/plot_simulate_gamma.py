@@ -50,7 +50,10 @@ net.add_poisson_drive(
     'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
     location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
 
+###############################################################################
 dpls = simulate_dipole(net)
+scaling_factor = 30000
+dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
 ###############################################################################
 # Take a look at how different cell types respond to the exogenous drive. Note
@@ -89,6 +92,7 @@ dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[1])
 # is applied to the entire duration of the simulation.
 net.add_tonic_bias(cell_type='L5_pyramidal', amplitude=6.)
 dpls = simulate_dipole(net, n_trials=1)
+dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
 dpls[trial_idx].plot()
 
@@ -116,6 +120,7 @@ plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
 # frequency from ~50 to ~65 Hz.
 net.cell_types['L5_pyramidal'].p_syn['gabaa']['tau2'] = 2
 dpls = simulate_dipole(net, n_trials=1)
+dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
                          constrained_layout=True)

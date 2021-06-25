@@ -136,7 +136,13 @@ import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
                          constrained_layout=True)
-dpls = [dpl_erp[0], dpl_all[0], dpl_sparse[0]]
+
+window_len = 30  # ms
+scaling_factor = 3000
+dpls = [dpl_erp[0].smooth(window_len).scale(scaling_factor),
+        dpl_all[0].smooth(window_len).scale(scaling_factor),
+        dpl_sparse[0].smooth(window_len).scale(scaling_factor)]
+
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
 axes[0].legend(['Default', 'Custom All', 'Custom Sparse'])
 net_erp.cell_response.plot_spikes_hist(

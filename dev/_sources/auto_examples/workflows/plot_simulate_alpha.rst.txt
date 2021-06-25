@@ -113,7 +113,7 @@ time with unique randomization. The drive is only connected to the proximal
         synaptic_delays=syn_delays_p, seedcore=14)
 
     # simulate the dipole, but do not automatically scale or smooth the result
-    dpl = simulate_dipole(net, n_trials=1, postproc=False)
+    dpl = simulate_dipole(net, n_trials=1)
 
     trial_idx = 0  # single trial simulated, choose the first index
     # to emulate a larger patch of cortex, we can apply a simple scaling factor
@@ -165,7 +165,7 @@ time with unique randomization. The drive is only connected to the proximal
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7f4112b959e8>
+    <hnn_core.dipole.Dipole object at 0x7f2cc81ce080>
 
 
 
@@ -243,7 +243,7 @@ as beta frequency events.
         spike_isi=10, repeats=10, location=location, weights_ampa=weights_ampa_d,
         synaptic_delays=syn_delays_d, seedcore=16)
 
-    dpl = simulate_dipole(net, n_trials=1, postproc=False)
+    dpl = simulate_dipole(net, n_trials=1)
 
 
 
@@ -351,7 +351,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  45.305 seconds)
+   **Total running time of the script:** ( 4 minutes  11.725 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

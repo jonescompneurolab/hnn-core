@@ -158,7 +158,7 @@ dipole time series during plotting (``postproc=False``)
     print(net.rec_arrays)
     net.plot_cells()
 
-    dpl = simulate_dipole(net, postproc=False)
+    dpl = simulate_dipole(net)
 
 
 
@@ -259,7 +259,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  4.338 seconds)
+   **Total running time of the script:** ( 2 minutes  17.511 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:
