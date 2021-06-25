@@ -57,9 +57,7 @@ fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 # Data recorded during simulations are stored under
 # :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
 # a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
-# Note that in the current example, we apply smoothing and scaling to the
-# dipoles as defined in the parameter file (``postproc=True``).
-dpl_erp = simulate_dipole(net_erp, n_trials=1, postproc=True)
+dpl_erp = simulate_dipole(net_erp, n_trials=1)
 net_erp.cell_response.plot_spikes_raster()
 
 ###############################################################################
@@ -97,14 +95,14 @@ def get_network(probability=1.0):
 
 
 net_all = get_network()
-dpl_all = simulate_dipole(net_all, n_trials=1, postproc=True)
+dpl_all = simulate_dipole(net_all, n_trials=1)
 
 ###############################################################################
 # We can additionally use the ``probability`` argument to create a sparse
 # connectivity pattern instead of all-to-all. Let's try creating the same
 # network with a 10% chance of cells connecting to each other.
 net_sparse = get_network(probability=0.1)
-dpl_sparse = simulate_dipole(net_sparse, n_trials=1, postproc=True)
+dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
 
 ###############################################################################
 # With the previous connection pattern there appears to be synchronous rhythmic
@@ -138,7 +136,13 @@ import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
                          constrained_layout=True)
-dpls = [dpl_erp[0], dpl_all[0], dpl_sparse[0]]
+
+window_len = 30  # ms
+scaling_factor = 3000
+dpls = [dpl_erp[0].smooth(window_len).scale(scaling_factor),
+        dpl_all[0].smooth(window_len).scale(scaling_factor),
+        dpl_sparse[0].smooth(window_len).scale(scaling_factor)]
+
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
 axes[0].legend(['Default', 'Custom All', 'Custom Sparse'])
 net_erp.cell_response.plot_spikes_hist(

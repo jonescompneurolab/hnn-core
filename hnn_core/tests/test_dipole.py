@@ -26,8 +26,16 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     dipole = Dipole(times, data)
     dipole._baseline_renormalize(params['N_pyr_x'], params['N_pyr_y'])
     dipole._convert_fAm_to_nAm()
+
+    # test smoothing and scaling
+    dipole_raw = dipole.copy()
     dipole.scale(params['dipole_scalefctr'])
     dipole.smooth(window_len=params['dipole_smooth_win'])
+    with pytest.raises(AssertionError):
+        assert_allclose(dipole.data['agg'], dipole_raw.data['agg'])
+    assert_allclose(dipole.data['agg'],
+                    (params['dipole_scalefctr'] * dipole_raw.smooth(
+                        params['dipole_smooth_win']).data['agg']))
 
     dipole.plot(show=False)
     plot_dipole([dipole, dipole], show=False)
@@ -48,10 +56,10 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
                        "average of 2 trials"):
         dipole_avg = average_dipoles([dipole_avg, dipole_read])
 
-    # test postproc
+    # XXX all below to be deprecated in 0.3
     dpls_raw, net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
                                          reduced=True, record_isoma=True,
-                                         record_vsoma=True, postproc=False)
+                                         record_vsoma=True)
     # test deprecation of postproc
     with pytest.warns(DeprecationWarning,
                       match='The postproc-argument is deprecated'):
