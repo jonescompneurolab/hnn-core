@@ -73,8 +73,6 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     for dpl_key in dpl_avg.data.keys():
         assert_allclose(dpl_1[0].data[dpl_key] / 2., dpl_avg.data[dpl_key])
 
-    # test postproc
-
     # XXX all below to be deprecated in 0.3
     dpls_raw, net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
                                          reduced=True, record_isoma=True,
