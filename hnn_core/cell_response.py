@@ -456,5 +456,4 @@ def read_spikes(fname, gid_ranges=None):
     if gid_ranges is not None:
         cell_response.update_types(gid_ranges)
 
-    return CellResponse(spike_times=spike_times, spike_gids=spike_gids,
-                        spike_types=spike_types)
+    return cell_response
