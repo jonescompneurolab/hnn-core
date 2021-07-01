@@ -146,11 +146,16 @@ def test_cell_response(tmpdir):
         'L2_basket': [[test_rate], [0.0]]}
 
     # Write spike file with no 'types' column
-    # Check for gid_ranges errors
-
     for fname in sorted(glob(str(tmpdir.join('spk_*.txt')))):
         times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
+
+    # Check that spike_types are updated according to gid_ranges
+    cell_response = read_spikes(tmpdir.join('spk_*.txt'),
+                                gid_ranges=gid_ranges)
+    assert cell_response.spike_types == spike_types
+
+    # Check for gid_ranges errors
     with pytest.raises(ValueError, match="gid_ranges must be provided if "
                        "spike types are unspecified in the file "):
         cell_response = read_spikes(tmpdir.join('spk_*.txt'))
