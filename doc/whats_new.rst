@@ -43,6 +43,8 @@ Bug
 
 - Fix bug where :func:`~hnn_core.average_dipole` failed when there were less than two dipoles in the input dipole list, by `Kenneth Loi`_ in `#368 <https://github.com/jonescompneurolab/hnn-core/pull/368>`_
 
+- Fix bug where :func:`~hnn_core.read_spikes` wasn't returning a :class:`~hnn_core.CellResponse` instance with updated spike types, by `Ryan Thorpe`_ in `#382 <https://github.com/jonescompneurolab/hnn-core/pull/382>`_
+
 API
 ~~~
 - New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
