@@ -51,7 +51,7 @@ plot_connectivity_matrix(net_erp, conn_idx)
 
 gid_idx = 11
 src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
-fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
+fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 ###############################################################################
 # Data recorded during simulations are stored under
