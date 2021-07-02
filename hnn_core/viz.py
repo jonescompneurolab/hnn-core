@@ -910,7 +910,6 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     """
     import matplotlib.pyplot as plt
     from .network import Network
-    from .cell import _get_gaussian_connection
     from matplotlib.ticker import ScalarFormatter
 
     _validate_type(net, Network, 'net', 'Network')
