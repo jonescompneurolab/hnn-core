@@ -1,3 +1,4 @@
+from functools import partial
 import os.path as op
 
 import matplotlib
@@ -11,6 +12,13 @@ from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
+
+
+def _fake_click(fig, ax, point, button=1):
+    """Fake a click at a point within axes."""
+    x, y = ax.transData.transform_point(point)
+    func = partial(fig.canvas.button_press_event, x=x, y=y, button=button)
+    func(guiEvent=None)
 
 
 def test_network_visualization():
@@ -47,8 +55,20 @@ def test_network_visualization():
     with pytest.raises(TypeError, match='src_gid must be an instance of'):
         plot_cell_connectivity(net, conn_idx, src_gid='blah')
 
-    with pytest.raises(ValueError, match='src_gid not in the'):
+    with pytest.raises(ValueError, match='src_gid not a valid cell ID'):
         plot_cell_connectivity(net, conn_idx, src_gid=-1)
+
+    # smoke test interactive clicking
+    del net.connectivity[-1]
+    conn_idx = 15
+    net.add_connection(net.gid_ranges['L2_pyramidal'][::2],
+                       'L5_basket', 'soma',
+                       'ampa', 0.00025, 1.0, lamtha=3.0,
+                       probability=0.8)
+    fig = plot_cell_connectivity(net, conn_idx)
+    ax_src = fig.axes[0]
+    pos = net.pos_dict['L2_pyramidal'][2]
+    _fake_click(fig, ax_src, [pos[0], pos[1]])
 
 
 def test_dipole_visualization():

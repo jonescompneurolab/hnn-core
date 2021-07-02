@@ -967,7 +967,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
                  f" ({conn['loc']}, {conn['receptor']})")
 
     def _onclick(event):
-        if event.inaxes in [ax]:
+        if event.inaxes in [ax] or event.inaxes is None:
             return
 
         dist = np.linalg.norm(src_type_pos[:, :2] -
@@ -997,4 +997,4 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     fig.canvas.mpl_connect('button_press_event', _onclick)
 
     plt_show(show)
-    return ax.get_figure(), ax
+    return ax.get_figure()
