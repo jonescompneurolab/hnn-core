@@ -18,7 +18,7 @@ Changelog
 
 - Add new function :func:`~hnn_core.viz.plot_cell_morphology` to visualize cell morphology, by `Mainak Jas`_ in `#319 <https://github.com/jonescompneurolab/hnn-core/pull/319>`_
 
-- Compute dipole component in z-direction automatically from cell morphology instead of hard coding, by `Mainak Jas`_ in  `#327 <https://github.com/jonescompneurolab/hnn-core/pull/320>`_
+- Compute dipole component in z-direction automatically from cell morphology instead of hard coding, by `Mainak Jas`_ in  `#327 <https://github.com/jonescompneurolab/hnn-core/pull/327>`_
 
 - Store :class:`~hnn_core.Cell` instances in :class:`~hnn_core.Network`'s :attr:`~/hnn_core.Network.cells` attribute by `Ryan Thorpe`_ in `#321 <https://github.com/jonescompneurolab/hnn-core/pull/321>`_
 
@@ -31,6 +31,8 @@ Changelog
 - Add function to visualize extracellular potentials from laminar array simulations, by `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
 
 - Previously published models can now be loaded via ``net=law_2021_model()`` and ``jones_2009_model()``, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/348>`_
+
+- Add ability to interactivity explore connections in :func:`~hnn_core.viz.plot_cell_connectivity` by `Mainak Jas`_ in `#376 <https://github.com/jonescompneurolab/hnn-core/pull/376>`_
 
 Bug
 ~~~
