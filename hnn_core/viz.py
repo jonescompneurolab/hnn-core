@@ -860,9 +860,8 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
     ax.clear()
     im = ax.scatter(target_x_pos, target_y_pos, c=weights, s=50,
                     cmap=colormap)
-    x_pos = [target_type_pos[idx][0] for idx in range(len(target_type_pos))]
-    y_pos = [target_type_pos[idx][1] for idx in range(len(target_type_pos))]
-
+    x_pos = target_type_pos[:, 0]
+    y_pos = target_type_pos[:, 1]
     ax.scatter(x_pos, y_pos, color='k', marker='x', zorder=-1, s=20)
     ax.scatter(src_pos[0], src_pos[1], marker='s', color='red', s=150)
     ax.set_ylabel('Y Position')
@@ -870,8 +869,8 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
     return im
 
 
-def plot_cell_connectivity(net, conn_idx, src_gid, axes=None, colorbar=True,
-                           colormap='viridis', show=True):
+def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
+                           colorbar=True, colormap='viridis', show=True):
     """Plot synaptic weight of connections originating from src_gid.
 
     Parameters
@@ -881,8 +880,10 @@ def plot_cell_connectivity(net, conn_idx, src_gid, axes=None, colorbar=True,
     conn_idx : int
         Index of connection to be visualized
         from `net.connectivity`
-    src_gid : int
-        Each cell in a network is uniquely identified by it's "global ID": GID.
+    src_gid : int | None
+        The cell ID of the source cell. It must be an element of
+        net.connectivity[conn_idx]['gid_pairs'].keys()
+        If None, the first src_gid from the list of valid src_gids is selected.
     axes : instance of Axes3D
         Matplotlib 3D axis
     colormap : str
@@ -914,21 +915,26 @@ def plot_cell_connectivity(net, conn_idx, src_gid, axes=None, colorbar=True,
 
     _validate_type(net, Network, 'net', 'Network')
     _validate_type(conn_idx, int, 'conn_idx', 'int')
-    _validate_type(src_gid, int, 'src_gid', 'int')
 
     # Load objects for distance calculation
     conn = net.connectivity[conn_idx]
     nc_dict = conn['nc_dict']
     src_type = conn['src_type']
     target_type = conn['target_type']
-    src_type_pos = net.pos_dict[src_type]
-    target_type_pos = net.pos_dict[target_type]
-
+    src_type_pos = np.array(net.pos_dict[src_type])
+    target_type_pos = np.array(net.pos_dict[target_type])
     src_range = np.array(conn['src_range'])
-    if src_gid not in src_range:
-        raise ValueError(f'src_gid not in the src type range of {src_type} '
-                         f'gids. Valid gids include {src_range[0]} -> '
-                         f'{src_range[-1]}')
+
+    valid_src_gids = list(net.connectivity[conn_idx]['gid_pairs'].keys())
+    src_pos_valid = src_type_pos[np.in1d(src_range, valid_src_gids)]
+
+    if src_gid is None:
+        src_gid = valid_src_gids[0]
+    _validate_type(src_gid, int, 'src_gid', 'int')
+
+    if src_gid not in valid_src_gids:
+        raise ValueError(f'src_gid not a valid cell ID for this connection '
+                         f'Please select one of {valid_src_gids}')
 
     target_range = np.array(conn['target_range'])
 
@@ -948,10 +954,15 @@ def plot_cell_connectivity(net, conn_idx, src_gid, axes=None, colorbar=True,
                              target_type_pos, src_range,
                              target_range, nc_dict, colormap)
 
-    x_src = [src_pos[0] for src_pos in src_type_pos]
-    y_src = [src_pos[1] for src_pos in src_type_pos]
+    x_src = src_type_pos[:, 0]
+    y_src = src_type_pos[:, 1]
+    x_src_valid = src_pos_valid[:, 0]
+    y_src_valid = src_pos_valid[:, 1]
     if src_type in net.cell_types:
-        ax_src.scatter(x_src, y_src, marker='s', color='red', s=50)
+        ax_src.scatter(x_src, y_src, marker='s', color='red', s=50,
+                       alpha=0.2)
+        ax_src.scatter(x_src_valid, y_src_valid, marker='s', color='red',
+                       s=50)
 
     plt.suptitle(f"{conn['src_type']}-> {conn['target_type']}"
                  f" ({conn['loc']}, {conn['receptor']})")
@@ -960,12 +971,14 @@ def plot_cell_connectivity(net, conn_idx, src_gid, axes=None, colorbar=True,
         if event.inaxes in [ax]:
             return
 
-        dist = np.linalg.norm(np.array(src_type_pos)[:, :2] -
+        dist = np.linalg.norm(src_type_pos[:, :2] -
                               np.array([event.xdata, event.ydata]),
                               axis=1)
         src_idx = np.argmin(dist)
 
         src_gid = src_range[src_idx]
+        if src_gid not in valid_src_gids:
+            return
         _update_target_plot(ax, conn, src_gid, src_type_pos,
                             target_type_pos, src_range, target_range,
                             nc_dict, colormap)
