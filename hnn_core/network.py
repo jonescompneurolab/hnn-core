@@ -454,7 +454,7 @@ class Network(object):
 
     def add_bursty_drive(self, name, *, tstart=0, tstart_std=0, tstop=None,
                          location, burst_rate, burst_std=0, numspikes=2,
-                         spike_isi=10, repeats=1, weights_ampa=None,
+                         spike_isi=10, numsources=1, weights_ampa=None,
                          weights_nmda=None, synaptic_delays=0.1,
                          space_constant=100., seedcore=2):
         """Add a bursty (rhythmic) external drive to all cells of the network
@@ -482,8 +482,9 @@ class Network(object):
             in the GUI. Default: 2 (doublet)
         spike_isi : float
             Time between spike events within a cycle (ISI). Default: 10 ms
-        repeats : int
-            The number of bursts per cycle. Default: 1
+        numsources : int
+            The number of sources that contribute an iid-sampled burst at each
+            cycle. Default: 1
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -523,7 +524,7 @@ class Network(object):
                                  tstart_std=tstart_std, tstop=tstop,
                                  burst_rate=burst_rate, burst_std=burst_std,
                                  numspikes=numspikes, spike_isi=spike_isi,
-                                 repeats=repeats)
+                                 numsources=numsources)
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,

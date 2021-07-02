@@ -89,7 +89,7 @@ def test_dipole_visualization():
 
     net.add_bursty_drive(
         'beta_prox', tstart=0., burst_rate=25, burst_std=5,
-        numspikes=1, spike_isi=0, repeats=11, location='proximal',
+        numspikes=1, spike_isi=0, numsources=11, location='proximal',
         weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p, seedcore=14)
 
     dpls = simulate_dipole(net, n_trials=2)

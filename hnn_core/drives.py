@@ -127,7 +127,7 @@ def _add_drives_from_params(net):
                 burst_std=specs['dynamics']['burst_std'],
                 numspikes=specs['dynamics']['numspikes'],
                 spike_isi=specs['dynamics']['spike_isi'],
-                repeats=specs['dynamics']['repeats'],
+                numsources=specs['dynamics']['numsources'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
                 location=specs['location'],
@@ -257,7 +257,7 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
             tstop=dynamics['tstop'],
             f_input=dynamics['burst_rate'],
             events_jitter_std=dynamics['burst_std'],
-            repeats=dynamics['repeats'],
+            numsources=dynamics['numsources'],
             events_per_cycle=dynamics['numspikes'],
             cycle_events_isi=dynamics['spike_isi'],
             prng=prng,
@@ -367,7 +367,7 @@ def drive_event_times(drive_type, target_cell_type, params, gid, trial_idx=0):
             tstop=params['tstop'],
             f_input=params['f_input'],
             events_jitter_std=params['stdev'],
-            repeats=params['repeats'],
+            numsources=params['numsources'],
             events_per_cycle=params['events_per_cycle'],
             cycle_events_isi=10,
             prng=prng,
@@ -446,7 +446,7 @@ def _create_gauss(*, mu, sigma, numspikes, prng):
 
 
 def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
-                         events_jitter_std, repeats, events_per_cycle=2,
+                         events_jitter_std, numsources, events_per_cycle=2,
                          cycle_events_isi=10, prng, prng2):
     """Creates the bursty ongoing external inputs.
 
@@ -467,8 +467,9 @@ def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
         The frequency of input bursts.
     events_jitter_std : float
         The standard deviation (in ms) of each burst event.
-    repeats : int
-        The number of (jittered) repeats for each burst cycle.
+    numsources : int
+        The number of sources that contribute an iid-sampled burst at each
+        cycle
     events_per_cycle : int
         The events per cycle. This is the spikes/burst parameter in the GUI.
         Default: 2 (doublet)
@@ -497,7 +498,7 @@ def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
     # array of mean stimulus times, starts at t0
     isi_array = np.arange(t0, tstop, burst_period)
     # array of single stimulus times -- no doublets
-    t_array = prng.normal(np.repeat(isi_array, repeats), events_jitter_std)
+    t_array = prng.normal(np.repeat(isi_array, numsources), events_jitter_std)
 
     if events_per_cycle > 1:
         cycle = (np.arange(events_per_cycle) - (events_per_cycle - 1) / 2)

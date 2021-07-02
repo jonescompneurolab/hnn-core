@@ -162,7 +162,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                              'burst_rate': par['f_input'],
                              'burst_std': par['stdev'],
                              'numspikes': par['events_per_cycle'],
-                             'repeats': par['repeats'],
+                             'numsources': par['numsources'],
                              'spike_isi': 10}  # not exposed in params-files
         drive['location'] = par['loc']
         drive['space_constant'] = par['lamtha']
@@ -477,7 +477,7 @@ def create_pext(p, tstop):
         'prng_seedcore': int(p['prng_seedcore_input_prox']),
         'lamtha': 100.,
         'loc': 'proximal',
-        'repeats': p['repeats_prox'],
+        'numsources': p['repeats_prox'],
         't0_stdev': p['t0_input_stdev_prox'],
         'threshold': p['threshold']
     }
@@ -507,7 +507,7 @@ def create_pext(p, tstop):
         'prng_seedcore': int(p['prng_seedcore_input_dist']),
         'lamtha': 100.,
         'loc': 'distal',
-        'repeats': p['repeats_dist'],
+        'numsources': p['repeats_dist'],
         't0_stdev': p['t0_input_stdev_dist'],
         'threshold': p['threshold']
     }
