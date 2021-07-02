@@ -689,7 +689,7 @@ object, this time we make a copy of it before smoothing and scaling.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  39.463 seconds)
+   **Total running time of the script:** ( 2 minutes  24.806 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

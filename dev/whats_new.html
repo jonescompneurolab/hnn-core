@@ -92,10 +92,10 @@
 <li><a class="reference internal" href="#api">API</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id22">0.1</a><ul>
-<li><a class="reference internal" href="#id24">Changelog</a></li>
-<li><a class="reference internal" href="#id44">Bug</a></li>
-<li><a class="reference internal" href="#id53">API</a></li>
+<li><a class="reference internal" href="#id23">0.1</a><ul>
+<li><a class="reference internal" href="#id25">Changelog</a></li>
+<li><a class="reference internal" href="#id45">Bug</a></li>
+<li><a class="reference internal" href="#id54">API</a></li>
 <li><a class="reference internal" href="#people-who-contributed-to-this-release-in-alphabetical-order">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
@@ -175,6 +175,7 @@
 <li><p>Fix issue where common drives use the same parameters for all cell types, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/350">#350</a></p></li>
 <li><p>Fix bug where depth of L5 and L2 cells were swapped, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/352">#352</a></p></li>
 <li><p>Fix bug where <code class="xref py py-func docutils literal notranslate"><span class="pre">average_dipole()</span></code> failed when there were less than two dipoles in the input dipole list, by <a class="reference external" href="https://github.com/kenloi">Kenneth Loi</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/368">#368</a></p></li>
+<li><p>Fix bug where <a class="reference internal" href="generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_spikes()</span></code></a> wasn’t returning a <a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellResponse</span></code></a> instance with updated spike types, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/382">#382</a></p></li>
 </ul>
 </section>
 <section id="api">
@@ -192,10 +193,10 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 </ul>
 </section>
 </section>
-<section id="id22">
-<span id="id23"></span><h2>0.1<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h2>
-<section id="id24">
-<h3>Changelog<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<section id="id23">
+<span id="id24"></span><h2>0.1<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h2>
+<section id="id25">
+<h3>Changelog<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add ability to simulate multiple trials in parallel using joblibs, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/44">#44</a></p></li>
 <li><p>Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting their start times to exceed the simulation stop time, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/105">#105</a></p></li>
@@ -218,8 +219,8 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 <li><p>Add Savitzky-Golay filtering method <a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter" title="hnn_core.dipole.Dipole.savgol_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>; copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v0.24.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 </ul>
 </section>
-<section id="id44">
-<h3>Bug<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h3>
+<section id="id45">
+<h3>Bug<a class="headerlink" href="#id45" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix missing autapses in network construction, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/50">#50</a></p></li>
 <li><p>Fix rhythmic input feed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/98">#98</a></p></li>
@@ -231,8 +232,8 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 <li><p>Fix bug in network to add empty spike when empty file is read in, by <a class="reference external" href="https://github.com/samikane">Samika Kanekar</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/207">#207</a></p></li>
 </ul>
 </section>
-<section id="id53">
-<h3>API<a class="headerlink" href="#id53" title="Permalink to this headline">¶</a></h3>
+<section id="id54">
+<h3>API<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Make a context manager for Network class, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/86">#86</a></p></li>
 <li><p>Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/96">#96</a></p></li>
