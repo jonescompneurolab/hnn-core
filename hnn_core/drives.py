@@ -90,8 +90,7 @@ def _add_drives_from_params(net):
                 drive_name, mu=specs['dynamics']['mu'],
                 sigma=specs['dynamics']['sigma'],
                 numspikes=specs['dynamics']['numspikes'],
-                sync_within_trial=specs['dynamics']
-                                       ['sync_within_trial'],
+                numsources=specs['dynamics']['numsources'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
                 location=specs['location'], seedcore=specs['seedcore'],
@@ -212,13 +211,8 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     event_times : list
         The event times at which spikes occur.
     """
-    sync_evinput = False
-    if 'sync_within_trial' in dynamics:
-        sync_evinput = dynamics['sync_within_trial']
-
     prng, prng2 = _get_prng(seed=seedcore + trial_idx,
-                            gid=drive_cell_gid,
-                            sync_evinput=sync_evinput)
+                            gid=drive_cell_gid)
 
     # check drive name validity, allowing substring matches
     valid_drives = ['evoked', 'poisson', 'gaussian', 'bursty']
@@ -469,7 +463,7 @@ def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
         The standard deviation (in ms) of each burst event.
     numsources : int
         The number of sources that contribute an iid-sampled burst at each
-        cycle
+        cycle.
     events_per_cycle : int
         The events per cycle. This is the spikes/burst parameter in the GUI.
         Default: 2 (doublet)
