@@ -77,14 +77,10 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4,
     # append the z value for position for L2 and L5
     # print(len(coords_sorted))
 
-    pos_dict['L5_basket'] = [(pos_xy[0] + inplane_distance / 2,
-                              pos_xy[1] + inplane_distance / 2,
-                              zdiff / 2) for
+    pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], zdiff / 2) for
                              pos_xy in coords_sorted]
-    pos_dict['L2_basket'] = [
-        (pos_xy[0] + inplane_distance / 2,
-         pos_xy[1] + inplane_distance / 2,
-         1.3 * zdiff) for pos_xy in coords_sorted]
+    pos_dict['L2_basket'] = [(pos_xy[0], pos_xy[1], 1.3 * zdiff) for
+                             pos_xy in coords_sorted]
 
     # ORIGIN
     # origin's z component isn't really used in
