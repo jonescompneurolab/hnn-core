@@ -111,12 +111,12 @@ def test_network():
 
         elif drive['type'] == 'bursty':
             for kw in ['tstart', 'tstart_std', 'tstop',
-                       'burst_rate', 'burst_std', 'numspikes', 'numsources']:
+                       'burst_rate', 'burst_std', 'numspikes', 'n_drive_cells']:
                 assert kw in drive['dynamics'].keys()
             assert len(drive['events'][0]) == 1
             n_events = (
                 drive['dynamics']['numspikes'] *  # 2
-                drive['dynamics']['numsources'] *  # 10
+                drive['dynamics']['n_drive_cells'] *  # 10
                 (1 + (drive['dynamics']['tstop'] -
                       drive['dynamics']['tstart'] - 1) //
                     (1000. / drive['dynamics']['burst_rate'])))
