@@ -52,7 +52,7 @@ syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 
 net.add_bursty_drive(
     'alpha_prox', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
-    spike_isi=10, numsources=10, location=location, weights_ampa=weights_ampa_p,
+    spike_isi=10, n_drive_cells=10, location=location, weights_ampa=weights_ampa_p,
     synaptic_delays=syn_delays_p, seedcore=14)
 
 # simulate the dipole, but do not automatically scale or smooth the result
@@ -101,7 +101,7 @@ weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 syn_delays_d = {'L2_pyramidal': 5., 'L5_pyramidal': 5.}
 net.add_bursty_drive(
     'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
-    spike_isi=10, numsources=10, location=location, weights_ampa=weights_ampa_d,
+    spike_isi=10, n_drive_cells=10, location=location, weights_ampa=weights_ampa_d,
     synaptic_delays=syn_delays_d, seedcore=16)
 
 dpl = simulate_dipole(net, n_trials=1)
