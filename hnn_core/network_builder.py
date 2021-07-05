@@ -417,10 +417,7 @@ class NetworkBuilder(object):
                 _PC.cell(cell.gid, nrn_netcon)
                 self._cells.append(cell)
 
-            # external inputs are special types of artificial-cells
-            # 'common': all cells impacted with identical TIMING of spike
-            # events. NB: cell types can still have different weights for
-            # how such 'common' spikes influence them
+            # external driving inputs are special types of artificial-cells
             else:
                 gid_idx = gid - self.net.gid_ranges[src_type][0]
                 event_times = self.net.external_drives[
