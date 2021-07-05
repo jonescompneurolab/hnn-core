@@ -1,13 +1,18 @@
 """
-=================================
-02. Simulate alpha and beta waves
-=================================
+===================================
+02. Simulate Alpha and Beta Rhythms
+===================================
 
-This example demonstrates how to simulate alpha and beta waves using
-HNN-core. Alpha activity can be produced with 10 Hz excitatory drive to the
-proximal or distal dendrites of pyramidal neurons. Providing proximal and
-distal drive simultaneously results in higher frequency beta activity [1]_,
-[2]_.
+This example demonstrates how to simulate alpha and beta frequency
+activity in the alpha/beta complex of the SI mu-rhythm [1]_,
+as detailed in the `HNN GUI alpha and beta tutorial
+<https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta>`_,
+using HNN-Core.
+
+We recommend you first review the GUI tutorial. The workflow below recreates
+the alpha only rhythm, similar to Figure 5 of the GUI tutorial, and the
+alpha/beta complex similar to Figure 20 in the GUI tutorial, albeit without
+visualization of the corresponding time-frequency spectrograms [1]_.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
@@ -125,5 +130,3 @@ plt.tight_layout()
 # .. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
 #    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
 #    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
-#
-# .. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta

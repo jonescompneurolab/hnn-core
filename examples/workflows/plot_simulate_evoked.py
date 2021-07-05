@@ -1,11 +1,17 @@
 """
-=====================================
-01. Simulate dipole for evoked inputs
-=====================================
+============================================
+01. Simulate Event Related Potentials (ERPs)
+============================================
 
-This example demonstrates how to simulate a dipole for evoked-like
-waveforms using HNN-core.
+This example demonstrates how to simulate a threshold level tactile
+evoked response, as detailed in the `HNN GUI ERP tutorial
+<https://jonescompneurolab.github.io/hnn-tutorials/erp/erp>`_,
+using HNN-core. We recommend you first review the GUI tutorial.
 
+The workflow below recreates an example of the threshold level tactile
+evoked response, as observed in Jones et al. J. Neuroscience 2007 [1]_
+(e.g. Figure 7 in the GUI tutorial), albeit without a direct comparison
+to the recorded data.
 """
 
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
@@ -146,3 +152,10 @@ dpls_sync = simulate_dipole(net_sync, n_trials=1)
 trial_idx = 0
 dpls_sync[trial_idx].copy().smooth(window_len).scale(scaling_factor).plot()
 net_sync.cell_response.plot_spikes_hist()
+
+###############################################################################
+# References
+# ----------
+# .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
+# a combined magnetoencephalography and biophysically based computational
+# modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
