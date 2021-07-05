@@ -82,9 +82,6 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict):
     y_dist = target_pos[1] - src_pos[1]
     cell_dist = np.sqrt(x_dist**2 + y_dist**2)
 
-    if _calculate_gaussian(cell_dist, 1, nc_dict['lamtha']) < 1e-10:
-        print('foo')
-
     weight = _calculate_gaussian(
         cell_dist, nc_dict['A_weight'], nc_dict['lamtha'])
     delay = nc_dict['A_delay'] / _calculate_gaussian(
