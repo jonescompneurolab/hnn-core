@@ -191,8 +191,8 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
         'poisson' : Poisson-distributed dynamics from t0 to T
         'gaussian' : Gaussian-distributed dynamics from t0 to T
         'evoked' : Spikes occur at specified time (mu) with dispersion (sigma)
-        'bursty' : As opposed to other drive types, these have timing that is
-        identical (synchronous) for all real cells in the network.
+        'bursty' : Spikes occur in bursts (events_per_cycle spikes at
+        cycle_events_isi intervals) in a rhythmic (f_input) fashion
     drive_conn : dict
         A drive is associated with a number of 'artificial cells', each
         with its spatial connectivity (and temporal dynamics). drive_conn
@@ -251,7 +251,6 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
             tstop=dynamics['tstop'],
             f_input=dynamics['burst_rate'],
             events_jitter_std=dynamics['burst_std'],
-            n_drive_cells=dynamics['n_drive_cells'],
             events_per_cycle=dynamics['numspikes'],
             cycle_events_isi=dynamics['spike_isi'],
             prng=prng,
@@ -440,7 +439,7 @@ def _create_gauss(*, mu, sigma, numspikes, prng):
 
 
 def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
-                         events_jitter_std, n_drive_cells, events_per_cycle=2,
+                         events_jitter_std, events_per_cycle=2,
                          cycle_events_isi=10, prng, prng2):
     """Creates the bursty ongoing external inputs.
 
@@ -461,9 +460,6 @@ def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
         The frequency of input bursts.
     events_jitter_std : float
         The standard deviation (in ms) of each burst event.
-    n_drive_cells : int
-        The number of sources that contribute an iid-sampled burst at each
-        cycle.
     events_per_cycle : int
         The events per cycle. This is the spikes/burst parameter in the GUI.
         Default: 2 (doublet)
@@ -492,7 +488,7 @@ def _create_bursty_input(*, t0, t0_stdev, tstop, f_input,
     # array of mean stimulus times, starts at t0
     isi_array = np.arange(t0, tstop, burst_period)
     # array of single stimulus times -- no doublets
-    t_array = prng.normal(np.repeat(isi_array, n_drive_cells), events_jitter_std)
+    t_array = prng.normal(isi_array, events_jitter_std)
 
     if events_per_cycle > 1:
         cycle = (np.arange(events_per_cycle) - (events_per_cycle - 1) / 2)
