@@ -80,7 +80,7 @@ def test_external_drive_times():
     with pytest.raises(ValueError, match='Rate must be > 0'):
         _create_extpois(t0=0, T=1000, lamtha=-5, prng=prng)
 
-    # check "common" input
+    # check bursty/rhythmic input
     t0 = 0
     t0_stdev = 5
     tstop = 100
@@ -88,13 +88,12 @@ def test_external_drive_times():
     events_per_cycle = 3
     cycle_events_isi = 7
     events_jitter_std = 5.
-    n_drive_cells = 2
     prng, prng2 = _get_prng(seed=0, gid=5, sync_evinput=False)
     event_times = _create_bursty_input(
         t0=t0, t0_stdev=t0_stdev, tstop=tstop,
         f_input=f_input, events_jitter_std=events_jitter_std,
         events_per_cycle=events_per_cycle, cycle_events_isi=cycle_events_isi,
-        n_drive_cells=n_drive_cells, prng=prng, prng2=prng2)
+        prng=prng, prng2=prng2)
 
     events_per_cycle = 5
     cycle_events_isi = 20
@@ -105,7 +104,7 @@ def test_external_drive_times():
                              events_jitter_std=events_jitter_std,
                              events_per_cycle=events_per_cycle,
                              cycle_events_isi=cycle_events_isi,
-                             n_drive_cells=n_drive_cells, prng=prng, prng2=prng2)
+                             prng=prng, prng2=prng2)
 
 
 def test_add_drives():

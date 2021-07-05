@@ -385,11 +385,12 @@ class Network(object):
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
         if n_drive_cells is None:
             n_drive_cells = self.n_cells
-            drive['cell_specific'] = True
+            cell_specific = True
         else:
             _validate_type(n_drive_cells, types=int)
             _check_option('n_drive_cells', n_drive_cells, allowed_values=[1])
-            drive['cell_specific'] = False
+            cell_specific = False
+        drive['cell_specific'] = cell_specific
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes,
@@ -398,7 +399,8 @@ class Network(object):
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells=n_drive_cells)
+                           n_drive_cells=n_drive_cells,
+                           cell_specific=cell_specific)
 
     def add_poisson_drive(self, name, *, tstart=0, tstop=None, rate_constant,
                           location, weights_ampa=None, weights_nmda=None,
@@ -461,7 +463,8 @@ class Network(object):
                                  rate_constant=rate_constant)
         drive['events'] = list()
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
-                           space_constant, synaptic_delays)
+                           space_constant, synaptic_delays,
+                           n_drive_cells=self.n_cells, cell_specific=True)
 
     def add_bursty_drive(self, name, *, tstart=0, tstart_std=0, tstop=None,
                          location, burst_rate, burst_std=0, numspikes=2,
@@ -543,8 +546,8 @@ class Network(object):
                            n_drive_cells=n_drive_cells, cell_specific=False)
 
     def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
-                      space_constant, synaptic_delays, n_drive_cells=None,
-                      cell_specific=True):
+                      space_constant, synaptic_delays, n_drive_cells=1,
+                      cell_specific=False):
         """Attach a drive to network based on connectivity information
 
         Parameters
@@ -567,12 +570,18 @@ class Network(object):
         synaptic_delays : dict
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
-        n_drive_cells : int | None
-            The number of sources (i.e., ArtificialCell objects) that
-            contribute to this drive.
+        n_drive_cells : int
+            The number of drive cells (i.e., ArtificialCell objects) that
+            contribute to this drive. If n_drive_cells=self.n_cells and
+            cell_specific=True, artificial drive cells get assigned to each
+            cell in the network with 1-to-1 connectivity (completely
+            unsynchronous). Otherwise, drive cells get assigned with all-to-all
+            connectivity. If you wish to synchronize the timing of this evoked
+            drive across the network in a given trial with one spike, set
+            n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each cell has unique connection parameters (default: True)
-            or all cells have common connections to a global (single) drive.
+            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
+            (False, default) connection parameters.
 
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
@@ -601,8 +610,13 @@ class Network(object):
                     raise ValueError(
                         'synaptic_delays is either a common float or needs '
                         'to be specified as a dict for each cell type')
-        if n_drive_cells is None:
-            n_drive_cells = self.n_cells
+
+        _validate_type(n_drive_cells, types=int)
+        if n_drive_cells < 1 or n_drive_cells > self.n_cells:
+            raise ValueError('Number of drive cells must be greater than 0 '
+                             'yet not exceed the number of cells in the '
+                             f'network (0<n_drive_cells<={self.n_cells}).'
+                             f'Got {n_drive_cells}.')
 
         # this is needed to keep the drive GIDs identical to those in HNN,
         # e.g., 'evdist1': range(272, 542), even when no L5_basket cells
@@ -652,7 +666,7 @@ class Network(object):
 
     def _create_drive_conns(self, target_populations, weights_by_receptor,
                             location, space_constant, synaptic_delays,
-                            n_drive_cells, cell_specific=True):
+                            n_drive_cells, cell_specific=False):
         """Create parameter dictionary defining how drive connects to network
 
         Parameters
@@ -669,9 +683,18 @@ class Network(object):
         synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
+        n_drive_cells : int
+            The number of drive cells (i.e., ArtificialCell objects) that
+            contribute to this drive. If n_drive_cells=self.n_cells and
+            cell_specific=True, artificial drive cells get assigned to each
+            cell in the network with 1-to-1 connectivity (completely
+            unsynchronous). Otherwise, drive cells get assigned with all-to-all
+            connectivity. If you wish to synchronize the timing of this evoked
+            drive across the network in a given trial with one spike, set
+            n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each cell has unique connection parameters (default: True)
-            or all cells have common connections to a global (single) drive.
+            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
+            (False, default) connection parameters.
 
         Returns
         -------
@@ -698,6 +721,9 @@ class Network(object):
         src_gid_curr = self._n_gids
 
         if cell_specific:
+            _check_option('n_drive_cells', n_drive_cells,
+                          allowed_values=[self.n_cells],
+                          extra=' when cell_specific is True')
             for cellname in target_populations:
                 drive_conn = dict()  # NB created inside target_pop-loop
                 drive_conn['location'] = location
@@ -715,8 +741,8 @@ class Network(object):
             drive_conn['location'] = location
 
             # NB list! This is used later in _parnet_connect
-            drive_conn['src_gids'] = [src_gid_curr]
-            src_gid_curr += 1
+            drive_conn['src_gids'] = range(src_gid_curr, n_drive_cells)
+            src_gid_curr += n_drive_cells
 
             drive_conn['target_gids'] = list()  # fill in below
             for cellname in target_populations:
@@ -783,9 +809,6 @@ class Network(object):
                                 seedcore=drive['seedcore'])
                             )
                     else:
-                        # cell_specific=False should only have one src_gid
-                        assert len(this_cell_drive_conn['src_gids']) == 1
-
                         # Only return empty event times if all cells have
                         # no events
                         drive_cell_gid = this_cell_drive_conn[
@@ -794,7 +817,7 @@ class Network(object):
                             drive['type'], this_cell_drive_conn,
                             drive['dynamics'], trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid,
-                            seedcore=drive['seedcore'])]
+                            seedcore=drive['seedcore'])] * self.n_cells
                         # only one event times list for one src_gid
                         if len(event_times[0]) > 0:
                             break
@@ -893,12 +916,12 @@ class Network(object):
         src_gids : str | int | range | list of int
             Identifier for source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-            equivalent to passing a list of gids for the relvant cell type.
+            equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
         target_gids : str | int | range | list of int
             Identifer for targets of source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-            equivalent to passing a list of gids for the relvant cell type.
+            equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
         loc : str
             Location of synapse on target cell. Must be
