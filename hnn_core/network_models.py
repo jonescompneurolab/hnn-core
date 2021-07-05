@@ -11,7 +11,8 @@ from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
 
 
-def jones_2009_model(params=None, add_drives_from_params=False):
+def jones_2009_model(params=None, add_drives_from_params=False,
+                     inplane_distance=1.):
     """Instantiate the Jones et al. 2009 model.
 
     Parameters
@@ -24,6 +25,10 @@ def jones_2009_model(params=None, add_drives_from_params=False):
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
+    inplane_distance : float
+        The in plane-distance (in um) between pyramidal cell somas in the
+        square grid. Note that this parameter does not affect the amplitude of
+        the dipole moment. Default: 1.0 um
 
     Returns
     -------
@@ -39,7 +44,8 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     if params is None:
         params = read_params(params_fname)
 
-    net = Network(params, add_drives_from_params=add_drives_from_params)
+    net = Network(params, add_drives_from_params=add_drives_from_params,
+                  inplane_distance=inplane_distance)
 
     delay = net.delay
 
@@ -47,7 +53,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
 
     # layer2 Pyr -> layer2 Pyr
     # layer5 Pyr -> layer5 Pyr
-    lamtha = 3.0
+    lamtha = 3.0 * inplane_distance
     loc = 'proximal'
     for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
         for receptor in ['nmda', 'ampa']:
@@ -61,7 +67,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     # layer2 Basket -> layer2 Pyr
     src_cell = 'L2_basket'
     target_cell = 'L2_pyramidal'
-    lamtha = 50.
+    lamtha = 50. * inplane_distance
     loc = 'soma'
     for receptor in ['gabaa', 'gabab']:
         key = f'gbar_L2Basket_L2Pyr_{receptor}'
@@ -72,7 +78,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     # layer5 Basket -> layer5 Pyr
     src_cell = 'L5_basket'
     target_cell = 'L5_pyramidal'
-    lamtha = 70.
+    lamtha = 70. * inplane_distance
     loc = 'soma'
     for receptor in ['gabaa', 'gabab']:
         key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
@@ -82,7 +88,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
 
     # layer2 Pyr -> layer5 Pyr
     src_cell = 'L2_pyramidal'
-    lamtha = 3.
+    lamtha = 3. * inplane_distance
     receptor = 'ampa'
     for loc in ['proximal', 'distal']:
         key = f'gbar_L2Pyr_{_short_name(target_cell)}'
@@ -92,7 +98,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
 
     # layer2 Basket -> layer5 Pyr
     src_cell = 'L2_basket'
-    lamtha = 50.
+    lamtha = 50. * inplane_distance
     key = f'gbar_L2Basket_{_short_name(target_cell)}'
     weight = net._params[key]
     loc = 'distal'
@@ -103,7 +109,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     # xx -> layer2 Basket
     src_cell = 'L2_pyramidal'
     target_cell = 'L2_basket'
-    lamtha = 3.
+    lamtha = 3. * inplane_distance
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
     weight = net._params[key]
     loc = 'soma'
@@ -112,7 +118,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     src_cell = 'L2_basket'
-    lamtha = 20.
+    lamtha = 20. * inplane_distance
     key = f'gbar_L2Basket_{_short_name(target_cell)}'
     weight = net._params[key]
     loc = 'soma'
@@ -123,7 +129,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     # xx -> layer5 Basket
     src_cell = 'L5_basket'
     target_cell = 'L5_basket'
-    lamtha = 20.
+    lamtha = 20. * inplane_distance
     loc = 'soma'
     receptor = 'gabaa'
     key = f'gbar_L5Basket_{_short_name(target_cell)}'
@@ -133,7 +139,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
         allow_autapses=False)
 
     src_cell = 'L5_pyramidal'
-    lamtha = 3.
+    lamtha = 3. * inplane_distance
     key = f'gbar_L5Pyr_{_short_name(target_cell)}'
     weight = net._params[key]
     loc = 'soma'
@@ -142,6 +148,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     src_cell = 'L2_pyramidal'
+    lamtha = 3. * inplane_distance
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
     weight = net._params[key]
     loc = 'soma'
