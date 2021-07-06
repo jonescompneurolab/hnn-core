@@ -93,8 +93,8 @@ def test_transmembrane_currents():
     # all transfer resistances set to unity
     net.add_electrode_array('net_Im', electrode_pos, method=None)
     _ = simulate_dipole(net)
-    currents = net.rec_arrays['net_Im'].get_data()
-    assert_allclose(currents, 0, rtol=1e-10, atol=1e-10)
+    assert_allclose(net.rec_arrays['net_Im'].voltages, 0,
+                    rtol=1e-10, atol=1e-10)
 
 
 def test_transfer_resistance():
@@ -170,8 +170,8 @@ def test_extracellular_backends(run_hnn_core_fixture):
         assert_allclose(joblib_net.rec_arrays['arr1']._data[tr_idx][el_idx],
                         mpi_net.rec_arrays['arr1']._data[tr_idx][el_idx])
 
-    assert isinstance(joblib_net.rec_arrays['arr1'].get_data(), np.ndarray)
-    assert_array_equal(joblib_net.rec_arrays['arr1'].get_data().shape,
+    assert isinstance(joblib_net.rec_arrays['arr1'].voltages, np.ndarray)
+    assert_array_equal(joblib_net.rec_arrays['arr1'].voltages.shape,
                        [len(joblib_net.rec_arrays['arr1']._data),
                         len(joblib_net.rec_arrays['arr1']._data[0]),
                         len(joblib_net.rec_arrays['arr1']._data[0][0])])
@@ -210,11 +210,8 @@ def test_rec_array_calculation():
     assert isinstance(net_copy.rec_arrays['arr1'], ExtracellularArray)
     assert len(net_copy.rec_arrays['arr1'].voltages) == 0
 
-    data, times = net.rec_arrays['arr1'].get_data(return_times=True)
-    assert isinstance(data, np.ndarray)
-    assert isinstance(times, np.ndarray)
-    data_only = net.rec_arrays['arr1'].get_data()
-    assert_allclose(data, data_only)
+    assert isinstance(net.rec_arrays['arr1'].voltages, np.ndarray)
+    assert isinstance(net.rec_arrays['arr1'].times, np.ndarray)
 
     # using the same electrode positions, but a different method: LSA
     net.add_electrode_array('arr2', electrode_pos, method='lsa')
