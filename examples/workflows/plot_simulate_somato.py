@@ -159,7 +159,7 @@ net = jones_2009_model(params)
 # proximal drive. In order to understand the physiological implications of
 # proximal and distal drive as well as the general process used to articulate
 # a sequence of exogenous drive for simulating evoked responses, see the
-# `HNN ERP tutorial`_. Note that setting ``sync_within_trial=True`` creates
+# `HNN ERP tutorial`_. Note that setting ``n_drive_cells=1`` creates
 # drives with synchronous input (arriving to and transmitted by hypothetical
 # granular cells at the center of the network) to all pyramidal and basket
 # cells that receive distal drive. Note that granule cells are not explicitly
@@ -174,7 +174,7 @@ synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
 net.add_evoked_drive(
-    'evprox1', mu=21., sigma=4., numspikes=1, sync_within_trial=True,
+    'evprox1', mu=21., sigma=4., numspikes=1, n_drive_cells=1,
     weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
     location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
 
@@ -187,9 +187,9 @@ synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_basket': 1.0, 'L5_pyramidal': 1.0}
 
 net.add_evoked_drive(
-    'evprox2', mu=134., sigma=4.5, numspikes=1, sync_within_trial=True,
+    'evprox2', mu=134., sigma=4.5, numspikes=1, n_drive_cells=1,
     weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
-    location='proximal', synaptic_delays=synaptic_delays_p, seedcore=6)
+    location='proximal', synaptic_delays=synaptic_delays_p, seedcore=5)
 
 # Early distal drive
 weights_ampa_d = {'L2_basket': 0.0043, 'L2_pyramidal': 0.0032,
@@ -200,9 +200,9 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 
 net.add_evoked_drive(
-    'evdist1', mu=32., sigma=2.5, numspikes=1, sync_within_trial=True,
+    'evdist1', mu=32., sigma=2.5, numspikes=1, n_drive_cells=1,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
-    location='distal', synaptic_delays=synaptic_delays_d, seedcore=6)
+    location='distal', synaptic_delays=synaptic_delays_d, seedcore=5)
 
 # Late distal drive
 weights_ampa_d = {'L2_basket': 0.0041, 'L2_pyramidal': 0.0019,
@@ -213,7 +213,7 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                      'L5_pyramidal': 0.1}
 
 net.add_evoked_drive(
-    'evdist2', mu=84., sigma=4.5, numspikes=1, sync_within_trial=True,
+    'evdist2', mu=84., sigma=4.5, numspikes=1, n_drive_cells=1,
     weights_ampa=weights_ampa_d, weights_nmda=weights_nmda_d,
     location='distal', synaptic_delays=synaptic_delays_d, seedcore=2)
 
