@@ -91,7 +91,7 @@ def test_network():
             assert set(conn['gid_pairs'].keys()) == set(
                 net.external_drives[src_type]['conn'][target_type]['src_gids'])
 
-    assert len(net.gid_ranges['bursty1']) == 1
+    assert len(net.gid_ranges['bursty1']) == 10
     for drive in net.external_drives.values():
         assert len(drive['events']) == 1  # single trial simulated
         if drive['type'] == 'evoked':
@@ -111,16 +111,16 @@ def test_network():
 
         elif drive['type'] == 'bursty':
             for kw in ['tstart', 'tstart_std', 'tstop',
-                       'burst_rate', 'burst_std', 'numspikes', 'n_drive_cells']:
+                       'burst_rate', 'burst_std', 'numspikes',
+                       'n_drive_cells']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == 1
+            assert len(drive['events'][0]) == 10
             n_events = (
                 drive['dynamics']['numspikes'] *  # 2
-                drive['dynamics']['n_drive_cells'] *  # 10
                 (1 + (drive['dynamics']['tstop'] -
                       drive['dynamics']['tstart'] - 1) //
                     (1000. / drive['dynamics']['burst_rate'])))
-            assert len(drive['events'][0][0]) == n_events  # 40
+            assert len(drive['events'][0][0]) == n_events  # 4
 
     # make sure the PRNGs are consistent.
     target_times = {'evdist1': [66.30498327062551, 61.54362532343694],
@@ -173,7 +173,12 @@ def test_network():
     n_evoked_sources = net.n_cells * 3
     n_pois_sources = net.n_cells
     n_gaus_sources = net.n_cells
-    n_bursty_sources = 2
+    n_bursty_sources = (net.external_drives['bursty1']
+                                           ['dynamics']
+                                           ['n_drive_cells'] +
+                        net.external_drives['bursty2']
+                                           ['dynamics']
+                                           ['n_drive_cells'])
 
     # test that expected number of external driving events are created
     assert len(network_builder._drive_cells) == (n_evoked_sources +
@@ -182,8 +187,8 @@ def test_network():
                                                  n_bursty_sources)
     assert len(network_builder._gid_list) ==\
         len(network_builder._drive_cells) + net.n_cells
-    # first 'evoked drive' comes after real cells and common inputs
-    assert network_builder._drive_cells[2].gid ==\
+    # first 'evoked drive' comes after real cells and bursty drive cells
+    assert network_builder._drive_cells[n_bursty_sources].gid ==\
         net.n_cells + n_bursty_sources
 
     # Assert that netcons are created properly
@@ -199,7 +204,10 @@ def test_network():
 
     # Check bursty drives which use cell_specific=False
     assert 'bursty1_L2Pyr_ampa' in network_builder.ncs
-    n_connections = 3 * n_pyr  # 3 synapses / cell
+    n_bursty1_sources = (net.external_drives['bursty1']
+                                            ['dynamics']
+                                            ['n_drive_cells'])
+    n_connections = n_bursty1_sources * 3 * n_pyr  # 3 synapses / cell
     assert len(network_builder.ncs['bursty1_L2Pyr_ampa']) == n_connections
     nc = network_builder.ncs['bursty1_L2Pyr_ampa'][0]
     assert nc.threshold == params['threshold']

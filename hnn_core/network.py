@@ -741,7 +741,8 @@ class Network(object):
             drive_conn['location'] = location
 
             # NB list! This is used later in _parnet_connect
-            drive_conn['src_gids'] = range(src_gid_curr, n_drive_cells)
+            drive_conn['src_gids'] = range(src_gid_curr,
+                                           src_gid_curr + n_drive_cells)
             src_gid_curr += n_drive_cells
 
             drive_conn['target_gids'] = list()  # fill in below
@@ -813,11 +814,12 @@ class Network(object):
                         # no events
                         drive_cell_gid = this_cell_drive_conn[
                             'src_gids'][0]
-                        event_times = [_drive_cell_event_times(
+                        event_times = ([_drive_cell_event_times(
                             drive['type'], this_cell_drive_conn,
                             drive['dynamics'], trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid,
-                            seedcore=drive['seedcore'])] * self.n_cells
+                            seedcore=drive['seedcore'])] *
+                            len(this_cell_drive_conn['src_gids']))
                         # only one event times list for one src_gid
                         if len(event_times[0]) > 0:
                             break
