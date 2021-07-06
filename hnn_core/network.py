@@ -353,11 +353,12 @@ class Network(object):
             The number of drive cells (i.e., ArtificialCell objects) that each
             contribute an independently sampled synaptic spike to the network
             according to the Gaussian time distribution (mu, sigma). If
-            'n_cells', a source gets assigned to each of the self.n_cells
-            simulated cells in the network with 1-to-1 connectivity. Otherwise,
-            sources are assigned with all-to-all connectivity. If you wish to
-            synchronize the timing of this evoked drive across the network in
-            a given trial with one spike, set n_drive_cells=1.
+            'n_cells' (default), a source gets assigned to each of the
+            self.n_cells simulated cells in the network with 1-to-1
+            connectivity. Otherwise, sources are assigned with all-to-all
+            connectivity. If you wish to synchronize the timing of this evoked
+            drive across the network in a given trial with one spike, set
+            n_drive_cells=1.
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -402,7 +403,8 @@ class Network(object):
                            cell_specific=drive['cell_specific'])
 
     def add_poisson_drive(self, name, *, tstart=0, tstop=None, rate_constant,
-                          location, weights_ampa=None, weights_nmda=None,
+                          location, n_drive_cells='n_cells',
+                          weights_ampa=None, weights_nmda=None,
                           space_constant=100., synaptic_delays=0.1,
                           seedcore=2):
         """Add a Poisson-distributed external drive to the network
@@ -424,6 +426,15 @@ class Network(object):
             cell type with non-zero AMPA or NMDA weights.
         location : str
             Target location of synapses ('distal' or 'proximal')
+        n_drive_cells : int | 'n_cells'
+            The number of drive cells (i.e., ArtificialCell objects) that each
+            contribute an independently sampled synaptic spike to the network
+            according to a Poisson process. If 'n_cells' (default), a source
+            gets assigned to each of the self.n_cells simulated cells in the
+            network with 1-to-1 connectivity. Otherwise, sources are assigned
+            with all-to-all connectivity. If you wish to synchronize the timing
+            of Poisson drive across the network in a given trial, set
+            n_drive_cells=1.
         weights_ampa : dict or None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
@@ -452,10 +463,15 @@ class Network(object):
                                                          weights_nmda)[0]
             _check_poisson_rates(rate_constant, target_populations,
                                  self.cell_types.keys())
-
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
-        drive['cell_specific'] = True
+        if n_drive_cells == 'n_cells':
+            n_drive_cells = self.n_cells
+            drive['cell_specific'] = True
+        else:
+            _validate_type(n_drive_cells, types=int)
+            _check_option('n_drive_cells', n_drive_cells, allowed_values=[1])
+            drive['cell_specific'] = False
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
@@ -463,7 +479,8 @@ class Network(object):
         drive['events'] = list()
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells=self.n_cells, cell_specific=True)
+                           n_drive_cells=n_drive_cells,
+                           cell_specific=drive['cell_specific'])
 
     def add_bursty_drive(self, name, *, tstart=0, tstart_std=0, tstop=None,
                          location, burst_rate, burst_std=0, numspikes=2,
