@@ -209,10 +209,14 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                                  key in cellname_list]
             sigma = par[cell_keys_present[0]][3]  # IID for all cells!
 
+            n_drive_cells = None
+            if par['sync_evinput']:
+                n_drive_cells = 1
+
             drive['dynamics'] = {'mu': par['t0'],
                                  'sigma': sigma,
                                  'numspikes': par['numspikes'],
-                                 'sync_within_trial': par['sync_evinput']}
+                                 'n_drive_cells': n_drive_cells}
             drive['space_constant'] = par['lamtha']
             drive['seedcore'] = par['prng_seedcore']
             for cellname in cellname_list:
