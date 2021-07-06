@@ -209,7 +209,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                                  key in cellname_list]
             sigma = par[cell_keys_present[0]][3]  # IID for all cells!
 
-            n_drive_cells = None
+            n_drive_cells = 'n_cells'
             if par['sync_evinput']:
                 n_drive_cells = 1
 
