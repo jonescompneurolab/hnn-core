@@ -408,9 +408,9 @@ class ExtracellularArray:
         from .viz import plot_extracellular
 
         if trial_no is None:
-            plot_data = self.get_data()
+            plot_data = self.voltages
         elif isinstance(trial_no, (list, tuple, int, slice)):
-            plot_data = self.get_data()[trial_no, ]
+            plot_data = self.voltages[trial_no, ]
         else:
             raise ValueError(f'unknown trial number type, got {trial_no}')
 
