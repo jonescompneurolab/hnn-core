@@ -71,10 +71,10 @@ print(net_jones.connectivity[10])
 # Specifically, we are considering the case where a tactile stimulus is
 # delivered at 150 ms. 25 ms later, the first input to sensory cortex arrives
 # as a proximal drive to the cortical column. Proximal drive corresponds to
-# projections from the direct thalamic nuclei. This is followed by one distal
-# drive representing projections from indirect thalamic nuclei, and a final
-# late proximal drive. It is important to note that the parameter values for
-# each are different from previous examples of the evoked response.
+# projections from the direct thalamic nuclei. This is followed by one
+# :term:`distal` drive representing projections from indirect thalamic nuclei,
+# and a final late proximal drive. It is important to note that the parameter
+# values for each are different from previous examples of the evoked response.
 # This reflects the altered network dynamics due to the changes described
 # above.
 def add_erp_drives(net, stimulus_start):

@@ -102,6 +102,7 @@ html_theme_options = {
     'navbar_links': [
         ("Examples", "auto_examples/index"),
         ("API", "api"),
+        ("Glossary", "glossary"),
         ("Whats new", "whats_new"),
         ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True),
         ("Roadmap", "roadmap")
