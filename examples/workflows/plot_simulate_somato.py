@@ -159,8 +159,8 @@ net = jones_2009_model(params)
 # proximal drive. In order to understand the physiological implications of
 # proximal and distal drive as well as the general process used to articulate
 # a sequence of exogenous drive for simulating evoked responses, see the
-# `HNN ERP tutorial`_. Note that setting ``n_drive_cells=1`` creates
-# drives with synchronous input (arriving to and transmitted by hypothetical
+# `HNN ERP tutorial`_. Note that setting ``n_drive_cells=1`` creates a
+# drive with synchronous input (arriving to and transmitted by all hypothetical
 # granular cells at the center of the network) to all pyramidal and basket
 # cells that receive distal drive. Note that granule cells are not explicitly
 # modelled within HNN.
