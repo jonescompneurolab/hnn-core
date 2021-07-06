@@ -40,8 +40,8 @@ params = read_params(params_fname)
 # simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
 # The occurrence of each burst is jittered by a random, normally distributed
 # amount (20 ms standard deviation). We repeat the burst train 10 times, each
-# time with unique randomization. The drive is only connected to the proximal
-# (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
+# time with unique randomization. The drive is only connected to the 
+# :term:`proximal` (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 net = jones_2009_model(params)
 
 location = 'proximal'
@@ -89,8 +89,8 @@ plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False)
 axes[1].set_xscale('log')
 plt.tight_layout()
 ###############################################################################
-# The next step is to add a simultaneous 10 Hz distal drive with a lower
-# within-burst spread of spike times (``burst_std``) compared with the
+# The next step is to add a simultaneous 10 Hz :term:`distal` drive with a
+# lower within-burst spread of spike times (``burst_std``) compared with the
 # proximal one. The different arrival times of spikes at opposite ends of
 # the pyramidal cells will tend to produce bursts of 15-30 Hz power known
 # as beta frequency events.
