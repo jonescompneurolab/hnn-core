@@ -871,19 +871,23 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
 
 def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
                            colorbar=True, colormap='viridis', show=True):
-    """Plot synaptic weight of connections originating from src_gid.
+    """Plot synaptic weight of connections.
+
+    This is an interactive plot with source cells shown in the left
+    subplot and connectivity from a source cell to all the target cells
+    in the right subplot. Click on the cells in the left subplot to
+    explore how the connectivity pattern changes for different source cells.
 
     Parameters
     ----------
     net : Instance of Network object
         The Network object
     conn_idx : int
-        Index of connection to be visualized
-        from `net.connectivity`
+        Index of connection to be visualized from net.connectivity
     src_gid : int | None
         The cell ID of the source cell. It must be an element of
         net.connectivity[conn_idx]['gid_pairs'].keys()
-        If None, the first src_gid from the list of valid src_gids is selected.
+        If None, the first cell from the list of valid src_gids is selected.
     axes : instance of Axes3D
         Matplotlib 3D axis
     colormap : str
@@ -900,11 +904,11 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
     Notes
     -----
-    Target cells will be determined by the connection class given by
+    Target cells will be determined by the connections in
     net.connectivity[conn_idx].
-    If the target cell is not connected to src_gid, it will appear as a
-    smaller black circle.
-    src_gid is plotted as a red circle. src_gid will not be plotted if
+    If the target cell is not connected to the source cell,
+    it will appear as a smaller black cross.
+    Source cell is plotted as a red square. Source cell will not be plotted if
     the connection corresponds to a drive, ex: poisson, bursty, etc.
 
     """
@@ -932,8 +936,8 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     _validate_type(src_gid, int, 'src_gid', 'int')
 
     if src_gid not in valid_src_gids:
-        raise ValueError(f'src_gid not a valid cell ID for this connection '
-                         f'Please select one of {valid_src_gids}')
+        raise ValueError(f'src_gid {src_gid} not a valid cell ID for this '
+                         f'connection. Please select one of {valid_src_gids}')
 
     target_range = np.array(conn['target_range'])
 

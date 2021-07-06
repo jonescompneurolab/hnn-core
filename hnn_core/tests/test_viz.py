@@ -3,6 +3,7 @@ import os.path as op
 
 import matplotlib
 import numpy as np
+from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
@@ -55,10 +56,10 @@ def test_network_visualization():
     with pytest.raises(TypeError, match='src_gid must be an instance of'):
         plot_cell_connectivity(net, conn_idx, src_gid='blah')
 
-    with pytest.raises(ValueError, match='src_gid not a valid cell ID'):
+    with pytest.raises(ValueError, match='src_gid -1 not a valid cell ID'):
         plot_cell_connectivity(net, conn_idx, src_gid=-1)
 
-    # smoke test interactive clicking
+    # test interactive clicking updates the position of src_cell in plot
     del net.connectivity[-1]
     conn_idx = 15
     net.add_connection(net.gid_ranges['L2_pyramidal'][::2],
@@ -66,9 +67,12 @@ def test_network_visualization():
                        'ampa', 0.00025, 1.0, lamtha=3.0,
                        probability=0.8)
     fig = plot_cell_connectivity(net, conn_idx)
-    ax_src = fig.axes[0]
+    ax_src, ax_target, _ = fig.axes
+
     pos = net.pos_dict['L2_pyramidal'][2]
     _fake_click(fig, ax_src, [pos[0], pos[1]])
+    pos_in_plot = ax_target.collections[2].get_offsets().data[0]
+    assert_allclose(pos[:2], pos_in_plot)
 
 
 def test_dipole_visualization():
