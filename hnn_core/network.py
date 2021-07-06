@@ -391,10 +391,10 @@ class Network(object):
             _validate_type(n_drive_cells, types=int)
             _check_option('n_drive_cells', n_drive_cells, allowed_values=[1])
             drive['cell_specific'] = False
+        drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
 
-        drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes,
-                                 n_drive_cells=n_drive_cells)
+        drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
@@ -472,6 +472,7 @@ class Network(object):
             _validate_type(n_drive_cells, types=int)
             _check_option('n_drive_cells', n_drive_cells, allowed_values=[1])
             drive['cell_specific'] = False
+        drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
@@ -547,14 +548,14 @@ class Network(object):
 
         drive = _NetworkDrive()
         drive['type'] = 'bursty'
+        drive['n_drive_cells'] = n_drive_cells
         drive['cell_specific'] = False
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(tstart=tstart,
                                  tstart_std=tstart_std, tstop=tstop,
                                  burst_rate=burst_rate, burst_std=burst_std,
-                                 numspikes=numspikes, spike_isi=spike_isi,
-                                 n_drive_cells=n_drive_cells)
+                                 numspikes=numspikes, spike_isi=spike_isi)
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
