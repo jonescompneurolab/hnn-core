@@ -334,7 +334,7 @@ class Network(object):
                 self.n_cells += len(cells)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes,
-                         n_drive_cells=None, location,
+                         n_drive_cells='n_cells', location,
                          weights_ampa=None, weights_nmda=None,
                          space_constant=3., synaptic_delays=0.1, seedcore=2):
         """Add an 'evoked' external drive to the network
@@ -349,7 +349,7 @@ class Network(object):
             Standard deviation of event time distribution
         numspikes : int
             Number of spikes at each target cell
-        n_drive_cells : int | None
+        n_drive_cells : int | 'n_cells'
             The number of drive cells (i.e., ArtificialCell objects) that each
             contribute an independently sampled synaptic spike to the network
             according to the Gaussian time distribution (mu, sigma). If None, a
@@ -383,14 +383,13 @@ class Network(object):
         drive['type'] = 'evoked'
         if name == 'extgauss':
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
-        if n_drive_cells is None:
+        if n_drive_cells == 'n_cells':
             n_drive_cells = self.n_cells
-            cell_specific = True
+            drive['cell_specific'] = True
         else:
             _validate_type(n_drive_cells, types=int)
             _check_option('n_drive_cells', n_drive_cells, allowed_values=[1])
-            cell_specific = False
-        drive['cell_specific'] = cell_specific
+            drive['cell_specific'] = False
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes,
@@ -400,7 +399,7 @@ class Network(object):
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
                            n_drive_cells=n_drive_cells,
-                           cell_specific=cell_specific)
+                           cell_specific=drive['cell_specific'])
 
     def add_poisson_drive(self, name, *, tstart=0, tstop=None, rate_constant,
                           location, weights_ampa=None, weights_nmda=None,
