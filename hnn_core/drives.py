@@ -360,7 +360,6 @@ def drive_event_times(drive_type, target_cell_type, params, gid, trial_idx=0):
             tstop=params['tstop'],
             f_input=params['f_input'],
             events_jitter_std=params['stdev'],
-            n_drive_cells=params['n_drive_cells'],
             events_per_cycle=params['events_per_cycle'],
             cycle_events_isi=10,
             prng=prng,

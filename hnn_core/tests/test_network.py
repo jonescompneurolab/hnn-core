@@ -111,8 +111,7 @@ def test_network():
 
         elif drive['type'] == 'bursty':
             for kw in ['tstart', 'tstart_std', 'tstop',
-                       'burst_rate', 'burst_std', 'numspikes',
-                       'n_drive_cells']:
+                       'burst_rate', 'burst_std', 'numspikes']:
                 assert kw in drive['dynamics'].keys()
             assert len(drive['events'][0]) == 10
             n_events = (
@@ -173,12 +172,8 @@ def test_network():
     n_evoked_sources = net.n_cells * 3
     n_pois_sources = net.n_cells
     n_gaus_sources = net.n_cells
-    n_bursty_sources = (net.external_drives['bursty1']
-                                           ['dynamics']
-                                           ['n_drive_cells'] +
-                        net.external_drives['bursty2']
-                                           ['dynamics']
-                                           ['n_drive_cells'])
+    n_bursty_sources = (net.external_drives['bursty1']['n_drive_cells'] +
+                        net.external_drives['bursty2']['n_drive_cells'])
 
     # test that expected number of external driving events are created
     assert len(network_builder._drive_cells) == (n_evoked_sources +
@@ -204,9 +199,7 @@ def test_network():
 
     # Check bursty drives which use cell_specific=False
     assert 'bursty1_L2Pyr_ampa' in network_builder.ncs
-    n_bursty1_sources = (net.external_drives['bursty1']
-                                            ['dynamics']
-                                            ['n_drive_cells'])
+    n_bursty1_sources = (net.external_drives['bursty1']['n_drive_cells'])
     n_connections = n_bursty1_sources * 3 * n_pyr  # 3 synapses / cell
     assert len(network_builder.ncs['bursty1_L2Pyr_ampa']) == n_connections
     nc = network_builder.ncs['bursty1_L2Pyr_ampa'][0]
