@@ -188,11 +188,10 @@ class ExtracellularArray:
 
     Attributes
     ----------
-    times : list of float
+    times : array, shape (n_times,)
         The time points the extracellular voltages are sampled at (ms)
-    voltages : list of list of list of float
-        A three-dimensional list with dimensions: (n_trials, n_electrodes,
-        n_times).
+    voltages : array, shape (n_trials, n_electrodes, n_times)
+        The measured extracellular voltages
     sfreq : float
         Sampling rate of the extracellular data (Hz).
 
@@ -301,11 +300,11 @@ class ExtracellularArray:
 
     @property
     def times(self):
-        return self._times
+        return np.array(self._times)
 
     @property
     def voltages(self):
-        return self._data
+        return np.array(self._data)
 
     @property
     def sfreq(self):
@@ -327,30 +326,6 @@ class ExtracellularArray:
     def _reset(self):
         self._data = list()
         self._times = list()
-
-    def get_data(self, return_times=False):
-        """Get extracellular electrode voltages as a Numpy array
-
-        The data are returned as as a Numpy array with exactly 3 dimensions:
-        (n_trials, n_channels, n_times), where ``n_channels`` are in the same
-        order as defined in the positions-argument.
-
-        Parameters
-        ----------
-        return_times : bool (default: False)
-            If True, also return the sample times.
-
-        Returns
-        -------
-        data : np.ndarray of shape (n_trials, n_channels, n_times)
-            The electrode voltages
-        times : np.ndarray of shape (n_times, )
-            The sampling times
-        """
-        if return_times:
-            return np.array(self._data), np.array(self._times)
-        else:
-            return np.array(self._data)
 
     def smooth(self, window_len):
         """Smooth extracellular waveforms using Hamming-windowed convolution
