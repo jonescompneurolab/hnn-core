@@ -350,14 +350,14 @@ class Network(object):
         numspikes : int
             Number of spikes at each target cell
         n_drive_cells : int | None
-            The number of sources (i.e., ArtificialCell objects) that each
-            contribute an iid-sampled synaptic spike to the network according
-            to the Gaussian time distribution (mu, sigma). If None, a source
-            gets assigned to each of the self.n_cells simulated cells in the
-            network with 1-to-1 connectivity. Otherwise, sources are assigned
-            with all-to-all connectivity. If you wish to synchronize the timing
-            of this evoked drive across the network in a given trial with one
-            spike, set n_drive_cells=1.
+            The number of drive cells (i.e., ArtificialCell objects) that each
+            contribute an independently sampled synaptic spike to the network
+            according to the Gaussian time distribution (mu, sigma). If None, a
+            source gets assigned to each of the self.n_cells simulated cells in
+            the network with 1-to-1 connectivity. Otherwise, sources are
+            assigned with all-to-all connectivity. If you wish to synchronize
+            the timing of this evoked drive across the network in a given trial
+            with one spike, set n_drive_cells=1.
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -497,8 +497,8 @@ class Network(object):
         spike_isi : float
             Time between spike events within a cycle (ISI). Default: 10 ms
         n_drive_cells : int
-            The number of sources that contribute an iid-sampled burst at each
-            cycle. Default: 1
+            The number of drive cells that contribute an independently sampled
+            burst at each cycle. Default: 1
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
