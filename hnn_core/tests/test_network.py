@@ -77,11 +77,7 @@ def test_network():
     assert sorted(dns_from_gids) == sorted(net.external_drives.keys())
     for dn in dns_from_gids:
         n_drive_cells = net.external_drives[dn]['n_drive_cells']
-        this_src_gids = set([gid for drive_conn in
-                             net.external_drives[dn]['conn'].values() for
-                             gid in drive_conn['src_gids']])  # NB set: globals
-        assert len(net.gid_ranges[dn]) == n_drive_cells == len(this_src_gids)
-        assert len(net.external_drives[dn]['events']) == 1  # single trial!
+        assert len(net.gid_ranges[dn]) == n_drive_cells
 
     # Check src_gids match between drives/connections
     for conn in net.connectivity:
@@ -93,6 +89,12 @@ def test_network():
 
     # Check drive dict structure for each external drive
     for drive in net.external_drives.values():
+        # Check that connectivity sources correspond to gid_ranges
+        this_src_gids = set([gid for drive_conn in
+                             drive['conn'].values() for
+                             gid in drive_conn['src_gids']])  # NB set: globals
+        assert sorted(this_src_gids) == list(net.gid_ranges[drive['name']])
+        # Check type-specific dynamics and events
         n_drive_cells = drive['n_drive_cells']
         assert len(drive['events']) == 1  # single trial simulated
         if drive['type'] == 'evoked':
