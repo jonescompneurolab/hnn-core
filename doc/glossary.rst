@@ -21,7 +21,12 @@ please consider creating a new issue or opening a pull request to add it.
         is unique even if the simulation is split across cores.
 
     distal
-        anatomical location that is further away from the soma
+        Anatomical location that is further away from the soma.
+        Distal drives refer to extrinsic connections to the distal dendrites of
+        the cortical column, which often originate from direct thalamic nuclei.
 
     proximal
-        anatomical location that is closer to the soma
+        Anatomical location that is closer to the soma.
+        Proximal drives refer to extrinsic connections to the proximal dendrites
+        of the cortical column, which often originate from indirect thalamic
+        nuclei, as well as other cortical regions.
