@@ -5,6 +5,7 @@
 #          Blake Caldwell <blake_caldwell@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
 #          Nick Tolley <nicholas_tolley@brown.edu>
+#          Ryan Thorpe <ryan_thorpe@brown.edu>
 
 import itertools as it
 import numpy as np
