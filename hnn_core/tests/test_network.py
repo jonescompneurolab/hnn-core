@@ -71,16 +71,16 @@ def test_network():
     print(network_builder)
     print(network_builder._cells[:2])
 
-    # Assert that proper number of gids are created for Network drives
+    # Assert that proper number/types of gids are created for Network drives
     dns_from_gids = [name for name in net.gid_ranges.keys() if
                      name not in net.cell_types]
-    assert len(dns_from_gids) == len(net.external_drives)
+    assert sorted(dns_from_gids) == sorted(net.external_drives.keys())
     for dn in dns_from_gids:
-        assert dn in net.external_drives.keys()
+        n_drive_cells = net.external_drives[dn]['n_drive_cells']
         this_src_gids = set([gid for drive_conn in
                              net.external_drives[dn]['conn'].values() for
                              gid in drive_conn['src_gids']])  # NB set: globals
-        assert len(net.gid_ranges[dn]) == len(this_src_gids)
+        assert len(net.gid_ranges[dn]) == n_drive_cells == len(this_src_gids)
         assert len(net.external_drives[dn]['events']) == 1  # single trial!
 
     # Check src_gids match between drives/connections
@@ -91,29 +91,29 @@ def test_network():
             assert set(conn['gid_pairs'].keys()) == set(
                 net.external_drives[src_type]['conn'][target_type]['src_gids'])
 
-    assert len(net.gid_ranges['bursty1']) == 10
+    # Check drive dict structure for each external drive
     for drive in net.external_drives.values():
+        n_drive_cells = drive['n_drive_cells']
         assert len(drive['events']) == 1  # single trial simulated
         if drive['type'] == 'evoked':
             for kw in ['mu', 'sigma', 'numspikes']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == net.n_cells
+            assert len(drive['events'][0]) == n_drive_cells
             # this also implicitly tests that events are always a list
             assert len(drive['events'][0][0]) == drive['dynamics']['numspikes']
         elif drive['type'] == 'gaussian':
             for kw in ['mu', 'sigma', 'numspikes']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == net.n_cells
+            assert len(drive['events'][0]) == n_drive_cells
         elif drive['type'] == 'poisson':
             for kw in ['tstart', 'tstop', 'rate_constant']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == net.n_cells
-
+            assert len(drive['events'][0]) == n_drive_cells
         elif drive['type'] == 'bursty':
             for kw in ['tstart', 'tstart_std', 'tstop',
                        'burst_rate', 'burst_std', 'numspikes']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == 10
+            assert len(drive['events'][0]) == n_drive_cells
             n_events = (
                 drive['dynamics']['numspikes'] *  # 2
                 (1 + (drive['dynamics']['tstop'] -
