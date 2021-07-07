@@ -15,7 +15,7 @@ if int(__version__[0]) >= 8:
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
 from copy import deepcopy
-from .extracellular import ExtracellularArrayBuilder
+from .extracellular import _ExtracellularArrayBuilder
 
 # a few globals
 _PC = None
@@ -492,7 +492,7 @@ class NetworkBuilder(object):
 
     def _record_extracellular(self):
         for arr_name, arr in self.net.rec_arrays.items():
-            nrn_arr = ExtracellularArrayBuilder(arr)
+            nrn_arr = _ExtracellularArrayBuilder(arr)
             nrn_arr._build(cvode=_CVODE)
             self._nrn_rec_arrays.update({arr_name: nrn_arr})
 
