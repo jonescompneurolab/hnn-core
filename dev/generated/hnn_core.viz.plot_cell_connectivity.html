@@ -142,19 +142,24 @@
 <h1>hnn_core.viz.plot_cell_connectivity<a class="headerlink" href="#hnn-core-viz-plot-cell-connectivity" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_cell_connectivity">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_cell_connectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_cell_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_cell_connectivity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot synaptic weight of connections originating from src_gid.</p>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_cell_connectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_cell_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_cell_connectivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot synaptic weight of connections.</p>
+<p>This is an interactive plot with source cells shown in the left
+subplot and connectivity from a source cell to all the target cells
+in the right subplot. Click on the cells in the left subplot to
+explore how the connectivity pattern changes for different source cells.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>net</strong><span class="classifier">Instance of Network object</span></dt><dd><p>The Network object</p>
 </dd>
-<dt><strong>conn_idx</strong><span class="classifier">int</span></dt><dd><p>Index of connection to be visualized
-from <em class="xref py py-obj">net.connectivity</em></p>
+<dt><strong>conn_idx</strong><span class="classifier">int</span></dt><dd><p>Index of connection to be visualized from net.connectivity</p>
 </dd>
-<dt><strong>src_gid</strong><span class="classifier">int</span></dt><dd><p>Each cell in a network is uniquely identified by it’s “global ID”: GID.</p>
+<dt><strong>src_gid</strong><span class="classifier">int | None</span></dt><dd><p>The cell ID of the source cell. It must be an element of
+net.connectivity[conn_idx][‘gid_pairs’].keys()
+If None, the first cell from the list of valid src_gids is selected.</p>
 </dd>
-<dt><strong>ax</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
+<dt><strong>axes</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
 </dd>
 <dt><strong>colormap</strong><span class="classifier">str</span></dt><dd><p>The name of a matplotlib colormap. Default: ‘viridis’</p>
 </dd>
@@ -172,11 +177,11 @@ from <em class="xref py py-obj">net.connectivity</em></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Target cells will be determined by the connection class given by
+<p>Target cells will be determined by the connections in
 net.connectivity[conn_idx].
-If the target cell is not connected to src_gid, it will appear as a
-smaller black circle.
-src_gid is plotted as a red circle. src_gid will not be plotted if
+If the target cell is not connected to the source cell,
+it will appear as a smaller black cross.
+Source cell is plotted as a red square. Source cell will not be plotted if
 the connection corresponds to a drive, ex: poisson, bursty, etc.</p>
 </dd></dl>
 
@@ -204,7 +209,7 @@ the connection corresponds to a drive, ex: poisson, bursty, etc.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

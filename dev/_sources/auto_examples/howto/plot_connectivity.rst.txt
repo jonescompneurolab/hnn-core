@@ -126,7 +126,7 @@ connection. The weights of these connections can be visualized with
 
     gid_idx = 11
     src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
-    fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
+    fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 
 
@@ -459,7 +459,7 @@ from the source cell.
  .. code-block:: none
 
 
-    (<Figure size 640x480 with 2 Axes>, <AxesSubplot:title={'center':'L2_basket-> L5_pyramidal (soma, gabaa)'}, xlabel='X Position', ylabel='Y Position'>)
+    <Figure size 640x480 with 3 Axes>
 
 
 
@@ -511,7 +511,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 33 minutes  11.458 seconds)
+   **Total running time of the script:** ( 22 minutes  48.476 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:
