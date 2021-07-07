@@ -178,13 +178,12 @@ class ExtracellularArray:
         distance limit between the electrode contacts and the active neuronal
         membrane elements that act as sources of current. The default value of
         0.5 um corresponds to 1 um diameter dendrites.
-    times : None | list of float
+    times : array-like, shape (n_times,) | None
         Optionally, provide precomputed voltage sampling times for electrodes
         at `positions`.
-    voltages : None | list of list of list of float (3D)
+    voltages : array-like, shape (n_trials, n_electrodes, n_times) | None
         Optionally, provide precomputed voltages for electrodes at
-        ``positions``. Note that the size of `voltages` must be:
-        ``(n_trials, n_electrodes, n_times)``, i.e., three-dimensional.
+        ``positions``.
 
     Attributes
     ----------
@@ -232,19 +231,18 @@ class ExtracellularArray:
         if voltages is None:
             voltages = list()
 
-        _validate_type(times, list, 'times')
-        _validate_type(voltages, list, 'voltages')
-        for ii in range(len(voltages)):
-            if len(voltages[ii]) != len(positions):
+        times = np.array(times)
+        voltages = np.array(voltages)
+
+        if voltages.size != 0:  # voltages is not None
+            n_trials, n_electrodes, n_times = voltages.shape
+            if len(positions) != n_electrodes:
                 raise ValueError(f'number of voltage traces must match number'
-                                 f' of channels, got {len(voltages[ii])} and '
-                                 f'{len(positions)} for trial {ii}')
-            for jj in range(len(voltages[ii])):
-                if len(times) != len(voltages[ii][jj]):
-                    raise ValueError('length of times and voltages must match,'
-                                     f' got {len(times)} and '
-                                     f'{len(voltages[ii][jj])} for trial{ii}, '
-                                     f'channel {jj}')
+                                 f' of channels, got {n_electrodes} and '
+                                 f'{len(positions)}')
+            if len(times) != n_times:
+                raise ValueError('length of times and voltages must match,'
+                                 f' got {len(times)} and {n_times} ')
 
         self.positions = positions
         self.n_contacts = len(self.positions)
@@ -430,8 +428,8 @@ class ExtracellularArray:
         return fig
 
 
-class ExtracellularArrayBuilder(object):
-    """The ExtracellularArrayBuilder class
+class _ExtracellularArrayBuilder(object):
+    """The _ExtracellularArrayBuilder class
 
     Parameters
     ----------
