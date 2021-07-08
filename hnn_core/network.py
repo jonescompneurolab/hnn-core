@@ -712,7 +712,9 @@ class Network(object):
             n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
             Whether each artifical drive cell has 1-to-1 (True) or all-to-all
-            (False, default) connection parameters.
+            (False, default) connection parameters. Note that 1-to-1
+            connectivity requires that n_drive_cells=n_cells, where n_cells is
+            the number of cells contained in the network.
 
         Returns
         -------
