@@ -10,7 +10,7 @@ as detailed in the `HNN GUI gamma tutorial
 using HNN-Core.
 
 We recommend you first review the GUI tutorial.
-The workflow below recreates weak gamma rhythm similar to Figures 4 and 5
+The workflow below recreates weak gamma rhythms similar to Figures 4 and 5
 of the GUI tutorial, and strong gamma rhythms similar to Figure 12 and 13
 in the GUI tutorial.
 """
