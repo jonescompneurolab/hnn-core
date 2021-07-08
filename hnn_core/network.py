@@ -1235,6 +1235,9 @@ class _NetworkDrive(dict):
     events : list of lists
         List of spike time lists. First index is of length n_trials. Second
         index is over the 'artificial' cells associated with this drive.
+    n_drive_cells : int
+        The number of drive cells (i.e., ArtificialCell objects) that
+        contribute to this drive.
     cell_specific : bool
         Whether each cell has unique connection parameters (default: True)
         or all cells have common connections to a global (single) drive.
@@ -1276,6 +1279,7 @@ class _NetworkDrive(dict):
         if 'type' in self.keys():
             entr += f"\ndrive class: {self['type']}"
             entr += f"\ntarget cell types: {self['target_types']}"
+            entr += f"\nnumber of drive cells: {self['n_drive_cells']}"
             entr += f"\ncell-specific: {self['cell_specific']}"
             entr += "\ndynamic parameters:"
             for key, val in self['dynamics'].items():
