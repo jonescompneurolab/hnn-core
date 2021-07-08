@@ -201,7 +201,7 @@ def test_network():
 
     # Check bursty drives which use cell_specific=False
     assert 'bursty1_L2Pyr_ampa' in network_builder.ncs
-    n_bursty1_sources = (net.external_drives['bursty1']['n_drive_cells'])
+    n_bursty1_sources = net.external_drives['bursty1']['n_drive_cells']
     n_connections = n_bursty1_sources * 3 * n_pyr  # 3 synapses / cell
     assert len(network_builder.ncs['bursty1_L2Pyr_ampa']) == n_connections
     nc = network_builder.ncs['bursty1_L2Pyr_ampa'][0]

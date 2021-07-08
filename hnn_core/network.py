@@ -629,7 +629,7 @@ class Network(object):
                         'to be specified as a dict for each cell type')
 
         _validate_type(n_drive_cells, types=int)
-        if n_drive_cells < 1 or n_drive_cells > self.n_cells:
+        if not 0 < n_drive_cells <= self.n_cells:
             raise ValueError('Number of drive cells must be greater than 0 '
                              'yet not exceed the number of cells in the '
                              f'network (0<n_drive_cells<={self.n_cells}).'
