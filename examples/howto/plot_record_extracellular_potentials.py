@@ -30,13 +30,13 @@ import matplotlib.pyplot as plt
 
 import hnn_core
 from hnn_core import read_params, default_network, simulate_dipole
-from hnn_core.network_models import add_default_ERP
+from hnn_core.network_models import add_erp_drives_to_default_network
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 net = default_network(params)
-add_default_ERP(net)
+add_erp_drives_to_default_network(net)
 
 ###############################################################################
 # Extracellular recordings require specifying the electrode postions. It can be
