@@ -12,9 +12,8 @@ please consider creating a new issue or opening a pull request to add it.
 
 
     drive
-        An artificial cell or population of artificial cells that only produces
-        spikes according to a given pattern and is used to initiate and sustain
-        cell spiking in the network
+        An exogenous source of excitatory action potentials
+        that perturbs the cortical column network.
 
     gid
         The "global" cell ID. A gid is assigned to each cell in the
