@@ -34,6 +34,8 @@ Changelog
 
 - Add ability to interactivity explore connections in :func:`~hnn_core.viz.plot_cell_connectivity` by `Mainak Jas`_ in `#376 <https://github.com/jonescompneurolab/hnn-core/pull/376>`_
 
+- Update ``default_network`` calcium dynamics with a distance dependent conductivity, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/333>`_
+
 Bug
 ~~~
 

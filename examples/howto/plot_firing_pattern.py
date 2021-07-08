@@ -80,6 +80,8 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p2, location='proximal',
     synaptic_delays=synaptic_delays_prox, seedcore=4)
 
+dpls = simulate_dipole(net, record_vsoma=True)
+
 ###############################################################################
 # Here, we explain more details about the data structures and how they can
 # be used to better interpret the data. The cell IDs (gids) uniquely define

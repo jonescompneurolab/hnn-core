@@ -273,7 +273,7 @@ def _calcium_model(params, add_drives_from_params):
     accurate distribution of calcium channels on L5 pyramidal cells.
     Specifically, this model introduces a distance dependent maximum
     conductance (gbar) on calcium channels such that the gbar linearly
-    decreases along the apical dendrite in the direction of the soma.
+    decreases along the dendrites in the direction of the soma.
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')

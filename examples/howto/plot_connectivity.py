@@ -47,7 +47,7 @@ from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 
 print(len(net_erp.connectivity))
 
-conn_idx = 20
+conn_idx = 6
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 

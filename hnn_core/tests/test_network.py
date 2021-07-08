@@ -64,6 +64,20 @@ def test_network():
     print(network_builder)
     print(network_builder._cells[:2])
 
+    # Ensure distant dependent calcium gbar
+    gid = net.gid_ranges['L5_pyramidal'][0]
+    for section_name, section in network_builder._cells[gid].sections.items():
+        ca_gbar = list()
+        for seg in section.allseg():
+            try:  # Necessary for seg end points with no calcium mech
+                ca_gbar.append(seg.__getattribute__('ca').gbar)
+            except:
+                pass
+        if section_name == 'apical_tuft':
+            assert np.all(np.diff(ca_gbar) == 0)
+        else:
+            assert np.all(np.diff(ca_gbar) > 0)
+
     # Assert that proper number of gids are created for Network drives
     dns_from_gids = [name for name in net.gid_ranges.keys() if
                      name not in net.cell_types]
