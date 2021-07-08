@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>02. Simulate alpha and beta waves &#8212; hnn-core  documentation</title>
+    <title>02. Simulate Alpha and Beta Rhythms &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
@@ -85,7 +85,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">02. Simulate alpha and beta waves</a><ul>
+<li><a class="reference internal" href="#">02. Simulate Alpha and Beta Rhythms</a><ul>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
@@ -143,13 +143,16 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-workflows-plot-simulate-alpha-py"><span class="std std-ref">here</span></a>
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
-<section class="sphx-glr-example-title" id="simulate-alpha-and-beta-waves">
-<span id="sphx-glr-auto-examples-workflows-plot-simulate-alpha-py"></span><h1>02. Simulate alpha and beta waves<a class="headerlink" href="#simulate-alpha-and-beta-waves" title="Permalink to this headline">¶</a></h1>
-<p>This example demonstrates how to simulate alpha and beta waves using
-HNN-core. Alpha activity can be produced with 10 Hz excitatory drive to the
-proximal or distal dendrites of pyramidal neurons. Providing proximal and
-distal drive simultaneously results in higher frequency beta activity <a class="footnote-reference brackets" href="#id3" id="id1">1</a>,
-<a class="footnote-reference brackets" href="#id4" id="id2">2</a>.</p>
+<section class="sphx-glr-example-title" id="simulate-alpha-and-beta-rhythms">
+<span id="sphx-glr-auto-examples-workflows-plot-simulate-alpha-py"></span><h1>02. Simulate Alpha and Beta Rhythms<a class="headerlink" href="#simulate-alpha-and-beta-rhythms" title="Permalink to this headline">¶</a></h1>
+<p>This example demonstrates how to simulate alpha and beta frequency
+activity in the alpha/beta complex of the SI mu-rhythm <a class="footnote-reference brackets" href="#id3" id="id1">1</a>,
+as detailed in the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta">HNN GUI alpha and beta tutorial</a>,
+using HNN-Core.</p>
+<p>We recommend you first review the GUI tutorial. The workflow below recreates
+the alpha only rhythm, similar to Figure 5 of the GUI tutorial, and the
+alpha/beta complex similar to Figure 20 in the GUI tutorial, albeit without
+visualization of the corresponding time-frequency spectrograms <a class="footnote-reference brackets" href="#id3" id="id2">1</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Mainak Jas &lt;mainak.jas@telecom-paristech.fr&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 <span class="c1">#          Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
@@ -234,7 +237,7 @@ Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
 
-&lt;hnn_core.dipole.Dipole object at 0x7fb66c272080&gt;
+&lt;hnn_core.dipole.Dipole object at 0x7fdca7ba1320&gt;
 </pre></div>
 </div>
 <p>Prior to plotting, we can choose to smooth the dipole waveform (note that the
@@ -267,7 +270,7 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).</p>
 </div>
 <img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_simulate_alpha_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/workflows/plot_simulate_alpha.py:86: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/workflows/plot_simulate_alpha.py:91: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False.
   plt.tight_layout()
 </pre></div>
 </div>
@@ -346,23 +349,20 @@ smaller absolute values in the plots.</p>
 </div>
 <img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_simulate_alpha_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/workflows/plot_simulate_alpha.py:120: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/workflows/plot_simulate_alpha.py:125: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False.
   plt.tight_layout()
 </pre></div>
 </div>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <dl class="footnote brackets">
-<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id3"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
 <dd><p>Jones, S. R. et al. Quantitative analysis and biophysically realistic
 neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
 sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).</p>
 </dd>
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p><a class="reference external" href="https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta">https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta</a></p>
-</dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  43.906 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 6 minutes  14.475 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-alpha-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_alpha.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>

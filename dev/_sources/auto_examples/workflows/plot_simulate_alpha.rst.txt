@@ -18,17 +18,22 @@
 .. _sphx_glr_auto_examples_workflows_plot_simulate_alpha.py:
 
 
-=================================
-02. Simulate alpha and beta waves
-=================================
+===================================
+02. Simulate Alpha and Beta Rhythms
+===================================
 
-This example demonstrates how to simulate alpha and beta waves using
-HNN-core. Alpha activity can be produced with 10 Hz excitatory drive to the
-proximal or distal dendrites of pyramidal neurons. Providing proximal and
-distal drive simultaneously results in higher frequency beta activity [1]_,
-[2]_.
+This example demonstrates how to simulate alpha and beta frequency
+activity in the alpha/beta complex of the SI mu-rhythm [1]_,
+as detailed in the `HNN GUI alpha and beta tutorial
+<https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta>`_,
+using HNN-Core.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-20
+We recommend you first review the GUI tutorial. The workflow below recreates
+the alpha only rhythm, similar to Figure 5 of the GUI tutorial, and the
+alpha/beta complex similar to Figure 20 in the GUI tutorial, albeit without
+visualization of the corresponding time-frequency spectrograms [1]_.
+
+.. GENERATED FROM PYTHON SOURCE LINES 17-25
 
 .. code-block:: default
 
@@ -47,11 +52,11 @@ distal drive simultaneously results in higher frequency beta activity [1]_,
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-22
+.. GENERATED FROM PYTHON SOURCE LINES 26-27
 
 Let us import hnn_core
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-26
+.. GENERATED FROM PYTHON SOURCE LINES 27-31
 
 .. code-block:: default
 
@@ -66,11 +71,11 @@ Let us import hnn_core
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-28
+.. GENERATED FROM PYTHON SOURCE LINES 32-33
 
 Then we setup the directories and read the default parameters file
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-32
+.. GENERATED FROM PYTHON SOURCE LINES 33-37
 
 .. code-block:: default
 
@@ -85,7 +90,7 @@ Then we setup the directories and read the default parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-40
+.. GENERATED FROM PYTHON SOURCE LINES 38-45
 
 Now let's simulate the dipole and plot it. To excite the network, we add a
 ~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
@@ -95,7 +100,7 @@ amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization. The drive is only connected to the proximal
 (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-60
+.. GENERATED FROM PYTHON SOURCE LINES 45-65
 
 .. code-block:: default
 
@@ -165,11 +170,11 @@ time with unique randomization. The drive is only connected to the proximal
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7fb66c272080>
+    <hnn_core.dipole.Dipole object at 0x7fdca7ba1320>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-67
+.. GENERATED FROM PYTHON SOURCE LINES 66-72
 
 Prior to plotting, we can choose to smooth the dipole waveform (note that the
 :meth:`~hnn_core.dipole.smooth`-method operates in-place, *i.e.*, it alters
@@ -178,7 +183,7 @@ signal summation from a larger number and greater volume of neurons than are
 included in our biophysical model. We can confirm that what we simulate is
 indeed 10 Hz activity by plotting the power spectral density (PSD).
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-87
+.. GENERATED FROM PYTHON SOURCE LINES 72-92
 
 .. code-block:: default
 
@@ -216,13 +221,13 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:86: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:91: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
       plt.tight_layout()
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-93
+.. GENERATED FROM PYTHON SOURCE LINES 93-98
 
 The next step is to add a simultaneous 10 Hz distal drive with a lower
 within-burst spread of spike times (``burst_std``) compared with the
@@ -230,7 +235,7 @@ proximal one. The different arrival times of spikes at opposite ends of
 the pyramidal cells will tend to produce bursts of 15-30 Hz power known
 as beta frequency events.
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-104
+.. GENERATED FROM PYTHON SOURCE LINES 98-109
 
 .. code-block:: default
 
@@ -294,7 +299,7 @@ as beta frequency events.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-110
+.. GENERATED FROM PYTHON SOURCE LINES 110-115
 
 We can verify that beta frequency activity was produced by inspecting the PSD
 of the most recent simulation. The dominant power in the signal is shifted
@@ -302,7 +307,7 @@ from alpha (~10 Hz) to beta (15-25 Hz) frequency range. All plotting and
 smoothing parameters are as above, but here no scaling is applied, leading to
 smaller absolute values in the plots.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-122
+.. GENERATED FROM PYTHON SOURCE LINES 115-127
 
 .. code-block:: default
 
@@ -332,13 +337,13 @@ smaller absolute values in the plots.
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:120: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:125: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
       plt.tight_layout()
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-130
+.. GENERATED FROM PYTHON SOURCE LINES 128-133
 
 References
 ----------
@@ -346,12 +351,10 @@ References
    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 
-.. [2] https://jonescompneurolab.github.io/hnn-tutorials/alpha_and_beta/alpha_and_beta
-
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  43.906 seconds)
+   **Total running time of the script:** ( 6 minutes  14.475 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

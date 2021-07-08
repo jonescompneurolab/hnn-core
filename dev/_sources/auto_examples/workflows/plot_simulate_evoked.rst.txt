@@ -18,15 +18,21 @@
 .. _sphx_glr_auto_examples_workflows_plot_simulate_evoked.py:
 
 
-=====================================
-01. Simulate dipole for evoked inputs
-=====================================
+============================================
+01. Simulate Event Related Potentials (ERPs)
+============================================
 
-This example demonstrates how to simulate a dipole for evoked-like
-waveforms using HNN-core.
+This example demonstrates how to simulate a threshold level tactile
+evoked response, as detailed in the `HNN GUI ERP tutorial
+<https://jonescompneurolab.github.io/hnn-tutorials/erp/erp>`_,
+using HNN-core. We recommend you first review the GUI tutorial.
 
+The workflow below recreates an example of the threshold level tactile
+evoked response, as observed in Jones et al. J. Neuroscience 2007 [1]_
+(e.g. Figure 7 in the GUI tutorial), albeit without a direct comparison
+to the recorded data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-23
+.. GENERATED FROM PYTHON SOURCE LINES 16-29
 
 .. code-block:: default
 
@@ -50,11 +56,11 @@ waveforms using HNN-core.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-25
+.. GENERATED FROM PYTHON SOURCE LINES 30-31
 
 Let us import hnn_core
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-32
+.. GENERATED FROM PYTHON SOURCE LINES 31-38
 
 .. code-block:: default
 
@@ -72,11 +78,11 @@ Let us import hnn_core
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-34
+.. GENERATED FROM PYTHON SOURCE LINES 39-40
 
 Then we read the parameters file
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-38
+.. GENERATED FROM PYTHON SOURCE LINES 40-44
 
 .. code-block:: default
 
@@ -330,13 +336,13 @@ Then we read the parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-42
+.. GENERATED FROM PYTHON SOURCE LINES 45-48
 
 This is a lot of parameters! We can also filter the
 parameters using unix-style wildcard characters. Most of the parameters
 relate to within-network connections and the cell geometry.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-44
+.. GENERATED FROM PYTHON SOURCE LINES 48-50
 
 .. code-block:: default
 
@@ -367,12 +373,12 @@ relate to within-network connections and the cell geometry.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-47
+.. GENERATED FROM PYTHON SOURCE LINES 51-53
 
 Let us first create our network from the params file and visualize the cells
 inside it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-51
+.. GENERATED FROM PYTHON SOURCE LINES 53-57
 
 .. code-block:: default
 
@@ -410,7 +416,7 @@ inside it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-60
+.. GENERATED FROM PYTHON SOURCE LINES 58-66
 
 The network of cells is now defined, to which we add external drives as
 required. Weights are prescribed separately for AMPA and NMDA receptors
@@ -421,11 +427,11 @@ drive types include the following (click on the links for documentation):
 - :meth:`hnn_core.Network.add_poisson_drive`
 - :meth:`hnn_core.Network.add_bursty_drive`
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-63
+.. GENERATED FROM PYTHON SOURCE LINES 68-69
 
 First, we add a distal evoked drive
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-74
+.. GENERATED FROM PYTHON SOURCE LINES 69-80
 
 .. code-block:: default
 
@@ -447,11 +453,11 @@ First, we add a distal evoked drive
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-76
+.. GENERATED FROM PYTHON SOURCE LINES 81-82
 
 Then, we add two proximal drives
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-95
+.. GENERATED FROM PYTHON SOURCE LINES 82-101
 
 .. code-block:: default
 
@@ -481,7 +487,7 @@ Then, we add two proximal drives
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-101
+.. GENERATED FROM PYTHON SOURCE LINES 102-107
 
 Now let's simulate the dipole, running 2 trials with the
 :class:`~hnn_core.parallel_backends.Joblib` backend.
@@ -489,7 +495,7 @@ To run them in parallel we could set ``n_jobs`` to equal the number of
 trials. The ``Joblib`` backend allows running the simulations in parallel
 across trials.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-106
+.. GENERATED FROM PYTHON SOURCE LINES 107-112
 
 .. code-block:: default
 
@@ -513,14 +519,14 @@ across trials.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
+.. GENERATED FROM PYTHON SOURCE LINES 113-117
 
 Rather than reading smoothing and scaling parameters from file, we recommend
 explicit use of the :meth:`~hnn_core.dipole.Dipole.smooth` and
 :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Note that both methods
 operate in-place, i.e., the objects are modified.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-115
+.. GENERATED FROM PYTHON SOURCE LINES 117-121
 
 .. code-block:: default
 
@@ -535,11 +541,11 @@ operate in-place, i.e., the objects are modified.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-117
+.. GENERATED FROM PYTHON SOURCE LINES 122-123
 
 Plot the amplitudes of the simulated aggregate dipole moments over time
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-124
+.. GENERATED FROM PYTHON SOURCE LINES 123-130
 
 .. code-block:: default
 
@@ -569,7 +575,7 @@ Plot the amplitudes of the simulated aggregate dipole moments over time
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-131
+.. GENERATED FROM PYTHON SOURCE LINES 131-137
 
 Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens. This is achieved by setting the parameter
@@ -578,7 +584,7 @@ a clone of the network defined above, and then modify the drive dynamics for
 each drive. Making a copy removes any existing outputs from the network
 such as spiking information and voltages at the soma.
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-137
+.. GENERATED FROM PYTHON SOURCE LINES 137-143
 
 .. code-block:: default
 
@@ -595,11 +601,11 @@ such as spiking information and voltages at the soma.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-139
+.. GENERATED FROM PYTHON SOURCE LINES 144-145
 
 You may interrogate current values defining the spike event time dynamics by
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-141
+.. GENERATED FROM PYTHON SOURCE LINES 145-147
 
 .. code-block:: default
 
@@ -620,12 +626,12 @@ You may interrogate current values defining the spike event time dynamics by
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-144
+.. GENERATED FROM PYTHON SOURCE LINES 148-150
 
 Finally, let's simulate this network. Rather than modifying the dipole
 object, this time we make a copy of it before smoothing and scaling.
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-149
+.. GENERATED FROM PYTHON SOURCE LINES 150-156
 
 .. code-block:: default
 
@@ -634,6 +640,7 @@ object, this time we make a copy of it before smoothing and scaling.
     trial_idx = 0
     dpls_sync[trial_idx].copy().smooth(window_len).scale(scaling_factor).plot()
     net_sync.cell_response.plot_spikes_hist()
+
 
 
 
@@ -686,10 +693,18 @@ object, this time we make a copy of it before smoothing and scaling.
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 157-162
+
+References
+----------
+.. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
+a combined magnetoencephalography and biophysically based computational
+modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  13.326 seconds)
+   **Total running time of the script:** ( 3 minutes  56.229 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:
