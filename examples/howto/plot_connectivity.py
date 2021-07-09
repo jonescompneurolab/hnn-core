@@ -40,26 +40,18 @@ net_erp = jones_2009_model(params, add_drives_from_params=True)
 # is a list of dictionaries which detail every cell-cell, and drive-cell
 # connection. The weights of these connections can be visualized with
 # :func:`~hnn_core.viz.plot_connectivity_weights` as well as
-# :func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
-# connections using ``net.pick_connection`` which returns the indices
-# of ``net.connectivity`` that match the provided parameters.
+# :func:`~hnn_core.viz.plot_cell_connectivity`
 from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 
 print(len(net_erp.connectivity))
 
-conn_idx = net_erp.pick_connection(
-    src_gids='L5_pyramidal', target_gids='L5_pyramidal', receptor='nmda')[0]
+conn_idx = 20
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
 gid_idx = 11
-<<<<<<< HEAD:examples/howto/plot_connectivity.py
 src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
 fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
-=======
-src_gid = net_erp.connectivity[conn_idx]['src_gids'][gid_idx]
-fig, ax = plot_cell_connectivity(net_erp, conn_idx, src_gid)
->>>>>>> Fix conn attribute:examples/plot_connectivity.py
 
 ###############################################################################
 # Data recorded during simulations are stored under
@@ -121,14 +113,12 @@ dpl_sparse = simulate_dipole(net_sparse, tstop=170., n_trials=1)
 net_all.cell_response.plot_spikes_raster()
 net_sparse.cell_response.plot_spikes_raster()
 
-# Get index of most recently added connection, and a src_gid in src_range.
-gid_idx = 5
-conn_idx = net_sparse.pick_connection(src_gids='L2_basket')[-1]
-src_gid = net_sparse.connectivity[conn_idx]['src_gids'][gid_idx]
+###############################################################################
+# We can plot the sparse connectivity pattern between cell populations.
+conn_idx = len(net_sparse.connectivity) - 1
 plot_connectivity_matrix(net_sparse, conn_idx)
 
-conn_idx -= 1
-src_gid = net_sparse.connectivity[conn_idx]['src_gids'][gid_idx]
+conn_idx = len(net_sparse.connectivity) - 2
 plot_connectivity_matrix(net_sparse, conn_idx)
 
 ###############################################################################
