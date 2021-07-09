@@ -25,6 +25,8 @@ help:
 	@echo "  html-noplot to make standalone HTML files, without plotting anything"
 	@echo "  html       to make standalone HTML files"
 	@echo "  html_dev-pattern to make standalone HTML files for one example dir (dev version)"
+	@ech "   view	    to view the documentation in a browser"
+	@echo "  linkcheck        to check all external links for integrity"
 
 .PHONY: clean
 
@@ -49,3 +51,9 @@ html_dev-pattern:
 	BUILD_DEV_HTML=1 $(SPHINXBUILD) -D sphinx_gallery_conf.filename_pattern=$(PATTERN) -D sphinx_gallery_conf.run_stale_examples=True -b html $(ALLSPHINXOPTS) _build/html
 	@echo
 	@echo "Build finished. The HTML pages are in _build/html"
+
+linkcheck:
+	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -d _build/doctrees . _build/linkcheck
+
+view:
+	@python -c "import webbrowser; webbrowser.open_new_tab('file://$(PWD)/_build/html/index.html')"
