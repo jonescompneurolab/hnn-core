@@ -789,8 +789,8 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
     src_type_pos = net.pos_dict[src_type]
     target_type_pos = net.pos_dict[target_type]
 
-    src_range = np.array(conn['src_range'])
-    target_range = np.array(conn['target_range'])
+    src_range = np.array(net.gid_ranges[conn['src_type']])
+    target_range = np.array(net.gid_ranges[conn['target_type']])
     connectivity_matrix = np.zeros((len(src_range), len(target_range)))
 
     for src_gid, target_src_pair in conn['gid_pairs'].items():
@@ -926,7 +926,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     target_type = conn['target_type']
     src_type_pos = np.array(net.pos_dict[src_type])
     target_type_pos = np.array(net.pos_dict[target_type])
-    src_range = np.array(conn['src_range'])
+    src_range = np.array(net.gid_ranges[conn['src_type']])
 
     valid_src_gids = list(net.connectivity[conn_idx]['gid_pairs'].keys())
     src_pos_valid = src_type_pos[np.in1d(src_range, valid_src_gids)]
@@ -939,7 +939,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
         raise ValueError(f'src_gid {src_gid} not a valid cell ID for this '
                          f'connection. Please select one of {valid_src_gids}')
 
-    target_range = np.array(conn['target_range'])
+    target_range = np.array(net.gid_ranges[conn['target_type']])
 
     if axes is None:
         if src_type in net.cell_types:
