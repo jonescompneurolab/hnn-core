@@ -273,8 +273,8 @@ net.cell_response.plot_spikes_raster(ax=axes[2])
 #
 # .. _MNE: https://mne.tools/
 # .. _HNN ERP tutorial: https://jonescompneurolab.github.io/hnn-tutorials/erp/erp
-# .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html#sphx-glr-auto-examples-inverse-plot-label-source-activations-py
-# .. |mne_label_fig| image:: https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png # noqa
+# .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html
+# .. |mne_label_fig| image:: https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png
 #   :width: 400
-# .. |mne_activity_fig| image:: https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png # noqa
+# .. |mne_activity_fig| image:: https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png
 #   :width: 400
