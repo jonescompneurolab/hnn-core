@@ -15,7 +15,6 @@ alpha/beta complex similar to Figure 20 in the GUI tutorial, albeit without
 visualization of the corresponding time-frequency spectrograms [1]_.
 """
 
-# **REMOVE BEFORE MERGE: Updated according to AlphaAndBetaSpike.param
 # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Nick Tolley <nicholas_tolley@brown.edu>
@@ -27,7 +26,7 @@ import os.path as op
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, default_network
+from hnn_core import simulate_dipole, read_params, jones_2009_model
 
 ###############################################################################
 # Then we setup the directories and read the default parameters file
@@ -44,7 +43,7 @@ params = read_params(params_fname)
 # time with unique randomization. The drive is only connected to the proximal
 # (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 params['tstop'] = 310
-net = default_network(params)
+net = jones_2009_model(params)
 
 location = 'proximal'
 burst_std = 20
@@ -97,8 +96,8 @@ plt.tight_layout()
 # the pyramidal cells will tend to produce bursts of 15-30 Hz power known
 # as beta frequency events.
 location = 'distal'
-burst_std = 20
-weights_ampa_d = {'L2_pyramidal': 4.0e-4, 'L5_pyramidal': 4.0e-4}
+burst_std = 15
+weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 syn_delays_d = {'L2_pyramidal': 5., 'L5_pyramidal': 5.}
 net.add_bursty_drive(
     'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,

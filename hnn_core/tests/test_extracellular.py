@@ -8,7 +8,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 import pytest
 
 import hnn_core
-from hnn_core import read_params, default_network, simulate_dipole
+from hnn_core import read_params, jones_2009_model, simulate_dipole
 from hnn_core.extracellular import ExtracellularArray
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
@@ -20,7 +20,7 @@ params = read_params(params_fname)
 
 def test_extracellular_api():
     """Test extracellular recording API."""
-    net = default_network(deepcopy(params), add_drives_from_params=True)
+    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
 
     # Test LFP electrodes
     electrode_pos = (1, 2, 3)
@@ -88,7 +88,7 @@ def test_transmembrane_currents():
                    't_evdist_1': 10,
                    't_evprox_2': 20,
                    'N_trials': 1})
-    net = default_network(params, add_drives_from_params=True)
+    net = jones_2009_model(params, add_drives_from_params=True)
     electrode_pos = (0, 0, 0)  # irrelevant where electrode is
     # all transfer resistances set to unity
     net.add_electrode_array('net_Im', electrode_pos, method=None)
@@ -192,7 +192,7 @@ def test_rec_array_calculation():
                    'tstop': 25,
                    't_evprox_1': 7,
                    't_evdist_1': 17})
-    net = default_network(params, add_drives_from_params=True)
+    net = jones_2009_model(params, add_drives_from_params=True)
 
     # one electrode inside, one above the active elements of the network
     electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]

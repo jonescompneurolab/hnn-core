@@ -16,8 +16,7 @@ import os.path as op
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, default_network, simulate_dipole
-from hnn_core.network_models import add_erp_drives_to_default_network
+from hnn_core import read_params, jones_2009_model, simulate_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -31,10 +30,9 @@ params = read_params(params_fname)
 # the evoked response from the
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`, and
 # explore how it changes with new connections. We first instantiate the
-# network. (Note: ``using add_erp_drives_to_default_network()`` loads a set of
+# network. (Note: Setting ``add_drives_from_params=True`` loads a set of
 # predefined drives without the drives API shown previously).
-net_erp = default_network(params)
-add_erp_drives_to_default_network(net_erp)
+net_erp = jones_2009_model(params, add_drives_from_params=True)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that
@@ -75,7 +73,7 @@ net_erp.cell_response.plot_spikes_raster()
 
 
 def get_network(probability=1.0):
-    net = default_network(params, add_drives_from_params=True)
+    net = jones_2009_model(params, add_drives_from_params=True)
     net.clear_connectivity()
 
     # Pyramidal cell connections

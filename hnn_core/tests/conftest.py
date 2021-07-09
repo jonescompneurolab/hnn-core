@@ -8,7 +8,7 @@ import pytest
 
 import os.path as op
 import hnn_core
-from hnn_core import read_params, default_network, simulate_dipole
+from hnn_core import read_params, jones_2009_model, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
 
 # store history of failures per test class name and per index in parametrize
@@ -90,7 +90,7 @@ def run_hnn_core_fixture():
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
-        net = default_network(params, add_drives_from_params=True)
+        net = jones_2009_model(params, add_drives_from_params=True)
         if electrode_array is not None:
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)

@@ -211,7 +211,7 @@ class Network(object):
 
     Notes
     ----
-    `net = default_network(params)` is the reccomended path for creating a
+    `net = jones_2009_model(params)` is the reccomended path for creating a
     network. Instantiating the network as `net = Network(params)` will
     produce a network with no cell to cell connections. As such,
     connectivity information contained in `params` will be ignored.
