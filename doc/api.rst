@@ -27,9 +27,17 @@ Published Models (:py:mod:`hnn_core`):
 .. autosummary::
    :toctree: generated/
 
-   default_network
    jones_2009_model
    law_2021_model
+
+Unpublished Models (:py:mod:`hnn_core`):
+----------------------------------------
+.. currentmodule:: hnn_core
+
+.. autosummary::
+   :toctree: generated/
+
+   calcium_model
 
 Dipole (:py:mod:`hnn_core.dipole`):
 -----------------------------------

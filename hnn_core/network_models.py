@@ -11,36 +11,6 @@ from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
 
 
-def default_network(params=None, add_drives_from_params=False):
-    """Instantiate the default network.
-
-    Parameters
-    ----------
-    params : dict | None
-        The parameters to use for constructing the network.
-        If None, parameters loaded from default.json
-        Default: None
-    add_drives_from_params : bool
-        If True, add drives as defined in the params-dict. NB this is mainly
-        for backward-compatibility with HNN GUI, and will be deprecated in a
-        future release. Default: False
-
-    Returns
-    -------
-    net : Instance of Network object
-        Network object used to store the default network.
-
-    Notes
-    -----
-    The default network builds upon the model from Jones et al. 2009 by adding
-    a distance dependent distribution of calcium channels along L5 pyramidal
-    cell apical dendrites. This addition better reflects the current
-    understanding pyramidal cell electrophysiology.
-    """
-    net = _calcium_model(params, add_drives_from_params)
-    return net
-
-
 def jones_2009_model(params=None, add_drives_from_params=False):
     """Instantiate the Jones et al. 2009 model.
 
@@ -190,6 +160,11 @@ def law_2021_model():
     net : Instance of Network object
         Network object used to store the model used in
         Law et al. 2021.
+
+    See Also
+    --------
+    jones_2009_model
+
     Notes
     -----
     Model reproduces results from Law et al. 2021
@@ -259,7 +234,7 @@ def law_2021_model():
 
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
-def _calcium_model(params, add_drives_from_params):
+def calcium_model(params=None, add_drives_from_params=False):
     """Instantiate the Jones 2009 model with improved calcium dynamics.
 
     Returns
@@ -267,6 +242,11 @@ def _calcium_model(params, add_drives_from_params):
     net : Instance of Network object
         Network object used to store the Jones 2009 model with an impoved
         calcium channel distribution.
+
+    See Also
+    --------
+    jones_2009_model
+
     Notes
     -----
     This model builds on the Jones 2009 model by using a more biologically
@@ -291,7 +271,7 @@ def _calcium_model(params, add_drives_from_params):
     return net
 
 
-def add_erp_drives_to_default_network(net, tstart=0.0):
+def add_erp_drives_to_jones_model(net, tstart=0.0):
     """Add drives necessary for an event related potential (ERP)
 
     Parameters
@@ -312,33 +292,30 @@ def add_erp_drives_to_default_network(net, tstart=0.0):
     _validate_type(tstart, (float, int), 'tstart', 'float or int')
 
     # Add distal drive
-    weights_ampa_d1 = {'L2_basket': 0.061, 'L2_pyramidal': 1.155,
-                       'L5_pyramidal': 1.004}
-    weights_nmda_d1 = {'L2_basket': 0.021, 'L2_pyramidal': 0.299,
-                       'L5_pyramidal': 0.579}
+    weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': 7e-6,
+                       'L5_pyramidal': 0.142300}
+    weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
+                       'L5_pyramidal': 0.080074}
     synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                           'L5_pyramidal': 0.1}
     net.add_evoked_drive(
-        'evdist1', mu=65.69 + tstart, sigma=3.81, numspikes=1,
+        'evdist1', mu=63.53, sigma=3.85, numspikes=1,
         weights_ampa=weights_ampa_d1, weights_nmda=weights_nmda_d1,
         location='distal', synaptic_delays=synaptic_delays_d1, seedcore=4)
 
     # Add proximal drives
-    weights_ampa_p1 = {'L2_basket': 0.2, 'L2_pyramidal': 0.25,
-                       'L5_basket': 0.411, 'L5_pyramidal': 0.014}
+    weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
+                       'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
     synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                             'L5_basket': 1., 'L5_pyramidal': 1.}
-
     net.add_evoked_drive(
-        'evprox1', mu=19.64 + tstart, sigma=2.52, numspikes=1,
+        'evprox1', mu=26.61, sigma=2.47, numspikes=1,
         weights_ampa=weights_ampa_p1, weights_nmda=None, location='proximal',
         synaptic_delays=synaptic_delays_prox, seedcore=4)
 
-    weights_ampa_p2 = {'L2_basket': 0.00006, 'L2_pyramidal': 48.23,
-                       'L5_basket': 0.0179, 'L5_pyramidal': 49.87}
-
-    # all NMDA weights are zero; omit weights_nmda (defaults to None)
+    weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                       'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
     net.add_evoked_drive(
-        'evprox2', mu=90.53 + tstart, sigma=10.38, numspikes=1,
-        weights_ampa=weights_ampa_p2, weights_nmda=None, location='proximal',
+        'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=synaptic_delays_prox, seedcore=4)

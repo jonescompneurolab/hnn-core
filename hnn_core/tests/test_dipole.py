@@ -7,7 +7,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles
-from hnn_core import Network, default_network
+from hnn_core import Network, jones_2009_model
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -103,7 +103,7 @@ def test_dipole_simulation():
                    't_evprox_1': 5,
                    't_evdist_1': 10,
                    't_evprox_2': 20})
-    net = default_network(params, add_drives_from_params=True)
+    net = jones_2009_model(params, add_drives_from_params=True)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, n_trials=0)
     with pytest.raises(TypeError, match="record_vsoma must be bool, got int"):

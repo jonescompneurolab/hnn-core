@@ -7,7 +7,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, default_network
+from hnn_core import read_params, jones_2009_model
 from hnn_core.viz import plot_cells, plot_dipole, plot_psd, plot_tfr_morlet
 from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 from hnn_core.dipole import simulate_dipole
@@ -29,7 +29,7 @@ def test_network_visualization():
     params = read_params(params_fname)
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3})
-    net = default_network(params)
+    net = jones_2009_model(params)
     plot_cells(net)
     ax = net.cell_types['L2_pyramidal'].plot_morphology()
     assert len(ax.lines) == 8
@@ -83,7 +83,7 @@ def test_dipole_visualization():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    'tstop': 100.})
-    net = default_network(params)
+    net = jones_2009_model(params)
     weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 

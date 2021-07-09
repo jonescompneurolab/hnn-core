@@ -8,8 +8,8 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, CellResponse
-from hnn_core import default_network, jones_2009_model, law_2021_model
-from hnn_core.network_models import add_erp_drives_to_default_network
+from hnn_core import jones_2009_model, law_2021_model, calcium_model
+from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.network_builder import NetworkBuilder
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -18,12 +18,6 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 
 def test_network_models():
     """"Test instantiations of the network object"""
-    # Default network should match Jones et al. 2009 model
-    net_default = default_network(add_drives_from_params=True)
-    net_jones = jones_2009_model(add_drives_from_params=True)
-    assert net_default.connectivity == net_jones.connectivity
-    assert net_default.external_drives == net_jones.external_drives
-
     # Make sure critical biophysics for Law model are updated
     net_law = law_2021_model()
     for cell_name in ['L5_pyramidal', 'L2_pyramidal']:
@@ -31,17 +25,30 @@ def test_network_models():
         assert net_law.cell_types[cell_name].p_syn['gabab']['tau2'] == 200.0
 
     # Check add_default_erp()
-    net_default = default_network()
+    net_default = jones_2009_model()
     with pytest.raises(TypeError, match='net must be'):
-        add_erp_drives_to_default_network(net='invalid_input')
+        add_erp_drives_to_jones_model(net='invalid_input')
     with pytest.raises(TypeError, match='tstart must be'):
-        add_erp_drives_to_default_network(net=net_default,
-                                          tstart='invalid_input')
+        add_erp_drives_to_jones_model(net=net_default,
+                                      tstart='invalid_input')
     n_conn = len(net_default.connectivity)
-    add_erp_drives_to_default_network(net_default)
+    add_erp_drives_to_jones_model(net_default)
     for drive_name in ['evdist1', 'evprox1', 'evprox2']:
         assert drive_name in net_default.external_drives.keys()
     assert len(net_default.connectivity) == n_conn + 14
+
+    # Ensure distant dependent calcium gbar
+    net_calcium = calcium_model()
+    network_builder = NetworkBuilder(net_calcium)
+    gid = net_calcium.gid_ranges['L5_pyramidal'][0]
+    for section_name, section in network_builder._cells[gid].sections.items():
+        # Section endpoints where seg.x == 0.0 or 1.0 don't have 'ca' mech
+        ca_gbar = [seg.__getattribute__('ca').gbar for
+                   seg in list(section.allseg())[1:-1]]
+        if section_name == 'apical_tuft':
+            assert np.all(np.diff(ca_gbar) == 0)
+        else:
+            assert np.all(np.diff(ca_gbar) > 0)
 
 
 def test_network():
@@ -54,7 +61,7 @@ def test_network():
                    'input_prox_A_weight_L2Pyr_ampa': 3.4e-5,
                    'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
                    't0_input_prox': 50})
-    net = default_network(deepcopy(params), add_drives_from_params=True)
+    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
     network_builder = NetworkBuilder(net)  # needed to populate net.cells
 
     # Assert that params are conserved across Network initialization
@@ -63,20 +70,6 @@ def test_network():
     assert len(params) == len(net._params)
     print(network_builder)
     print(network_builder._cells[:2])
-
-    # Ensure distant dependent calcium gbar
-    gid = net.gid_ranges['L5_pyramidal'][0]
-    for section_name, section in network_builder._cells[gid].sections.items():
-        ca_gbar = list()
-        for seg in section.allseg():
-            try:  # Necessary for seg end points with no calcium mech
-                ca_gbar.append(seg.__getattribute__('ca').gbar)
-            except:
-                pass
-        if section_name == 'apical_tuft':
-            assert np.all(np.diff(ca_gbar) == 0)
-        else:
-            assert np.all(np.diff(ca_gbar) > 0)
 
     # Assert that proper number of gids are created for Network drives
     dns_from_gids = [name for name in net.gid_ranges.keys() if
@@ -226,7 +219,7 @@ def test_network():
     assert nc.threshold == params['threshold']
 
     # Test inputs for connectivity API
-    net = default_network(deepcopy(params), add_drives_from_params=True)
+    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
     n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
     kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
                           loc='soma', receptor='gabaa',
@@ -309,7 +302,7 @@ def test_network():
 def test_add_cell_type():
     """Test adding a new cell type."""
     params = read_params(params_fname)
-    net = default_network(params)
+    net = jones_2009_model(params)
 
     n_total_cells = net.n_cells
     pos = [(0, idx, 0) for idx in range(10)]
