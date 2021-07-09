@@ -190,6 +190,10 @@ intersphinx_mapping = {
 }
 intersphinx_timeout = 5
 
+linkcheck_ignore = [
+   'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#'
+]
+
 # Resolve binder filepath_prefix. From the docs:
 # "A prefix to append to the filepath in the Binder links. You should use this
 # if you will store your built documentation in a sub-folder of a repository,

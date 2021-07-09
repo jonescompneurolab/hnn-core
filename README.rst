@@ -1,10 +1,6 @@
 hnn-core
 ========
 
-.. image:: https://badges.gitter.im/hnn-core/hnn-core.svg
-   :target: https://gitter.im/hnn-core/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-   :alt: Gitter
-
 .. image:: https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg
    :target: https://circleci.com/gh/jonescompneurolab/hnn-core
    :alt: CircleCi
