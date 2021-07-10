@@ -50,7 +50,7 @@ print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
 gid_idx = 11
-src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+src_gid = net_erp.connectivity[conn_idx]['src_gids'][gid_idx]
 fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 ###############################################################################
@@ -124,7 +124,7 @@ plot_connectivity_matrix(net_sparse, conn_idx)
 ###############################################################################
 # Note that the sparsity is in addition to the weight decay with distance
 # from the source cell.
-src_gid = net_sparse.connectivity[conn_idx]['src_range'][5]
+src_gid = net_sparse.connectivity[conn_idx]['src_gids'][5]
 plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
 
 ###############################################################################
