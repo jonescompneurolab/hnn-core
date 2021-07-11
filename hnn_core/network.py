@@ -19,7 +19,7 @@ from .params import _long_name, _short_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
-from .check import _create_gid_list, _gid_to_type, _string_input_to_list
+from .check import _check_gids, _gid_to_type, _string_input_to_list
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
@@ -969,8 +969,8 @@ class Network(object):
         valid_cells = list(self.cell_types.keys())
 
         # Convert src_gids to list
-        src_gids = _create_gid_list(src_gids, self.gid_ranges,
-                                    valid_cells, 'src_gids')
+        src_gids = _check_gids(src_gids, self.gid_ranges,
+                               valid_cells, 'src_gids')
 
         # Convert target_gids to list of list, one element for each src_gid
         if isinstance(target_gids, int):
@@ -1102,10 +1102,10 @@ class Network(object):
         # Convert src and target gids to lists
         valid_srcs = list(self.gid_ranges.keys())  # includes drives as srcs
         valid_targets = list(self.cell_types.keys())
-        src_gids = _create_gid_list(src_gids, self.gid_ranges,
-                                    valid_srcs, 'src_gids')
-        target_gids = _create_gid_list(target_gids, self.gid_ranges,
-                                       valid_targets, 'target_gids')
+        src_gids = _check_gids(src_gids, self.gid_ranges,
+                               valid_srcs, 'src_gids')
+        target_gids = _check_gids(target_gids, self.gid_ranges,
+                                  valid_targets, 'target_gids')
 
         _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
         _validate_type(receptor, (str, list, None), 'receptor',
