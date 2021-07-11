@@ -322,8 +322,7 @@ def test_network():
         assert indices == net.pick_connection(**kwargs)
 
     # Check condition where not connections match
-    with pytest.raises(Warning, match='No connections match search'):
-        net.pick_connection(loc='distal', receptor='gabab')
+    assert net.pick_connection(loc='distal', receptor='gabab') == list()
 
     kwargs_bad = [
         ('src_gids', 0.0), ('src_gids', [0.0]),

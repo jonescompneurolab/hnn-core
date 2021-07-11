@@ -1185,10 +1185,6 @@ class Network(object):
             # Intersection across parameters
             if conn_set and inner_set:
                 conn_set = conn_set.intersection(inner_set)
-                if not conn_set:  # Exit if both are non empty disjoint sets
-                    raise Warning('No connections match search parameters.'
-                                  'Try changing or excluding parameters.')
-                    break
             else:
                 conn_set = conn_set.union(inner_set)
 
