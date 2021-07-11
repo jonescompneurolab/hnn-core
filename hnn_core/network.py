@@ -1083,7 +1083,7 @@ class Network(object):
         -------
         conn_indices : list of int
             List of indices corresponding to items in net.connectivity.
-            Connecion indices are added if any of the provided parameter
+            Connecion indices are included if any of the provided parameter
             values are present in a connection.
 
         Notes
