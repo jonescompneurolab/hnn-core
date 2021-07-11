@@ -120,9 +120,7 @@ net_sparse.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can plot the sparse connectivity pattern between cell populations.
-src_gids, target_gids = 'L2_basket', 'L2_basket'
-loc, receptor = 'soma', 'gabaa'
-conn_indices = net_erp.pick_connection(src_gids, target_gids, loc, receptor)
+conn_indices = net_erp.pick_connection(src_gids='L2_basket', target_gids='L2_basket, loc='soma', receptor='gabaa')
 conn_idx = conn_indices[0]
 plot_connectivity_matrix(net_sparse, conn_idx)
 

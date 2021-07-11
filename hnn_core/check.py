@@ -6,7 +6,7 @@ from .params import _long_name
 from .externals.mne import _validate_type, _check_option
 
 
-def _create_gid_list(gids, gid_ranges, valid_cells, arg_name):
+def _check_gids(gids, gid_ranges, valid_cells, arg_name):
     """Format different gid specifications into list of gids"""
     _validate_type(gids, (int, list, range, str, None), arg_name,
                    'int list, range, str, or None')
