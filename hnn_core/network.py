@@ -20,7 +20,7 @@ from .params import _long_name, _short_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
-from .check import (_create_gid_list, _gid_to_type, _string_input_to_list)
+from .check import _create_gid_list, _gid_to_type, _string_input_to_list
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
