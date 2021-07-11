@@ -41,6 +41,7 @@ def _gid_to_type(gid, gid_ranges):
 
 
 def _check_gid_range(gid, gid_ranges, arg_name):
+    """Check if gid in gid_ranges"""
     gid_type = _gid_to_type(gid, gid_ranges)
     if gid_type is None:
         raise AssertionError(
