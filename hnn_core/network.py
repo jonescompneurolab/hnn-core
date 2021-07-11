@@ -20,6 +20,7 @@ from .params import _long_name, _short_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
+from .check import _create_gid_list, _gid_to_type, _check_gid_range
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
@@ -925,9 +926,7 @@ class Network(object):
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
-        for gidtype, gids in self.gid_ranges.items():
-            if gid in gids:
-                return gidtype
+        return _gid_to_type(gid, self.gid_ranges)
 
     def _gid_to_cell(self, gid):
         """Reverse lookup of gid to cell.
@@ -992,17 +991,14 @@ class Network(object):
         """
         conn = _Connectivity()
         threshold = self.threshold
-        _validate_type(src_gids, (int, list, range, str), 'src_gids',
-                       'int list, range, or str')
+
         _validate_type(target_gids, (int, list, range, str), 'target_gids',
                        'int list, range or str')
         valid_cells = list(self.cell_types.keys())
+
         # Convert src_gids to list
-        if isinstance(src_gids, int):
-            src_gids = [src_gids]
-        elif isinstance(src_gids, str):
-            _check_option('src_gids', src_gids, valid_cells)
-            src_gids = self.gid_ranges[_long_name(src_gids)]
+        src_gids = _create_gid_list(src_gids, self.gid_ranges,
+                                    valid_cells, 'src_gids')
 
         # Convert target_gids to list of list, one element for each src_gid
         if isinstance(target_gids, int):
@@ -1045,21 +1041,13 @@ class Network(object):
 
         # Format gid_pairs and add to conn dictionary
         gid_pairs = dict()
-        src_type = self.gid_to_type(src_gids[0])
         for src_gid, target_src_pair in zip(src_gids, target_gids):
-            _validate_type(src_gid, int, 'src_gid', 'int')
-            gid_type = self.gid_to_type(src_gid)
-            if gid_type is None:
-                raise AssertionError(
-                    f'src_gid {src_gid} not in net.gid_ranges')
-            elif gid_type != src_type:
-                raise AssertionError('All src_gids must be of the same type')
             if not allow_autapses:
                 mask = np.in1d(target_src_pair, src_gid, invert=True)
                 target_src_pair = np.array(target_src_pair)[mask].tolist()
             gid_pairs[src_gid] = target_src_pair
 
-        conn['src_type'] = src_type
+        conn['src_type'] = self.gid_to_type(src_gids[0])
         conn['src_gids'] = list(set(src_gids))
         conn['num_srcs'] = len(src_gids)
 
