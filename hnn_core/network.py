@@ -19,7 +19,7 @@ from .params import _long_name, _short_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
-from .check import _create_gid_list, _gid_to_type, _check_gid_range
+from .check import (_create_gid_list, _gid_to_type, _string_input_to_list)
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4):
@@ -1099,64 +1099,24 @@ class Network(object):
         dendrites and have ampa receptors.
         """
 
-        _validate_type(src_gids, (int, list, range, str, None), 'src_gids',
-                       'int list, range, str, or None')
-        _validate_type(target_gids, (int, list, range, str, None),
-                       'target_gids', 'int list, range or str')
+        # Convert src and target gids to lists
+        valid_srcs = list(self.gid_ranges.keys())  # includes drives as srcs
+        valid_targets = list(self.cell_types.keys())
+        src_gids = _create_gid_list(src_gids, self.gid_ranges,
+                                    valid_srcs, 'src_gids')
+        target_gids = _create_gid_list(target_gids, self.gid_ranges,
+                                       valid_targets, 'target_gids')
+
         _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
         _validate_type(receptor, (str, list, None), 'receptor',
                        'str, list, or None')
 
-        valid_srcs = list(self.gid_ranges.keys())  # includes drives as srcs
-        valid_targets = list(self.cell_types.keys())
         valid_loc = ['proximal', 'distal', 'soma']
         valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
 
-        # Convert src_gids to list
-        if src_gids is None:
-            src_gids = list()
-        elif isinstance(src_gids, int):
-            src_gids = [src_gids]
-        elif isinstance(src_gids, str):
-            _check_option('src_gids', src_gids, valid_srcs)
-            src_gids = self.gid_ranges[_long_name(src_gids)]
-        for src_gid in src_gids:
-            _validate_type(src_gid, int, 'src_gid')
-            gid_type = self.gid_to_type(src_gid)
-            if gid_type is None:
-                raise AssertionError(
-                    f'src_gid {src_gid} not in net.gid_ranges')
-
-        # Convert target_gids to list
-        if target_gids is None:
-            target_gids = list()
-        elif isinstance(target_gids, int):
-            target_gids = [target_gids]
-        elif isinstance(target_gids, str):
-            _check_option('target_gids', target_gids, valid_targets)
-            target_gids = self.gid_ranges[_long_name(target_gids)]
-        for target_gid in target_gids:
-            _validate_type(target_gid, int, 'target_gid')
-            gid_type = self.gid_to_type(target_gid)
-            if gid_type is None:
-                raise AssertionError(
-                    f'target_gid {src_gid} not in net.gid_ranges')
-
-        # Convert loc to list
-        if loc is None:
-            loc = list()
-        elif isinstance(loc, str):
-            loc = [loc]
-        for loc_item in loc:
-            _check_option('loc', loc_item, valid_loc)
-
-        # Convert receptor to list
-        if receptor is None:
-            receptor = list()
-        elif isinstance(receptor, str):
-            receptor = [receptor]
-        for receptor_item in receptor:
-            _check_option('receptor', receptor_item, valid_receptor)
+        # Convert receptor and loc to list
+        loc = _string_input_to_list(loc, valid_loc, 'loc')
+        receptor = _string_input_to_list(receptor, valid_receptor, 'receptor')
 
         # Create lookup dictionaries
         src_dict, target_dict = dict(), dict()
