@@ -40,14 +40,6 @@ def _gid_to_type(gid, gid_ranges):
             return gidtype
 
 
-def _check_gid_range(gid, gid_ranges, arg_name):
-    """Check if gid in gid_ranges"""
-    gid_type = _gid_to_type(gid, gid_ranges)
-    if gid_type is None:
-        raise AssertionError(
-            f'{arg_name} {gid} not in net.gid_ranges')
-
-
 def _string_input_to_list(input_str, valid_str, arg_name):
     """Convert input strings to list"""
     if input_str is None:
