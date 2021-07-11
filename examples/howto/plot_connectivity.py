@@ -40,12 +40,17 @@ net_erp = jones_2009_model(params, add_drives_from_params=True)
 # is a list of dictionaries which detail every cell-cell, and drive-cell
 # connection. The weights of these connections can be visualized with
 # :func:`~hnn_core.viz.plot_connectivity_weights` as well as
-# :func:`~hnn_core.viz.plot_cell_connectivity`
+# :func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
+# connections using ``net.pick_connection`` which returns the indices
+# of ``net.connectivity`` that match the provided parameters.
 from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
 
 print(len(net_erp.connectivity))
 
-conn_idx = 20
+src_gids, target_gids = 'L5_basket', 'L5_pyramidal'
+loc, receptor = 'soma', 'gabaa'
+conn_indices = net_erp.pick_connection(src_gids, target_gids, loc, receptor)
+conn_idx = conn_indices[0]
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
