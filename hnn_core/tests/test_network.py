@@ -12,6 +12,7 @@ from hnn_core import read_params, CellResponse
 from hnn_core import jones_2009_model, law_2021_model, calcium_model
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.network_builder import NetworkBuilder
+from hnn_core.network import pick_connection
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -296,7 +297,7 @@ def test_network():
         net.add_connection(**kwargs)
 
     # Test net.pick_connection()
-    kwargs_default = dict(src_gids=[0, 1], target_gids=[0, 1],
+    kwargs_default = dict(net=net, src_gids=[0, 1], target_gids=[0, 1],
                           loc=['soma', 'distal'], receptor=['ampa', 'gabaa'])
 
     # List of tuples with (arg, item, correct_indices)
@@ -318,10 +319,10 @@ def test_network():
     for arg, item, indices in kwargs_good:
         kwargs = kwargs_default.copy()
         kwargs[arg] = item
-        assert indices == net.pick_connection(**kwargs)
+        assert indices == pick_connection(**kwargs)
 
     # Check condition where not connections match
-    assert net.pick_connection(loc='distal', receptor='gabab') == list()
+    assert pick_connection(net, loc='distal', receptor='gabab') == list()
 
     kwargs_bad = [
         ('src_gids', 0.0), ('src_gids', [0.0]),
@@ -333,7 +334,7 @@ def test_network():
         with pytest.raises(TypeError, match=match):
             kwargs = kwargs_default.copy()
             kwargs[arg] = item
-            net.pick_connection(**kwargs)
+            pick_connection(**kwargs)
 
     kwargs_bad = [
         ('src_gids', -1), ('src_gids', [-1]),
@@ -343,7 +344,7 @@ def test_network():
         with pytest.raises(AssertionError):
             kwargs = kwargs_default.copy()
             kwargs[arg] = item
-            net.pick_connection(**kwargs)
+            pick_connection(**kwargs)
 
     for arg in ['src_gids', 'target_gids', 'loc', 'receptor']:
         string_arg = 'invalid_string'
@@ -351,7 +352,7 @@ def test_network():
         with pytest.raises(ValueError, match=match):
             kwargs = kwargs_default.copy()
             kwargs[arg] = string_arg
-            net.pick_connection(**kwargs)
+            pick_connection(**kwargs)
 
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
