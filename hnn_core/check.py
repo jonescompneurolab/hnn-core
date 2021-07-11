@@ -12,6 +12,8 @@ def _create_gid_list(gids, gid_ranges, valid_cells, arg_name):
                    'int list, range, str, or None')
 
     # Convert gids to list
+    if gids is None:
+        return list()
     if isinstance(gids, int):
         gids = [gids]
     elif isinstance(gids, str):
@@ -43,3 +45,15 @@ def _check_gid_range(gid, gid_ranges, arg_name):
     if gid_type is None:
         raise AssertionError(
             f'{arg_name} {gid} not in net.gid_ranges')
+
+
+def _string_input_to_list(input_str, valid_str, arg_name):
+    """Convert input strings to list"""
+    if input_str is None:
+        input_str = list()
+    elif isinstance(input_str, str):
+        input_str = [input_str]
+    for str_item in input_str:
+        _check_option(arg_name, str_item, valid_str)
+
+    return input_str
