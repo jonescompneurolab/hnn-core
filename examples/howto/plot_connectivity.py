@@ -41,15 +41,16 @@ net_erp = jones_2009_model(params, add_drives_from_params=True)
 # connection. The weights of these connections can be visualized with
 # :func:`~hnn_core.viz.plot_connectivity_weights` as well as
 # :func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
-# connections using ``net.pick_connection`` which returns the indices
+# connections using ``pick_connection`` which returns the indices
 # of ``net.connectivity`` that match the provided parameters.
 from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+from hnn_core.network import pick_connection
 
 print(len(net_erp.connectivity))
 
-src_gids, target_gids = 'L5_basket', 'L5_pyramidal'
-loc, receptor = 'soma', 'gabaa'
-conn_indices = net_erp.pick_connection(src_gids, target_gids, loc, receptor)
+conn_indices = pick_connection(
+    net=net_erp, src_gids='L5_basket', target_gids='L5_pyramidal',
+    loc='soma', receptor='gabaa')
 conn_idx = conn_indices[0]
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
@@ -75,8 +76,6 @@ net_erp.cell_response.plot_spikes_raster()
 # and L2 basket cells. :meth:`hnn_core.Network.add_connection` allows
 # connections to be specified with either cell names, or the cell IDs (gids)
 # directly.
-
-
 def get_network(probability=1.0):
     net = jones_2009_model(params, add_drives_from_params=True)
     net.clear_connectivity()
@@ -120,8 +119,8 @@ net_sparse.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can plot the sparse connectivity pattern between cell populations.
-conn_indices = net_sparse.pick_connection(
-    src_gids='L2_basket', target_gids='L2_basket',
+conn_indices = pick_connection(
+    net=net_sparse, src_gids='L2_basket', target_gids='L2_basket',
     loc='soma', receptor='gabaa')
 
 conn_idx = conn_indices[0]

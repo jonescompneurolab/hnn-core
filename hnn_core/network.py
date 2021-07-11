@@ -152,6 +152,119 @@ def _connection_probability(conn, probability, seed=0):
         conn['gid_pairs'].pop(src_gid)
 
 
+def pick_connection(net, src_gids=None, target_gids=None,
+                    loc=None, receptor=None):
+    """Returns indices of connections that match search parameters.
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        The Network object
+    src_gids : str | int | range | list of int | None
+        Identifier for source cells. Passing str arguments
+        ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
+        equivalent to passing a list of gids for the relvant cell type.
+        source - target connections are made in an all-to-all pattern.
+    target_gids : str | int | range | list of int | None
+        Identifer for targets of source cells. Passing str arguments
+        ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
+        equivalent to passing a list of gids for the relvant cell type.
+        source - target connections are made in an all-to-all pattern.
+    loc : str | list of str | None
+        Location of synapse on target cell. Must be
+        'proximal', 'distal', or 'soma'. Note that inhibitory synapses
+        (receptor='gabaa' or 'gabab') of L2 pyramidal neurons are only
+        valid loc='soma'.
+    receptor : str | list of str | None
+        Synaptic receptor of connection. Must be one of:
+        'ampa', 'nmda', 'gabaa', or 'gabab'.
+
+    Returns
+    -------
+    conn_indices : list of int
+        List of indices corresponding to items in net.connectivity.
+        Connection indices are included if any of the provided parameter
+        values are present in a connection.
+
+    Notes
+    -----
+    Passing a list of values to a single parameter corresponds to a
+    logical OR operation across indices. For example,
+    loc=['distal', 'proximal'] returns all connections that target
+    distal or proximal dendrites.
+
+    Passing  multiple parameters corresponds to a logical AND operation.
+    For example, net.pick_connection(loc='distal', receptor='ampa')
+    returns only the indices of connections that target the distal
+    dendrites and have ampa receptors.
+    """
+
+    # Convert src and target gids to lists
+    valid_srcs = list(net.gid_ranges.keys())  # includes drives as srcs
+    valid_targets = list(net.cell_types.keys())
+    src_gids = _check_gids(src_gids, net.gid_ranges,
+                           valid_srcs, 'src_gids')
+    target_gids = _check_gids(target_gids, net.gid_ranges,
+                              valid_targets, 'target_gids')
+
+    _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
+    _validate_type(receptor, (str, list, None), 'receptor',
+                   'str, list, or None')
+
+    valid_loc = ['proximal', 'distal', 'soma']
+    valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
+
+    # Convert receptor and loc to list
+    loc = _string_input_to_list(loc, valid_loc, 'loc')
+    receptor = _string_input_to_list(receptor, valid_receptor, 'receptor')
+
+    # Create lookup dictionaries
+    src_dict, target_dict = dict(), dict()
+    loc_dict, receptor_dict = dict(), dict()
+    for conn_idx, conn in enumerate(net.connectivity):
+        # Store connections matching each src_gid
+        for src_gid in conn['src_gids']:
+            if src_gid in src_dict:
+                src_dict[src_gid].append(conn_idx)
+            else:
+                src_dict[src_gid] = [conn_idx]
+        # Store connections matching each target_gid
+        for target_gid in conn['target_gids']:
+            if target_gid in target_dict:
+                target_dict[target_gid].append(conn_idx)
+            else:
+                target_dict[target_gid] = [conn_idx]
+        # Store connections matching each location
+        if conn['loc'] in loc_dict:
+            loc_dict[conn['loc']].append(conn_idx)
+        else:
+            loc_dict[conn['loc']] = [conn_idx]
+        # Store connections matching each receptor
+        if conn['receptor'] in receptor_dict:
+            receptor_dict[conn['receptor']].append(conn_idx)
+        else:
+            receptor_dict[conn['receptor']] = [conn_idx]
+
+    # Look up conn indeces that match search terms and add to set.
+    conn_set = set()
+    search_pairs = [(src_gids, src_dict), (target_gids, target_dict),
+                    (loc, loc_dict), (receptor, receptor_dict)]
+    for search_terms, search_dict in search_pairs:
+        inner_set = set()
+        # Union of indices which match inputs for single parameter
+        for term in search_terms:
+            inner_set = inner_set.union(search_dict[term])
+        # Intersection across parameters
+        if conn_set and inner_set:
+            conn_set = conn_set.intersection(inner_set)
+        else:
+            conn_set = conn_set.union(inner_set)
+
+    conn_set = list(conn_set)
+    conn_set.sort()
+    return conn_set
+
+
 class Network(object):
     """The Network class.
 
@@ -1081,116 +1194,6 @@ class Network(object):
         conn['probability'] = probability
 
         self.connectivity.append(deepcopy(conn))
-
-    def pick_connection(self, src_gids=None, target_gids=None,
-                        loc=None, receptor=None):
-        """Returns indices of connections that match search parameters.
-
-        Parameters
-        ----------
-        src_gids : str | int | range | list of int | None
-            Identifier for source cells. Passing str arguments
-            ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-            equivalent to passing a list of gids for the relvant cell type.
-            source - target connections are made in an all-to-all pattern.
-        target_gids : str | int | range | list of int | None
-            Identifer for targets of source cells. Passing str arguments
-            ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-            equivalent to passing a list of gids for the relvant cell type.
-            source - target connections are made in an all-to-all pattern.
-        loc : str | list of str | None
-            Location of synapse on target cell. Must be
-            'proximal', 'distal', or 'soma'. Note that inhibitory synapses
-            (receptor='gabaa' or 'gabab') of L2 pyramidal neurons are only
-            valid loc='soma'.
-        receptor : str | list of str | None
-            Synaptic receptor of connection. Must be one of:
-            'ampa', 'nmda', 'gabaa', or 'gabab'.
-
-        Returns
-        -------
-        conn_indices : list of int
-            List of indices corresponding to items in net.connectivity.
-            Connecion indices are included if any of the provided parameter
-            values are present in a connection.
-
-        Notes
-        -----
-        Passing a list of values to a single parameter corresponds to a
-        logical OR operation across indices. For example,
-        loc=['distal', 'proximal'] returns all connections that target
-        distal or proximal dendrites.
-
-        Passing  multiple parameters corresponds to a logical AND operation.
-        For example, net.pick_connection(loc='distal', receptor='ampa')
-        returns only the indices of connections that target the distal
-        dendrites and have ampa receptors.
-        """
-
-        # Convert src and target gids to lists
-        valid_srcs = list(self.gid_ranges.keys())  # includes drives as srcs
-        valid_targets = list(self.cell_types.keys())
-        src_gids = _check_gids(src_gids, self.gid_ranges,
-                               valid_srcs, 'src_gids')
-        target_gids = _check_gids(target_gids, self.gid_ranges,
-                                  valid_targets, 'target_gids')
-
-        _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
-        _validate_type(receptor, (str, list, None), 'receptor',
-                       'str, list, or None')
-
-        valid_loc = ['proximal', 'distal', 'soma']
-        valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
-
-        # Convert receptor and loc to list
-        loc = _string_input_to_list(loc, valid_loc, 'loc')
-        receptor = _string_input_to_list(receptor, valid_receptor, 'receptor')
-
-        # Create lookup dictionaries
-        src_dict, target_dict = dict(), dict()
-        loc_dict, receptor_dict = dict(), dict()
-        for conn_idx, conn in enumerate(self.connectivity):
-            # Store connections matching each src_gid
-            for src_gid in conn['src_gids']:
-                if src_gid in src_dict:
-                    src_dict[src_gid].append(conn_idx)
-                else:
-                    src_dict[src_gid] = [conn_idx]
-            # Store connections matching each target_gid
-            for target_gid in conn['target_gids']:
-                if target_gid in target_dict:
-                    target_dict[target_gid].append(conn_idx)
-                else:
-                    target_dict[target_gid] = [conn_idx]
-            # Store connections matching each location
-            if conn['loc'] in loc_dict:
-                loc_dict[conn['loc']].append(conn_idx)
-            else:
-                loc_dict[conn['loc']] = [conn_idx]
-            # Store connections matching each receptor
-            if conn['receptor'] in receptor_dict:
-                receptor_dict[conn['receptor']].append(conn_idx)
-            else:
-                receptor_dict[conn['receptor']] = [conn_idx]
-
-        # Look up conn indeces that match search terms and add to set.
-        conn_set = set()
-        search_pairs = [(src_gids, src_dict), (target_gids, target_dict),
-                        (loc, loc_dict), (receptor, receptor_dict)]
-        for search_terms, search_dict in search_pairs:
-            inner_set = set()
-            # Union of indices which match inputs for single parameter
-            for term in search_terms:
-                inner_set = inner_set.union(search_dict[term])
-            # Intersection across parameters
-            if conn_set and inner_set:
-                conn_set = conn_set.intersection(inner_set)
-            else:
-                conn_set = conn_set.union(inner_set)
-
-        conn_set = list(conn_set)
-        conn_set.sort()
-        return conn_set
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity
