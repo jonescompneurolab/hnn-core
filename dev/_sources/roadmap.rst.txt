@@ -21,7 +21,7 @@ tutorials to teach to the MEG/EEG community how to interact with the model to
 study the neural origin of  these signals, without needing to access the
 underlying complex neural modeling code. To this end, HNN was constructed with a 
 graphical user interface (GUI) and corresponding tutorials of use for commonly measured signals, 
-which are distributed on the HNN website (https:/hnn.brown.edu). 
+which are distributed on the HNN website (https://hnn.brown.edu).
 Our philosophy is that the interactive GUI is essential for all new users of HNN to develop an intuition 
 on how to interact with the large-scale computational model to study the multi-scale neural dynamics underlying 
 their MEG/EEG data. Once this intuition is gained, users who chose to can dive into the computational neural 
@@ -171,7 +171,7 @@ models that include different cell types and or different network features.
 We have begun creation of a framework where models built in NetPyNE can be adapted 
 to the HNN workflows of use. As a test bed, this currently entails integration of 
 the HNN cortical column model and exogenous drives into the full NetPyNE 
-platform (https://github.com/jonescompneurolab/hnn/tree/netpyne/netpyne). 
+platform (https://github.com/jonescompneurolab/hnn/tree/netpyne).
 See also update from **MARCH 2021** https://github.com/jonescompneurolab/hnn/tree/hnn2 .
 
 To limit the scope of this effort to HNN-specific goals, i.e. neural modeling 
