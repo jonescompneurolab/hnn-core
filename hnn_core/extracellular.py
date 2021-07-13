@@ -227,12 +227,12 @@ class ExtracellularArray:
             _check_option('method', method, ['psa', 'lsa'])
 
         if times is None:
-            times = list()
+            times = np.array([])
         if voltages is None:
-            voltages = list()
+            voltages = np.array([])
 
-        times = np.array(times)
-        voltages = np.array(voltages)
+        times = np.array(times, dtype='float')
+        voltages = np.array(voltages, dtype='float')
 
         if voltages.size != 0:  # voltages is not None
             n_trials, n_electrodes, n_times = voltages.shape
@@ -340,8 +340,8 @@ class ExtracellularArray:
 
         Returns
         -------
-        dpl_copy : instance of Dipole
-            The modified Dipole instance.
+        extracellular_copy : instance of ExtraCellularArray
+            The modified ExtraCellularArray instance.
         """
         from .utils import smooth_waveform
 
@@ -349,7 +349,7 @@ class ExtracellularArray:
             for n_contact in range(self.n_contacts):
                 self._data[n_trial][n_contact] = smooth_waveform(
                     self._data[n_trial][n_contact], window_len,
-                    self.sfreq).tolist()  # XXX smooth_waveform returns ndarray
+                    self.sfreq)  # XXX smooth_waveform returns ndarray
 
         return self
 
