@@ -143,7 +143,7 @@ plt.show()
 # network parameters from ``N20.json`` and instantiate the network.
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, default_network
+from hnn_core import simulate_dipole, read_params, jones_2009_model
 from hnn_core import average_dipoles, JoblibBackend
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -151,7 +151,7 @@ hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'N20.json')
 params = read_params(params_fname)
 
-net = default_network(params)
+net = jones_2009_model(params)
 
 ###############################################################################
 # To simulate the source of the median nerve evoked response, we add a

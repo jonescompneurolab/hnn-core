@@ -52,7 +52,7 @@ Let us import ``hnn_core``.
 
 
     import hnn_core
-    from hnn_core import read_params, default_network, simulate_dipole
+    from hnn_core import read_params, jones_2009_model, simulate_dipole
 
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -94,7 +94,7 @@ predefined drives without the drives API shown previously).
 
 .. code-block:: default
 
-    net_erp = default_network(params, add_drives_from_params=True)
+    net_erp = jones_2009_model(params, add_drives_from_params=True)
 
 
 
@@ -120,7 +120,7 @@ connection. The weights of these connections can be visualized with
 
     print(len(net_erp.connectivity))
 
-    conn_idx = 20
+    conn_idx = 6
     print(net_erp.connectivity[conn_idx])
     plot_connectivity_matrix(net_erp, conn_idx)
 
@@ -137,13 +137,13 @@ connection. The weights of these connections can be visualized with
     *
 
       .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_001.png
-          :alt: L5_basket -> L5_pyramidal (soma, gabaa)
+          :alt: evprox1 -> L2_basket (proximal, ampa)
           :class: sphx-glr-multi-img
 
     *
 
       .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_002.png
-          :alt: L5_basket-> L5_pyramidal (soma, gabaa)
+          :alt: evprox1-> L2_basket (proximal, ampa)
           :class: sphx-glr-multi-img
 
 
@@ -154,11 +154,11 @@ connection. The weights of these connections can be visualized with
  .. code-block:: none
 
     30
-    L5_basket -> L5_pyramidal
-    cell counts: 35 srcs, 100 targets
+    evprox1 -> L2_basket
+    cell counts: 35 srcs, 35 targets
     connection probability: 1.0 
-    loc: 'soma'; receptor: 'gabaa'
-    weight: 0.025; delay: 1.0; lamtha: 70.0
+    loc: 'proximal'; receptor: 'ampa'
+    weight: 0.08831; delay: 0.1; lamtha: 3.0
  
 
 
@@ -236,7 +236,7 @@ directly.
 
 
     def get_network(probability=1.0):
-        net = default_network(params, add_drives_from_params=True)
+        net = jones_2009_model(params, add_drives_from_params=True)
         net.clear_connectivity()
 
         # Pyramidal cell connections
@@ -511,7 +511,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 39 minutes  17.212 seconds)
+   **Total running time of the script:** ( 23 minutes  48.662 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

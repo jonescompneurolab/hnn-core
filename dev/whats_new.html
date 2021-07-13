@@ -92,10 +92,10 @@
 <li><a class="reference internal" href="#api">API</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id24">0.1</a><ul>
-<li><a class="reference internal" href="#id26">Changelog</a></li>
-<li><a class="reference internal" href="#id46">Bug</a></li>
-<li><a class="reference internal" href="#id55">API</a></li>
+<li><a class="reference internal" href="#id25">0.1</a><ul>
+<li><a class="reference internal" href="#id27">Changelog</a></li>
+<li><a class="reference internal" href="#id47">Bug</a></li>
+<li><a class="reference internal" href="#id56">API</a></li>
 <li><a class="reference internal" href="#people-who-contributed-to-this-release-in-alphabetical-order">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
@@ -167,6 +167,7 @@
 <li><p>Add function to visualize extracellular potentials from laminar array simulations, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/329">#329</a></p></li>
 <li><p>Previously published models can now be loaded via <code class="docutils literal notranslate"><span class="pre">net=law_2021_model()</span></code> and <code class="docutils literal notranslate"><span class="pre">jones_2009_model()</span></code>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/348">#348</a></p></li>
 <li><p>Add ability to interactivity explore connections in <a class="reference internal" href="generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_cell_connectivity()</span></code></a> by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/376">#376</a></p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">calcium_model</span></code> with a distance dependent calcium channel conductivity, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/333">#348</a></p></li>
 </ul>
 </section>
 <section id="bug">
@@ -188,16 +189,16 @@ in favor of instantation through functions and a more consistent <a class="refer
 <li><p>Remove parameter <em class="xref py py-obj">distribution</em> in <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_bursty_drive()</span></code></a>. The distribution is now Gaussian by default, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/330">#330</a></p></li>
 <li><p>New API for accessing and modifying <a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cell</span></code></a> attributes (e.g., synapse and biophysics parameters) as cells are now instantiated from template cells specified
 in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> instance’s <code class="xref py py-attr docutils literal notranslate"><span class="pre">cell_types</span></code> attribute by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/321">#321</a></p></li>
-<li><p>New API for network creation. The default network is now created with <code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">default_network(params)</span></code>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/318">#318</a></p></li>
+<li><p>New API for network creation. The default network is now created with <code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">jones_2009_model(params)</span></code>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/318">#318</a></p></li>
 <li><p>Replace parameter <em class="xref py py-obj">T</em> with <em class="xref py py-obj">tstop</em> in <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_tonic_bias()</span></code></a> and <a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_tonic_bias()</span></code></a> to be more consistent with other functions and improve readability, by <a class="reference external" href="https://github.com/kenloi">Kenneth Loi</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/354">#354</a></p></li>
 <li><p>Deprecated <em class="xref py py-obj">postproc</em> argument in <code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code>, whereby user should explicitly smooth and scale resulting dipoles, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/372">#372</a></p></li>
 </ul>
 </section>
 </section>
-<section id="id24">
-<span id="id25"></span><h2>0.1<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h2>
-<section id="id26">
-<h3>Changelog<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<section id="id25">
+<span id="id26"></span><h2>0.1<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h2>
+<section id="id27">
+<h3>Changelog<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add ability to simulate multiple trials in parallel using joblibs, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/44">#44</a></p></li>
 <li><p>Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting their start times to exceed the simulation stop time, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/105">#105</a></p></li>
@@ -220,8 +221,8 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 <li><p>Add Savitzky-Golay filtering method <a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter" title="hnn_core.dipole.Dipole.savgol_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>; copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v0.24.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 </ul>
 </section>
-<section id="id46">
-<h3>Bug<a class="headerlink" href="#id46" title="Permalink to this headline">¶</a></h3>
+<section id="id47">
+<h3>Bug<a class="headerlink" href="#id47" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix missing autapses in network construction, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/50">#50</a></p></li>
 <li><p>Fix rhythmic input feed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/98">#98</a></p></li>
@@ -233,8 +234,8 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 <li><p>Fix bug in network to add empty spike when empty file is read in, by <a class="reference external" href="https://github.com/samikane">Samika Kanekar</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/207">#207</a></p></li>
 </ul>
 </section>
-<section id="id55">
-<h3>API<a class="headerlink" href="#id55" title="Permalink to this headline">¶</a></h3>
+<section id="id56">
+<h3>API<a class="headerlink" href="#id56" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Make a context manager for Network class, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/86">#86</a></p></li>
 <li><p>Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/96">#96</a></p></li>

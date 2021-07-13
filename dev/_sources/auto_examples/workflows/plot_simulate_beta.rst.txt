@@ -19,17 +19,18 @@
 
 
 ===============================
-06. Simulate beta modulated ERP
+05. Simulate beta modulated ERP
 ===============================
 
 This example demonstrates how event related potentials (ERP) are modulated
-by prestimulus beta events. Transient beta activity in the neocortex has
-been shown to suppress the perceptibility of sensory input. This suppression
-depends on the timing of the beta event, and the incoming sensory
-information. The following example demonstrates the biophysical mechansisms
-underlying beta mediated sensory suppression.
+by prestimulus beta events. Specifically, this example reproduces Figure 5
+from Law et al. 2021 [1]_. To be consistent with the publication, the default
+network connectivity is altered. These modfications demonstrate a potential
+mechanism by which transient beta activity in the neocortex can suppress
+the perceptibility of sensory input. This suppression depends on the timing
+of the beta event, and the incoming sensory information.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-19
+.. GENERATED FROM PYTHON SOURCE LINES 14-20
 
 .. code-block:: default
 
@@ -46,11 +47,11 @@ underlying beta mediated sensory suppression.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-21
+.. GENERATED FROM PYTHON SOURCE LINES 21-22
 
 We begin by instantiating the network model from Law et al. 2021 [1]_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-23
+.. GENERATED FROM PYTHON SOURCE LINES 22-24
 
 .. code-block:: default
 
@@ -63,7 +64,7 @@ We begin by instantiating the network model from Law et al. 2021 [1]_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-32
+.. GENERATED FROM PYTHON SOURCE LINES 25-33
 
 The Law 2021 model is based on the network model described in
 Jones et al. 2009 [2]_ with several important modifications. One of the most
@@ -74,7 +75,7 @@ L5 pyramidal cells specifically.
 We can inspect these properties with the ``net.cell_types`` attribute which
 contains information on the biophysics and geometry of each cell.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-47
+.. GENERATED FROM PYTHON SOURCE LINES 33-48
 
 .. code-block:: default
 
@@ -115,14 +116,14 @@ contains information on the biophysics and geometry of each cell.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-52
+.. GENERATED FROM PYTHON SOURCE LINES 49-53
 
 A major change to the Jones 2009 model is the addition of a
 Martinotti-like recurrent tuft connection [3]_. This new connection
 originates from L5 basket cells, and provides GABAa inhibition on
-the distal dendrites of L5 basket cells.
+the distal dendrites of L5 pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-55
+.. GENERATED FROM PYTHON SOURCE LINES 53-56
 
 .. code-block:: default
 
@@ -150,12 +151,12 @@ the distal dendrites of L5 basket cells.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-58
+.. GENERATED FROM PYTHON SOURCE LINES 57-59
 
 The remaining changes to the connectivity was the removal of an
 L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-65
+.. GENERATED FROM PYTHON SOURCE LINES 59-66
 
 .. code-block:: default
 
@@ -195,7 +196,7 @@ L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-78
+.. GENERATED FROM PYTHON SOURCE LINES 67-80
 
 To demonstrate sensory depression, we will add the drives necessary to
 generate and ERP similar to
@@ -203,14 +204,15 @@ generate and ERP similar to
 but modified to reflect the parameters used in Law et al. 2021.
 Specifically, we are considering the case where a tactile stimulus is
 delivered at 150 ms. 25 ms later, the first input to sensory cortex arrives
-as at the proximal drive to the cortical column. Proximal drive corresponds
-projects from the direct thalamic nuclei. This is followed by one distal
-representing projections from indirect thalamic nuclei, and a final late
-proximal drive. It is important to note that the parameter values for each
-are different from previous examples of the evoekd response. This reflects
-the altered network dynamics due to the changes described above.
+as a proximal drive to the cortical column. Proximal drive corresponds to
+projections from the direct thalamic nuclei. This is followed by one distal
+drive representing projections from indirect thalamic nuclei, and a final
+late proximal drive. It is important to note that the parameter values for
+each are different from previous examples of the evoked response.
+This reflects the altered network dynamics due to the changes described
+above.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-115
+.. GENERATED FROM PYTHON SOURCE LINES 80-117
 
 .. code-block:: default
 
@@ -258,14 +260,14 @@ the altered network dynamics due to the changes described above.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-120
+.. GENERATED FROM PYTHON SOURCE LINES 118-122
 
 A beta event is created by inducing simultaneous proximal and distal
 drives. The input is just strong enough to evoke spiking in the
 L2 basket cells. This spiking causes GABAb mediated inhibition
 of the network, and ultimately suppressed sensory detection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-147
+.. GENERATED FROM PYTHON SOURCE LINES 122-149
 
 .. code-block:: default
 
@@ -303,12 +305,12 @@ of the network, and ultimately suppressed sensory detection.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-150
+.. GENERATED FROM PYTHON SOURCE LINES 150-152
 
 We can now use our functions to create three distinct simulations:
 1) beta event only, 2) ERP only, and 3) beta event + ERP.
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-160
+.. GENERATED FROM PYTHON SOURCE LINES 152-162
 
 .. code-block:: default
 
@@ -329,13 +331,13 @@ We can now use our functions to create three distinct simulations:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-164
+.. GENERATED FROM PYTHON SOURCE LINES 163-166
 
 And finally we simulate. Note that the default simulation time has been
 increased to 400 ms to observe the long time course over which beta events
 can influence sensory input to the cortical column.
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-168
+.. GENERATED FROM PYTHON SOURCE LINES 166-170
 
 .. code-block:: default
 
@@ -489,7 +491,7 @@ can influence sensory input to the cortical column.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-174
+.. GENERATED FROM PYTHON SOURCE LINES 171-176
 
 By inspecting the activity during the beta event, we can see that spiking
 occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
@@ -497,7 +499,7 @@ and distal inputs. This spiking activity leads to sustained GABAb mediated
 inhibition of the L2 and L5 pyrmaidal cells. One effect of this inhibition
 is an assymetric beta event with a long positive tail.
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-188
+.. GENERATED FROM PYTHON SOURCE LINES 176-190
 
 .. code-block:: default
 
@@ -511,7 +513,7 @@ is an assymetric beta event with a long positive tail.
     net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
     axes[2].set_title('Spike Raster')
 
-    # Create an fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz
+    # Create a fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz
     freqs = np.arange(10., 60., 1.)
     dpls_beta[0].plot_tfr_morlet(freqs, n_cycles=7, ax=axes[3])
 
@@ -534,14 +536,14 @@ is an assymetric beta event with a long positive tail.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-193
+.. GENERATED FROM PYTHON SOURCE LINES 191-195
 
 Next we will inspect what happens when a sensory stimulus is delivered 75 ms
 after a beta event. Note that the delay time for a tactile stimulus at the
 hand to arrive at the cortex is roughly 25 ms, which means the first proximal
-input to thecortical column occurs ~100 ms after the beta event.
+input to the cortical column occurs ~100 ms after the beta event.
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-203
+.. GENERATED FROM PYTHON SOURCE LINES 195-205
 
 .. code-block:: default
 
@@ -574,15 +576,15 @@ input to thecortical column occurs ~100 ms after the beta event.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-209
+.. GENERATED FROM PYTHON SOURCE LINES 206-211
 
-To help understand the effect of beta mediated inhibition of the response to
+To help understand the effect of beta mediated inhibition on the response to
 incoming sensory stimuli, we can compare the ERP and spiking activity due to
 sensory input with and without a beta event.
-The sustained inhibition of the network ultimately depressing
-the sensory response which is assoicated with a reduced ERP amplitude
+The sustained inhibition of the network ultimately depresses
+the sensory response which is associated with a reduced ERP amplitude
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-221
+.. GENERATED FROM PYTHON SOURCE LINES 211-223
 
 .. code-block:: default
 
@@ -617,7 +619,7 @@ the sensory response which is assoicated with a reduced ERP amplitude
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-238
+.. GENERATED FROM PYTHON SOURCE LINES 224-240
 
 References
 ----------
@@ -639,7 +641,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 52 minutes  36.736 seconds)
+   **Total running time of the script:** ( 47 minutes  32.990 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:

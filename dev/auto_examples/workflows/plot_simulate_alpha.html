@@ -163,7 +163,7 @@ visualization of the corresponding time-frequency spectrograms <a class="footnot
 </div>
 <p>Let us import hnn_core</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../../generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_params</span></a><span class="p">,</span> <a href="../../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../../generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_params</span></a><span class="p">,</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a>
 </pre></div>
 </div>
 <p>Then we setup the directories and read the default parameters file</p>
@@ -180,7 +180,7 @@ amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization. The drive is only connected to the proximal
 (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">310</span>
-<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">location</span></a> <span class="o">=</span> <span class="s1">&#39;proximal&#39;</span>
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">burst_std</span></a> <span class="o">=</span> <span class="mi">20</span>
@@ -237,7 +237,7 @@ Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
 
-&lt;hnn_core.dipole.Dipole object at 0x7f4329a6f048&gt;
+&lt;hnn_core.dipole.Dipole object at 0x7f50fdc4f048&gt;
 </pre></div>
 </div>
 <p>Prior to plotting, we can choose to smooth the dipole waveform (note that the
@@ -362,7 +362,7 @@ neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
 sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).</p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  14.327 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 8 minutes  16.818 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-alpha-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_alpha.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>

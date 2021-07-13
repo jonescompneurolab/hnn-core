@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>06. Simulate beta modulated ERP &#8212; hnn-core  documentation</title>
+    <title>05. Simulate beta modulated ERP &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
@@ -85,7 +85,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">06. Simulate beta modulated ERP</a><ul>
+<li><a class="reference internal" href="#">05. Simulate beta modulated ERP</a><ul>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
@@ -144,25 +144,26 @@
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
 <section class="sphx-glr-example-title" id="simulate-beta-modulated-erp">
-<span id="sphx-glr-auto-examples-workflows-plot-simulate-beta-py"></span><h1>06. Simulate beta modulated ERP<a class="headerlink" href="#simulate-beta-modulated-erp" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-workflows-plot-simulate-beta-py"></span><h1>05. Simulate beta modulated ERP<a class="headerlink" href="#simulate-beta-modulated-erp" title="Permalink to this headline">¶</a></h1>
 <p>This example demonstrates how event related potentials (ERP) are modulated
-by prestimulus beta events. Transient beta activity in the neocortex has
-been shown to suppress the perceptibility of sensory input. This suppression
-depends on the timing of the beta event, and the incoming sensory
-information. The following example demonstrates the biophysical mechansisms
-underlying beta mediated sensory suppression.</p>
+by prestimulus beta events. Specifically, this example reproduces Figure 5
+from Law et al. 2021 <a class="footnote-reference brackets" href="#id5" id="id1">1</a>. To be consistent with the publication, the default
+network connectivity is altered. These modfications demonstrate a potential
+mechanism by which transient beta activity in the neocortex can suppress
+the perceptibility of sensory input. This suppression depends on the timing
+of the beta event, and the incoming sensory information.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
 
 <span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../../generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model" title="hnn_core.law_2021_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">law_2021_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a>
 <span class="kn">from</span> <span class="nn">hnn_core.viz</span> <span class="kn">import</span> <a href="../../generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_dipole</span></a>
 </pre></div>
 </div>
-<p>We begin by instantiating the network model from Law et al. 2021 <a class="footnote-reference brackets" href="#id4" id="id1">1</a>.</p>
+<p>We begin by instantiating the network model from Law et al. 2021 <a class="footnote-reference brackets" href="#id5" id="id2">1</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model" title="hnn_core.law_2021_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">law_2021_model</span></a><span class="p">()</span>
 </pre></div>
 </div>
 <p>The Law 2021 model is based on the network model described in
-Jones et al. 2009 <a class="footnote-reference brackets" href="#id5" id="id2">2</a> with several important modifications. One of the most
+Jones et al. 2009 <a class="footnote-reference brackets" href="#id6" id="id3">2</a> with several important modifications. One of the most
 significant changes is substantially increasing the rise and fall time
 constants of GABAb-conductances on L2 and L5 pyramidal. Another important
 change is the removal of calcium channels from basal dendrites and soma of
@@ -197,9 +198,9 @@ dict_keys([&#39;hh2&#39;, &#39;cad&#39;, &#39;kca&#39;, &#39;km&#39;, &#39;cat&#
 </pre></div>
 </div>
 <p>A major change to the Jones 2009 model is the addition of a
-Martinotti-like recurrent tuft connection <a class="footnote-reference brackets" href="#id6" id="id3">3</a>. This new connection
+Martinotti-like recurrent tuft connection <a class="footnote-reference brackets" href="#id7" id="id4">3</a>. This new connection
 originates from L5 basket cells, and provides GABAa inhibition on
-the distal dendrites of L5 basket cells.</p>
+the distal dendrites of L5 pyramidal cells.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Recurrent Tuft Connection&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><span class="mi">16</span><span class="p">])</span>
 </pre></div>
@@ -245,12 +246,13 @@ generate and ERP similar to
 but modified to reflect the parameters used in Law et al. 2021.
 Specifically, we are considering the case where a tactile stimulus is
 delivered at 150 ms. 25 ms later, the first input to sensory cortex arrives
-as at the proximal drive to the cortical column. Proximal drive corresponds
-projects from the direct thalamic nuclei. This is followed by one distal
-representing projections from indirect thalamic nuclei, and a final late
-proximal drive. It is important to note that the parameter values for each
-are different from previous examples of the evoekd response. This reflects
-the altered network dynamics due to the changes described above.</p>
+as a proximal drive to the cortical column. Proximal drive corresponds to
+projections from the direct thalamic nuclei. This is followed by one distal
+drive representing projections from indirect thalamic nuclei, and a final
+late proximal drive. It is important to note that the parameter values for
+each are different from previous examples of the evoked response.
+This reflects the altered network dynamics due to the changes described
+above.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_erp_drives</span><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">stimulus_start</span></a><span class="p">):</span>
     <span class="c1"># Distal evoked drive</span>
     <span class="n">weights_ampa_d1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.004</span><span class="p">,</span>
@@ -490,7 +492,7 @@ is an assymetric beta event with a long positive tail.</p>
 <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_beta</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Spike Raster&#39;</span><span class="p">)</span>
 
-<span class="c1"># Create an fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz</span>
+<span class="c1"># Create a fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz</span>
 <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">freqs</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="mf">10.</span><span class="p">,</span> <span class="mf">60.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls_beta</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_tfr_morlet</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">freqs</span></a><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 </pre></div>
@@ -503,7 +505,7 @@ is an assymetric beta event with a long positive tail.</p>
 <p>Next we will inspect what happens when a sensory stimulus is delivered 75 ms
 after a beta event. Note that the delay time for a tactile stimulus at the
 hand to arrive at the cortex is roughly 25 ms, which means the first proximal
-input to thecortical column occurs ~100 ms after the beta event.</p>
+input to the cortical column occurs ~100 ms after the beta event.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls_beta_erp</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
 <a href="https://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a> <span class="o">=</span> <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
                          <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -520,11 +522,11 @@ input to thecortical column occurs ~100 ms after the beta event.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Spike Raster&#39;)
 </pre></div>
 </div>
-<p>To help understand the effect of beta mediated inhibition of the response to
+<p>To help understand the effect of beta mediated inhibition on the response to
 incoming sensory stimuli, we can compare the ERP and spiking activity due to
 sensory input with and without a beta event.
-The sustained inhibition of the network ultimately depressing
-the sensory response which is assoicated with a reduced ERP amplitude</p>
+The sustained inhibition of the network ultimately depresses
+the sensory response which is associated with a reduced ERP amplitude</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls_erp</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
 <a href="https://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a> <span class="o">=</span> <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
                          <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -546,14 +548,14 @@ the sensory response which is assoicated with a reduced ERP amplitude</p>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <dl class="footnote brackets">
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id5"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
 <dd><p>Law, R. G., Pugliese, S., Shin, H., Sliva, D. D., Lee, S.,
 Neymotin, S., Moore, C., &amp; Jones, S. R. (2021). Thalamocortical
 mechanisms regulating the relationship between transient beta events
 and human tactile perception. BioRxiv, 2021.04.16.440210.
 <a class="reference external" href="https://doi.org/10.1101/2021.04.16.440210">https://doi.org/10.1101/2021.04.16.440210</a></p>
 </dd>
-<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
 <dd><p>Jones, S. R., Pritchett, D. L., Sikora, M. A., Stufflebeam, S. M.,
 Hämäläinen, M., &amp; Moore, C. I. (2009). Quantitative Analysis and
 Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
@@ -561,13 +563,13 @@ Rhythmogenesis and Modulation of Sensory-Evoked Responses. Journal of
 Neurophysiology, 102(6), 3554–3572.
 <a class="reference external" href="https://doi.org/10.1152/jn.00535.2009">https://doi.org/10.1152/jn.00535.2009</a></p>
 </dd>
-<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
 <dd><p>Silberberg, G., &amp; Markram, H. (2007). Disynaptic Inhibition between
 Neocortical Pyramidal Cells Mediated by Martinotti Cells. Neuron,
 53(5), 735–746. <a class="reference external" href="https://doi.org/10.1016/j.neuron.2007.02.012">https://doi.org/10.1016/j.neuron.2007.02.012</a></p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 52 minutes  36.736 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 47 minutes  32.990 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-beta-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_beta.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>

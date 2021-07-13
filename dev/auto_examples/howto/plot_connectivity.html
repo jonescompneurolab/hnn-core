@@ -152,7 +152,7 @@ to download the full example code or to run this example in your browser via Bin
 </div>
 <p>Let us import <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_params</span></a><span class="p">,</span> <a href="../../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_params</span></a><span class="p">,</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hnn_core_root</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.dirname" title="os.path.dirname" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">dirname</span></a><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
@@ -168,7 +168,7 @@ the evoked response from the
 explore how it changes with new connections. We first instantiate the
 network. (Note: Setting <code class="docutils literal notranslate"><span class="pre">add_drives_from_params=True</span></code> loads a set of
 predefined drives without the drives API shown previously).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Instantiating the network comes with a predefined set of connections that
@@ -181,7 +181,7 @@ connection. The weights of these connections can be visualized with
 
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">))</span>
 
-<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a> <span class="o">=</span> <span class="mi">20</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a> <span class="o">=</span> <span class="mi">6</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">])</span>
 <a href="../../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix" title="hnn_core.viz.plot_connectivity_matrix" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_connectivity_matrix</span></a><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_idx</span></a><span class="p">)</span>
 
@@ -191,18 +191,18 @@ connection. The weights of these connections can be visualized with
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="L5_basket -&gt; L5_pyramidal (soma, gabaa)" class="sphx-glr-multi-img" src="../../_images/sphx_glr_plot_connectivity_001.png" />
+<li><img alt="evprox1 -&gt; L2_basket (proximal, ampa)" class="sphx-glr-multi-img" src="../../_images/sphx_glr_plot_connectivity_001.png" />
 </li>
-<li><img alt="L5_basket-&gt; L5_pyramidal (soma, gabaa)" class="sphx-glr-multi-img" src="../../_images/sphx_glr_plot_connectivity_002.png" />
+<li><img alt="evprox1-&gt; L2_basket (proximal, ampa)" class="sphx-glr-multi-img" src="../../_images/sphx_glr_plot_connectivity_002.png" />
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>30
-L5_basket -&gt; L5_pyramidal
-cell counts: 35 srcs, 100 targets
+evprox1 -&gt; L2_basket
+cell counts: 35 srcs, 35 targets
 connection probability: 1.0
-loc: &#39;soma&#39;; receptor: &#39;gabaa&#39;
-weight: 0.025; delay: 1.0; lamtha: 70.0
+loc: &#39;proximal&#39;; receptor: &#39;ampa&#39;
+weight: 0.08831; delay: 0.1; lamtha: 3.0
 </pre></div>
 </div>
 <p>Data recorded during simulations are stored under
@@ -249,7 +249,7 @@ and L2 basket cells. <a class="reference internal" href="../../generated/hnn_cor
 connections to be specified with either cell names, or the cell IDs (gids)
 directly.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_network</span><span class="p">(</span><span class="n">probability</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-    <span class="n">net</span> <span class="o">=</span> <a href="../../generated/hnn_core.default_network.html#hnn_core.default_network" title="hnn_core.default_network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">default_network</span></a><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">net</span> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">net</span><span class="o">.</span><span class="n">clear_connectivity</span><span class="p">()</span>
 
     <span class="c1"># Pyramidal cell connections</span>
@@ -403,7 +403,7 @@ the aggregate current dipole.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 39 minutes  17.212 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 23 minutes  48.662 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-connectivity-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_connectivity.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>

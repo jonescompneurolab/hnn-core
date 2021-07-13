@@ -26,7 +26,7 @@ import os.path as op
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, default_network
+from hnn_core import simulate_dipole, read_params, jones_2009_model
 
 ###############################################################################
 # Then we setup the directories and read the default parameters file
@@ -43,7 +43,7 @@ params = read_params(params_fname)
 # time with unique randomization. The drive is only connected to the proximal
 # (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 params['tstop'] = 310
-net = default_network(params)
+net = jones_2009_model(params)
 
 location = 'proximal'
 burst_std = 20
