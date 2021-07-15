@@ -180,7 +180,7 @@ def _get_prng(seed, gid, sync_evinput=False):
     return prng, prng2
 
 
-def _drive_cell_event_times(drive_type, drive_conn, dynamics,
+def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
                             trial_idx=0, drive_cell_gid=0, seedcore=0):
     """Generate event times for one artificial drive cell based on dynamics.
 
@@ -223,28 +223,27 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     elif len(matches) > 1:
         raise ValueError('Ambiguous external drive: %s' % drive_type)
 
-    # Return values not checked: False if all weights for given drive type
-    # are zero. Designed to be silent so that zeroing input weights
-    # effectively disables each.
-    n_ampa_nmda_weights = (len(drive_conn['ampa'].keys()) +
-                           len(drive_conn['nmda'].keys()))
-    target_syn_weights_zero = True if n_ampa_nmda_weights == 0 else False
-
     event_times = list()
-    if drive_type == 'poisson' and not target_syn_weights_zero:
-        event_times = _create_extpois(
-            t0=dynamics['tstart'],
-            T=dynamics['tstop'],
-            lamtha=dynamics['rate_constant'][drive_conn['target_type']],
-            prng=prng)
-    elif not target_syn_weights_zero and (drive_type == 'evoked' or
-                                          drive_type == 'gaussian'):
+    if drive_type == 'poisson':
+        # Poisson rate constant in Network.add_poisson_drive() can be
+        # target specific or not
+        if target_type == 'any':
+            rate_constant = dynamics['rate_constant']
+        else:
+            rate_constant = dynamics['rate_constant'][target_type]
+        if rate_constant > 0:
+            event_times = _create_extpois(
+                t0=dynamics['tstart'],
+                T=dynamics['tstop'],
+                lamtha=rate_constant,
+                prng=prng)
+    elif drive_type == 'evoked' or drive_type == 'gaussian':
         event_times = _create_gauss(
             mu=dynamics['mu'],
             sigma=dynamics['sigma'],
             numspikes=dynamics['numspikes'],
             prng=prng)
-    elif drive_type == 'bursty' and not target_syn_weights_zero:
+    elif drive_type == 'bursty':
         event_times = _create_bursty_input(
             t0=dynamics['tstart'],
             t0_stdev=dynamics['tstart_std'],
@@ -260,7 +259,8 @@ def _drive_cell_event_times(drive_type, drive_conn, dynamics,
     # than desired
     # values MUST be sorted for VecStim()!
     if len(event_times) > 0:
-        event_times = event_times[event_times > 0]
+        event_times = event_times[np.logical_and(event_times > 0,
+                                                 event_times <= tstop)]
         event_times.sort()
         event_times = event_times.tolist()
 
