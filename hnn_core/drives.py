@@ -193,12 +193,13 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
         'evoked' : Spikes occur at specified time (mu) with dispersion (sigma)
         'bursty' : Spikes occur in bursts (events_per_cycle spikes at
         cycle_events_isi intervals) in a rhythmic (f_input) fashion
-    drive_conn : dict
-        A drive is associated with a number of 'artificial cells', each
-        with its spatial connectivity (and temporal dynamics). drive_conn
-        defines AMPA and NMDA weights, and the cell target (e.g. 'L2_basket')
     dynamics : dict
         Parameters of the event time dynamics to simulate
+    tstop : float
+        End time of spike events for this trial
+    target_type : str
+        Type of cell (e.g. 'L2_basket') this drive cell will target. If
+        'any' (default), the drive cell is non-specific.
     trial_idx : int
         The index number of the current trial of a simulation (default=1).
     drive_cell_gid : int

@@ -125,10 +125,6 @@ def test_network():
             assert len(drive['events'][0][0]) == n_events  # 4
 
     # make sure the PRNGs are consistent.
-    # XXX legacy values
-    #target_times = {'evdist1': [66.30498327062551, 61.54362532343694],
-    #                'evprox1': [23.80641637082997, 30.857310915553647],
-    #                'evprox2': [141.76252038319825, 137.73942375578602]}
     target_times = {'evdist1': [66.30498327062551, 66.33129889343446],
                     'evprox1': [24.610833574615338, 27.092474713246524],
                     'evprox2': [141.30008375432763, 150.0834131845305]}
