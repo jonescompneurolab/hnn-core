@@ -354,12 +354,11 @@ class Network(object):
             The number of drive cells (i.e., ArtificialCell objects) that each
             contribute an independently sampled synaptic spike to the network
             according to the Gaussian time distribution (mu, sigma). If
-            'n_cells' (default), a source gets assigned to each of the
-            self.n_cells simulated cells in the network with 1-to-1
-            connectivity. Otherwise, sources are assigned with all-to-all
-            connectivity. If you wish to synchronize the timing of this evoked
-            drive across the network in a given trial with one spike, set
-            n_drive_cells=1.
+            'n_cells' (default), a drive cell gets assigned to each available
+            simulated cell in the network with 1-to-1 connectivity. Otherwise,
+            drive cells are assigned with all-to-all connectivity. If you wish
+            to synchronize the timing of this evoked drive across the network
+            in a given trial with one spike, set n_drive_cells=1.
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -385,12 +384,6 @@ class Network(object):
         drive['type'] = 'evoked'
         if name == 'extgauss':
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
-        if n_drive_cells == 'n_cells':
-            n_drive_cells = self.n_cells
-            drive['cell_specific'] = True
-        else:
-            _validate_type(n_drive_cells, types=int)
-            drive['cell_specific'] = False
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
 
@@ -399,8 +392,7 @@ class Network(object):
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells=n_drive_cells,
-                           cell_specific=drive['cell_specific'])
+                           n_drive_cells=n_drive_cells)
 
     def add_poisson_drive(self, name, *, tstart=0, tstop=None, rate_constant,
                           location, n_drive_cells='n_cells',
@@ -429,10 +421,10 @@ class Network(object):
         n_drive_cells : int | 'n_cells'
             The number of drive cells (i.e., ArtificialCell objects) that each
             contribute an independently sampled synaptic spike to the network
-            according to a Poisson process. If 'n_cells' (default), a source
-            gets assigned to each of the self.n_cells simulated cells in the
-            network with 1-to-1 connectivity. Otherwise, sources are assigned
-            with all-to-all connectivity. If you wish to synchronize the timing
+            according to a Poisson process. If 'n_cells' (default), a drive
+            cell gets assigned to each available simulated cell in the network
+            with 1-to-1 connectivity. Otherwise, drive cells are assigned with
+            all-to-all connectivity. If you wish to synchronize the timing
             of Poisson drive across the network in a given trial, set
             n_drive_cells=1.
         weights_ampa : dict or None
@@ -465,12 +457,6 @@ class Network(object):
                                  self.cell_types.keys())
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
-        if n_drive_cells == 'n_cells':
-            n_drive_cells = self.n_cells
-            drive['cell_specific'] = True
-        else:
-            _validate_type(n_drive_cells, types=int)
-            drive['cell_specific'] = False
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
 
@@ -479,8 +465,7 @@ class Network(object):
         drive['events'] = list()
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells=n_drive_cells,
-                           cell_specific=drive['cell_specific'])
+                           n_drive_cells=n_drive_cells)
 
     def add_bursty_drive(self, name, *, tstart=0, tstart_std=0, tstop=None,
                          location, burst_rate, burst_std=0, numspikes=2,
@@ -512,9 +497,12 @@ class Network(object):
             in the GUI. Default: 2 (doublet)
         spike_isi : float
             Time between spike events within a cycle (ISI). Default: 10 ms
-        n_drive_cells : int
+        n_drive_cells : int | 'n_cells'
             The number of drive cells that contribute an independently sampled
-            burst at each cycle. Default: 1
+            burst at each cycle. If 'n_cells', a drive cell gets assigned to
+            each available simulated cell in the network with 1-to-1
+            connectivity. Otherwise (default: 1), drive cells are assigned with
+            all-to-all connectivity.
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -548,7 +536,6 @@ class Network(object):
         drive = _NetworkDrive()
         drive['type'] = 'bursty'
         drive['n_drive_cells'] = n_drive_cells
-        drive['cell_specific'] = False
         drive['seedcore'] = seedcore
 
         drive['dynamics'] = dict(tstart=tstart,
@@ -559,11 +546,10 @@ class Network(object):
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells=n_drive_cells, cell_specific=False)
+                           n_drive_cells=n_drive_cells)
 
     def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
-                      space_constant, synaptic_delays, n_drive_cells=1,
-                      cell_specific=False):
+                      space_constant, synaptic_delays, n_drive_cells=1):
         """Attach a drive to network based on connectivity information
 
         Parameters
@@ -586,18 +572,14 @@ class Network(object):
         synaptic_delays : dict
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
-        n_drive_cells : int
+        n_drive_cells : int | 'n_cells'
             The number of drive cells (i.e., ArtificialCell objects) that
-            contribute to this drive. If n_drive_cells=self.n_cells and
-            cell_specific=True, artificial drive cells get assigned to each
-            cell in the network with 1-to-1 connectivity (completely
-            unsynchronous). Otherwise, drive cells get assigned with all-to-all
-            connectivity. If you wish to synchronize the timing of this evoked
-            drive across the network in a given trial with one spike, set
-            n_drive_cells=1 and cell_specific=False.
-        cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
-            (False, default) connection parameters.
+            contribute to this drive. If 'n_cells', artificial drive cells get
+            assigned to each cell in the network with 1-to-1 connectivity
+            (completely unsynchronous). Otherwise, drive cells get assigned
+            with all-to-all connectivity. If you wish to synchronize the
+            timing of this evoked drive across the network in a given trial
+            with one spike, set n_drive_cells=1 and cell_specific=False.
 
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
@@ -630,21 +612,28 @@ class Network(object):
                         'synaptic_delays is either a common float or needs '
                         'to be specified as a dict for each cell type')
 
-        _validate_type(n_drive_cells, types=int)
-        if not 0 < n_drive_cells <= self.n_cells:
-            raise ValueError('Number of drive cells must be greater than 0 '
-                             'yet not exceed the number of cells in the '
-                             f'network (0<n_drive_cells<={self.n_cells}).'
-                             f'Got {n_drive_cells}.')
+        cell_specific = True
+        if n_drive_cells != 'n_cells':
+            _validate_type(n_drive_cells, types=int)
+            if not 0 < n_drive_cells <= self.n_cells:
+                raise ValueError('Number of drive cells must be greater than 0'
+                                 ' yet not exceed the number of cells in the '
+                                 f'network (0<n_drive_cells<={self.n_cells}).'
+                                 f'Got {n_drive_cells}.')
+            cell_specific = False
 
         drive['name'] = name  # for easier for-looping later
         drive['target_types'] = target_populations  # for _connect_celltypes
+        drive['cell_specific'] = cell_specific
 
         drive['conn'], src_gid_ran = self._create_drive_conns(
             target_populations, weights_by_receptor, location,
             space_constant, synaptic_delays, n_drive_cells,
             cell_specific=cell_specific)
 
+        # When 'n_drive_cells' == 'n_cells', it needs to be updated to reflect
+        # an actual number
+        drive['n_drive_cells'] = len(src_gid_ran)
         self.external_drives[name] = drive
 
         pos = [self.pos_dict['origin'] for _ in src_gid_ran]
@@ -732,9 +721,6 @@ class Network(object):
         src_gid_curr = self._n_gids
 
         if cell_specific:
-            _check_option('n_drive_cells', n_drive_cells,
-                          allowed_values=[self.n_cells],
-                          extra=' when cell_specific is True')
             for cellname in target_populations:
                 drive_conn = dict()  # NB created inside target_pop-loop
                 drive_conn['location'] = location
