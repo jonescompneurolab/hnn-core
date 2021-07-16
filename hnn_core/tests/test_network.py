@@ -61,6 +61,7 @@ def test_network():
                    'input_prox_A_weight_L2Pyr_ampa': 3.4e-5,
                    'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
                    't0_input_prox': 50})
+
     net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
     network_builder = NetworkBuilder(net)  # needed to populate net.cells
 
@@ -124,9 +125,13 @@ def test_network():
             assert len(drive['events'][0][0]) == n_events  # 4
 
     # make sure the PRNGs are consistent.
-    target_times = {'evdist1': [66.30498327062551, 61.54362532343694],
-                    'evprox1': [23.80641637082997, 30.857310915553647],
-                    'evprox2': [141.76252038319825, 137.73942375578602]}
+    # XXX legacy values
+    #target_times = {'evdist1': [66.30498327062551, 61.54362532343694],
+    #                'evprox1': [23.80641637082997, 30.857310915553647],
+    #                'evprox2': [141.76252038319825, 137.73942375578602]}
+    target_times = {'evdist1': [66.30498327062551, 66.33129889343446],
+                    'evprox1': [24.610833574615338, 27.092474713246524],
+                    'evprox2': [141.30008375432763, 150.0834131845305]}
     for drive_name in target_times:
         for idx in [0, -1]:  # first and last
             assert_allclose(net.external_drives[drive_name]['events'][0][idx],
@@ -171,12 +176,15 @@ def test_network():
         _ = CellResponse(times=[1, 2, 3])
 
     # Assert that all external drives are initialized
-    n_evoked_sources = net.n_cells * 3
-    n_pois_sources = net.n_cells
-    n_gaus_sources = net.n_cells
+    n_l2bask = len(net.gid_ranges['L2_basket'])
+    n_l2pyr = len(net.gid_ranges['L2_pyramidal'])
+    n_l5bask = len(net.gid_ranges['L5_basket'])
+    n_l5pyr = len(net.gid_ranges['L5_pyramidal'])
+    n_evoked_sources = 3 * (n_l2bask + n_l2pyr + n_l5pyr) + 2 * n_l5bask
+    n_pois_sources = 0  # by default, this drive is silent with 0 drive cells
+    n_gaus_sources = 0  # by default, this drive is silent with 0 drive cells
     n_bursty_sources = (net.external_drives['bursty1']['n_drive_cells'] +
                         net.external_drives['bursty2']['n_drive_cells'])
-
     # test that expected number of external driving events are created
     assert len(network_builder._drive_cells) == (n_evoked_sources +
                                                  n_pois_sources +
