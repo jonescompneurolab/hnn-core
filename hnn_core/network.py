@@ -390,7 +390,6 @@ class Network(object):
             drive['cell_specific'] = True
         else:
             _validate_type(n_drive_cells, types=int)
-            _check_option('n_drive_cells', n_drive_cells, allowed_values=[1])
             drive['cell_specific'] = False
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
@@ -471,7 +470,6 @@ class Network(object):
             drive['cell_specific'] = True
         else:
             _validate_type(n_drive_cells, types=int)
-            _check_option('n_drive_cells', n_drive_cells, allowed_values=[1])
             drive['cell_specific'] = False
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
@@ -613,6 +611,9 @@ class Network(object):
         target_populations, weights_ampa, weights_nmda = \
             _get_target_populations(weights_ampa, weights_nmda)
 
+        if len(target_populations) == 0:
+            warn('No target populations have been specified for this drive.')
+
         # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cell_types.keys())):
             raise ValueError('Allowed drive target cell types are: ',
@@ -635,16 +636,6 @@ class Network(object):
                              'yet not exceed the number of cells in the '
                              f'network (0<n_drive_cells<={self.n_cells}).'
                              f'Got {n_drive_cells}.')
-
-        # this is needed to keep the drive GIDs identical to those in HNN,
-        # e.g., 'evdist1': range(272, 542), even when no L5_basket cells
-        # are targeted (event times lists are empty). The logic in
-        # _connect_celltypes is hard-coded to use these implict gid ranges
-        if self._legacy_mode:
-            # XXX tests must match HNN GUI output
-            target_populations = list(self.cell_types.keys())
-        elif len(target_populations) == 0:
-            warn('No AMPA or NMDA weights > 0')
 
         drive['name'] = name  # for easier for-looping later
         drive['target_types'] = target_populations  # for _connect_celltypes
@@ -747,7 +738,6 @@ class Network(object):
             for cellname in target_populations:
                 drive_conn = dict()  # NB created inside target_pop-loop
                 drive_conn['location'] = location
-
                 drive_conn['target_gids'] = self.gid_ranges[cellname]
                 # NB list! This is used later in _parnet_connect
                 drive_conn['target_type'] = cellname
@@ -764,7 +754,6 @@ class Network(object):
             drive_conn['src_gids'] = range(src_gid_curr,
                                            src_gid_curr + n_drive_cells)
             src_gid_curr += n_drive_cells
-
             drive_conn['target_gids'] = list()  # fill in below
             for cellname in target_populations:
                 drive_conn['target_gids'] = self.gid_ranges[cellname]
