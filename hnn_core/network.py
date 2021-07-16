@@ -840,6 +840,7 @@ class Network(object):
                             drive['type'],
                             drive['dynamics'],
                             self.cell_response.times[-1],
+                            target_type='any',
                             trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid,
                             seedcore=drive['seedcore'])
