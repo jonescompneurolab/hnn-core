@@ -100,17 +100,17 @@ def test_network():
         if drive['type'] == 'evoked':
             for kw in ['mu', 'sigma', 'numspikes']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == n_drive_cells == net.n_cells
+            assert len(drive['events'][0]) == n_drive_cells
             # this also implicitly tests that events are always a list
             assert len(drive['events'][0][0]) == drive['dynamics']['numspikes']
         elif drive['type'] == 'gaussian':
             for kw in ['mu', 'sigma', 'numspikes']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == n_drive_cells == net.n_cells
+            assert len(drive['events'][0]) == n_drive_cells
         elif drive['type'] == 'poisson':
             for kw in ['tstart', 'tstop', 'rate_constant']:
                 assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == n_drive_cells == net.n_cells
+            assert len(drive['events'][0]) == n_drive_cells
         elif drive['type'] == 'bursty':
             for kw in ['tstart', 'tstart_std', 'tstop',
                        'burst_rate', 'burst_std', 'numspikes']:
