@@ -351,14 +351,14 @@ class Network(object):
         numspikes : int
             Number of spikes at each target cell
         n_drive_cells : int | 'n_cells'
-            The number of drive cells (i.e., ArtificialCell objects) that each
-            contribute an independently sampled synaptic spike to the network
-            according to the Gaussian time distribution (mu, sigma). If
-            'n_cells' (default), a drive cell gets assigned to each available
-            simulated cell in the network with 1-to-1 connectivity. Otherwise,
-            drive cells are assigned with all-to-all connectivity. If you wish
-            to synchronize the timing of this evoked drive across the network
-            in a given trial with one spike, set n_drive_cells=1.
+            The number of drive cells that each contribute an independently
+            sampled synaptic spike to the network according to the Gaussian
+            time distribution (mu, sigma). If 'n_cells' (default), a drive
+            cell gets assigned to each available simulated cell in the network
+            with 1-to-1 connectivity. Otherwise, drive cells are assigned with
+            all-to-all connectivity. If you wish to synchronize the timing of
+            this evoked drive across the network in a given trial with one
+            spike, set n_drive_cells=1.
         location : str
             Target location of synapses ('distal' or 'proximal')
         weights_ampa : dict or None
@@ -419,11 +419,11 @@ class Network(object):
         location : str
             Target location of synapses ('distal' or 'proximal')
         n_drive_cells : int | 'n_cells'
-            The number of drive cells (i.e., ArtificialCell objects) that each
-            contribute an independently sampled synaptic spike to the network
-            according to a Poisson process. If 'n_cells' (default), a drive
-            cell gets assigned to each available simulated cell in the network
-            with 1-to-1 connectivity. Otherwise, drive cells are assigned with
+            The number of drive cells that each contribute an independently
+            sampled synaptic spike to the network according to a Poisson
+            process. If 'n_cells' (default), a drive cell gets assigned to
+            each available simulated cell in the network with 1-to-1
+            connectivity. Otherwise, drive cells are assigned with
             all-to-all connectivity. If you wish to synchronize the timing
             of Poisson drive across the network in a given trial, set
             n_drive_cells=1.
