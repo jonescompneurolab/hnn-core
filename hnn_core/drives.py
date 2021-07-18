@@ -196,7 +196,8 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     dynamics : dict
         Parameters of the event time dynamics to simulate
     tstop : float
-        End time of spike events for this trial
+        Last possible time for a spike event to occur in this trial (i.e., the
+        simulation stop time).
     target_type : str
         Type of cell (e.g. 'L2_basket') this drive cell will target. If
         'any' (default), the drive cell is non-specific.
@@ -226,8 +227,6 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
 
     event_times = list()
     if drive_type == 'poisson':
-        # Poisson rate constant in Network.add_poisson_drive() can be
-        # target specific or not
         if target_type == 'any':
             rate_constant = dynamics['rate_constant']
         else:
