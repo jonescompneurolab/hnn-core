@@ -21,8 +21,8 @@ def _get_range(val, multiplier):
     return ranges
 
 
-def split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
-                     synweight_range_multiplier):
+def _split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
+                      synweight_range_multiplier):
     """ Sorts parameter ranges by evoked inputs into a dictionary
 
     Parameters
@@ -88,7 +88,7 @@ def split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
         # calculate ranges for syn. weights
         for label in params[f'gbar_{id_str}*']:
             value = params[label]
-            ranges = _get_range(value, synweight_range_multiplier)    
+            ranges = _get_range(value, synweight_range_multiplier)
             if value == 0.0:
                 ranges['minval'] = value
                 ranges['maxval'] = 1.0
@@ -109,8 +109,9 @@ def _generate_weights(evinput_params, params, decay_multiplier):
         to evinput_params[input_name] and removes 'mean'
         and 'sigma' which were needed to compute 'weights'.
     """
-    num_step = ceil(params['tstop'] / params['dt']) + 1
-    times = np.linspace(0, params['tstop'], num_step)
+    tstop, dt = params['tstop'], params['dt']
+    num_step = ceil(tstop / dt) + 1
+    times = np.linspace(0, tstop, num_step)
 
     for evinput_this in evinput_params.values():
         # calculate cdf using start time (minival of optimization range)
@@ -128,7 +129,7 @@ def _generate_weights(evinput_params, params, decay_multiplier):
                 continue
 
             decay_factor = decay_multiplier * \
-                (evinput_other['mean'] - evinput_this['mean']) / params['tstop']
+                (evinput_other['mean'] - evinput_this['mean']) / tstop
             evinput_this['weights'] -= evinput_other['cdf'] * decay_factor
 
         # weights should not drop below 0
@@ -143,10 +144,9 @@ def _generate_weights(evinput_params, params, decay_multiplier):
                                       times[indices][-1])
 
         # convert to multiples of dt
-        evinput_this['opt_start'] = floor(
-            evinput_this['opt_start'] / params['dt']) * params['dt']
+        evinput_this['opt_start'] = floor(evinput_this['opt_start'] / dt) * dt
         evinput_params[input_name]['opt_end'] = ceil(
-            evinput_this['opt_end'] / params['dt']) * params['dt']
+            evinput_this['opt_end'] / dt) * dt
 
     for evinput_this in evinput_params.values():
         del evinput_this['mean'], evinput_this['sigma'], evinput_this['cdf']
@@ -154,7 +154,7 @@ def _generate_weights(evinput_params, params, decay_multiplier):
     return evinput_params
 
 
-def create_last_chunk(input_chunks):
+def _create_last_chunk(input_chunks):
     """ This creates a chunk that combines parameters for
     all chunks in input_chunks (final step)
 
@@ -184,7 +184,7 @@ def create_last_chunk(input_chunks):
     return chunk
 
 
-def consolidate_chunks(inputs):
+def _consolidate_chunks(inputs):
     """Consolidates inputs into optimization "chunks" defined by
     opt_start and opt_end
 
@@ -222,13 +222,13 @@ def consolidate_chunks(inputs):
 
     # add one last chunk to the end
     if len(chunks) > 1:
-        last_chunk = create_last_chunk(chunks)
+        last_chunk = _create_last_chunk(chunks)
         chunks.append(last_chunk)
 
     return chunks
 
 
-def optrun(new_params, opt_params, params, opt_dpls):
+def _optrun(new_params, opt_params, params, opt_dpls):
     """ This is the function to run a simulation
 
     Parameters
@@ -287,7 +287,7 @@ def optrun(new_params, opt_params, params, opt_dpls):
     return avg_rmse  # nlopt expects error
 
 
-def run_optimization(maxiter, param_ranges, optrun):
+def _run_optimization(maxiter, param_ranges, optrun):
 
     cons = list()
     x0 = list()
@@ -349,12 +349,12 @@ def optimize_evoked(params, exp_dpl, maxiter,
     # the simulation timeframe to optimize. Chunks are consolidated if
     # more than one input should
     # be optimized at a time.
-    evinput_params = split_by_evinput(params, sigma_range_multiplier,
-                                      timing_range_multiplier,
-                                      synweight_range_multiplier)
+    evinput_params = _split_by_evinput(params, sigma_range_multiplier,
+                                       timing_range_multiplier,
+                                       synweight_range_multiplier)
     evinput_params = _generate_weights(evinput_params, params,
                                        decay_multiplier)
-    param_chunks = consolidate_chunks(evinput_params)
+    param_chunks = _consolidate_chunks(evinput_params)
 
     avg_rmse = rmse(initial_dpl[0], exp_dpl, tstop=params['tstop'])
     print("Initial RMSE: %.2f" % avg_rmse)
@@ -387,12 +387,12 @@ def optimize_evoked(params, exp_dpl, maxiter,
             # The purpose of the last step (with regular RMSE) is to clean up
             # overfitting introduced by local weighted RMSE optimization.
 
-            evinput_params = split_by_evinput(params, sigma_range_multiplier,
-                                              timing_range_multiplier,
-                                              synweight_range_multiplier)
+            evinput_params = _split_by_evinput(params, sigma_range_multiplier,
+                                               timing_range_multiplier,
+                                               synweight_range_multiplier)
             evinput_params = _generate_weights(evinput_params, params,
                                                decay_multiplier)
-            param_chunks = consolidate_chunks(evinput_params)
+            param_chunks = _consolidate_chunks(evinput_params)
 
             # reload opt_params for the last step in case the number of
             # steps was changed by updateoptparams()
@@ -404,15 +404,15 @@ def optimize_evoked(params, exp_dpl, maxiter,
         opt_params['stepminopterr'] = 1e9  # min optimization error so far
         opt_dpls = dict(best_dpl=None, exp_dpl=exp_dpl)
 
-        def _optrun(new_params):
-            return optrun(new_params, opt_params,
-                          params, opt_dpls=opt_dpls)
+        def _myoptrun(new_params):
+            return _optrun(new_params, opt_params,
+                           params, opt_dpls=opt_dpls)
 
         print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                     opt_params['opt_end']))
-        opt_results = run_optimization(maxiter=maxiter,
-                                       param_ranges=opt_params['ranges'],
-                                       optrun=_optrun)
+        opt_results = _run_optimization(maxiter=maxiter,
+                                        param_ranges=opt_params['ranges'],
+                                        optrun=_myoptrun)
 
         # update opt_params for the next round
         for var_name, value in zip(opt_params['ranges'], opt_results):
