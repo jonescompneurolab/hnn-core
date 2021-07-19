@@ -28,12 +28,16 @@ mpi_cmd = '/autofs/space/meghnn_001/users/mjas/opt/openmpi/bin/mpirun'
 n_procs = 10
 
 ###############################################################################
-# Load experimental data into Dipole object. Data can be retrieved from
-# https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt
+# First, we will load experimental data into Dipole object.
 #
 # This is a different experiment than the one to which the base parameters were
 # tuned. So, the initial RMSE will be large, giving the optimization procedure
 # a lot to work with.
+from urllib.request import urlretrieve
+
+data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
+            'data/MEG_detection_data/S1_SupraT.txt')
+urlretrieve(data_url, 'S1_SupraT.txt')
 extdata = np.loadtxt('S1_SupraT.txt')
 exp_dpl = Dipole(extdata[:, 0], np.c_[extdata[:, 1],
                  extdata[:, 1], extdata[:, 1]])
