@@ -68,13 +68,15 @@ def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
             offending_keys = constants_provided.difference(all_cell_types)
             raise ValueError(
                 f"Rate constant provided for unknown target cell "
-                f"population: {offending_keys}")
+
+        for key, val in rate_constant.items():
+            if not val > 0.:
+                raise ValueError(
+                    f"Rate constant must be positive ({key}, {val})")
     else:
-        rate_constant = {key: rate_constant for key in all_cell_types}
-    for key, val in rate_constant.items():
-        if not val > 0.:
-            raise ValueError(
-                f"Rate constant must be positive ({key}, {val})")
+        if not rate_constant > 0.:
+                raise ValueError(
+                    f"Rate constant must be positive, got {rate_constant}")
 
 
 def _add_drives_from_params(net):
@@ -231,12 +233,11 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
             rate_constant = dynamics['rate_constant']
         else:
             rate_constant = dynamics['rate_constant'][target_type]
-        if rate_constant > 0:
-            event_times = _create_extpois(
-                t0=dynamics['tstart'],
-                T=dynamics['tstop'],
-                lamtha=rate_constant,
-                prng=prng)
+        event_times = _create_extpois(
+            t0=dynamics['tstart'],
+            T=dynamics['tstop'],
+            lamtha=rate_constant,
+            prng=prng)
     elif drive_type == 'evoked' or drive_type == 'gaussian':
         event_times = _create_gauss(
             mu=dynamics['mu'],
