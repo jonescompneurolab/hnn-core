@@ -303,7 +303,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
     return result
 
 
-def optimize_evoked(params, exp_dpl, maxiter,
+def optimize_evoked(params, exp_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6):
     """Optimize drives to generate evoked response.
