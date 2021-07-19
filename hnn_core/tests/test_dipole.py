@@ -1,15 +1,16 @@
 import os.path as op
+from urllib.request import urlretrieve
 
 import matplotlib
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles
 from hnn_core import Network, jones_2009_model
 from hnn_core.viz import plot_dipole
-from hnn_core.dipole import Dipole, simulate_dipole
+from hnn_core.dipole import Dipole, simulate_dipole, _rmse
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 matplotlib.use('agg')
@@ -171,3 +172,26 @@ def test_cell_response_backends(run_hnn_core_fixture):
             net_ets = [spike_times[i] for i, g in enumerate(spike_gids) if
                        g == gid_ran[idx_drive]]
             assert_allclose(np.array(event_times), np.array(net_ets))
+
+
+def test_rmse():
+    """Test to check RMSE calculation"""
+    data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/'
+                'master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
+    if not op.exists('yes_trial_S1_ERP_all_avg.txt'):
+        urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
+    extdata = np.loadtxt('yes_trial_S1_ERP_all_avg.txt')
+
+    exp_dpl = Dipole(extdata[:, 0], np.c_[extdata[:, 1]])
+
+    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+    net = Network(params)
+    dpls = simulate_dipole(net)
+    avg_dpl = average_dipoles(dpls)
+    avg_rmse = _rmse(avg_dpl, exp_dpl, tstop=params['tstop'])
+    expected_rmse = 4.533252902006792
+
+    assert_equal(avg_rmse, expected_rmse)

@@ -3,13 +3,14 @@ from os import environ
 import io
 from contextlib import redirect_stdout
 from multiprocessing import cpu_count
-from numpy import loadtxt
-from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 from threading import Thread, Event
 from time import sleep
+from urllib.request import urlretrieve
+
+from numpy import loadtxt
+from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
 import pytest
-from mne.utils import _fetch_file
 
 import hnn_core
 from hnn_core import MPIBackend, jones_2009_model, read_params
@@ -187,7 +188,7 @@ class TestParallelBackends():
         data_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
                     'hnn-core/test_data/dpl.txt')
         if not op.exists('dpl.txt'):
-            _fetch_file(data_url, 'dpl.txt')
+            urlretrieve(data_url, 'dpl.txt')
         dpl_master = loadtxt('dpl.txt')
 
         dpls, net = run_hnn_core_fixture(backend=backend)
