@@ -3,9 +3,9 @@
 
 import os.path as op
 import json
+from urllib.request import urlretrieve
 
 import pytest
-from mne.utils import _fetch_file
 
 import hnn_core
 from hnn_core import read_params, Params
@@ -37,7 +37,7 @@ def test_read_legacy_params():
                  'hnn-core/test_data/default.param')
     params_legacy_fname = op.join(hnn_core_root, 'param', 'default.param')
     if not op.exists(params_legacy_fname):
-        _fetch_file(param_url, params_legacy_fname)
+        urlretrieve(param_url, params_legacy_fname)
 
     params_new_fname = op.join(hnn_core_root, 'param', 'default.json')
     params_legacy = read_params(params_legacy_fname)
@@ -57,7 +57,7 @@ def test_base_params():
                  'hnn-core/test_data/base.json')
     params_base_fname = op.join(hnn_core_root, 'param', 'base.json')
     if not op.exists(params_base_fname):
-        _fetch_file(param_url, params_base_fname)
+        urlretrieve(param_url, params_base_fname)
 
     params_base = read_params(params_base_fname)
     params = Params()

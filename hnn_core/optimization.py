@@ -11,7 +11,7 @@ import scipy.stats as stats
 from scipy.optimize import fmin_cobyla
 
 from .network import Network
-from .dipole import rmse
+from .dipole import _rmse
 
 
 def _get_range(val, multiplier):
@@ -267,10 +267,10 @@ def _optrun(new_params, opt_params, params, opt_dpls):
     dpls = _BACKEND.simulate(net, n_trials=1)
     # avg_dpl = average_dipoles(dpls)
     avg_dpl = dpls[0].copy()
-    avg_rmse = rmse(avg_dpl, opt_dpls['exp_dpl'],
-                    tstart=opt_params['opt_start'],
-                    tstop=opt_params['opt_end'],
-                    weights=opt_params['weights'])
+    avg_rmse = _rmse(avg_dpl, opt_dpls['exp_dpl'],
+                     tstart=opt_params['opt_start'],
+                     tstop=opt_params['opt_end'],
+                     weights=opt_params['weights'])
 
     if avg_rmse < opt_params['stepminopterr']:
         best = "[best] "
@@ -356,7 +356,7 @@ def optimize_evoked(params, exp_dpl, maxiter,
                                        decay_multiplier)
     param_chunks = _consolidate_chunks(evinput_params)
 
-    avg_rmse = rmse(initial_dpl[0], exp_dpl, tstop=params['tstop'])
+    avg_rmse = _rmse(initial_dpl[0], exp_dpl, tstop=params['tstop'])
     print("Initial RMSE: %.2f" % avg_rmse)
 
     opt_params = dict()
@@ -422,6 +422,6 @@ def optimize_evoked(params, exp_dpl, maxiter,
     for var_name in opt_params['ranges']:
         params[var_name] = opt_params['ranges'][var_name]['initial']
 
-    avg_rmse = rmse(opt_dpls['best_dpl'], exp_dpl, tstop=params['tstop'])
+    avg_rmse = _rmse(opt_dpls['best_dpl'], exp_dpl, tstop=params['tstop'])
     print("Final RMSE: %.2f" % avg_rmse)
     return params

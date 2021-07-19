@@ -153,7 +153,7 @@ def average_dipoles(dpls):
     return avg_dpl
 
 
-def rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """ Calculates RMSE between data in dpl and exp_dpl
     Parameters
     ----------
