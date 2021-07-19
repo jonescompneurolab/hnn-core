@@ -1,13 +1,11 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-import pytest
-
 import os.path as op
 import numpy as np
 
 import hnn_core
 from hnn_core import read_params
-from hnn_core.optimization import (consolidate_chunks, split_by_evinput,
+from hnn_core.optimization import (_consolidate_chunks, _split_by_evinput,
                                    _generate_weights)
 
 
@@ -29,7 +27,7 @@ def test_consolidate_chunks():
             'weights': np.array([10., 5.])
         }
     }
-    chunks = consolidate_chunks(inputs)
+    chunks = _consolidate_chunks(inputs)
     assert len(chunks) == len(inputs) + 1  # extra last chunk??
     assert chunks[-1]['opt_end'] == inputs['ev2']['opt_end']
     assert chunks[-1]['inputs'] == ['ev1', 'ev2']
@@ -37,7 +35,7 @@ def test_consolidate_chunks():
 
     # overlapping chunks
     inputs['ev1']['end'] = 110
-    chunks = consolidate_chunks(inputs)
+    chunks = _consolidate_chunks(inputs)
     assert len(chunks) == 1
     assert chunks[0]['start'] == inputs['ev1']['start']
     assert chunks[0]['end'] == inputs['ev2']['end']
@@ -56,9 +54,9 @@ def test_split_by_evinput():
     sigma_range_multiplier = 50.0
     synweight_range_multiplier = 500.0
     decay_multiplier = 1.6
-    evinput_params = split_by_evinput(params, sigma_range_multiplier,
-                                      timing_range_multiplier,
-                                      synweight_range_multiplier)
+    evinput_params = _split_by_evinput(params, sigma_range_multiplier,
+                                       timing_range_multiplier,
+                                       synweight_range_multiplier)
     assert list(evinput_params.keys()) == [
         'evprox_1', 'evdist_1', 'evprox_2']
     for evinput in evinput_params.values():
