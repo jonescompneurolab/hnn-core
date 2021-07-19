@@ -3,7 +3,7 @@ from urllib.request import urlretrieve
 
 import matplotlib
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
+from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
@@ -182,16 +182,18 @@ def test_rmse():
         urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
     extdata = np.loadtxt('yes_trial_S1_ERP_all_avg.txt')
 
-    exp_dpl = Dipole(extdata[:, 0], np.c_[extdata[:, 1]])
+    exp_dpl = Dipole(times=extdata[:, 0],
+                     data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]])
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__), '..')
+    hnn_core_root = op.join(op.dirname(hnn_core.__file__))
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    net = Network(params)
-    dpls = simulate_dipole(net)
-    avg_dpl = average_dipoles(dpls)
-    avg_rmse = _rmse(avg_dpl, exp_dpl, tstop=params['tstop'])
-    expected_rmse = 4.533252902006792
+    expected_rmse = 0.1
+    test_dpl = Dipole(times=extdata[:, 0],
+                      data=np.c_[extdata[:, 1] + expected_rmse,
+                                 extdata[:, 1] + expected_rmse,
+                                 extdata[:, 1] + expected_rmse])
+    avg_rmse = _rmse(test_dpl, exp_dpl, tstop=params['tstop'])
 
-    assert_equal(avg_rmse, expected_rmse)
+    assert_allclose(avg_rmse, expected_rmse)

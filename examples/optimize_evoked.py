@@ -24,7 +24,6 @@ from hnn_core import read_params, Dipole, MPIBackend, Network
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
-mpi_cmd = '/autofs/space/meghnn_001/users/mjas/opt/openmpi/bin/mpirun'
 n_procs = 10
 
 ###############################################################################
@@ -50,7 +49,7 @@ params = read_params(params_fname)
 ###############################################################################
 # Let's first simulate the dipole with the initial parameters.
 net = Network(params, add_drives_from_params=True)
-with MPIBackend(n_procs=n_procs, mpi_cmd=mpi_cmd):
+with MPIBackend(n_procs=n_procs):
     initial_dpl = simulate_dipole(net, n_trials=1)
 
 ###############################################################################
@@ -59,13 +58,13 @@ with MPIBackend(n_procs=n_procs, mpi_cmd=mpi_cmd):
 from hnn_core.optimization import optimize_evoked
 
 maxiter = 50
-with MPIBackend(n_procs=n_procs, mpi_cmd=mpi_cmd):
+with MPIBackend(n_procs=n_procs):
     params_optim = optimize_evoked(params, exp_dpl, maxiter)
 
 ###############################################################################
 # Now, let's simulate the dipole with the optimized parameters.
 net = Network(params, add_drives_from_params=True)
-with MPIBackend(n_procs=n_procs, mpi_cmd=mpi_cmd):
+with MPIBackend(n_procs=n_procs):
     best_dpl = simulate_dipole(net, n_trials=1)
 
 ###############################################################################
