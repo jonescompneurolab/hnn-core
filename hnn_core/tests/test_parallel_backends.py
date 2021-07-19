@@ -182,7 +182,7 @@ class TestParallelBackends():
                                      'L2_pyramidal': 113,
                                      'L5_pyramidal': 395,
                                      'L5_basket': 85,
-                                     'evdist1': 234,
+                                     'evdist1': 269,
                                      'evprox2': 269}
 
 

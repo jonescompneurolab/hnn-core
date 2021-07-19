@@ -68,15 +68,15 @@ def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
             offending_keys = constants_provided.difference(all_cell_types)
             raise ValueError(
                 f"Rate constant provided for unknown target cell "
-
+                f"population: {offending_keys}")
         for key, val in rate_constant.items():
             if not val > 0.:
                 raise ValueError(
                     f"Rate constant must be positive ({key}, {val})")
     else:
         if not rate_constant > 0.:
-                raise ValueError(
-                    f"Rate constant must be positive, got {rate_constant}")
+            raise ValueError(
+                f"Rate constant must be positive, got {rate_constant}")
 
 
 def _add_drives_from_params(net):

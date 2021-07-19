@@ -10,7 +10,6 @@
 import itertools as it
 import numpy as np
 from copy import deepcopy
-from warnings import warn
 
 from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
@@ -411,7 +410,7 @@ class Network(object):
             End time of the spike train (defaults to None: tstop is set to the
             end of the simulation)
         rate_constant : float or dict of floats
-            Rate constant (lambda) of the renewal-process generating the
+            Rate constant (lambda > 0) of the renewal-process generating the
             samples. If a float is provided, the same rate constant is applied
             to each target cell type. Cell type-specific values may be
             provided as a dictionary, in which a key must be present for each
@@ -600,14 +599,18 @@ class Network(object):
         target_populations, weights_ampa, weights_nmda = \
             _get_target_populations(weights_ampa, weights_nmda)
 
-        if len(target_populations) == 0:
-            raise ValueError('No target populations have been specified for '
-                             'this drive.')
-
         # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cell_types.keys())):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cell_types.keys()}')
+
+        if self._legacy_mode:
+            # allows tests must match HNN GUI output by preserving original
+            # gid assignment convention
+            target_populations = list(self.cell_types.keys())
+        elif len(target_populations) == 0:
+            raise ValueError('No target populations have been specified for '
+                             'this drive.')
 
         weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
         if isinstance(synaptic_delays, dict):
