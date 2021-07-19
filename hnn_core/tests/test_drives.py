@@ -113,8 +113,6 @@ def test_add_drives():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
     net = Network(params, legacy_mode=False)
-    net.add_evoked_drive('early_distal', mu=10, sigma=1, numspikes=1,
-                         location='distal')
 
     # Ensure weights and delays are updated
     weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 3.0,
@@ -130,10 +128,11 @@ def test_add_drives():
         assert drive['ampa']['A_delay'] == syn_delays[type_name]
 
     net.add_evoked_drive(
-        'evoked', mu=1.0, sigma=1.0, numspikes=1.0, weights_ampa=weights_ampa,
-        location='distal', synaptic_delays=syn_delays)
+        'evoked_dist', mu=1.0, sigma=1.0, numspikes=1.0,
+        weights_ampa=weights_ampa, location='distal',
+        synaptic_delays=syn_delays)
 
-    for type_name, drive in net.external_drives['evoked']['conn'].items():
+    for type_name, drive in net.external_drives['evoked_dist']['conn'].items():
         assert drive['ampa']['A_weight'] == weights_ampa[type_name]
         assert drive['ampa']['A_delay'] == syn_delays[type_name]
 
@@ -161,8 +160,8 @@ def test_add_drives():
         net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
                              location='bogus_location')
     with pytest.raises(ValueError,
-                       match='Drive early_distal already defined'):
-        net.add_evoked_drive('early_distal', mu=10, sigma=1, numspikes=1,
+                       match='Drive evoked_dist already defined'):
+        net.add_evoked_drive('evoked_dist', mu=10, sigma=1, numspikes=1,
                              location='distal')
 
     # Poisson
@@ -224,8 +223,8 @@ def test_add_drives():
 
     # attaching drives
     with pytest.raises(ValueError,
-                       match='Drive early_distal already defined'):
-        net.add_poisson_drive('early_distal', location='distal',
+                       match='Drive evoked_dist already defined'):
+        net.add_poisson_drive('evoked_dist', location='distal',
                               rate_constant=10.)
     with pytest.raises(ValueError,
                        match='Allowed drive target locations are:'):

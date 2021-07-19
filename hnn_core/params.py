@@ -218,7 +218,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                                  'numspikes': par['numspikes'],
                                  'n_drive_cells': n_drive_cells}
             drive['space_constant'] = par['lamtha']
-            drive['seedcore'] = par['prng_seedcore']
+            drive['seedcore'] = par['prng_seedcore'] - 18
             for cellname in cellname_list:
                 if cellname in par:
                     ampa_weight = par[cellname][0]
@@ -260,6 +260,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             for cellname in cellname_list:
                 if cellname in par:
                     rate_params[cellname] = par[cellname][3]
+                    # correct for non-positive poisson rate constant
+                    if not rate_params[cellname] > 0:
+                        rate_params[cellname] = 1
                     ampa_weight = par[cellname][0]
                     nmda_weight = par[cellname][1]
                     synaptic_delays = par[cellname][2]
