@@ -447,14 +447,21 @@ class Network(object):
         if tstop is None:
             tstop = sim_end_time
 
-        if not self._legacy_mode:
-            _check_drive_parameter_values('Poisson', tstart=tstart,
-                                          tstop=tstop,
-                                          sim_end_time=sim_end_time)
-            target_populations = _get_target_populations(weights_ampa,
-                                                         weights_nmda)[0]
-            _check_poisson_rates(rate_constant, target_populations,
-                                 self.cell_types.keys())
+        _check_drive_parameter_values('Poisson', tstart=tstart,
+                                      tstop=tstop,
+                                      sim_end_time=sim_end_time)
+        target_populations = _get_target_populations(weights_ampa,
+                                                     weights_nmda)[0]
+        _check_poisson_rates(rate_constant, target_populations,
+                             self.cell_types.keys())
+        if isinstance(rate_constant, dict):
+            if n_drive_cells != 'n_cells':
+                raise ValueError(f"For Poisson rate constants (got "
+                                 f"{rate_constant}) that are cell type "
+                                 f"specific, 'n_drive_cells' must be set "
+                                 f"to 'n_cells' so that the drive has 1-to-1"
+                                 f"connectivity")
+
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
         drive['n_drive_cells'] = n_drive_cells
@@ -594,7 +601,8 @@ class Network(object):
             _get_target_populations(weights_ampa, weights_nmda)
 
         if len(target_populations) == 0:
-            warn('No target populations have been specified for this drive.')
+            raise ValueError('No target populations have been specified for '
+                             'this drive.')
 
         # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cell_types.keys())):
