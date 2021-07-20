@@ -355,7 +355,7 @@ class Network(object):
             The number of drive cells that each contribute an independently
             sampled synaptic spike to the network according to the Gaussian
             time distribution (mu, sigma). If n_drive_cells='n_cells'
-            (default) and cell_specific=True a drive cell gets assigned to
+            (default) and cell_specific=True, a drive cell gets assigned to
             each available simulated cell in the network with 1-to-1
             connectivity. Otherwise, drive cells are assigned with
             all-to-all connectivity. If you wish to synchronize the timing of
@@ -365,8 +365,8 @@ class Network(object):
             Whether each artifical drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
-            denotes the number of number of all available cells that this
-            drive can target in the network.
+            denotes the number of all available cells that this drive can
+            target in the network.
         weights_ampa : dict or None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
@@ -437,8 +437,8 @@ class Network(object):
             Whether each artifical drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
-            denotes the number of number of all available cells that this
-            drive can target in the network.
+            denotes the number of all available cells that this drive can
+            target in the network.
         weights_ampa : dict or None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
@@ -530,8 +530,8 @@ class Network(object):
             Whether each artifical drive cell has 1-to-1 (True) or all-to-all
             (False, default) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
-            denotes the number of number of all available cells that this
-            drive can target in the network.
+            denotes the number of all available cells that this drive can
+            target in the network.
         weights_ampa : dict or None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
@@ -613,8 +613,8 @@ class Network(object):
             Whether each artifical drive cell has 1-to-1 (True) or all-to-all
             (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
-            denotes the number of number of all available cells that this
-            drive can target in the network.
+            denotes the number of all available cells that this drive can
+            target in the network.
 
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
@@ -724,7 +724,7 @@ class Network(object):
         n_drive_cells : int | 'n_cells'
             The number of drive cells (i.e., ArtificialCell objects) that
             contribute to this drive. If n_drive_cells='n_cells' and
-            cell_specific=True, artificial drive cells get assigned to each
+            cell_specific=True, an artificial drive cell get assigned to each
             cell in the network with 1-to-1 connectivity (completely
             unsynchronous). Otherwise, drive cells get assigned with all-to-all
             connectivity. If you wish to synchronize the timing of this evoked
@@ -734,8 +734,8 @@ class Network(object):
             Whether each artifical drive cell has 1-to-1 (True) or all-to-all
             (False) connection parameters. Note that 1-to-1 connectivity
             requires that n_drive_cells='n_cells', where 'n_cells'
-            denotes the number of number of all available cells that this
-            drive can target in the network.
+            denotes the number of all available cells that this drive can
+            target in the network.
 
         Returns
         -------
