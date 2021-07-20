@@ -171,19 +171,19 @@ class TestParallelBackends():
         spike_type_counts = {}
         for spike_gid in net.cell_response.spike_gids[0]:
             if net.gid_to_type(spike_gid) not in spike_type_counts:
-                spike_type_counts[net.gid_to_type(spike_gid)] = 0
+                spike_type_counts[net.gid_to_type(spike_gid)] = 1
             else:
                 spike_type_counts[net.gid_to_type(spike_gid)] += 1
         assert 'common' not in spike_type_counts
         assert 'exgauss' not in spike_type_counts
         assert 'extpois' not in spike_type_counts
-        assert spike_type_counts == {'evprox1': 269,
-                                     'L2_basket': 54,
-                                     'L2_pyramidal': 113,
-                                     'L5_pyramidal': 395,
-                                     'L5_basket': 85,
-                                     'evdist1': 269,
-                                     'evprox2': 269}
+        assert spike_type_counts == {'evprox1': 270,
+                                     'L2_basket': 55,
+                                     'L2_pyramidal': 114,
+                                     'L5_pyramidal': 396,
+                                     'L5_basket': 86,
+                                     'evdist1': 270,
+                                     'evprox2': 270}
 
 
 # there are no dependencies if this unit tests fails; no need to be in
