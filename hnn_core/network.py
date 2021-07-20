@@ -467,12 +467,12 @@ class Network(object):
         _check_poisson_rates(rate_constant, target_populations,
                              self.cell_types.keys())
         if isinstance(rate_constant, dict):
-            if n_drive_cells != 'n_cells':
-                raise ValueError(f"For Poisson rate constants (got "
-                                 f"{rate_constant}) that are cell type "
-                                 f"specific, 'n_drive_cells' must be set "
-                                 f"to 'n_cells' so that the drive has 1-to-1"
-                                 f"connectivity")
+            if cell_specific is False:
+                raise ValueError(f"Drives specific to cell types are only "
+                                 f"possible with cell_specific=True and "
+                                 f"n_drive_cells='n_cells'. Got cell_specific"
+                                 f" cell_specific={cell_specific} and "
+                                 f"n_drive_cells={n_drive_cells}.")
 
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
