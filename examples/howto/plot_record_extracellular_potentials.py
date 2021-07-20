@@ -34,7 +34,8 @@ from hnn_core import read_params, jones_2009_model, simulate_dipole
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
-net = jones_2009_model(params, add_drives_from_params=True)
+net = jones_2009_model(params, add_drives_from_params=True,
+                       inplane_distance=30.)
 
 ###############################################################################
 # Extracellular recordings require specifying the electrode postions. It can be
