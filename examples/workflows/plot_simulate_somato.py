@@ -160,7 +160,7 @@ net = jones_2009_model(params)
 # proximal and distal drive as well as the general process used to articulate
 # a sequence of exogenous drive for simulating evoked responses, see the
 # `HNN ERP tutorial`_. Note that setting ``n_drive_cells=1`` and
-# ``cell_specific=True`` creates a drive with synchronous input across cells
+# ``cell_specific=False`` creates a drive with synchronous input across cells
 # in the network.
 
 # Early proximal drive
