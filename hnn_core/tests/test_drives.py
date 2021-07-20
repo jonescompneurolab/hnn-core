@@ -119,27 +119,46 @@ def test_add_drives():
                     'L5_basket': 2.0, 'L5_pyramidal': 4.0}
     syn_delays = {'L2_basket': 1.0, 'L2_pyramidal': 2.0,
                   'L5_basket': 3.0, 'L5_pyramidal': 4.0}
+
+    n_drive_cells = 10
+    cell_specific = False  # default for bursty drive
     net.add_bursty_drive(
         'bursty', location='distal', burst_rate=10,
-        weights_ampa=weights_ampa, synaptic_delays=syn_delays)
+        weights_ampa=weights_ampa, synaptic_delays=syn_delays,
+        n_drive_cells=n_drive_cells)
 
+    assert net.external_drives['bursty']['n_drive_cells'] == n_drive_cells
+    assert net.external_drives['bursty']['cell_specific'] == cell_specific
     for type_name, drive in net.external_drives['bursty']['conn'].items():
         assert drive['ampa']['A_weight'] == weights_ampa[type_name]
         assert drive['ampa']['A_delay'] == syn_delays[type_name]
 
+    n_drive_cells = 'n_cells'  # default for evoked drive
+    cell_specific = True
     net.add_evoked_drive(
         'evoked_dist', mu=1.0, sigma=1.0, numspikes=1.0,
         weights_ampa=weights_ampa, location='distal',
-        synaptic_delays=syn_delays)
+        synaptic_delays=syn_delays, cell_specific=True)
 
+    n_dist_targets = 270  # 235 with non-legacy mode
+    assert (net.external_drives['evoked_dist']
+                               ['n_drive_cells'] == n_dist_targets)
+    assert net.external_drives['evoked_dist']['cell_specific'] == cell_specific
     for type_name, drive in net.external_drives['evoked_dist']['conn'].items():
         assert drive['ampa']['A_weight'] == weights_ampa[type_name]
         assert drive['ampa']['A_delay'] == syn_delays[type_name]
 
+    n_drive_cells = 'n_cells'  # default for poisson drive
+    cell_specific = True
     net.add_poisson_drive(
         'poisson', rate_constant=1.0, weights_ampa=weights_ampa,
-        location='distal', synaptic_delays=syn_delays)
+        location='distal', synaptic_delays=syn_delays,
+        cell_specific=cell_specific)
 
+    n_dist_targets = 270  # 235 with non-legacy mode
+    assert (net.external_drives['poisson']
+                               ['n_drive_cells'] == n_dist_targets)
+    assert net.external_drives['poisson']['cell_specific'] == cell_specific
     for type_name, drive in net.external_drives['poisson']['conn'].items():
         assert drive['ampa']['A_weight'] == weights_ampa[type_name]
         assert drive['ampa']['A_delay'] == syn_delays[type_name]
@@ -163,39 +182,70 @@ def test_add_drives():
                        match='Drive evoked_dist already defined'):
         net.add_evoked_drive('evoked_dist', mu=10, sigma=1, numspikes=1,
                              location='distal')
+    with pytest.raises(ValueError,
+                       match='If cell_specific is True, n_drive_cells'):
+        net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
+                             location='distal', n_drive_cells=10,
+                             cell_specific=True, weights_ampa=weights_ampa,
+                             synaptic_delays=syn_delays)
+    with pytest.raises(ValueError,
+                       match='If cell_specific is False, n_drive_cells'):
+        net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
+                             location='distal', n_drive_cells='n_cells',
+                             cell_specific=False, weights_ampa=weights_ampa,
+                             synaptic_delays=syn_delays)
+    with pytest.raises(ValueError,
+                       match='Number of drive cells must be greater than 0'):
+        net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
+                             location='distal', n_drive_cells=0,
+                             cell_specific=False, weights_ampa=weights_ampa,
+                             synaptic_delays=syn_delays)
 
     # Poisson
     with pytest.raises(ValueError,
                        match='End time of Poisson drive cannot be negative'):
-        net.add_poisson_drive('tonic_drive', tstart=0, tstop=-1,
+        net.add_poisson_drive('poisson1', tstart=0, tstop=-1,
                               location='distal', rate_constant=10.)
     with pytest.raises(ValueError,
                        match='Start time of Poisson drive cannot be negative'):
-        net.add_poisson_drive('tonic_drive', tstart=-1,
+        net.add_poisson_drive('poisson1', tstart=-1,
                               location='distal', rate_constant=10.)
     with pytest.raises(ValueError,
                        match='Duration of Poisson drive cannot be negative'):
-        net.add_poisson_drive('tonic_drive', tstart=10, tstop=1,
+        net.add_poisson_drive('poisson1', tstart=10, tstop=1,
                               location='distal', rate_constant=10.)
     with pytest.raises(ValueError,
                        match='End time of Poisson drive cannot exceed'):
-        net.add_poisson_drive('tonic_drive', tstop=params['tstop'] + 1,
+        net.add_poisson_drive('poisson1', tstop=params['tstop'] + 1,
                               location='distal', rate_constant=10.)
     with pytest.raises(ValueError,
                        match='Rate constant must be positive'):
-        net.add_poisson_drive('tonic_drive', location='distal',
+        net.add_poisson_drive('poisson1', location='distal',
                               rate_constant=0.)
 
     with pytest.raises(ValueError,
                        match='Rate constants not provided for all target'):
-        net.add_poisson_drive('tonic_drive', location='distal',
+        net.add_poisson_drive('poisson1', location='distal',
                               rate_constant={'L2_pyramidal': 10.},
                               weights_ampa={'L5_pyramidal': .01})
     with pytest.raises(ValueError,
                        match='Rate constant provided for unknown target cell'):
-        net.add_poisson_drive('tonic_drive', location='distal',
+        net.add_poisson_drive('poisson1', location='distal',
                               rate_constant={'L2_pyramidal': 10.,
                                              'bogus_celltype': 20.})
+
+    with pytest.raises(ValueError,
+                       match='Drives specific to cell types are only '
+                       'possible with cell_specific=True'):
+        net.add_poisson_drive('poisson1', location='distal',
+                              rate_constant={'L2_basket': 10.,
+                                             'L2_pyramidal': 11.,
+                                             'L5_basket': 12.,
+                                             'L5_pyramidal': 13.},
+                              n_drive_cells=1, cell_specific=False,
+                              weights_ampa=weights_ampa,
+                              synaptic_delays=syn_delays)
+
     # bursty
     with pytest.raises(ValueError,
                        match='End time of bursty drive cannot be negative'):
