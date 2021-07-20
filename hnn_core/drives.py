@@ -93,6 +93,7 @@ def _add_drives_from_params(net):
                 sigma=specs['dynamics']['sigma'],
                 numspikes=specs['dynamics']['numspikes'],
                 n_drive_cells=specs['dynamics']['n_drive_cells'],
+                cell_specific=specs['cell_specific'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
                 location=specs['location'], seedcore=specs['seedcore'],
@@ -129,6 +130,7 @@ def _add_drives_from_params(net):
                 numspikes=specs['dynamics']['numspikes'],
                 spike_isi=specs['dynamics']['spike_isi'],
                 n_drive_cells=specs['dynamics']['n_drive_cells'],
+                cell_specific=specs['cell_specific'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
                 location=specs['location'],
@@ -231,13 +233,16 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     if drive_type == 'poisson':
         if target_type == 'any':
             rate_constant = dynamics['rate_constant']
-        else:
+        elif target_type in dynamics['rate_constant']:
             rate_constant = dynamics['rate_constant'][target_type]
-        event_times = _create_extpois(
-            t0=dynamics['tstart'],
-            T=dynamics['tstop'],
-            lamtha=rate_constant,
-            prng=prng)
+        # XXX required for legacy mode since drive cells are created in network
+        # for which rate constant may not be defined
+        if target_type == 'any' or target_type in dynamics['rate_constant']:
+            event_times = _create_extpois(
+                t0=dynamics['tstart'],
+                T=dynamics['tstop'],
+                lamtha=rate_constant,
+                prng=prng)
     elif drive_type == 'evoked' or drive_type == 'gaussian':
         event_times = _create_gauss(
             mu=dynamics['mu'],
