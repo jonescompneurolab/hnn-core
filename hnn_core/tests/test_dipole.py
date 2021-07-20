@@ -98,21 +98,21 @@ def test_dipole_simulation():
     params = read_params(params_fname)
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
-                   'tstop': 25,
                    'dipole_smooth_win': 5,
                    't_evprox_1': 5,
                    't_evdist_1': 10,
                    't_evprox_2': 20})
     net = jones_2009_model(params, add_drives_from_params=True)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
-        simulate_dipole(net, n_trials=0)
+        simulate_dipole(net, tstop=25., n_trials=0)
     with pytest.raises(TypeError, match="record_vsoma must be bool, got int"):
-        simulate_dipole(net, n_trials=1, record_vsoma=0)
+        simulate_dipole(net, tstop=25., n_trials=1, record_vsoma=0)
     with pytest.raises(TypeError, match="record_isoma must be bool, got int"):
-        simulate_dipole(net, n_trials=1, record_vsoma=False, record_isoma=0)
+        simulate_dipole(net, tstop=25., n_trials=1, record_vsoma=False,
+                        record_isoma=0)
 
     # test Network.copy() returns 'bare' network after simulating
-    dpl = simulate_dipole(net, n_trials=1)[0]
+    dpl = simulate_dipole(net, tstop=25., n_trials=1)[0]
     net_copy = net.copy()
     assert len(net_copy.external_drives['evprox1']['events']) == 0
     assert len(net_copy.cell_response.vsoma) == 0
@@ -121,9 +121,8 @@ def test_dipole_simulation():
     assert_allclose(dpl.data['agg'], dpl.copy().data['agg'])
 
     # Test raster plot with no spikes
-    params['tstop'] = 0.1
     net = Network(params)
-    simulate_dipole(net, n_trials=1)
+    simulate_dipole(net, tstop=0.1, n_trials=1)
     net.cell_response.plot_spikes_raster()
 
 
