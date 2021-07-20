@@ -392,7 +392,6 @@ class Network(object):
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
-
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
         drive['events'] = list()
 
@@ -467,7 +466,7 @@ class Network(object):
         _check_poisson_rates(rate_constant, target_populations,
                              self.cell_types.keys())
         if isinstance(rate_constant, dict):
-            if cell_specific is False:
+            if not cell_specific:
                 raise ValueError(f"Drives specific to cell types are only "
                                  f"possible with cell_specific=True and "
                                  f"n_drive_cells='n_cells'. Got cell_specific"
@@ -478,10 +477,10 @@ class Network(object):
         drive['type'] = 'poisson'
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
-
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
                                  rate_constant=rate_constant)
         drive['events'] = list()
+
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
                            n_drive_cells, cell_specific)
@@ -564,7 +563,6 @@ class Network(object):
         drive['type'] = 'bursty'
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
-
         drive['dynamics'] = dict(tstart=tstart,
                                  tstart_std=tstart_std, tstop=tstop,
                                  burst_rate=burst_rate, burst_std=burst_std,
@@ -653,11 +651,11 @@ class Network(object):
                         'to be specified as a dict for each cell type')
 
         if cell_specific and n_drive_cells != 'n_cells':
-            raise ValueError(f"If cell_specific is True, 'n_drive_cells' must"
+            raise ValueError(f"If cell_specific is True, n_drive_cells must"
                              f" equal 'n_cells'. Got {n_drive_cells}.")
         elif not cell_specific:
             if not isinstance(n_drive_cells, int):
-                raise ValueError(f"If cell_specific is False, 'n_drive_cells' "
+                raise ValueError(f"If cell_specific is False, n_drive_cells "
                                  f"must be of type int. Got "
                                  f"{type(n_drive_cells)}.")
             if not n_drive_cells > 0:
