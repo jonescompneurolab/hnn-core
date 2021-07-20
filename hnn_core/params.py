@@ -219,6 +219,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                                  'numspikes': par['numspikes'],
                                  'n_drive_cells': n_drive_cells}
             drive['space_constant'] = par['lamtha']
+            # XXX Force random states to be the same as HNN-gui for the default
+            # parameter set after increasing the number of bursty drive
+            # gids from 2 to 20
             drive['seedcore'] = par['prng_seedcore'] - 18
             for cellname in cellname_list:
                 if cellname in par:
@@ -261,7 +264,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             for cellname in cellname_list:
                 if cellname in par:
                     rate_params[cellname] = par[cellname][3]
-                    # correct for non-positive poisson rate constant
+                    # XXX correct for non-positive poisson rate constant that
+                    # is specified in null poisson drives of legacy
+                    # param files
                     if not rate_params[cellname] > 0:
                         rate_params[cellname] = 1
                     ampa_weight = par[cellname][0]
