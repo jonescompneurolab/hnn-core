@@ -83,7 +83,6 @@ def test_transmembrane_currents():
     """Test that net transmembrane current is zero at all times."""
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
-                   'tstop': 40,
                    't_evprox_1': 5,
                    't_evdist_1': 10,
                    't_evprox_2': 20,
@@ -92,7 +91,7 @@ def test_transmembrane_currents():
     electrode_pos = (0, 0, 0)  # irrelevant where electrode is
     # all transfer resistances set to unity
     net.add_electrode_array('net_Im', electrode_pos, method=None)
-    _ = simulate_dipole(net)
+    _ = simulate_dipole(net, tstop=40.)
     assert_allclose(net.rec_arrays['net_Im'].voltages, 0,
                     rtol=1e-10, atol=1e-10)
 
