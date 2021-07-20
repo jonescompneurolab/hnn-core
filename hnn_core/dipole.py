@@ -10,7 +10,7 @@ from copy import deepcopy
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
-def simulate_dipole(net, n_trials=None, record_vsoma=False,
+def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
                     record_isoma=False, postproc=False):
     """Simulate a dipole given the experiment parameters.
 
@@ -19,6 +19,10 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     net : Network object
         The Network object specifying how cells are
         connected.
+    tstop : float
+        The stop time (ms)
+    dt : float
+        The sampling time (s)
     n_trials : int | None
         The number of trials to simulate. If None, the 'N_trials' value
         of the ``params`` used to create ``net`` is used (must be >0)
@@ -56,6 +60,10 @@ def simulate_dipole(net, n_trials=None, record_vsoma=False,
     net._instantiate_drives(n_trials=n_trials)
     net.cell_response.reset()  # see #290 for context; relevant for MPI
     net._reset_rec_arrays()
+
+    # XXX used in network_builder::_simulate_single_trial
+    net._params['tstop'] = tstop
+    net._params['dt'] = dt
 
     if isinstance(record_vsoma, bool):
         net._params['record_vsoma'] = record_vsoma
