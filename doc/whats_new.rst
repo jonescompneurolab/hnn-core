@@ -36,7 +36,7 @@ Changelog
 
 - Add ``calcium_model`` with a distance dependent calcium channel conductivity, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/333>`_
 
-- Each drive spike train sampled through an independent process corresponds to a single artificial drive cell, the number of which users can set when adding drives, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
+- Each drive spike train sampled through an independent process corresponds to a single artificial drive cell, the number of which users can set when adding drives with `n_drive_cells` and `cell_specific`, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
 
 Bug
 ~~~
@@ -69,7 +69,7 @@ API
 
 - Deprecated `postproc` argument in :func:`~hnn_core.dipole.simulate_dipole`, whereby user should explicitly smooth and scale resulting dipoles, by `Christopher Bailey`_ in `#372 <https://github.com/jonescompneurolab/hnn-core/pull/372>`_
 
-- Number of drive cells can now be specified through the `n_drive_cells` argument in `Network.add_xxx_drive()` methods, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
+- Number of drive cells and their connectivity can now be specified through the `n_drive_cells` and `cell_specific` arguments in `Network.add_xxx_drive()` methods, replacing use of `repeats` and `sync_within_trial`, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
 
 .. _0.1:
 
