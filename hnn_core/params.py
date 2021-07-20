@@ -212,6 +212,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             n_drive_cells = 'n_cells'
             if par['sync_evinput']:
                 n_drive_cells = 1
+                drive['cell_specific'] = False
 
             drive['dynamics'] = {'mu': par['t0'],
                                  'sigma': sigma,
