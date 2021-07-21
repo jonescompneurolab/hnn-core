@@ -302,7 +302,7 @@ of the network, and ultimately suppressed sensory detection.</p>
                      <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}</span>
     <a href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_bursty_drive</span></a><span class="p">(</span>
         <span class="s1">&#39;beta_dist&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beta_start</span></a><span class="p">,</span> <span class="n">tstart_std</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beta_start</span></a> <span class="o">+</span> <span class="mf">50.</span><span class="p">,</span>
-        <span class="n">burst_rate</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">burst_rate</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">location</span><span class="o">=</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_d1</span><span class="p">,</span>
         <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">syn_delays_d1</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -314,7 +314,7 @@ of the network, and ultimately suppressed sensory detection.</p>
 
     <a href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_bursty_drive</span></a><span class="p">(</span>
         <span class="s1">&#39;beta_prox&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beta_start</span></a><span class="p">,</span> <span class="n">tstart_std</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">beta_start</span></a> <span class="o">+</span> <span class="mf">50.</span><span class="p">,</span>
-        <span class="n">burst_rate</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">burst_rate</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">location</span><span class="o">=</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa_p1</span><span class="p">,</span>
         <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">syn_delays_p1</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 
@@ -569,7 +569,7 @@ Neocortical Pyramidal Cells Mediated by Martinotti Cells. Neuron,
 53(5), 735–746. <a class="reference external" href="https://doi.org/10.1016/j.neuron.2007.02.012">https://doi.org/10.1016/j.neuron.2007.02.012</a></p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 92 minutes  6.779 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 19 minutes  30.419 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-beta-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_beta.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -598,7 +598,7 @@ Neocortical Pyramidal Cells Mediated by Martinotti Cells. Neuron,
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.<br/>
     </p>
   </div>
 </footer>

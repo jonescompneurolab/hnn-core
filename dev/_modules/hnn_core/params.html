@@ -292,7 +292,7 @@
                              <span class="s1">&#39;burst_rate&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;f_input&#39;</span><span class="p">],</span>
                              <span class="s1">&#39;burst_std&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;stdev&#39;</span><span class="p">],</span>
                              <span class="s1">&#39;numspikes&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;events_per_cycle&#39;</span><span class="p">],</span>
-                             <span class="s1">&#39;repeats&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">],</span>
+                             <span class="s1">&#39;n_drive_cells&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">],</span>
                              <span class="s1">&#39;spike_isi&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>  <span class="c1"># not exposed in params-files</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;space_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span>
@@ -339,12 +339,20 @@
                                  <span class="n">key</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">]</span>
             <span class="n">sigma</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cell_keys_present</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># IID for all cells!</span>
 
+            <span class="n">n_drive_cells</span> <span class="o">=</span> <span class="s1">&#39;n_cells&#39;</span>
+            <span class="k">if</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;sync_evinput&#39;</span><span class="p">]:</span>
+                <span class="n">n_drive_cells</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">],</span>
                                  <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">sigma</span><span class="p">,</span>
                                  <span class="s1">&#39;numspikes&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;numspikes&#39;</span><span class="p">],</span>
-                                 <span class="s1">&#39;sync_within_trial&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;sync_evinput&#39;</span><span class="p">]}</span>
+                                 <span class="s1">&#39;n_drive_cells&#39;</span><span class="p">:</span> <span class="n">n_drive_cells</span><span class="p">}</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;space_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
+            <span class="c1"># XXX Force random states to be the same as HNN-gui for the default</span>
+            <span class="c1"># parameter set after increasing the number of bursty drive</span>
+            <span class="c1"># gids from 2 to 20</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">18</span>
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -386,6 +394,11 @@
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                     <span class="n">rate_params</span><span class="p">[</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="c1"># XXX correct for non-positive poisson rate constant that</span>
+                    <span class="c1"># is specified in null poisson drives of legacy</span>
+                    <span class="c1"># param files</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rate_params</span><span class="p">[</span><span class="n">cellname</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">rate_params</span><span class="p">[</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">nmda_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
@@ -607,7 +620,7 @@
         <span class="s1">&#39;prng_seedcore&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;prng_seedcore_input_prox&#39;</span><span class="p">]),</span>
         <span class="s1">&#39;lamtha&#39;</span><span class="p">:</span> <span class="mf">100.</span><span class="p">,</span>
         <span class="s1">&#39;loc&#39;</span><span class="p">:</span> <span class="s1">&#39;proximal&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;repeats&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;repeats_prox&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;n_drive_cells&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;repeats_prox&#39;</span><span class="p">],</span>
         <span class="s1">&#39;t0_stdev&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t0_input_stdev_prox&#39;</span><span class="p">],</span>
         <span class="s1">&#39;threshold&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;threshold&#39;</span><span class="p">]</span>
     <span class="p">}</span>
@@ -637,7 +650,7 @@
         <span class="s1">&#39;prng_seedcore&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;prng_seedcore_input_dist&#39;</span><span class="p">]),</span>
         <span class="s1">&#39;lamtha&#39;</span><span class="p">:</span> <span class="mf">100.</span><span class="p">,</span>
         <span class="s1">&#39;loc&#39;</span><span class="p">:</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;repeats&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;repeats_dist&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;n_drive_cells&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;repeats_dist&#39;</span><span class="p">],</span>
         <span class="s1">&#39;t0_stdev&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;t0_input_stdev_dist&#39;</span><span class="p">],</span>
         <span class="s1">&#39;threshold&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;threshold&#39;</span><span class="p">]</span>
     <span class="p">}</span>
@@ -788,7 +801,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.<br/>
     </p>
   </div>
 </footer>

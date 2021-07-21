@@ -127,7 +127,7 @@ def add_beta_drives(net, beta_start):
                      'L5_pyramidal': 0.5}
     net.add_bursty_drive(
         'beta_dist', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-        burst_rate=1., burst_std=10., numspikes=2, spike_isi=10, repeats=10,
+        burst_rate=1., burst_std=10., numspikes=2, spike_isi=10, n_drive_cells=10,
         location='distal', weights_ampa=weights_ampa_d1,
         synaptic_delays=syn_delays_d1, seedcore=2)
 
@@ -139,7 +139,7 @@ def add_beta_drives(net, beta_start):
 
     net.add_bursty_drive(
         'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-        burst_rate=1., burst_std=20., numspikes=2, spike_isi=10, repeats=10,
+        burst_rate=1., burst_std=20., numspikes=2, spike_isi=10, n_drive_cells=10,
         location='proximal', weights_ampa=weights_ampa_p1,
         synaptic_delays=syn_delays_p1, seedcore=8)
 

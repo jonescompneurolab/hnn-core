@@ -135,11 +135,11 @@
 <span class="c1">#          Blake Caldwell &lt;blake_caldwell@brown.edu&gt;</span>
 <span class="c1">#          Christopher Bailey &lt;cjb@cfin.au.dk&gt;</span>
 <span class="c1">#          Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
+<span class="c1">#          Ryan Thorpe &lt;ryan_thorpe@brown.edu&gt;</span>
 
 <span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_drive_cell_event_times</span>
 <span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_get_target_populations</span><span class="p">,</span> <span class="n">_add_drives_from_params</span>
@@ -463,8 +463,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cells</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">n_cells</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Network.add_evoked_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive">[docs]</a>    <span class="k">def</span> <span class="nf">add_evoked_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="p">,</span>
-                         <span class="n">sync_within_trial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
+<div class="viewcode-block" id="Network.add_evoked_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive">[docs]</a>    <span class="k">def</span> <span class="nf">add_evoked_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
+                         <span class="n">n_drive_cells</span><span class="o">=</span><span class="s1">&#39;n_cells&#39;</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                          <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">space_constant</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add an &#39;evoked&#39; external drive to the network</span>
@@ -479,12 +479,24 @@
 <span class="sd">            Standard deviation of event time distribution</span>
 <span class="sd">        numspikes : int</span>
 <span class="sd">            Number of spikes at each target cell</span>
-<span class="sd">        sync_within_trial : bool</span>
-<span class="sd">            If True, the target cells receive each numspike synchronously. By</span>
-<span class="sd">            default (False), spike times arriving at each target cell are</span>
-<span class="sd">            sampled independently using the Gaussian parameteres (mu, sigma).</span>
 <span class="sd">        location : str</span>
 <span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
+<span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
+<span class="sd">            The number of drive cells that each contribute an independently</span>
+<span class="sd">            sampled synaptic spike to the network according to the Gaussian</span>
+<span class="sd">            time distribution (mu, sigma). If n_drive_cells=&#39;n_cells&#39;</span>
+<span class="sd">            (default) and cell_specific=True, a drive cell gets assigned to</span>
+<span class="sd">            each available simulated cell in the network with 1-to-1</span>
+<span class="sd">            connectivity. Otherwise, drive cells are assigned with</span>
+<span class="sd">            all-to-all connectivity. If you wish to synchronize the timing of</span>
+<span class="sd">            this evoked drive across the network in a given trial with one</span>
+<span class="sd">            spike, set n_drive_cells=1 and cell_specific=False.</span>
+<span class="sd">        cell_specific : bool</span>
+<span class="sd">            Whether each artifical drive cell has 1-to-1 (True, default) or</span>
+<span class="sd">            all-to-all (False) connection parameters. Note that 1-to-1</span>
+<span class="sd">            connectivity requires that n_drive_cells=&#39;n_cells&#39;, where &#39;n_cells&#39;</span>
+<span class="sd">            denotes the number of all available cells that this drive can</span>
+<span class="sd">            target in the network.</span>
 <span class="sd">        weights_ampa : dict or None</span>
 <span class="sd">            Synaptic weights (in uS) of AMPA receptors on each targeted cell</span>
 <span class="sd">            type (dict keys). Cell types omitted from the dict are set to zero.</span>
@@ -504,25 +516,24 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
             <span class="n">_check_drive_parameter_values</span><span class="p">(</span><span class="s1">&#39;evoked&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
                                           <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">)</span>
-
         <span class="n">drive</span> <span class="o">=</span> <span class="n">_NetworkDrive</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;evoked&#39;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;extgauss&#39;</span><span class="p">:</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span>  <span class="c1"># XXX needed to pass legacy tests!</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_drive_cells</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seedcore</span>
-
-        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">,</span>
-                                 <span class="n">sync_within_trial</span><span class="o">=</span><span class="n">sync_within_trial</span><span class="p">)</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">)</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
-                           <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">)</span></div>
+                           <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span>
+                           <span class="n">n_drive_cells</span><span class="p">,</span> <span class="n">cell_specific</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Network.add_poisson_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_poisson_drive">[docs]</a>    <span class="k">def</span> <span class="nf">add_poisson_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rate_constant</span><span class="p">,</span>
-                          <span class="n">location</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                          <span class="n">seedcore</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+                          <span class="n">location</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="s1">&#39;n_cells&#39;</span><span class="p">,</span>
+                          <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.</span><span class="p">,</span>
+                          <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a Poisson-distributed external drive to the network</span>
 
 <span class="sd">        Parameters</span>
@@ -535,13 +546,28 @@
 <span class="sd">            End time of the spike train (defaults to None: tstop is set to the</span>
 <span class="sd">            end of the simulation)</span>
 <span class="sd">        rate_constant : float or dict of floats</span>
-<span class="sd">            Rate constant (lambda) of the renewal-process generating the</span>
+<span class="sd">            Rate constant (lambda &gt; 0) of the renewal-process generating the</span>
 <span class="sd">            samples. If a float is provided, the same rate constant is applied</span>
 <span class="sd">            to each target cell type. Cell type-specific values may be</span>
 <span class="sd">            provided as a dictionary, in which a key must be present for each</span>
 <span class="sd">            cell type with non-zero AMPA or NMDA weights.</span>
 <span class="sd">        location : str</span>
 <span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
+<span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
+<span class="sd">            The number of drive cells that each contribute an independently</span>
+<span class="sd">            sampled synaptic spike to the network according to a Poisson</span>
+<span class="sd">            process. If n_drive_cells=&#39;n_cells&#39; (default) and</span>
+<span class="sd">            cell_specific=True, a drive cell gets assigned to each available</span>
+<span class="sd">            simulated cell in the network with 1-to-1 connectivity. Otherwise,</span>
+<span class="sd">            drive cells are assigned with all-to-all connectivity. If you wish</span>
+<span class="sd">            to synchronize the timing of Poisson drive across the network in a</span>
+<span class="sd">            given trial, set n_drive_cells=1 and cell_specific=False.</span>
+<span class="sd">        cell_specific : bool</span>
+<span class="sd">            Whether each artifical drive cell has 1-to-1 (True, default) or</span>
+<span class="sd">            all-to-all (False) connection parameters. Note that 1-to-1</span>
+<span class="sd">            connectivity requires that n_drive_cells=&#39;n_cells&#39;, where &#39;n_cells&#39;</span>
+<span class="sd">            denotes the number of all available cells that this drive can</span>
+<span class="sd">            target in the network.</span>
 <span class="sd">        weights_ampa : dict or None</span>
 <span class="sd">            Synaptic weights (in uS) of AMPA receptors on each targeted cell</span>
 <span class="sd">            type (dict keys). Cell types omitted from the dict are set to zero.</span>
@@ -562,31 +588,38 @@
         <span class="k">if</span> <span class="n">tstop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tstop</span> <span class="o">=</span> <span class="n">sim_end_time</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
-            <span class="n">_check_drive_parameter_values</span><span class="p">(</span><span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="n">tstart</span><span class="p">,</span>
-                                          <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
-                                          <span class="n">sim_end_time</span><span class="o">=</span><span class="n">sim_end_time</span><span class="p">)</span>
-            <span class="n">target_populations</span> <span class="o">=</span> <span class="n">_get_target_populations</span><span class="p">(</span><span class="n">weights_ampa</span><span class="p">,</span>
-                                                         <span class="n">weights_nmda</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">_check_poisson_rates</span><span class="p">(</span><span class="n">rate_constant</span><span class="p">,</span> <span class="n">target_populations</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">_check_drive_parameter_values</span><span class="p">(</span><span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="n">tstart</span><span class="p">,</span>
+                                      <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+                                      <span class="n">sim_end_time</span><span class="o">=</span><span class="n">sim_end_time</span><span class="p">)</span>
+        <span class="n">target_populations</span> <span class="o">=</span> <span class="n">_get_target_populations</span><span class="p">(</span><span class="n">weights_ampa</span><span class="p">,</span>
+                                                     <span class="n">weights_nmda</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_check_poisson_rates</span><span class="p">(</span><span class="n">rate_constant</span><span class="p">,</span> <span class="n">target_populations</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rate_constant</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cell_specific</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Drives specific to cell types are only &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;possible with cell_specific=True and &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;n_drive_cells=&#39;n_cells&#39;. Got cell_specific&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot; cell_specific=</span><span class="si">{</span><span class="n">cell_specific</span><span class="si">}</span><span class="s2"> and &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;n_drive_cells=</span><span class="si">{</span><span class="n">n_drive_cells</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="n">drive</span> <span class="o">=</span> <span class="n">_NetworkDrive</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;poisson&#39;</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_drive_cells</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seedcore</span>
-
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="n">tstart</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
                                  <span class="n">rate_constant</span><span class="o">=</span><span class="n">rate_constant</span><span class="p">)</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
-                           <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">)</span></div>
+                           <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span>
+                           <span class="n">n_drive_cells</span><span class="p">,</span> <span class="n">cell_specific</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Network.add_bursty_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive">[docs]</a>    <span class="k">def</span> <span class="nf">add_bursty_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstart_std</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">location</span><span class="p">,</span> <span class="n">burst_rate</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                         <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                         <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                         <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+                         <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.</span><span class="p">,</span> <span class="n">seedcore</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a bursty (rhythmic) external drive to all cells of the network</span>
 
 <span class="sd">        Parameters</span>
@@ -602,6 +635,8 @@
 <span class="sd">        tstop : float</span>
 <span class="sd">            End time of burst trains (defaults to None: tstop is set to the</span>
 <span class="sd">            end of the simulation)</span>
+<span class="sd">        location : str</span>
+<span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
 <span class="sd">        burst_rate : float</span>
 <span class="sd">            The mean rate at which cyclic bursts occur (unit: Hz)</span>
 <span class="sd">        burst_std : float</span>
@@ -612,10 +647,20 @@
 <span class="sd">            in the GUI. Default: 2 (doublet)</span>
 <span class="sd">        spike_isi : float</span>
 <span class="sd">            Time between spike events within a cycle (ISI). Default: 10 ms</span>
-<span class="sd">        repeats : int</span>
-<span class="sd">            The number of bursts per cycle. Default: 1</span>
-<span class="sd">        location : str</span>
-<span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
+<span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
+<span class="sd">            The number of drive cells that contribute an independently sampled</span>
+<span class="sd">            burst at each cycle. If n_drive_cells=&#39;n_cells&#39; and</span>
+<span class="sd">            cell_specific=True, a drive cell gets assigned to</span>
+<span class="sd">            each available simulated cell in the network with 1-to-1</span>
+<span class="sd">            connectivity. Otherwise (default: 1), drive cells are assigned with</span>
+<span class="sd">            all-to-all connectivity and provide synchronous input to cells in</span>
+<span class="sd">            the network.</span>
+<span class="sd">        cell_specific : bool</span>
+<span class="sd">            Whether each artifical drive cell has 1-to-1 (True) or all-to-all</span>
+<span class="sd">            (False, default) connection parameters. Note that 1-to-1</span>
+<span class="sd">            connectivity requires that n_drive_cells=&#39;n_cells&#39;, where &#39;n_cells&#39;</span>
+<span class="sd">            denotes the number of all available cells that this drive can</span>
+<span class="sd">            target in the network.</span>
 <span class="sd">        weights_ampa : dict or None</span>
 <span class="sd">            Synaptic weights (in uS) of AMPA receptors on each targeted cell</span>
 <span class="sd">            type (dict keys). Cell types omitted from the dict are set to zero.</span>
@@ -646,22 +691,21 @@
 
         <span class="n">drive</span> <span class="o">=</span> <span class="n">_NetworkDrive</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bursty&#39;</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_drive_cells</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seedcore</span>
-
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="n">tstart</span><span class="p">,</span>
                                  <span class="n">tstart_std</span><span class="o">=</span><span class="n">tstart_std</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
                                  <span class="n">burst_rate</span><span class="o">=</span><span class="n">burst_rate</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="n">burst_std</span><span class="p">,</span>
-                                 <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">,</span> <span class="n">spike_isi</span><span class="o">=</span><span class="n">spike_isi</span><span class="p">,</span>
-                                 <span class="n">repeats</span><span class="o">=</span><span class="n">repeats</span><span class="p">)</span>
+                                 <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">,</span> <span class="n">spike_isi</span><span class="o">=</span><span class="n">spike_isi</span><span class="p">)</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                            <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span>
-                           <span class="n">cell_specific</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+                           <span class="n">n_drive_cells</span><span class="p">,</span> <span class="n">cell_specific</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_attach_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
-                      <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                      <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="p">,</span>
+                      <span class="n">cell_specific</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Attach a drive to network based on connectivity information</span>
 
 <span class="sd">        Parameters</span>
@@ -684,9 +728,21 @@
 <span class="sd">        synaptic_delays : dict</span>
 <span class="sd">            Synaptic delay (in ms) at the column origin, dispersed laterally as</span>
 <span class="sd">            a function of the space_constant</span>
+<span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
+<span class="sd">            The number of drive cells (i.e., ArtificialCell objects) that</span>
+<span class="sd">            contribute to this drive. If n_drive_cells=&#39;n_cells&#39; and</span>
+<span class="sd">            cell_specific=True, an artificial drive cell gets assigned to each</span>
+<span class="sd">            available cell in the network with 1-to-1 connectivity (completely</span>
+<span class="sd">            unsynchronous). Otherwise, drive cells get assigned with all-to-all</span>
+<span class="sd">            connectivity. If you wish to synchronize the timing of this evoked</span>
+<span class="sd">            drive across the network in a given trial with one spike, set</span>
+<span class="sd">            n_drive_cells=1 and cell_specific=False.</span>
 <span class="sd">        cell_specific : bool</span>
-<span class="sd">            Whether each cell has unique connection parameters (default: True)</span>
-<span class="sd">            or all cells have common connections to a global (single) drive.</span>
+<span class="sd">            Whether each artifical drive cell has 1-to-1 (True) or all-to-all</span>
+<span class="sd">            (False) connection parameters. Note that 1-to-1</span>
+<span class="sd">            connectivity requires that n_drive_cells=&#39;n_cells&#39;, where &#39;n_cells&#39;</span>
+<span class="sd">            denotes the number of all available cells that this drive can</span>
+<span class="sd">            target in the network.</span>
 
 <span class="sd">        Attached drive is stored in self.external_drives[name]</span>
 <span class="sd">        self.pos_dict is updated, and self._update_gid_ranges() called</span>
@@ -705,6 +761,14 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Allowed drive target cell types are: &#39;</span><span class="p">,</span>
                              <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
+            <span class="c1"># allows tests must match HNN GUI output by preserving original</span>
+            <span class="c1"># gid assignment convention</span>
+            <span class="n">target_populations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_populations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No target populations have been specified for &#39;</span>
+                             <span class="s1">&#39;this drive.&#39;</span><span class="p">)</span>
+
         <span class="n">weights_by_receptor</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ampa&#39;</span><span class="p">:</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">:</span> <span class="n">weights_nmda</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synaptic_delays</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">]:</span>
@@ -716,23 +780,28 @@
                         <span class="s1">&#39;synaptic_delays is either a common float or needs &#39;</span>
                         <span class="s1">&#39;to be specified as a dict for each cell type&#39;</span><span class="p">)</span>
 
-        <span class="c1"># this is needed to keep the drive GIDs identical to those in HNN,</span>
-        <span class="c1"># e.g., &#39;evdist1&#39;: range(272, 542), even when no L5_basket cells</span>
-        <span class="c1"># are targeted (event times lists are empty). The logic in</span>
-        <span class="c1"># _connect_celltypes is hard-coded to use these implict gid ranges</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
-            <span class="c1"># XXX tests must match HNN GUI output</span>
-            <span class="n">target_populations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_populations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No AMPA or NMDA weights &gt; 0&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cell_specific</span> <span class="ow">and</span> <span class="n">n_drive_cells</span> <span class="o">!=</span> <span class="s1">&#39;n_cells&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;If cell_specific is True, n_drive_cells must&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot; equal &#39;n_cells&#39;. Got </span><span class="si">{</span><span class="n">n_drive_cells</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">cell_specific</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_drive_cells</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;If cell_specific is False, n_drive_cells &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;must be of type int. Got &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">n_drive_cells</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">n_drive_cells</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Number of drive cells must be greater than &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;0. Got </span><span class="si">{</span><span class="n">n_drive_cells</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>  <span class="c1"># for easier for-looping later</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;target_types&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_populations</span>  <span class="c1"># for _connect_celltypes</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_specific</span>
 
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;conn&#39;</span><span class="p">],</span> <span class="n">src_gid_ran</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_drive_conns</span><span class="p">(</span>
             <span class="n">target_populations</span><span class="p">,</span> <span class="n">weights_by_receptor</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
-            <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="n">cell_specific</span><span class="p">)</span>
+            <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="p">,</span>
+            <span class="n">cell_specific</span><span class="p">)</span>
 
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_gid_ran</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">drive</span>
 
         <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">src_gid_ran</span><span class="p">]</span>
@@ -763,7 +832,7 @@
 
     <span class="k">def</span> <span class="nf">_create_drive_conns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_populations</span><span class="p">,</span> <span class="n">weights_by_receptor</span><span class="p">,</span>
                             <span class="n">location</span><span class="p">,</span> <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span>
-                            <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                            <span class="n">n_drive_cells</span><span class="p">,</span> <span class="n">cell_specific</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create parameter dictionary defining how drive connects to network</span>
 
 <span class="sd">        Parameters</span>
@@ -780,9 +849,21 @@
 <span class="sd">        synaptic_delays : dict or float</span>
 <span class="sd">            Synaptic delay (in ms) at the column origin, dispersed laterally as</span>
 <span class="sd">            a function of the space_constant</span>
+<span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
+<span class="sd">            The number of drive cells (i.e., ArtificialCell objects) that</span>
+<span class="sd">            contribute to this drive. If n_drive_cells=&#39;n_cells&#39; and</span>
+<span class="sd">            cell_specific=True, an artificial drive cell get assigned to each</span>
+<span class="sd">            cell in the network with 1-to-1 connectivity (completely</span>
+<span class="sd">            unsynchronous). Otherwise, drive cells get assigned with all-to-all</span>
+<span class="sd">            connectivity. If you wish to synchronize the timing of this evoked</span>
+<span class="sd">            drive across the network in a given trial with one spike, set</span>
+<span class="sd">            n_drive_cells=1 and cell_specific=False.</span>
 <span class="sd">        cell_specific : bool</span>
-<span class="sd">            Whether each cell has unique connection parameters (default: True)</span>
-<span class="sd">            or all cells have common connections to a global (single) drive.</span>
+<span class="sd">            Whether each artifical drive cell has 1-to-1 (True) or all-to-all</span>
+<span class="sd">            (False) connection parameters. Note that 1-to-1 connectivity</span>
+<span class="sd">            requires that n_drive_cells=&#39;n_cells&#39;, where &#39;n_cells&#39;</span>
+<span class="sd">            denotes the number of all available cells that this drive can</span>
+<span class="sd">            target in the network.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -812,7 +893,6 @@
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">target_populations</span><span class="p">:</span>
                 <span class="n">drive_conn</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># NB created inside target_pop-loop</span>
                 <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">location</span>
-
                 <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;target_gids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cellname</span><span class="p">]</span>
                 <span class="c1"># NB list! This is used later in _parnet_connect</span>
                 <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cellname</span>
@@ -826,9 +906,9 @@
             <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">location</span>
 
             <span class="c1"># NB list! This is used later in _parnet_connect</span>
-            <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;src_gids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">src_gid_curr</span><span class="p">]</span>
-            <span class="n">src_gid_curr</span> <span class="o">+=</span> <span class="mi">1</span>
-
+            <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;src_gids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">src_gid_curr</span><span class="p">,</span>
+                                           <span class="n">src_gid_curr</span> <span class="o">+</span> <span class="n">n_drive_cells</span><span class="p">)</span>
+            <span class="n">src_gid_curr</span> <span class="o">+=</span> <span class="n">n_drive_cells</span>
             <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;target_gids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>  <span class="c1"># fill in below</span>
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">target_populations</span><span class="p">:</span>
                 <span class="n">drive_conn</span><span class="p">[</span><span class="s1">&#39;target_gids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cellname</span><span class="p">]</span>
@@ -881,35 +961,34 @@
         <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="n">event_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>  <span class="c1"># new list for each trial and drive</span>
-
-                <span class="c1"># loop over drives (one for each target cell population)</span>
-                <span class="c1"># and create event times</span>
-                <span class="k">for</span> <span class="n">this_cell_drive_conn</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;conn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]:</span>
+                    <span class="c1"># loop over drives (one for each target cell population)</span>
+                    <span class="c1"># and create event times</span>
+                    <span class="k">for</span> <span class="n">this_cell_drive_conn</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;conn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                        <span class="n">target_type</span> <span class="o">=</span> <span class="n">this_cell_drive_conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span>
                         <span class="k">for</span> <span class="n">drive_cell_gid</span> <span class="ow">in</span> <span class="n">this_cell_drive_conn</span><span class="p">[</span><span class="s1">&#39;src_gids&#39;</span><span class="p">]:</span>
                             <span class="n">event_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_drive_cell_event_times</span><span class="p">(</span>
-                                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">this_cell_drive_conn</span><span class="p">,</span>
-                                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">],</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
+                                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
+                                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">],</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                <span class="n">target_type</span><span class="o">=</span><span class="n">target_type</span><span class="p">,</span>
+                                <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
                                 <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid</span><span class="p">,</span>
                                 <span class="n">seedcore</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">])</span>
                             <span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="c1"># cell_specific=False should only have one src_gid</span>
-                        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">this_cell_drive_conn</span><span class="p">[</span><span class="s1">&#39;src_gids&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span>
-
-                        <span class="c1"># Only return empty event times if all cells have</span>
-                        <span class="c1"># no events</span>
-                        <span class="n">drive_cell_gid</span> <span class="o">=</span> <span class="n">this_cell_drive_conn</span><span class="p">[</span>
-                            <span class="s1">&#39;src_gids&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                        <span class="n">event_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">_drive_cell_event_times</span><span class="p">(</span>
-                            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">this_cell_drive_conn</span><span class="p">,</span>
-                            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">],</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Only return empty event times if all cells have</span>
+                    <span class="c1"># no events</span>
+                    <span class="k">for</span> <span class="n">drive_cell_gid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]:</span>
+                        <span class="n">src_event_times</span> <span class="o">=</span> <span class="n">_drive_cell_event_times</span><span class="p">(</span>
+                            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
+                            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">target_type</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span>
+                            <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
                             <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid</span><span class="p">,</span>
-                            <span class="n">seedcore</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">])]</span>
-                        <span class="c1"># only one event times list for one src_gid</span>
-                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="k">break</span>
-
+                            <span class="n">seedcore</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">])</span>
+                        <span class="n">event_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src_event_times</span><span class="p">)</span>
                 <span class="c1"># &#39;events&#39;: nested list (n_trials x n_drive_cells x n_events)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="p">[</span>
                     <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]][</span><span class="s1">&#39;events&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_times</span><span class="p">)</span>
@@ -1004,12 +1083,12 @@
 <span class="sd">        src_gids : str | int | range | list of int</span>
 <span class="sd">            Identifier for source cells. Passing str arguments</span>
 <span class="sd">            (&#39;L2_pyramidal&#39;, &#39;L2_basket&#39;, &#39;L5_pyramidal&#39;, &#39;L5_basket&#39;) is</span>
-<span class="sd">            equivalent to passing a list of gids for the relvant cell type.</span>
+<span class="sd">            equivalent to passing a list of gids for the relevant cell type.</span>
 <span class="sd">            source - target connections are made in an all-to-all pattern.</span>
 <span class="sd">        target_gids : str | int | range | list of int</span>
 <span class="sd">            Identifer for targets of source cells. Passing str arguments</span>
 <span class="sd">            (&#39;L2_pyramidal&#39;, &#39;L2_basket&#39;, &#39;L5_pyramidal&#39;, &#39;L5_basket&#39;) is</span>
-<span class="sd">            equivalent to passing a list of gids for the relvant cell type.</span>
+<span class="sd">            equivalent to passing a list of gids for the relevant cell type.</span>
 <span class="sd">            source - target connections are made in an all-to-all pattern.</span>
 <span class="sd">        loc : str</span>
 <span class="sd">            Location of synapse on target cell. Must be</span>
@@ -1301,6 +1380,8 @@
 <span class="sd">    events : list of lists</span>
 <span class="sd">        List of spike time lists. First index is of length n_trials. Second</span>
 <span class="sd">        index is over the &#39;artificial&#39; cells associated with this drive.</span>
+<span class="sd">    n_drive_cells : int</span>
+<span class="sd">        The number of drive cells that contribute to this drive.</span>
 <span class="sd">    cell_specific : bool</span>
 <span class="sd">        Whether each cell has unique connection parameters (default: True)</span>
 <span class="sd">        or all cells have common connections to a global (single) drive.</span>
@@ -1342,6 +1423,7 @@
         <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">drive class: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">target cell types: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;target_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">number of drive cells: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">cell-specific: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">dynamic parameters:&quot;</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1366,7 +1448,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.<br/>
     </p>
   </div>
 </footer>
