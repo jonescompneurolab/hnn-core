@@ -447,8 +447,7 @@ def plot_cells(net, ax=None, show=True):
 
     Parameters
     ----------
-    net : instance of NetworkBuilder
-        The NetworkBuilder object.
+    net : instance of the Network object.
     ax : instance of matplotlib Axes3D | None
         An axis object from matplotlib. If None,
         a new figure is created.
