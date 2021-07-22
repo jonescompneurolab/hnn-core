@@ -219,6 +219,7 @@ net_beta_erp.cell_response.plot_spikes_raster(ax=axes[1], show=False)
 axes[1].set_title('Beta + ERP Spike Raster')
 net_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('ERP Spike Raster')
+plt.show()
 
 ###############################################################################
 # References
