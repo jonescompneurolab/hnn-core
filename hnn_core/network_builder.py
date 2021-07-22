@@ -320,6 +320,8 @@ class NetworkBuilder(object):
         self._create_cells_and_drives(threshold=self.net._params['threshold'],
                                       record_vsoma=record_vsoma,
                                       record_isoma=record_isoma)
+        n_drive_cells = len(self._drive_cells)
+        print(f'n_art_cells = {n_drive_cells}')
 
         self.state_init()
 
@@ -359,13 +361,19 @@ class NetworkBuilder(object):
         # only assign a "source" artificial cell to this rank if its target
         # exists in _gid_list. "Global" drives get placed on different ranks
         for drive in self.net.external_drives.values():
-            for conn in drive['conn'].values():  # all cell types
-                for src_gid, target_gid in zip(conn['src_gids'],
-                                               conn['target_gids']):
-                    if (target_gid in self._gid_list and
-                            src_gid not in self._gid_list):
-                        _PC.set_gid2node(src_gid, rank)
-                        self._gid_list.append(src_gid)
+            if drive['cell_specific']:
+                for conn in drive['conn'].values():  # all cell types
+                    for src_gid, target_gid in zip(conn['src_gids'],
+                                                   conn['target_gids']):
+                        if (target_gid in self._gid_list and
+                                src_gid not in self._gid_list):
+                            _PC.set_gid2node(src_gid, rank)
+                            self._gid_list.append(src_gid)
+            else:
+                src_gids = list(self.net.gid_ranges[drive['name']])
+                for gid_idx in range(rank, len(src_gids), nhosts):
+                    _PC.set_gid2node(src_gids[gid_idx], rank)
+                    self._gid_list.append(src_gids[gid_idx])
 
         # extremely important to get the gids in the right order
         self._gid_list.sort()

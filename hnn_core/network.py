@@ -436,7 +436,7 @@ class Network(object):
                     cell.gid = self.gid_ranges[cell_type][cell_idx]
                     cell.pos = pos
                     cells.append(cell)
-                    self.cells[cell_type] = cells
+                self.cells[cell_type] = cells
                 self.n_cells += len(cells)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
