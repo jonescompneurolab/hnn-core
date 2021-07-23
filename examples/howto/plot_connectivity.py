@@ -57,7 +57,7 @@ fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 # Data recorded during simulations are stored under
 # :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
 # a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
-dpl_erp = simulate_dipole(net_erp, n_trials=1)
+dpl_erp = simulate_dipole(net_erp, tstop=170., n_trials=1)
 net_erp.cell_response.plot_spikes_raster()
 
 ###############################################################################
@@ -95,14 +95,14 @@ def get_network(probability=1.0):
 
 
 net_all = get_network()
-dpl_all = simulate_dipole(net_all, n_trials=1)
+dpl_all = simulate_dipole(net_all, tstop=170., n_trials=1)
 
 ###############################################################################
 # We can additionally use the ``probability`` argument to create a sparse
 # connectivity pattern instead of all-to-all. Let's try creating the same
 # network with a 10% chance of cells connecting to each other.
 net_sparse = get_network(probability=0.1)
-dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
+dpl_sparse = simulate_dipole(net_sparse, tstop=170., n_trials=1)
 
 ###############################################################################
 # With the previous connection pattern there appears to be synchronous rhythmic
