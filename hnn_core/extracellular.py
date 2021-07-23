@@ -440,6 +440,8 @@ class _ExtracellularArrayBuilder(object):
     def __init__(self, array):
         self.array = array
         self.n_contacts = array.n_contacts
+        self.secs_on_rank = None
+        self.n_total_segments = None
         self._nrn_imem_ptrvec = None
         self._nrn_imem_vec = None
         self._nrn_r_transfer = None
@@ -465,40 +467,33 @@ class _ExtracellularArrayBuilder(object):
             ``'Pyr'``. For basket cells, use ``'Basket'``. NB This argument is
             currently not exposed in the API.
         """
-        secs_on_rank = h.allsec()  # get all h.Sections known to this MPI rank
+        self.secs_on_rank = h.allsec()  # get all h.Sections known to this rank
         _validate_type(include_celltypes, str)
         _check_option('include_celltypes', include_celltypes, ['all', 'Pyr',
                                                                'Basket'])
         if include_celltypes.lower() != 'all':
-            secs_on_rank = [s for s in secs_on_rank if
-                            include_celltypes in s.name()]
+            self.secs_on_rank = [s for s in self.secs_on_rank if
+                                 include_celltypes in s.name()]
 
-        segment_counts = [sec.nseg for sec in secs_on_rank]
-        n_total_segments = np.sum(segment_counts)
+        segment_counts = [sec.nseg for sec in self.secs_on_rank]
+        self.n_total_segments = np.sum(segment_counts)
 
         # pointers assigned to _ref_i_membrane_ at each EACH internal segment
-        self._nrn_imem_ptrvec = h.PtrVector(n_total_segments)
+        self._nrn_imem_ptrvec = h.PtrVector(self.n_total_segments)
         # placeholder into which pointer values are read on each sim time step
-        self._nrn_imem_vec = h.Vector(n_total_segments)
+        self._nrn_imem_vec = h.Vector(self.n_total_segments)
 
-        ptr_idx = 0
-        for sec in secs_on_rank:
-            for seg in sec:  # section end points (0, 1) not included
-                # set Nth pointer to the net membrane current at this segment
-                self._nrn_imem_ptrvec.pset(
-                    ptr_idx, sec(seg.x)._ref_i_membrane_)
-                ptr_idx += 1
-        if ptr_idx != n_total_segments:
-            raise RuntimeError(f'Expected {n_total_segments} imem pointers, '
-                               f'got {ptr_idx}.')
+        self._nrn_imem_ptrvec.ptr_update_callback(
+            self._set_imem_pointers_to_ref_i_membrane_)
 
         # transfer resistances for each segment (keep in Neuron Matrix object)
-        self._nrn_r_transfer = h.Matrix(self.n_contacts, n_total_segments)
+        self._nrn_r_transfer = h.Matrix(self.n_contacts,
+                                        self.n_total_segments)
 
         for row, pos in enumerate(self.array.positions):
             if self.array.method is not None:
                 transfer_resistance = list()
-                for sec in secs_on_rank:
+                for sec in self.secs_on_rank:
                     this_xfer_r = _transfer_resistance(
                         sec, pos, conductivity=self.array.conductivity,
                         method=self.array.method,
@@ -509,7 +504,8 @@ class _ExtracellularArrayBuilder(object):
             else:
                 # for testing, make a matrix of ones
                 self._nrn_r_transfer.setrow(row,
-                                            h.Vector(n_total_segments, 1.))
+                                            h.Vector(self.n_total_segments,
+                                                     1.))
 
         # record time for each array
         self._nrn_times = h.Vector().record(h._ref_t)
@@ -517,7 +513,7 @@ class _ExtracellularArrayBuilder(object):
         # contributions of all segments on this rank to total calculated
         # potential at electrode (_PC.allreduce called in _simulate_dipole)
         self._nrn_voltages = h.Vector()
-        self._nrn_imem_vec = h.Vector(n_total_segments)
+        self._nrn_imem_vec = h.Vector(self.n_total_segments, 1.)
 
         # Attach a callback for calculating the potentials at each time step.
         # Enables fast calculation of transmembrane current (nA) at each
@@ -526,11 +522,30 @@ class _ExtracellularArrayBuilder(object):
         # "multiple threads".
         cvode.extra_scatter_gather(0, self._calc_potentials_callback)
 
+    def _set_imem_pointers_to_ref_i_membrane_(self):
+        """Let h.PtrVector.pset point to each segment's _ref_i_membrane_
+
+        NB this needs to be a separate method so that
+        self._nrn_imem_ptrvec.ptr_update_callback can be called during _build.
+        Without it, repeated calls of simulate_dipole will cause segmentation
+        faults.
+        """
+        ptr_idx = 0
+        for sec in self.secs_on_rank:
+            for seg in sec:  # section end points (0, 1) not included
+                # set Nth pointer to the net membrane current at this segment
+                self._nrn_imem_ptrvec.pset(
+                    ptr_idx, sec(seg.x)._ref_i_membrane_)
+                ptr_idx += 1
+        if ptr_idx != self.n_total_segments:
+            raise RuntimeError(f'Expected {self.n_total_segments} imem '
+                               f'pointers, got {ptr_idx}.')
+
     @property
     def _nrn_n_samples(self):
         """Return the length (in samples) of the extracellular data."""
         if self._nrn_voltages.size() % self.n_contacts != 0:
-            raise RuntimeError('Something went wrong: have {self.n_contacts}'
+            raise RuntimeError(f'Something went wrong: have {self.n_contacts}'
                                f', but {self._nrn_voltages.size()} samples')
         return int(self._nrn_voltages.size() / self.n_contacts)
 
