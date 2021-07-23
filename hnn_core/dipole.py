@@ -8,6 +8,7 @@ import numpy as np
 from copy import deepcopy
 
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
+from .cell_response import CellResponse
 
 
 def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
@@ -62,11 +63,17 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     net._params['tstop'] = tstop
     net._params['dt'] = dt
 
-    net._instantiate_drives(n_trials=n_trials)
-    net.cell_response.reset()  # see #290 for context; relevant for MPI
-    net._reset_rec_arrays()
+    net._instantiate_drives(n_trials=n_trials, tstop=tstop)
 
-    net.cell_response._times = np.arange(0., tstop + dt, dt)
+    # Create array of equally sampled time points for simulating currents
+    # NB (only) used to initialise self.cell_response._times
+    times = np.arange(0., tstop + dt, dt)
+    cell_type_names = list(net.cell_types.keys())
+    cell_response = CellResponse(times=times,
+                                 cell_type_names=cell_type_names)
+    net.cell_response = cell_response
+
+    net._reset_rec_arrays()
 
     if isinstance(record_vsoma, bool):
         net._params['record_vsoma'] = record_vsoma

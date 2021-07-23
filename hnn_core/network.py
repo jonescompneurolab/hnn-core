@@ -242,14 +242,6 @@ class Network(object):
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
         }
 
-        # Create array of equally sampled time points for simulating currents
-        # NB (only) used to initialise self.cell_response._times
-        times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
-        cell_type_names = list(cell_types.keys())
-        # Create CellResponse object, initialised with simulation time points
-        self.cell_response = CellResponse(times=times,
-                                          cell_type_names=cell_type_names)
-
         # external drives and biases
         self.external_drives = dict()
         self.external_biases = dict()
@@ -454,13 +446,9 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        sim_end_time = self.cell_response.times[-1]
-        if tstop is None:
-            tstop = sim_end_time
 
         _check_drive_parameter_values('Poisson', tstart=tstart,
-                                      tstop=tstop,
-                                      sim_end_time=sim_end_time)
+                                      tstop=tstop)
         target_populations = _get_target_populations(weights_ampa,
                                                      weights_nmda)[0]
         _check_poisson_rates(rate_constant, target_populations,
@@ -547,12 +535,8 @@ class Network(object):
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
-        sim_end_time = self.cell_response.times[-1]
-        if tstop is None:
-            tstop = sim_end_time
         if not self._legacy_mode:
             _check_drive_parameter_values('bursty', tstart=tstart, tstop=tstop,
-                                          sim_end_time=sim_end_time,
                                           sigma=tstart_std, location=location)
             _check_drive_parameter_values('bursty', sigma=burst_std,
                                           numspikes=numspikes,
@@ -812,13 +796,15 @@ class Network(object):
         for arr in self.rec_arrays.values():
             arr._reset()
 
-    def _instantiate_drives(self, n_trials=1):
+    def _instantiate_drives(self, tstop, n_trials=1):
         """Creates drive_event_times vectors for all drives and all trials
 
         Parameters
         ----------
         n_trials : int
             Number of trials to create events for (default: 1)
+        tstop : float
+            The simulation end time
 
         NB this must be a separate method because dipole.py:simulate_dipole
         accepts an n_trials-argument, which overrides the N_trials-parameter
@@ -844,7 +830,7 @@ class Network(object):
                                 target_type=target_type,
                                 trial_idx=trial_idx,
                                 drive_cell_gid=drive_cell_gid,
-                                seedcore=drive['seedcore'])
+                                seedcore=drive['seedcore'], tstop=tstop)
                             )
                 else:
                     # Only return empty event times if all cells have
@@ -853,7 +839,7 @@ class Network(object):
                         src_event_times = _drive_cell_event_times(
                             drive['type'],
                             drive['dynamics'],
-                            self.cell_response.times[-1],
+                            tstop=tstop,
                             target_type='any',
                             trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid,
@@ -921,7 +907,6 @@ class Network(object):
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
-            self.cell_response._cell_type_names.append(cell_name)
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
