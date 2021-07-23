@@ -57,13 +57,16 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
 
     # XXX needed in mpi_child.py:run()#L103; include fix in #211 or later PR
     net._params['N_trials'] = n_trials
-    net._instantiate_drives(n_trials=n_trials)
-    net.cell_response.reset()  # see #290 for context; relevant for MPI
-    net._reset_rec_arrays()
 
     # XXX used in network_builder::_simulate_single_trial
     net._params['tstop'] = tstop
     net._params['dt'] = dt
+
+    net._instantiate_drives(n_trials=n_trials)
+    net.cell_response.reset()  # see #290 for context; relevant for MPI
+    net._reset_rec_arrays()
+
+    net.cell_response._times = np.arange(0., tstop + dt, dt)
 
     if isinstance(record_vsoma, bool):
         net._params['record_vsoma'] = record_vsoma
