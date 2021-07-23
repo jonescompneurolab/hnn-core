@@ -54,7 +54,7 @@ net.add_poisson_drive(
     location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
 
 ###############################################################################
-dpls = simulate_dipole(net)
+dpls = simulate_dipole(net, tstop=250.)
 scaling_factor = 30000
 dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
@@ -94,7 +94,7 @@ dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[1])
 # dominates over the influence of the Poisson drive. By default, a tonic bias
 # is applied to the entire duration of the simulation.
 net.add_tonic_bias(cell_type='L5_pyramidal', amplitude=6.)
-dpls = simulate_dipole(net, n_trials=1)
+dpls = simulate_dipole(net, tstop=250., n_trials=1)
 dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
 dpls[trial_idx].plot()
@@ -122,7 +122,7 @@ plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
 # refactory period between L5 pyramidal cell spikes and increase the PING
 # frequency from ~50 to ~65 Hz.
 net.cell_types['L5_pyramidal'].p_syn['gabaa']['tau2'] = 2
-dpls = simulate_dipole(net, n_trials=1)
+dpls = simulate_dipole(net, tstop=250., n_trials=1)
 dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),

@@ -34,12 +34,6 @@ params = read_params(params_fname)
 print(params)
 
 ###############################################################################
-# Update a few of the default parameters related to visualisation
-params.update({
-    'tstop': 310.0,
-})
-
-###############################################################################
 # Following :ref:`the alpha example
 # <sphx_glr_auto_examples_plot_simulate_alpha.py>`, we add a
 # ~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
@@ -64,7 +58,7 @@ net.add_bursty_drive(
 from hnn_core import MPIBackend
 
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-    dpls = simulate_dipole(net, n_trials=1)
+    dpls = simulate_dipole(net, tstop=310., n_trials=1)
 
 trial_idx = 0
 dpls[trial_idx].plot()

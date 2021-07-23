@@ -107,7 +107,7 @@ net.add_evoked_drive(
 from hnn_core import JoblibBackend
 
 with JoblibBackend(n_jobs=2):
-    dpls = simulate_dipole(net, n_trials=2)
+    dpls = simulate_dipole(net, tstop=170., n_trials=2)
 
 ###############################################################################
 # Rather than reading smoothing and scaling parameters from file, we recommend
@@ -147,7 +147,7 @@ print(net_sync.external_drives['evdist1']['dynamics'])
 ###############################################################################
 # Finally, let's simulate this network. Rather than modifying the dipole
 # object, this time we make a copy of it before smoothing and scaling.
-dpls_sync = simulate_dipole(net_sync, n_trials=1)
+dpls_sync = simulate_dipole(net_sync, tstop=170., n_trials=1)
 
 trial_idx = 0
 dpls_sync[trial_idx].copy().smooth(window_len).scale(scaling_factor).plot()

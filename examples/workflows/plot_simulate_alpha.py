@@ -42,7 +42,6 @@ params = read_params(params_fname)
 # amount (20 ms standard deviation). We repeat the burst train 10 times, each
 # time with unique randomization. The drive is only connected to the proximal
 # (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
-params['tstop'] = 310
 net = jones_2009_model(params)
 
 location = 'proximal'
@@ -56,7 +55,7 @@ net.add_bursty_drive(
     synaptic_delays=syn_delays_p, seedcore=14)
 
 # simulate the dipole, but do not automatically scale or smooth the result
-dpl = simulate_dipole(net, n_trials=1)
+dpl = simulate_dipole(net, tstop=310., n_trials=1)
 
 trial_idx = 0  # single trial simulated, choose the first index
 # to emulate a larger patch of cortex, we can apply a simple scaling factor
@@ -104,7 +103,7 @@ net.add_bursty_drive(
     spike_isi=10, n_drive_cells=10, location=location, weights_ampa=weights_ampa_d,
     synaptic_delays=syn_delays_d, seedcore=16)
 
-dpl = simulate_dipole(net, n_trials=1)
+dpl = simulate_dipole(net, tstop=310., n_trials=1)
 
 ###############################################################################
 # We can verify that beta frequency activity was produced by inspecting the PSD
