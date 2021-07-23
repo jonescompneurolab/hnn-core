@@ -94,7 +94,6 @@ class TestParallelBackends():
         params = read_params(params_fname)
         params.update({'N_pyr_x': 3,
                        'N_pyr_y': 3,
-                       'tstop': 40,
                        't_evprox_1': 5,
                        't_evdist_1': 10,
                        't_evprox_2': 20,
@@ -117,7 +116,7 @@ class TestParallelBackends():
                 with pytest.raises(
                         RuntimeError,
                         match="MPI simulation failed. Return code: 1"):
-                    simulate_dipole(net)
+                    simulate_dipole(net, tstop=40)
 
             event.set()
         expected_string = "Child process failed unexpectedly"
@@ -132,7 +131,6 @@ class TestParallelBackends():
         params = read_params(params_fname)
         params.update({'N_pyr_x': 3,
                        'N_pyr_y': 3,
-                       'tstop': 40,
                        't_evprox_1': 5,
                        't_evdist_1': 10,
                        't_evprox_2': 20,
@@ -142,7 +140,7 @@ class TestParallelBackends():
         oversubscribed = round(cpu_count() * 1.5)
         with MPIBackend(n_procs=oversubscribed) as backend:
             assert backend.n_procs == oversubscribed
-            simulate_dipole(net)
+            simulate_dipole(net, tstop=40)
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
     def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
