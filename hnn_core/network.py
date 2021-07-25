@@ -875,8 +875,6 @@ class Network(object):
             raise ValueError(f'Tonic bias already defined for {cell_type}')
         if t0 is None:
             t0 = 0
-        if tstop < 0.:
-            raise ValueError('End time of tonic input cannot be negative')
         if cell_type not in self.cell_types:
             raise ValueError(f'cell_type must be one of '
                              f'{list(self.cell_types.keys())}. '
