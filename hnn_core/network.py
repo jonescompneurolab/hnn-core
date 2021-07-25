@@ -879,9 +879,6 @@ class Network(object):
             raise ValueError(f'cell_type must be one of '
                              f'{list(self.cell_types.keys())}. '
                              f'Got {cell_type}')
-        duration = tstop - t0
-        if duration < 0.:
-            raise ValueError('Duration of tonic input cannot be negative')
 
         self.external_biases['tonic'][cell_type] = {
             'amplitude': amplitude,
