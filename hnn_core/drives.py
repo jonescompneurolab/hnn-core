@@ -21,6 +21,14 @@ def _get_target_populations(weights_ampa, weights_nmda):
 
 
 def _check_drive_parameter_values(drive_type, **kwargs):
+    if 'tstop' in kwargs:
+        if kwargs['tstop'] is not None:
+            if kwargs['tstop'] < 0.:
+                raise ValueError(f'End time of {drive_type} drive cannot be '
+                                 'negative')
+            if 'tstart' in kwargs and kwargs['tstop'] < kwargs['tstart']:
+                raise ValueError(f'Duration of {drive_type} drive cannot be '
+                                 'negative')
     if 'sigma' in kwargs:
         if kwargs['sigma'] < 0.:
             raise ValueError('Standard deviation cannot be negative')
