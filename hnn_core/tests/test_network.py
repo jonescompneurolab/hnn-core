@@ -351,11 +351,6 @@ def test_tonic_biases():
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
                            t0=5.0, tstop=4.0)
 
-    with pytest.raises(ValueError, match='End time of tonic input cannot be'
-                       ' negative'):
-        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
-                           t0=5.0, tstop=-1.)
-
     with pytest.raises(ValueError, match='parameter may be missing'):
         params['Itonic_T_L2Pyr_soma'] = 5.0
         net = hnn_core.Network(params, add_drives_from_params=True)

@@ -215,10 +215,6 @@ def test_add_drives():
         net.add_poisson_drive('poisson1', tstart=10, tstop=1,
                               location='distal', rate_constant=10.)
     with pytest.raises(ValueError,
-                       match='End time of Poisson drive cannot exceed'):
-        net.add_poisson_drive('poisson1', tstop=params['tstop'] + 1,
-                              location='distal', rate_constant=10.)
-    with pytest.raises(ValueError,
                        match='Rate constant must be positive'):
         net.add_poisson_drive('poisson1', location='distal',
                               rate_constant=0.)
@@ -258,10 +254,6 @@ def test_add_drives():
     with pytest.raises(ValueError,
                        match='Duration of bursty drive cannot be negative'):
         net.add_bursty_drive('bursty_drive', tstart=10, tstop=1,
-                             location='distal', burst_rate=10)
-    with pytest.raises(ValueError,
-                       match='End time of bursty drive cannot exceed'):
-        net.add_bursty_drive('bursty_drive', tstop=params['tstop'] + 1,
                              location='distal', burst_rate=10)
 
     msg = (r'Burst duration (?s).* cannot be greater than '
