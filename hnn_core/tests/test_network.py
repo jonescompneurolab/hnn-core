@@ -1,6 +1,7 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
 from copy import deepcopy
+from hnn_core.dipole import simulate_dipole
 import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose
@@ -347,6 +348,7 @@ def test_tonic_biases():
                        ' negative'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
                            t0=5.0, tstop=4.0)
+        simulate_dipole(net, tstop=5.)
 
     with pytest.raises(ValueError, match='parameter may be missing'):
         params['Itonic_T_L2Pyr_soma'] = 5.0
@@ -354,7 +356,7 @@ def test_tonic_biases():
 
     params.update({
         'N_pyr_x': 3, 'N_pyr_y': 3,
-        'tstop': 25, 'N_trials': 1,
+        'N_trials': 1,
         'dipole_smooth_win': 5,
         't_evprox_1': 5,
         't_evdist_1': 10,
@@ -375,7 +377,5 @@ def test_tonic_biases():
     assert 'tonic' in net.external_biases
     assert 'L5_pyramidal' not in net.external_biases['tonic']
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
-    assert net.external_biases[
-        'tonic']['L2_pyramidal']['tstop'] == net._params['tstop']
     with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)

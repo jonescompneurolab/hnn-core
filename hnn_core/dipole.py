@@ -69,13 +69,14 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
             if drive['dynamics']['tstop'] is None:
                 drive['dynamics']['tstop'] = tstop
     for bias_name, bias in net.external_biases.items():
-        if bias['tstop'] is None:
-            bias['tstop'] = tstop
-        if bias['tstop'] < 0.:
-            raise ValueError('End time of tonic input cannot be negative')
-        duration = bias['tstop'] - bias['t0']
-        if duration < 0.:
-            raise ValueError('Duration of tonic input cannot be negative')
+        for cell_type, bias_cell_type in bias.items():
+            if bias_cell_type['tstop'] is None:
+                bias_cell_type['tstop'] = tstop
+            if bias_cell_type['tstop'] < 0.:
+                raise ValueError('End time of tonic input cannot be negative')
+            duration = bias_cell_type['tstop'] - bias_cell_type['t0']
+            if duration < 0.:
+                raise ValueError('Duration of tonic input cannot be negative')
 
     net._instantiate_drives(n_trials=n_trials, tstop=tstop)
 
