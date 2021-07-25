@@ -60,8 +60,17 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     net._params['N_trials'] = n_trials
 
     # XXX used in network_builder::_simulate_single_trial
+    # and network_builder.__init__()
     net._params['tstop'] = tstop
     net._params['dt'] = dt
+
+    for drive_name, drive in net.external_drives.items():
+        if 'tstop' in drive['dynamics']:
+            if drive['dynamics']['tstop'] is None:
+                drive['dynamics']['tstop'] = tstop
+            if drive['dynamics']['tstop'] > tstop:
+                raise ValueError('End time cannot be larger than'
+                                 ' simulation end time')
 
     net._instantiate_drives(n_trials=n_trials, tstop=tstop)
 

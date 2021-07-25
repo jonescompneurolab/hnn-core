@@ -91,6 +91,8 @@ def run_hnn_core_fixture():
                            't_evprox_2': 20,
                            'N_trials': 2})
             tstop = 40.
+            # XXX: add_drives_from_params sets net.external_drives['dynamics']['tstop']
+            params['tstop'] = 40.
         net = jones_2009_model(params, add_drives_from_params=True)
         if electrode_array is not None:
             for name, positions in electrode_array.items():
