@@ -52,8 +52,6 @@ def _simulate_single_trial(neuron_net, trial_idx):
     h.dt = neuron_net.net._params['dt']  # simulation duration and time-step
     h.celsius = neuron_net.net._params['celsius']  # 37.0 - set temperature
 
-    times = neuron_net.net.cell_response.times
-
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
 
@@ -112,7 +110,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
                      np.array(neuron_net.dipoles['L2_pyramidal'].to_python()),
                      np.array(neuron_net.dipoles['L5_pyramidal'].to_python())]
 
-    dpl = Dipole(times, dpl_data)
+    dpl = Dipole(neuron_net.times, dpl_data)
 
     return dpl
 
@@ -260,6 +258,8 @@ class NetworkBuilder(object):
     def __init__(self, net, trial_idx=0):
         self.net = net
         self.trial_idx = trial_idx
+        self.times = np.arange(0., net._params['tstop'] + net._params['dt'],
+                               net._params['dt'])
 
         # When computing the network dynamics in parallel, the nodes of the
         # network (real and artificial cells) potentially get distributed
@@ -307,8 +307,8 @@ class NetworkBuilder(object):
 
         # Create a h.Vector() with size 1xself.N_t, zero'd
         self.dipoles = {
-            'L5_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
-            'L2_pyramidal': h.Vector(self.net.cell_response.times.size, 0),
+            'L5_pyramidal': h.Vector(self.times.size, 0),
+            'L2_pyramidal': h.Vector(self.times.size, 0),
         }
 
         self._gid_assign()
