@@ -163,8 +163,6 @@ def test_network():
                     drive_name]['conn'][cellname]['ampa']['A_delay'],
                 target_delays[drive_name][cellname], rtol=1e-12)
 
-    # Assert that an empty CellResponse object is created as an attribute
-    assert net.cell_response == CellResponse()
     # array of simulation times is created in Network.__init__, but passed
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError,
@@ -319,7 +317,6 @@ def test_add_cell_type():
 
     n_new_type = len(net.gid_ranges['new_type'])
     assert n_new_type == len(pos)
-    assert 'new_type' in net.cell_response._cell_type_names
     net.add_connection('L2_basket', 'new_type', loc='proximal',
                        receptor='gabaa', weight=8e-3, delay=1,
                        lamtha=2)

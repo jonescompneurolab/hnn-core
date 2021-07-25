@@ -4,9 +4,10 @@ from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
 
 import pytest
+import numpy as np
 
 import hnn_core
-from hnn_core import read_params, Network, jones_2009_model
+from hnn_core import read_params, Network, jones_2009_model, CellResponse
 from hnn_core.mpi_child import (MPISimulation, _str_to_net, _pickle_data)
 from hnn_core.parallel_backends import (_gather_trial_data,
                                         _process_child_data,
@@ -121,6 +122,11 @@ def test_child_run():
                            't_evprox_2': 20,
                            'N_trials': 2})
     net_reduced = jones_2009_model(params_reduced, add_drives_from_params=True)
+    times = np.arange(0., params['tstop'] + params['dt'], params['dt'])
+    cell_type_names = list(net_reduced.cell_types.keys())
+    cell_response = CellResponse(times=times,
+                                 cell_type_names=cell_type_names)
+    net_reduced.cell_response = cell_response
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):
