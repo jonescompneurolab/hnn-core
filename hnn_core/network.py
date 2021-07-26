@@ -803,7 +803,7 @@ class Network(object):
         n_trials : int
             Number of trials to create events for (default: 1)
         tstop : float
-            The simulation end time (s).
+            The simulation stop time (ms).
 
         NB this must be a separate method because dipole.py:simulate_dipole
         accepts an n_trials-argument, which overrides the N_trials-parameter
