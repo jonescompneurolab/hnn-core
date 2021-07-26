@@ -115,7 +115,6 @@ def test_dipole_simulation():
     dpl = simulate_dipole(net, tstop=25., n_trials=1)[0]
     net_copy = net.copy()
     assert len(net_copy.external_drives['evprox1']['events']) == 0
-    assert len(net_copy.cell_response.vsoma) == 0
 
     # test that Dipole.copy() returns the expected exact copy
     assert_allclose(dpl.data['agg'], dpl.copy().data['agg'])

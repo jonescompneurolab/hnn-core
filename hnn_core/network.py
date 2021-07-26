@@ -241,6 +241,7 @@ class Network(object):
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
         }
 
+        self.cell_response = None
         # external drives and biases
         self.external_drives = dict()
         self.external_biases = dict()
@@ -824,11 +825,11 @@ class Network(object):
                             event_times.append(_drive_cell_event_times(
                                 drive['type'],
                                 drive['dynamics'],
-                                self.cell_response.times[-1],
                                 target_type=target_type,
                                 trial_idx=trial_idx,
                                 drive_cell_gid=drive_cell_gid,
-                                seedcore=drive['seedcore'], tstop=tstop)
+                                seedcore=drive['seedcore'],
+                                tstop=tstop)
                             )
                 else:
                     # Only return empty event times if all cells have
