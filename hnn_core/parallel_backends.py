@@ -18,6 +18,10 @@ from threading import Thread, Event
 
 from psutil import wait_procs, process_iter, NoSuchProcess
 
+import numpy as np
+
+from .dipole import Dipole
+
 _BACKEND = None
 
 
@@ -42,11 +46,12 @@ def _clone_and_simulate(net, trial_idx):
     from hnn_core.network_builder import _simulate_single_trial
 
     neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
-    dpl = _simulate_single_trial(neuron_net, trial_idx)
+    times = _simulate_single_trial(neuron_net, trial_idx)
 
     sim_data = neuron_net.get_data_from_neuron()
+    sim_data['times'] = times
 
-    return dpl, sim_data
+    return sim_data
 
 
 def _gather_trial_data(sim_data, net, n_trials, postproc):
@@ -58,19 +63,26 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     dpls = []
 
     for idx in range(n_trials):
-        dpls.append(sim_data[idx][0])
-        sim_data_trial = sim_data[idx][1]
-        net.cell_response._spike_times.append(sim_data_trial[0])
-        net.cell_response._spike_gids.append(sim_data_trial[1])
+
+        # cell response
+        net.cell_response._spike_times.append(sim_data[idx]['spike_times'])
+        net.cell_response._spike_gids.append(sim_data[idx]['spike_gids'])
         net.cell_response.update_types(net.gid_ranges)
-        net.cell_response._vsoma.append(sim_data_trial[3])
-        net.cell_response._isoma.append(sim_data_trial[4])
+        net.cell_response._vsoma.append(sim_data[idx]['vsoma'])
+        net.cell_response._isoma.append(sim_data[idx]['isoma'])
+
+        # extracellular array
         for arr_name, arr in net.rec_arrays.items():
             # voltages is a n_trials x n_contacts x n_samples array
             net.rec_arrays[
-                arr_name]._data.append(sim_data_trial[5][arr_name])
+                arr_name]._data.append(sim_data[idx]['rec_data'][arr_name])
+            net.rec_arrays[arr_name]._times = sim_data[
+                idx]['rec_times'][arr_name]
 
-            net.rec_arrays[arr_name]._times = sim_data_trial[6][arr_name]
+        # dipole
+        dpl = Dipole(times=np.array(sim_data[idx]['times']),
+                     data=sim_data[idx]['dpl_data'])
+        dpls.append(dpl)
 
         N_pyr_x = net._params['N_pyr_x']
         N_pyr_y = net._params['N_pyr_y']
