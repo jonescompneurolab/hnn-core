@@ -31,8 +31,6 @@ _LAST_NETWORK = None
 def _simulate_single_trial(neuron_net, trial_idx):
     """Simulate one trial."""
 
-    from .dipole import Dipole
-
     global _PC, _CVODE
 
     h.load_file("stdrun.hoc")
@@ -51,6 +49,8 @@ def _simulate_single_trial(neuron_net, trial_idx):
     h.tstop = neuron_net.net._params['tstop']
     h.dt = neuron_net.net._params['dt']  # simulation duration and time-step
     h.celsius = neuron_net.net._params['celsius']  # 37.0 - set temperature
+
+    times = h.Vector().record(h._ref_t)
 
     # sets the default max solver step in ms (purposefully large)
     _PC.set_maxstep(10)
@@ -105,14 +105,7 @@ def _simulate_single_trial(neuron_net, trial_idx):
 
     _PC.barrier()  # get all nodes to this place before continuing
 
-    dpl_data = np.c_[np.array(neuron_net.dipoles['L2_pyramidal'].to_python()) +
-                     np.array(neuron_net.dipoles['L5_pyramidal'].to_python()),
-                     np.array(neuron_net.dipoles['L2_pyramidal'].to_python()),
-                     np.array(neuron_net.dipoles['L5_pyramidal'].to_python())]
-
-    dpl = Dipole(neuron_net.times, dpl_data)
-
-    return dpl
+    return times.to_python()
 
 
 def _is_loaded_mechanisms():
@@ -580,6 +573,11 @@ class NetworkBuilder(object):
             isoma_py[gid] = {key: rec_i.to_python()
                              for key, rec_i in rec_i.items()}
 
+        dpl_data = np.c_[np.array(self.dipoles['L2_pyramidal'].to_python()) +
+                         np.array(self.dipoles['L5_pyramidal'].to_python()),
+                         np.array(self.dipoles['L2_pyramidal'].to_python()),
+                         np.array(self.dipoles['L5_pyramidal'].to_python())]
+
         rec_arr_py = dict()
         rec_times_py = dict()
         for arr_name, nrn_arr in self._nrn_rec_arrays.items():
@@ -587,12 +585,15 @@ class NetworkBuilder(object):
             rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
         from copy import deepcopy
-        data = (self._all_spike_times.to_python(),
-                self._all_spike_gids.to_python(),
-                deepcopy(self.net.gid_ranges),
-                deepcopy(vsoma_py),
-                deepcopy(isoma_py),
-                rec_arr_py, rec_times_py)
+        data = {'dpl_data': dpl_data,
+                'spike_times': self._all_spike_times.to_python(),
+                'spike_gids': self._all_spike_gids.to_python(),
+                'gid_ranges': deepcopy(self.net.gid_ranges),
+                'vsoma': deepcopy(vsoma_py),
+                'isoma': deepcopy(isoma_py),
+                'rec_data': rec_arr_py,
+                'rec_times': rec_times_py}
+
         return data
 
     def _clear_last_network_objects(self):
