@@ -54,7 +54,7 @@ class CellResponse(object):
     isoma : list (n_trials,) of dict, shape
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing somatic currents.
-    times : numpy array
+    times : array-like, shape (n_times,)
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
 
