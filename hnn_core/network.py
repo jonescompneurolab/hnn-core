@@ -305,7 +305,6 @@ class Network(object):
         # clear cells containing Neuron objects to avoid pickling error
         self.cells = dict()
         net_copy = deepcopy(self)
-        net_copy.cell_response = CellResponse(times=self.cell_response._times)
         net_copy._reset_drives()
         net_copy._reset_rec_arrays()
         return net_copy
