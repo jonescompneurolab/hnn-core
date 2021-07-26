@@ -4,6 +4,8 @@
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
+from copy import deepcopy
+
 import numpy as np
 from neuron import h
 
@@ -14,7 +16,6 @@ if int(__version__[0]) >= 8:
 
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
-from copy import deepcopy
 from .extracellular import _ExtracellularArrayBuilder
 
 # a few globals
@@ -563,7 +564,14 @@ class NetworkBuilder(object):
         self._cells = list()
 
     def get_data_from_neuron(self):
-        """Get copies of spike data that are pickleable"""
+        """Get copies of spike data that are pickleable.
+
+        Returns
+        -------
+        data : dict
+            Returns the dipole data, spiking data, soma voltage
+            and currents as well as extracellular voltages.
+        """
 
         vsoma_py = dict()
         for gid, rec_v in self._vsoma.items():
@@ -585,13 +593,12 @@ class NetworkBuilder(object):
             rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
             rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
-        from copy import deepcopy
         data = {'dpl_data': dpl_data,
                 'spike_times': self._all_spike_times.to_python(),
                 'spike_gids': self._all_spike_gids.to_python(),
-                'gid_ranges': deepcopy(self.net.gid_ranges),
-                'vsoma': deepcopy(vsoma_py),
-                'isoma': deepcopy(isoma_py),
+                'gid_ranges': self.net.gid_ranges,
+                'vsoma': vsoma_py,
+                'isoma': isoma_py,
                 'rec_data': rec_arr_py,
                 'rec_times': rec_times_py}
 
