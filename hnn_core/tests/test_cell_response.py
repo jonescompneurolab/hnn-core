@@ -27,11 +27,8 @@ def test_cell_response(tmpdir):
     cell_response.plot_spikes_hist(show=False)
     cell_response.write(tmpdir.join('spk_%d.txt'))
     assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
-
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
-    cell_response.reset()
-    assert ("CellResponse | 0 simulation trials" in repr(cell_response))
     # reset clears all recorded variables, but leaves simulation time intact
     assert len(cell_response.times) == len(sim_times)
     sim_attributes = ['_spike_times', '_spike_gids', '_spike_types',
@@ -42,8 +39,6 @@ def test_cell_response(tmpdir):
     # size small
     assert list(cell_response.__dict__.keys()) == \
         sim_attributes + net_attributes
-    for attr in sim_attributes:  # populated by `simulate_dipole`
-        assert len(getattr(cell_response, attr)) == 0  # all lists are empty
 
     # Test recovery of empty spike files
     empty_spike = CellResponse(spike_times=[[], []], spike_gids=[[], []],

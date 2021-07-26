@@ -76,6 +76,8 @@ API
 
 - Simulation end time and integration time have to be specified now with `tstop` and `dt` in :func:`~hnn_core.simulate_dipole`, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
 
+- `~hnn_core.CellResponse.reset` method is not supported any more, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+
 .. _0.1:
 
 0.1
