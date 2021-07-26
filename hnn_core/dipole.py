@@ -20,7 +20,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
         The Network object specifying how cells are
         connected.
     tstop : float
-        The stop time (ms)
+        The simulation stop time (ms).
     dt : float
         The integration time step of h.CVode (s)
     n_trials : int | None

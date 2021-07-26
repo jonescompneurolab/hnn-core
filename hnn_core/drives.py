@@ -196,8 +196,7 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     dynamics : dict
         Parameters of the event time dynamics to simulate
     tstop : float
-        Last possible time for a spike event to occur in this trial (i.e., the
-        simulation stop time).
+        The simulation stop time (ms).
     target_type : str
         Type of cell (e.g. 'L2_basket') this drive cell will target. If
         'any' (default), the drive cell is non-specific.
