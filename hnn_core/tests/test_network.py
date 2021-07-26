@@ -168,7 +168,7 @@ def test_network():
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError,
                        match="'times' is an np.ndarray of simulation times"):
-        _ = CellResponse(times=[1, 2, 3])
+        _ = CellResponse(times='blah')
 
     # Assert that all external drives are initialized
     # Assumes legacy mode where cell-specific drives create artificial cells

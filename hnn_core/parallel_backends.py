@@ -18,8 +18,7 @@ from threading import Thread, Event
 
 from psutil import wait_procs, process_iter, NoSuchProcess
 
-import numpy as np
-
+from .cell_response import CellResponse
 from .dipole import Dipole
 
 _BACKEND = None
@@ -62,6 +61,12 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     """
     dpls = []
 
+    # Create array of equally sampled time points for simulating currents
+    cell_type_names = list(net.cell_types.keys())
+    cell_response = CellResponse(times=sim_data[0]['times'],
+                                 cell_type_names=cell_type_names)
+    net.cell_response = cell_response
+
     for idx in range(n_trials):
 
         # cell response
@@ -80,21 +85,21 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
                 idx]['rec_times'][arr_name]
 
         # dipole
-        dpl = Dipole(times=np.array(sim_data[idx]['times']),
+        dpl = Dipole(times=sim_data[idx]['times'],
                      data=sim_data[idx]['dpl_data'])
-        dpls.append(dpl)
 
         N_pyr_x = net._params['N_pyr_x']
         N_pyr_y = net._params['N_pyr_y']
-        dpls[-1]._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
-        dpls[-1]._convert_fAm_to_nAm()  # always applied, cf. #264
+        dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+        dpl._convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:
             window_len = net._params['dipole_smooth_win']  # specified in ms
             fctr = net._params['dipole_scalefctr']
             if window_len > 0:  # param files set this to zero for no smoothing
-                dpls[-1].smooth(window_len=window_len)
+                dpl.smooth(window_len=window_len)
             if fctr > 0:
-                dpls[-1].scale(fctr)
+                dpl.scale(fctr)
+        dpls.append(dpl)
 
     return dpls
 
