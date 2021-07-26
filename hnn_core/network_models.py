@@ -182,7 +182,6 @@ def law_2021_model():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    params['tstop'] = 400.0
     net = jones_2009_model(params)
 
     # Update biophysics (increase gabab duration of inhibition)
