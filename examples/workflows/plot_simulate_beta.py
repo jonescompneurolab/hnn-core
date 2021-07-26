@@ -163,9 +163,9 @@ net_beta_erp = add_erp_drives(net_beta_erp, stimulus_start)
 # And finally we simulate. Note that the default simulation time has been
 # increased to 400 ms to observe the long time course over which beta events
 # can influence sensory input to the cortical column.
-dpls_beta = simulate_dipole(net_beta)
-dpls_erp = simulate_dipole(net_erp)
-dpls_beta_erp = simulate_dipole(net_beta_erp)
+dpls_beta = simulate_dipole(net_beta, tstop=400)
+dpls_erp = simulate_dipole(net_erp, tstop=400)
+dpls_beta_erp = simulate_dipole(net_beta_erp, tstop=400)
 
 ###############################################################################
 # By inspecting the activity during the beta event, we can see that spiking
