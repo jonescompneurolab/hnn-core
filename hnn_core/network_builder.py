@@ -251,8 +251,6 @@ class NetworkBuilder(object):
     def __init__(self, net, trial_idx=0):
         self.net = net
         self.trial_idx = trial_idx
-        self.times = np.arange(0., net._params['tstop'] + net._params['dt'],
-                               net._params['dt'])
 
         # When computing the network dynamics in parallel, the nodes of the
         # network (real and artificial cells) potentially get distributed
@@ -275,6 +273,11 @@ class NetworkBuilder(object):
         self._drive_cells = list()
 
         self.ncs = dict()
+        self.dipoles = dict()
+
+        self._vsoma = dict()
+        self._isoma = dict()
+        self._nrn_rec_arrays = dict()
 
         # if extracellular electrodes have been included, we need to calculate
         # transmembrane currents at each integration step
@@ -298,11 +301,8 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        # Create a h.Vector() with size 1xself.N_t, zero'd
-        self.dipoles = {
-            'L5_pyramidal': h.Vector(self.times.size, 0),
-            'L2_pyramidal': h.Vector(self.times.size, 0),
-        }
+        self.dipoles['L5_pyramidal'] = h.Vector()
+        self.dipoles['L2_pyramidal'] = h.Vector()
 
         self._gid_assign()
 
@@ -317,9 +317,6 @@ class NetworkBuilder(object):
         # set to record spikes, somatic voltages, and extracellular potentials
         self._spike_times = h.Vector()
         self._spike_gids = h.Vector()
-        self._vsoma = dict()
-        self._isoma = dict()
-        self._nrn_rec_arrays = dict()
 
         # used by rank 0 for spikes across all procs (MPI)
         self._all_spike_times = h.Vector()
@@ -500,7 +497,11 @@ class NetworkBuilder(object):
         """Aggregate somatic currents, voltages, and dipoles."""
         for cell in self._cells:
             if cell.name in ('L5Pyr', 'L2Pyr'):
-                self.dipoles[_long_name(cell.name)].add(cell.dipole)
+                nrn_dpl = self.dipoles[_long_name(cell.name)]
+                if nrn_dpl.size() > 0:
+                    nrn_dpl.add(cell.dipole)
+                else:
+                    nrn_dpl.append(cell.dipole)
 
             self._vsoma[cell.gid] = cell.rec_v
             self._isoma[cell.gid] = cell.rec_i
