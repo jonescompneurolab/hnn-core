@@ -59,7 +59,6 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     net._params['N_trials'] = n_trials
 
     # XXX used in network_builder::_simulate_single_trial
-    # and network_builder.__init__()
     net._params['tstop'] = tstop
     net._params['dt'] = dt
 
