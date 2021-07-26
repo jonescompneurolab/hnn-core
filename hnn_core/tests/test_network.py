@@ -348,7 +348,7 @@ def test_tonic_biases():
                        ' negative'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
                            t0=5.0, tstop=4.0)
-        simulate_dipole(net, tstop=5.)
+        simulate_dipole(net, tstop=20.)
     net.external_biases = dict()
 
     with pytest.raises(ValueError, match='End time of tonic input cannot be'
