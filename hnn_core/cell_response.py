@@ -112,9 +112,9 @@ class CellResponse(object):
         self._vsoma = list()
         self._isoma = list()
         if times is not None:
-            if not isinstance(times, np.ndarray):
+            if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
-        self._times = times
+        self._times = np.array(times)
         self._cell_type_names = cell_type_names
 
     def __repr__(self):
