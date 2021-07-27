@@ -29,8 +29,15 @@ _CVODE = None
 _LAST_NETWORK = None
 
 
-def _simulate_single_trial(neuron_net, trial_idx):
-    """Simulate one trial."""
+def _simulate_single_trial(net, trial_idx):
+    """Simulate one trial including building the network
+
+    This is used by both backends. MPIBackend calls this in mpi_child.py, once
+    for each trial (blocking), and JoblibBackend calls this for each trial
+    (non-blocking)
+    """
+
+    neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
 
     global _PC, _CVODE
 
@@ -47,9 +54,9 @@ def _simulate_single_trial(neuron_net, trial_idx):
               (trial_idx + 1, nhosts))
 
     # Set tstop before instantiating any classes
-    h.tstop = neuron_net.net._params['tstop']
-    h.dt = neuron_net.net._params['dt']  # simulation duration and time-step
-    h.celsius = neuron_net.net._params['celsius']  # 37.0 - set temperature
+    h.tstop = net._params['tstop']
+    h.dt = net._params['dt']  # simulation duration and time-step
+    h.celsius = net._params['celsius']  # 37.0 - set temperature
 
     times = h.Vector().record(h._ref_t)
 
@@ -79,34 +86,41 @@ def _simulate_single_trial(neuron_net, trial_idx):
 
     # these calls aggregate data across procs/nodes
     neuron_net.aggregate_data()
-    _PC.allreduce(neuron_net.dipoles['L5_pyramidal'], 1)
-    _PC.allreduce(neuron_net.dipoles['L2_pyramidal'], 1)
-    for nrn_arr in neuron_net._nrn_rec_arrays.values():
-        _PC.allreduce(nrn_arr._nrn_voltages, 1)
 
-    # aggregate the currents and voltages independently on each proc
-    vsoma_list = _PC.py_gather(neuron_net._vsoma, 0)
-    isoma_list = _PC.py_gather(neuron_net._isoma, 0)
+    # now convert data from Neuron into Python
+    vsoma_py = dict()
+    for gid, rec_v in neuron_net._vsoma.items():
+        vsoma_py[gid] = rec_v.to_python()
 
-    # combine spiking data from each proc
-    spike_times_list = _PC.py_gather(neuron_net._spike_times, 0)
-    spike_gids_list = _PC.py_gather(neuron_net._spike_gids, 0)
+    isoma_py = dict()
+    for gid, rec_i in neuron_net._isoma.items():
+        isoma_py[gid] = {key: rec_i.to_python()
+                         for key, rec_i in rec_i.items()}
 
-    # only rank 0's lists are complete
+    dpl_data = np.c_[
+        np.array(neuron_net._nrn_dipoles['L2_pyramidal'].to_python()) +
+        np.array(neuron_net._nrn_dipoles['L5_pyramidal'].to_python()),
+        np.array(neuron_net._nrn_dipoles['L2_pyramidal'].to_python()),
+        np.array(neuron_net._nrn_dipoles['L5_pyramidal'].to_python())
+    ]
 
-    if rank == 0:
-        for spike_vec in spike_times_list:
-            neuron_net._all_spike_times.append(spike_vec)
-        for spike_vec in spike_gids_list:
-            neuron_net._all_spike_gids.append(spike_vec)
-        for vsoma in vsoma_list:
-            neuron_net._vsoma.update(vsoma)
-        for isoma in isoma_list:
-            neuron_net._isoma.update(isoma)
+    rec_arr_py = dict()
+    rec_times_py = dict()
+    for arr_name, nrn_arr in neuron_net._nrn_rec_arrays.items():
+        rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
+        rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
-    _PC.barrier()  # get all nodes to this place before continuing
+    data = {'dpl_data': dpl_data,
+            'spike_times': neuron_net._all_spike_times.to_python(),
+            'spike_gids': neuron_net._all_spike_gids.to_python(),
+            'gid_ranges': net.gid_ranges,
+            'vsoma': vsoma_py,
+            'isoma': isoma_py,
+            'rec_data': rec_arr_py,
+            'rec_times': rec_times_py,
+            'times': times.to_python()}
 
-    return times.to_python()
+    return data
 
 
 def _is_loaded_mechanisms():
@@ -229,12 +243,6 @@ class NetworkBuilder(object):
     ncs : dict of list
         A dictionary with key describing the types of cell objects connected
         and contains a list of NetCon objects.
-    dipoles : dict of h.Vector()
-        A dictionary containing total magnetic dipole moment over cell types.
-        Keys are L2_pyramidal and L5_pyramidal.
-    current : dict of h.Vector()
-        A dictionary containing total somatic currents over cell types.
-        Keys are L2_pyramidal and L5_pyramidal.
 
     Notes
     -----
@@ -274,7 +282,7 @@ class NetworkBuilder(object):
         self._drive_cells = list()
 
         self.ncs = dict()
-        self.dipoles = dict()
+        self._nrn_dipoles = dict()
 
         self._vsoma = dict()
         self._isoma = dict()
@@ -302,8 +310,8 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        self.dipoles['L5_pyramidal'] = h.Vector()
-        self.dipoles['L2_pyramidal'] = h.Vector()
+        self._nrn_dipoles['L5_pyramidal'] = h.Vector()
+        self._nrn_dipoles['L2_pyramidal'] = h.Vector()
 
         self._gid_assign()
 
@@ -498,7 +506,7 @@ class NetworkBuilder(object):
         """Aggregate somatic currents, voltages, and dipoles."""
         for cell in self._cells:
             if cell.name in ('L5Pyr', 'L2Pyr'):
-                nrn_dpl = self.dipoles[_long_name(cell.name)]
+                nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
 
                 # dipoles are initialized as empty h.Vector() containers
                 # the first cell is "appended", setting the
@@ -510,6 +518,32 @@ class NetworkBuilder(object):
 
             self._vsoma[cell.gid] = cell.rec_v
             self._isoma[cell.gid] = cell.rec_i
+
+        _PC.allreduce(self._nrn_dipoles['L5_pyramidal'], 1)
+        _PC.allreduce(self._nrn_dipoles['L2_pyramidal'], 1)
+        for nrn_arr in self._nrn_rec_arrays.values():
+            _PC.allreduce(nrn_arr._nrn_voltages, 1)
+
+        # aggregate the currents and voltages independently on each proc
+        vsoma_list = _PC.py_gather(self._vsoma, 0)
+        isoma_list = _PC.py_gather(self._isoma, 0)
+
+        # combine spiking data from each proc
+        spike_times_list = _PC.py_gather(self._spike_times, 0)
+        spike_gids_list = _PC.py_gather(self._spike_gids, 0)
+
+        # only rank 0's lists are complete
+        if _get_rank() == 0:
+            for spike_vec in spike_times_list:
+                self._all_spike_times.append(spike_vec)
+            for spike_vec in spike_gids_list:
+                self._all_spike_gids.append(spike_vec)
+            for vsoma in vsoma_list:
+                self._vsoma.update(vsoma)
+            for isoma in isoma_list:
+                self._isoma.update(isoma)
+
+        _PC.barrier()  # get all nodes to this place before continuing
 
     def state_init(self):
         """Initializes the state closer to baseline."""
@@ -566,47 +600,6 @@ class NetworkBuilder(object):
 
         self._gid_list = list()
         self._cells = list()
-
-    def get_data_from_neuron(self):
-        """Get copies of spike data that are pickleable.
-
-        Returns
-        -------
-        data : dict
-            Returns the dipole data, spiking data, soma voltage
-            and currents as well as extracellular voltages.
-        """
-
-        vsoma_py = dict()
-        for gid, rec_v in self._vsoma.items():
-            vsoma_py[gid] = rec_v.to_python()
-
-        isoma_py = dict()
-        for gid, rec_i in self._isoma.items():
-            isoma_py[gid] = {key: rec_i.to_python()
-                             for key, rec_i in rec_i.items()}
-
-        dpl_data = np.c_[np.array(self.dipoles['L2_pyramidal'].to_python()) +
-                         np.array(self.dipoles['L5_pyramidal'].to_python()),
-                         np.array(self.dipoles['L2_pyramidal'].to_python()),
-                         np.array(self.dipoles['L5_pyramidal'].to_python())]
-
-        rec_arr_py = dict()
-        rec_times_py = dict()
-        for arr_name, nrn_arr in self._nrn_rec_arrays.items():
-            rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
-            rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
-
-        data = {'dpl_data': dpl_data,
-                'spike_times': self._all_spike_times.to_python(),
-                'spike_gids': self._all_spike_gids.to_python(),
-                'gid_ranges': self.net.gid_ranges,
-                'vsoma': vsoma_py,
-                'isoma': isoma_py,
-                'rec_data': rec_arr_py,
-                'rec_times': rec_times_py}
-
-        return data
 
     def _clear_last_network_objects(self):
         """Clears NEURON objects and saves the current Network instance"""
