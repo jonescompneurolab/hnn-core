@@ -79,10 +79,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         # extracellular array
         for arr_name, arr in net.rec_arrays.items():
             # voltages is a n_trials x n_contacts x n_samples array
-            net.rec_arrays[
-                arr_name]._data.append(sim_data[idx]['rec_data'][arr_name])
-            net.rec_arrays[arr_name]._times = sim_data[
-                idx]['rec_times'][arr_name]
+            arr._data.append(sim_data[idx]['rec_data'][arr_name])
+            arr._times = sim_data[idx]['rec_times'][arr_name]
 
         # dipole
         dpl = Dipole(times=sim_data[idx]['times'],
