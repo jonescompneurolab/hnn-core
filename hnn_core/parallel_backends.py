@@ -20,6 +20,7 @@ from psutil import wait_procs, process_iter, NoSuchProcess
 
 from .cell_response import CellResponse
 from .dipole import Dipole
+from .network_builder import _simulate_single_trial
 
 _BACKEND = None
 
@@ -30,27 +31,6 @@ def _thread_handler(event, out, queue):
         if line == '':
             break
         queue.put(line)
-
-
-def _clone_and_simulate(net, trial_idx):
-    """Run a simulation including building the network
-
-    This is used by both backends. MPIBackend calls this in mpi_child.py, once
-    for each trial (blocking), and JoblibBackend calls this for each trial
-    (non-blocking)
-    """
-
-    # avoid relative lookups after being forked (Joblib)
-    from hnn_core.network_builder import NetworkBuilder
-    from hnn_core.network_builder import _simulate_single_trial
-
-    neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
-    times = _simulate_single_trial(neuron_net, trial_idx)
-
-    sim_data = neuron_net.get_data_from_neuron()
-    sim_data['times'] = times
-
-    return sim_data
 
 
 def _gather_trial_data(sim_data, net, n_trials, postproc):
@@ -546,7 +526,7 @@ class JoblibBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-        parallel, myfunc = self._parallel_func(_clone_and_simulate)
+        parallel, myfunc = self._parallel_func(_simulate_single_trial)
         sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
