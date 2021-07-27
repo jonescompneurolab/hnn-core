@@ -499,6 +499,10 @@ class NetworkBuilder(object):
         for cell in self._cells:
             if cell.name in ('L5Pyr', 'L2Pyr'):
                 nrn_dpl = self.dipoles[_long_name(cell.name)]
+
+                # dipoles are initialized as empty h.Vector() containers
+                # the first cell is "appended", setting the
+                # length of the vector, after which cell data are added (sum)
                 if nrn_dpl.size() > 0:
                     nrn_dpl.add(cell.dipole)
                 else:
