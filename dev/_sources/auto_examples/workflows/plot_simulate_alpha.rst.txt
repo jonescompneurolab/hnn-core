@@ -169,7 +169,7 @@ time with unique randomization. The drive is only connected to the proximal
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7f3b17377ac8>
+    <hnn_core.dipole.Dipole object at 0x7ff71971a3c8>
 
 
 
@@ -353,7 +353,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 20 minutes  13.643 seconds)
+   **Total running time of the script:** ( 3 minutes  11.403 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

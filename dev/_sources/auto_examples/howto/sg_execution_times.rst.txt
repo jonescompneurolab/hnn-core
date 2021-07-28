@@ -5,14 +5,14 @@
 
 Computation times
 =================
-**64:23.378** total execution time for **auto_examples_howto** files:
+**13:34.167** total execution time for **auto_examples_howto** files:
 
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)                                       | 45:28.436 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)                                       | 10:36.576 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)                       | 06:34.148 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``) | 01:17.181 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``) | 06:23.709 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``plot_firing_pattern.py``)                                   | 01:05.151 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``plot_firing_pattern.py``)                                   | 05:57.085 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)                       | 00:35.258 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+

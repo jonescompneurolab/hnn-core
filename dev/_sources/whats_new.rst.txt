@@ -38,6 +38,8 @@ Changelog
 
 - Each drive spike train sampled through an independent process corresponds to a single artificial drive cell, the number of which users can set when adding drives with `n_drive_cells` and `cell_specific`, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
 
+- Add :func:`~hnn_core.Network.pick_connection` to query the indices of specific connections in :attr:`~hnn_core.Network.connectivity`, by `Nick Tolley`_ in `#367 <https://github.com/jonescompneurolab/hnn-core/pull/367>`_
+
 Bug
 ~~~
 

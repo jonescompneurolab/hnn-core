@@ -103,29 +103,35 @@ predefined drives without the drives API shown previously).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-44
+.. GENERATED FROM PYTHON SOURCE LINES 38-46
 
 Instantiating the network comes with a predefined set of connections that
 reflect the canonical neocortical microcircuit. ``net.connectivity``
 is a list of dictionaries which detail every cell-cell, and drive-cell
 connection. The weights of these connections can be visualized with
 :func:`~hnn_core.viz.plot_connectivity_weights` as well as
-:func:`~hnn_core.viz.plot_cell_connectivity`
+:func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
+connections using ``pick_connection`` which returns the indices
+of ``net.connectivity`` that match the provided parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-56
+.. GENERATED FROM PYTHON SOURCE LINES 46-62
 
 .. code-block:: default
 
     from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+    from hnn_core.network import pick_connection
 
     print(len(net_erp.connectivity))
 
-    conn_idx = 6
+    conn_indices = pick_connection(
+        net=net_erp, src_gids='L5_basket', target_gids='L5_pyramidal',
+        loc='soma', receptor='gabaa')
+    conn_idx = conn_indices[0]
     print(net_erp.connectivity[conn_idx])
     plot_connectivity_matrix(net_erp, conn_idx)
 
     gid_idx = 11
-    src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+    src_gid = net_erp.connectivity[conn_idx]['src_gids'][gid_idx]
     fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 
@@ -137,13 +143,13 @@ connection. The weights of these connections can be visualized with
     *
 
       .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_001.png
-          :alt: evprox1 -> L2_basket (proximal, ampa)
+          :alt: L5_basket -> L5_pyramidal (soma, gabaa)
           :class: sphx-glr-multi-img
 
     *
 
       .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_002.png
-          :alt: evprox1-> L2_basket (proximal, ampa)
+          :alt: L5_basket-> L5_pyramidal (soma, gabaa)
           :class: sphx-glr-multi-img
 
 
@@ -154,23 +160,23 @@ connection. The weights of these connections can be visualized with
  .. code-block:: none
 
     30
-    evprox1 -> L2_basket
-    cell counts: 35 srcs, 35 targets
+    L5_basket -> L5_pyramidal
+    cell counts: 35 srcs, 100 targets
     connection probability: 1.0 
-    loc: 'proximal'; receptor: 'ampa'
-    weight: 0.08831; delay: 0.1; lamtha: 3.0
+    loc: 'soma'; receptor: 'gabaa'
+    weight: 0.025; delay: 1.0; lamtha: 70.0
  
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-60
+.. GENERATED FROM PYTHON SOURCE LINES 63-66
 
 Data recorded during simulations are stored under
 :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
 a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-63
+.. GENERATED FROM PYTHON SOURCE LINES 66-69
 
 .. code-block:: default
 
@@ -217,7 +223,7 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-73
+.. GENERATED FROM PYTHON SOURCE LINES 70-79
 
 We can also define our own connections to test the effect of different
 connectivity patterns. To start, ``net.clear_connectivity()`` can be used
@@ -229,11 +235,9 @@ and L2 basket cells. :meth:`hnn_core.Network.add_connection` allows
 connections to be specified with either cell names, or the cell IDs (gids)
 directly.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-100
+.. GENERATED FROM PYTHON SOURCE LINES 79-104
 
 .. code-block:: default
-
-
 
     def get_network(probability=1.0):
         net = jones_2009_model(params, add_drives_from_params=True)
@@ -295,13 +299,13 @@ directly.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-104
+.. GENERATED FROM PYTHON SOURCE LINES 105-108
 
 We can additionally use the ``probability`` argument to create a sparse
 connectivity pattern instead of all-to-all. Let's try creating the same
 network with a 10% chance of cells connecting to each other.
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-107
+.. GENERATED FROM PYTHON SOURCE LINES 108-111
 
 .. code-block:: default
 
@@ -343,7 +347,7 @@ network with a 10% chance of cells connecting to each other.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-113
+.. GENERATED FROM PYTHON SOURCE LINES 112-117
 
 With the previous connection pattern there appears to be synchronous rhythmic
 firing of the L5 pyramidal cells with a period of 10 ms. The synchronous
@@ -351,7 +355,7 @@ activity is visible as vertical lines where several cells fire simultaneously
 Using the sparse connectivity pattern produced a lot more spiking in
 the L5 pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-116
+.. GENERATED FROM PYTHON SOURCE LINES 117-120
 
 .. code-block:: default
 
@@ -388,37 +392,27 @@ the L5 pyramidal cells.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-118
+.. GENERATED FROM PYTHON SOURCE LINES 121-122
 
 We can plot the sparse connectivity pattern between cell populations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-124
+.. GENERATED FROM PYTHON SOURCE LINES 122-129
 
 .. code-block:: default
 
-    conn_idx = len(net_sparse.connectivity) - 1
+    conn_indices = pick_connection(
+        net=net_sparse, src_gids='L2_basket', target_gids='L2_basket',
+        loc='soma', receptor='gabaa')
+
+    conn_idx = conn_indices[0]
     plot_connectivity_matrix(net_sparse, conn_idx)
 
-    conn_idx = len(net_sparse.connectivity) - 2
-    plot_connectivity_matrix(net_sparse, conn_idx)
 
 
 
-
-.. rst-class:: sphx-glr-horizontal
-
-
-    *
-
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_006.png
-          :alt: L2_basket -> L2_basket (soma, gabaa)
-          :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_007.png
-          :alt: L2_basket -> L5_pyramidal (soma, gabaa)
-          :class: sphx-glr-multi-img
+.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_006.png
+    :alt: L2_basket -> L2_basket (soma, gabaa)
+    :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -432,23 +426,23 @@ We can plot the sparse connectivity pattern between cell populations.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-127
+.. GENERATED FROM PYTHON SOURCE LINES 130-132
 
 Note that the sparsity is in addition to the weight decay with distance
 from the source cell.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-130
+.. GENERATED FROM PYTHON SOURCE LINES 132-135
 
 .. code-block:: default
 
-    src_gid = net_sparse.connectivity[conn_idx]['src_range'][5]
+    src_gid = net_sparse.connectivity[conn_idx]['src_gids'][5]
     plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
 
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
-    :alt: L2_basket-> L5_pyramidal (soma, gabaa)
+.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_007.png
+    :alt: L2_basket-> L2_basket (soma, gabaa)
     :class: sphx-glr-single-img
 
 
@@ -463,14 +457,14 @@ from the source cell.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-135
+.. GENERATED FROM PYTHON SOURCE LINES 136-140
 
 In the sparse network, there still appears to be some rhythmicity
 where the cells are firing synchronously with a smaller period of 4-5 ms.
 As a final step, we can see how this change in spiking activity impacts
 the aggregate current dipole.
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-150
+.. GENERATED FROM PYTHON SOURCE LINES 140-155
 
 .. code-block:: default
 
@@ -492,7 +486,7 @@ the aggregate current dipole.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_009.png
+.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
     :alt: Aggregate (L2 + L5)
     :class: sphx-glr-single-img
 
@@ -511,7 +505,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 45 minutes  28.436 seconds)
+   **Total running time of the script:** ( 10 minutes  36.576 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

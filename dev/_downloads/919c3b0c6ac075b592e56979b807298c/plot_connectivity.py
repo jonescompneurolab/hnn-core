@@ -40,17 +40,23 @@ net_erp = jones_2009_model(params, add_drives_from_params=True)
 # is a list of dictionaries which detail every cell-cell, and drive-cell
 # connection. The weights of these connections can be visualized with
 # :func:`~hnn_core.viz.plot_connectivity_weights` as well as
-# :func:`~hnn_core.viz.plot_cell_connectivity`
+# :func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
+# connections using ``pick_connection`` which returns the indices
+# of ``net.connectivity`` that match the provided parameters.
 from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+from hnn_core.network import pick_connection
 
 print(len(net_erp.connectivity))
 
-conn_idx = 6
+conn_indices = pick_connection(
+    net=net_erp, src_gids='L5_basket', target_gids='L5_pyramidal',
+    loc='soma', receptor='gabaa')
+conn_idx = conn_indices[0]
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
 gid_idx = 11
-src_gid = net_erp.connectivity[conn_idx]['src_range'][gid_idx]
+src_gid = net_erp.connectivity[conn_idx]['src_gids'][gid_idx]
 fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 ###############################################################################
@@ -70,8 +76,6 @@ net_erp.cell_response.plot_spikes_raster()
 # and L2 basket cells. :meth:`hnn_core.Network.add_connection` allows
 # connections to be specified with either cell names, or the cell IDs (gids)
 # directly.
-
-
 def get_network(probability=1.0):
     net = jones_2009_model(params, add_drives_from_params=True)
     net.clear_connectivity()
@@ -115,16 +119,17 @@ net_sparse.cell_response.plot_spikes_raster()
 
 ###############################################################################
 # We can plot the sparse connectivity pattern between cell populations.
-conn_idx = len(net_sparse.connectivity) - 1
-plot_connectivity_matrix(net_sparse, conn_idx)
+conn_indices = pick_connection(
+    net=net_sparse, src_gids='L2_basket', target_gids='L2_basket',
+    loc='soma', receptor='gabaa')
 
-conn_idx = len(net_sparse.connectivity) - 2
+conn_idx = conn_indices[0]
 plot_connectivity_matrix(net_sparse, conn_idx)
 
 ###############################################################################
 # Note that the sparsity is in addition to the weight decay with distance
 # from the source cell.
-src_gid = net_sparse.connectivity[conn_idx]['src_range'][5]
+src_gid = net_sparse.connectivity[conn_idx]['src_gids'][5]
 plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
 
 ###############################################################################
