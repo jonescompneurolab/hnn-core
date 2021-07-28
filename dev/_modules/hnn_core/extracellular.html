@@ -570,6 +570,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">n_contacts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secs_on_rank</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span> <span class="o">=</span> <span class="kc">None</span>
@@ -595,40 +597,33 @@
 <span class="sd">            ``&#39;Pyr&#39;``. For basket cells, use ``&#39;Basket&#39;``. NB This argument is</span>
 <span class="sd">            currently not exposed in the API.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">secs_on_rank</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">allsec</span><span class="p">()</span>  <span class="c1"># get all h.Sections known to this MPI rank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secs_on_rank</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">allsec</span><span class="p">()</span>  <span class="c1"># get all h.Sections known to this rank</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">include_celltypes</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;include_celltypes&#39;</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;Pyr&#39;</span><span class="p">,</span>
                                                                <span class="s1">&#39;Basket&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">include_celltypes</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
-            <span class="n">secs_on_rank</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">secs_on_rank</span> <span class="k">if</span>
-                            <span class="n">include_celltypes</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secs_on_rank</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secs_on_rank</span> <span class="k">if</span>
+                                 <span class="n">include_celltypes</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span>
 
-        <span class="n">segment_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">sec</span><span class="o">.</span><span class="n">nseg</span> <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">]</span>
-        <span class="n">n_total_segments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">segment_counts</span><span class="p">)</span>
+        <span class="n">segment_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">sec</span><span class="o">.</span><span class="n">nseg</span> <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secs_on_rank</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">segment_counts</span><span class="p">)</span>
 
         <span class="c1"># pointers assigned to _ref_i_membrane_ at each EACH internal segment</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">PtrVector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">PtrVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span><span class="p">)</span>
         <span class="c1"># placeholder into which pointer values are read on each sim time step</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span><span class="p">)</span>
 
-        <span class="n">ptr_idx</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">sec</span><span class="p">:</span>  <span class="c1"># section end points (0, 1) not included</span>
-                <span class="c1"># set Nth pointer to the net membrane current at this segment</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">pset</span><span class="p">(</span>
-                    <span class="n">ptr_idx</span><span class="p">,</span> <span class="n">sec</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_i_membrane_</span><span class="p">)</span>
-                <span class="n">ptr_idx</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">ptr_idx</span> <span class="o">!=</span> <span class="n">n_total_segments</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected </span><span class="si">{</span><span class="n">n_total_segments</span><span class="si">}</span><span class="s1"> imem pointers, &#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="n">ptr_idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">ptr_update_callback</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_imem_pointers_to_ref_i_membrane_</span><span class="p">)</span>
 
         <span class="c1"># transfer resistances for each segment (keep in Neuron Matrix object)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="n">n_total_segments</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">positions</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">transfer_resistance</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secs_on_rank</span><span class="p">:</span>
                     <span class="n">this_xfer_r</span> <span class="o">=</span> <span class="n">_transfer_resistance</span><span class="p">(</span>
                         <span class="n">sec</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">conductivity</span><span class="p">,</span>
                         <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
@@ -639,7 +634,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># for testing, make a matrix of ones</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">setrow</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
-                                            <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+                                            <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span><span class="p">,</span>
+                                                     <span class="mf">1.</span><span class="p">))</span>
 
         <span class="c1"># record time for each array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_t</span><span class="p">)</span>
@@ -647,7 +643,7 @@
         <span class="c1"># contributions of all segments on this rank to total calculated</span>
         <span class="c1"># potential at electrode (_PC.allreduce called in _simulate_dipole)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span><span class="p">)</span>
 
         <span class="c1"># Attach a callback for calculating the potentials at each time step.</span>
         <span class="c1"># Enables fast calculation of transmembrane current (nA) at each</span>
@@ -656,11 +652,30 @@
         <span class="c1"># &quot;multiple threads&quot;.</span>
         <span class="n">cvode</span><span class="o">.</span><span class="n">extra_scatter_gather</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_potentials_callback</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_set_imem_pointers_to_ref_i_membrane_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Let h.PtrVector.pset point to each segment&#39;s _ref_i_membrane_</span>
+
+<span class="sd">        NB this needs to be a separate method so that</span>
+<span class="sd">        self._nrn_imem_ptrvec.ptr_update_callback can be called during _build.</span>
+<span class="sd">        Without it, repeated calls of simulate_dipole will cause segmentation</span>
+<span class="sd">        faults.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ptr_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secs_on_rank</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">sec</span><span class="p">:</span>  <span class="c1"># section end points (0, 1) not included</span>
+                <span class="c1"># set Nth pointer to the net membrane current at this segment</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">pset</span><span class="p">(</span>
+                    <span class="n">ptr_idx</span><span class="p">,</span> <span class="n">sec</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_i_membrane_</span><span class="p">)</span>
+                <span class="n">ptr_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">ptr_idx</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_total_segments</span><span class="si">}</span><span class="s1"> imem &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;pointers, got </span><span class="si">{</span><span class="n">ptr_idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_nrn_n_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the length (in samples) of the extracellular data.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Something went wrong: have </span><span class="si">{self.n_contacts}</span><span class="s1">&#39;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Something went wrong: have </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1">&#39;</span>
                                <span class="sa">f</span><span class="s1">&#39;, but </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s1"> samples&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">)</span>
 
