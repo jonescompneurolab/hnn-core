@@ -1,6 +1,6 @@
 """Neuron simulation functions and NetworkBuilder class."""
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
@@ -98,10 +98,10 @@ def _simulate_single_trial(net, trial_idx):
                          for key, rec_i in rec_i.items()}
 
     dpl_data = np.c_[
-        np.array(neuron_net._nrn_dipoles['L2_pyramidal'].to_python()) +
-        np.array(neuron_net._nrn_dipoles['L5_pyramidal'].to_python()),
-        np.array(neuron_net._nrn_dipoles['L2_pyramidal'].to_python()),
-        np.array(neuron_net._nrn_dipoles['L5_pyramidal'].to_python())
+        neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
+        neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy(),
+        neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy(),
+        neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy()
     ]
 
     rec_arr_py = dict()

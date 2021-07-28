@@ -14,7 +14,7 @@ evoked response, as observed in Jones et al. J. Neuroscience 2007 [1]_
 to the recorded data.
 """
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mmjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
