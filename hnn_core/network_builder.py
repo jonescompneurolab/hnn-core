@@ -29,7 +29,7 @@ _CVODE = None
 _LAST_NETWORK = None
 
 
-def _simulate_single_trial(net, trial_idx):
+def _simulate_single_trial(net, tstop, dt, trial_idx):
     """Simulate one trial including building the network
 
     This is used by both backends. MPIBackend calls this in mpi_child.py, once
@@ -54,8 +54,8 @@ def _simulate_single_trial(net, trial_idx):
               (trial_idx + 1, nhosts))
 
     # Set tstop before instantiating any classes
-    h.tstop = net._params['tstop']
-    h.dt = net._params['dt']  # simulation duration and time-step
+    h.tstop = tstop
+    h.dt = dt  # simulation duration and time-step
     h.celsius = net._params['celsius']  # 37.0 - set temperature
 
     times = h.Vector().record(h._ref_t)
