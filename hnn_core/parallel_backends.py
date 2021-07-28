@@ -508,7 +508,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, n_trials, postproc=False):
+    def simulate(self, net, tstop, dt, n_trials, postproc=False):
         """Simulate the HNN model
 
         Parameters
@@ -518,6 +518,10 @@ class JoblibBackend(object):
             connected.
         n_trials : int
             Number of trials to simulate.
+        tstop : float
+            The simulation stop time (ms).
+        dt : float
+            The integration time step of h.CVode (s)
         postproc : bool
             If False, no postprocessing applied to the dipole
 
@@ -527,7 +531,8 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
         parallel, myfunc = self._parallel_func(_simulate_single_trial)
-        sim_data = parallel(myfunc(net, idx) for idx in range(n_trials))
+        sim_data = parallel(myfunc(net, tstop, dt, trial_idx) for
+                            trial_idx in range(n_trials))
 
         dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
                                   postproc=postproc)
@@ -649,7 +654,7 @@ class MPIBackend(object):
         # always kill nrniv processes for good measure
         kill_proc_name('nrniv')
 
-    def simulate(self, net, n_trials, postproc=False):
+    def simulate(self, net, tstop, dt, n_trials, postproc=False):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -657,6 +662,10 @@ class MPIBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
+        tstop : float
+            The simulation stop time (ms).
+        dt : float
+            The integration time step of h.CVode (s)
         n_trials : int
             Number of trials to simulate.
         postproc: bool
@@ -670,7 +679,9 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            return JoblibBackend(n_jobs=1).simulate(net, n_trials=n_trials,
+            return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
+                                                    dt=dt,
+                                                    n_trials=n_trials,
                                                     postproc=postproc)
 
         print("Running %d trials..." % (n_trials))

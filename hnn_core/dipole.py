@@ -96,7 +96,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
                       ' in a future release of hnn-core. Please define '
                       'smoothing and scaling explicitly using Dipole methods.',
                       DeprecationWarning)
-    dpls = _BACKEND.simulate(net, n_trials, postproc)
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
 
     return dpls
 

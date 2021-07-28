@@ -120,14 +120,14 @@ class MPISimulation(object):
         sys.stderr.write('@end_of_data:%d@\n' % len(pickled_bytes))
         sys.stderr.flush()  # flush to ensure signal is not buffered
 
-    def run(self, net):
+    def run(self, net, tstop, dt):
         """Run MPI simulation(s) and write results to stderr"""
 
         from hnn_core.network_builder import _simulate_single_trial
 
         sim_data = []
         for trial_idx in range(net._params['N_trials']):
-            single_sim_data = _simulate_single_trial(net, trial_idx)
+            single_sim_data = _simulate_single_trial(net, tstop, dt, trial_idx)
 
             # go ahead and append trial data for each rank, though
             # only rank 0 has data that should be sent back to MPIBackend
@@ -148,8 +148,8 @@ if __name__ == '__main__':
 
     try:
         with MPISimulation() as mpi_sim:
-            net = mpi_sim._read_net()
-            sim_data = mpi_sim.run(net)
+            net, tstop, dt = mpi_sim._read_net()
+            sim_data = mpi_sim.run(net, tstop, dt)
             mpi_sim._write_data_stderr(sim_data)
             mpi_sim._wait_for_exit_signal()
     except Exception:
