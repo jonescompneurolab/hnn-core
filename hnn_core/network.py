@@ -764,7 +764,7 @@ class Network(object):
         drive['target_types'] = target_populations  # for _connect_celltypes
         drive['cell_specific'] = cell_specific
 
-        if cell_specific:
+        if n_drive_cells == 'n_cells':
             n_drive_cells = 0
             for cell_type in target_populations:
                 n_drive_cells += len(self.gid_ranges[cell_type])
@@ -772,7 +772,7 @@ class Network(object):
         drive['n_drive_cells'] = n_drive_cells
         self.external_drives[name] = drive
 
-        pos = [self.pos_dict['origin'] for _ in n_drive_cells]
+        pos = [self.pos_dict['origin']] * n_drive_cells
         self._add_cell_type(name, pos)
 
         receptors = ['ampa', 'nmda']
@@ -780,20 +780,33 @@ class Network(object):
             receptors = ['ampa']
 
         for receptor in receptors:
-            for target_cell_type in weights_by_receptor[receptor]:
-                target_gids = list(self.gid_ranges[target_cell_type])
-                if drive['cell_specific']:
-                    gid_idxs = np.array(target_gids) - target_gids[0]
-                    src_gids_list = (list(self.gid_ranges[name])
-                                     [gid_idxs[0]:gid_idxs[-1]])
-                    src_gids = [[src_gid] for src_gid in src_gids_list]
-                    target_gids = [[target_gid] for target_gid in target_gids]
-                else:
+            if drive['cell_specific']:
+                # Set the starting index for source gids
+                # This will be updated depending on the number of target cells
+                # for each cell type
+                src_idx = 0
+                for target_cell_type in weights_by_receptor[receptor]:
+                    target_gids = list(self.gid_ranges[target_cell_type])
+                    target_gids_nested = [[target_gid] for
+                                          target_gid in target_gids]
+                    src_idx_end = src_idx + len(target_gids)
+                    src_gids_by_type = (list(self.gid_ranges[name])
+                                        [src_idx:src_idx_end])
+                    weights = weights_by_receptor[receptor][target_cell_type]
+                    delays = synaptic_delays[target_cell_type]
+                    self.add_connection(src_gids_by_type, target_gids_nested,
+                                        location, receptor, weights, delays,
+                                        space_constant)
+                    src_idx = src_idx_end
+            else:
+                for target_cell_type in weights_by_receptor[receptor]:
+                    target_gids = list(self.gid_ranges[target_cell_type])
                     src_gids = list(self.gid_ranges[name])
-                weights = weights_by_receptor[receptor][target_cell_type]
-                delays = synaptic_delays[target_cell_type]
-                self.add_connection(name, src_gids, target_gids, location,
-                                    receptor, weights, delays, space_constant)
+                    weights = weights_by_receptor[receptor][target_cell_type]
+                    delays = synaptic_delays[target_cell_type]
+                    self.add_connection(src_gids, target_gids, location,
+                                        receptor, weights, delays,
+                                        space_constant)
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
