@@ -15,7 +15,7 @@ alpha/beta complex similar to Figure 20 in the GUI tutorial, albeit without
 visualization of the corresponding time-frequency spectrograms [1]_.
 """
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Christopher Bailey <bailey.cj@gmail.com>
