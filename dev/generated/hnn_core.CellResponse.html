@@ -187,7 +187,7 @@ Dictionary indexed by gids containing somatic voltages.</p>
 <dt><strong>isoma</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
 Dictionary indexed by gids containing somatic currents.</p>
 </dd>
-<dt><strong>times</strong><span class="classifier">numpy array</span></dt><dd><p>Array of time points for samples in continuous data.
+<dt><strong>times</strong><span class="classifier">array-like, shape (n_times,)</span></dt><dd><p>Array of time points for samples in continuous data.
 This includes vsoma and isoma.</p>
 </dd>
 </dl>
@@ -340,12 +340,6 @@ a new figure is created.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.CellResponse.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.reset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reset all recorded attributes to empty lists.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.CellResponse.update_types">
 <span class="sig-name descname"><span class="pre">update_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.update_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.update_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update spike types in the current instance of CellResponse.</p>
@@ -402,7 +396,7 @@ path to the output spike file(s).</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
     </p>
   </div>
 </footer>

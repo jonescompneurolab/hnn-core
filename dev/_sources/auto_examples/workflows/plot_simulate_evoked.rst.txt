@@ -502,7 +502,7 @@ across trials.
     from hnn_core import JoblibBackend
 
     with JoblibBackend(n_jobs=2):
-        dpls = simulate_dipole(net, n_trials=2)
+        dpls = simulate_dipole(net, tstop=170., n_trials=2)
 
 
 
@@ -635,7 +635,7 @@ object, this time we make a copy of it before smoothing and scaling.
 
 .. code-block:: default
 
-    dpls_sync = simulate_dipole(net_sync, n_trials=1)
+    dpls_sync = simulate_dipole(net_sync, tstop=170., n_trials=1)
 
     trial_idx = 0
     dpls_sync[trial_idx].copy().smooth(window_len).scale(scaling_factor).plot()
@@ -704,7 +704,7 @@ modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  42.618 seconds)
+   **Total running time of the script:** ( 11 minutes  28.900 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

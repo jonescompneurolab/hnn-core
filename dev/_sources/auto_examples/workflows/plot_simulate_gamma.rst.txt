@@ -150,7 +150,7 @@ simulate the dipole moment in a single trial (the default value used by
 
 .. code-block:: default
 
-    dpls = simulate_dipole(net)
+    dpls = simulate_dipole(net, tstop=250.)
     scaling_factor = 30000
     dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
@@ -289,7 +289,7 @@ is applied to the entire duration of the simulation.
 .. code-block:: default
 
     net.add_tonic_bias(cell_type='L5_pyramidal', amplitude=6.)
-    dpls = simulate_dipole(net, n_trials=1)
+    dpls = simulate_dipole(net, tstop=250., n_trials=1)
     dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
     dpls[trial_idx].plot()
@@ -421,7 +421,7 @@ frequency from ~50 to ~65 Hz.
 .. code-block:: default
 
     net.cell_types['L5_pyramidal'].p_syn['gabaa']['tau2'] = 2
-    dpls = simulate_dipole(net, n_trials=1)
+    dpls = simulate_dipole(net, tstop=250., n_trials=1)
     dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
     fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
@@ -490,7 +490,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  50.756 seconds)
+   **Total running time of the script:** ( 26 minutes  13.436 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:

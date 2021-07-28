@@ -174,7 +174,7 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 .. code-block:: default
 
-    dpl_erp = simulate_dipole(net_erp, n_trials=1)
+    dpl_erp = simulate_dipole(net_erp, tstop=170., n_trials=1)
     net_erp.cell_response.plot_spikes_raster()
 
 
@@ -258,7 +258,7 @@ directly.
 
 
     net_all = get_network()
-    dpl_all = simulate_dipole(net_all, n_trials=1)
+    dpl_all = simulate_dipole(net_all, tstop=170., n_trials=1)
 
 
 
@@ -306,7 +306,7 @@ network with a 10% chance of cells connecting to each other.
 .. code-block:: default
 
     net_sparse = get_network(probability=0.1)
-    dpl_sparse = simulate_dipole(net_sparse, n_trials=1)
+    dpl_sparse = simulate_dipole(net_sparse, tstop=170., n_trials=1)
 
 
 
@@ -511,7 +511,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 11 minutes  37.846 seconds)
+   **Total running time of the script:** ( 45 minutes  28.436 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

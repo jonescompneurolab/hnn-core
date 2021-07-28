@@ -140,7 +140,7 @@
 <span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_dipole</span><span class="p">,</span> <span class="n">plot_psd</span><span class="p">,</span> <span class="n">plot_tfr_morlet</span>
 
 
-<div class="viewcode-block" id="simulate_dipole"><a class="viewcode-back" href="../../generated/hnn_core.simulate_dipole.html#hnn_core.dipole.simulate_dipole">[docs]</a><span class="k">def</span> <span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsoma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="simulate_dipole"><a class="viewcode-back" href="../../generated/hnn_core.simulate_dipole.html#hnn_core.dipole.simulate_dipole">[docs]</a><span class="k">def</span> <span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsoma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">record_isoma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simulate a dipole given the experiment parameters.</span>
 
@@ -149,6 +149,10 @@
 <span class="sd">    net : Network object</span>
 <span class="sd">        The Network object specifying how cells are</span>
 <span class="sd">        connected.</span>
+<span class="sd">    tstop : float</span>
+<span class="sd">        The simulation stop time (ms).</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        The integration time step of h.CVode (s)</span>
 <span class="sd">    n_trials : int | None</span>
 <span class="sd">        The number of trials to simulate. If None, the &#39;N_trials&#39; value</span>
 <span class="sd">        of the ``params`` used to create ``net`` is used (must be &gt;0)</span>
@@ -183,8 +187,26 @@
 
     <span class="c1"># XXX needed in mpi_child.py:run()#L103; include fix in #211 or later PR</span>
     <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_trials&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_trials</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">_instantiate_drives</span><span class="p">(</span><span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">)</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>  <span class="c1"># see #290 for context; relevant for MPI</span>
+
+    <span class="c1"># XXX used in network_builder::_simulate_single_trial</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>
+
+    <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">][</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">][</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
+    <span class="k">for</span> <span class="n">bias_name</span><span class="p">,</span> <span class="n">bias</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_biases</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">bias_cell_type</span> <span class="ow">in</span> <span class="n">bias</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
+            <span class="k">if</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;End time of tonic input cannot be negative&#39;</span><span class="p">)</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">duration</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Duration of tonic input cannot be negative&#39;</span><span class="p">)</span>
+
+    <span class="n">net</span><span class="o">.</span><span class="n">_instantiate_drives</span><span class="p">(</span><span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
     <span class="n">net</span><span class="o">.</span><span class="n">_reset_rec_arrays</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_vsoma</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
@@ -289,7 +311,7 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    times : array</span>
+<span class="sd">    times : array-like</span>
 <span class="sd">        The time vector (in ms)</span>
 <span class="sd">    sfreq : float</span>
 <span class="sd">        The sampling frequency (in Hz)</span>
@@ -303,7 +325,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nave</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># noqa: D102</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">times</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;L5&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nave</span> <span class="o">=</span> <span class="n">nave</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># NB assumes len &gt; 1</span>
@@ -635,7 +657,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
     </p>
   </div>
 </footer>

@@ -145,7 +145,6 @@
 <span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_get_target_populations</span><span class="p">,</span> <span class="n">_add_drives_from_params</span>
 <span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_check_drive_parameter_values</span><span class="p">,</span> <span class="n">_check_poisson_rates</span>
 <span class="kn">from</span> <span class="nn">.cells_default</span> <span class="kn">import</span> <span class="n">pyramidal</span><span class="p">,</span> <span class="n">basket</span>
-<span class="kn">from</span> <span class="nn">.cell_response</span> <span class="kn">import</span> <span class="n">CellResponse</span>
 <span class="kn">from</span> <span class="nn">.params</span> <span class="kn">import</span> <span class="n">_long_name</span><span class="p">,</span> <span class="n">_short_name</span>
 <span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_cells</span>
 <span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
@@ -372,14 +371,7 @@
             <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">))</span>
         <span class="p">}</span>
 
-        <span class="c1"># Create array of equally sampled time points for simulating currents</span>
-        <span class="c1"># NB (only) used to initialise self.cell_response._times</span>
-        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
-        <span class="n">cell_type_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="c1"># Create CellResponse object, initialised with simulation time points</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span> <span class="o">=</span> <span class="n">CellResponse</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">times</span><span class="p">,</span>
-                                          <span class="n">cell_type_names</span><span class="o">=</span><span class="n">cell_type_names</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># external drives and biases</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">external_biases</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -443,7 +435,6 @@
         <span class="c1"># clear cells containing Neuron objects to avoid pickling error</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">net_copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">net_copy</span><span class="o">.</span><span class="n">cell_response</span> <span class="o">=</span> <span class="n">CellResponse</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_times</span><span class="p">)</span>
         <span class="n">net_copy</span><span class="o">.</span><span class="n">_reset_drives</span><span class="p">()</span>
         <span class="n">net_copy</span><span class="o">.</span><span class="n">_reset_rec_arrays</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">net_copy</span></div>
@@ -584,13 +575,9 @@
 <span class="sd">        seedcore : int</span>
 <span class="sd">            Optional initial seed for random number generator (default: 2).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sim_end_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">tstop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tstop</span> <span class="o">=</span> <span class="n">sim_end_time</span>
 
         <span class="n">_check_drive_parameter_values</span><span class="p">(</span><span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="n">tstart</span><span class="p">,</span>
-                                      <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
-                                      <span class="n">sim_end_time</span><span class="o">=</span><span class="n">sim_end_time</span><span class="p">)</span>
+                                      <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
         <span class="n">target_populations</span> <span class="o">=</span> <span class="n">_get_target_populations</span><span class="p">(</span><span class="n">weights_ampa</span><span class="p">,</span>
                                                      <span class="n">weights_nmda</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">_check_poisson_rates</span><span class="p">(</span><span class="n">rate_constant</span><span class="p">,</span> <span class="n">target_populations</span><span class="p">,</span>
@@ -677,12 +664,8 @@
 <span class="sd">        seedcore : int</span>
 <span class="sd">            Optional initial seed for random number generator (default: 2).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sim_end_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">tstop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tstop</span> <span class="o">=</span> <span class="n">sim_end_time</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
             <span class="n">_check_drive_parameter_values</span><span class="p">(</span><span class="s1">&#39;bursty&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="n">tstart</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
-                                          <span class="n">sim_end_time</span><span class="o">=</span><span class="n">sim_end_time</span><span class="p">,</span>
                                           <span class="n">sigma</span><span class="o">=</span><span class="n">tstart_std</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">)</span>
             <span class="n">_check_drive_parameter_values</span><span class="p">(</span><span class="s1">&#39;bursty&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">burst_std</span><span class="p">,</span>
                                           <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">,</span>
@@ -942,11 +925,13 @@
         <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rec_arrays</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">arr</span><span class="o">.</span><span class="n">_reset</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_instantiate_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_instantiate_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates drive_event_times vectors for all drives and all trials</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        tstop : float</span>
+<span class="sd">            The simulation stop time (ms)</span>
 <span class="sd">        n_trials : int</span>
 <span class="sd">            Number of trials to create events for (default: 1)</span>
 
@@ -970,11 +955,11 @@
                             <span class="n">event_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_drive_cell_event_times</span><span class="p">(</span>
                                 <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
                                 <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">],</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                                 <span class="n">target_type</span><span class="o">=</span><span class="n">target_type</span><span class="p">,</span>
                                 <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
                                 <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid</span><span class="p">,</span>
-                                <span class="n">seedcore</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">])</span>
+                                <span class="n">seedcore</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">],</span>
+                                <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
                             <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Only return empty event times if all cells have</span>
@@ -983,7 +968,7 @@
                         <span class="n">src_event_times</span> <span class="o">=</span> <span class="n">_drive_cell_event_times</span><span class="p">(</span>
                             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
                             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">],</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
                             <span class="n">target_type</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span>
                             <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
                             <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid</span><span class="p">,</span>
@@ -1019,22 +1004,10 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Tonic bias already defined for </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">t0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">t0</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">tstop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tstop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">tstop</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;End time of tonic input cannot be negative&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">tstop</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;End time of tonic input cannot exceed &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;simulation end time </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">. &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;Got </span><span class="si">{</span><span class="n">tstop</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cell_type must be one of &#39;</span>
                              <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s1">. &#39;</span>
                              <span class="sa">f</span><span class="s1">&#39;Got </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">duration</span> <span class="o">=</span> <span class="n">tstop</span> <span class="o">-</span> <span class="n">t0</span>
-        <span class="k">if</span> <span class="n">duration</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Duration of tonic input cannot be negative&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="s1">&#39;tonic&#39;</span><span class="p">][</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="n">amplitude</span><span class="p">,</span>
@@ -1051,7 +1024,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
         <span class="k">if</span> <span class="n">cell_template</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">cell_name</span><span class="p">:</span> <span class="n">cell_template</span><span class="p">})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_cell_type_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Network.gid_to_type"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.gid_to_type">[docs]</a>    <span class="k">def</span> <span class="nf">gid_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reverse lookup of gid to type.&quot;&quot;&quot;</span>
@@ -1448,7 +1420,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
     </p>
   </div>
 </footer>

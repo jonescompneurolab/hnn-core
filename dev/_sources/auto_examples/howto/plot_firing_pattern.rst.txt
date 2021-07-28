@@ -181,7 +181,7 @@ differ from first.
         weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=synaptic_delays_prox, seedcore=4)
 
-    dpls = simulate_dipole(net, record_vsoma=True)
+    dpls = simulate_dipole(net, tstop=170., record_vsoma=True)
 
 
 
@@ -431,7 +431,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  51.879 seconds)
+   **Total running time of the script:** ( 5 minutes  57.085 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:

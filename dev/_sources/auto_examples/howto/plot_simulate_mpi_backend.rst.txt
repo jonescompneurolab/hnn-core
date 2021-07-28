@@ -341,26 +341,7 @@ Then we read the default parameters file
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-38
-
-Update a few of the default parameters related to visualisation
-
-.. GENERATED FROM PYTHON SOURCE LINES 38-42
-
-.. code-block:: default
-
-    params.update({
-        'tstop': 310.0,
-    })
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 43-50
+.. GENERATED FROM PYTHON SOURCE LINES 37-44
 
 Following :ref:`the alpha example
 <sphx_glr_auto_examples_plot_simulate_alpha.py>`, we add a
@@ -370,7 +351,7 @@ The occurrence of each burst is jittered by a random, normally distributed
 amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization.
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-58
+.. GENERATED FROM PYTHON SOURCE LINES 44-52
 
 .. code-block:: default
 
@@ -389,7 +370,7 @@ time with unique randomization.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-64
+.. GENERATED FROM PYTHON SOURCE LINES 53-58
 
 Finally, to simulate we use the
 :class:`~hnn_core.parallel_backends.MPIBackend` class. This will
@@ -397,14 +378,14 @@ start the simulation across the number of processors (cores) specified by
 ``n_procs`` using MPI. The ``'mpiexec'`` launcher is used from
 ``openmpi``, which must be installed on the system
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-71
+.. GENERATED FROM PYTHON SOURCE LINES 58-65
 
 .. code-block:: default
 
     from hnn_core import MPIBackend
 
     with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-        dpls = simulate_dipole(net, n_trials=1)
+        dpls = simulate_dipole(net, tstop=310., n_trials=1)
 
     trial_idx = 0
     dpls[trial_idx].plot()
@@ -425,7 +406,7 @@ start the simulation across the number of processors (cores) specified by
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
-    [90757f9143ce:01761] Read -1, expected 164558, errno = 1
+    [87af45ff894e:01763] Read -1, expected 114725, errno = 1
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -462,15 +443,15 @@ start the simulation across the number of processors (cores) specified by
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    [90757f9143ce:01761] Read -1, expected 49608, errno = 1
-    [90757f9143ce:01760] Read -1, expected 49600, errno = 1
-    [90757f9143ce:01761] Read -1, expected 49600, errno = 1
-    [90757f9143ce:01760] Read -1, expected 49608, errno = 1
-    [90757f9143ce:01761] Read -1, expected 49608, errno = 1
-    [90757f9143ce:01760] Read -1, expected 49600, errno = 1
-    [90757f9143ce:01761] Read -1, expected 49600, errno = 1
-    [90757f9143ce:01760] Read -1, expected 49608, errno = 1
-    [90757f9143ce:01760] Read -1, expected 5616, errno = 1
+    [87af45ff894e:01763] Read -1, expected 49608, errno = 1
+    [87af45ff894e:01762] Read -1, expected 49600, errno = 1
+    [87af45ff894e:01762] Read -1, expected 49608, errno = 1
+    [87af45ff894e:01763] Read -1, expected 49600, errno = 1
+    [87af45ff894e:01763] Read -1, expected 49608, errno = 1
+    [87af45ff894e:01762] Read -1, expected 49600, errno = 1
+    [87af45ff894e:01762] Read -1, expected 49608, errno = 1
+    [87af45ff894e:01763] Read -1, expected 49600, errno = 1
+    [87af45ff894e:01762] Read -1, expected 5616, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -479,7 +460,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  38.918 seconds)
+   **Total running time of the script:** ( 6 minutes  34.148 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

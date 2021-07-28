@@ -51,6 +51,9 @@ Bug
 
 - Fix bug where :func:`~hnn_core.read_spikes` wasn't returning a :class:`~hnn_core.CellResponse` instance with updated spike types, by `Ryan Thorpe`_ in `#382 <https://github.com/jonescompneurolab/hnn-core/pull/382>`_
 
+- `~hnn_core.Dipole.times` and `~hnn_core.Cell_response.times` now reflect the actual integration points instead of the intended
+   times, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+
 API
 ~~~
 - New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
@@ -70,6 +73,10 @@ API
 - Deprecated `postproc` argument in :func:`~hnn_core.dipole.simulate_dipole`, whereby user should explicitly smooth and scale resulting dipoles, by `Christopher Bailey`_ in `#372 <https://github.com/jonescompneurolab/hnn-core/pull/372>`_
 
 - Number of drive cells and their connectivity can now be specified through the `n_drive_cells` and `cell_specific` arguments in `Network.add_xxx_drive()` methods, replacing use of `repeats` and `sync_within_trial`, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
+
+- Simulation end time and integration time have to be specified now with `tstop` and `dt` in :func:`~hnn_core.simulate_dipole`, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+
+- `~hnn_core.CellResponse.reset` method is not supported any more, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
 
 .. _0.1:
 

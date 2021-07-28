@@ -222,7 +222,7 @@ net.add_evoked_drive(
 n_trials = 2
 # n_trials = 25
 with JoblibBackend(n_jobs=2):
-    dpls = simulate_dipole(net, n_trials=n_trials)
+    dpls = simulate_dipole(net, tstop=170., n_trials=n_trials)
 
 ###############################################################################
 # Since the model is a reduced representation of the larger network

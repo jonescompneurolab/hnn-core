@@ -148,6 +148,10 @@
 
 <span class="kn">from</span> <span class="nn">psutil</span> <span class="kn">import</span> <span class="n">wait_procs</span><span class="p">,</span> <span class="n">process_iter</span><span class="p">,</span> <span class="n">NoSuchProcess</span>
 
+<span class="kn">from</span> <span class="nn">.cell_response</span> <span class="kn">import</span> <span class="n">CellResponse</span>
+<span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
+<span class="kn">from</span> <span class="nn">.network_builder</span> <span class="kn">import</span> <span class="n">_simulate_single_trial</span>
+
 <span class="n">_BACKEND</span> <span class="o">=</span> <span class="kc">None</span>
 
 
@@ -159,26 +163,6 @@
         <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_clone_and_simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run a simulation including building the network</span>
-
-<span class="sd">    This is used by both backends. MPIBackend calls this in mpi_child.py, once</span>
-<span class="sd">    for each trial (blocking), and JoblibBackend calls this for each trial</span>
-<span class="sd">    (non-blocking)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># avoid relative lookups after being forked (Joblib)</span>
-    <span class="kn">from</span> <span class="nn">hnn_core.network_builder</span> <span class="kn">import</span> <span class="n">NetworkBuilder</span>
-    <span class="kn">from</span> <span class="nn">hnn_core.network_builder</span> <span class="kn">import</span> <span class="n">_simulate_single_trial</span>
-
-    <span class="n">neuron_net</span> <span class="o">=</span> <span class="n">NetworkBuilder</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">)</span>
-    <span class="n">dpl</span> <span class="o">=</span> <span class="n">_simulate_single_trial</span><span class="p">(</span><span class="n">neuron_net</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span>
-
-    <span class="n">sim_data</span> <span class="o">=</span> <span class="n">neuron_net</span><span class="o">.</span><span class="n">get_data_from_neuron</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">dpl</span><span class="p">,</span> <span class="n">sim_data</span>
-
-
 <span class="k">def</span> <span class="nf">_gather_trial_data</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Arrange data by trial</span>
 
@@ -187,32 +171,43 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dpls</span> <span class="o">=</span> <span class="p">[]</span>
 
+    <span class="c1"># Create array of equally sampled time points for simulating currents</span>
+    <span class="n">cell_type_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">cell_response</span> <span class="o">=</span> <span class="n">CellResponse</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">sim_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;times&#39;</span><span class="p">],</span>
+                                 <span class="n">cell_type_names</span><span class="o">=</span><span class="n">cell_type_names</span><span class="p">)</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span> <span class="o">=</span> <span class="n">cell_response</span>
+
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
-        <span class="n">dpls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">sim_data_trial</span> <span class="o">=</span> <span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_gids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># cell response</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;spike_times&#39;</span><span class="p">])</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_gids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;spike_gids&#39;</span><span class="p">])</span>
         <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">update_types</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">)</span>
-        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_vsoma</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_isoma</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_vsoma</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;vsoma&#39;</span><span class="p">])</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_isoma</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;isoma&#39;</span><span class="p">])</span>
+
+        <span class="c1"># extracellular array</span>
         <span class="k">for</span> <span class="n">arr_name</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># voltages is a n_trials x n_contacts x n_samples array</span>
-            <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="p">[</span>
-                <span class="n">arr_name</span><span class="p">]</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="n">arr_name</span><span class="p">])</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;rec_data&#39;</span><span class="p">][</span><span class="n">arr_name</span><span class="p">])</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;rec_times&#39;</span><span class="p">][</span><span class="n">arr_name</span><span class="p">]</span>
 
-            <span class="n">net</span><span class="o">.</span><span class="n">rec_arrays</span><span class="p">[</span><span class="n">arr_name</span><span class="p">]</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="n">sim_data_trial</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="n">arr_name</span><span class="p">]</span>
+        <span class="c1"># dipole</span>
+        <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;times&#39;</span><span class="p">],</span>
+                     <span class="n">data</span><span class="o">=</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;dpl_data&#39;</span><span class="p">])</span>
 
         <span class="n">N_pyr_x</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_x&#39;</span><span class="p">]</span>
         <span class="n">N_pyr_y</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_y&#39;</span><span class="p">]</span>
-        <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_baseline_renormalize</span><span class="p">(</span><span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">)</span>  <span class="c1"># XXX cf. #270</span>
-        <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_convert_fAm_to_nAm</span><span class="p">()</span>  <span class="c1"># always applied, cf. #264</span>
+        <span class="n">dpl</span><span class="o">.</span><span class="n">_baseline_renormalize</span><span class="p">(</span><span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">)</span>  <span class="c1"># XXX cf. #270</span>
+        <span class="n">dpl</span><span class="o">.</span><span class="n">_convert_fAm_to_nAm</span><span class="p">()</span>  <span class="c1"># always applied, cf. #264</span>
         <span class="k">if</span> <span class="n">postproc</span><span class="p">:</span>
             <span class="n">window_len</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;dipole_smooth_win&#39;</span><span class="p">]</span>  <span class="c1"># specified in ms</span>
             <span class="n">fctr</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;dipole_scalefctr&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">window_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># param files set this to zero for no smoothing</span>
-                <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">window_len</span><span class="o">=</span><span class="n">window_len</span><span class="p">)</span>
+                <span class="n">dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">window_len</span><span class="o">=</span><span class="n">window_len</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">fctr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">dpls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">fctr</span><span class="p">)</span>
+                <span class="n">dpl</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">fctr</span><span class="p">)</span>
+        <span class="n">dpls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dpl</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dpls</span>
 
@@ -661,7 +656,7 @@
 <span class="sd">        dpl: list of Dipole</span>
 <span class="sd">            The Dipole results from each simulation trial</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">parallel</span><span class="p">,</span> <span class="n">myfunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_func</span><span class="p">(</span><span class="n">_clone_and_simulate</span><span class="p">)</span>
+        <span class="n">parallel</span><span class="p">,</span> <span class="n">myfunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_func</span><span class="p">(</span><span class="n">_simulate_single_trial</span><span class="p">)</span>
         <span class="n">sim_data</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span><span class="n">myfunc</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
 
         <span class="n">dpls</span> <span class="o">=</span> <span class="n">_gather_trial_data</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
@@ -854,7 +849,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
     </p>
   </div>
 </footer>

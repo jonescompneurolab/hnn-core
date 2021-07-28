@@ -71,7 +71,7 @@ net.add_electrode_array('shank1', electrode_pos)
 print(net.rec_arrays)
 net.plot_cells()
 
-dpl = simulate_dipole(net)
+dpl = simulate_dipole(net, tstop=170)
 
 ###############################################################################
 # For plotting both aggregate dipole moment and LFP traces, we'll use a 10 ms
