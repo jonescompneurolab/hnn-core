@@ -340,17 +340,6 @@ class NetworkBuilder(object):
         if _get_rank() == 0:
             print('[Done]')
 
-    def __enter__(self):
-        """Context manager to cleanly build NetworkBuilder objects"""
-        return self
-
-    def __exit__(self, cell_type, value, traceback):
-        """Clear up NEURON internal gid information."""
-
-        self._clear_neuron_objects()
-        if _LAST_NETWORK is not None:
-            _LAST_NETWORK._clear_neuron_objects()
-
     # this happens on EACH node
     # creates self._gid_list for THIS node
     def _gid_assign(self):
@@ -492,9 +481,8 @@ class NetworkBuilder(object):
             nrn_arr._build(cvode=_CVODE)
             self._nrn_rec_arrays.update({arr_name: nrn_arr})
 
-    # setup spike recording for this node
     def _record_spikes(self):
-
+        """Setup spike recording for this node"""
         # iterate through gids on this node and
         # set to record spikes in spike time vec and id vec
         # agnostic to type of source, will sort that out later
