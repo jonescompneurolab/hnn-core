@@ -946,21 +946,16 @@
 <span class="sd">        synaptic_delays : dict or float</span>
 <span class="sd">            Synaptic delay (in ms) at the column origin, dispersed laterally as</span>
 <span class="sd">            a function of the space_constant</span>
-<span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
+<span class="sd">        n_drive_cells : int</span>
 <span class="sd">            The number of drive cells (i.e., ArtificialCell objects) that</span>
-<span class="sd">            contribute to this drive. If n_drive_cells=&#39;n_cells&#39; and</span>
-<span class="sd">            cell_specific=True, an artificial drive cell get assigned to each</span>
-<span class="sd">            cell in the network with 1-to-1 connectivity (completely</span>
-<span class="sd">            unsynchronous). Otherwise, drive cells get assigned with all-to-all</span>
-<span class="sd">            connectivity. If you wish to synchronize the timing of this evoked</span>
-<span class="sd">            drive across the network in a given trial with one spike, set</span>
-<span class="sd">            n_drive_cells=1 and cell_specific=False.</span>
+<span class="sd">            contribute to this drive. If you wish to synchronize the timing of</span>
+<span class="sd">            this evoked drive across the network in a given trial with one</span>
+<span class="sd">            spike, set n_drive_cells=1 and cell_specific=False.</span>
 <span class="sd">        cell_specific : bool</span>
 <span class="sd">            Whether each artifical drive cell has 1-to-1 (True) or all-to-all</span>
 <span class="sd">            (False) connection parameters. Note that 1-to-1 connectivity</span>
-<span class="sd">            requires that n_drive_cells=&#39;n_cells&#39;, where &#39;n_cells&#39;</span>
-<span class="sd">            denotes the number of all available cells that this drive can</span>
-<span class="sd">            target in the network.</span>
+<span class="sd">            requires that n_drive_cells equals the number of cells that this</span>
+<span class="sd">            drive targets in the network.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
