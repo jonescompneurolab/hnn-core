@@ -17,6 +17,7 @@ if int(__version__[0]) >= 8:
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
 from .extracellular import _ExtracellularArrayBuilder
+from .network import pick_connection
 
 # a few globals
 _PC = None
@@ -363,23 +364,27 @@ class NetworkBuilder(object):
 
         self.net._update_cells()  # updates net.n_cells
 
-        # round robin assignment of gids
+        # round robin assignment of cell gids
         for gid in range(self._rank, self.net.n_cells, n_hosts):
-            # set the cell gid
             self._gid_list.append(gid)
 
-        # loop over all drives, then all cell types, then all artificial cells
-        # only assign a "source" artificial cell to this rank if its target
-        # exists in _gid_list. "Global" drives get placed on different ranks
         for drive in self.net.external_drives.values():
             if drive['cell_specific']:
-                for conn in drive['conn'].values():  # all cell types
-                    for src_gid, target_gid in zip(conn['src_gids'],
-                                                   conn['target_gids']):
+                # only assign drive gids that have a target cell gid already
+                # assigned to this rank
+                for src_gid in self.net.gid_ranges[drive['name']]:
+                    conn_idxs = pick_connection(self.net, src_gids=src_gid)
+                    target_gids = list()
+                    for conn_idx in conn_idxs:
+                        target_gids += (self.net.connectivity[conn_idx]
+                                        ['target_gids'])
+
+                    for target_gid in set(target_gids):
                         if (target_gid in self._gid_list and
                                 src_gid not in self._gid_list):
                             self._gid_list.append(src_gid)
             else:
+                # round robin assignment of drive gids
                 src_gids = list(self.net.gid_ranges[drive['name']])
                 for gid_idx in range(self._rank, len(src_gids), n_hosts):
                     self._gid_list.append(src_gids[gid_idx])

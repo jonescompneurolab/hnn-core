@@ -1174,7 +1174,7 @@ class _Connectivity(dict):
         Number of unique target gids.
     src_gids : list of int
         List of unique source gids in connection.
-    target_gidst : list of int
+    target_gids : list of int
         List of unique target gids in connection.
     loc : str
         Location of synapse on target cell. Must be
