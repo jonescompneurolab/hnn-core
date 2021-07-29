@@ -141,9 +141,6 @@ def _add_drives_from_params(net):
             t0=bias_specs['tonic'][cellname]['t0'],
             tstop=bias_specs['tonic'][cellname]['tstop'])
 
-    net._instantiate_drives(tstop=net._params['tstop'],
-                            n_trials=net._params['N_trials'])
-
 
 def _get_prng(seed, gid, sync_evinput=False):
     """Random generator for this instance.

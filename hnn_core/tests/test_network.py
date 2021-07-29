@@ -22,6 +22,10 @@ def test_network_models():
     """"Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated
     net_law = law_2021_model()
+    # instantiate drive events for NetworkBuilder
+    net_law._instantiate_drives(tstop=net_law._params['tstop'],
+                                n_trials=net_law._params['N_trials'])
+
     for cell_name in ['L5_pyramidal', 'L2_pyramidal']:
         assert net_law.cell_types[cell_name].p_syn['gabab']['tau1'] == 45.0
         assert net_law.cell_types[cell_name].p_syn['gabab']['tau2'] == 200.0
@@ -41,6 +45,9 @@ def test_network_models():
 
     # Ensure distant dependent calcium gbar
     net_calcium = calcium_model()
+    # instantiate drive events for NetworkBuilder
+    net_calcium._instantiate_drives(tstop=net_calcium._params['tstop'],
+                                    n_trials=net_calcium._params['N_trials'])
     network_builder = NetworkBuilder(net_calcium)
     gid = net_calcium.gid_ranges['L5_pyramidal'][0]
     for section_name, section in network_builder._cells[gid].sections.items():
@@ -65,6 +72,9 @@ def test_network():
                    't0_input_prox': 50})
 
     net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
+    # instantiate drive events for NetworkBuilder
+    net._instantiate_drives(tstop=params['tstop'],
+                            n_trials=params['N_trials'])
     network_builder = NetworkBuilder(net)  # needed to populate net.cells
 
     # Assert that params are conserved across Network initialization
@@ -225,6 +235,9 @@ def test_network():
 
     # Test inputs for connectivity API
     net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
+    # instantiate drive events for NetworkBuilder
+    net._instantiate_drives(tstop=params['tstop'],
+                            n_trials=params['N_trials'])
     n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
     kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
                           loc='soma', receptor='gabaa',
@@ -366,6 +379,9 @@ def test_add_cell_type():
     """Test adding a new cell type."""
     params = read_params(params_fname)
     net = jones_2009_model(params)
+    # instantiate drive events for NetworkBuilder
+    net._instantiate_drives(tstop=params['tstop'],
+                            n_trials=params['N_trials'])
 
     n_total_cells = net.n_cells
     pos = [(0, idx, 0) for idx in range(10)]

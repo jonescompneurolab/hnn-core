@@ -96,10 +96,6 @@ def run_hnn_core_fixture():
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
 
-        # number of trials simulated
-        for drive in net.external_drives.values():
-            assert len(drive['events']) == params['N_trials']
-
         if backend == 'mpi':
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
@@ -114,6 +110,10 @@ def run_hnn_core_fixture():
             dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                    record_isoma=record_vsoma,
                                    postproc=postproc, tstop=tstop)
+
+        # number of trials simulated
+        for drive in net.external_drives.values():
+            assert len(drive['events']) == params['N_trials']
 
         return dpls, net
     return _run_hnn_core_fixture
