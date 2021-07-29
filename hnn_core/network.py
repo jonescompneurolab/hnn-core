@@ -35,11 +35,15 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4,
         The number of Pyramidal cells in y direction.
 
     zdiff : float
-        Expressed as a positive DEPTH of L2 relative to L5, where L5 is defined
-        to lie at z==0. Interlaminar weight/delay calculations (lamtha) are not
-        affected.
+        Expressed as a positive DEPTH of L2 relative to L5 pyramidal cell
+        somas, where L5 is defined to lie at z==0. Interlaminar weight/delay
+        calculations (lamtha) are not affected. The basket cells are
+        arbitrarily placed slightly above (L5) and slightly below (L2) their
+        respective pyramidal cell layers.
     inplane_distance : float
-        The grid spacing in um
+        The grid spacing of pyramidal cells (in um). Note that basket cells are
+        placed in an uneven formation. Each one of them lies on a grid point
+        together with a pyramidal cell, though (overlapping).
 
     Returns
     -------
@@ -77,9 +81,9 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff=1307.4,
     # append the z value for position for L2 and L5
     # print(len(coords_sorted))
 
-    pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], zdiff / 2) for
+    pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
                              pos_xy in coords_sorted]
-    pos_dict['L2_basket'] = [(pos_xy[0], pos_xy[1], 1.3 * zdiff) for
+    pos_dict['L2_basket'] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
                              pos_xy in coords_sorted]
 
     # ORIGIN
