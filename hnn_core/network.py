@@ -253,7 +253,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
         inner_set = set()
         # Union of indices which match inputs for single parameter
         for term in search_terms:
-            inner_set = inner_set.union(search_dict[term])
+            inner_set = inner_set.union(search_dict.get(term, list()))
         # Intersection across parameters
         if conn_set and inner_set:
             conn_set = conn_set.intersection(inner_set)
@@ -780,7 +780,7 @@ class Network(object):
             receptors = ['ampa']
 
         for receptor in receptors:
-            if drive['cell_specific']:
+            if cell_specific:
                 # Set the starting index for source gids
                 # This will be updated depending on the number of target cells
                 # for each cell type
@@ -839,12 +839,16 @@ class Network(object):
         for trial_idx in range(n_trials):
             for drive in self.external_drives.values():
                 event_times = list()  # new list for each trial and drive
-                if drive['cell_specific']:
-                    # loop over drives (one for each target cell population)
-                    # and create event times
-                    for this_cell_drive_conn in drive['conn'].values():
-                        target_type = this_cell_drive_conn['target_type']
-                        for drive_cell_gid in this_cell_drive_conn['src_gids']:
+                for drive_cell_gid in self.gid_ranges[drive['name']]:
+                    if drive['cell_specific']:
+                        # loop over drives (one for each target cell
+                        # population) and create event times
+                        conn_idxs = pick_connection(self,
+                                                    src_gids=drive_cell_gid)
+                        target_types = set([self.connectivity[conn_idx]
+                                            ['target_type'] for conn_idx in
+                                            conn_idxs])
+                        for target_type in target_types:
                             event_times.append(_drive_cell_event_times(
                                 drive['type'],
                                 drive['dynamics'],
@@ -854,10 +858,7 @@ class Network(object):
                                 seedcore=drive['seedcore'],
                                 tstop=tstop)
                             )
-                else:
-                    # Only return empty event times if all cells have
-                    # no events
-                    for drive_cell_gid in self.gid_ranges[drive['name']]:
+                    else:
                         src_event_times = _drive_cell_event_times(
                             drive['type'],
                             drive['dynamics'],
