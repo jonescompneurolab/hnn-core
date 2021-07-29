@@ -15,7 +15,7 @@ of the GUI tutorial, and strong gamma rhythms similar to Figure 12 and 13
 in the GUI tutorial.
 """
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <bailey.cj@gmail.com>
 

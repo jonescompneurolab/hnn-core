@@ -37,7 +37,7 @@ to the recorded data.
 .. code-block:: default
 
 
-    # Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+    # Authors: Mainak Jas <mmjas@mgh.harvard.edu>
     #          Sam Neymotin <samnemo@gmail.com>
     #          Blake Caldwell <blake_caldwell@brown.edu>
     #          Christopher Bailey <cjb@cfin.au.dk>
@@ -704,7 +704,7 @@ modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  50.591 seconds)
+   **Total running time of the script:** ( 1 minutes  44.279 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

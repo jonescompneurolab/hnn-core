@@ -13,7 +13,7 @@ want to simulate in parallel across trials, the Joblib backend allows this
 without the need to install and configure MPI.
 """
 
-# Authors: Mainak Jas <mainak.jas@telecom-paristech.fr>
+# Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
 ###############################################################################
