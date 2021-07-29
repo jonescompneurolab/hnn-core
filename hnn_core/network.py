@@ -8,8 +8,9 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 
 import itertools as it
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
 
 from .drives import _drive_cell_event_times
 from .drives import _get_target_populations, _add_drives_from_params
