@@ -816,21 +816,16 @@ class Network(object):
         synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
-        n_drive_cells : int | 'n_cells'
+        n_drive_cells : int
             The number of drive cells (i.e., ArtificialCell objects) that
-            contribute to this drive. If n_drive_cells='n_cells' and
-            cell_specific=True, an artificial drive cell get assigned to each
-            cell in the network with 1-to-1 connectivity (completely
-            unsynchronous). Otherwise, drive cells get assigned with all-to-all
-            connectivity. If you wish to synchronize the timing of this evoked
-            drive across the network in a given trial with one spike, set
-            n_drive_cells=1 and cell_specific=False.
+            contribute to this drive. If you wish to synchronize the timing of
+            this evoked drive across the network in a given trial with one
+            spike, set n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
             Whether each artifical drive cell has 1-to-1 (True) or all-to-all
             (False) connection parameters. Note that 1-to-1 connectivity
-            requires that n_drive_cells='n_cells', where 'n_cells'
-            denotes the number of all available cells that this drive can
-            target in the network.
+            requires that n_drive_cells equals the number of cells that this
+            drive targets in the network.
 
         Returns
         -------
