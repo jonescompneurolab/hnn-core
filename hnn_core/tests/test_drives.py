@@ -11,6 +11,7 @@ from hnn_core import Params, Network, read_params
 from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
                              _create_bursty_input)
 from hnn_core.params import create_pext
+from hnn_core.network import pick_connection
 
 
 def test_external_drive_times():
@@ -129,9 +130,12 @@ def test_add_drives():
 
     assert net.external_drives['bursty']['n_drive_cells'] == n_drive_cells
     assert net.external_drives['bursty']['cell_specific'] == cell_specific
-    for type_name, drive in net.external_drives['bursty']['conn'].items():
-        assert drive['ampa']['A_weight'] == weights_ampa[type_name]
-        assert drive['ampa']['A_delay'] == syn_delays[type_name]
+    conn_idxs = pick_connection(net, src_gids='bursty')
+    for conn_idx in conn_idxs:
+        drive_conn = net.connectivity[conn_idx]
+        target_type = drive_conn['target_type']
+        assert drive_conn['nc_dict']['A_weight'] == weights_ampa[target_type]
+        assert drive_conn['nc_dict']['A_delay'] == syn_delays[target_type]
 
     n_drive_cells = 'n_cells'  # default for evoked drive
     cell_specific = True
@@ -144,9 +148,12 @@ def test_add_drives():
     assert (net.external_drives['evoked_dist']
                                ['n_drive_cells'] == n_dist_targets)
     assert net.external_drives['evoked_dist']['cell_specific'] == cell_specific
-    for type_name, drive in net.external_drives['evoked_dist']['conn'].items():
-        assert drive['ampa']['A_weight'] == weights_ampa[type_name]
-        assert drive['ampa']['A_delay'] == syn_delays[type_name]
+    conn_idxs = pick_connection(net, src_gids='evoked_dist')
+    for conn_idx in conn_idxs:
+        drive_conn = net.connectivity[conn_idx]
+        target_type = drive_conn['target_type']
+        assert drive_conn['nc_dict']['A_weight'] == weights_ampa[target_type]
+        assert drive_conn['nc_dict']['A_delay'] == syn_delays[target_type]
 
     n_drive_cells = 'n_cells'  # default for poisson drive
     cell_specific = True
@@ -159,9 +166,12 @@ def test_add_drives():
     assert (net.external_drives['poisson']
                                ['n_drive_cells'] == n_dist_targets)
     assert net.external_drives['poisson']['cell_specific'] == cell_specific
-    for type_name, drive in net.external_drives['poisson']['conn'].items():
-        assert drive['ampa']['A_weight'] == weights_ampa[type_name]
-        assert drive['ampa']['A_delay'] == syn_delays[type_name]
+    conn_idxs = pick_connection(net, src_gids='poisson')
+    for conn_idx in conn_idxs:
+        drive_conn = net.connectivity[conn_idx]
+        target_type = drive_conn['target_type']
+        assert drive_conn['nc_dict']['A_weight'] == weights_ampa[target_type]
+        assert drive_conn['nc_dict']['A_delay'] == syn_delays[target_type]
 
     # evoked
     with pytest.raises(ValueError,

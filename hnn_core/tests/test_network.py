@@ -111,20 +111,13 @@ def test_network():
         n_drive_cells = net.external_drives[dn]['n_drive_cells']
         assert len(net.gid_ranges[dn]) == n_drive_cells
 
-    # Check src_gids match between drives/connections
-    for conn in net.connectivity:
-        src_type = conn['src_type']
-        target_type = conn['target_type']
-        if src_type not in net.cell_types.keys():
-            assert set(conn['gid_pairs'].keys()) == set(
-                net.external_drives[src_type]['conn'][target_type]['src_gids'])
-
     # Check drive dict structure for each external drive
     for drive in net.external_drives.values():
         # Check that connectivity sources correspond to gid_ranges
-        this_src_gids = set([gid for drive_conn in
-                             drive['conn'].values() for
-                             gid in drive_conn['src_gids']])  # NB set: globals
+        conn_idxs = pick_connection(net, src_gids=drive['name'])
+        this_src_gids = set([gid for conn_idx in conn_idxs
+                             for gid in net.connectivity[conn_idx]['src_gids']
+                             ])  # NB set: globals
         assert sorted(this_src_gids) == list(net.gid_ranges[drive['name']])
         # Check type-specific dynamics and events
         n_drive_cells = drive['n_drive_cells']
@@ -177,22 +170,28 @@ def test_network():
                                   'L5_pyramidal': 0.000024}
                       }
     for drive_name in target_weights:
-        for cellname in target_weights[drive_name]:
-            assert_allclose(
-                net.external_drives[
-                    drive_name]['conn'][cellname]['ampa']['A_weight'],
-                target_weights[drive_name][cellname], rtol=1e-12)
+        for target_type in target_weights[drive_name]:
+            conn_idxs = pick_connection(net, src_gids=drive_name,
+                                        target_gids=target_type,
+                                        receptor='ampa')
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity[conn_idx]
+                assert_allclose(drive_conn['nc_dict']['A_weight'],
+                                target_weights[target_type], rtol=1e-12)
 
     # check select synaptic delays
     target_delays = {'evdist1': {'L2_basket': 0.1, 'L5_pyramidal': 0.1},
                      'evprox1': {'L2_basket': 0.1, 'L5_pyramidal': 1.},
                      'evprox2': {'L2_basket': 0.1, 'L5_pyramidal': 1.}}
     for drive_name in target_delays:
-        for cellname in target_delays[drive_name]:
-            assert_allclose(
-                net.external_drives[
-                    drive_name]['conn'][cellname]['ampa']['A_delay'],
-                target_delays[drive_name][cellname], rtol=1e-12)
+        for target_type in target_delays[drive_name]:
+            conn_idxs = pick_connection(net, src_gids=drive_name,
+                                        target_gids=target_type,
+                                        receptor='ampa')
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity[conn_idx]
+                assert_allclose(drive_conn['nc_dict']['A_delay'],
+                                target_delays[target_type], rtol=1e-12)
 
     # array of simulation times is created in Network.__init__, but passed
     # to CellResponse-constructor for storage (Network is agnostic of time)
