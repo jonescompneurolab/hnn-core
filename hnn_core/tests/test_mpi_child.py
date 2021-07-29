@@ -117,13 +117,15 @@ def test_child_run():
                            'N_pyr_y': 3,
                            't_evprox_1': 5,
                            't_evdist_1': 10,
-                           't_evprox_2': 20,
-                           'N_trials': 2})
+                           't_evprox_2': 20})
+    tstop, n_trials = 25, 2
     net_reduced = jones_2009_model(params_reduced, add_drives_from_params=True)
+    net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):
-            sim_data = mpi_sim.run(net_reduced, tstop=25, dt=0.025)
+            sim_data = mpi_sim.run(net_reduced, tstop=tstop, dt=0.025,
+                                   n_trials=n_trials)
             stdout = buf.getvalue()
         assert "Simulation time:" in stdout
 

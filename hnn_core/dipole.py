@@ -55,13 +55,6 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
-    # XXX needed in mpi_child.py:run()#L103; include fix in #211 or later PR
-    net._params['N_trials'] = n_trials
-
-    # XXX used in network_builder::_simulate_single_trial
-    net._params['tstop'] = tstop
-    net._params['dt'] = dt
-
     for drive_name, drive in net.external_drives.items():
         if 'tstop' in drive['dynamics']:
             if drive['dynamics']['tstop'] is None:
