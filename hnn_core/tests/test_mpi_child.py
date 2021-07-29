@@ -115,7 +115,6 @@ def test_child_run():
     params_reduced = params.copy()
     params_reduced.update({'N_pyr_x': 3,
                            'N_pyr_y': 3,
-                           'tstop': 25,
                            't_evprox_1': 5,
                            't_evdist_1': 10,
                            't_evprox_2': 20,
@@ -124,7 +123,7 @@ def test_child_run():
 
     with MPISimulation(skip_mpi_import=True) as mpi_sim:
         with io.StringIO() as buf, redirect_stdout(buf):
-            sim_data = mpi_sim.run(net_reduced)
+            sim_data = mpi_sim.run(net_reduced, tstop=25, dt=0.025)
             stdout = buf.getvalue()
         assert "Simulation time:" in stdout
 
