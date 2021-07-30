@@ -296,16 +296,23 @@ class NetworkBuilder(object):
 
         self._build()
 
-    def _build(self):
+    def _build(self, test_rank=None):
         """Building the network in NEURON."""
 
         global _CVODE, _PC
         _create_parallel_context(expose_imem=self._expose_imem)
 
+        # used to set the rank while testing gid assignment in
+        # test_parallel_backend
+        if test_rank is None:
+            self._rank = _get_rank()
+        else:
+            self._rank = test_rank
+
         # load mechanisms needs ParallelContext for get_rank
         load_custom_mechanisms()
 
-        if _get_rank() == 0:
+        if self._rank == 0:
             print('Building the NEURON model')
 
         self._clear_last_network_objects()
@@ -339,7 +346,7 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
-        if _get_rank() == 0:
+        if self._rank == 0:
             print('[Done]')
 
     # this happens on EACH node
@@ -348,7 +355,7 @@ class NetworkBuilder(object):
 
         self.net._update_cells()  # updates net.n_cells
 
-        rank = _get_rank()
+        rank = self._rank
         nhosts = _get_nhosts()
 
         # round robin assignment of gids
@@ -596,6 +603,7 @@ class NetworkBuilder(object):
 
         self._gid_list = list()
         self._cells = list()
+        self._drive_cells = list()
 
     def _clear_last_network_objects(self):
         """Clears NEURON objects and saves the current Network instance"""
