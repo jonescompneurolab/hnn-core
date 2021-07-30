@@ -478,11 +478,10 @@ class _ExtracellularArrayBuilder(object):
         segment_counts = [sec.nseg for sec in self.secs_on_rank]
         self.n_total_segments = np.sum(segment_counts)
 
-        # pointers assigned to _ref_i_membrane_ at each EACH internal segment
-        self._nrn_imem_ptrvec = h.PtrVector(self.n_total_segments)
         # placeholder into which pointer values are read on each sim time step
         self._nrn_imem_vec = h.Vector(self.n_total_segments)
 
+        self._set_imem_pointers_to_ref_i_membrane_()
         self._nrn_imem_ptrvec.ptr_update_callback(
             self._set_imem_pointers_to_ref_i_membrane_)
 
@@ -530,6 +529,9 @@ class _ExtracellularArrayBuilder(object):
         Without it, repeated calls of simulate_dipole will cause segmentation
         faults.
         """
+        # pointers assigned to _ref_i_membrane_ at each EACH internal segment
+        self._nrn_imem_ptrvec = h.PtrVector(self.n_total_segments)
+
         ptr_idx = 0
         for sec in self.secs_on_rank:
             for seg in sec:  # section end points (0, 1) not included
