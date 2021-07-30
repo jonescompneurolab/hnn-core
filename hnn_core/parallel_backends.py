@@ -521,7 +521,7 @@ class JoblibBackend(object):
         tstop : float
             The simulation stop time (ms).
         dt : float
-            The integration time step of h.CVode (s)
+            The integration time step of h.CVode (ms)
         postproc : bool
             If False, no postprocessing applied to the dipole
 
@@ -665,7 +665,7 @@ class MPIBackend(object):
         tstop : float
             The simulation stop time (ms).
         dt : float
-            The integration time step of h.CVode (s)
+            The integration time step of h.CVode (ms)
         n_trials : int
             Number of trials to simulate.
         postproc: bool

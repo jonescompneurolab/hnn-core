@@ -22,7 +22,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     tstop : float
         The simulation stop time (ms).
     dt : float
-        The integration time step of h.CVode (s)
+        The integration time step of h.CVode (ms)
     n_trials : int | None
         The number of trials to simulate. If None, the 'N_trials' value
         of the ``params`` used to create ``net`` is used (must be >0)
