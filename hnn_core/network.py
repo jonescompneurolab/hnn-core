@@ -389,15 +389,15 @@ class Network(object):
         # cell counts, real and artificial
         self.pos_dict = dict()
         self.cell_types = dict()
+
         self._inplane_distance = inplane_distance
-        pos = _create_cell_coords(n_pyr_x=self._params['N_pyr_x'],
-                                  n_pyr_y=self._params['N_pyr_y'],
-                                  zdiff=layer_separation,
-                                  inplane_distance=self._inplane_distance)
-        self.pos_dict['origin'] = pos['origin']
+        self._layer_separation = layer_separation
+        self._N_pyr_x = self._params['N_pyr_x']
+        self._N_pyr_y = self._params['N_pyr_y']
+        self._reset_cell_positions()
 
         for cell_name in cell_types:
-            self._add_cell_type(cell_name, pos[cell_name],
+            self._add_cell_type(cell_name, self.pos_dict[cell_name],
                                 cell_template=cell_types[cell_name])
 
         self.cells = dict()
@@ -417,6 +417,51 @@ class Network(object):
               % (len(self.pos_dict['L2_basket']),
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
+
+    def _reset_cell_positions(self):
+        pos = _create_cell_coords(n_pyr_x=self._N_pyr_x, n_pyr_y=self._N_pyr_y,
+                                  zdiff=self._layer_separation,
+                                  inplane_distance=self._inplane_distance)
+        for key in pos.keys():
+            self.pos_dict[key] = pos[key]
+
+    @property
+    def inplane_distance(self):
+        return self._inplane_distance
+
+    @inplane_distance.setter
+    def inplane_distance(self, new_dist):
+        if len(self.external_drives) > 0:
+            raise RuntimeError('In-plane distance between network cells can '
+                               'only be adjusted before external drives are '
+                               f'attached; have {len(self.external_drives)} '
+                               'drives.')
+        _validate_type(new_dist, (float, int), 'new distance')
+        if not new_dist > 0.:
+            raise ValueError('In-plane distance must be positive definite, '
+                             f'got: {new_dist}')
+
+        self._inplane_distance = new_dist
+        self._reset_cell_positions()
+
+    @property
+    def layer_separation(self):
+        return self._layer_separation
+
+    @layer_separation.setter
+    def layer_separation(self, new_sep):
+        if len(self.external_drives) > 0:
+            raise RuntimeError('Layer separation between pyramidal cells can '
+                               'only be adjusted before external drives are '
+                               f'attached; have {len(self.external_drives)} '
+                               'drives.')
+        _validate_type(new_sep, (float, int), 'new separation')
+        if not new_sep > 0.:
+            raise ValueError('Layer separation must be positive definite, '
+                             f'got: {new_sep}')
+
+        self._layer_separation = new_sep
+        self._reset_cell_positions()
 
     def copy(self):
         """Return a copy of the Network instance
