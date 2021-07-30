@@ -197,6 +197,9 @@ def test_rec_array_calculation():
     net.add_electrode_array('arr1', electrode_pos)
     _ = simulate_dipole(net, tstop=25, n_trials=1)
 
+    # make sure tests aren't passing just because everything is zero!
+    assert np.any(net.rec_arrays['arr1']._data[0][1])
+
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
             len(net.rec_arrays['arr1'].voltages) == 1)  # n_trials
