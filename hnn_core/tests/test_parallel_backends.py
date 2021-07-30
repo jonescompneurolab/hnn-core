@@ -15,6 +15,7 @@ import hnn_core
 from hnn_core import MPIBackend, jones_2009_model, read_params
 from hnn_core.dipole import simulate_dipole
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+from hnn_core.network_builder import NetworkBuilder
 
 
 def _terminate_mpibackend(event, backend):
@@ -30,6 +31,35 @@ def _terminate_mpibackend(event, backend):
     while not event.isSet():
         backend.terminate()
         sleep(0.01)
+
+
+def test_gid_assignment_across_ranks():
+    """Test that gids are assigned without overlap across ranks"""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3,
+                   'tstop': 40,
+                   't_evprox_1': 5,
+                   't_evdist_1': 10,
+                   't_evprox_2': 20,
+                   'N_trials': 2})
+    net = jones_2009_model(params, add_drives_from_params=True)
+    n_drive_cells = {name: drive['n_drive_cells'] for name, drive in
+                     net.external_drives.items()}
+    n_ranks = 3
+    n_drive_cells_instantiated = dict()
+    for rank in range(n_ranks):
+        net_builder = NetworkBuilder(net)
+        net_builder._build(test_rank=rank)
+        for drive_cell in net_builder._drive_cells:
+            drive_name = net.gid_to_type(drive_cell.gid)
+            if drive_name in n_drive_cells_instantiated:
+                n_drive_cells_instantiated[drive_name] += 1
+            else:
+                n_drive_cells_instantiated[drive_name] = 1
+    assert n_drive_cells == n_drive_cells_instantiated
 
 
 # The purpose of this incremental mark is to avoid running the full length
