@@ -23,19 +23,27 @@ import os.path as op
 import matplotlib.pyplot as plt
 
 ###############################################################################
-# We will use the default network with three evoked drives; see
-# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>` for
-# details. We'll go ahead and use the drive features defined in the parameter
-# file.
+# This example relies on the default "Jones2009"-network.
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
+from hnn_core.network_models import add_erp_drives_to_jones_model
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
-net = jones_2009_model(params, add_drives_from_params=True,
-                       inplane_distance=30.)
+net = jones_2009_model(params)
+
+###############################################################################
+# The in-plane distance between pyramidal cell somas in the network can be set
+# by the user. Note that external drives must be added *after* the distance is
+# set, as the space constants of the synaptic connections must be adjusted
+# accordingly. Here, we add the three evoked 'ERP' drives to the net; see
+# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`
+# for details.
+
+net.inplane_distance = 30.
+add_erp_drives_to_jones_model(net)
 
 ###############################################################################
 # Extracellular recordings require specifying the electrode postions. It can be
@@ -49,8 +57,8 @@ net.plot_cells()
 # the z-axis. We can simulate a linear multielectrode array with 100 um
 # intercontact spacing [1]_ by specifying a list of (x, y, z) coordinate
 # triplets. The L5 pyramidal cell somas are at z=0 um, with apical dendrites
-# extending up to approximately z=2000 um. L2 pyramidal cell somas reside at
-# z=1300 um, and have apical dendrites extending to z=2300 um. We'll place the
+# extending up to z~2000 um. L2 pyramidal cell somas reside at
+# z~1300 um, and have apical dendrites extending to z~2300 um. We'll place the
 # recording array in the center of the network. By default, a value of
 # 0.3 S/m is used for the constant extracellular conductivity and the
 # 'point source approximation' for calculations; see
