@@ -406,7 +406,7 @@ start the simulation across the number of processors (cores) specified by
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
-    [47618a7de3a0:01767] Read -1, expected 117259, errno = 1
+    [0e318e92c4b3:01767] Read -1, expected 117269, errno = 1
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -443,15 +443,15 @@ start the simulation across the number of processors (cores) specified by
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    [47618a7de3a0:01767] Read -1, expected 49608, errno = 1
-    [47618a7de3a0:01766] Read -1, expected 49600, errno = 1
-    [47618a7de3a0:01767] Read -1, expected 49600, errno = 1
-    [47618a7de3a0:01766] Read -1, expected 49608, errno = 1
-    [47618a7de3a0:01767] Read -1, expected 49608, errno = 1
-    [47618a7de3a0:01766] Read -1, expected 49600, errno = 1
-    [47618a7de3a0:01767] Read -1, expected 49600, errno = 1
-    [47618a7de3a0:01766] Read -1, expected 49608, errno = 1
-    [47618a7de3a0:01766] Read -1, expected 5616, errno = 1
+    [0e318e92c4b3:01767] Read -1, expected 49608, errno = 1
+    [0e318e92c4b3:01766] Read -1, expected 49600, errno = 1
+    [0e318e92c4b3:01767] Read -1, expected 49600, errno = 1
+    [0e318e92c4b3:01766] Read -1, expected 49608, errno = 1
+    [0e318e92c4b3:01767] Read -1, expected 49608, errno = 1
+    [0e318e92c4b3:01766] Read -1, expected 49600, errno = 1
+    [0e318e92c4b3:01767] Read -1, expected 49600, errno = 1
+    [0e318e92c4b3:01766] Read -1, expected 49608, errno = 1
+    [0e318e92c4b3:01766] Read -1, expected 5616, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -460,7 +460,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  35.399 seconds)
+   **Total running time of the script:** ( 0 minutes  31.333 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

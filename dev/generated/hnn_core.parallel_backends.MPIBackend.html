@@ -178,7 +178,7 @@ There will be a valid process handle present the queue when a MPI
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.parallel_backends.MPIBackend.simulate" title="hnn_core.parallel_backends.MPIBackend.simulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate</span></code></a>(net, n_trials[, postproc])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.parallel_backends.MPIBackend.simulate" title="hnn_core.parallel_backends.MPIBackend.simulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate</span></code></a>(net, tstop, dt, n_trials[, postproc])</p></td>
 <td><p>Simulate the HNN model in parallel on all cores</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.parallel_backends.MPIBackend.terminate" title="hnn_core.parallel_backends.MPIBackend.terminate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">terminate</span></code></a>()</p></td>
@@ -188,13 +188,17 @@ There will be a valid process handle present the queue when a MPI
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.parallel_backends.MPIBackend.simulate">
-<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/parallel_backends.html#MPIBackend.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.parallel_backends.MPIBackend.simulate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/parallel_backends.html#MPIBackend.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.parallel_backends.MPIBackend.simulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simulate the HNN model in parallel on all cores</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>net</strong><span class="classifier">Network object</span></dt><dd><p>The Network object specifying how cells are
 connected.</p>
+</dd>
+<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The simulation stop time (ms).</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float</span></dt><dd><p>The integration time step of h.CVode (ms)</p>
 </dd>
 <dt><strong>n_trials</strong><span class="classifier">int</span></dt><dd><p>Number of trials to simulate.</p>
 </dd>

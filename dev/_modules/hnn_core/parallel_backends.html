@@ -638,7 +638,7 @@
 
         <span class="n">_BACKEND</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_backend</span>
 
-<div class="viewcode-block" id="JoblibBackend.simulate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.JoblibBackend.html#hnn_core.parallel_backends.JoblibBackend.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="JoblibBackend.simulate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.JoblibBackend.html#hnn_core.parallel_backends.JoblibBackend.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Simulate the HNN model</span>
 
 <span class="sd">        Parameters</span>
@@ -648,6 +648,10 @@
 <span class="sd">            connected.</span>
 <span class="sd">        n_trials : int</span>
 <span class="sd">            Number of trials to simulate.</span>
+<span class="sd">        tstop : float</span>
+<span class="sd">            The simulation stop time (ms).</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            The integration time step of h.CVode (ms)</span>
 <span class="sd">        postproc : bool</span>
 <span class="sd">            If False, no postprocessing applied to the dipole</span>
 
@@ -657,7 +661,8 @@
 <span class="sd">            The Dipole results from each simulation trial</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parallel</span><span class="p">,</span> <span class="n">myfunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_func</span><span class="p">(</span><span class="n">_simulate_single_trial</span><span class="p">)</span>
-        <span class="n">sim_data</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span><span class="n">myfunc</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
+        <span class="n">sim_data</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span><span class="n">myfunc</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span> <span class="k">for</span>
+                            <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
 
         <span class="n">dpls</span> <span class="o">=</span> <span class="n">_gather_trial_data</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
                                   <span class="n">postproc</span><span class="o">=</span><span class="n">postproc</span><span class="p">)</span>
@@ -779,7 +784,7 @@
         <span class="c1"># always kill nrniv processes for good measure</span>
         <span class="n">kill_proc_name</span><span class="p">(</span><span class="s1">&#39;nrniv&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MPIBackend.simulate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="MPIBackend.simulate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Simulate the HNN model in parallel on all cores</span>
 
 <span class="sd">        Parameters</span>
@@ -787,6 +792,10 @@
 <span class="sd">        net : Network object</span>
 <span class="sd">            The Network object specifying how cells are</span>
 <span class="sd">            connected.</span>
+<span class="sd">        tstop : float</span>
+<span class="sd">            The simulation stop time (ms).</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            The integration time step of h.CVode (ms)</span>
 <span class="sd">        n_trials : int</span>
 <span class="sd">            Number of trials to simulate.</span>
 <span class="sd">        postproc: bool</span>
@@ -800,7 +809,9 @@
 
         <span class="c1"># just use the joblib backend for a single core</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
+            <span class="k">return</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+                                                    <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                                                    <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
                                                     <span class="n">postproc</span><span class="o">=</span><span class="n">postproc</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running </span><span class="si">%d</span><span class="s2"> trials...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
@@ -809,7 +820,7 @@
         <span class="n">env</span> <span class="o">=</span> <span class="n">_get_mpi_env</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="p">,</span> <span class="n">sim_data</span> <span class="o">=</span> <span class="n">run_subprocess</span><span class="p">(</span>
-            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="p">[</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
             <span class="n">proc_queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
             <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 

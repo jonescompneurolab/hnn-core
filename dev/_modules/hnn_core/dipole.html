@@ -152,7 +152,7 @@
 <span class="sd">    tstop : float</span>
 <span class="sd">        The simulation stop time (ms).</span>
 <span class="sd">    dt : float</span>
-<span class="sd">        The integration time step of h.CVode (s)</span>
+<span class="sd">        The integration time step of h.CVode (ms)</span>
 <span class="sd">    n_trials : int | None</span>
 <span class="sd">        The number of trials to simulate. If None, the &#39;N_trials&#39; value</span>
 <span class="sd">        of the ``params`` used to create ``net`` is used (must be &gt;0)</span>
@@ -184,13 +184,6 @@
         <span class="n">n_trials</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_trials&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">n_trials</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of simulations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">n_trials</span><span class="p">)</span>
-
-    <span class="c1"># XXX needed in mpi_child.py:run()#L103; include fix in #211 or later PR</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_trials&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_trials</span>
-
-    <span class="c1"># XXX used in network_builder::_simulate_single_trial</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>
 
     <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]:</span>
@@ -226,7 +219,7 @@
                       <span class="s1">&#39; in a future release of hnn-core. Please define &#39;</span>
                       <span class="s1">&#39;smoothing and scaling explicitly using Dipole methods.&#39;</span><span class="p">,</span>
                       <span class="ne">DeprecationWarning</span><span class="p">)</span>
-    <span class="n">dpls</span> <span class="o">=</span> <span class="n">_BACKEND</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="p">)</span>
+    <span class="n">dpls</span> <span class="o">=</span> <span class="n">_BACKEND</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dpls</span></div>
 
