@@ -729,14 +729,6 @@ class Network(object):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cell_types.keys()}')
 
-        if self._legacy_mode:
-            # allows tests must match HNN GUI output by preserving original
-            # gid assignment convention
-            target_populations = list(self.cell_types.keys())
-        elif len(target_populations) == 0:
-            raise ValueError('No target populations have been specified for '
-                             'this drive.')
-
         weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
         if isinstance(synaptic_delays, dict):
             for receptor in ['ampa', 'nmda']:
@@ -747,6 +739,20 @@ class Network(object):
                     raise ValueError(
                         'synaptic_delays is either a common float or needs '
                         'to be specified as a dict for each cell type')
+
+        if self._legacy_mode:
+            # allows tests must match HNN GUI output by preserving original
+            # gid assignment convention
+            target_populations = list(self.cell_types.keys())
+            for target_type in target_populations:
+                for receptor in ['ampa', 'nmda']:
+                    if target_type not in weights_by_receptor[receptor]:
+                        weights_by_receptor[receptor].update({target_type: 0})
+                if target_type not in synaptic_delays:
+                    synaptic_delays.update({target_type: 0})
+        elif len(target_populations) == 0:
+            raise ValueError('No target populations have been specified for '
+                             'this drive.')
 
         if cell_specific and n_drive_cells != 'n_cells':
             raise ValueError(f"If cell_specific is True, n_drive_cells must"
@@ -785,7 +791,7 @@ class Network(object):
                 # This will be updated depending on the number of target cells
                 # for each cell type
                 src_idx = 0
-                for target_cell_type in weights_by_receptor[receptor]:
+                for target_cell_type in target_populations:
                     target_gids = list(self.gid_ranges[target_cell_type])
                     target_gids_nested = [[target_gid] for
                                           target_gid in target_gids]
@@ -799,7 +805,7 @@ class Network(object):
                                         space_constant)
                     src_idx = src_idx_end
             else:
-                for target_cell_type in weights_by_receptor[receptor]:
+                for target_cell_type in target_populations:
                     target_gids = list(self.gid_ranges[target_cell_type])
                     src_gids = list(self.gid_ranges[name])
                     weights = weights_by_receptor[receptor][target_cell_type]
