@@ -83,6 +83,48 @@ def test_network_models():
         assert np.all(np.diff(k_gbar, n=2) > 0)  # positive 2nd derivative
 
 
+def test_network_cell_positions():
+    """"Test manipulation of cell positions in the network object"""
+
+    net = jones_2009_model()
+    assert np.isclose(net.inplane_distance, 1.)
+    assert np.isclose(net.layer_separation, 1307.4)
+    pos_dict = deepcopy(net.pos_dict)
+    net._reset_cell_positions()
+    # assert reset does nothing
+    for cell_name, coords in pos_dict.items():
+        if cell_name == 'origin':
+            continue
+        for xyz_orig, xyz_new in zip(coords, net.pos_dict[cell_name]):
+            for orig, new in zip(xyz_orig, xyz_new):
+                assert np.isclose(orig, new)
+
+    net.inplane_distance = 2.
+    # check that in-plane distance has doubled
+    assert np.isclose(2. * pos_dict['L5_pyramidal'][1][1],
+                      net.pos_dict['L5_pyramidal'][1][1])
+
+    net.layer_separation = 1000.
+    # check that layer separation has changed (L5 is zero)
+    assert np.isclose(net.pos_dict['L2_pyramidal'][0][2], 1000.)
+
+    with pytest.raises(ValueError,
+                       match='In-plane distance must be positive definite'):
+        net.inplane_distance = 0.
+    with pytest.raises(ValueError,
+                       match='Layer separation must be positive definite'):
+        net.layer_separation = 0.
+
+    add_erp_drives_to_jones_model(net)
+    # values that determine network topology cannot be changed after drives
+    with pytest.raises(RuntimeError,
+                       match='In-plane distance between network cells can'):
+        net.inplane_distance = 1.
+    with pytest.raises(RuntimeError,
+                       match='Layer separation between pyramidal cells can'):
+        net.layer_separation = 1000.
+
+
 def test_network():
     """Test network object."""
     params = read_params(params_fname)
