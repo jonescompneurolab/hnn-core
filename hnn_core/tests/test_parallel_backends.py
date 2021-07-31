@@ -33,7 +33,7 @@ def _terminate_mpibackend(event, backend):
         sleep(0.01)
 
 
-def test_gid_assignment_across_ranks():
+def test_gid_assignment():
     """Test that gids are assigned without overlap across ranks"""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
