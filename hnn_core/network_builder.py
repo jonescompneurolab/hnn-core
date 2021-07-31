@@ -294,20 +294,27 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._expose_imem = True
 
+        self._rank = 0
+
         self._build()
 
-    def _build(self, test_rank=None):
-        """Building the network in NEURON."""
+    def _build(self, rank=None):
+        """Building the network in NEURON.
+
+        Parameters
+        ----------
+        rank : int | None
+            If not None, override the rank set
+            automatically using Neuron. Used for testing.
+        """
 
         global _CVODE, _PC
         _create_parallel_context(expose_imem=self._expose_imem)
 
-        # used to set the rank while testing gid assignment in
-        # test_parallel_backend
-        if test_rank is None:
+        if rank is None:
             self._rank = _get_rank()
         else:
-            self._rank = test_rank
+            self._rank = rank
 
         # load mechanisms needs ParallelContext for get_rank
         load_custom_mechanisms()
@@ -349,17 +356,13 @@ class NetworkBuilder(object):
         if self._rank == 0:
             print('[Done]')
 
-    # this happens on EACH node
-    # creates self._gid_list for THIS node
     def _gid_assign(self):
-
+        """Assign cell IDs to this node"""
         self.net._update_cells()  # updates net.n_cells
 
-        rank = self._rank
-        nhosts = _get_nhosts()
-
+        n_hosts = _get_nhosts()
         # round robin assignment of gids
-        for gid in range(rank, self.net.n_cells, nhosts):
+        for gid in range(self._rank, self.net.n_cells, n_hosts):
             # set the cell gid
             self._gid_list.append(gid)
 
@@ -376,11 +379,8 @@ class NetworkBuilder(object):
                             self._gid_list.append(src_gid)
             else:
                 src_gids = list(self.net.gid_ranges[drive['name']])
-                for gid_idx in range(rank, len(src_gids), nhosts):
+                for gid_idx in range(self._rank, len(src_gids), n_hosts):
                     self._gid_list.append(src_gids[gid_idx])
-
-        for gid in self._gid_list:
-            _PC.set_gid2node(gid, rank)
 
         # extremely important to get the gids in the right order
         self._gid_list.sort()
@@ -395,6 +395,10 @@ class NetworkBuilder(object):
         These drives are spike SOURCES but cells are also targets.
         External inputs are not targets.
         """
+
+        for gid in self._gid_list:
+            _PC.set_gid2node(gid, self._rank)
+
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
