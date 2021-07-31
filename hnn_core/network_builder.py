@@ -361,7 +361,6 @@ class NetworkBuilder(object):
         # round robin assignment of gids
         for gid in range(rank, self.net.n_cells, nhosts):
             # set the cell gid
-            _PC.set_gid2node(gid, rank)
             self._gid_list.append(gid)
 
         # loop over all drives, then all cell types, then all artificial cells
@@ -374,13 +373,14 @@ class NetworkBuilder(object):
                                                    conn['target_gids']):
                         if (target_gid in self._gid_list and
                                 src_gid not in self._gid_list):
-                            _PC.set_gid2node(src_gid, rank)
                             self._gid_list.append(src_gid)
             else:
                 src_gids = list(self.net.gid_ranges[drive['name']])
                 for gid_idx in range(rank, len(src_gids), nhosts):
-                    _PC.set_gid2node(src_gids[gid_idx], rank)
                     self._gid_list.append(src_gids[gid_idx])
+
+        for gid in self._gid_list:
+            _PC.set_gid2node(gid, rank)
 
         # extremely important to get the gids in the right order
         self._gid_list.sort()
@@ -417,6 +417,7 @@ class NetworkBuilder(object):
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
+                assert cell.gid in self._gid_list
                 _PC.cell(cell.gid, nrn_netcon)
                 self._cells.append(cell)
 
