@@ -40,7 +40,6 @@ def test_gid_assignment():
     params = read_params(params_fname)
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
-                   'tstop': 40,
                    't_evprox_1': 5,
                    't_evdist_1': 10,
                    't_evprox_2': 20,
@@ -52,7 +51,7 @@ def test_gid_assignment():
     n_drive_cells_instantiated = dict()
     for rank in range(n_ranks):
         net_builder = NetworkBuilder(net)
-        net_builder._build(test_rank=rank)
+        net_builder._build(rank=rank)
         for drive_cell in net_builder._drive_cells:
             drive_name = net.gid_to_type(drive_cell.gid)
             if drive_name in n_drive_cells_instantiated:
