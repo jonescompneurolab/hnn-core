@@ -16,7 +16,6 @@ if int(__version__[0]) >= 8:
 
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
-from .extracellular import _ExtracellularArrayBuilder
 
 # a few globals
 _PC = None
@@ -487,6 +486,15 @@ class NetworkBuilder(object):
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
+        from hnn_core.extracellular import _ExtracellularArrayBuilder
+
+        for nrn_arr in _LAST_NETWORK._nrn_rec_arrays.values():
+            del nrn_arr._nrn_imem_ptrvec
+            del nrn_arr._nrn_imem_vec
+            del nrn_arr._nrn_r_transfer
+            del nrn_arr._nrn_times
+            del nrn_arr._nrn_voltages
+
         for arr_name, arr in self.net.rec_arrays.items():
             nrn_arr = _ExtracellularArrayBuilder(arr)
             nrn_arr._build(cvode=_CVODE)

@@ -467,6 +467,8 @@ class _ExtracellularArrayBuilder(object):
             ``'Pyr'``. For basket cells, use ``'Basket'``. NB This argument is
             currently not exposed in the API.
         """
+        from .network_builder import _CVODE
+
         self.secs_on_rank = h.allsec()  # get all h.Sections known to this rank
         _validate_type(include_celltypes, str)
         _check_option('include_celltypes', include_celltypes, ['all', 'Pyr',
@@ -519,7 +521,7 @@ class _ExtracellularArrayBuilder(object):
         # segment. Note that this will run on each rank, so it is safe to use
         # the extra_scatter_gather-method, which docs say doesn't support
         # "multiple threads".
-        cvode.extra_scatter_gather(0, self._calc_potentials_callback)
+        _CVODE.extra_scatter_gather(0, self._calc_potentials_callback)
 
     def _set_imem_pointers_to_ref_i_membrane_(self):
         """Let h.PtrVector.pset point to each segment's _ref_i_membrane_
