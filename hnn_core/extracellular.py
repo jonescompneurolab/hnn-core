@@ -484,8 +484,6 @@ class _ExtracellularArrayBuilder(object):
         self._nrn_imem_vec = h.Vector(self.n_total_segments)
 
         self._set_imem_pointers_to_ref_i_membrane_()
-        self._nrn_imem_ptrvec.ptr_update_callback(
-            self._set_imem_pointers_to_ref_i_membrane_)
 
         # transfer resistances for each segment (keep in Neuron Matrix object)
         self._nrn_r_transfer = h.Matrix(self.n_contacts,
