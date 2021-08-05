@@ -298,23 +298,13 @@ class NetworkBuilder(object):
 
         self._build()
 
-    def _build(self, rank=None):
-        """Building the network in NEURON.
-
-        Parameters
-        ----------
-        rank : int | None
-            If not None, override the rank set
-            automatically using Neuron. Used for testing.
-        """
+    def _build(self):
+        """Building the network in NEURON."""
 
         global _CVODE, _PC
         _create_parallel_context(expose_imem=self._expose_imem)
 
-        if rank is None:
-            self._rank = _get_rank()
-        else:
-            self._rank = rank
+        self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
         load_custom_mechanisms()
@@ -356,11 +346,25 @@ class NetworkBuilder(object):
         if self._rank == 0:
             print('[Done]')
 
-    def _gid_assign(self):
-        """Assign cell IDs to this node"""
+    def _gid_assign(self, rank=None, n_hosts=None):
+        """Assign cell IDs to this node
+
+        Parameters
+        ----------
+        rank : int | None
+            If not None, override the rank set
+            automatically using Neuron. Used for testing.
+        n_hosts : int | None
+            If not None, override the number of hosts set
+            automatically using Neuron. Used for testing.
+        """
+        if rank is not None:
+            self._rank = rank
+        if n_hosts is None:
+            n_hosts = _get_nhosts()
+
         self.net._update_cells()  # updates net.n_cells
 
-        n_hosts = _get_nhosts()
         # round robin assignment of gids
         for gid in range(self._rank, self.net.n_cells, n_hosts):
             # set the cell gid
