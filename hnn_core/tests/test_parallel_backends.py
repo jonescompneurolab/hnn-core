@@ -35,16 +35,24 @@ def _terminate_mpibackend(event, backend):
 
 def test_gid_assignment():
     """Test that gids are assigned without overlap across ranks"""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   't_evprox_1': 5,
-                   't_evdist_1': 10,
-                   't_evprox_2': 20})
-    net = jones_2009_model(params, add_drives_from_params=True)
+
+    net = jones_2009_model(add_drives_from_params=False)
+    weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 3.0,
+                    'L5_basket': 2.0, 'L5_pyramidal': 4.0}
+    syn_delays = {'L2_basket': 1.0, 'L2_pyramidal': 2.0,
+                  'L5_basket': 3.0, 'L5_pyramidal': 4.0}
+
+    net.add_bursty_drive(
+        'bursty_dist', location='distal', burst_rate=10,
+        weights_ampa=weights_ampa, synaptic_delays=syn_delays,
+        cell_specific=False, n_drive_cells=5)
+    net.add_evoked_drive(
+        'evoked_prox', mu=1.0, sigma=1.0, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=syn_delays, cell_specific=True,
+        n_drive_cells='n_cells')
     net._instantiate_drives(tstop=20, n_trials=2)
+
     n_cells = {type: len(gid_range) for type, gid_range in
                net.gid_ranges.items()}
     n_hosts = 3
