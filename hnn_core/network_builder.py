@@ -324,8 +324,6 @@ class NetworkBuilder(object):
         self._create_cells_and_drives(threshold=self.net._params['threshold'],
                                       record_vsoma=record_vsoma,
                                       record_isoma=record_isoma)
-        n_drive_cells = len(self._drive_cells)
-        print(f'n_art_cells = {n_drive_cells}')
 
         self.state_init()
 
