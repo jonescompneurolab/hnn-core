@@ -10,7 +10,7 @@ import numpy as np
 import scipy.stats as stats
 from scipy.optimize import fmin_cobyla
 
-from .network import Network
+from .network_models import jones_2009_model
 from .dipole import _rmse
 
 
@@ -263,7 +263,7 @@ def _optrun(new_params, opt_params, params, opt_dpls):
 
     # run the simulation, but stop early if possible
     params['tstop'] = opt_params['opt_end']
-    net = Network(params, add_drives_from_params=True)
+    net = jones_2009_model(params, add_drives_from_params=True)
     dpls = _BACKEND.simulate(net, n_trials=1)
     # avg_dpl = average_dipoles(dpls)
     avg_dpl = dpls[0].copy()
@@ -337,7 +337,7 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
         _BACKEND = JoblibBackend(n_jobs=1)
 
     print("Running simulation with initial parameters")
-    net = Network(params, add_drives_from_params=True)
+    net = jones_2009_model(params, add_drives_from_params=True)
     initial_dpl = _BACKEND.simulate(net, n_trials=1)
 
     # Create a sorted dictionary with the inputs and parameters

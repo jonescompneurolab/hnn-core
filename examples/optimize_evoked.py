@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 import hnn_core
 from hnn_core.dipole import simulate_dipole
-from hnn_core import read_params, Dipole, MPIBackend, Network
+from hnn_core import read_params, Dipole, MPIBackend, jones_2009_model
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
@@ -48,7 +48,7 @@ params = read_params(params_fname)
 
 ###############################################################################
 # Let's first simulate the dipole with the initial parameters.
-net = Network(params, add_drives_from_params=True)
+net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
     initial_dpl = simulate_dipole(net, n_trials=1)
 
@@ -62,7 +62,7 @@ with MPIBackend(n_procs=n_procs):
 
 ###############################################################################
 # Now, let's simulate the dipole with the optimized parameters.
-net = Network(params, add_drives_from_params=True)
+net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
     best_dpl = simulate_dipole(net, n_trials=1)
 
