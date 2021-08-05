@@ -53,8 +53,9 @@ Bug
 
 - Fix bug where :func:`~hnn_core.read_spikes` wasn't returning a :class:`~hnn_core.CellResponse` instance with updated spike types, by `Ryan Thorpe`_ in `#382 <https://github.com/jonescompneurolab/hnn-core/pull/382>`_
 
-- `~hnn_core.Dipole.times` and `~hnn_core.Cell_response.times` now reflect the actual integration points instead of the intended
-   times, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+- :attr:`~hnn_core.Dipole.times` and :attr:`~hnn_core.Cell_response.times` now reflect the actual integration points instead of the intended times, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+
+- Fix overlapping non-cell-specific drive gid assignment over different ranks in `~hnn_core.MPIBackend`, by `Ryan Thorpe`_ and `Mainak Jas`_ in `#399 <https://github.com/jonescompneurolab/hnn-core/pull/399>`_
 
 API
 ~~~
