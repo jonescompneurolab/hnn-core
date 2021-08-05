@@ -42,23 +42,24 @@ def test_gid_assignment():
                    'N_pyr_y': 3,
                    't_evprox_1': 5,
                    't_evdist_1': 10,
-                   't_evprox_2': 20,
-                   'N_trials': 2})
+                   't_evprox_2': 20})
     net = jones_2009_model(params, add_drives_from_params=True)
-    n_drive_cells = {name: drive['n_drive_cells'] for name, drive in
-                     net.external_drives.items()}
-    n_ranks = 3
-    n_drive_cells_instantiated = dict()
-    for rank in range(n_ranks):
+    net._instantiate_drives(tstop=20, n_trials=2)
+    n_cells = {type: len(gid_range) for type, gid_range in
+               net.gid_ranges.items()}
+    n_hosts = 3
+    n_cells_instantiated = dict()
+    for rank in range(n_hosts):
         net_builder = NetworkBuilder(net)
-        net_builder._build(rank=rank)
-        for drive_cell in net_builder._drive_cells:
-            drive_name = net.gid_to_type(drive_cell.gid)
-            if drive_name in n_drive_cells_instantiated:
-                n_drive_cells_instantiated[drive_name] += 1
+        net_builder._gid_list = list()
+        net_builder._gid_assign(rank=rank, n_hosts=n_hosts)
+        for gid in net_builder._gid_list:
+            gid_type = net.gid_to_type(gid)
+            if gid_type in n_cells_instantiated:
+                n_cells_instantiated[gid_type] += 1
             else:
-                n_drive_cells_instantiated[drive_name] = 1
-    assert n_drive_cells == n_drive_cells_instantiated
+                n_cells_instantiated[gid_type] = 1
+    assert n_cells == n_cells_instantiated
 
 
 # The purpose of this incremental mark is to avoid running the full length
