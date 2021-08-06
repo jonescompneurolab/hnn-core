@@ -24,6 +24,7 @@ from hnn_core import read_params, Dipole, MPIBackend, jones_2009_model
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
+# The number of cores may need modifying depending on your current machine.
 n_procs = 10
 
 ###############################################################################
@@ -67,7 +68,7 @@ with MPIBackend(n_procs=n_procs):
     best_dpl = simulate_dipole(net, n_trials=1)
 
 ###############################################################################
-# Now plot the results against experimental data:
+# Finally, we can plot the results against experimental data:
 # 1. Initial dipole
 # 2. Optimized dipole fit
 #

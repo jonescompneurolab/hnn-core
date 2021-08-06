@@ -43,7 +43,7 @@ Changelog
 - Drives in :attr:`~hnn_core.Network.external_drives` no longer contain a `'conn'` key and the :attr:`~hnn_core.Network.connectivity` list contains more items when adding drives from a param file or when in legacy mode, by `Ryan Thorpe`_, `Mainak Jas`_, and `Nick Tolley`_ in `#369 <https://github.com/jonescompneurolab/hnn-core/pull/369>`_
 
 - Add :func:`~hnn_core.optimize_evoked` to optimize the timing and weights of driving inputs for simulating
-  evoked responses, by `Blake Caldwell`_ and `Mainak Jas`_ in `#77 <https://github.com/jonescompneurolab/hnn-core/pull/333>`_
+  evoked responses, by `Blake Caldwell`_ and `Mainak Jas`_ in `#77 <https://github.com/jonescompneurolab/hnn-core/pull/77>`_
 
 Bug
 ~~~
