@@ -53,21 +53,21 @@ def test_gid_assignment():
         n_drive_cells='n_cells')
     net._instantiate_drives(tstop=20, n_trials=2)
 
-    n_cells = {type: len(gid_range) for type, gid_range in
-               net.gid_ranges.items()}
+    all_gids = list()
+    for type_range in net.gid_ranges.values():
+        all_gids.extend(list(type_range))
+    all_gids.sort()
+
     n_hosts = 3
-    n_cells_instantiated = dict()
+    all_gids_instantiated = list()
     for rank in range(n_hosts):
         net_builder = NetworkBuilder(net)
         net_builder._gid_list = list()
         net_builder._gid_assign(rank=rank, n_hosts=n_hosts)
-        for gid in net_builder._gid_list:
-            gid_type = net.gid_to_type(gid)
-            if gid_type in n_cells_instantiated:
-                n_cells_instantiated[gid_type] += 1
-            else:
-                n_cells_instantiated[gid_type] = 1
-    assert n_cells == n_cells_instantiated
+        all_gids_instantiated.extend(net_builder._gid_list)
+    all_gids_instantiated.sort()
+    assert all_gids_instantiated == sorted(set(all_gids_instantiated))
+    assert all_gids == all_gids_instantiated
 
 
 # The purpose of this incremental mark is to avoid running the full length
