@@ -146,9 +146,23 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     return mech_props
 
 
-def _set_variable_mech(dist_from_soma):
-    """Set a cell mechanism based on its distance from the soma"""
-    return 1e-6 * np.exp(3e-3 * dist_from_soma)
+def _exp_g_at_dist(x, zero_val, exp_term, offset):
+    """Compute exponential distance-dependent ionic conductance.
+
+    Parameters
+    ----------
+    x : float | int
+        Distance from soma
+    zero_val : float | int
+        Value of function when x = 0
+    exp_term : float | int
+        Mutiplier of x in the exponent
+    offset: float |int
+        Offset value added to output
+
+    """
+
+    return zero_val * np.exp(exp_term * x) + offset
 
 
 def basket(cell_name, pos=(0, 0, 0), gid=None):
@@ -264,8 +278,9 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         else:
             syns = list(p_syn.keys())
             if cell_name == 'L5Pyr':
-                p_secs[key]['mechs'][
-                    'ar']['gbar_ar'] = _set_variable_mech
+                p_secs[key]['mechs']['ar']['gbar_ar'] = \
+                    partial(_exp_g_at_dist, zero_val=1e-6,
+                            exp_term=3e-3, offset=0.0)
         p_secs[key]['syns'] = syns
 
     for sec_name in p_secs:
@@ -282,8 +297,18 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
                 gid=gid)
 
 
-def _get_g_at_dist(x, gsoma, gdend, xkink):
-    """Compute distance-dependent ionic conductance.
+def _linear_g_at_dist(x, gsoma, gdend, xkink):
+    """Compute linear distance-dependent ionic conductance.
+    Parameters
+    ----------
+    x : float | int
+        Distance from soma
+    gsoma : float | int
+        Somatic conductance.
+    gdend : float | int
+        Dendritic conductance
+    xkink : float | int
+        Plateau value where conductance is fixed at gdend.
 
     Notes
     -----
@@ -301,14 +326,20 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 
     override_params['L5Pyr_soma_gkbar_hh2'] = 0.06
     override_params['L5Pyr_soma_gnabar_hh2'] = 0.32
-    override_params['L5Pyr_dend_gkbar_hh2'] = 1e-4
-    override_params['L5Pyr_dend_gnabar_hh2'] = 28e-4
 
-    gbar_ca = partial(_get_g_at_dist,
-                      gsoma=10.,
-                      gdend=40.,
-                      xkink=1501)
+    gbar_ca = partial(
+        _linear_g_at_dist, gsoma=10., gdend=40., xkink=1501)
+    gbar_na = partial(
+        _linear_g_at_dist, gsoma=override_params['L5Pyr_soma_gnabar_hh2'],
+        gdend=28e-4, xkink=962)
+    gbar_k = partial(
+        _exp_g_at_dist, zero_val=override_params['L5Pyr_soma_gkbar_hh2'],
+        exp_term=-0.006, offset=1e-4)
+
     override_params['L5Pyr_dend_gbar_ca'] = gbar_ca
+    override_params['L5Pyr_dend_gnabar_hh2'] = gbar_na
+    override_params['L5Pyr_dend_gkbar_hh2'] = gbar_k
+
     cell = pyramidal(cell_name, pos, override_params=override_params,
                      gid=gid)
 
