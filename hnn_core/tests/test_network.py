@@ -54,10 +54,29 @@ def test_network_models():
         # Section endpoints where seg.x == 0.0 or 1.0 don't have 'ca' mech
         ca_gbar = [seg.__getattribute__('ca').gbar for
                    seg in list(section.allseg())[1:-1]]
+        na_gbar = [seg.__getattribute__('hh2').gnabar for
+                   seg in list(section.allseg())[1:-1]]
+        k_gbar = [seg.__getattribute__('hh2').gkbar for
+                  seg in list(section.allseg())[1:-1]]
+
+        # Ensure positive distance dependent calcium gbar with plateau
         if section_name == 'apical_tuft':
             assert np.all(np.diff(ca_gbar) == 0)
         else:
             assert np.all(np.diff(ca_gbar) > 0)
+
+        # Ensure negative distance dependent sodium gbar with plateau
+        if section_name == 'apical_2':
+            assert np.all(np.diff(na_gbar[0:3]) < 0)
+            assert np.all(np.diff(na_gbar[3:]) == 0)
+        elif section_name == 'apical_tuft':
+            assert np.all(np.diff(na_gbar) == 0)
+        else:
+            assert np.all(np.diff(na_gbar) < 0)
+
+        # Ensure negative exponential distance dependent K gbar
+        assert np.all(np.diff(k_gbar) < 0)
+        assert np.all(np.diff(k_gbar, n=2) > 0)  # positive 2nd derivative
 
 
 def test_network():
