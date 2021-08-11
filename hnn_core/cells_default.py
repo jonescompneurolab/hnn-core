@@ -299,6 +299,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
 
 def _linear_g_at_dist(x, gsoma, gdend, xkink):
     """Compute linear distance-dependent ionic conductance.
+
     Parameters
     ----------
     x : float | int
