@@ -417,7 +417,7 @@ time with unique randomization.</p>
 <a href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_bursty_drive</span></a><span class="p">(</span>
     <span class="s1">&#39;bursty&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">50.</span><span class="p">,</span> <span class="n">burst_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa</span></a><span class="p">,</span>
-    <span class="n">seedcore</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">seedcore</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Finally, to simulate we use the
@@ -439,7 +439,7 @@ start the simulation across the number of processors (cores) specified by
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
 Running 1 trials...
 numprocs=2
-[0e318e92c4b3:01767] Read -1, expected 117269, errno = 1
+[3195910d3075:01796] Read -1, expected 117269, errno = 1
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -476,20 +476,20 @@ Simulation time: 270.0 ms...
 Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
-[0e318e92c4b3:01767] Read -1, expected 49608, errno = 1
-[0e318e92c4b3:01766] Read -1, expected 49600, errno = 1
-[0e318e92c4b3:01767] Read -1, expected 49600, errno = 1
-[0e318e92c4b3:01766] Read -1, expected 49608, errno = 1
-[0e318e92c4b3:01767] Read -1, expected 49608, errno = 1
-[0e318e92c4b3:01766] Read -1, expected 49600, errno = 1
-[0e318e92c4b3:01767] Read -1, expected 49600, errno = 1
-[0e318e92c4b3:01766] Read -1, expected 49608, errno = 1
-[0e318e92c4b3:01766] Read -1, expected 5616, errno = 1
+[3195910d3075:01796] Read -1, expected 49608, errno = 1
+[3195910d3075:01795] Read -1, expected 49600, errno = 1
+[3195910d3075:01796] Read -1, expected 49600, errno = 1
+[3195910d3075:01795] Read -1, expected 49608, errno = 1
+[3195910d3075:01796] Read -1, expected 49608, errno = 1
+[3195910d3075:01795] Read -1, expected 49600, errno = 1
+[3195910d3075:01796] Read -1, expected 49600, errno = 1
+[3195910d3075:01795] Read -1, expected 49608, errno = 1
+[3195910d3075:01795] Read -1, expected 5616, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.333 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  47.921 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>

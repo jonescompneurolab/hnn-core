@@ -129,7 +129,7 @@ def add_beta_drives(net, beta_start):
         'beta_dist', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
         burst_rate=1., burst_std=10., numspikes=2, spike_isi=10, n_drive_cells=10,
         location='distal', weights_ampa=weights_ampa_d1,
-        synaptic_delays=syn_delays_d1, seedcore=2)
+        synaptic_delays=syn_delays_d1, seedcore=20)
 
     # Proximal Drive
     weights_ampa_p1 = {'L2_basket': 0.00004, 'L2_pyramidal': 0.00002,
@@ -141,7 +141,7 @@ def add_beta_drives(net, beta_start):
         'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
         burst_rate=1., burst_std=20., numspikes=2, spike_isi=10, n_drive_cells=10,
         location='proximal', weights_ampa=weights_ampa_p1,
-        synaptic_delays=syn_delays_p1, seedcore=8)
+        synaptic_delays=syn_delays_p1, seedcore=20)
 
     return net
 
@@ -219,6 +219,7 @@ net_beta_erp.cell_response.plot_spikes_raster(ax=axes[1], show=False)
 axes[1].set_title('Beta + ERP Spike Raster')
 net_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('ERP Spike Raster')
+plt.show()
 
 ###############################################################################
 # References
