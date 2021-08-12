@@ -13,7 +13,7 @@ from copy import deepcopy
 import numpy as np
 
 from .drives import _drive_cell_event_times
-from .drives import _get_target_populations, _add_drives_from_params
+from .drives import _get_target_population_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
 from .params import _long_name, _short_name
@@ -479,7 +479,7 @@ class Network(object):
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : float or dict
+        synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
@@ -550,7 +550,7 @@ class Network(object):
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : float or dict
+        synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
@@ -563,8 +563,10 @@ class Network(object):
 
         _check_drive_parameter_values('Poisson', tstart=tstart,
                                       tstop=tstop)
-        target_populations = _get_target_populations(weights_ampa,
-                                                     weights_nmda)[0]
+        target_populations = _get_target_population_properties(weights_ampa,
+                                                               weights_nmda,
+                                                               synaptic_delays,
+                                                               location)[0]
         _check_poisson_rates(rate_constant, target_populations,
                              self.cell_types.keys())
         if isinstance(rate_constant, dict):
@@ -639,7 +641,7 @@ class Network(object):
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : float or dict
+        synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
@@ -693,7 +695,7 @@ class Network(object):
         space_constant : float
             Describes lateral dispersion (from column origin) of synaptic
             weights and delays within the simulated column
-        synaptic_delays : dict
+        synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
         n_drive_cells : int | 'n_cells'
@@ -721,35 +723,24 @@ class Network(object):
             raise ValueError("Allowed drive target locations are: 'distal', "
                              f"and 'proximal', got {location}")
         # allow passing weights as None, convert to dict here
-        target_populations, weights_ampa, weights_nmda = \
-            _get_target_populations(weights_ampa, weights_nmda)
+        target_populations, weights_by_type, delays_by_type = \
+            _get_target_population_properties(weights_ampa, weights_nmda,
+                                              synaptic_delays, location)
 
         # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cell_types.keys())):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cell_types.keys()}')
 
-        weights_by_receptor = {'ampa': weights_ampa, 'nmda': weights_nmda}
-        if isinstance(synaptic_delays, dict):
-            for receptor in ['ampa', 'nmda']:
-                # synaptic_delays must be defined for all cell types for which
-                # either AMPA or NMDA weights are non-zero
-                if not (set(weights_by_receptor[receptor].keys()).issubset(
-                        set(synaptic_delays.keys()))):
-                    raise ValueError(
-                        'synaptic_delays is either a common float or needs '
-                        'to be specified as a dict for each cell type')
-
         if self._legacy_mode:
             # allows tests must match HNN GUI output by preserving original
             # gid assignment convention
             target_populations = list(self.cell_types.keys())
             for target_type in target_populations:
-                for receptor in ['ampa', 'nmda']:
-                    if target_type not in weights_by_receptor[receptor]:
-                        weights_by_receptor[receptor].update({target_type: 0})
-                if target_type not in synaptic_delays:
-                    synaptic_delays.update({target_type: 0})
+                if target_type not in weights_by_type:
+                    weights_by_type.update({target_type: {'ampa': 0.}})
+                if target_type not in delays_by_type:
+                    delays_by_type.update({target_type: 0.1})
         elif len(target_populations) == 0:
             raise ValueError('No target populations have been specified for '
                              'this drive.')
@@ -781,35 +772,29 @@ class Network(object):
         pos = [self.pos_dict['origin']] * n_drive_cells
         self._add_cell_type(name, pos)
 
-        receptors = ['ampa', 'nmda']
-        if drive['type'] == 'gaussian':
-            receptors = ['ampa']
-
-        for receptor in receptors:
+        # Set the starting index for cell-specific source gids
+        # This will be updated depending on the number of target cells
+        # of each cell type
+        src_idx = 0
+        for target_cell_type in target_populations:
+            target_gids = list(self.gid_ranges[target_cell_type])
+            delays = delays_by_type[target_cell_type]
             if cell_specific:
-                # Set the starting index for source gids
-                # This will be updated depending on the number of target cells
-                # for each cell type
-                src_idx = 0
-                for target_cell_type in target_populations:
-                    target_gids = list(self.gid_ranges[target_cell_type])
-                    target_gids_nested = [[target_gid] for
-                                          target_gid in target_gids]
-                    src_idx_end = src_idx + len(target_gids)
-                    src_gids_by_type = (list(self.gid_ranges[name])
-                                        [src_idx:src_idx_end])
-                    weights = weights_by_receptor[receptor][target_cell_type]
-                    delays = synaptic_delays[target_cell_type]
-                    self.add_connection(src_gids_by_type, target_gids_nested,
+                target_gids_nested = [[target_gid] for
+                                      target_gid in target_gids]
+                src_idx_end = src_idx + len(target_gids)
+                src_gids = (list(self.gid_ranges[name])
+                            [src_idx:src_idx_end])
+                src_idx = src_idx_end
+                for receptor in weights_by_type[target_cell_type]:
+                    weights = weights_by_type[target_cell_type][receptor]
+                    self.add_connection(src_gids, target_gids_nested,
                                         location, receptor, weights, delays,
                                         space_constant)
-                    src_idx = src_idx_end
             else:
-                for target_cell_type in target_populations:
-                    target_gids = list(self.gid_ranges[target_cell_type])
-                    src_gids = list(self.gid_ranges[name])
-                    weights = weights_by_receptor[receptor][target_cell_type]
-                    delays = synaptic_delays[target_cell_type]
+                src_gids = list(self.gid_ranges[name])
+                for receptor in weights_by_type[target_cell_type]:
+                    weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(src_gids, target_gids, location,
                                         receptor, weights, delays,
                                         space_constant)

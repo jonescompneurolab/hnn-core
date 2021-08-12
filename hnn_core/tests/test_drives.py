@@ -116,10 +116,8 @@ def test_add_drives():
     net = Network(params, legacy_mode=False)
 
     # Ensure weights and delays are updated
-    weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 3.0,
-                    'L5_basket': 2.0, 'L5_pyramidal': 4.0}
-    syn_delays = {'L2_basket': 1.0, 'L2_pyramidal': 2.0,
-                  'L5_basket': 3.0, 'L5_pyramidal': 4.0}
+    weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 3.0, 'L5_pyramidal': 4.0}
+    syn_delays = {'L2_basket': 1.0, 'L2_pyramidal': 2.0, 'L5_pyramidal': 4.0}
 
     n_drive_cells = 10
     cell_specific = False  # default for bursty drive
@@ -144,7 +142,7 @@ def test_add_drives():
         weights_ampa=weights_ampa, location='distal',
         synaptic_delays=syn_delays, cell_specific=True)
 
-    n_dist_targets = 270  # 235 with non-legacy mode
+    n_dist_targets = 235  # 270 with legacy mode
     assert (net.external_drives['evoked_dist']
                                ['n_drive_cells'] == n_dist_targets)
     assert net.external_drives['evoked_dist']['cell_specific'] == cell_specific
@@ -162,7 +160,7 @@ def test_add_drives():
         location='distal', synaptic_delays=syn_delays,
         cell_specific=cell_specific)
 
-    n_dist_targets = 270  # 235 with non-legacy mode
+    n_dist_targets = 235  # 270 with non-legacy mode
     assert (net.external_drives['poisson']
                                ['n_drive_cells'] == n_dist_targets)
     assert net.external_drives['poisson']['cell_specific'] == cell_specific
@@ -289,7 +287,7 @@ def test_add_drives():
                               weights_ampa={'CA1_pyramidal': 1.})
     with pytest.raises(ValueError,
                        match='synaptic_delays is either a common float or '
-                             'needs to be specified as a dict for each cell'):
+                       'needs to be specified as a dict for each of the cell'):
         net.add_poisson_drive('cell_unknown', location='proximal',
                               rate_constant=10.,
                               weights_ampa={'L2_pyramidal': 1.},
