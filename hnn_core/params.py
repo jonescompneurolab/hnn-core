@@ -177,7 +177,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             if cname_ampa in par:
                 ampa_weight = par[cname_ampa][0]
                 ampa_delay = par[cname_ampa][1]
-                if ampa_weight > 0.:
+                if ampa_weight >= 0.:
                     drive['weights_ampa'][cellname] = ampa_weight
 
                 # NB synaptic delay same for NMDA, read only for AMPA
@@ -185,7 +185,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
 
             if cname_nmda in par:
                 nmda_weight = par[cname_nmda][0]
-                if nmda_weight > 0.:
+                if nmda_weight >= 0.:
                     drive['weights_nmda'][cellname] = nmda_weight
 
         drive_specs[feed_name] = drive
@@ -228,9 +228,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                     ampa_weight = par[cellname][0]
                     nmda_weight = par[cellname][1]
                     synaptic_delays = par[cellname][2]
-                    if ampa_weight > 0.:
+                    if ampa_weight >= 0.:
                         drive['weights_ampa'][cellname] = ampa_weight
-                    if nmda_weight > 0.:
+                    if nmda_weight >= 0.:
                         drive['weights_nmda'][cellname] = nmda_weight
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
@@ -249,7 +249,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                 if cellname in par:
                     ampa_weight = par[cellname][0]
                     synaptic_delays = par[cellname][3]
-                    if ampa_weight > 0.:
+                    if ampa_weight >= 0.:
                         drive['weights_ampa'][cellname] = ampa_weight
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
@@ -272,9 +272,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                     ampa_weight = par[cellname][0]
                     nmda_weight = par[cellname][1]
                     synaptic_delays = par[cellname][2]
-                    if ampa_weight > 0.:
+                    if ampa_weight >= 0.:
                         drive['weights_ampa'][cellname] = ampa_weight
-                    if nmda_weight > 0.:
+                    if nmda_weight >= 0.:
                         drive['weights_nmda'][cellname] = nmda_weight
                     drive['synaptic_delays'][cellname] = synaptic_delays
 

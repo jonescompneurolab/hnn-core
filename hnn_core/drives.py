@@ -29,6 +29,9 @@ def _get_target_population_properties(weights_ampa, weights_nmda,
         weights_by_type[cell_type] = {'nmda': weights_nmda[cell_type]}
 
     target_populations = set(weights_by_type)
+    if not target_populations:
+        raise ValueError('No target cell types have been given a synaptic '
+                         'weight for this drive.')
     # Distal drives should not target L5 basket cells according to the
     # canonical Jones model
     if location == 'distal' and 'L5_basket' in target_populations:
