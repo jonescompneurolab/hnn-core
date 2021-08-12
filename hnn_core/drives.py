@@ -10,14 +10,45 @@ from .params import (_extract_bias_specs_from_hnn_params,
                      _extract_drive_specs_from_hnn_params)
 
 
-def _get_target_populations(weights_ampa, weights_nmda):
+def _get_target_population_properties(weights_ampa, weights_nmda,
+                                      synaptic_delays, location):
+    """Retrieve the the user-defined synaptic weight and delay parameters
+    according to their target populations cell types
+    """
+
     # allow passing weights as None, but make iterable here
     if weights_ampa is None:
         weights_ampa = dict()
     if weights_nmda is None:
         weights_nmda = dict()
-    target_populations = (set(weights_ampa.keys()) | set(weights_nmda.keys()))
-    return target_populations, weights_ampa, weights_nmda
+
+    weights_by_type = dict()
+    for cell_type in weights_ampa:
+        weights_by_type[cell_type] = {'ampa': weights_ampa[cell_type]}
+    for cell_type in weights_nmda:
+        weights_by_type[cell_type] = {'nmda': weights_nmda[cell_type]}
+
+    target_populations = set(weights_by_type)
+    # Distal drives should not target L5 basket cells according to the
+    # canonical Jones model
+    if location == 'distal' and 'L5_basket' in target_populations:
+        raise ValueError('When adding a distal drive, synaptic weight cannot '
+                         'be defined for the L5_basket cell type as this'
+                         'connection does not exist.')
+
+    if isinstance(synaptic_delays, float):
+        delays_by_type = {cell_type: synaptic_delays for cell_type in
+                          target_populations}
+    else:
+        delays_by_type = synaptic_delays
+
+    if set(delays_by_type.keys()) != target_populations:
+        raise ValueError('synaptic_delays is either a common float or needs '
+                         'to be specified as a dict for each of the cell '
+                         'types defined in weights_ampa and weights_nmda: '
+                         f'{target_populations}')
+
+    return target_populations, weights_by_type, delays_by_type
 
 
 def _check_drive_parameter_values(drive_type, **kwargs):
