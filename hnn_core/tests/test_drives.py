@@ -225,18 +225,24 @@ def test_add_drives():
     with pytest.raises(ValueError,
                        match='Rate constant must be positive'):
         net.add_poisson_drive('poisson1', location='distal',
-                              rate_constant=0.)
+                              rate_constant=0.,
+                              weights_ampa=weights_ampa,
+                              synaptic_delays=syn_delays)
 
     with pytest.raises(ValueError,
                        match='Rate constants not provided for all target'):
         net.add_poisson_drive('poisson1', location='distal',
                               rate_constant={'L2_pyramidal': 10.},
-                              weights_ampa={'L5_pyramidal': .01})
+                              weights_ampa=weights_ampa,
+                              synaptic_delays=syn_delays)
     with pytest.raises(ValueError,
                        match='Rate constant provided for unknown target cell'):
         net.add_poisson_drive('poisson1', location='distal',
                               rate_constant={'L2_pyramidal': 10.,
-                                             'bogus_celltype': 20.})
+                                             'bogus_celltype': 20.},
+                              weights_ampa={'L2_pyramidal': .01,
+                                            'bogus_celltype': .01},
+                              synaptic_delays=0.1)
 
     with pytest.raises(ValueError,
                        match='Drives specific to cell types are only '
@@ -275,16 +281,21 @@ def test_add_drives():
     with pytest.raises(ValueError,
                        match='Drive evoked_dist already defined'):
         net.add_poisson_drive('evoked_dist', location='distal',
-                              rate_constant=10.)
+                              rate_constant=10.,
+                              weights_ampa=weights_ampa,
+                              synaptic_delays=syn_delays)
     with pytest.raises(ValueError,
                        match='Allowed drive target locations are:'):
         net.add_poisson_drive('weird_poisson', location='inbetween',
-                              rate_constant=10.)
+                              rate_constant=10.,
+                              weights_ampa=weights_ampa,
+                              synaptic_delays=syn_delays)
     with pytest.raises(ValueError,
                        match='Allowed drive target cell types are:'):
         net.add_poisson_drive('cell_unknown', location='proximal',
                               rate_constant=10.,
-                              weights_ampa={'CA1_pyramidal': 1.})
+                              weights_ampa={'CA1_pyramidal': 1.},
+                              synaptic_delays=.01)
     with pytest.raises(ValueError,
                        match='synaptic_delays is either a common float or '
                        'needs to be specified as a dict for each of the cell'):
