@@ -336,26 +336,35 @@ def test_network():
     kwargs_default = dict(net=net, src_gids=[0, 1], target_gids=[0, 1],
                           loc=['soma', 'distal'], receptor=['ampa', 'gabaa'])
 
-    # List of tuples with (arg, item, correct_indices)
     kwargs_good = [
-        ('src_gids', 0, [30, 39]),
-        ('src_gids', 'L2_pyramidal', [29]),
-        ('src_gids', range(2), [30, 39]),
-        ('src_gids', None, [4, 29, 30, 39]),
-        ('target_gids', 35, [22, 34, 35, 37, 38, 40, 41, 42, 43, 44]),
-        ('target_gids', range(2), [30, 39]),
-        ('target_gids', 'L2_pyramidal',
-         [22, 34, 35, 37, 38, 40, 41, 42, 43, 44]),
-        ('target_gids', None,
-         [22, 28, 30, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44]),
-        ('loc', 'soma', [30, 39]),
-        ('loc', None, [30, 39]),
-        ('receptor', 'gabaa', [30, 39]),
-        ('receptor', None, [30, 39])]
-    for arg, item, indices in kwargs_good:
+        ('src_gids', 0),
+        ('src_gids', 'L2_pyramidal'),
+        ('src_gids', range(2)),
+        ('src_gids', None),
+        ('target_gids', 35),
+        ('target_gids', range(2)),
+        ('target_gids', 'L2_pyramidal'),
+        ('target_gids', None),
+        ('loc', 'soma'),
+        ('loc', None),
+        ('receptor', 'gabaa'),
+        ('receptor', None)]
+    for arg, item in kwargs_good:
         kwargs = kwargs_default.copy()
         kwargs[arg] = item
-        assert indices == pick_connection(**kwargs)
+        indices = pick_connection(**kwargs)
+        for conn_idx in indices:
+            for check_arg, check_item in kwargs.items():
+                if (arg == 'src_gids' or arg == 'target_gids') and \
+                        isinstance(item, str):
+                    assert np.all(np.in1d(net.connectivity[conn_idx][arg],
+                                          net.gid_ranges[item]) == True)
+                elif item is None:
+                    pass
+                else:
+                    assert np.all(
+                        np.in1d(
+                            [item], net.connectivity[conn_idx][arg]) == True)
 
     # Check condition where not connections match
     assert pick_connection(net, loc='distal', receptor='gabab') == list()
