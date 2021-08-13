@@ -37,10 +37,8 @@ def test_gid_assignment():
     """Test that gids are assigned without overlap across ranks"""
 
     net = jones_2009_model(add_drives_from_params=False)
-    weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 3.0,
-                    'L5_basket': 2.0, 'L5_pyramidal': 4.0}
-    syn_delays = {'L2_basket': 1.0, 'L2_pyramidal': 2.0,
-                  'L5_basket': 3.0, 'L5_pyramidal': 4.0}
+    weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 2.0, 'L5_pyramidal': 3.0}
+    syn_delays = 0.1
 
     net.add_bursty_drive(
         'bursty_dist', location='distal', burst_rate=10,

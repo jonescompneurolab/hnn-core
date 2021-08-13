@@ -37,7 +37,7 @@ def _get_target_population_properties(weights_ampa, weights_nmda,
     # canonical Jones model
     if location == 'distal' and 'L5_basket' in target_populations:
         raise ValueError('When adding a distal drive, synaptic weight cannot '
-                         'be defined for the L5_basket cell type as this'
+                         'be defined for the L5_basket cell type as this '
                          'connection does not exist.')
 
     if isinstance(synaptic_delays, float):

@@ -377,7 +377,7 @@ class NetworkBuilder(object):
                     target_gids = list()
                     for conn_idx in conn_idxs:
                         target_gids += (self.net.connectivity[conn_idx]
-                                        ['target_gids'])
+                                        ['gid_pairs'][src_gid])
 
                     for target_gid in set(target_gids):
                         if (target_gid in self._gid_list and
