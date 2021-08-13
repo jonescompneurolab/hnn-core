@@ -22,11 +22,12 @@ def _get_target_population_properties(weights_ampa, weights_nmda,
     if weights_nmda is None:
         weights_nmda = dict()
 
-    weights_by_type = dict()
+    weights_by_type = {cell_type: dict() for cell_type in
+                       (set(weights_ampa.keys()) | set(weights_ampa.keys()))}
     for cell_type in weights_ampa:
-        weights_by_type[cell_type] = {'ampa': weights_ampa[cell_type]}
+        weights_by_type[cell_type].update({'ampa': weights_ampa[cell_type]})
     for cell_type in weights_nmda:
-        weights_by_type[cell_type] = {'nmda': weights_nmda[cell_type]}
+        weights_by_type[cell_type].update({'nmda': weights_nmda[cell_type]})
 
     target_populations = set(weights_by_type)
     if not target_populations:

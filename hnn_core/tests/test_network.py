@@ -41,7 +41,10 @@ def test_network_models():
     add_erp_drives_to_jones_model(net_default)
     for drive_name in ['evdist1', 'evprox1', 'evprox2']:
         assert drive_name in net_default.external_drives.keys()
-    assert len(net_default.connectivity) == n_conn + 14
+    # 15 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
+    # evprox1: 4 ampa, evprox2: 4 ampa, and 1 extra zero-weighted ampa
+    # evdist1->L5_basket connection is added to comply with legacy_mode
+    assert len(net_default.connectivity) == n_conn + 15
 
     # Ensure distant dependent calcium gbar
     net_calcium = calcium_model()
@@ -177,7 +180,8 @@ def test_network():
             for conn_idx in conn_idxs:
                 drive_conn = net.connectivity[conn_idx]
                 assert_allclose(drive_conn['nc_dict']['A_weight'],
-                                target_weights[target_type], rtol=1e-12)
+                                target_weights[drive_name][target_type],
+                                rtol=1e-12)
 
     # check select synaptic delays
     target_delays = {'evdist1': {'L2_basket': 0.1, 'L5_pyramidal': 0.1},
@@ -191,7 +195,8 @@ def test_network():
             for conn_idx in conn_idxs:
                 drive_conn = net.connectivity[conn_idx]
                 assert_allclose(drive_conn['nc_dict']['A_delay'],
-                                target_delays[target_type], rtol=1e-12)
+                                target_delays[drive_name][target_type],
+                                rtol=1e-12)
 
     # array of simulation times is created in Network.__init__, but passed
     # to CellResponse-constructor for storage (Network is agnostic of time)
