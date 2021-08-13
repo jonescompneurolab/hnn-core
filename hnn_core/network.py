@@ -13,7 +13,7 @@ from copy import deepcopy
 import numpy as np
 
 from .drives import _drive_cell_event_times
-from .drives import _get_target_population_properties, _add_drives_from_params
+from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
 from .params import _long_name, _short_name
@@ -563,10 +563,10 @@ class Network(object):
 
         _check_drive_parameter_values('Poisson', tstart=tstart,
                                       tstop=tstop)
-        target_populations = _get_target_population_properties(weights_ampa,
-                                                               weights_nmda,
-                                                               synaptic_delays,
-                                                               location)[0]
+        target_populations = _get_target_properties(weights_ampa,
+                                                    weights_nmda,
+                                                    synaptic_delays,
+                                                    location)[0]
         _check_poisson_rates(rate_constant, target_populations,
                              self.cell_types.keys())
         if isinstance(rate_constant, dict):
@@ -724,8 +724,8 @@ class Network(object):
                              f"and 'proximal', got {location}")
         # allow passing weights as None, convert to dict here
         target_populations, weights_by_type, delays_by_type = \
-            _get_target_population_properties(weights_ampa, weights_nmda,
-                                              synaptic_delays, location)
+            _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
+                                   location)
 
         # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cell_types.keys())):

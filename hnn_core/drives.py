@@ -10,8 +10,8 @@ from .params import (_extract_bias_specs_from_hnn_params,
                      _extract_drive_specs_from_hnn_params)
 
 
-def _get_target_population_properties(weights_ampa, weights_nmda,
-                                      synaptic_delays, location):
+def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
+                           location):
     """Retrieve the the user-defined synaptic weight and delay parameters
     according to their target populations cell types
     """
