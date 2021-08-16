@@ -792,10 +792,9 @@ class Network(object):
                                         location, receptor, weights, delays,
                                         space_constant)
             else:
-                src_gids = list(self.gid_ranges[name])
                 for receptor in weights_by_type[target_cell_type]:
                     weights = weights_by_type[target_cell_type][receptor]
-                    self.add_connection(src_gids, target_gids, location,
+                    self.add_connection(name, target_gids, location,
                                         receptor, weights, delays,
                                         space_constant)
 
@@ -936,8 +935,8 @@ class Network(object):
         Parameters
         ----------
         src_gids : str | int | range | list of int
-            Identifier for source cells. Passing str arguments
-            ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
+            Identifier for source cells. Passing str arguments ('evdist1',
+            'L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket', etc.) is
             equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
         target_gids : str | int | range | list of int
@@ -980,17 +979,18 @@ class Network(object):
 
         _validate_type(target_gids, (int, list, range, str), 'target_gids',
                        'int list, range or str')
-        valid_cells = list(self.cell_types.keys())
+        valid_source_cells = list(self.gid_ranges.keys())
 
         # Convert src_gids to list
         src_gids = _check_gids(src_gids, self.gid_ranges,
-                               valid_cells, 'src_gids')
+                               valid_source_cells, 'src_gids')
 
         # Convert target_gids to list of list, one element for each src_gid
+        valid_target_cells = list(self.cell_types.keys())
         if isinstance(target_gids, int):
             target_gids = [[target_gids] for _ in range(len(src_gids))]
         elif isinstance(target_gids, str):
-            _check_option('target_gids', target_gids, valid_cells)
+            _check_option('target_gids', target_gids, valid_target_cells)
             target_gids = [list(self.gid_ranges[_long_name(target_gids)])
                            for _ in range(len(src_gids))]
         elif isinstance(target_gids, range):
