@@ -362,14 +362,14 @@ def test_network():
                 pass
             else:
                 assert np.any(np.in1d([item], net.connectivity[conn_idx][arg]))
-    
+
     # Check that a given gid isn't present in any connection profile that
     # pick_connection can't identify
     conn_idxs = pick_connection(net, src_gids=0)
     for conn_idx in range(len(net.connectivity)):
         if conn_idx not in conn_idxs:
             assert 0 not in net.connectivity[conn_idx]['src_gids']
-    
+
     # Check that pick_connection returns empty lists when searching for
     # a drive targetting the wrong location
     assert not pick_connection(net, src_gids='evdist1', loc='proximal')
