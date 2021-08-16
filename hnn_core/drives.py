@@ -12,8 +12,10 @@ from .params import (_extract_bias_specs_from_hnn_params,
 
 def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
                            location):
-    """Retrieve the the user-defined synaptic weight and delay parameters
-    according to their target populations cell types
+    """Retrieve drive properties associated with each target cell type
+
+    Note that target cell types of a drive are inferred from the synaptic
+    weight and delay parameters keys defined by the user.
     """
 
     # allow passing weights as None, but make iterable here
@@ -44,7 +46,7 @@ def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
         delays_by_type = {cell_type: synaptic_delays for cell_type in
                           target_populations}
     else:
-        delays_by_type = synaptic_delays
+        delays_by_type = synaptic_delays.copy()
 
     if set(delays_by_type.keys()) != target_populations:
         raise ValueError('synaptic_delays is either a common float or needs '
