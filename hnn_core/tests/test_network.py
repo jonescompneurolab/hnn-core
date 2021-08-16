@@ -333,8 +333,8 @@ def test_network():
         net.add_connection(**kwargs)
 
     # Test net.pick_connection()
-    kwargs_default = dict(net=net, src_gids=[0, 1], target_gids=[0, 1],
-                          loc=['soma', 'distal'], receptor=['ampa', 'gabaa'])
+    kwargs_default = dict(net=net, src_gids=None, target_gids=None,
+                          loc=None, receptor=None)
 
     kwargs_good = [
         ('src_gids', 0),
@@ -354,17 +354,14 @@ def test_network():
         kwargs[arg] = item
         indices = pick_connection(**kwargs)
         for conn_idx in indices:
-            for check_arg, check_item in kwargs.items():
-                if (arg == 'src_gids' or arg == 'target_gids') and \
-                        isinstance(item, str):
-                    assert np.all(np.in1d(net.connectivity[conn_idx][arg],
-                                          net.gid_ranges[item]) == True)
-                elif item is None:
-                    pass
-                else:
-                    assert np.all(
-                        np.in1d(
-                            [item], net.connectivity[conn_idx][arg]) == True)
+            if (arg == 'src_gids' or arg == 'target_gids') and \
+                    isinstance(item, str):
+                assert np.all(np.in1d(net.connectivity[conn_idx][arg],
+                              net.gid_ranges[item]))
+            elif item is None:
+                pass
+            else:
+                assert np.any(np.in1d([item], net.connectivity[conn_idx][arg]))
 
     # Check condition where not connections match
     assert pick_connection(net, loc='distal', receptor='gabab') == list()
@@ -402,7 +399,7 @@ def test_network():
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
-    assert len(net.connectivity) == 18
+    assert len(net.connectivity) == 50
     net.clear_drives()
     assert len(net.connectivity) == 0
 
