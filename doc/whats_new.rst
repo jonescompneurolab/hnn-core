@@ -40,7 +40,7 @@ Changelog
 
 - Add :func:`~hnn_core.Network.pick_connection` to query the indices of specific connections in :attr:`~hnn_core.Network.connectivity`, by `Nick Tolley`_ in `#367 <https://github.com/jonescompneurolab/hnn-core/pull/367>`_
 
-- Unify the codepath for instantiating drive and local network connectivity, by `Ryan Thorpe`_, `Mainak Jas`_, and `Nick Tolley`_ in `#369 <https://github.com/jonescompneurolab/hnn-core/pull/369>`_
+- Drives in :attr:`~hnn_core.Network.external_drives` no longer contain a `'conn'` key and the :attr:`~hnn_core.Network.connectivity` list contains more items when adding drives from a param file or when in legacy mode, by `Ryan Thorpe`_, `Mainak Jas`_, and `Nick Tolley`_ in `#369 <https://github.com/jonescompneurolab/hnn-core/pull/369>`_
 
 Bug
 ~~~
