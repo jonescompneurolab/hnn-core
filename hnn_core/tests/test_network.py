@@ -372,7 +372,8 @@ def test_network():
 
     # Check that pick_connection returns empty lists when searching for
     # a drive targetting the wrong location
-    assert not pick_connection(net, src_gids='evdist1', loc='proximal')
+    conn_idxs = pick_connection(net, src_gids='evdist1', loc='proximal')
+    assert len(conn_idxs) == 0
     assert not pick_connection(net, src_gids='evprox1', loc='distal')
 
     # Check condition where not connections match
