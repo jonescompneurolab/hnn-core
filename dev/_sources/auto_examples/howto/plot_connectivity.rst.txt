@@ -159,7 +159,7 @@ of ``net.connectivity`` that match the provided parameters.
 
  .. code-block:: none
 
-    30
+    66
     L5_basket -> L5_pyramidal
     cell counts: 35 srcs, 100 targets
     connection probability: 1.0 
@@ -505,7 +505,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 8 minutes  34.340 seconds)
+   **Total running time of the script:** ( 9 minutes  23.896 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

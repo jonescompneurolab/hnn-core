@@ -307,7 +307,7 @@ type (dict keys). Cell types omitted from the dict are set to zero.</p>
 <dt><strong>weights_nmda</strong><span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of NMDA receptors on each targeted cell
 type (dict keys). Cell types omitted from the dict are set to zero.</p>
 </dd>
-<dt><strong>synaptic_delays</strong><span class="classifier">float or dict</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
+<dt><strong>synaptic_delays</strong><span class="classifier">dict or float</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
 a function of the space_constant. If float, applies to all target
 cell types. Use dict to create delay-&gt;cell mapping.</p>
 </dd>
@@ -328,8 +328,8 @@ weights and delays within the simulated column</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>src_gids</strong><span class="classifier">str | int | range | list of int</span></dt><dd><p>Identifier for source cells. Passing str arguments
-(‘L2_pyramidal’, ‘L2_basket’, ‘L5_pyramidal’, ‘L5_basket’) is
+<dt><strong>src_gids</strong><span class="classifier">str | int | range | list of int</span></dt><dd><p>Identifier for source cells. Passing str arguments (‘evdist1’,
+‘L2_pyramidal’, ‘L2_basket’, ‘L5_pyramidal’, ‘L5_basket’, etc.) is
 equivalent to passing a list of gids for the relevant cell type.
 source - target connections are made in an all-to-all pattern.</p>
 </dd>
@@ -443,7 +443,7 @@ type (dict keys). Cell types omitted from the dict are set to zero.</p>
 <dt><strong>weights_nmda</strong><span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of NMDA receptors on each targeted cell
 type (dict keys). Cell types omitted from the dict are set to zero.</p>
 </dd>
-<dt><strong>synaptic_delays</strong><span class="classifier">float or dict</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
+<dt><strong>synaptic_delays</strong><span class="classifier">dict or float</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
 a function of the space_constant. If float, applies to all target
 cell types. Use dict to create delay-&gt;cell mapping.</p>
 </dd>
@@ -500,7 +500,7 @@ type (dict keys). Cell types omitted from the dict are set to zero.</p>
 <dt><strong>weights_nmda</strong><span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of NMDA receptors on each targeted cell
 type (dict keys). Cell types omitted from the dict are set to zero.</p>
 </dd>
-<dt><strong>synaptic_delays</strong><span class="classifier">float or dict</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
+<dt><strong>synaptic_delays</strong><span class="classifier">dict or float</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
 a function of the space_constant. If float, applies to all target
 cell types. Use dict to create delay-&gt;cell mapping.</p>
 </dd>

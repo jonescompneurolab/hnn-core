@@ -40,6 +40,8 @@ Changelog
 
 - Add :func:`~hnn_core.Network.pick_connection` to query the indices of specific connections in :attr:`~hnn_core.Network.connectivity`, by `Nick Tolley`_ in `#367 <https://github.com/jonescompneurolab/hnn-core/pull/367>`_
 
+- Drives in :attr:`~hnn_core.Network.external_drives` no longer contain a `'conn'` key and the :attr:`~hnn_core.Network.connectivity` list contains more items when adding drives from a param file or when in legacy mode, by `Ryan Thorpe`_, `Mainak Jas`_, and `Nick Tolley`_ in `#369 <https://github.com/jonescompneurolab/hnn-core/pull/369>`_
+
 Bug
 ~~~
 
@@ -80,6 +82,8 @@ API
 - Simulation end time and integration time have to be specified now with `tstop` and `dt` in :func:`~hnn_core.simulate_dipole`, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
 
 - `~hnn_core.CellResponse.reset` method is not supported any more, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+
+- Target cell types and their connections are created for each drive according to the synaptic weight and delay dictionaries assigned in `Network.add_xxx_drive()`, by `Ryan Thorpe`_ in `#369 <https://github.com/jonescompneurolab/hnn-core/pull/369>`_
 
 .. _0.1:
 
