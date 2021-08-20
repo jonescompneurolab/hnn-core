@@ -336,6 +336,12 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
     -------
     params : dict
         The optimized params dictionary.
+    
+    Notes
+    -----
+    This optimization protocol utilizes the Constrained Optimization
+    By Linear Approximation (COBYLA) method:
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_cobyla.html  # noqa
     """
     from .parallel_backends import _BACKEND, JoblibBackend
 
