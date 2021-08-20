@@ -99,7 +99,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     return pos_dict
 
 
-def _connection_probability(conn, probability, seed=0):
+def _connection_probability(conn, probability, conn_seed=3):
     """Remove/keep a random subset of connections.
 
     Parameters
@@ -110,8 +110,9 @@ def _connection_probability(conn, probability, seed=0):
     probability : float
         Probability of connection between any src-target pair.
         Defaults to 1.0 producing an all-to-all pattern.
-    seed : int
-        Seed for the numpy random number generator.
+    conn_seed : int
+        Optional initial seed for random number generator (default: 3).
+        Used to randomly remove connections when probablity < 1.0.
 
     Notes
     -----
@@ -124,7 +125,7 @@ def _connection_probability(conn, probability, seed=0):
     connections probability of the original set after successive calls.
     """
     # Random number generator for random connection selection
-    rng = np.random.default_rng(seed)
+    rng = np.random.default_rng(conn_seed)
     _validate_type(probability, float, 'probability')
     if probability <= 0.0 or probability >= 1.0:
         raise ValueError('probability must be in the range (0,1)')
@@ -472,7 +473,7 @@ class Network(object):
                          n_drive_cells='n_cells', cell_specific=True,
                          weights_ampa=None, weights_nmda=None,
                          space_constant=3., synaptic_delays=0.1,
-                         probability=1.0, seedcore=2, conn_seed=2):
+                         probability=1.0, event_seed=2, conn_seed=3):
         """Add an 'evoked' external drive to the network
 
         Parameters
@@ -525,8 +526,12 @@ class Network(object):
         probability : float
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
-        seedcore : int
+        event_seed : int
             Optional initial seed for random number generator (default: 2).
+            Used to generate event times for drive cells.
+        conn_seed : int
+            Optional initial seed for random number generator (default: 3).
+            Used to randomly remove connections when probablity < 1.0.
         """
         if not self._legacy_mode:
             _check_drive_parameter_values('evoked', sigma=sigma,
@@ -536,7 +541,7 @@ class Network(object):
         if name == 'extgauss':
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
         drive['n_drive_cells'] = n_drive_cells
-        drive['seedcore'] = seedcore
+        drive['event_seed'] = event_seed
         drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
         drive['events'] = list()
@@ -549,8 +554,8 @@ class Network(object):
                           location, n_drive_cells='n_cells',
                           cell_specific=True, weights_ampa=None,
                           weights_nmda=None, space_constant=100.,
-                          synaptic_delays=0.1, probability=1.0, seedcore=2,
-                          conn_seed=2):
+                          synaptic_delays=0.1, probability=1.0, event_seed=2,
+                          conn_seed=3):
         """Add a Poisson-distributed external drive to the network
 
         Parameters
@@ -607,8 +612,12 @@ class Network(object):
         probability : float
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
-        seedcore : int
+        event_seed : int
             Optional initial seed for random number generator (default: 2).
+            Used to generate event times for drive cells.
+        conn_seed : int
+            Optional initial seed for random number generator (default: 3).
+            Used to randomly remove connections when probablity < 1.0.
         """
 
         _check_drive_parameter_values('Poisson', tstart=tstart,
@@ -630,7 +639,7 @@ class Network(object):
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
         drive['n_drive_cells'] = n_drive_cells
-        drive['seedcore'] = seedcore
+        drive['event_seed'] = event_seed
         drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
                                  rate_constant=rate_constant)
@@ -645,7 +654,7 @@ class Network(object):
                          spike_isi=10, n_drive_cells=1, cell_specific=False,
                          weights_ampa=None, weights_nmda=None,
                          synaptic_delays=0.1, space_constant=100.,
-                         probability=1.0, seedcore=2, conn_seed=2):
+                         probability=1.0, event_seed=2, conn_seed=3):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
         Parameters
@@ -709,8 +718,12 @@ class Network(object):
         probability : float
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
-        seedcore : int
+        event_seed : int
             Optional initial seed for random number generator (default: 2).
+            Used to generate event times for drive cells.
+        conn_seed : int
+            Optional initial seed for random number generator (default: 3).
+            Used to randomly remove connections when probablity < 1.0.
         """
         if not self._legacy_mode:
             _check_drive_parameter_values('bursty', tstart=tstart, tstop=tstop,
@@ -723,7 +736,7 @@ class Network(object):
         drive = _NetworkDrive()
         drive['type'] = 'bursty'
         drive['n_drive_cells'] = n_drive_cells
-        drive['seedcore'] = seedcore
+        drive['event_seed'] = event_seed
         drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(tstart=tstart,
                                  tstart_std=tstart_std, tstop=tstop,
@@ -863,15 +876,15 @@ class Network(object):
                         src_gids=src_gids, target_gids=target_gids_nested,
                         loc=location, receptor=receptor, weight=weights,
                         delay=delays, lamtha=space_constant,
-                        probability=probability, seed=drive['conn_seed'])
+                        probability=probability, conn_seed=drive['conn_seed'])
             else:
                 for receptor in weights_by_type[target_cell_type]:
                     weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(
-                        src_gids=name, target_gid=target_gids, loc=location,
+                        src_gids=name, target_gids=target_gids, loc=location,
                         receptor=receptor, weight=weights, delay=delays,
                         lamtha=space_constant, probability=probability,
-                        seed=drive['conn_seed'])
+                        conn_seed=drive['conn_seed'])
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
@@ -920,7 +933,7 @@ class Network(object):
                                 target_type=target_type,
                                 trial_idx=trial_idx,
                                 drive_cell_gid=drive_cell_gid,
-                                seedcore=drive['seedcore'],
+                                event_seed=drive['event_seed'],
                                 tstop=tstop)
                             )
                     else:
@@ -931,7 +944,7 @@ class Network(object):
                             target_type='any',
                             trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid,
-                            seedcore=drive['seedcore'])
+                            event_seed=drive['event_seed'])
                         event_times.append(src_event_times)
                 # 'events': nested list (n_trials x n_drive_cells x n_events)
                 self.external_drives[
@@ -991,7 +1004,7 @@ class Network(object):
 
     def add_connection(self, src_gids, target_gids, loc, receptor,
                        weight, delay, lamtha, allow_autapses=True,
-                       probability=1.0, seed=0):
+                       probability=1.0, conn_seed=3):
         """Appends connections to connectivity list
 
         Parameters
@@ -1025,8 +1038,9 @@ class Network(object):
         probability : float
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
-        seed : int
-            Seed for the numpy random number generator.
+        conn_seed : int
+            Optional initial seed for random number generator (default: 2).
+            Used to randomly remove connections when probablity < 1.0.
 
         Notes
         -----
@@ -1125,7 +1139,7 @@ class Network(object):
 
         # Probabilistically define connections
         if probability != 1.0:
-            _connection_probability(conn, probability, seed)
+            _connection_probability(conn, probability, conn_seed)
 
         conn['probability'] = probability
 
@@ -1292,9 +1306,12 @@ class _NetworkDrive(dict):
     cell_specific : bool
         Whether each cell has unique connection parameters (default: True)
         or all cells have common connections to a global (single) drive.
-    seedcore : int
-        Optional initial seed for random number generator
-        Each artificial drive cell has seed = seedcore + gid
+    event_seed : int
+        Optional initial seed for random number generator used for event times.
+        Each artificial drive cell has seed = event_seed + gid
+    conn_seed : int
+        Optional initial seed for random number generator.
+        Used to randomly remove connections when probablity < 1.0.
     target_types : set or list of str
         Names of cell types targeted by this drive (must be subset of
         net.cell_types.keys()).
