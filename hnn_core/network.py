@@ -523,9 +523,10 @@ class Network(object):
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where x is the
             physical distance (in um) between the connected cells in the xy
             plane (delays are modulated by the inverse of this factor).
-        probability : float
+        probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Defaults to 1.0 producing an all-to-all pattern.
+            Use dict to create delay->cell mapping. If float, applies to all
+            target cell types
         event_seed : int
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
@@ -609,9 +610,10 @@ class Network(object):
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
-        probability : float
+        probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Defaults to 1.0 producing an all-to-all pattern.
+            Use dict to create delay->cell mapping. If float, applies to all
+            target cell types.
         event_seed : int
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
@@ -715,9 +717,10 @@ class Network(object):
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
-        probability : float
+        probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Defaults to 1.0 producing an all-to-all pattern.
+            Use dict to create delay->cell mapping. If float, applies to all
+            target cell types.
         event_seed : int
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
@@ -794,9 +797,10 @@ class Network(object):
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
             target in the network.
-        probability : float
+        probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Defaults to 1.0 producing an all-to-all pattern.
+            Use dict to create delay->cell mapping. If float, applies to all
+            target cell types
 
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
