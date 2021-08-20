@@ -806,10 +806,14 @@ class Network(object):
         if location not in ['distal', 'proximal']:
             raise ValueError("Allowed drive target locations are: 'distal', "
                              f"and 'proximal', got {location}")
+
+        _validate_type(
+            probability, (float, dict), 'probability', 'float or dict')
         # allow passing weights as None, convert to dict here
-        target_populations, weights_by_type, delays_by_type = \
+        (target_populations, weights_by_type, delays_by_type,
+         probability_by_type) = \
             _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
-                                   location)
+                                   location, probability)
 
         # weights passed must correspond to cells in the network
         if not target_populations.issubset(set(self.cell_types.keys())):
@@ -825,6 +829,8 @@ class Network(object):
                     weights_by_type.update({target_type: {'ampa': 0.}})
                 if target_type not in delays_by_type:
                     delays_by_type.update({target_type: 0.1})
+                if target_type not in probability_by_type:
+                    probability_by_type.update({target_type: 1.0})
         elif len(target_populations) == 0:
             raise ValueError('No target populations have been specified for '
                              'this drive.')
@@ -863,6 +869,7 @@ class Network(object):
         for target_cell_type in target_populations:
             target_gids = list(self.gid_ranges[target_cell_type])
             delays = delays_by_type[target_cell_type]
+            probability = probability_by_type[target_cell_type]
             if cell_specific:
                 target_gids_nested = [[target_gid] for
                                       target_gid in target_gids]

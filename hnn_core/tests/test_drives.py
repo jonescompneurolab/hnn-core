@@ -171,6 +171,51 @@ def test_add_drives():
         assert drive_conn['nc_dict']['A_weight'] == weights_ampa[target_type]
         assert drive_conn['nc_dict']['A_delay'] == syn_delays[target_type]
 
+    # Test probabalistic drive connections.
+    # drive with cell_specific=False
+    n_drive_cells = 10
+    probability = 0.5  # test that only half of possible connections are made
+    weights_nmda = {'L2_basket': 1.0, 'L2_pyramidal': 3.0, 'L5_pyramidal': 4.0}
+    net.add_bursty_drive(
+        'bursty_prob', location='distal', burst_rate=10,
+        weights_ampa=weights_ampa, weights_nmda=weights_nmda,
+        synaptic_delays=syn_delays, n_drive_cells=n_drive_cells,
+        probability=probability)
+
+    for cell_type in weights_ampa.keys():
+        conn_idxs = pick_connection(
+            net, src_gids='bursty_prob', target_gids=cell_type)
+        gid_pairs_comparison = net.connectivity[conn_idxs[0]]['gid_pairs']
+        for conn_idx in conn_idxs:
+            conn = net.connectivity[conn_idx]
+            num_connections = np.sum(
+                [len(gids) for gids in conn['gid_pairs'].values()])
+            assert gid_pairs_comparison == conn['gid_pairs']
+            assert num_connections == \
+                np.around(len(net.gid_ranges[cell_type]) * n_drive_cells *
+                          probability).astype(int)
+
+    # drives with cell_specific=True
+    probability = {'L2_basket': 0.1, 'L2_pyramidal': 0.25, 'L5_pyramidal': 0.5}
+    net.add_evoked_drive(
+        'evoked_prob', mu=1.0, sigma=1.0, numspikes=1.0,
+        weights_ampa=weights_ampa, weights_nmda=weights_nmda,
+        location='distal', synaptic_delays=syn_delays, cell_specific=True,
+        probability=probability)
+
+    for cell_type in weights_ampa.keys():
+        conn_idxs = pick_connection(
+            net, src_gids='evoked_prob', target_gids=cell_type)
+        gid_pairs_comparison = net.connectivity[conn_idxs[0]]['gid_pairs']
+        for conn_idx in conn_idxs:
+            conn = net.connectivity[conn_idx]
+            num_connections = np.sum(
+                [len(gids) for gids in conn['gid_pairs'].values()])
+            assert gid_pairs_comparison == conn['gid_pairs']
+            assert num_connections == \
+                np.around(len(net.gid_ranges[cell_type]) *
+                          probability[cell_type]).astype(int)
+
     # evoked
     with pytest.raises(ValueError,
                        match='Standard deviation cannot be negative'):
@@ -314,3 +359,35 @@ def test_add_drives():
                               rate_constant=10.,
                               weights_ampa={'L2_pyramidal': 1.},
                               synaptic_delays={'L5_pyramidal': 1.})
+    with pytest.raises(ValueError, match='probability must be'):
+        net.add_bursty_drive(
+            'cell_unknown', location='distal', burst_rate=10,
+            weights_ampa={'L2_pyramidal': 1.},
+            synaptic_delays={'L2_pyramidal': 1.}, probability=2.0)
+
+    with pytest.raises(TypeError, match='probability must be'):
+        net.add_bursty_drive(
+            'cell_unknown2', location='distal', burst_rate=10,
+            weights_ampa={'L2_pyramidal': 1.},
+            synaptic_delays={'L2_pyramidal': 1.}, probability='1.0')
+
+    with pytest.raises(ValueError, match='probability is either'):
+        net.add_bursty_drive(
+            'cell_unknown2', location='distal', burst_rate=10,
+            weights_ampa={'L2_pyramidal': 1.},
+            synaptic_delays={'L2_pyramidal': 1.},
+            probability={'L5_pyramidal': 1.})
+
+    with pytest.raises(TypeError, match='probability must be'):
+        net.add_bursty_drive(
+            'cell_unknown2', location='distal', burst_rate=10,
+            weights_ampa={'L2_pyramidal': 1.},
+            synaptic_delays={'L2_pyramidal': 1.},
+            probability={'L2_pyramidal': '1.0'})
+
+    with pytest.raises(ValueError, match='probability must be'):
+        net.add_bursty_drive(
+            'cell_unknown3', location='distal', burst_rate=10,
+            weights_ampa={'L2_pyramidal': 1.},
+            synaptic_delays={'L2_pyramidal': 1.},
+            probability={'L2_pyramidal': 2.0})
