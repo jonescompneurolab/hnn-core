@@ -36,8 +36,8 @@ net = jones_2009_model()
 weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 net.add_bursty_drive(
     'bursty', tstart=50., burst_rate=10, burst_std=20., numspikes=2,
-    spike_isi=10, n_drive_cells=10, location='distal', weights_ampa=weights_ampa,
-    seedcore=8)
+    spike_isi=10, n_drive_cells=10, location='distal',
+    weights_ampa=weights_ampa, event_seed=8)
 
 ###############################################################################
 # Finally, to simulate we use the
