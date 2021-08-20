@@ -11,7 +11,7 @@ from .params import (_extract_bias_specs_from_hnn_params,
 
 
 def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
-                           location):
+                           location, probability=1.0):
     """Retrieve drive properties associated with each target cell type
 
     Note that target cell types of a drive are inferred from the synaptic
@@ -54,7 +54,20 @@ def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
                          'types defined in weights_ampa and weights_nmda '
                          f'({target_populations})')
 
-    return target_populations, weights_by_type, delays_by_type
+    if isinstance(probability, float):
+        probability_by_type = {cell_type: probability for cell_type in
+                               target_populations}
+    else:
+        probability_by_type = probability.copy()
+
+    if set(probability_by_type.keys()) != target_populations:
+        raise ValueError('probability is either a common float or needs '
+                         'to be specified as a dict for each of the cell '
+                         'types defined in weights_ampa and weights_nmda '
+                         f'({target_populations})')
+
+    return (target_populations, weights_by_type, delays_by_type,
+            probability_by_type)
 
 
 def _check_drive_parameter_values(drive_type, **kwargs):
