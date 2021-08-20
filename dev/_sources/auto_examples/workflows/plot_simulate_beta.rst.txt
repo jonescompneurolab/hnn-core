@@ -205,10 +205,10 @@ but modified to reflect the parameters used in Law et al. 2021.
 Specifically, we are considering the case where a tactile stimulus is
 delivered at 150 ms. 25 ms later, the first input to sensory cortex arrives
 as a proximal drive to the cortical column. Proximal drive corresponds to
-projections from the direct thalamic nuclei. This is followed by one distal
-drive representing projections from indirect thalamic nuclei, and a final
-late proximal drive. It is important to note that the parameter values for
-each are different from previous examples of the evoked response.
+projections from the direct thalamic nuclei. This is followed by one
+:term:`distal` drive representing projections from indirect thalamic nuclei,
+and a final late proximal drive. It is important to note that the parameter
+values for each are different from previous examples of the evoked response.
 This reflects the altered network dynamics due to the changes described
 above.
 
@@ -634,7 +634,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 20 minutes  41.715 seconds)
+   **Total running time of the script:** ( 22 minutes  28.415 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:

@@ -431,7 +431,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  13.744 seconds)
+   **Total running time of the script:** ( 1 minutes  12.354 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:
