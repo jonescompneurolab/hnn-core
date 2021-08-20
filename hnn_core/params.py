@@ -166,7 +166,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                              'spike_isi': 10}  # not exposed in params-files
         drive['location'] = par['loc']
         drive['space_constant'] = par['lamtha']
-        drive['seedcore'] = par['prng_seedcore']
+        drive['event_seed'] = par['prng_seedcore']
         drive['weights_ampa'] = dict()
         drive['weights_nmda'] = dict()
         drive['synaptic_delays'] = dict()
@@ -220,7 +220,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             # XXX Force random states to be the same as HNN-gui for the default
             # parameter set after increasing the number of bursty drive
             # gids from 2 to 20
-            drive['seedcore'] = par['prng_seedcore'] - 18
+            drive['event_seed'] = par['prng_seedcore'] - 18
             for cellname in cellname_list:
                 if cellname in par:
                     ampa_weight = par[cellname][0]
@@ -239,7 +239,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                                  'numspikes': 50,  # NB hard-coded in GUI!
                                  'sync_within_trial': False}
             drive['space_constant'] = par['lamtha']
-            drive['seedcore'] = par['prng_seedcore']
+            drive['event_seed'] = par['prng_seedcore']
 
             for cellname in cellname_list:
                 if cellname in par:
@@ -253,7 +253,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
             drive['type'] = 'poisson'
             drive['location'] = par['loc']
             drive['space_constant'] = par['lamtha']
-            drive['seedcore'] = par['prng_seedcore']
+            drive['event_seed'] = par['prng_seedcore']
 
             rate_params = dict()
             for cellname in cellname_list:

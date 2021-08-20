@@ -128,7 +128,7 @@ def _add_drives_from_params(net):
                 cell_specific=specs['cell_specific'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
-                location=specs['location'], seedcore=specs['seedcore'],
+                location=specs['location'], event_seed=specs['event_seed'],
                 synaptic_delays=specs['synaptic_delays'],
                 space_constant=specs['space_constant'])
         elif specs['type'] == 'poisson':
@@ -138,7 +138,7 @@ def _add_drives_from_params(net):
                 rate_constant=specs['dynamics']['rate_constant'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
-                location=specs['location'], seedcore=specs['seedcore'],
+                location=specs['location'], event_seed=specs['event_seed'],
                 synaptic_delays=specs['synaptic_delays'],
                 space_constant=specs['space_constant'])
         elif specs['type'] == 'gaussian':
@@ -148,7 +148,7 @@ def _add_drives_from_params(net):
                 numspikes=specs['dynamics']['numspikes'],
                 weights_ampa=specs['weights_ampa'],
                 weights_nmda=specs['weights_nmda'],
-                location=specs['location'], seedcore=specs['seedcore'],
+                location=specs['location'], event_seed=specs['event_seed'],
                 synaptic_delays=specs['synaptic_delays'],
                 space_constant=specs['space_constant'])
         elif specs['type'] == 'bursty':
@@ -168,7 +168,7 @@ def _add_drives_from_params(net):
                 location=specs['location'],
                 space_constant=specs['space_constant'],
                 synaptic_delays=specs['synaptic_delays'],
-                seedcore=specs['seedcore'])
+                event_seed=specs['event_seed'])
 
     # add tonic biases if present in params
     for cellname in bias_specs['tonic']:
@@ -215,7 +215,7 @@ def _get_prng(seed, gid, sync_evinput=False):
 
 
 def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
-                            trial_idx=0, drive_cell_gid=0, seedcore=0):
+                            trial_idx=0, drive_cell_gid=0, event_seed=0):
     """Generate event times for one artificial drive cell based on dynamics.
 
     Parameters
@@ -238,7 +238,7 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
         The index number of the current trial of a simulation (default=1).
     drive_cell_gid : int
         Optional gid of current artificial cell (used for seeding)
-    seedcore : int
+    event_seed : int
         Optional initial seed for random number generator.
 
     Returns
@@ -246,7 +246,7 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     event_times : list
         The event times at which spikes occur.
     """
-    prng, prng2 = _get_prng(seed=seedcore + trial_idx,
+    prng, prng2 = _get_prng(seed=event_seed + trial_idx,
                             gid=drive_cell_gid)
 
     # check drive name validity, allowing substring matches
