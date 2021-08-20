@@ -335,7 +335,7 @@ def test_network():
         ('target_gids', 35.0), ('target_gids', [35.0]),
         ('target_gids', [[35], [36.0]]), ('loc', 1.0),
         ('receptor', 1.0), ('weight', '1.0'), ('delay', '1.0'),
-        ('lamtha', '1.0'), ('probability', '0.5')]
+        ('lamtha', '1.0'), ('probability', '0.5'), ('allow_autapses', 1.0)]
     for arg, item in kwargs_bad:
         match = ('must be an instance of')
         with pytest.raises(TypeError, match=match):
