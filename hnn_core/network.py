@@ -471,7 +471,8 @@ class Network(object):
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
                          n_drive_cells='n_cells', cell_specific=True,
                          weights_ampa=None, weights_nmda=None,
-                         space_constant=3., synaptic_delays=0.1, seedcore=2):
+                         space_constant=3., synaptic_delays=0.1,
+                         probability=1.0, seedcore=2, conn_seed=2):
         """Add an 'evoked' external drive to the network
 
         Parameters
@@ -521,6 +522,9 @@ class Network(object):
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where x is the
             physical distance (in um) between the connected cells in the xy
             plane (delays are modulated by the inverse of this factor).
+        probability : float
+            Probability of connection between any src-target pair.
+            Defaults to 1.0 producing an all-to-all pattern.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -533,18 +537,20 @@ class Network(object):
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
+        drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells, cell_specific)
+                           n_drive_cells, cell_specific, probability)
 
     def add_poisson_drive(self, name, *, tstart=0, tstop=None, rate_constant,
                           location, n_drive_cells='n_cells',
                           cell_specific=True, weights_ampa=None,
                           weights_nmda=None, space_constant=100.,
-                          synaptic_delays=0.1, seedcore=2):
+                          synaptic_delays=0.1, probability=1.0, seedcore=2,
+                          conn_seed=2):
         """Add a Poisson-distributed external drive to the network
 
         Parameters
@@ -598,6 +604,9 @@ class Network(object):
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
+        probability : float
+            Probability of connection between any src-target pair.
+            Defaults to 1.0 producing an all-to-all pattern.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -622,19 +631,21 @@ class Network(object):
         drive['type'] = 'poisson'
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
+        drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
                                  rate_constant=rate_constant)
         drive['events'] = list()
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells, cell_specific)
+                           n_drive_cells, cell_specific, probability)
 
     def add_bursty_drive(self, name, *, tstart=0, tstart_std=0, tstop=None,
                          location, burst_rate, burst_std=0, numspikes=2,
                          spike_isi=10, n_drive_cells=1, cell_specific=False,
                          weights_ampa=None, weights_nmda=None,
-                         synaptic_delays=0.1, space_constant=100., seedcore=2):
+                         synaptic_delays=0.1, space_constant=100.,
+                         probability=1.0, seedcore=2, conn_seed=2):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
         Parameters
@@ -695,6 +706,9 @@ class Network(object):
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
+        probability : float
+            Probability of connection between any src-target pair.
+            Defaults to 1.0 producing an all-to-all pattern.
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
@@ -710,6 +724,7 @@ class Network(object):
         drive['type'] = 'bursty'
         drive['n_drive_cells'] = n_drive_cells
         drive['seedcore'] = seedcore
+        drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(tstart=tstart,
                                  tstart_std=tstart_std, tstop=tstop,
                                  burst_rate=burst_rate, burst_std=burst_std,
@@ -718,11 +733,11 @@ class Network(object):
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
-                           n_drive_cells, cell_specific)
+                           n_drive_cells, cell_specific, probability)
 
     def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
                       space_constant, synaptic_delays, n_drive_cells,
-                      cell_specific):
+                      cell_specific, probability):
         """Attach a drive to network based on connectivity information
 
         Parameters
@@ -766,6 +781,9 @@ class Network(object):
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
             target in the network.
+        probability : float
+            Probability of connection between any src-target pair.
+            Defaults to 1.0 producing an all-to-all pattern.
 
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
@@ -841,15 +859,19 @@ class Network(object):
                 src_idx = src_idx_end
                 for receptor in weights_by_type[target_cell_type]:
                     weights = weights_by_type[target_cell_type][receptor]
-                    self.add_connection(src_gids, target_gids_nested,
-                                        location, receptor, weights, delays,
-                                        space_constant)
+                    self.add_connection(
+                        src_gids=src_gids, target_gids=target_gids_nested,
+                        loc=location, receptor=receptor, weight=weights,
+                        delay=delays, lamtha=space_constant,
+                        probability=probability, seed=drive['conn_seed'])
             else:
                 for receptor in weights_by_type[target_cell_type]:
                     weights = weights_by_type[target_cell_type][receptor]
-                    self.add_connection(name, target_gids, location,
-                                        receptor, weights, delays,
-                                        space_constant)
+                    self.add_connection(
+                        src_gids=name, target_gid=target_gids, loc=location,
+                        receptor=receptor, weight=weights, delay=delays,
+                        lamtha=space_constant, probability=probability,
+                        seed=drive['conn_seed'])
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
@@ -1019,6 +1041,7 @@ class Network(object):
 
         _validate_type(target_gids, (int, list, range, str), 'target_gids',
                        'int list, range or str')
+        _validate_type(allow_autapses, bool, 'target_gids', 'bool')
         valid_source_cells = list(self.gid_ranges.keys())
 
         # Convert src_gids to list
