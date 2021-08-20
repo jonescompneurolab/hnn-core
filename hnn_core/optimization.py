@@ -15,6 +15,7 @@ from .dipole import _rmse
 
 
 def _get_range(val, multiplier):
+    """Get range of values to sweep over."""
     range_min = max(0, val - val * multiplier / 100.)
     range_max = val + val * multiplier / 100.
     ranges = {'initial': val, 'minval': range_min, 'maxval': range_max}
@@ -29,14 +30,19 @@ def _split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
     ----------
     params: an instance of Params
         Full set of simulation parameters
+    sigma_range_multiplier : float
+        The scale of sigma values to sweep over.
+    timing_range_multiplier : float
+        The scale of timing values to sweep over.
+    synweight_range_multiplier : float
+        The scale of input synaptic weights to sweep over.
 
     Returns
     -------
     sorted_evinput_params: dict
         Dictionary with parameters grouped by evoked inputs.
         Keys for each evoked input are
-        'mean', 'sigma', 'ranges', 'start',
-        'end'.
+        'mean', 'sigma', 'ranges', 'start', and 'end'.
         sorted_evinput_params['evprox1']['ranges'] is a dict
         with keys as the parameters to be optimized and values
         indicating the ranges over which they should be
@@ -242,7 +248,7 @@ def _optrun(new_params, opt_params, params, opt_dpls):
     params : dict
         The params dictionary.
     opt_dpls : dict
-        Dictionary with keys exp_dpl and best for
+        Dictionary with keys 'exp_dpl' and 'best' for
         the experimental dipole and best dipole.
 
     Returns
