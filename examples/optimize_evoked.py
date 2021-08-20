@@ -51,7 +51,7 @@ params = read_params(params_fname)
 # Let's first simulate the dipole with the initial parameters.
 net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
-    initial_dpl = simulate_dipole(net, n_trials=1)
+    initial_dpl = simulate_dipole(net, n_trials=1, postproc=True)
 
 ###############################################################################
 # Start the optimization!
@@ -65,7 +65,7 @@ with MPIBackend(n_procs=n_procs):
 # Now, let's simulate the dipole with the optimized parameters.
 net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
-    best_dpl = simulate_dipole(net, n_trials=1)
+    best_dpl = simulate_dipole(net, n_trials=1, postproc=True)
 
 ###############################################################################
 # Finally, we can plot the results against experimental data:

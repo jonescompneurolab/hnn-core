@@ -264,7 +264,7 @@ def _optrun(new_params, opt_params, params, opt_dpls):
     # run the simulation, but stop early if possible
     params['tstop'] = opt_params['opt_end']
     net = jones_2009_model(params, add_drives_from_params=True)
-    dpls = _BACKEND.simulate(net, n_trials=1)
+    dpls = _BACKEND.simulate(net, n_trials=1, postproc=True)
     # avg_dpl = average_dipoles(dpls)
     avg_dpl = dpls[0].copy()
     avg_rmse = _rmse(avg_dpl, opt_dpls['exp_dpl'],
@@ -338,7 +338,7 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
 
     print("Running simulation with initial parameters")
     net = jones_2009_model(params, add_drives_from_params=True)
-    initial_dpl = _BACKEND.simulate(net, n_trials=1)
+    initial_dpl = _BACKEND.simulate(net, n_trials=1, postproc=True)
 
     # Create a sorted dictionary with the inputs and parameters
     # belonging to each.
