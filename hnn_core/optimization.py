@@ -234,8 +234,9 @@ def _consolidate_chunks(inputs):
     return chunks
 
 
-def _optrun(new_params, opt_params, params, opt_dpls):
-    """ This is the function to run a simulation
+def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
+            smooth_window_len):
+    """This is the function to run a simulation
 
     Parameters
     ----------
@@ -250,6 +251,12 @@ def _optrun(new_params, opt_params, params, opt_dpls):
     opt_dpls : dict
         Dictionary with keys 'exp_dpl' and 'best' for
         the experimental dipole and best dipole.
+    scale_factor : float
+        Scales the simulated dipoles by scale_factor to match
+        exp_dpl.
+    smooth_window_len : int
+        The length of the hamming window (in samples) to smooth the
+        simulated dipole waveform in each optimization step.
 
     Returns
     -------
@@ -268,9 +275,15 @@ def _optrun(new_params, opt_params, params, opt_dpls):
         params[param_name] = test_value
 
     # run the simulation, but stop early if possible
-    params['tstop'] = opt_params['opt_end']
     net = jones_2009_model(params, add_drives_from_params=True)
-    dpls = _BACKEND.simulate(net, n_trials=1, postproc=True)
+    tstop = params['tstop'] = opt_params['opt_end']
+    net._instantiate_drives(n_trials=1, tstop=tstop)
+    dpls = _BACKEND.simulate(net, tstop=tstop, dt=0.025, n_trials=1)
+    for dpl in dpls:
+        dpl = dpl.scale(scale_factor)
+        if smooth_window_len is not None:
+            dpl = dpl.smooth(smooth_window_len)
+
     # avg_dpl = average_dipoles(dpls)
     avg_dpl = dpls[0].copy()
     avg_rmse = _rmse(avg_dpl, opt_dpls['exp_dpl'],
@@ -311,7 +324,8 @@ def _run_optimization(maxiter, param_ranges, optrun):
 
 def optimize_evoked(params, exp_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
-                    synweight_range_multiplier=500.0, decay_multiplier=1.6):
+                    synweight_range_multiplier=500.0, decay_multiplier=1.6,
+                    scale_factor=1., smooth_window_len=None):
     """Optimize drives to generate evoked response.
 
     Parameters
@@ -331,6 +345,13 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
         The scale of input synaptic weights to sweep over.
     decay_multiplier : float
         The decay multiplier.
+    scale_factor : float
+        Scales the simulated dipoles by scale_factor to match
+        exp_dpl.
+    smooth_window_len : int
+        The length of the hamming window (in samples) to smooth the
+        simulated dipole waveform in each optimization step.
+
 
     Returns
     -------
@@ -350,7 +371,16 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
 
     print("Running simulation with initial parameters")
     net = jones_2009_model(params, add_drives_from_params=True)
-    initial_dpl = _BACKEND.simulate(net, n_trials=1, postproc=True)
+    # XXX: hack, instantiate_drives shouldn't have to be called
+    # should have common codepath with simulate_dipole
+    tstop = exp_dpl.times[-1]
+    net._instantiate_drives(n_trials=1, tstop=tstop)
+    initial_dpl = _BACKEND.simulate(net, tstop=tstop,
+                                    dt=0.025, n_trials=1)
+    for dpl in initial_dpl:
+        dpl = dpl.scale(scale_factor)
+        if smooth_window_len is not None:
+            dpl = dpl.smooth(smooth_window_len)
 
     # Create a sorted dictionary with the inputs and parameters
     # belonging to each.
@@ -418,7 +448,9 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
 
         def _myoptrun(new_params):
             return _optrun(new_params, opt_params,
-                           params, opt_dpls=opt_dpls)
+                           params, opt_dpls=opt_dpls,
+                           scale_factor=scale_factor,
+                           smooth_window_len=smooth_window_len)
 
         print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                     opt_params['opt_end']))
