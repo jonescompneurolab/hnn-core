@@ -75,7 +75,7 @@ with MPIBackend(n_procs=n_procs):
 net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
     best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)
-    best_dpl.scale(scale_factor).smooth(smooth_window_len)
+    best_dpl[0].scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
 # Finally, we can plot the results against experimental data:
