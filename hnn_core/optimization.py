@@ -271,9 +271,7 @@ def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
         _BACKEND = JoblibBackend(n_jobs=1)
 
     # set parameters
-    print(opt_params['ranges'])
     for param_name, test_value in zip(opt_params['ranges'].keys(), new_params):
-        print(param_name, test_value)
         params[param_name] = test_value
 
     # run the simulation, but stop early if possible
