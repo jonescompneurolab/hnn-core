@@ -271,7 +271,9 @@ def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
         _BACKEND = JoblibBackend(n_jobs=1)
 
     # set parameters
+    print(opt_params['ranges'])
     for param_name, test_value in zip(opt_params['ranges'].keys(), new_params):
+        print(param_name, test_value)
         params[param_name] = test_value
 
     # run the simulation, but stop early if possible
@@ -313,12 +315,11 @@ def _run_optimization(maxiter, param_ranges, optrun):
     for idx, param_name in enumerate(param_ranges):
         x0.append(param_ranges[param_name]['initial'])
         cons.append(
-            lambda x: x[idx] <= param_ranges[param_name]['maxval'])
+            lambda x, idx=idx: param_ranges[param_name]['maxval'] - x[idx])
         cons.append(
-            lambda x: x[idx] >= param_ranges[param_name]['minval'])
-
-    result = fmin_cobyla(optrun, cons=cons, rhoend=1e-4,
-                         x0=x0, maxfun=maxiter)
+            lambda x, idx=idx: x[idx] - param_ranges[param_name]['minval'])
+    result = fmin_cobyla(optrun, cons=cons, rhobeg=0.1, rhoend=1e-4,
+                         x0=x0, maxfun=maxiter, catol=0.0)
     return result
 
 
@@ -335,7 +336,7 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
     exp_dpl : instance of Dipole
         The target experimental dipole.
     maxiter : int
-        The maximum number of of simulations to run for optimizing
+        The maximum number of simulations to run for optimizing
         one "chunk".
     timing_range_multiplier : float
         The scale of timing values to sweep over.
