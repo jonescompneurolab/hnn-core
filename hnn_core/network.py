@@ -525,8 +525,8 @@ class Network(object):
             plane (delays are modulated by the inverse of this factor).
         probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Use dict to create delay->cell mapping. If float, applies to all
-            target cell types
+            Use dict to create probability->cell mapping. If float, applies to
+            all target cell types
         event_seed : int
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
@@ -612,8 +612,8 @@ class Network(object):
             plane.
         probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Use dict to create delay->cell mapping. If float, applies to all
-            target cell types.
+            Use dict to create probability->cell mapping. If float, applies to
+            all target cell types.
         event_seed : int
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
@@ -719,8 +719,8 @@ class Network(object):
             plane.
         probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Use dict to create delay->cell mapping. If float, applies to all
-            target cell types.
+            Use dict to create probability->cell mapping. If float, applies to
+            all target cell types.
         event_seed : int
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
@@ -799,8 +799,8 @@ class Network(object):
             target in the network.
         probability : dict or float (default: 1.0)
             Probability of connection between any src-target pair.
-            Use dict to create delay->cell mapping. If float, applies to all
-            target cell types
+            Use dict to create probability->cell mapping. If float, applies to
+            all target cell types
 
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called

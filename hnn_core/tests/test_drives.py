@@ -359,33 +359,39 @@ def test_add_drives():
                               rate_constant=10.,
                               weights_ampa={'L2_pyramidal': 1.},
                               synaptic_delays={'L5_pyramidal': 1.})
-    with pytest.raises(ValueError, match='probability must be'):
+    with pytest.raises(ValueError,
+                       match=r'probability must be in the range \(0\,1\)'):
         net.add_bursty_drive(
             'cell_unknown', location='distal', burst_rate=10,
             weights_ampa={'L2_pyramidal': 1.},
             synaptic_delays={'L2_pyramidal': 1.}, probability=2.0)
 
-    with pytest.raises(TypeError, match='probability must be'):
+    with pytest.raises(TypeError, match="probability must be an instance of "
+                       r"float or dict, got \<class 'str'\> instead"):
         net.add_bursty_drive(
             'cell_unknown2', location='distal', burst_rate=10,
             weights_ampa={'L2_pyramidal': 1.},
             synaptic_delays={'L2_pyramidal': 1.}, probability='1.0')
 
-    with pytest.raises(ValueError, match='probability is either'):
+    with pytest.raises(ValueError, match='probability is either a common '
+                       'float or needs to be specified as a dict for '
+                       'each of the cell'):
         net.add_bursty_drive(
             'cell_unknown2', location='distal', burst_rate=10,
             weights_ampa={'L2_pyramidal': 1.},
             synaptic_delays={'L2_pyramidal': 1.},
             probability={'L5_pyramidal': 1.})
 
-    with pytest.raises(TypeError, match='probability must be'):
+    with pytest.raises(TypeError, match="probability must be an instance of "
+                       r"float, got \<class 'str'\> instead"):
         net.add_bursty_drive(
             'cell_unknown2', location='distal', burst_rate=10,
             weights_ampa={'L2_pyramidal': 1.},
             synaptic_delays={'L2_pyramidal': 1.},
             probability={'L2_pyramidal': '1.0'})
 
-    with pytest.raises(ValueError, match='probability must be'):
+    with pytest.raises(ValueError,
+                       match=r'probability must be in the range \(0\,1\)'):
         net.add_bursty_drive(
             'cell_unknown3', location='distal', burst_rate=10,
             weights_ampa={'L2_pyramidal': 1.},
