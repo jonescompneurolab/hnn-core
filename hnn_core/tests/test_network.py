@@ -362,6 +362,28 @@ def test_network():
             kwargs[arg] = string_arg
             net.add_connection(**kwargs)
 
+    # Test warnings for undefined loc
+    with pytest.raises(
+        ValueError,
+        match=r"The loc \'distal\' is not defined for L5_basket"
+              r"cells. Valid locations include \[\'soma\'\]"):
+        kwargs = kwargs_default.copy()
+        kwargs['target_gids'] = 'L5_basket'
+        kwargs['loc'] = 'distal'
+        net.add_connection(**kwargs)
+
+    # Test warnings for undefined synapse for specific loc
+    with pytest.raises(
+        ValueError,
+        match=r"The receptor \'ampa\' is not defined for the loc \'soma\'"
+              r" on \'L5_pyramidal\' cells. Valid receptors include "
+              r"\[\'gabaa\', \'gabab\'\]"):
+        kwargs = kwargs_default.copy()
+        kwargs['target_gids'] = 'L5_pyramidal'
+        kwargs['loc'] = 'soma'
+        kwargs['receptor'] = 'ampa'
+        net.add_connection(**kwargs)
+
     # Check probability=0.5 produces half as many connections as default
     net.add_connection(**kwargs_default)
     kwargs = kwargs_default.copy()

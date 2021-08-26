@@ -11,6 +11,7 @@ import itertools as it
 from copy import deepcopy
 
 import numpy as np
+from numpy.testing._private.utils import raises
 
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
@@ -1174,12 +1175,34 @@ class Network(object):
         _validate_type(loc, str, 'loc')
         _validate_type(receptor, str, 'receptor')
 
-        valid_loc = ['proximal', 'distal', 'soma']
-        _check_option('loc', loc, valid_loc)
+        valid_loc = list(self.cell_types[target_type].p_secs.keys())
+        for item in self.cell_types[target_type].sect_loc.values():
+            valid_loc.extend(item)
+
+        valid_loc = list(set(valid_loc))
+        # Separation ecessary to identify valid receptors
+        if loc in self.cell_types[target_type].sect_loc and \
+                self.cell_types[target_type].sect_loc[loc]:
+            sect_list = self.cell_types[target_type].sect_loc[loc]
+        elif loc in self.cell_types[target_type].p_secs:
+            sect_list = [loc]
+        else:
+            raise ValueError(
+                f"The loc '{loc}' is not defined for '{target_type}' "
+                f"cells. Valid locations include {valid_loc}")
+
         conn['loc'] = loc
 
-        valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
-        _check_option('receptor', receptor, valid_receptor)
+        valid_receptors = set(np.concatenate([
+            self.cell_types[target_type].p_secs[sect_name]['syns'] for
+            sect_name in sect_list]))
+
+        if receptor not in valid_receptors:
+            raise ValueError(
+                f"The receptor'{receptor}' is not defined for the loc '{loc}'"
+                f" on '{target_type}' cells. Valid receptors include"
+                f"{valid_receptors}")
+
         conn['receptor'] = receptor
 
         # Create and validate nc_dict
