@@ -351,7 +351,6 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
         The length of the hamming window (in samples) to smooth the
         simulated dipole waveform in each optimization step.
 
-
     Returns
     -------
     params : dict
@@ -456,6 +455,8 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
         opt_results = _run_optimization(maxiter=maxiter,
                                         param_ranges=opt_params['ranges'],
                                         optrun=_myoptrun)
+        # tiny negative weights are possible. Clip them to 0.
+        opt_results[opt_results < 0] = 0
 
         # update opt_params for the next round
         for var_name, value in zip(opt_params['ranges'], opt_results):
