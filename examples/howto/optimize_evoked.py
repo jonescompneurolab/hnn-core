@@ -1,6 +1,6 @@
 """
 =================================================
-08. Optimize simulated evoked response parameters
+05. Optimize simulated evoked response parameters
 =================================================
 
 This example demonstrates how to optimize the parameters
