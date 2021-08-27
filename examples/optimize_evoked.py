@@ -48,9 +48,10 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
 
 ###############################################################################
-# Let's first simulate the dipole with the initial parameters. The parameter
+# Let's first simulate the dipole with some initial parameters. The parameter
 # definitions also contain the drives. Even though we could add drives
-# explicitly through our API (see xxxx example), for conciseness,
+# explicitly through our API
+# (see :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`), for conciseness,
 # we add them automatically from the parameter files
 
 scale_factor = 3000.
@@ -58,16 +59,18 @@ smooth_window_len = 30.
 tstop = exp_dpl.times[-1]
 net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
+    print("Running simulation with initial parameters")
     initial_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
     initial_dpl = initial_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
-# Start the optimization!
+# Now we start the optimization!
 
 from hnn_core.optimization import optimize_evoked
 
 with MPIBackend(n_procs=n_procs):
-    params_optim = optimize_evoked(params, exp_dpl, scale_factor=scale_factor,
+    params_optim = optimize_evoked(params, exp_dpl, initial_dpl,
+                                   scale_factor=scale_factor,
                                    smooth_window_len=smooth_window_len)
 
 ###############################################################################
@@ -75,7 +78,7 @@ with MPIBackend(n_procs=n_procs):
 net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
     best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
-    best_dpl.scale(scale_factor).smooth(smooth_window_len)
+    best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
 # Finally, we can plot the results against experimental data:

@@ -249,7 +249,7 @@ def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
     params : dict
         The params dictionary.
     opt_dpls : dict
-        Dictionary with keys 'exp_dpl' and 'best' for
+        Dictionary with keys 'target_dpl' and 'best' for
         the experimental dipole and best dipole.
     scale_factor : float
         Scales the simulated dipoles by scale_factor to match
@@ -278,15 +278,12 @@ def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
     net = jones_2009_model(params, add_drives_from_params=True)
     tstop = params['tstop'] = opt_params['opt_end']
     net._instantiate_drives(n_trials=1, tstop=tstop)
-    dpls = _BACKEND.simulate(net, tstop=tstop, dt=0.025, n_trials=1)
-    for dpl in dpls:
-        dpl = dpl.scale(scale_factor)
-        if smooth_window_len is not None:
-            dpl = dpl.smooth(smooth_window_len)
+    avg_dpl = _BACKEND.simulate(net, tstop=tstop, dt=0.025, n_trials=1)[0]
+    avg_dpl = avg_dpl.scale(scale_factor)
+    if smooth_window_len is not None:
+        avg_dpl = avg_dpl.smooth(smooth_window_len)
 
-    # avg_dpl = average_dipoles(dpls)
-    avg_dpl = dpls[0].copy()
-    avg_rmse = _rmse(avg_dpl, opt_dpls['exp_dpl'],
+    avg_rmse = _rmse(avg_dpl, opt_dpls['target_dpl'],
                      tstart=opt_params['opt_start'],
                      tstop=opt_params['opt_end'],
                      weights=opt_params['weights'])
@@ -321,7 +318,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
     return result
 
 
-def optimize_evoked(params, exp_dpl, maxiter=50,
+def optimize_evoked(params, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
                     scale_factor=1., smooth_window_len=None):
@@ -331,8 +328,10 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
     ----------
     params : dict
         The initial params
-    exp_dpl : instance of Dipole
+    target_dpl : instance of Dipole
         The target experimental dipole.
+    initial_dpl : instance of Dipole
+        The initial dipole to start the optimization.
     maxiter : int
         The maximum number of simulations to run for optimizing
         one "chunk".
@@ -346,7 +345,7 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
         The decay multiplier.
     scale_factor : float
         Scales the simulated dipoles by scale_factor to match
-        exp_dpl.
+        target_dpl.
     smooth_window_len : int
         The length of the hamming window (in samples) to smooth the
         simulated dipole waveform in each optimization step.
@@ -367,19 +366,6 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
 
-    print("Running simulation with initial parameters")
-    net = jones_2009_model(params, add_drives_from_params=True)
-    # XXX: hack, instantiate_drives shouldn't have to be called
-    # should have common codepath with simulate_dipole
-    tstop = exp_dpl.times[-1]
-    net._instantiate_drives(n_trials=1, tstop=tstop)
-    initial_dpl = _BACKEND.simulate(net, tstop=tstop,
-                                    dt=0.025, n_trials=1)
-    for dpl in initial_dpl:
-        dpl = dpl.scale(scale_factor)
-        if smooth_window_len is not None:
-            dpl = dpl.smooth(smooth_window_len)
-
     # Create a sorted dictionary with the inputs and parameters
     # belonging to each.
     # Then, calculate the appropriate weight function to be used
@@ -396,7 +382,7 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
                                        decay_multiplier)
     param_chunks = _consolidate_chunks(evinput_params)
 
-    avg_rmse = _rmse(initial_dpl[0], exp_dpl, tstop=params['tstop'])
+    avg_rmse = _rmse(initial_dpl, target_dpl, tstop=params['tstop'])
     print("Initial RMSE: %.2f" % avg_rmse)
 
     opt_params = dict()
@@ -442,7 +428,7 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
 
         opt_params['optiter'] = 0
         opt_params['stepminopterr'] = 1e9  # min optimization error so far
-        opt_dpls = dict(best_dpl=None, exp_dpl=exp_dpl)
+        opt_dpls = dict(best_dpl=None, target_dpl=target_dpl)
 
         def _myoptrun(new_params):
             return _optrun(new_params, opt_params,
@@ -466,6 +452,6 @@ def optimize_evoked(params, exp_dpl, maxiter=50,
     for var_name in opt_params['ranges']:
         params[var_name] = opt_params['ranges'][var_name]['initial']
 
-    avg_rmse = _rmse(opt_dpls['best_dpl'], exp_dpl, tstop=params['tstop'])
+    avg_rmse = _rmse(opt_dpls['best_dpl'], target_dpl, tstop=params['tstop'])
     print("Final RMSE: %.2f" % avg_rmse)
     return params
