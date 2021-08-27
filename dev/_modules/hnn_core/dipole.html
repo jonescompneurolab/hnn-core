@@ -284,6 +284,73 @@
     <span class="k">return</span> <span class="n">avg_dpl</span></div>
 
 
+<span class="k">def</span> <span class="nf">_rmse</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">exp_dpl</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculates RMSE between data in dpl and exp_dpl</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dpl: instance of Dipole</span>
+<span class="sd">        A dipole object with simulated data</span>
+<span class="sd">    exp_dpl: instance of Dipole</span>
+<span class="sd">        A dipole object with experimental data</span>
+<span class="sd">    tstart | None: float</span>
+<span class="sd">        Time at beginning of range over which to calculate RMSE</span>
+<span class="sd">    tstop | None: float</span>
+<span class="sd">        Time at end of range over which to calculate RMSE</span>
+<span class="sd">    weights | None: array</span>
+<span class="sd">        An array of weights to be applied to each point in</span>
+<span class="sd">        simulated dpl. Must have length &gt;= dpl.data</span>
+<span class="sd">        If None, weights will be replaced with 1&#39;s for typical RMSE</span>
+<span class="sd">        calculation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    err: float</span>
+<span class="sd">        Weighted RMSE between data in dpl and exp_dpl</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+
+    <span class="n">exp_times</span> <span class="o">=</span> <span class="n">exp_dpl</span><span class="o">.</span><span class="n">times</span>
+    <span class="n">sim_times</span> <span class="o">=</span> <span class="n">dpl</span><span class="o">.</span><span class="n">times</span>
+
+    <span class="c1"># do tstart and tstop fall within both datasets?</span>
+    <span class="c1"># if not, use the closest data point as the new tstop/tstart</span>
+    <span class="k">for</span> <span class="n">tseries</span> <span class="ow">in</span> <span class="p">[</span><span class="n">exp_times</span><span class="p">,</span> <span class="n">sim_times</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">tstart</span> <span class="o">&lt;</span> <span class="n">tseries</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">tstart</span> <span class="o">=</span> <span class="n">tseries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tstop</span> <span class="o">&gt;</span> <span class="n">tseries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">tstop</span> <span class="o">=</span> <span class="n">tseries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># make sure start and end times are valid for both dipoles</span>
+    <span class="n">exp_start_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">exp_times</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">exp_end_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">exp_times</span> <span class="o">-</span> <span class="n">tstop</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">exp_length</span> <span class="o">=</span> <span class="n">exp_end_index</span> <span class="o">-</span> <span class="n">exp_start_index</span>
+
+    <span class="n">sim_start_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sim_times</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">sim_end_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sim_times</span> <span class="o">-</span> <span class="n">tstop</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">sim_length</span> <span class="o">=</span> <span class="n">sim_end_index</span> <span class="o">-</span> <span class="n">sim_start_index</span>
+
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># weighted RMSE with weights of all 1&#39;s is equivalent to</span>
+        <span class="c1"># normal RMSE</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sim_times</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">sim_end_index</span><span class="p">]))</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">sim_start_index</span><span class="p">:</span><span class="n">sim_end_index</span><span class="p">]</span>
+
+    <span class="n">dpl1</span> <span class="o">=</span> <span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="n">sim_start_index</span><span class="p">:</span><span class="n">sim_end_index</span><span class="p">]</span>
+    <span class="n">dpl2</span> <span class="o">=</span> <span class="n">exp_dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="n">exp_start_index</span><span class="p">:</span><span class="n">exp_end_index</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">sim_length</span> <span class="o">&gt;</span> <span class="n">exp_length</span><span class="p">):</span>
+        <span class="c1"># downsample simulation timeseries to match exp data</span>
+        <span class="n">dpl1</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">dpl1</span><span class="p">,</span> <span class="n">exp_length</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">exp_length</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">weights</span> <span class="o">&lt;</span> <span class="mf">1e-4</span><span class="p">)</span>
+        <span class="n">weights</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">sim_length</span> <span class="o">&lt;</span> <span class="n">exp_length</span><span class="p">):</span>
+        <span class="c1"># downsample exp timeseries to match simulation data</span>
+        <span class="n">dpl2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">dpl2</span><span class="p">,</span> <span class="n">sim_length</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">weights</span> <span class="o">*</span> <span class="p">((</span><span class="n">dpl1</span> <span class="o">-</span> <span class="n">dpl2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+
 <div class="viewcode-block" id="Dipole"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole">[docs]</a><span class="k">class</span> <span class="nc">Dipole</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Dipole class.</span>
 

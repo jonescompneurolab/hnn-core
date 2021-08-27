@@ -308,16 +308,14 @@
             <span class="k">if</span> <span class="n">cname_ampa</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                 <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cname_ampa</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">ampa_delay</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cname_ampa</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">ampa_weight</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
 
                 <span class="c1"># NB synaptic delay same for NMDA, read only for AMPA</span>
                 <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_delay</span>
 
             <span class="k">if</span> <span class="n">cname_nmda</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                 <span class="n">nmda_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cname_nmda</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">nmda_weight</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span>
-                    <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
 
         <span class="n">drive_specs</span><span class="p">[</span><span class="n">feed_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">drive</span>
 
@@ -359,10 +357,8 @@
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">nmda_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">ampa_weight</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span>
-                        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
-                    <span class="k">if</span> <span class="n">nmda_weight</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span>
-                        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
                     <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
 
         <span class="k">elif</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;extgauss&#39;</span><span class="p">):</span>
@@ -380,8 +376,7 @@
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">ampa_weight</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span>
-                        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
                     <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
 
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># no NMDA weights for Gaussians</span>
@@ -403,10 +398,8 @@
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">nmda_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">ampa_weight</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span>
-                        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
-                    <span class="k">if</span> <span class="n">nmda_weight</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">:</span>
-                        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampa_weight</span>
+                    <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
                     <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
 
             <span class="c1"># do NOT allow negative times sometimes used in param-files</span>
