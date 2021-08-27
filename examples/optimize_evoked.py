@@ -74,8 +74,8 @@ with MPIBackend(n_procs=n_procs):
 # Now, let's simulate the dipole with the optimized parameters.
 net = jones_2009_model(params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
-    best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)
-    best_dpl[0].scale(scale_factor).smooth(smooth_window_len)
+    best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
+    best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
 # Finally, we can plot the results against experimental data:
@@ -88,5 +88,5 @@ fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
 exp_dpl.plot(ax=axes[0], layer='agg', show=False)
 initial_dpl.plot(ax=axes[0], layer='agg', show=False)
-best_dpl[0].plot(ax=axes[0], layer='agg', show=False)
+best_dpl.plot(ax=axes[0], layer='agg', show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1])
