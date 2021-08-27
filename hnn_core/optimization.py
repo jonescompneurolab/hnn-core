@@ -240,7 +240,7 @@ def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
 
     Parameters
     ----------
-    new_params: Array
+    new_params: array
         List or numpy array with the parameters chosen by
         optimization engine. Order is consistent with
         opt_params['ranges'].
@@ -271,6 +271,8 @@ def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
         _BACKEND = JoblibBackend(n_jobs=1)
 
     # set parameters
+    # tiny negative weights are possible. Clip them to 0.
+    new_params[new_params < 0] = 0
     for param_name, test_value in zip(opt_params['ranges'].keys(), new_params):
         params[param_name] = test_value
 
