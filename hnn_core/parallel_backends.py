@@ -16,8 +16,6 @@ import binascii
 from queue import Queue, Empty
 from threading import Thread, Event
 
-from psutil import wait_procs, process_iter, NoSuchProcess
-
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
@@ -325,6 +323,26 @@ def _get_data_from_child_err(err_q):
     return data_length, data_bytes
 
 
+def _has_mpi4py():
+    """Determine if mpi4py is present."""
+    try:
+        import mpi4py  # noqa
+    except ImportError:
+        return False
+    else:
+        return True
+
+
+def _has_psutil():
+    """Determine if psutil is present."""
+    try:
+        import psutil  # noqa
+    except ImportError:
+        return False
+    else:
+        return True
+
+
 def requires_mpi4py(function):
     """Decorator for testing functions that require MPI."""
     import pytest
@@ -388,6 +406,8 @@ def _extract_data(data_str, object_name):
 # Next 3 functions are from HNN. Will move here. They require psutil
 def _kill_procs(procs):
     """Tries to terminate processes in a list before sending kill signal"""
+    from psutil import wait_procs, NoSuchProcess
+
     # try terminate first
     for p in procs:
         try:
@@ -406,6 +426,8 @@ def _kill_procs(procs):
 
 def _get_procs_running(proc_name):
     """Return a list of processes currently running"""
+    from psutil import process_iter
+
     process_list = []
     for p in process_iter(attrs=["name", "exe", "cmdline"]):
         if proc_name == p.info['name'] or \
@@ -588,26 +610,23 @@ class MPIBackend(object):
 
         hyperthreading = False
 
-        try:
-            import mpi4py
-            mpi4py.__version__  # for flake8 test
+        if _has_mpi4py() and _has_psutil():
+            import psutil
 
-            try:
-                import psutil
+            n_physical_cores = psutil.cpu_count(logical=False)
 
-                n_physical_cores = psutil.cpu_count(logical=False)
-
-                # detect if we need to use hwthread-cpus with mpiexec
-                if self.n_procs > n_physical_cores:
-                    hyperthreading = True
-
-            except ImportError:
-                warn('psutil not installed, so cannot detect if hyperthreading'
-                     'is enabled, assuming yes.')
+            # detect if we need to use hwthread-cpus with mpiexec
+            if self.n_procs > n_physical_cores:
                 hyperthreading = True
 
-        except ImportError:
-            warn('mpi4py not installed. will run on single processor')
+        else:
+            packages = list()
+            if not _has_mpi4py():
+                packages += ['mpi4py']
+            if not _has_psutil():
+                packages += ['psutil']
+            packages = ' and '.join(packages)
+            warn(f'{packages} not installed. Will run on single processor')
             self.n_procs = 1
 
         self.mpi_cmd = mpi_cmd
@@ -652,7 +671,8 @@ class MPIBackend(object):
         _BACKEND = self._old_backend
 
         # always kill nrniv processes for good measure
-        kill_proc_name('nrniv')
+        if self.n_procs > 1:
+            kill_proc_name('nrniv')
 
     def simulate(self, net, tstop, dt, n_trials, postproc=False):
         """Simulate the HNN model in parallel on all cores
