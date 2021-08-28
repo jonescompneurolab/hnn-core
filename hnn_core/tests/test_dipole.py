@@ -40,6 +40,8 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
 
     dipole.plot(show=False)
     plot_dipole([dipole, dipole], show=False)
+
+    # Test IO
     dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.times, dipole.times, rtol=0, atol=0.00051)
@@ -73,6 +75,15 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     dpl_avg = average_dipoles(dpl_1)
     for dpl_key in dpl_avg.data.keys():
         assert_allclose(dpl_1[0].data[dpl_key] / 2., dpl_avg.data[dpl_key])
+
+    # Test experimental dipole
+    dipole_exp = Dipole(times, data[:, 1])
+    dipole_exp.write(dpl_out_fname)
+    dipole_exp_read = read_dipole(dpl_out_fname)
+    assert_allclose(dipole_exp.data['agg'], dipole_exp_read.data['agg'],
+                    rtol=1e-2)
+    dipole_exp_avg = average_dipoles([dipole_exp, dipole_exp])
+    assert_allclose(dipole_exp.data['agg'], dipole_exp_avg.data['agg'])
 
     # XXX all below to be deprecated in 0.3
     dpls_raw, net = run_hnn_core_fixture(backend='joblib', n_jobs=1,

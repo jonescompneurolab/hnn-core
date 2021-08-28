@@ -108,7 +108,7 @@ def read_dipole(fname):
         The instance of Dipole class
     """
     dpl_data = np.loadtxt(fname, dtype=float)
-    dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:4])
+    dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:])
     return dpl
 
 
@@ -137,15 +137,14 @@ def average_dipoles(dpls):
                              " trials. Cannot reaverage" %
                              (dpl_idx, dpl.nave))
 
-    agg_avg = np.mean(np.array([dpl.data['agg'] for dpl in dpls]), axis=0)
-    L2_avg = np.mean(np.array([dpl.data['L2'] for dpl in dpls]), axis=0)
-    L5_avg = np.mean(np.array([dpl.data['L5'] for dpl in dpls]), axis=0)
-
-    avg_dpl_data = np.c_[agg_avg,
-                         L2_avg,
-                         L5_avg]
-
-    avg_dpl = Dipole(dpls[0].times, avg_dpl_data)
+    avg_data = list()
+    layers = dpl.data.keys()
+    for layer in layers:
+        avg_data.append(
+            np.mean(np.array([dpl.data[layer] for dpl in dpls]), axis=0)
+        )
+    avg_data = np.c_[avg_data].T
+    avg_dpl = Dipole(dpls[0].times, avg_data)
 
     # set nave to the number of trials averaged in this dipole
     avg_dpl.nave = len(dpls)
@@ -232,9 +231,10 @@ class Dipole(object):
     ----------
     times : array (n_times,)
         The time vector (in ms)
-    data : array (n_times x 3)
-        The data. The first column represents 'agg',
-        the second 'L2' and the last one 'L5'
+    data : array, shape (n_times x n_layers)
+        The data. The first column represents 'agg' (the total diple),
+        the second 'L2' layer and the last one 'L5' layer. For experimental
+        data, it can contain only one column.
     nave : int
         Number of trials that were averaged to produce this Dipole. Defaults
         to 1
@@ -256,7 +256,15 @@ class Dipole(object):
 
     def __init__(self, times, data, nave=1):  # noqa: D102
         self.times = np.array(times)
-        self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
+
+        if data.ndim == 1:
+            data = data[:, None]
+
+        if data.shape[1] == 3:
+            self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
+        elif data.shape[1] == 1:
+            self.data = {'agg': data[:, 0]}
+
         self.nave = nave
         self.sfreq = 1000. / (times[1] - times[0])  # NB assumes len > 1
         self.scale_applied = 1  # for visualisation
@@ -569,7 +577,11 @@ class Dipole(object):
             warnings.warn("Saving Dipole to file that is an average of %d"
                           " trials" % self.nave)
 
-        X = np.r_[[self.times, self.data['agg'], self.data['L2'],
-                   self.data['L5']]].T
-        np.savetxt(fname, X, fmt=['%3.3f', '%5.4f', '%5.4f', '%5.4f'],
-                   delimiter='\t')
+        X = [self.times]
+        fmt = ['%3.3f']
+        for data in self.data.values():
+            X.append(data)
+            fmt.append('%5.4f')
+        X = np.r_[X].T
+
+        np.savetxt(fname, X, fmt=fmt, delimiter='\t')
