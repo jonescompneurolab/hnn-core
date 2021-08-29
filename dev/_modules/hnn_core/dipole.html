@@ -239,7 +239,7 @@
 <span class="sd">        The instance of Dipole class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+    <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
     <span class="k">return</span> <span class="n">dpl</span></div>
 
 
@@ -268,15 +268,14 @@
                              <span class="s2">&quot; trials. Cannot reaverage&quot;</span> <span class="o">%</span>
                              <span class="p">(</span><span class="n">dpl_idx</span><span class="p">,</span> <span class="n">dpl</span><span class="o">.</span><span class="n">nave</span><span class="p">))</span>
 
-    <span class="n">agg_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">L2_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">L5_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="n">avg_dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">agg_avg</span><span class="p">,</span>
-                         <span class="n">L2_avg</span><span class="p">,</span>
-                         <span class="n">L5_avg</span><span class="p">]</span>
-
-    <span class="n">avg_dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">avg_dpl_data</span><span class="p">)</span>
+    <span class="n">avg_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
+        <span class="n">avg_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">avg_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">avg_data</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">avg_dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">avg_data</span><span class="p">)</span>
 
     <span class="c1"># set nave to the number of trials averaged in this dipole</span>
     <span class="n">avg_dpl</span><span class="o">.</span><span class="n">nave</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls</span><span class="p">)</span>
@@ -363,9 +362,10 @@
 <span class="sd">    ----------</span>
 <span class="sd">    times : array (n_times,)</span>
 <span class="sd">        The time vector (in ms)</span>
-<span class="sd">    data : array (n_times x 3)</span>
-<span class="sd">        The data. The first column represents &#39;agg&#39;,</span>
-<span class="sd">        the second &#39;L2&#39; and the last one &#39;L5&#39;</span>
+<span class="sd">    data : array, shape (n_times x n_layers)</span>
+<span class="sd">        The data. The first column represents &#39;agg&#39; (the total diple),</span>
+<span class="sd">        the second &#39;L2&#39; layer and the last one &#39;L5&#39; layer. For experimental</span>
+<span class="sd">        data, it can contain only one column.</span>
 <span class="sd">    nave : int</span>
 <span class="sd">        Number of trials that were averaged to produce this Dipole. Defaults</span>
 <span class="sd">        to 1</span>
@@ -387,7 +387,15 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nave</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># noqa: D102</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;L5&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]}</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;L5&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]}</span>
+        <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]}</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">nave</span> <span class="o">=</span> <span class="n">nave</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># NB assumes len &gt; 1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># for visualisation</span>
@@ -700,10 +708,14 @@
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Saving Dipole to file that is an average of </span><span class="si">%d</span><span class="s2">&quot;</span>
                           <span class="s2">&quot; trials&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nave</span><span class="p">)</span>
 
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">],</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]]]</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%3.3f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">],</span>
-                   <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+        <span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">]</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%3.3f</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">X</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
     </div>

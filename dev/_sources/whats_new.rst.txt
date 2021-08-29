@@ -62,6 +62,8 @@ Bug
 
 - Fix overlapping non-cell-specific drive gid assignment over different ranks in `~hnn_core.MPIBackend`, by `Ryan Thorpe`_ and `Mainak Jas`_ in `#399 <https://github.com/jonescompneurolab/hnn-core/pull/399>`_
 
+- Allow :func:`~hnn_core.read_dipoles` to read dipole from a file with only two columns (`times` and `data`), by `Mainak Jas`_ in `#421 <https://github.com/jonescompneurolab/hnn-core/pull/421>`_
+
 API
 ~~~
 - New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_

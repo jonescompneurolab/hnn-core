@@ -19,8 +19,8 @@ import matplotlib.pyplot as plt
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core.dipole import simulate_dipole
-from hnn_core import read_params, Dipole, MPIBackend, jones_2009_model
+from hnn_core.dipole import read_dipole, simulate_dipole
+from hnn_core import read_params, MPIBackend, jones_2009_model
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
@@ -38,9 +38,7 @@ from urllib.request import urlretrieve
 data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
             'data/MEG_detection_data/S1_SupraT.txt')
 urlretrieve(data_url, 'S1_SupraT.txt')
-extdata = np.loadtxt('S1_SupraT.txt')
-exp_dpl = Dipole(extdata[:, 0], np.c_[extdata[:, 1],
-                 extdata[:, 1], extdata[:, 1]])
+exp_dpl = read_dipole('S1_SupraT.txt')
 
 ###############################################################################
 # Read the base parameters from a file
