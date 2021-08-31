@@ -147,8 +147,6 @@
 <span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Event</span>
 
-<span class="kn">from</span> <span class="nn">psutil</span> <span class="kn">import</span> <span class="n">wait_procs</span><span class="p">,</span> <span class="n">process_iter</span><span class="p">,</span> <span class="n">NoSuchProcess</span>
-
 <span class="kn">from</span> <span class="nn">.cell_response</span> <span class="kn">import</span> <span class="n">CellResponse</span>
 <span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
 <span class="kn">from</span> <span class="nn">.network_builder</span> <span class="kn">import</span> <span class="n">_simulate_single_trial</span>
@@ -456,6 +454,26 @@
     <span class="k">return</span> <span class="n">data_length</span><span class="p">,</span> <span class="n">data_bytes</span>
 
 
+<span class="k">def</span> <span class="nf">_has_mpi4py</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Determine if mpi4py is present.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">mpi4py</span>  <span class="c1"># noqa</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_has_psutil</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Determine if psutil is present.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">psutil</span>  <span class="c1"># noqa</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+
 <span class="k">def</span> <span class="nf">requires_mpi4py</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decorator for testing functions that require MPI.&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">pytest</span>
@@ -519,6 +537,8 @@
 <span class="c1"># Next 3 functions are from HNN. Will move here. They require psutil</span>
 <span class="k">def</span> <span class="nf">_kill_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Tries to terminate processes in a list before sending kill signal&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">psutil</span> <span class="kn">import</span> <span class="n">wait_procs</span><span class="p">,</span> <span class="n">NoSuchProcess</span>
+
     <span class="c1"># try terminate first</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -537,6 +557,8 @@
 
 <span class="k">def</span> <span class="nf">_get_procs_running</span><span class="p">(</span><span class="n">proc_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a list of processes currently running&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">psutil</span> <span class="kn">import</span> <span class="n">process_iter</span>
+
     <span class="n">process_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">process_iter</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;exe&quot;</span><span class="p">,</span> <span class="s2">&quot;cmdline&quot;</span><span class="p">]):</span>
         <span class="k">if</span> <span class="n">proc_name</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">or</span> \
@@ -719,26 +741,23 @@
 
         <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">mpi4py</span>
-            <span class="n">mpi4py</span><span class="o">.</span><span class="n">__version__</span>  <span class="c1"># for flake8 test</span>
+        <span class="k">if</span> <span class="n">_has_mpi4py</span><span class="p">()</span> <span class="ow">and</span> <span class="n">_has_psutil</span><span class="p">():</span>
+            <span class="kn">import</span> <span class="nn">psutil</span>
 
-            <span class="k">try</span><span class="p">:</span>
-                <span class="kn">import</span> <span class="nn">psutil</span>
+            <span class="n">n_physical_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-                <span class="n">n_physical_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-                <span class="c1"># detect if we need to use hwthread-cpus with mpiexec</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_physical_cores</span><span class="p">:</span>
-                    <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">True</span>
-
-            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-                <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;psutil not installed, so cannot detect if hyperthreading&#39;</span>
-                     <span class="s1">&#39;is enabled, assuming yes.&#39;</span><span class="p">)</span>
+            <span class="c1"># detect if we need to use hwthread-cpus with mpiexec</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_physical_cores</span><span class="p">:</span>
                 <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;mpi4py not installed. will run on single processor&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_mpi4py</span><span class="p">():</span>
+                <span class="n">packages</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;mpi4py&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_psutil</span><span class="p">():</span>
+                <span class="n">packages</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;psutil&#39;</span><span class="p">]</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="s1">&#39; and &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">packages</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">packages</span><span class="si">}</span><span class="s1"> not installed. Will run on single processor&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">=</span> <span class="n">mpi_cmd</span>
@@ -783,7 +802,8 @@
         <span class="n">_BACKEND</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_backend</span>
 
         <span class="c1"># always kill nrniv processes for good measure</span>
-        <span class="n">kill_proc_name</span><span class="p">(</span><span class="s1">&#39;nrniv&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">kill_proc_name</span><span class="p">(</span><span class="s1">&#39;nrniv&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MPIBackend.simulate"><a class="viewcode-back" href="../../generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Simulate the HNN model in parallel on all cores</span>
