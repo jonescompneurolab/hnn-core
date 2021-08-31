@@ -513,7 +513,7 @@ class _ExtracellularArrayBuilder(object):
         # contributions of all segments on this rank to total calculated
         # potential at electrode (_PC.allreduce called in _simulate_dipole)
         self._nrn_voltages = h.Vector()
-        self._nrn_imem_vec = h.Vector(self.n_total_segments)
+        self._nrn_imem_vec = h.Vector(self.n_total_segments, 1.)
 
         # Attach a callback for calculating the potentials at each time step.
         # Enables fast calculation of transmembrane current (nA) at each
