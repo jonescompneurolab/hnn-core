@@ -517,7 +517,6 @@ class _ExtracellularArrayBuilder(object):
         # contributions of all segments on this rank to total calculated
         # potential at electrode (_PC.allreduce called in _simulate_dipole)
         self._nrn_voltages = h.Vector()
-        self._nrn_imem_vec = h.Vector(n_total_segments)
 
         # Attach a callback for calculating the potentials at each time step.
         # Enables fast calculation of transmembrane current (nA) at each
@@ -530,7 +529,7 @@ class _ExtracellularArrayBuilder(object):
     def _nrn_n_samples(self):
         """Return the length (in samples) of the extracellular data."""
         if self._nrn_voltages.size() % self.n_contacts != 0:
-            raise RuntimeError('Something went wrong: have {self.n_contacts}'
+            raise RuntimeError(f'Something went wrong: have {self.n_contacts}'
                                f', but {self._nrn_voltages.size()} samples')
         return int(self._nrn_voltages.size() / self.n_contacts)
 
