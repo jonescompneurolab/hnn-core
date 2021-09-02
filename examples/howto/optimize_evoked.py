@@ -42,7 +42,8 @@ exp_dpl = read_dipole('S1_SupraT.txt')
 # Let's first simulate the dipole with some initial parameters. The parameter
 # definitions also contain the drives. Even though we could add drives
 # explicitly through our API
-# (see :ref:`sphx_glr_auto_examples_plot_simulate_evoked.py`), for conciseness,
+# (see :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`),
+# for conciseness,
 # we add them automatically from the parameter files
 
 scale_factor = 3000.
