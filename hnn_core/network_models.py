@@ -16,8 +16,8 @@ def jones_2009_model(params=None, add_drives_from_params=False):
 
     Parameters
     ----------
-    params : dict | None
-        The parameters to use for constructing the network.
+    params : str | dict | None
+        The path to the parameter file for constructing the network.
         If None, parameters loaded from default.json
         Default: None
     add_drives_from_params : bool
@@ -40,9 +40,10 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     present at a 1:3-ratio.
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
     if params is None:
-        params = read_params(params_fname)
+        params = op.join(hnn_core_root, 'param', 'default.json')
+    if isinstance(params, str):
+        params = read_params(params)
 
     net = Network(params, add_drives_from_params=add_drives_from_params)
 
