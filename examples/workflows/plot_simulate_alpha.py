@@ -26,13 +26,7 @@ import os.path as op
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, jones_2009_model
-
-###############################################################################
-# Then we setup the directories and read the default parameters file
-hnn_core_root = op.dirname(hnn_core.__file__)
-params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = read_params(params_fname)
+from hnn_core import simulate_dipole, jones_2009_model
 
 ###############################################################################
 # Now let's simulate the dipole and plot it. To excite the network, we add a
@@ -42,7 +36,7 @@ params = read_params(params_fname)
 # amount (20 ms standard deviation). We repeat the burst train 10 times, each
 # time with unique randomization. The drive is only connected to the 
 # :term:`proximal` (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
-net = jones_2009_model(params)
+net = jones_2009_model()
 
 location = 'proximal'
 burst_std = 20

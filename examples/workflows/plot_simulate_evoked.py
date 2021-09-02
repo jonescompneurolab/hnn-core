@@ -30,27 +30,13 @@ import matplotlib.pyplot as plt
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, jones_2009_model
+from hnn_core import simulate_dipole, jones_2009_model
 from hnn_core.viz import plot_dipole
 
-hnn_core_root = op.dirname(hnn_core.__file__)
-
 ###############################################################################
-# Then we read the parameters file
-params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = read_params(params_fname)
-print(params)
-
-###############################################################################
-# This is a lot of parameters! We can also filter the
-# parameters using unix-style wildcard characters. Most of the parameters
-# relate to within-network connections and the cell geometry.
-print(params['L2Pyr_soma*'])
-
-###############################################################################
-# Let us first create our network from the params file and visualize the cells
+# Let us first create our default network and visualize the cells
 # inside it.
-net = jones_2009_model(params)
+net = jones_2009_model()
 net.plot_cells()
 net.cell_types['L5_pyramidal'].plot_morphology()
 
