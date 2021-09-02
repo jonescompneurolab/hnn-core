@@ -34,7 +34,7 @@ hnn_core_root = op.dirname(hnn_core.__file__)
 ###############################################################################
 # Read the parameter file and print the between-cell connectivity parameters.
 # Note that these are different compared with the 'default' parameter set used
-# in, e.g., :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`.
+# in, e.g., :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`.
 params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
 params = read_params(params_fname)
 print(params['gbar_L*'])
