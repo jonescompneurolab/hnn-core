@@ -21,17 +21,7 @@ without the need to install and configure MPI.
 import os.path as op
 
 import hnn_core
-from hnn_core import simulate_dipole, read_params, jones_2009_model
-
-###############################################################################
-# Then we setup the directories and Neuron
-hnn_core_root = op.dirname(hnn_core.__file__)
-
-###############################################################################
-# Then we read the default parameters file
-params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = read_params(params_fname)
-print(params)
+from hnn_core import simulate_dipole, jones_2009_model
 
 ###############################################################################
 # Following :ref:`the alpha example
@@ -41,7 +31,7 @@ print(params)
 # The occurrence of each burst is jittered by a random, normally distributed
 # amount (20 ms standard deviation). We repeat the burst train 10 times, each
 # time with unique randomization.
-net = jones_2009_model(params)
+net = jones_2009_model()
 
 weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 net.add_bursty_drive(
