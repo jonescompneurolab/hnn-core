@@ -6,6 +6,7 @@ import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pytest
+from time import time
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
@@ -195,7 +196,18 @@ def test_rec_array_calculation():
     # one electrode inside, one above the active elements of the network
     electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]
     net.add_electrode_array('arr1', electrode_pos)
-    _ = simulate_dipole(net, tstop=25, n_trials=1)
+    # run a single trial multiple times in this python process to ensure
+    # nothing funky happens with potential calculation callback (cf. #409)
+    run_times = list()
+    for _ in range(5):
+        start_time = time()
+        _ = simulate_dipole(net, tstop=25, n_trials=1)
+        run_times.append(time() - start_time)
+        # choice of 5% increase arbitrary
+        if (run_times[-1] - run_times[0]) / run_times[0] > 0.05:
+            raise RuntimeError('Repeated simulations increase in time spent; '
+                               'check for pointer leaks in extracellular '
+                               'potential calculation callback')
 
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
