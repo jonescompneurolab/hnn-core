@@ -190,6 +190,8 @@ def test_add_drives():
             conn = net.connectivity[conn_idx]
             num_connections = np.sum(
                 [len(gids) for gids in conn['gid_pairs'].values()])
+            # Ensures that AMPA and NMDA connections target the same gids.
+            # Necessary when weights of both are non-zero.
             assert gid_pairs_comparison == conn['gid_pairs']
             assert num_connections == \
                 np.around(len(net.gid_ranges[cell_type]) * n_drive_cells *
