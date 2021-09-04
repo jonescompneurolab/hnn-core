@@ -203,11 +203,11 @@ def test_rec_array_calculation():
         start_time = time()
         _ = simulate_dipole(net, tstop=25, n_trials=1)
         run_times.append(time() - start_time)
-        # choice of 5% increase arbitrary
-        if (run_times[-1] - run_times[0]) / run_times[0] > 0.05:
-            raise RuntimeError('Repeated simulations increase in time spent; '
-                               'check for pointer leaks in extracellular '
-                               'potential calculation callback')
+        # choice of 50% increase arbitrary (heuristic)
+        if (run_times[-1] - run_times[0]) / run_times[0] > 0.50:
+            raise RuntimeError('Time for repeated simulations increases '
+                               'greatly; check for pointer leaks in '
+                               'extracellular potential calculation callback')
 
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
