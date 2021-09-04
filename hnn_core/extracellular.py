@@ -559,7 +559,7 @@ class _ExtracellularArrayBuilder(object):
             raise RuntimeError('Simulation not yet run!')
 
 
-def _calc_potentials_callback(nrn_arr):
+def _gather_nrn_voltages(nrn_arr):
     """Callback function for _CVODE.extra_scatter_gather
 
     Enables fast calculation of transmembrane current (nA) at each

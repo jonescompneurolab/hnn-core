@@ -504,7 +504,7 @@ class NetworkBuilder(object):
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
-        from .extracellular import _calc_potentials_callback
+        from .extracellular import _gather_nrn_voltages
 
         for arr_name, arr in self.net.rec_arrays.items():
             nrn_arr = _ExtracellularArrayBuilder(arr)
@@ -513,7 +513,7 @@ class NetworkBuilder(object):
 
             # Attach a callback for calculating the potentials at each time
             # step. Keep the callbacks in a list so they can be removed later.
-            recording_callback = (_calc_potentials_callback, nrn_arr)
+            recording_callback = (_gather_nrn_voltages, nrn_arr)
             _CVODE.extra_scatter_gather(0, recording_callback)
             self._nrn_rec_callbacks.append(recording_callback)
 
