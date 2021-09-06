@@ -445,8 +445,9 @@ class _ExtracellularArrayBuilder(object):
         self._nrn_r_transfer = None
         self._nrn_times = None
         self._nrn_voltages = None
+        self._recording_callback = None
 
-    def _build(self, include_celltypes='all'):
+    def _build(self, cvode=None, include_celltypes='all'):
         """Assemble NEURON objects for calculating extracellular potentials.
 
         The handler is set up to maintain a vector of membrane currents at at
@@ -517,14 +518,34 @@ class _ExtracellularArrayBuilder(object):
         # contributions of all segments on this rank to total calculated
         # potential at electrode (_PC.allreduce called in _simulate_dipole)
         self._nrn_voltages = h.Vector()
-        # NB the vector is only initialised here: a separate callback-function
-        # must be attached to the _CVODE (extra_scatter_gather), which
-        # will append the summed potential of each electrode at each time step.
-        # The callback-function is included in this file (below), but must
-        # be called in network_builder during the actual simulation (including
-        # the callback as a method of the present class lead to segmentation
-        # violations when simulate_dipole was called multiple times in the same
-        # python process; extra_scatter_gather_remove did not work)
+
+        # NB we must make a copy of the function reference, and keep it for
+        # later decoupling using extra_scatter_gather_remove
+        # (instead of a new function the reference)
+        self._recording_callback = self._gather_nrn_voltages
+        cvode.extra_scatter_gather(0, self._recording_callback)
+
+    def _gather_nrn_voltages(self):
+        """Callback function for _CVODE.extra_scatter_gather
+
+        Enables fast calculation of transmembrane current (nA) at each
+        segment. Note that this will run on each rank, so it is safe to use
+        the extra_scatter_gather-method, which docs say doesn't support
+        'multiple threads'.
+        """
+        # keep all data in Neuron objects for efficiency
+
+        # 'gather' the values of seg.i_membrane_ into self.imem_vec
+        self._nrn_imem_ptrvec.gather(self._nrn_imem_vec)
+
+        # Calculate potentials by multiplying the _nrn_imem_vec by the matrix
+        # _nrn_r_transfer. This is equivalent to a row-by-row dot-product:
+        # V_i(t) = SUM_j ( R_i,j x I_j (t) )
+        self._nrn_voltages.append(
+            self._nrn_r_transfer.mulv(self._nrn_imem_vec))
+        # NB all values appended to the h.Vector _nrn_voltages at current time
+        # step. The vector will have size (n_contacts x n_samples, 1), which
+        # will be reshaped later to (n_contacts, n_samples).
 
     @property
     def _nrn_n_samples(self):
@@ -557,26 +578,3 @@ class _ExtracellularArrayBuilder(object):
             return self._nrn_times.to_python()[:self._nrn_n_samples]
         else:
             raise RuntimeError('Simulation not yet run!')
-
-
-def _gather_nrn_voltages(nrn_arr):
-    """Callback function for _CVODE.extra_scatter_gather
-
-    Enables fast calculation of transmembrane current (nA) at each
-    segment. Note that this will run on each rank, so it is safe to use
-    the extra_scatter_gather-method, which docs say doesn't support
-    'multiple threads'.
-    """
-    # keep all data in Neuron objects for efficiency
-
-    # 'gather' the values of seg.i_membrane_ into self.imem_vec
-    nrn_arr._nrn_imem_ptrvec.gather(nrn_arr._nrn_imem_vec)
-
-    # Calculate potentials by multiplying the _nrn_imem_vec by the matrix
-    # _nrn_r_transfer. This is equivalent to a row-by-row dot-product:
-    # V_i(t) = SUM_j ( R_i,j x I_j (t) )
-    nrn_arr._nrn_voltages.append(
-        nrn_arr._nrn_r_transfer.mulv(nrn_arr._nrn_imem_vec))
-    # NB all values appended to the h.Vector _nrn_voltages at current time
-    # step. The vector will have size (n_contacts x n_samples, 1), which
-    # will be reshaped later to (n_contacts, n_samples).
