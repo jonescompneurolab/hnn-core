@@ -6,7 +6,6 @@ import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pytest
-from time import time
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
