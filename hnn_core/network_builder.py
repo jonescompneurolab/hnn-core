@@ -504,18 +504,10 @@ class NetworkBuilder(object):
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
-        from .extracellular import _gather_nrn_voltages
-
         for arr_name, arr in self.net.rec_arrays.items():
             nrn_arr = _ExtracellularArrayBuilder(arr)
-            nrn_arr._build()
+            nrn_arr._build(cvode=_CVODE)
             self._nrn_rec_arrays.update({arr_name: nrn_arr})
-
-            # Attach a callback for calculating the potentials at each time
-            # step. Keep the callbacks in a list so they can be removed later.
-            recording_callback = (_gather_nrn_voltages, nrn_arr)
-            _CVODE.extra_scatter_gather(0, recording_callback)
-            self._nrn_rec_callbacks.append(recording_callback)
 
     def _record_spikes(self):
         """Setup spike recording for this node"""
@@ -547,8 +539,8 @@ class NetworkBuilder(object):
         _PC.allreduce(self._nrn_dipoles['L2_pyramidal'], 1)
         for nrn_arr in self._nrn_rec_arrays.values():
             _PC.allreduce(nrn_arr._nrn_voltages, 1)
-        for recording_callback in self._nrn_rec_callbacks:
-            _CVODE.extra_scatter_gather_remove(recording_callback)
+            # NB needed if multiple simulations are run in same python proc.
+            _CVODE.extra_scatter_gather_remove(nrn_arr._recording_callback)
 
         # aggregate the currents and voltages independently on each proc
         vsoma_list = _PC.py_gather(self._vsoma, 0)
