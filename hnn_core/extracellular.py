@@ -517,12 +517,16 @@ class _ExtracellularArrayBuilder(object):
 
         # contributions of all segments on this rank to total calculated
         # potential at electrode (_PC.allreduce called in _simulate_dipole)
-        self._nrn_voltages = h.Vector()
+        # NB voltages of all contacts are initialised to 0 mV, i.e., the
+        # potential at time 0.0 ms is defined to be zero.
+        self._nrn_voltages = h.Vector(self.n_contacts, 0.)
 
         # NB we must make a copy of the function reference, and keep it for
         # later decoupling using extra_scatter_gather_remove
         # (instead of a new function the reference)
         self._recording_callback = self._gather_nrn_voltages
+        # Nb extra_scatter_gather is called _after_ the solver takes a step,
+        # so the initial state is not recorded (initialised to zero above)
         cvode.extra_scatter_gather(0, self._recording_callback)
 
     def _gather_nrn_voltages(self):
@@ -574,7 +578,6 @@ class _ExtracellularArrayBuilder(object):
     def _get_nrn_times(self):
         """The sampling time points."""
         if self._nrn_times.size() > 0:
-            # NB _nrn_times is one sample longer than _nrn_voltages
-            return self._nrn_times.to_python()[:self._nrn_n_samples]
+            return self._nrn_times.to_python()
         else:
             raise RuntimeError('Simulation not yet run!')
