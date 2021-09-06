@@ -196,18 +196,7 @@ def test_rec_array_calculation():
     # one electrode inside, one above the active elements of the network
     electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]
     net.add_electrode_array('arr1', electrode_pos)
-    # run a single trial multiple times in this python process to ensure
-    # nothing funky happens with potential calculation callback (cf. #409)
-    run_times = list()
-    for _ in range(5):
-        start_time = time()
-        _ = simulate_dipole(net, tstop=25, n_trials=1)
-        run_times.append(time() - start_time)
-        # choice of 50% increase arbitrary (heuristic)
-        if (run_times[-1] - run_times[0]) / run_times[0] > 0.50:
-            raise RuntimeError('Time for repeated simulations increases '
-                               'greatly; check for pointer leaks in '
-                               'extracellular potential calculation callback')
+    _ = simulate_dipole(net, tstop=25, n_trials=1)
 
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
