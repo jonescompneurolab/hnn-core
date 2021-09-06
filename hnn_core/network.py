@@ -335,6 +335,7 @@ class Network(object):
 
     def __init__(self, params, add_drives_from_params=False, legacy_mode=True):
         # Save the parameters used to create the Network
+        _validate_type(params, dict, 'params')
         self._params = params
         # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder

@@ -8,7 +8,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, CellResponse
+from hnn_core import read_params, CellResponse, Network
 from hnn_core import jones_2009_model, law_2021_model, calcium_model
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.network_builder import NetworkBuilder
@@ -130,6 +130,8 @@ def test_network_cell_positions():
 
 def test_network():
     """Test network object."""
+    with pytest.raises(TypeError, match='params must be an instance of dict'):
+        Network('hello')
     params = read_params(params_fname)
     # add rhythmic inputs (i.e., a type of common input)
     params.update({'input_dist_A_weight_L2Pyr_ampa': 1.4e-5,
@@ -502,7 +504,7 @@ def test_tonic_biases():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    net = hnn_core.Network(params, add_drives_from_params=True)
+    net = Network(params, add_drives_from_params=True)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
                            t0=0.0, tstop=4.0)
@@ -522,7 +524,7 @@ def test_tonic_biases():
 
     with pytest.raises(ValueError, match='parameter may be missing'):
         params['Itonic_T_L2Pyr_soma'] = 5.0
-        net = hnn_core.Network(params, add_drives_from_params=True)
+        net = Network(params, add_drives_from_params=True)
 
     params.update({
         'N_pyr_x': 3, 'N_pyr_y': 3,
@@ -537,12 +539,12 @@ def test_tonic_biases():
         'Itonic_T_L2Pyr_soma': 15.0
     })
     # old API
-    net = hnn_core.Network(params, add_drives_from_params=True)
+    net = Network(params, add_drives_from_params=True)
     assert 'tonic' in net.external_biases
     assert 'L2_pyramidal' in net.external_biases['tonic']
 
     # new API
-    net = hnn_core.Network(params)
+    net = Network(params)
     net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
     assert 'tonic' in net.external_biases
     assert 'L5_pyramidal' not in net.external_biases['tonic']
