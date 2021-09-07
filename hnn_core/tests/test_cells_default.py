@@ -26,7 +26,7 @@ def test_cells_default():
     vertical_secs = ['basal_1', 'soma', 'apical_trunk', 'apical_1', 'apical_2',
                      'apical_tuft']
     for sec_name in vertical_secs:
-        sec = l5p.sections[sec_name]
+        sec = l5p._nrn_sections[sec_name]
         vert_len = np.abs(sec.z3d(1) - sec.z3d(0))
         assert np.allclose(vert_len, sec.L)
 
@@ -36,10 +36,10 @@ def test_cells_default():
     h.dt = 0.025
     h.celsius = 37
 
-    vsoma = l5p.rec_v.record(l5p.sections['soma'](0.5)._ref_v)
+    vsoma = l5p.rec_v.record(l5p._nrn_sections['soma'](0.5)._ref_v)
     times = h.Vector().record(h._ref_t)
 
-    stim = h.IClamp(l5p.sections['soma'](0.5))
+    stim = h.IClamp(l5p._nrn_sections['soma'](0.5))
     stim.delay = 5
     stim.dur = 5.
     stim.amp = 2.

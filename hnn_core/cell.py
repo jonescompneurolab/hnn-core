@@ -16,12 +16,12 @@ from .viz import plot_cell_morphology
 # Units for gbar: S/cm^2
 
 
-def _get_cos_theta(p_secs, sec_name_apical):
+def _get_cos_theta(sections, sec_name_apical):
     """Get cos(theta) to compute dipole along the apical dendrite."""
-    a = (np.array(p_secs[sec_name_apical]['sec_pts'][1]) -
-         np.array(p_secs[sec_name_apical]['sec_pts'][0]))
+    a = (np.array(sections[sec_name_apical]['sec_pts'][1]) -
+         np.array(sections[sec_name_apical]['sec_pts'][0]))
     cos_thetas = dict()
-    for sec_name, p_sec in p_secs.items():
+    for sec_name, p_sec in sections.items():
         b = np.array(p_sec['sec_pts'][1]) - np.array(p_sec['sec_pts'][0])
         cos_thetas[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
     return cos_thetas
@@ -157,9 +157,9 @@ class Cell:
         The name of the cell.
     pos : tuple
         The (x, y, z) coordinates.
-    p_secs : nested dict
+    sections : nested dict
         Dictionary with keys as section name.
-        p_secs[sec_name] is a dictionary with keys
+        sections[sec_name] is a dictionary with keys
         L, diam, Ra, cm, syns and mech.
         syns is a list specifying the synapses at that section.
         The properties of syn are specified in p_syn.
@@ -189,9 +189,6 @@ class Cell:
     ----------
     pos : list of length 3
         The position of the cell.
-    sections : dict
-        The sections. The key is the name of the section
-        and the value is an instance of h.Section.
     synapses : dict
         The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
@@ -214,7 +211,7 @@ class Cell:
 
     Examples
     --------
-    >>> p_secs = {
+    >>> sections = {
         'soma':
         {
             'L': 39,
@@ -232,14 +229,15 @@ class Cell:
     }
     """
 
-    def __init__(self, name, pos, p_secs, p_syn, topology, sect_loc, gid=None):
+    def __init__(self, name, pos, sections, p_syn, topology, sect_loc,
+                 gid=None):
         self.name = name
         self.pos = pos
-        self.p_secs = p_secs
+        self.sections = sections
         self.p_syn = p_syn
         self.topology = topology
         self.sect_loc = sect_loc
-        self.sections = dict()
+        self._nrn_sections = dict()
         self.synapses = dict()
         self.dipole_pp = list()
         self.rec_v = h.Vector()
@@ -268,7 +266,7 @@ class Cell:
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
-    def _set_biophysics(self, p_secs):
+    def _set_biophysics(self, sections):
         "Set the biophysics for the cell."
 
         # neuron syntax is used to set values for mechanisms
@@ -282,9 +280,9 @@ class Cell:
         # and set attribute depending on h.distance(seg.x), which returns
         # distance from the soma to this point on the CURRENTLY ACCESSED
         # SECTION!!!
-        h.distance(sec=self.sections['soma'])
-        for sec_name, p_sec in p_secs.items():
-            sec = self.sections[sec_name]
+        h.distance(sec=self._nrn_sections['soma'])
+        for sec_name, p_sec in sections.items():
+            sec = self._nrn_sections[sec_name]
             for mech_name, p_mech in p_sec['mechs'].items():
                 sec.insert(mech_name)
                 for attr, val in p_mech.items():
@@ -296,16 +294,16 @@ class Cell:
                     else:
                         setattr(sec, attr, val)
 
-    def _create_synapses(self, p_secs, p_syn):
+    def _create_synapses(self, sections, p_syn):
         """Create synapses."""
-        for sec_name in p_secs:
-            for receptor in p_secs[sec_name]['syns']:
+        for sec_name in sections:
+            for receptor in sections[sec_name]['syns']:
                 syn_key = f'{sec_name}_{receptor}'
-                seg = self.sections[sec_name](0.5)
+                seg = self._nrn_sections[sec_name](0.5)
                 self.synapses[syn_key] = self.syn_create(
                     seg, **p_syn[receptor])
 
-    def _create_sections(self, p_secs, topology):
+    def _create_sections(self, sections, topology):
         """Create soma and set geometry.
 
         Notes
@@ -316,25 +314,25 @@ class Cell:
         """
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
-        dx = self.pos[0] - self.p_secs['soma']['sec_pts'][0][0]
-        dy = self.pos[1] - self.p_secs['soma']['sec_pts'][0][1]
-        dz = self.pos[2] - self.p_secs['soma']['sec_pts'][0][2]
+        dx = self.pos[0] - self.sections['soma']['sec_pts'][0][0]
+        dy = self.pos[1] - self.sections['soma']['sec_pts'][0][1]
+        dz = self.pos[2] - self.sections['soma']['sec_pts'][0][2]
 
-        for sec_name in p_secs:
+        for sec_name in sections:
             sec = h.Section(name=f'{self.name}_{sec_name}')
-            self.sections[sec_name] = sec
+            self._nrn_sections[sec_name] = sec
 
             h.pt3dclear(sec=sec)
             h.pt3dconst(0, sec=sec)  # be explicit, see documentation
-            for pt in p_secs[sec_name]['sec_pts']:
+            for pt in sections[sec_name]['sec_pts']:
                 h.pt3dadd(pt[0] + dx,
                           pt[1] + dy,
                           pt[2] + dz, 1, sec=sec)
             # with pt3dconst==0, these will alter the 3d points defined above!
-            sec.L = p_secs[sec_name]['L']
-            sec.diam = p_secs[sec_name]['diam']
-            sec.Ra = p_secs[sec_name]['Ra']
-            sec.cm = p_secs[sec_name]['cm']
+            sec.L = sections[sec_name]['L']
+            sec.diam = sections[sec_name]['diam']
+            sec.Ra = sections[sec_name]['Ra']
+            sec.cm = sections[sec_name]['cm']
 
             if sec.L > 100.:  # 100 um
                 sec.nseg = int(sec.L / 50.)
@@ -347,8 +345,8 @@ class Cell:
 
         # Connects sections of THIS cell together.
         for connection in topology:
-            parent_sec = self.sections[connection[0]]
-            child_sec = self.sections[connection[2]]
+            parent_sec = self._nrn_sections[connection[0]]
+            child_sec = self._nrn_sections[connection[2]]
             parent_loc = connection[1]
             child_loc = connection[3]
             child_sec.connect(parent_sec, parent_loc, child_loc)
@@ -368,12 +366,12 @@ class Cell:
             with this section. The section should belong to the apical dendrite
             of a pyramidal neuron.
         """
-        if 'soma' not in self.p_secs:
+        if 'soma' not in self.sections:
             raise KeyError('soma must be defined for cell')
-        self._create_sections(self.p_secs, self.topology)
-        self._create_synapses(self.p_secs, self.p_syn)
-        self._set_biophysics(self.p_secs)
-        if sec_name_apical in self.sections:
+        self._create_sections(self.sections, self.topology)
+        self._create_synapses(self.sections, self.p_syn)
+        self._set_biophysics(self.sections)
+        if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)
         elif sec_name_apical is not None:
             raise ValueError(f'sec_name_apical must be an existing '
@@ -399,11 +397,11 @@ class Cell:
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
-        cos_thetas = _get_cos_theta(self.p_secs, 'apical_trunk')
+        cos_thetas = _get_cos_theta(self.sections, 'apical_trunk')
 
         # setting pointers and ztan values
-        for sect_name in self.p_secs:
-            sect = self.sections[sect_name]
+        for sect_name in self.sections:
+            sect = self._nrn_sections[sect_name]
             sect.insert('dipole')
 
             dpp = h.Dipole(1, sec=sect)  # defined in dipole_pp.mod
@@ -456,7 +454,7 @@ class Cell:
         loc : float (0 to 1)
             The location of the input in the soma section.
         """
-        stim = h.IClamp(self.sections['soma'](loc))
+        stim = h.IClamp(self._nrn_sections['soma'](loc))
         stim.delay = t0
         stim.dur = tstop - t0
         stim.amp = amplitude
@@ -473,7 +471,7 @@ class Cell:
             Option to record somatic currents from cells
 
         """
-        # a soma exists at self.sections['soma']
+        # a soma exists at self._nrn_sections['soma']
         if record_isoma:
             # assumes that self.synapses is a dict that exists
             list_syn_soma = [key for key in self.synapses.keys()
@@ -486,7 +484,7 @@ class Cell:
                 self.rec_i[key].record(self.synapses[key]._ref_i)
 
         if record_vsoma:
-            self.rec_v.record(self.sections['soma'](0.5)._ref_v)
+            self.rec_v.record(self._nrn_sections['soma'](0.5)._ref_v)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
@@ -524,8 +522,8 @@ class Cell:
         threshold : float
             The voltage threshold for action potential.
         """
-        nc = h.NetCon(self.sections['soma'](0.5)._ref_v, None,
-                      sec=self.sections['soma'])
+        nc = h.NetCon(self._nrn_sections['soma'](0.5)._ref_v, None,
+                      sec=self._nrn_sections['soma'])
         nc.threshold = threshold
         return nc
 

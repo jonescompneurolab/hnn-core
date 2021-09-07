@@ -191,18 +191,18 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     else:
         raise ValueError(f'Unknown basket cell type: {cell_name}')
 
-    p_secs = dict()
-    p_secs['soma'] = _get_basket_soma_props(cell_name)
+    sections = dict()
+    sections['soma'] = _get_basket_soma_props(cell_name)
     p_syn = _get_basket_syn_props()
-    p_secs['soma']['syns'] = list(p_syn.keys())
-    p_secs['soma']['mechs'] = {'hh2': dict()}
+    sections['soma']['syns'] = list(p_syn.keys())
+    sections['soma']['mechs'] = {'hh2': dict()}
 
     sec_pts, topology = _secs_Basket()
-    for sec_name in p_secs:
-        p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
+    for sec_name in sections:
+        sections[sec_name]['sec_pts'] = sec_pts[sec_name]
 
     return Cell(cell_name, pos,
-                p_secs=p_secs,
+                sections=sections,
                 p_syn=p_syn,
                 topology=topology,
                 sect_loc=sect_loc,
@@ -267,30 +267,30 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
                              section_names=section_names,
                              prop_names=prop_names)
     p_syn = _get_pyr_syn_props(p_all, cell_name)
-    p_secs = p_dend.copy()
-    p_secs['soma'] = p_soma
+    sections = p_dend.copy()
+    sections['soma'] = p_soma
     p_mech = _get_mechanisms(p_all, cell_name, ['soma'] + section_names,
                              mechanisms)
-    for key in p_secs:
-        p_secs[key]['mechs'] = p_mech[key]
+    for key in sections:
+        sections[key]['mechs'] = p_mech[key]
         if key == 'soma':
             syns = ['gabaa', 'gabab']
         else:
             syns = list(p_syn.keys())
             if cell_name == 'L5Pyr':
-                p_secs[key]['mechs']['ar']['gbar_ar'] = \
+                sections[key]['mechs']['ar']['gbar_ar'] = \
                     partial(_exp_g_at_dist, zero_val=1e-6,
                             exp_term=3e-3, offset=0.0)
-        p_secs[key]['syns'] = syns
+        sections[key]['syns'] = syns
 
-    for sec_name in p_secs:
-        p_secs[sec_name]['sec_pts'] = sec_pts[sec_name]
+    for sec_name in sections:
+        sections[sec_name]['sec_pts'] = sec_pts[sec_name]
 
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
                 'distal': ['apical_tuft']}
 
     return Cell(cell_name, pos,
-                p_secs=p_secs,
+                sections=sections,
                 p_syn=p_syn,
                 topology=topology,
                 sect_loc=sect_loc,

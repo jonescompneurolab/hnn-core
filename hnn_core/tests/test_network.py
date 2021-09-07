@@ -53,7 +53,8 @@ def test_network_models():
                                     n_trials=net_calcium._params['N_trials'])
     network_builder = NetworkBuilder(net_calcium)
     gid = net_calcium.gid_ranges['L5_pyramidal'][0]
-    for section_name, section in network_builder._cells[gid].sections.items():
+    for section_name, section in \
+            network_builder._cells[gid]._nrn_sections.items():
         # Section endpoints where seg.x == 0.0 or 1.0 don't have 'ca' mech
         ca_gbar = [seg.__getattribute__('ca').gbar for
                    seg in list(section.allseg())[1:-1]]
