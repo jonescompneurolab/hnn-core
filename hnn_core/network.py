@@ -283,20 +283,22 @@ class Network(object):
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
-    inplane_distance : float
-        The in plane-distance (in um) between pyramidal cell somas in the
-        square grid. Note that this parameter does not affect the amplitude of
-        the dipole moment. Default: 1.0 um
-    layer_separation : float
-        The default separation of pyramidal cell somas in layers 2/3 and 5
-        is 1307.4 um. Note that this parameter does not affect the amplitude of
-        the dipole moment.
     legacy_mode : bool
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
 
     Attributes
     ----------
+    inplane_distance : float (settable)
+        The in plane-distance (in um) between pyramidal cell somas in the
+        square grid. Note that this parameter does not affect the amplitude of
+        the dipole moment. Default: 1.0 um. Must be set before any drives are
+        added to the network.
+    layer_separation : float (settable)
+        The default separation of pyramidal cell somas in layers 2/3 and 5
+        is 1307.4 um. Note that this parameter does not affect the amplitude of
+        the dipole moment. Must be set before any drives are added to the
+        network.
     cell_types : dict
         Dictionary containing names of real cell types in the network
         (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
@@ -440,6 +442,12 @@ class Network(object):
         if not new_dist > 0.:
             raise ValueError('In-plane distance must be positive definite, '
                              f'got: {new_dist}')
+
+        # Adjust the lamtha of all cells; note that this would have no effect
+        # on external drives, since the event times there are calculated when
+        # the drives are attached.
+        for conn in self.connectivity:
+            conn['nc_dict']['lamtha'] *= new_dist / self._inplane_distance
 
         self._inplane_distance = new_dist
         self._reset_cell_positions()
