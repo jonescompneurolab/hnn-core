@@ -576,6 +576,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recording_callback</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cvode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Assemble NEURON objects for calculating extracellular potentials.</span>
@@ -647,14 +648,39 @@
 
         <span class="c1"># contributions of all segments on this rank to total calculated</span>
         <span class="c1"># potential at electrode (_PC.allreduce called in _simulate_dipole)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
+        <span class="c1"># NB voltages of all contacts are initialised to 0 mV, i.e., the</span>
+        <span class="c1"># potential at time 0.0 ms is defined to be zero.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
 
-        <span class="c1"># Attach a callback for calculating the potentials at each time step.</span>
-        <span class="c1"># Enables fast calculation of transmembrane current (nA) at each</span>
-        <span class="c1"># segment. Note that this will run on each rank, so it is safe to use</span>
-        <span class="c1"># the extra_scatter_gather-method, which docs say doesn&#39;t support</span>
-        <span class="c1"># &quot;multiple threads&quot;.</span>
-        <span class="n">cvode</span><span class="o">.</span><span class="n">extra_scatter_gather</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_potentials_callback</span><span class="p">)</span>
+        <span class="c1"># NB we must make a copy of the function reference, and keep it for</span>
+        <span class="c1"># later decoupling using extra_scatter_gather_remove</span>
+        <span class="c1"># (instead of a new function reference)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recording_callback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_nrn_voltages</span>
+        <span class="c1"># Nb extra_scatter_gather is called _after_ the solver takes a step,</span>
+        <span class="c1"># so the initial state is not recorded (initialised to zero above)</span>
+        <span class="n">cvode</span><span class="o">.</span><span class="n">extra_scatter_gather</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recording_callback</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_gather_nrn_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback function for _CVODE.extra_scatter_gather</span>
+
+<span class="sd">        Enables fast calculation of transmembrane current (nA) at each</span>
+<span class="sd">        segment. Note that this will run on each rank, so it is safe to use</span>
+<span class="sd">        the extra_scatter_gather-method, which docs say doesn&#39;t support</span>
+<span class="sd">        &#39;multiple threads&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># keep all data in Neuron objects for efficiency</span>
+
+        <span class="c1"># &#39;gather&#39; the values of seg.i_membrane_ into self.imem_vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">)</span>
+
+        <span class="c1"># Calculate potentials by multiplying the _nrn_imem_vec by the matrix</span>
+        <span class="c1"># _nrn_r_transfer. This is equivalent to a row-by-row dot-product:</span>
+        <span class="c1"># V_i(t) = SUM_j ( R_i,j x I_j (t) )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">mulv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">))</span>
+        <span class="c1"># NB all values appended to the h.Vector _nrn_voltages at current time</span>
+        <span class="c1"># step. The vector will have size (n_contacts x n_samples, 1), which</span>
+        <span class="c1"># will be reshaped later to (n_contacts, n_samples).</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_nrn_n_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -683,25 +709,9 @@
     <span class="k">def</span> <span class="nf">_get_nrn_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The sampling time points.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># NB _nrn_times is one sample longer than _nrn_voltages</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span><span class="o">.</span><span class="n">to_python</span><span class="p">()[:</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_n_samples</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span><span class="o">.</span><span class="n">to_python</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Simulation not yet run!&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_calc_potentials_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># keep all data in Neuron objects for efficiency</span>
-
-        <span class="c1"># &#39;gather&#39; the values of seg.i_membrane_ into self.imem_vec</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">)</span>
-
-        <span class="c1"># Calculate potentials by multiplying the _nrn_imem_vec by the matrix</span>
-        <span class="c1"># _nrn_r_transfer. This is equivalent to a row-by-row dot-product:</span>
-        <span class="c1"># V_i(t) = SUM_j ( R_i,j x I_j (t) )</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">mulv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">))</span>
-        <span class="c1"># NB all values appended to the h.Vector _nrn_voltages at current time</span>
-        <span class="c1"># step. The vector will have size (n_contacts x n_samples, 1), which</span>
-        <span class="c1"># will be reshaped later to (n_contacts, n_samples).</span>
 </pre></div>
 
     </div>
