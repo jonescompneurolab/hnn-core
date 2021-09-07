@@ -140,7 +140,7 @@
 <h1>hnn_core.Cell<a class="headerlink" href="#hnn-core-cell" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.Cell">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_secs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_syn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a cell object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -149,15 +149,15 @@
 </dd>
 <dt><strong>pos</strong><span class="classifier">tuple</span></dt><dd><p>The (x, y, z) coordinates.</p>
 </dd>
-<dt><strong>p_secs</strong><span class="classifier">nested dict</span></dt><dd><p>Dictionary with keys as section name.
-p_secs[sec_name] is a dictionary with keys
+<dt><strong>sections</strong><span class="classifier">nested dict</span></dt><dd><p>Dictionary with keys as section name.
+sections[sec_name] is a dictionary with keys
 L, diam, Ra, cm, syns and mech.
 syns is a list specifying the synapses at that section.
-The properties of syn are specified in p_syn.
+The properties of syn are specified in synapses.
 mech is a dict with keys as the mechanism names. The
 values are dictionaries with properties of the mechanism.</p>
 </dd>
-<dt><strong>p_syn</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
+<dt><strong>synapses</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
 has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
 ‘tau2’.</p>
 </dd>
@@ -180,7 +180,7 @@ yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p_secs</span> <span class="o">=</span> <span class="p">{</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sections</span> <span class="o">=</span> <span class="p">{</span>
 <span class="go">    &#39;soma&#39;:</span>
 <span class="go">    {</span>
 <span class="go">        &#39;L&#39;: 39,</span>
@@ -203,8 +203,9 @@ yet attached to a network. Once the GID is set, it cannot be changed.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>pos</strong><span class="classifier">list of length 3</span></dt><dd><p>The position of the cell.</p>
 </dd>
-<dt><strong>sections</strong><span class="classifier">dict</span></dt><dd><p>The sections. The key is the name of the section
-and the value is an instance of h.Section.</p>
+<dt><strong>sections</strong><span class="classifier">nested dict</span></dt><dd><p>The section parameters. The key is the name of the section
+and the value is a dictionary parametrizing the morphology
+of the section and the mechanisms inserted.</p>
 </dd>
 <dt><strong>synapses</strong><span class="classifier">dict</span></dt><dd><p>The synapses that the cell can use for connections.</p>
 </dd>

@@ -420,7 +420,7 @@ frequency from ~50 to ~65 Hz.
 
 .. code-block:: default
 
-    net.cell_types['L5_pyramidal'].p_syn['gabaa']['tau2'] = 2
+    net.cell_types['L5_pyramidal'].synapses['gabaa']['tau2'] = 2
     dpls = simulate_dipole(net, tstop=250., n_trials=1)
     dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
@@ -490,7 +490,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 4 minutes  45.949 seconds)
+   **Total running time of the script:** ( 4 minutes  17.132 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:

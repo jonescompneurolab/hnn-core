@@ -32,18 +32,18 @@ net = law_2021_model()
 # contains information on the biophysics and geometry of each cell.
 net_jones = jones_2009_model()
 
-jones_rise = net_jones.cell_types['L5_pyramidal'].p_syn['gabab']['tau1']
-law_rise = net.cell_types['L5_pyramidal'].p_syn['gabab']['tau1']
+jones_rise = net_jones.cell_types['L5_pyramidal'].synapses['gabab']['tau1']
+law_rise = net.cell_types['L5_pyramidal'].synapses['gabab']['tau1']
 print(f'GABAb Rise (ms): {jones_rise} -> {law_rise}')
 
-jones_fall = net_jones.cell_types['L5_pyramidal'].p_syn['gabab']['tau2']
-law_fall = net.cell_types['L5_pyramidal'].p_syn['gabab']['tau2']
+jones_fall = net_jones.cell_types['L5_pyramidal'].synapses['gabab']['tau2']
+law_fall = net.cell_types['L5_pyramidal'].synapses['gabab']['tau2']
 print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}\n')
 
 print('Apical Dendrite Channels:')
-print(net.cell_types['L5_pyramidal'].p_secs['apical_1']['mechs'].keys())
+print(net.cell_types['L5_pyramidal'].sections['apical_1']['mechs'].keys())
 print("\nBasal Dendrite Channels ('ca' missing):")
-print(net.cell_types['L5_pyramidal'].p_secs['basal_1']['mechs'].keys())
+print(net.cell_types['L5_pyramidal'].sections['basal_1']['mechs'].keys())
 
 ###############################################################################
 # A major change to the Jones 2009 model is the addition of a
