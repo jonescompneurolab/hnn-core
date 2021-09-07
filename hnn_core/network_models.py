@@ -185,10 +185,10 @@ def law_2021_model():
     net = jones_2009_model(params)
 
     # Update biophysics (increase gabab duration of inhibition)
-    net.cell_types['L2_pyramidal'].p_syn['gabab']['tau1'] = 45.0
-    net.cell_types['L2_pyramidal'].p_syn['gabab']['tau2'] = 200.0
-    net.cell_types['L5_pyramidal'].p_syn['gabab']['tau1'] = 45.0
-    net.cell_types['L5_pyramidal'].p_syn['gabab']['tau2'] = 200.0
+    net.cell_types['L2_pyramidal'].synapses['gabab']['tau1'] = 45.0
+    net.cell_types['L2_pyramidal'].synapses['gabab']['tau2'] = 200.0
+    net.cell_types['L5_pyramidal'].synapses['gabab']['tau1'] = 45.0
+    net.cell_types['L5_pyramidal'].synapses['gabab']['tau2'] = 200.0
 
     # Decrease L5_pyramidal -> L5_pyramidal nmda weight
     net.connectivity[2]['nc_dict']['A_weight'] = 0.0004
