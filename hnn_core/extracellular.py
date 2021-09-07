@@ -523,7 +523,7 @@ class _ExtracellularArrayBuilder(object):
 
         # NB we must make a copy of the function reference, and keep it for
         # later decoupling using extra_scatter_gather_remove
-        # (instead of a new function the reference)
+        # (instead of a new function reference)
         self._recording_callback = self._gather_nrn_voltages
         # Nb extra_scatter_gather is called _after_ the solver takes a step,
         # so the initial state is not recorded (initialised to zero above)

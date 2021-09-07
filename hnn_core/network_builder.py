@@ -539,8 +539,6 @@ class NetworkBuilder(object):
         _PC.allreduce(self._nrn_dipoles['L2_pyramidal'], 1)
         for nrn_arr in self._nrn_rec_arrays.values():
             _PC.allreduce(nrn_arr._nrn_voltages, 1)
-            # NB needed if multiple simulations are run in same python proc.
-            _CVODE.extra_scatter_gather_remove(nrn_arr._recording_callback)
 
         # aggregate the currents and voltages independently on each proc
         vsoma_list = _PC.py_gather(self._vsoma, 0)
@@ -588,10 +586,10 @@ class NetworkBuilder(object):
                         seg.v = -64.9737
 
     def _clear_neuron_objects(self):
-        """Clear up NEURON internal gid information.
+        """Clear up NEURON internal gid and reference information.
 
         Note: This function must be called from the context of the
-        Network instance that ran build_in_neuron. This is a bug or
+        Network instance that ran `_build`. This is a bug or
         peculiarity of NEURON. If this function is called from a different
         context, then the next simulation will run very slow because nrniv
         workers are still going for the old simulation. If pc.gid_clear is
@@ -619,6 +617,12 @@ class NetworkBuilder(object):
         self._gid_list = list()
         self._cells = list()
         self._drive_cells = list()
+
+        # NB needed if multiple simulations are run in same python proc.
+        # removes callbacks used to gather transmembrane currents
+        for nrn_arr in self._nrn_rec_arrays.values():
+            if nrn_arr._recording_callback is not None:
+                _CVODE.extra_scatter_gather_remove(nrn_arr._recording_callback)
 
     def _clear_last_network_objects(self):
         """Clears NEURON objects and saves the current Network instance"""
