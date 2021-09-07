@@ -195,7 +195,7 @@ def test_rec_array_calculation():
     # one electrode inside, one above the active elements of the network
     electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]
     net.add_electrode_array('arr1', electrode_pos)
-    _ = simulate_dipole(net, tstop=25, n_trials=1)
+    _ = simulate_dipole(net, tstop=5, n_trials=1)
 
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
@@ -216,7 +216,7 @@ def test_rec_array_calculation():
 
     # make sure no sinister segfaults are triggered when running mult. trials
     n_trials = 5  # NB 5 trials!
-    _ = simulate_dipole(net, tstop=25, n_trials=n_trials)
+    _ = simulate_dipole(net, tstop=5, n_trials=n_trials)
 
     # simulate_dipole is run twice above, first 1 then 5 trials.
     # Make sure that previous results are discarded on each run
