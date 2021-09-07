@@ -37,8 +37,7 @@ net = jones_2009_model(params)
 ###############################################################################
 # The in-plane distance between pyramidal cell somas in the network can be set
 # by the user. Note that external drives must be added *after* the distance is
-# set, as the space constants of the synaptic connections must be adjusted
-# accordingly. Here, we add the three evoked 'ERP' drives to the net; see
+# set. Here, we add the three evoked 'ERP' drives to the net; see
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`
 # for details.
 
@@ -64,7 +63,7 @@ net.plot_cells()
 # 'point source approximation' for calculations; see
 # :meth:`hnn_core.Network.add_electrode_array` for details.
 
-depths = list(range(-325, 2150, 25))
+depths = list(range(-325, 2150, 100))
 electrode_pos = [(135, 135, dep) for dep in depths]
 net.add_electrode_array('shank1', electrode_pos)
 
@@ -75,8 +74,7 @@ net.add_electrode_array('shank1', electrode_pos)
 # calculating the extracellular potentials requires additional computational
 # resources and will thus slightly slow down the simulation.
 # :ref:`Using MPI <sphx_glr_auto_examples_plot_simulate_mpi_backend.py>` will
-# speed up computation considerably. Note that we will perform smoothing of the
-# dipole time series during plotting (``postproc=False``)
+# speed up computation considerably.
 print(net.rec_arrays)
 net.plot_cells()
 
@@ -102,14 +100,10 @@ voltage_offset = 50  # the spacing between individual traces
 voltage_scalebar = 200  # can be different from offset
 # we can assign each electrode a unique color using a linear colormap
 colors = plt.get_cmap('cividis', len(electrode_pos))
-# --> XXX just temporary!
-labels = []
-for lidx, dep in enumerate(depths):
-    labels += [dep] if not lidx % 4 else ['']
-# <-- XXX
+
 # use the same smoothing window on the LFP traces to allow comparison to dipole
 net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
-    ax=axs[1], contact_labels=labels, color=colors, decim=decimate, show=False,
+    ax=axs[1], contact_labels=depths, color=colors, decim=decimate, show=False,
     voltage_offset=voltage_offset, voltage_scalebar=voltage_scalebar)
 
 axs[1].grid(True, which='major', axis='x')
