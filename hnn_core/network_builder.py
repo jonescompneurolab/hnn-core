@@ -499,7 +499,7 @@ class NetworkBuilder(object):
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
                             src_gid, deepcopy(nc_dict),
-                            target_cell.synapses[syn_key])
+                            target_cell._nrn_synapses[syn_key])
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):

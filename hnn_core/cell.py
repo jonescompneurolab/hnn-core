@@ -162,10 +162,10 @@ class Cell:
         sections[sec_name] is a dictionary with keys
         L, diam, Ra, cm, syns and mech.
         syns is a list specifying the synapses at that section.
-        The properties of syn are specified in p_syn.
+        The properties of syn are specified in synapses.
         mech is a dict with keys as the mechanism names. The
         values are dictionaries with properties of the mechanism.
-    p_syn : dict of dict
+    synapses : dict of dict
         Keys are name of synaptic mechanism. Each synaptic mechanism
         has keys for parameters of the mechanism, e.g., 'e', 'tau1',
         'tau2'.
@@ -189,8 +189,6 @@ class Cell:
     ----------
     pos : list of length 3
         The position of the cell.
-    synapses : dict
-        The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
     rec_v : h.Vector()
@@ -229,16 +227,16 @@ class Cell:
     }
     """
 
-    def __init__(self, name, pos, sections, p_syn, topology, sect_loc,
+    def __init__(self, name, pos, sections, synapses, topology, sect_loc,
                  gid=None):
         self.name = name
         self.pos = pos
         self.sections = sections
-        self.p_syn = p_syn
+        self.synapses = synapses
         self.topology = topology
         self.sect_loc = sect_loc
         self._nrn_sections = dict()
-        self.synapses = dict()
+        self._nrn_synapses = dict()
         self.dipole_pp = list()
         self.rec_v = h.Vector()
         self.rec_i = dict()
@@ -294,14 +292,14 @@ class Cell:
                     else:
                         setattr(sec, attr, val)
 
-    def _create_synapses(self, sections, p_syn):
+    def _create_synapses(self, sections, synapses):
         """Create synapses."""
         for sec_name in sections:
             for receptor in sections[sec_name]['syns']:
                 syn_key = f'{sec_name}_{receptor}'
                 seg = self._nrn_sections[sec_name](0.5)
-                self.synapses[syn_key] = self.syn_create(
-                    seg, **p_syn[receptor])
+                self._nrn_synapses[syn_key] = self.syn_create(
+                    seg, **synapses[receptor])
 
     def _create_sections(self, sections, topology):
         """Create soma and set geometry.
@@ -369,7 +367,7 @@ class Cell:
         if 'soma' not in self.sections:
             raise KeyError('soma must be defined for cell')
         self._create_sections(self.sections, self.topology)
-        self._create_synapses(self.sections, self.p_syn)
+        self._create_synapses(self.sections, self.synapses)
         self._set_biophysics(self.sections)
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)
@@ -473,15 +471,15 @@ class Cell:
         """
         # a soma exists at self._nrn_sections['soma']
         if record_isoma:
-            # assumes that self.synapses is a dict that exists
-            list_syn_soma = [key for key in self.synapses.keys()
+            # assumes that self._nrn_synapses is a dict that exists
+            list_syn_soma = [key for key in self._nrn_synapses.keys()
                              if key.startswith('soma_')]
             # matching dict from the list_syn_soma keys
             self.rec_i = dict.fromkeys(list_syn_soma)
             # iterate through keys and record currents appropriately
             for key in self.rec_i:
                 self.rec_i[key] = h.Vector()
-                self.rec_i[key].record(self.synapses[key]._ref_i)
+                self.rec_i[key].record(self._nrn_synapses[key]._ref_i)
 
         if record_vsoma:
             self.rec_v.record(self._nrn_sections['soma'](0.5)._ref_v)

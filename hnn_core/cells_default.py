@@ -193,8 +193,8 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
 
     sections = dict()
     sections['soma'] = _get_basket_soma_props(cell_name)
-    p_syn = _get_basket_syn_props()
-    sections['soma']['syns'] = list(p_syn.keys())
+    synapses = _get_basket_syn_props()
+    sections['soma']['syns'] = list(synapses.keys())
     sections['soma']['mechs'] = {'hh2': dict()}
 
     sec_pts, topology = _secs_Basket()
@@ -203,7 +203,7 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
 
     return Cell(cell_name, pos,
                 sections=sections,
-                p_syn=p_syn,
+                synapses=synapses,
                 topology=topology,
                 sect_loc=sect_loc,
                 gid=gid)
@@ -266,7 +266,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
     p_dend = _get_dend_props(p_all, cell_type=cell_name,
                              section_names=section_names,
                              prop_names=prop_names)
-    p_syn = _get_pyr_syn_props(p_all, cell_name)
+    synapses = _get_pyr_syn_props(p_all, cell_name)
     sections = p_dend.copy()
     sections['soma'] = p_soma
     p_mech = _get_mechanisms(p_all, cell_name, ['soma'] + section_names,
@@ -276,7 +276,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         if key == 'soma':
             syns = ['gabaa', 'gabab']
         else:
-            syns = list(p_syn.keys())
+            syns = list(synapses.keys())
             if cell_name == 'L5Pyr':
                 sections[key]['mechs']['ar']['gbar_ar'] = \
                     partial(_exp_g_at_dist, zero_val=1e-6,
@@ -291,7 +291,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
 
     return Cell(cell_name, pos,
                 sections=sections,
-                p_syn=p_syn,
+                synapses=synapses,
                 topology=topology,
                 sect_loc=sect_loc,
                 gid=gid)
