@@ -15,19 +15,19 @@ def test_cell():
 
     name = 'test'
     pos = (0., 0., 0.)
-    p_secs = {'blah': 1}
+    sections = {'blah': 1}
     p_syn = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
     topology = None
     sect_loc = {'proximal': 'soma'}
     # GID is assigned exactly once for each cell, either at initialisation...
-    cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc, gid=42)
+    cell = Cell(name, pos, sections, p_syn, topology, sect_loc, gid=42)
     assert cell.gid == 42
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
     # ... or later
     # cells can exist fine without gid
-    cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc)
+    cell = Cell(name, pos, sections, p_syn, topology, sect_loc)
     assert cell.gid is None  # check that it's initialised to None
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
@@ -37,7 +37,7 @@ def test_cell():
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
         # test init checks gid
-        cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc,
+        cell = Cell(name, pos, sections, p_syn, topology, sect_loc,
                     gid='one')
 
     # test that ExpSyn always takes nrn.Segment, not float
@@ -48,7 +48,7 @@ def test_cell():
     with pytest.raises(KeyError, match='soma must be defined'):
         cell.build()
 
-    p_secs = {
+    sections = {
         'soma':
         {
             'L': 39,
@@ -67,12 +67,12 @@ def test_cell():
             }
         }
     }
-    cell = Cell(name, pos, p_secs, p_syn, topology, sect_loc)
+    cell = Cell(name, pos, sections, p_syn, topology, sect_loc)
     # test successful build
     cell.build()
-    assert 'soma' in cell.sections
-    assert cell.sections['soma'].L == p_secs['soma']['L']
-    assert cell.sections['soma'].gbar_km == p_secs[
+    assert 'soma' in cell._nrn_sections
+    assert cell._nrn_sections['soma'].L == sections['soma']['L']
+    assert cell._nrn_sections['soma'].gbar_km == sections[
         'soma']['mechs']['km']['gbar_km']
     # test building cell with a dipole oriented to a nonexitent section
     with pytest.raises(ValueError, match='sec_name_apical must be an'):
