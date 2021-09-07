@@ -189,6 +189,12 @@ class Cell:
     ----------
     pos : list of length 3
         The position of the cell.
+    sections : nested dict
+        The section parameters. The key is the name of the section
+        and the value is a dictionary parametrizing the morphology
+        of the section and the mechanisms inserted.
+    synapses : dict
+        The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
     rec_v : h.Vector()
