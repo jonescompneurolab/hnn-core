@@ -18,9 +18,10 @@ Simulation (:py:mod:`hnn_core`):
    Network
    Cell
    CellResponse
+   pick_connection
 
-Published Models (:py:mod:`hnn_core`):
---------------------------------------
+Network Models (:py:mod:`hnn_core`):
+------------------------------------
 
 .. currentmodule:: hnn_core
 
@@ -29,18 +30,16 @@ Published Models (:py:mod:`hnn_core`):
 
    jones_2009_model
    law_2021_model
+   calcium_model
 
-Unpublished Models (:py:mod:`hnn_core`):
-----------------------------------------
-.. currentmodule:: hnn_core
+Optimization (:py:mod:`hnn_core.optimization`):
+-----------------------------------------------
+
+.. currentmodule:: hnn_core.optimization
 
 .. autosummary::
    :toctree: generated/
 
-   calcium_model
-
-Optimization (:py:mod:`hnn_core`):
-----------------------------------
    optimize_evoked
 
 Dipole (:py:mod:`hnn_core.dipole`):

@@ -20,6 +20,12 @@ from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
 
 import sphinx_bootstrap_theme
 
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+curdir = os.path.dirname(__file__)
+sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'hnn_core')))
+sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 
 # -- Project information -----------------------------------------------------
 
@@ -48,7 +54,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'numpydoc'
+    'numpydoc',
+    'gh_substitutions', # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
 # generate autosummary even if no references
