@@ -141,7 +141,67 @@ def test_network():
                    'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
                    't0_input_prox': 50})
 
-    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
+    net = jones_2009_model(deepcopy(params), add_drives_from_params=False)
+
+    # add all drives explicitly and ensure that the expected number of drive
+    # cells get instantiated for each case
+    n_drive_cells_list = list()
+
+    weights_ampa_d1 = {'L2_basket': 0.006562,
+                       'L2_pyramidal': 7e-6,
+                       'L5_pyramidal': 0.142300}
+    weights_nmda_d1 = {'L2_basket': 0.019482,
+                       'L2_pyramidal': 0.004317,
+                       'L5_pyramidal': 0.080074}
+    synaptic_delays_d1 = {'L2_basket': 0.1,
+                          'L2_pyramidal': 0.1,
+                          'L5_pyramidal': 0.1}
+    n_drive_cells = 'n_cells'
+    n_drive_cells_list.append(n_drive_cells)
+    net.add_evoked_drive(
+        name='evdist1',
+        mu=63.53,
+        sigma=3.85,
+        numspikes=1,
+        location='distal',
+        n_drive_cells=n_drive_cells,
+        cell_specific=True,
+        weights_ampa=weights_ampa_d1,
+        weights_nmda=weights_nmda_d1,
+        synaptic_delays=synaptic_delays_d1,
+        seedcore=4)
+
+    weights_ampa_d2 = {'L2_basket': 0.006562,
+                       'L2_pyramidal': 7e-6,
+                       'L5_basket': 0.01,
+                       'L5_pyramidal': 0.142300}
+    weights_nmda_d2 = {'L2_basket': 0.019482,
+                       'L2_pyramidal': 0.004317,
+                       'L5_basket': 0.001,
+                       'L5_pyramidal': 0.080074}
+    synaptic_delays_d2 = {'L2_basket': 0.1,
+                          'L2_pyramidal': 0.1,
+                          'L5_basket': 0.1,
+                          'L5_pyramidal': 0.1}
+    n_drive_cells = 10
+    n_drive_cells_list.append(n_drive_cells)
+    net.add_bursty_drive(
+        name='bursty1',
+        tstart=10.,
+        tstart_std=0.5,
+        tstop=30.,
+        location='proximal',
+        burst_rate=100.,
+        burst_std=0.,
+        numspikes=2,
+        spike_isi=1.,
+        n_drive_cells=n_drive_cells,
+        cell_specific=False,
+        weights_ampa=weights_ampa_d2,
+        weights_nmda=weights_nmda_d2,
+        synaptic_delays=synaptic_delays_d2,
+        seedcore=4)
+
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
@@ -163,7 +223,7 @@ def test_network():
         assert len(net.gid_ranges[dn]) == n_drive_cells
 
     # Check drive dict structure for each external drive
-    for drive in net.external_drives.values():
+    for drive_idx, drive in enumerate(net.external_drives.values()):
         # Check that connectivity sources correspond to gid_ranges
         conn_idxs = pick_connection(net, src_gids=drive['name'])
         this_src_gids = set([gid for conn_idx in conn_idxs
@@ -172,6 +232,8 @@ def test_network():
         assert sorted(this_src_gids) == list(net.gid_ranges[drive['name']])
         # Check type-specific dynamics and events
         n_drive_cells = drive['n_drive_cells']
+        if n_drive_cells_list[drive_idx] != 'n_cells':
+            assert n_drive_cells_list[drive_idx] == n_drive_cells
         assert len(drive['events']) == 1  # single trial simulated
         if drive['type'] == 'evoked':
             for kw in ['mu', 'sigma', 'numspikes']:
@@ -529,7 +591,7 @@ def test_network():
 def test_add_cell_type():
     """Test adding a new cell type."""
     params = read_params(params_fname)
-    net = jones_2009_model(params)
+    net = jones_2009_model(params, add_drives_from_params=False)
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
@@ -565,7 +627,7 @@ def test_tonic_biases():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    net = Network(params, add_drives_from_params=True)
+    net = Network(params, add_drives_from_params=False)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
                            t0=0.0, tstop=4.0)
