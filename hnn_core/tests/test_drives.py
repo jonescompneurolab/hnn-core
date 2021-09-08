@@ -8,8 +8,8 @@ import numpy as np
 
 import hnn_core
 from hnn_core import Params, Network, read_params
-from hnn_core.drives import (_drive_cell_event_times, _get_prng, _create_extpois,
-                             _create_bursty_input)
+from hnn_core.drives import (_drive_cell_event_times, _get_prng,
+                             _create_extpois, _create_bursty_input)
 from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
@@ -36,17 +36,15 @@ def test_external_drive_times():
     dynamics = drive_specs['extpois']['dynamics']
     with pytest.raises(ValueError, match='The end time for Poisson input'):
         dynamics['tstop'] = -1
-        event_times = _drive_cell_event_times(
-            drive_type=drive_type,
-            dynamics = dynamics,
-            tstop = tstop)
+        event_times = _drive_cell_event_times(drive_type=drive_type,
+                                              dynamics=dynamics,
+                                              tstop=tstop)
     with pytest.raises(ValueError, match='The start time for Poisson'):
         dynamics['tstop'] = tstop
         dynamics['tstart'] = -1
-        event_times = _drive_cell_event_times(
-            drive_type=drive_type,
-            dynamics = dynamics,
-            tstop = tstop)
+        event_times = _drive_cell_event_times(drive_type=drive_type,
+                                              dynamics=dynamics,
+                                              tstop=tstop)
 
     # checks the poisson spike train generation
     prng = np.random.RandomState()
