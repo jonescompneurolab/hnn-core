@@ -803,7 +803,8 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
             # Identical calculation used in Cell.par_connect_from_src()
             if show_weight:
                 weight, _ = _get_gaussian_connection(
-                    src_pos, target_pos, nc_dict)
+                    src_pos, target_pos, nc_dict,
+                    inplane_distance=net.inplane_distance)
             else:
                 weight = 1.0
 
@@ -837,7 +838,8 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
 
 
 def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
-                        src_range, target_range, nc_dict, colormap):
+                        src_range, target_range, nc_dict, colormap,
+                        inplane_distance):
     from .cell import _get_gaussian_connection
 
     # Extract indeces to get position in network
@@ -854,7 +856,8 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
         target_pos = target_type_pos[target_idx]
         target_x_pos.append(target_pos[0])
         target_y_pos.append(target_pos[1])
-        weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict)
+        weight, _ = _get_gaussian_connection(src_pos, target_pos, nc_dict,
+                                             inplane_distance)
         weights.append(weight)
 
     ax.clear()
@@ -955,7 +958,8 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
     im = _update_target_plot(ax, conn, src_gid, src_type_pos,
                              target_type_pos, src_range,
-                             target_range, nc_dict, colormap)
+                             target_range, nc_dict, colormap,
+                             net.inplane_distance)
 
     x_src = src_type_pos[:, 0]
     y_src = src_type_pos[:, 1]
@@ -984,7 +988,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
             return
         _update_target_plot(ax, conn, src_gid, src_type_pos,
                             target_type_pos, src_range, target_range,
-                            nc_dict, colormap)
+                            nc_dict, colormap, net.inplane_distance)
 
         fig.canvas.draw()
 

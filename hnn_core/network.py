@@ -443,12 +443,6 @@ class Network(object):
             raise ValueError('In-plane distance must be positive definite, '
                              f'got: {new_dist}')
 
-        # Adjust the lamtha of all cells; note that this would have no effect
-        # on external drives, since the event times there are calculated when
-        # the drives are attached.
-        for conn in self.connectivity:
-            conn['nc_dict']['lamtha'] *= new_dist / self._inplane_distance
-
         self._inplane_distance = new_dist
         self._reset_cell_positions()
 
@@ -867,9 +861,6 @@ class Network(object):
         pos = [self.pos_dict['origin']] * n_drive_cells
         self._add_cell_type(name, pos)
 
-        # space_constant is unitless, scale here to reflect in-plance dist.
-        scaled_space_constant = space_constant * self._inplane_distance
-
         # Set the starting index for cell-specific source gids
         # This will be updated depending on the number of target cells
         # of each cell type
@@ -888,13 +879,13 @@ class Network(object):
                     weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(src_gids, target_gids_nested,
                                         location, receptor, weights, delays,
-                                        scaled_space_constant)
+                                        space_constant)
             else:
                 for receptor in weights_by_type[target_cell_type]:
                     weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(name, target_gids, location,
                                         receptor, weights, delays,
-                                        scaled_space_constant)
+                                        space_constant)
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()

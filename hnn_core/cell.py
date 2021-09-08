@@ -54,7 +54,8 @@ def _calculate_gaussian(x_val, height, lamtha):
     return x_height
 
 
-def _get_gaussian_connection(src_pos, target_pos, nc_dict):
+def _get_gaussian_connection(src_pos, target_pos, nc_dict,
+                             inplane_distance=1.):
     """Calculate distance dependent connection properties.
 
     Parameters
@@ -66,6 +67,9 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict):
     nc_dict : dict
         Dictionary with keys: pos_src, A_weight, A_delay, lamtha
         Defines the connection parameters
+    inplane_distance : float
+        The in plane-distance (in um) between pyramidal cell somas in the
+        square grid. Default: 1.0 um.
 
     Returns
     -------
@@ -81,11 +85,12 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict):
     x_dist = target_pos[0] - src_pos[0]
     y_dist = target_pos[1] - src_pos[1]
     cell_dist = np.sqrt(x_dist**2 + y_dist**2)
+    scaled_lamtha = nc_dict['lamtha'] * inplane_distance
 
     weight = _calculate_gaussian(
-        cell_dist, nc_dict['A_weight'], nc_dict['lamtha'])
+        cell_dist, nc_dict['A_weight'], scaled_lamtha)
     delay = nc_dict['A_delay'] / _calculate_gaussian(
-        cell_dist, 1, nc_dict['lamtha'])
+        cell_dist, 1, scaled_lamtha)
     return weight, delay
 
 
@@ -531,7 +536,8 @@ class Cell:
         nc.threshold = threshold
         return nc
 
-    def parconnect_from_src(self, gid_presyn, nc_dict, postsyn):
+    def parconnect_from_src(self, gid_presyn, nc_dict, postsyn,
+                            inplane_distance):
         """Parallel receptor-centric connect FROM presyn TO this cell,
            based on GID.
 
@@ -544,6 +550,9 @@ class Cell:
             Defines the connection parameters
         postsyn : instance of h.Exp2Syn
             The postsynaptic cell object.
+        inplane_distance : float
+            The in plane-distance (in um) between pyramidal cell somas in the
+            square grid.
 
         Returns
         -------
@@ -557,7 +566,8 @@ class Cell:
         # set props here.
         nc.threshold = nc_dict['threshold']
         nc.weight[0], nc.delay = _get_gaussian_connection(
-            nc_dict['pos_src'], self.pos, nc_dict)
+            nc_dict['pos_src'], self.pos, nc_dict,
+            inplane_distance=inplane_distance)
 
         return nc
 
