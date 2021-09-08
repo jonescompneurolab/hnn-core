@@ -14,83 +14,120 @@ Current
 
 Changelog
 ~~~~~~~~~
-- Store all connectivity information under :attr:`~hnn_core.Network.connectivity` before building the network, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
+- Store all connectivity information under :attr:`~hnn_core.Network.connectivity` before building
+  the network, by `Nick Tolley`_ in :gh:`276`
 
-- Add new function :func:`~hnn_core.viz.plot_cell_morphology` to visualize cell morphology, by `Mainak Jas`_ in `#319 <https://github.com/jonescompneurolab/hnn-core/pull/319>`_
+- Add new function :func:`~hnn_core.viz.plot_cell_morphology` to visualize cell morphology, 
+  by `Mainak Jas`_ in :gh:`319`
 
-- Compute dipole component in z-direction automatically from cell morphology instead of hard coding, by `Mainak Jas`_ in  `#327 <https://github.com/jonescompneurolab/hnn-core/pull/327>`_
+- Compute dipole component in z-direction automatically from cell morphology instead of hard coding,
+  by `Mainak Jas`_ in  :gh:`327`
 
-- Store :class:`~hnn_core.Cell` instances in :class:`~hnn_core.Network`'s :attr:`~/hnn_core.Network.cells` attribute by `Ryan Thorpe`_ in `#321 <https://github.com/jonescompneurolab/hnn-core/pull/321>`_
+- Store :class:`~hnn_core.Cell` instances in :class:`~hnn_core.Network`'s :attr:`~/hnn_core.Network.cells`
+  attribute by `Ryan Thorpe`_ in :gh:`321`
 
-- Add probability argument to :func:`~hnn_core.Network.add_connection`. Connectivity patterns can also be visualized with :func:`~hnn_core.viz.plot_connectivity_matrix`, by `Nick Tolley`_ in `#318 <https://github.com/jonescompneurolab/hnn-core/pull/318>`_
+- Add probability argument to :func:`~hnn_core.Network.add_connection`. Connectivity patterns can also
+  be visualized with :func:`~hnn_core.viz.plot_connectivity_matrix`, by `Nick Tolley`_ in :gh:`318`
 
-- Add function to visualize connections originating from individual cells :func:`~hnn_core.viz.plot_cell_connectivity`, by `Nick Tolley`_ in `#339 <https://github.com/jonescompneurolab/hnn-core/pull/339>`_
+- Add function to visualize connections originating from individual cells :func:`~hnn_core.viz.plot_cell_connectivity`,
+  by `Nick Tolley`_ in :gh:`339`
 
-- Add method for calculating extracellular potentials using electrode arrays :func:`~hnn_core.Network.add_electrode_array` that are stored under ``net.rec_array`` as a dictionary of :class:`hnn_core.extracellular.ExtracellularArray` containers, by `Mainak Jas`_, `Nick Tolley`_ and `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
+- Add method for calculating extracellular potentials using electrode arrays
+  :func:`~hnn_core.Network.add_electrode_array` that are stored under ``net.rec_array`` as a dictionary
+  of :class:`~hnn_core.extracellular.ExtracellularArray` containers, by `Mainak Jas`_,
+  `Nick Tolley`_ and `Christopher Bailey`_ in :gh:`329`
 
-- Add function to visualize extracellular potentials from laminar array simulations, by `Christopher Bailey`_ in `#329 <https://github.com/jonescompneurolab/hnn-core/pull/329>`_
+- Add function to visualize extracellular potentials from laminar array simulations,
+  by `Christopher Bailey`_ in :gh:`329`
 
-- Previously published models can now be loaded via ``net=law_2021_model()`` and ``jones_2009_model()``, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/348>`_
+- Previously published models can now be loaded via :func:`~hnn_core.law_2021_model()`
+  and :func:`~hnn_core.jones_2009_model()`, by `Nick Tolley`_ in :gh:`348`
 
-- Add ability to interactivity explore connections in :func:`~hnn_core.viz.plot_cell_connectivity` by `Mainak Jas`_ in `#376 <https://github.com/jonescompneurolab/hnn-core/pull/376>`_
+- Add ability to interactivity explore connections in :func:`~hnn_core.viz.plot_cell_connectivity`
+  by `Mainak Jas`_ in :gh:`376`
 
-- Add ``calcium_model`` with a distance dependent calcium channel conductivity, by `Nick Tolley`_ in `#348 <https://github.com/jonescompneurolab/hnn-core/pull/333>`_
+- Add :func:`~hnn_core.calcium_model` with a distance dependent calcium channel conductivity,
+  by `Nick Tolley`_ in :gh:`348`
 
-- Each drive spike train sampled through an independent process corresponds to a single artificial drive cell, the number of which users can set when adding drives with `n_drive_cells` and `cell_specific`, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
+- Each drive spike train sampled through an independent process corresponds to a single artificial
+  drive cell, the number of which users can set when adding drives with ``n_drive_cells`` and
+  ``cell_specific``, by `Ryan Thorpe`_ in :gh:`383`
 
-- Add :func:`~hnn_core.Network.pick_connection` to query the indices of specific connections in :attr:`~hnn_core.Network.connectivity`, by `Nick Tolley`_ in `#367 <https://github.com/jonescompneurolab/hnn-core/pull/367>`_
+- Add :func:`~hnn_core.pick_connection` to query the indices of specific connections in
+  :attr:`~hnn_core.Network.connectivity`, by `Nick Tolley`_ in :gh:`367`
 
-- Drives in :attr:`~hnn_core.Network.external_drives` no longer contain a `'conn'` key and the :attr:`~hnn_core.Network.connectivity` list contains more items when adding drives from a param file or when in legacy mode, by `Ryan Thorpe`_, `Mainak Jas`_, and `Nick Tolley`_ in `#369 <https://github.com/jonescompneurolab/hnn-core/pull/369>`_
+- Drives in :attr:`~hnn_core.Network.external_drives` no longer contain a `'conn'` key and the
+  :attr:`~hnn_core.Network.connectivity` list contains more items when adding drives from a param
+  file or when in legacy mode, by `Ryan Thorpe`_, `Mainak Jas`_, and `Nick Tolley`_ in :gh:`369`
 
-- Add :func:`~hnn_core.optimize_evoked` to optimize the timing and weights of driving inputs for simulating
-  evoked responses, by `Blake Caldwell`_ and `Mainak Jas`_ in `#77 <https://github.com/jonescompneurolab/hnn-core/pull/77>`_
+- Add :func:`~hnn_core.optimization.optimize_evoked` to optimize the timing and weights of driving
+  inputs for simulating evoked responses, by `Blake Caldwell`_ and `Mainak Jas`_ in :gh:`77`
 
 - Add method for setting in-plane cell distances and layer separation in the network :func:`~hnn_core.Network.set_cell_positions`, by `Christopher Bailey`_ in `#370 <https://github.com/jonescompneurolab/hnn-core/pull/370>`_
 
 Bug
 ~~~
 
-- Remove rounding error caused by repositioning of NEURON cell sections, by `Mainak Jas`_ and `Ryan Thorpe`_ in `#314 <https://github.com/jonescompneurolab/hnn-core/pull/314>`_
+- Remove rounding error caused by repositioning of NEURON cell sections, by `Mainak Jas`_ 
+  and `Ryan Thorpe`_ in :gh:`314`
 
-- Fix issue where common drives use the same parameters for all cell types, by `Nick Tolley`_ in `#350 <https://github.com/jonescompneurolab/hnn-core/pull/350>`_
+- Fix issue where common drives use the same parameters for all cell types, by `Nick Tolley`_
+  in :gh:`350`
 
-- Fix bug where depth of L5 and L2 cells were swapped, by `Christopher Bailey`_ in `#352 <https://github.com/jonescompneurolab/hnn-core/pull/352>`_
+- Fix bug where depth of L5 and L2 cells were swapped, by `Christopher Bailey`_ in :gh:`352`
 
-- Fix bug where :func:`~hnn_core.average_dipole` failed when there were less than two dipoles in the input dipole list, by `Kenneth Loi`_ in `#368 <https://github.com/jonescompneurolab/hnn-core/pull/368>`_
+- Fix bug where :func:`~hnn_core.dipole.average_dipoles` failed when there were less than two dipoles in the
+  input dipole list, by `Kenneth Loi`_ in :gh:`368`
 
-- Fix bug where :func:`~hnn_core.read_spikes` wasn't returning a :class:`~hnn_core.CellResponse` instance with updated spike types, by `Ryan Thorpe`_ in `#382 <https://github.com/jonescompneurolab/hnn-core/pull/382>`_
+- Fix bug where :func:`~hnn_core.read_spikes` wasn't returning a :class:`~hnn_core.CellResponse` instance
+  with updated spike types, by `Ryan Thorpe`_ in :gh:`382`
 
-- :attr:`~hnn_core.Dipole.times` and :attr:`~hnn_core.Cell_response.times` now reflect the actual integration points instead of the intended times, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+- :attr:`Dipole.times` and :attr:`Cell_response.times` now reflect the actual
+  integration points instead of the intended times, by `Mainak Jas`_ in :gh:`397`
 
-- Fix overlapping non-cell-specific drive gid assignment over different ranks in `~hnn_core.MPIBackend`, by `Ryan Thorpe`_ and `Mainak Jas`_ in `#399 <https://github.com/jonescompneurolab/hnn-core/pull/399>`_
+- Fix overlapping non-cell-specific drive gid assignment over different ranks in `~hnn_core.MPIBackend`, by `Ryan Thorpe`_
+  and `Mainak Jas`_ in :gh:`399`
 
-- Allow :func:`~hnn_core.read_dipoles` to read dipole from a file with only two columns (`times` and `data`), by `Mainak Jas`_ in `#421 <https://github.com/jonescompneurolab/hnn-core/pull/421>`_
+- Allow :func:`~hnn_core.read_dipoles` to read dipole from a file with only two columns
+  (``times`` and ``data``), by `Mainak Jas`_ in :gh:`421`
 
 API
 ~~~
-- New API for defining cell-cell connections. Custom connections can be added with :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in `#276 <https://github.com/jonescompneurolab/hnn-core/pull/276>`_
+- New API for defining cell-cell connections. Custom connections can be added with
+  :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in :gh:`276`
 
-- Remove :class:`~hnn_core.L2Pyr`, :class:`~hnn_core.L5Pyr`, :class:`~hnn_core.L2Basket`, and :class:`~hnn_core.L5Basket` classes
-  in favor of instantation through functions and a more consistent :class:`~hnn_core.Cell` class by `Mainak Jas`_ in  `#322 <https://github.com/jonescompneurolab/hnn-core/pull/320>`_
+- Remove :class:`~hnn_core.L2Pyr`, :class:`~hnn_core.L5Pyr`, :class:`~hnn_core.L2Basket`,
+  and :class:`~hnn_core.L5Basket` classes in favor of instantation through functions and
+  a more consistent :class:`~hnn_core.Cell` class by `Mainak Jas`_ in  :gh:`322`
 
-- Remove parameter `distribution` in :func:`~hnn_core.Network.add_bursty_drive`. The distribution is now Gaussian by default, by `Mainak Jas`_ in `#330 <https://github.com/jonescompneurolab/hnn-core/pull/330>`_
+- Remove parameter ``distribution`` in :func:`~hnn_core.Network.add_bursty_drive`.
+  The distribution is now Gaussian by default, by `Mainak Jas`_ in :gh:`330`
 
-- New API for accessing and modifying :class:`~hnn_core.Cell` attributes (e.g., synapse and biophysics parameters) as cells are now instantiated from template cells specified
-  in a :class:`~hnn_core.Network` instance's :attr:`~/hnn_core.Network.cell_types` attribute by `Ryan Thorpe`_ in `#321 <https://github.com/jonescompneurolab/hnn-core/pull/321>`_
+- New API for accessing and modifying :class:`~hnn_core.Cell` attributes (e.g., synapse and biophysics parameters)
+  as cells are now instantiated from template cells specified in a :class:`~hnn_core.Network`
+  instance's :attr:`~/hnn_core.Network.cell_types` attribute by `Ryan Thorpe`_ in :gh:`321`
 
-- New API for network creation. The default network is now created with ``net = jones_2009_model(params)``, by `Nick Tolley`_ in `#318 <https://github.com/jonescompneurolab/hnn-core/pull/318>`_
+- New API for network creation. The default network is now created with
+  ``net = jones_2009_model(params)``, by `Nick Tolley`_ in :gh:`318`
 
-- Replace parameter `T` with `tstop` in :func:`~hnn_core.Network.add_tonic_bias` and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and improve readability, by `Kenneth Loi`_ in `#354 <https://github.com/jonescompneurolab/hnn-core/pull/354>`_
+- Replace parameter ``T`` with ``tstop`` in :func:`~hnn_core.Network.add_tonic_bias`
+  and :func:`~hnn_core.Cell.create_tonic_bias` to be more consistent with other functions and
+  improve readability, by `Kenneth Loi`_ in :gh:`354`
 
-- Deprecated `postproc` argument in :func:`~hnn_core.dipole.simulate_dipole`, whereby user should explicitly smooth and scale resulting dipoles, by `Christopher Bailey`_ in `#372 <https://github.com/jonescompneurolab/hnn-core/pull/372>`_
+- Deprecated ``postproc`` argument in :func:`~hnn_core.dipole.simulate_dipole`, whereby user should
+  explicitly smooth and scale resulting dipoles, by `Christopher Bailey`_ in :gh:`372`
 
-- Number of drive cells and their connectivity can now be specified through the `n_drive_cells` and `cell_specific` arguments in `Network.add_xxx_drive()` methods, replacing use of `repeats` and `sync_within_trial`, by `Ryan Thorpe`_ in `#383 <https://github.com/jonescompneurolab/hnn-core/pull/383>`_
+- Number of drive cells and their connectivity can now be specified through the ``n_drive_cells``
+  and ``cell_specific`` arguments in ``Network.add_xxx_drive()`` methods, replacing use of ``repeats``
+  and ``sync_within_trial``, by `Ryan Thorpe`_ in :gh:`383`
 
-- Simulation end time and integration time have to be specified now with `tstop` and `dt` in :func:`~hnn_core.simulate_dipole`, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+- Simulation end time and integration time have to be specified now with ``tstop`` and ``dt`` in
+  :func:`~hnn_core.simulate_dipole`, by `Mainak Jas`_ in :gh:`397`
 
-- `~hnn_core.CellResponse.reset` method is not supported any more, by `Mainak Jas`_ in `#397 <https://github.com/jonescompneurolab/hnn-core/pull/397>`_
+- :meth:`CellResponse.reset` method is not supported any more, by `Mainak Jas`_ in :gh:`397`
 
-- Target cell types and their connections are created for each drive according to the synaptic weight and delay dictionaries assigned in `Network.add_xxx_drive()`, by `Ryan Thorpe`_ in `#369 <https://github.com/jonescompneurolab/hnn-core/pull/369>`_
+- Target cell types and their connections are created for each drive according to the synaptic weight
+  and delay dictionaries assigned in ``Network.add_xxx_drive()``, by `Ryan Thorpe`_ in :gh:`369`
 
 .. _0.1:
 
