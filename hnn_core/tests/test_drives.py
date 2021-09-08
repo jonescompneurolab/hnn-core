@@ -8,9 +8,9 @@ import numpy as np
 
 import hnn_core
 from hnn_core import Params, Network, read_params
-from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
+from hnn_core.drives import (_drive_cell_event_times, _get_prng, _create_extpois,
                              _create_bursty_input)
-from hnn_core.params import create_pext
+from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
@@ -20,54 +20,33 @@ def test_external_drive_times():
     """Test the different external drives."""
 
     params = Params()
-    p_common, p_unique = create_pext(params,
-                                     params['tstop'])
+    cellname_list = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
+    drive_specs = _extract_drive_specs_from_hnn_params(params, cellname_list)
 
-    # drive name must be valid and unambiguous
-    p_bogus = {'prng_seedcore': 0}
-    pytest.raises(ValueError, drive_event_times,
-                  'invalid_drive', None, p_bogus, 0)
-    pytest.raises(ValueError, drive_event_times,
-                  'ev', None, p_bogus, 0)  # ambiguous
-
-    # 'unique' external drives are always created
-    for drive_type in ['extpois', 'extgauss']:
-        event_times = drive_event_times(
-            drive_type=drive_type,
-            target_cell_type='L2_basket',
-            params=p_unique[drive_type],
-            gid=0)
-
-    # but 'common' (rhythmic) drives are not
-    for ii in range(len(p_common)):  # len == 0 for def. params
-        event_times = drive_event_times(
-            drive_type='common',
-            target_cell_type=None,
-            params=p_common[ii],
-            gid=0)
-        # parameters should lead to 0 input spikes for default params
-        assert len(event_times) == 0
-        # check that ei.p_ext matches params
-        loc = p_common[ii]['loc'][:4]  # loc=prox or dist
-        for layer in ['L2', 'L5']:
-            key = 'input_{}_A_weight_{}Pyr_ampa'.format(loc, layer)
-            assert p_common[ii][layer + 'Pyr_ampa'][0] == params[key]
+    drive_type = 'invalid_drive'
+    dynamics = dict(mu=5, sigma=0.5, numspikes=1)
+    tstop = 10
+    pytest.raises(ValueError, _drive_cell_event_times,
+                  'invalid_drive', dynamics, tstop)
+    pytest.raises(ValueError, _drive_cell_event_times,
+                  'ss', dynamics, tstop)  # ambiguous
 
     # validate poisson input time interval
-    p_extpois = p_unique['extpois']
-    p_extpois['L2_basket'] = (1., 1., 0., 0.)
+    drive_type = 'poisson'
+    dynamics = drive_specs['extpois']['dynamics']
     with pytest.raises(ValueError, match='The end time for Poisson input'):
-        p_extpois['t_interval'] = (p_extpois['t_interval'][0], -1)
-        event_times = drive_event_times(
-            drive_type='extpois',
-            target_cell_type='L2_basket',
-            params=p_extpois, gid=0)
+        dynamics['tstop'] = -1
+        event_times = _drive_cell_event_times(
+            drive_type=drive_type,
+            dynamics = dynamics,
+            tstop = tstop)
     with pytest.raises(ValueError, match='The start time for Poisson'):
-        p_extpois['t_interval'] = (-1, 5)
-        event_times = drive_event_times(
-            drive_type='extpois',
-            target_cell_type='L2_basket',
-            params=p_extpois, gid=0)
+        dynamics['tstop'] = tstop
+        dynamics['tstart'] = -1
+        event_times = _drive_cell_event_times(
+            drive_type=drive_type,
+            dynamics = dynamics,
+            tstop = tstop)
 
     # checks the poisson spike train generation
     prng = np.random.RandomState()
