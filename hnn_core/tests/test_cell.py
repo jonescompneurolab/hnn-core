@@ -3,7 +3,8 @@ import pickle
 
 import matplotlib
 
-from hnn_core.network_builder import load_custom_mechanisms
+from hnn_core.network_builder import NetworkBuilder, load_custom_mechanisms
+from hnn_core.network_models import jones_2009_model
 from hnn_core.cell import _ArtificialCell, Cell
 
 matplotlib.use('agg')
@@ -68,6 +69,15 @@ def test_cell():
         }
     }
     cell = Cell(name, pos, sections, synapses, topology, sect_loc)
+
+    # check that length or other attributes of net.cell_types
+    # can be updated
+    net = jones_2009_model()
+    net._add_cell_type('mycell', pos=[(0., 0., 0.)], cell_template=cell.copy())
+    net.cell_types['mycell'].sections['soma']['L'] = 63.
+    nrn_net = NetworkBuilder(net)
+    assert nrn_net.net.cells['mycell'][0]._nrn_sections['soma'].L == 63.
+
     # test successful build
     cell.build()
     assert 'soma' in cell._nrn_sections
