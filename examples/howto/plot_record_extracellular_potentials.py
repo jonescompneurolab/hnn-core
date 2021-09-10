@@ -32,17 +32,22 @@ from hnn_core.network_models import add_erp_drives_to_jones_model
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 params = read_params(params_fname)
-net = jones_2009_model(params)
 
 ###############################################################################
-# The in-plane distance between pyramidal cell somas in the network can be set
-# by the user. Note that external drives must be added *after* the distance is
-# set. Here, we add the three evoked 'ERP' drives to the net; see
+# The default network model defined in Jones et al. (2009) [1]_ consists of a
+# square grid of pyramidal cells. The in-plane distance between pyramidal cell
+# somas on the grid can be set by the user, which will have an influence on the
+# extracellular potentials (but not on the calculated net intracellular dipole
+# moment). In this example, we'll simulate a network of model cells spaced
+# 30 um apart. To drive the network dynamics, we'll use three evoked 'ERP'
+# drives; see
 # :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`
 # for details.
 
-net.inplane_distance = 30.
+net = jones_2009_model(params)
 add_erp_drives_to_jones_model(net)
+
+net.set_cell_positions(inplane_distance=30.)
 
 ###############################################################################
 # Extracellular recordings require specifying the electrode postions. It can be
@@ -54,7 +59,7 @@ net.plot_cells()
 # The default network consists of 2 layers (L2 and L5), within which the cell
 # somas are arranged in a regular grid, and apical dendrites are aligned along
 # the z-axis. We can simulate a linear multielectrode array with 100 um
-# intercontact spacing [1]_ by specifying a list of (x, y, z) coordinate
+# intercontact spacing [2]_ by specifying a list of (x, y, z) coordinate
 # triplets. The L5 pyramidal cell somas are at z=0 um, with apical dendrites
 # extending up to z~2000 um. L2 pyramidal cell somas reside at
 # z~1300 um, and have apical dendrites extending to z~2300 um. We'll place the
@@ -116,5 +121,8 @@ plt.show()
 ###############################################################################
 # References
 # ----------
-# .. [1] Kajikawa, Y. & Schroeder, C. E. How local is the local field
+# .. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
+#    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
+#    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
+# .. [2] Kajikawa, Y. & Schroeder, C. E. How local is the local field
 #        potential? Neuron 72, 847–858 (2011).
