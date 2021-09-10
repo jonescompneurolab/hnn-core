@@ -870,7 +870,11 @@ class Network(object):
         # This will be updated depending on the number of target cells
         # of each cell type
         src_idx = 0
-        for target_cell_type in target_populations:
+
+        # seed_increment increased by 1 for each target cell type,
+        # added to conn_seed to ensure statistical independence of random
+        # connections when probability < 1.0
+        for seed_increment, target_cell_type in enumerate(target_populations):
             target_gids = list(self.gid_ranges[target_cell_type])
             delays = delays_by_type[target_cell_type]
             probability = probability_by_type[target_cell_type]
@@ -881,21 +885,35 @@ class Network(object):
                 src_gids = (list(self.gid_ranges[name])
                             [src_idx:src_idx_end])
                 src_idx = src_idx_end
-                for receptor in weights_by_type[target_cell_type]:
+                for receptor_idx, receptor in enumerate(
+                        weights_by_type[target_cell_type]):
                     weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(
                         src_gids=src_gids, target_gids=target_gids_nested,
                         loc=location, receptor=receptor, weight=weights,
                         delay=delays, lamtha=space_constant,
-                        probability=probability, conn_seed=drive['conn_seed'])
+                        probability=probability,
+                        conn_seed=drive['conn_seed'] + seed_increment)
+                    # Ensure that AMPA/NMDA connections target the same gids
+                    if receptor_idx > 0:
+                        self.connectivity[-1]['src_gids'] = \
+                            self.connectivity[-2]['src_gids']
+
             else:
-                for receptor in weights_by_type[target_cell_type]:
+                for receptor_idx, receptor in enumerate(
+                        weights_by_type[target_cell_type]):
                     weights = weights_by_type[target_cell_type][receptor]
                     self.add_connection(
                         src_gids=name, target_gids=target_gids, loc=location,
                         receptor=receptor, weight=weights, delay=delays,
                         lamtha=space_constant, probability=probability,
-                        conn_seed=drive['conn_seed'])
+                        conn_seed=drive['conn_seed'] + seed_increment)
+                    # Ensure that AMPA/NMDA connections target the same gids
+                    if receptor_idx > 0:
+                        self.connectivity[-1]['src_gids'] = \
+                            self.connectivity[-2]['src_gids']
+
+            seed_increment += 1
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
