@@ -32,7 +32,6 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         The number of Pyramidal cells in x direction.
     n_pyr_y : int
         The number of Pyramidal cells in y direction.
-
     zdiff : float
         Expressed as a positive DEPTH of L2 relative to L5 pyramidal cell
         somas, where L5 is defined to lie at z==0. Interlaminar weight/delay
@@ -408,45 +407,56 @@ class Network(object):
         return '<%s | %s>' % (class_name, s)
 
     def set_cell_positions(self, *, n_pyr_x=10, n_pyr_y=10,
-                           layer_separation=1307.4, inplane_distance=1.):
+                           inplane_distance=1., layer_separation=1307.4):
         """Set relative positions of cells arranged in a square grid
 
         All ``hnn_core``-models are organised in a square grid of
-        ``n_pyr_x x n_pyr_y` pyramidal cells. Basket cells are included at a
+        ``n_pyr_x X n_pyr_y` pyramidal cells. Basket cells are included at a
         ratio of ``1:3``. The separation between L2 and L5 layers and the
         distance between grid points (i.e., pyramidal cells) can be adjusted.
 
         Parameters
         ----------
-        inplane_distance : float (settable)
+        n_pyr_x : int
+            The number of Pyramidal cells in the x direction.
+        n_pyr_y : int
+            The number of Pyramidal cells in the y direction.
+        inplane_distance : float
             The in plane-distance (in um) between pyramidal cell somas in the
             square grid. Note that this parameter does not affect the amplitude
             of the dipole moment. Default: 1.0 um.
-        layer_separation : float (settable)
+        layer_separation : float
             The default separation of pyramidal cell somas in layers 2/3 and 5
             is 1307.4 um. Note that this parameter does not affect the
             amplitude of the dipole moment.
         """
-        if len(self.external_drives) > 0:
-            raise RuntimeError('Distances between network cells can '
-                               'only be adjusted before external drives are '
-                               f'attached; have {len(self.external_drives)} '
-                               'drives.')
+        _validate_type(n_pyr_x, (float, int), 'n_pyr_x')
+        _validate_type(n_pyr_y, (float, int), 'n_pyr_y')
+        if not (n_pyr_x > 0 and n_pyr_y > 0):
+            raise ValueError('Number of pyramidal cells in each direction must'
+                             f'be positive; got: ({n_pyr_x}, {n_pyr_y})')
+
         _validate_type(inplane_distance, (float, int), 'inplane_distance')
         if not inplane_distance > 0.:
-            raise ValueError('In-plane distance must be positive definite, '
+            raise ValueError('In-plane distance must be positive, '
                              f'got: {inplane_distance}')
 
         _validate_type(layer_separation, (float, int), 'layer_separation')
         if not layer_separation > 0.:
-            raise ValueError('Layer separation must be positive definite, '
+            raise ValueError('Layer separation must be positive, '
                              f'got: {layer_separation}')
 
         pos = _create_cell_coords(n_pyr_x=n_pyr_x, n_pyr_y=n_pyr_y,
                                   zdiff=layer_separation,
                                   inplane_distance=inplane_distance)
+        # update positions of the real cells
         for key in pos.keys():
             self.pos_dict[key] = pos[key]
+
+        # update drives to be positioned at network origin
+        for drive_name, drive in self.external_drives.items():
+            pos = [self.pos_dict['origin']] * drive['n_drive_cells']
+            self.pos_dict[drive_name] = pos
 
         self._inplane_distance = inplane_distance
         self._layer_separation = layer_separation

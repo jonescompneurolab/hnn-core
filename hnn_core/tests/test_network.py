@@ -89,18 +89,11 @@ def test_network_cell_positions():
     net = jones_2009_model()
     assert np.isclose(net._inplane_distance, 1.)
     assert np.isclose(net._layer_separation, 1307.4)
-    pos_dict = deepcopy(net.pos_dict)
-    # assert reset does nothing
-    for cell_name, coords in pos_dict.items():
-        if cell_name == 'origin':
-            continue
-        for xyz_orig, xyz_new in zip(coords, net.pos_dict[cell_name]):
-            for orig, new in zip(xyz_orig, xyz_new):
-                assert np.isclose(orig, new)
+    pos_dict_nodrives = deepcopy(net.pos_dict)
 
     net.set_cell_positions(inplane_distance=2.)
-    # check that in-plane distance has doubled
-    assert np.isclose(2. * pos_dict['L5_pyramidal'][1][1],
+    # check that in-plane distance has doubled from the default 1.0
+    assert np.isclose(2. * pos_dict_nodrives['L5_pyramidal'][1][1],
                       net.pos_dict['L5_pyramidal'][1][1])
 
     net.set_cell_positions(layer_separation=1000.)
@@ -108,17 +101,28 @@ def test_network_cell_positions():
     assert np.isclose(net.pos_dict['L2_pyramidal'][0][2], 1000.)
 
     with pytest.raises(ValueError,
-                       match='In-plane distance must be positive definite'):
+                       match='Number of pyramidal cells in each direction'):
+        net.set_cell_positions(n_pyr_y=0)
+    with pytest.raises(ValueError,
+                       match='Number of pyramidal cells in each direction'):
+        net.set_cell_positions(n_pyr_y=0)
+    with pytest.raises(ValueError,
+                       match='In-plane distance must be positive'):
         net.set_cell_positions(inplane_distance=0.)
     with pytest.raises(ValueError,
-                       match='Layer separation must be positive definite'):
+                       match='Layer separation must be positive'):
         net.set_cell_positions(layer_separation=0.)
 
+    # check that the origin of the drive cells matches the new 'origin'
+    # when set_cell_positions is called after adding drives
     add_erp_drives_to_jones_model(net)
-    # values that determine network topology cannot be changed after drives
-    with pytest.raises(RuntimeError,
-                       match='Distances between network cells can'):
-        net.set_cell_positions(inplane_distance=1.)
+    net.set_cell_positions(inplane_distance=20.)
+    for drive_name, drive in net.external_drives.items():
+        assert len(net.pos_dict[drive_name]) == drive['n_drive_cells']
+        # just test the 0th index, assume all others then fine too
+        for idx in range(3):  # x,y,z coords
+            assert (net.pos_dict[drive_name][0][idx] ==
+                    net.pos_dict['origin'][idx])
 
 
 def test_network():
