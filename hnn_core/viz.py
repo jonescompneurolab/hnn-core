@@ -804,7 +804,7 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
             if show_weight:
                 weight, _ = _get_gaussian_connection(
                     src_pos, target_pos, nc_dict,
-                    inplane_distance=net.inplane_distance)
+                    inplane_distance=net._inplane_distance)
             else:
                 weight = 1.0
 
@@ -959,7 +959,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     im = _update_target_plot(ax, conn, src_gid, src_type_pos,
                              target_type_pos, src_range,
                              target_range, nc_dict, colormap,
-                             net.inplane_distance)
+                             net._inplane_distance)
 
     x_src = src_type_pos[:, 0]
     y_src = src_type_pos[:, 1]
@@ -988,7 +988,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
             return
         _update_target_plot(ax, conn, src_gid, src_type_pos,
                             target_type_pos, src_range, target_range,
-                            nc_dict, colormap, net.inplane_distance)
+                            nc_dict, colormap, net._inplane_distance)
 
         fig.canvas.draw()
 

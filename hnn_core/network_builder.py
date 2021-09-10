@@ -501,7 +501,7 @@ class NetworkBuilder(object):
                         nc = target_cell.parconnect_from_src(
                             src_gid, deepcopy(nc_dict),
                             target_cell._nrn_synapses[syn_key],
-                            net.inplane_distance)
+                            net._inplane_distance)
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
