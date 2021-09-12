@@ -45,6 +45,8 @@ Changelog
 - Add :func:`~hnn_core.optimize_evoked` to optimize the timing and weights of driving inputs for simulating
   evoked responses, by `Blake Caldwell`_ and `Mainak Jas`_ in `#77 <https://github.com/jonescompneurolab/hnn-core/pull/77>`_
 
+- Add method for setting in-plane cell distances and layer separation in the network :func:`~hnn_core.Network.set_cell_positions`, by `Christopher Bailey`_ in `#370 <https://github.com/jonescompneurolab/hnn-core/pull/370>`_
+
 Bug
 ~~~
 

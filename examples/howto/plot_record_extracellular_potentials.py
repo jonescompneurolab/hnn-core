@@ -23,7 +23,7 @@ import os.path as op
 import matplotlib.pyplot as plt
 
 ###############################################################################
-# This example relies on the default "Jones2009"-network.
+# Load the default parameter set and import the functions we'll need
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
@@ -40,9 +40,7 @@ params = read_params(params_fname)
 # extracellular potentials (but not on the calculated net intracellular dipole
 # moment). In this example, we'll simulate a network of model cells spaced
 # 30 um apart. To drive the network dynamics, we'll use three evoked 'ERP'
-# drives; see
-# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`
-# for details.
+# drives; see the event-related potential (ERP) example for details.
 
 net = jones_2009_model(params)
 add_erp_drives_to_jones_model(net)

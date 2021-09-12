@@ -410,9 +410,9 @@ class Network(object):
                            inplane_distance=1., layer_separation=1307.4):
         """Set relative positions of cells arranged in a square grid
 
-        All ``hnn_core``-models are organised in a square grid of
-        ``n_pyr_x X n_pyr_y` pyramidal cells. Basket cells are included at a
-        ratio of ``1:3``. The separation between L2 and L5 layers and the
+        All hnn_core-models are organised in a square grid of
+        (n_pyr_x, n_pyr_y) pyramidal cells. Basket cells are included at a
+        ratio of 1:3. The separation between L2 and L5 layers and the
         distance between grid points (i.e., pyramidal cells) can be adjusted.
 
         Parameters
