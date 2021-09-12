@@ -89,12 +89,13 @@ def test_network_cell_positions():
     net = jones_2009_model()
     assert np.isclose(net._inplane_distance, 1.)
     assert np.isclose(net._layer_separation, 1307.4)
-    pos_dict_nodrives = deepcopy(net.pos_dict)
 
     net.set_cell_positions(inplane_distance=2.)
-    # check that in-plane distance has doubled from the default 1.0
-    assert np.isclose(2. * pos_dict_nodrives['L5_pyramidal'][1][1],
-                      net.pos_dict['L5_pyramidal'][1][1])
+    # check that in-plane distance is now 2. for the default 10 x 10 grid
+    assert np.allclose(  # x-coordinate jumps every 10th gid
+        np.diff(np.array(net.pos_dict['L5_pyramidal'])[9::10, 0], axis=0), 2.)
+    assert np.allclose(  # test first 10 y-coordinates
+        np.diff(np.array(net.pos_dict['L5_pyramidal'])[:9, 1], axis=0), 2.)
 
     net.set_cell_positions(layer_separation=1000.)
     # check that layer separation has changed (L5 is zero)
