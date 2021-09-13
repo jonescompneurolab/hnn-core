@@ -5,7 +5,7 @@ import matplotlib
 
 from hnn_core.network_builder import NetworkBuilder, load_custom_mechanisms
 from hnn_core.network_models import jones_2009_model
-from hnn_core.cell import _ArtificialCell, Cell
+from hnn_core.cell import _ArtificialCell, Cell, Section
 
 matplotlib.use('agg')
 
@@ -50,24 +50,24 @@ def test_cell():
         cell.build()
 
     sections = {
-        'soma':
-        {
-            'L': 39,
-            'diam': 20,
-            'cm': 0.85,
-            'Ra': 200.,
-            'sec_pts': [[0, 0, 0], [0, 39., 0]],
-            'syns': ['ampa'],
-            'mechs': {
+        'soma' : Section(
+            L=39,
+            diam=20,
+            cm=0.85,
+            Ra=200.,
+            sec_pts=[[0, 0, 0], [0, 39., 0]]
+        )
+    }
+    sections['soma'].syns = ['ampa']
+    sections['soma'].mechs = {
                 'km': {
                     'gbar_km': 60
                 },
                 'ca': {
                     'gbar_ca': lambda x: 3e-3 * x
                 }
-            }
-        }
     }
+
     cell = Cell(name, pos, sections, synapses, topology, sect_loc)
 
     # check that length or other attributes of net.cell_types

@@ -18,11 +18,11 @@ from .viz import plot_cell_morphology
 
 def _get_cos_theta(sections, sec_name_apical):
     """Get cos(theta) to compute dipole along the apical dendrite."""
-    a = (np.array(sections[sec_name_apical]['sec_pts'][1]) -
-         np.array(sections[sec_name_apical]['sec_pts'][0]))
+    a = (np.array(sections[sec_name_apical].sec_pts[1]) -
+         np.array(sections[sec_name_apical].sec_pts[0]))
     cos_thetas = dict()
-    for sec_name, p_sec in sections.items():
-        b = np.array(p_sec['sec_pts'][1]) - np.array(p_sec['sec_pts'][0])
+    for sec_name, section in sections.items():
+        b = np.array(section.sec_pts[1]) - np.array(section.sec_pts[0])
         cos_thetas[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
     return cos_thetas
 
@@ -153,6 +153,39 @@ class _ArtificialCell:
             raise RuntimeError('Global ID for this cell already assigned!')
 
 
+class Section:
+    """Section class.
+
+    Parameters
+    ----------
+    L : float
+        length of a section in microns
+    diam : float 
+        diameter of a section in microns
+    cm : float
+        membrane capacitance in micro-Farads
+    Ra : float
+        axial resistivity in ohm-cm
+    """
+    def __init__(self, L, diam, Ra, cm, sec_pts=None):
+
+        self.L = L
+        self.diam = diam
+        self.Ra = Ra
+        self.cm = cm
+        if sec_pts is None:
+            sec_pts = list()
+        self.sec_pts = sec_pts
+
+        self.mechs = dict()
+        self.syns = list()
+
+    def insert_mech(name):
+        pass
+
+    def insert_synapse(name):
+        pass
+
 class Cell:
     """Create a cell object.
 
@@ -220,28 +253,22 @@ class Cell:
 
     Examples
     --------
-    >>> sections = {
-        'soma':
-        {
-            'L': 39,
-            'diam': 20,
-            'cm': 0.85,
-            'Ra': 200.,
-            'sec_pts': [[0, 0, 0], [0, 39., 0]],
-            'syns': ['ampa', 'gabaa', 'nmda'],
-            'mechs' : {
-                'ca': {
-                    'gbar_ca': 60
-                }
-            }
-        }
-    }
+    >>> section_soma = Section(
+            L=39,
+            diam=20,
+            cm=0.85,
+            Ra=200.,
+            sec_pts=[[0, 0, 0], [0, 39., 0]]
+        )
     """
 
     def __init__(self, name, pos, sections, synapses, topology, sect_loc,
                  gid=None):
         self.name = name
         self.pos = pos
+        for section in sections.values():
+            if not isinstance(section, Section):
+                raise ValueError('elements in section must be instance of Section')
         self.sections = sections
         self.synapses = synapses
         self.topology = topology
@@ -290,9 +317,9 @@ class Cell:
         # distance from the soma to this point on the CURRENTLY ACCESSED
         # SECTION!!!
         h.distance(sec=self._nrn_sections['soma'])
-        for sec_name, p_sec in sections.items():
+        for sec_name, section in sections.items():
             sec = self._nrn_sections[sec_name]
-            for mech_name, p_mech in p_sec['mechs'].items():
+            for mech_name, p_mech in section.mechs.items():
                 sec.insert(mech_name)
                 for attr, val in p_mech.items():
                     if hasattr(val, '__call__'):
@@ -306,7 +333,7 @@ class Cell:
     def _create_synapses(self, sections, synapses):
         """Create synapses."""
         for sec_name in sections:
-            for receptor in sections[sec_name]['syns']:
+            for receptor in sections[sec_name].syns:
                 syn_key = f'{sec_name}_{receptor}'
                 seg = self._nrn_sections[sec_name](0.5)
                 self._nrn_synapses[syn_key] = self.syn_create(
@@ -323,9 +350,9 @@ class Cell:
         """
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
-        dx = self.pos[0] - self.sections['soma']['sec_pts'][0][0]
-        dy = self.pos[1] - self.sections['soma']['sec_pts'][0][1]
-        dz = self.pos[2] - self.sections['soma']['sec_pts'][0][2]
+        dx = self.pos[0] - self.sections['soma'].sec_pts[0][0]
+        dy = self.pos[1] - self.sections['soma'].sec_pts[0][1]
+        dz = self.pos[2] - self.sections['soma'].sec_pts[0][2]
 
         for sec_name in sections:
             sec = h.Section(name=f'{self.name}_{sec_name}')
@@ -333,15 +360,15 @@ class Cell:
 
             h.pt3dclear(sec=sec)
             h.pt3dconst(0, sec=sec)  # be explicit, see documentation
-            for pt in sections[sec_name]['sec_pts']:
+            for pt in sections[sec_name].sec_pts:
                 h.pt3dadd(pt[0] + dx,
                           pt[1] + dy,
                           pt[2] + dz, 1, sec=sec)
             # with pt3dconst==0, these will alter the 3d points defined above!
-            sec.L = sections[sec_name]['L']
-            sec.diam = sections[sec_name]['diam']
-            sec.Ra = sections[sec_name]['Ra']
-            sec.cm = sections[sec_name]['cm']
+            sec.L = sections[sec_name].L
+            sec.diam = sections[sec_name].diam
+            sec.Ra = sections[sec_name].Ra
+            sec.cm = sections[sec_name].cm
 
             if sec.L > 100.:  # 100 um
                 sec.nseg = int(sec.L / 50.)
