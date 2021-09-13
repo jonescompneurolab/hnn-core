@@ -160,7 +160,7 @@ class Section:
     ----------
     L : float
         length of a section in microns
-    diam : float 
+    diam : float
         diameter of a section in microns
     cm : float
         membrane capacitance in micro-Farads
@@ -169,7 +169,7 @@ class Section:
     """
     def __init__(self, L, diam, Ra, cm, sec_pts=None):
 
-        self.L = L
+        self._L = L
         self.diam = diam
         self.Ra = Ra
         self.cm = cm
@@ -180,11 +180,23 @@ class Section:
         self.mechs = dict()
         self.syns = list()
 
-    def insert_mech(name):
-        pass
+    @property
+    def L(self):
+        return self._L
 
-    def insert_synapse(name):
-        pass
+    @L.setter
+    def L(self, val):
+        factor = val / self._L
+
+        x0 = self.sec_pts[0][0]
+        y0 = self.sec_pts[0][1]
+        z0 = self.sec_pts[0][2]
+
+        for sec_pt in self.sec_pts:
+            sec_pt[0] = x0 + (sec_pt[0] - x0) * factor
+            sec_pt[1] = y0 + (sec_pt[1] - y0) * factor
+            sec_pt[2] = z0 + (sec_pt[2] - z0) * factor
+        self._L = val
 
 class Cell:
     """Create a cell object.
@@ -268,7 +280,8 @@ class Cell:
         self.pos = pos
         for section in sections.values():
             if not isinstance(section, Section):
-                raise ValueError('elements in section must be instance of Section')
+                raise ValueError(f'Items in section must be instances'
+                                 f' of Section. Got {type(section)}')
         self.sections = sections
         self.synapses = synapses
         self.topology = topology
