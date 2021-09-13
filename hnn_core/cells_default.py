@@ -5,35 +5,27 @@
 
 import numpy as np
 from functools import partial
-from .cell import Cell
+from .cell import Cell, Section
 
 from .params import compare_dictionaries
 from .params_default import (get_L2Pyr_params_default,
-                             get_L5Pyr_params_default,
-                             _secs_L2Pyr, _secs_L5Pyr,
-                             _secs_Basket)
+                             get_L5Pyr_params_default)
 
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
 # units for taur: ms
 
 
-def _get_dend_props(params, cell_type, section_names, prop_names):
+def _get_dends(params, cell_type, section_names):
     """Convert a flat dictionary to a nested dictionary.
 
     Returns
     -------
-    dend_props : dict
-        Nested dictionary. The outer dictionary has keys
-        with names of dendrites and the inner dictionary
-        specifies the geometry of these sections.
-
-        * L: length of a section in microns
-        * diam: diameter of a section in microns
-        * cm: membrane capacitance in micro-Farads
-        * Ra: axial resistivity in ohm-cm
+    sections : dict
+        Dictionary of sections. Keys are section names
     """
-    dend_props = dict()
+    prop_names = ['L', 'diam', 'Ra', 'cm']
+    sections = dict()
     for section_name in section_names:
         dend_prop = dict()
         for key in prop_names:
@@ -43,27 +35,179 @@ def _get_dend_props(params, cell_type, section_names, prop_names):
                 # map apicaltrunk -> apical_trunk etc.
                 middle = section_name.replace('_', '')
             dend_prop[key] = params[f'{cell_type}_{middle}_{key}']
-        dend_props[section_name] = dend_prop
-    return dend_props
+        sections[section_name] = Section(L=dend_prop['L'],
+                                         diam=dend_prop['diam'],
+                                         Ra=dend_prop['Ra'],
+                                         cm=dend_prop['cm'])
+    return sections
 
 
-def _get_pyr_soma_props(p_all, cell_type):
+def _get_pyr_soma(p_all, cell_type):
     """Get somatic properties."""
-    return {
-        'L': p_all[f'{cell_type}_soma_L'],
-        'diam': p_all[f'{cell_type}_soma_diam'],
-        'cm': p_all[f'{cell_type}_soma_cm'],
-        'Ra': p_all[f'{cell_type}_soma_Ra']
-    }
+    return Section(
+        L=p_all[f'{cell_type}_soma_L'],
+        diam=p_all[f'{cell_type}_soma_diam'],
+        cm=p_all[f'{cell_type}_soma_cm'],
+        Ra=p_all[f'{cell_type}_soma_Ra']
+    )
 
 
-def _get_basket_soma_props(cell_name):
-    return {
-        'L': 39.,
-        'diam': 20.,
-        'cm': 0.85,
-        'Ra': 200.
+def _cell_L2Pyr(override_params, pos=(0., 0., 0), gid=0.):
+    """The geometry of the default sections in L2Pyr neuron."""
+    p_all = get_L2Pyr_params_default()
+    if override_params is not None:
+        assert isinstance(override_params, dict)
+        p_all = compare_dictionaries(p_all, override_params)
+
+    section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
+                     'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+
+    sections = _get_dends(p_all, cell_type='L2Pyr',
+                          section_names=section_names)
+    sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr')
+
+    sec_pts = {
+        'soma': [[-50, 0, 765], [-50, 0, 778]],
+        'apical_trunk': [[-50, 0, 778], [-50, 0, 813]],
+        'apical_oblique': [[-50, 0, 813], [-250, 0, 813]],
+        'apical_1': [[-50, 0, 813], [-50, 0, 993]],
+        'apical_tuft': [[-50, 0, 993], [-50, 0, 1133]],
+        'basal_1': [[-50, 0, 765], [-50, 0, 715]],
+        'basal_2': [[-50, 0, 715], [-156, 0, 609]],
+        'basal_3': [[-50, 0, 715], [56, 0, 609]],
     }
+
+    mechanisms = {
+        'km': ['gbar_km'],
+        'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                'gl_hh2', 'el_hh2']
+    }
+    p_mech = _get_mechanisms(p_all, 'L2Pyr', ['soma'] + section_names,
+                             mechanisms)
+
+    for sec_name, section in sections.items():
+        section.sec_pts = sec_pts[sec_name]
+
+        if sec_name == 'soma':
+            section.syns = ['gabaa', 'gabab']
+        else:
+            section.syns = ['ampa', 'nmda', 'gabaa', 'gabab']
+
+        section.mechs = p_mech[sec_name]
+
+    # parent, parent_end, child, {child_start=0}
+    topology = [
+        # Distal (Apical)
+        ['soma', 1, 'apical_trunk', 0],
+        ['apical_trunk', 1, 'apical_1', 0],
+        ['apical_1', 1, 'apical_tuft', 0],
+        # apical_oblique comes off distal end of apical_trunk
+        ['apical_trunk', 1, 'apical_oblique', 0],
+        # Proximal (basal)
+        ['soma', 0, 'basal_1', 0],
+        ['basal_1', 1, 'basal_2', 0],
+        ['basal_1', 1, 'basal_3', 0]
+    ]
+
+    sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
+                'distal': ['apical_tuft']}
+    
+    synapses = _get_pyr_syn_props(p_all, 'L2Pyr')
+    return Cell('L2Pyr', pos,
+                sections=sections,
+                synapses=synapses,
+                topology=topology,
+                sect_loc=sect_loc,
+                gid=gid)
+
+
+def _cell_L5Pyr(override_params, pos=(0., 0., 0), gid=0.):
+    """The geometry of the default sections in L5Pyr Neuron."""
+
+    p_all = get_L5Pyr_params_default()
+    if override_params is not None:
+        assert isinstance(override_params, dict)
+        p_all = compare_dictionaries(p_all, override_params)
+
+    section_names = ['apical_trunk', 'apical_1',
+                     'apical_2', 'apical_tuft',
+                     'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
+
+    sections = _get_dends(p_all, cell_type='L5Pyr',
+                          section_names=section_names)
+    sections['soma'] = _get_pyr_soma(p_all, 'L5Pyr')
+
+    sec_pts = {
+        'soma': [[0, 0, 0], [0, 0, 23]],
+        'apical_trunk': [[0, 0, 23], [0, 0, 83]],
+        'apical_oblique': [[0, 0, 83], [-150, 0, 83]],
+        'apical_1': [[0, 0, 83], [0, 0, 483]],
+        'apical_2': [[0, 0, 483], [0, 0, 883]],
+        'apical_tuft': [[0, 0, 883], [0, 0, 1133]],
+        'basal_1': [[0, 0, 0], [0, 0, -50]],
+        'basal_2': [[0, 0, -50], [-106, 0, -156]],
+        'basal_3': [[0, 0, -50], [106, 0, -156]]
+    }
+
+    # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
+    mechanisms = {
+        'hh2': ['gkbar_hh2', 'gnabar_hh2',
+                'gl_hh2', 'el_hh2'],
+        'ca': ['gbar_ca'],
+        'cad': ['taur_cad'],
+        'kca': ['gbar_kca'],
+        'km': ['gbar_km'],
+        'cat': ['gbar_cat'],
+        'ar': ['gbar_ar']
+    }
+    p_mech = _get_mechanisms(p_all, 'L5Pyr', ['soma'] + section_names,
+                             mechanisms)
+
+    for sec_name, section in sections.items():
+        section.sec_pts = sec_pts[sec_name]
+
+        if sec_name == 'soma':
+            section.syns = ['gabaa', 'gabab']
+        else:
+            section.syns = ['ampa', 'nmda', 'gabaa', 'gabab']
+
+        section.mechs = p_mech[sec_name]
+
+    topology = [
+        # Distal (Apical)
+        ['soma', 1, 'apical_trunk', 0],
+        ['apical_trunk', 1, 'apical_1', 0],
+        ['apical_1', 1, 'apical_2', 0],
+        ['apical_2', 1, 'apical_tuft', 0],
+        # apical_oblique comes off distal end of apical_trunk
+        ['apical_trunk', 1, 'apical_oblique', 0],
+        # Proximal (basal)
+        ['soma', 0, 'basal_1', 0],
+        ['basal_1', 1, 'basal_2', 0],
+        ['basal_1', 1, 'basal_3', 0]
+    ]
+
+    sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
+                'distal': ['apical_tuft']}
+
+    synapses = _get_pyr_syn_props(p_all, 'L5Pyr')
+    return Cell('L5Pyr', pos,
+                sections=sections,
+                synapses=synapses,
+                topology=topology,
+                sect_loc=sect_loc,
+                gid=gid)
+
+
+def _get_basket_soma(cell_name):
+    sec_pts = [[0, 0, 0], [0, 0, 39.]]
+    return Section(
+        L=39.,
+        diam=20.,
+        cm=0.85,
+        Ra=200.,
+        sec_pts=sec_pts
+    )
 
 
 def _get_pyr_syn_props(p_all, cell_type):
@@ -192,15 +336,12 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         raise ValueError(f'Unknown basket cell type: {cell_name}')
 
     sections = dict()
-    sections['soma'] = _get_basket_soma_props(cell_name)
+    sections['soma'] = _get_basket_soma(cell_name)
     synapses = _get_basket_syn_props()
-    sections['soma']['syns'] = list(synapses.keys())
-    sections['soma']['mechs'] = {'hh2': dict()}
+    sections['soma'].syns = list(synapses.keys())
+    sections['soma'].mechs = {'hh2': dict()}
 
-    sec_pts, topology = _secs_Basket()
-    for sec_name in sections:
-        sections[sec_name]['sec_pts'] = sec_pts[sec_name]
-
+    topology = None
     return Cell(cell_name, pos,
                 sections=sections,
                 synapses=synapses,
@@ -225,76 +366,13 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         The GID is an integer from 0 to n_cells, or None if the cell is not
         yet attached to a network. Once the GID is set, it cannot be changed.
     """
-
-    if cell_name == 'L5Pyr':
-        p_all_default = get_L5Pyr_params_default()
-        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
-        mechanisms = {
-            'hh2': ['gkbar_hh2', 'gnabar_hh2',
-                    'gl_hh2', 'el_hh2'],
-            'ca': ['gbar_ca'],
-            'cad': ['taur_cad'],
-            'kca': ['gbar_kca'],
-            'km': ['gbar_km'],
-            'cat': ['gbar_cat'],
-            'ar': ['gbar_ar']
-        }
-        section_names = ['apical_trunk', 'apical_1',
-                         'apical_2', 'apical_tuft',
-                         'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        sec_pts, topology = _secs_L5Pyr()
-    elif cell_name == 'L2Pyr':
-        p_all_default = get_L2Pyr_params_default()
-        mechanisms = {
-            'km': ['gbar_km'],
-            'hh2': ['gkbar_hh2', 'gnabar_hh2',
-                    'gl_hh2', 'el_hh2']}
-        section_names = ['apical_trunk', 'apical_1', 'apical_tuft',
-                         'apical_oblique', 'basal_1', 'basal_2', 'basal_3']
-        sec_pts, topology = _secs_L2Pyr()
+    if cell_name == 'L2Pyr':
+        return _cell_L2Pyr(override_params, pos=pos, gid=gid)
+    elif cell_name == 'L5Pyr':
+        return _cell_L5Pyr(override_params, pos=pos, gid=gid)
     else:
         raise ValueError(f'Unknown pyramidal cell type: {cell_name}')
 
-    p_all = p_all_default
-    if override_params is not None:
-        assert isinstance(override_params, dict)
-        p_all = compare_dictionaries(p_all_default, override_params)
-
-    prop_names = ['L', 'diam', 'Ra', 'cm']
-    # Get somatic, dendritic, and synapse properties
-    p_soma = _get_pyr_soma_props(p_all, cell_name)
-    p_dend = _get_dend_props(p_all, cell_type=cell_name,
-                             section_names=section_names,
-                             prop_names=prop_names)
-    synapses = _get_pyr_syn_props(p_all, cell_name)
-    sections = p_dend.copy()
-    sections['soma'] = p_soma
-    p_mech = _get_mechanisms(p_all, cell_name, ['soma'] + section_names,
-                             mechanisms)
-    for key in sections:
-        sections[key]['mechs'] = p_mech[key]
-        if key == 'soma':
-            syns = ['gabaa', 'gabab']
-        else:
-            syns = list(synapses.keys())
-            if cell_name == 'L5Pyr':
-                sections[key]['mechs']['ar']['gbar_ar'] = \
-                    partial(_exp_g_at_dist, zero_val=1e-6,
-                            exp_term=3e-3, offset=0.0)
-        sections[key]['syns'] = syns
-
-    for sec_name in sections:
-        sections[sec_name]['sec_pts'] = sec_pts[sec_name]
-
-    sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
-                'distal': ['apical_tuft']}
-
-    return Cell(cell_name, pos,
-                sections=sections,
-                synapses=synapses,
-                topology=topology,
-                sect_loc=sect_loc,
-                gid=gid)
 
 
 def _linear_g_at_dist(x, gsoma, gdend, xkink):
