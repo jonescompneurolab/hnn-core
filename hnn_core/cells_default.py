@@ -111,7 +111,7 @@ def _cell_L2Pyr(override_params, pos=(0., 0., 0), gid=0.):
 
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
                 'distal': ['apical_tuft']}
-    
+
     synapses = _get_pyr_syn_props(p_all, 'L2Pyr')
     return Cell('L2Pyr', pos,
                 sections=sections,
@@ -172,6 +172,11 @@ def _cell_L5Pyr(override_params, pos=(0., 0., 0), gid=0.):
             section.syns = ['ampa', 'nmda', 'gabaa', 'gabab']
 
         section.mechs = p_mech[sec_name]
+
+        if sec_name != 'soma':
+            sections[sec_name].mechs['ar']['gbar_ar'] = \
+                partial(_exp_g_at_dist, zero_val=1e-6,
+                        exp_term=3e-3, offset=0.0)
 
     topology = [
         # Distal (Apical)
@@ -372,7 +377,6 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         return _cell_L5Pyr(override_params, pos=pos, gid=gid)
     else:
         raise ValueError(f'Unknown pyramidal cell type: {cell_name}')
-
 
 
 def _linear_g_at_dist(x, gsoma, gdend, xkink):

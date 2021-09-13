@@ -50,7 +50,7 @@ def test_cell():
         cell.build()
 
     sections = {
-        'soma' : Section(
+        'soma': Section(
             L=39,
             diam=20,
             cm=0.85,
@@ -60,12 +60,12 @@ def test_cell():
     }
     sections['soma'].syns = ['ampa']
     sections['soma'].mechs = {
-                'km': {
-                    'gbar_km': 60
-                },
-                'ca': {
-                    'gbar_ca': lambda x: 3e-3 * x
-                }
+        'km': {
+            'gbar_km': 60
+        },
+        'ca': {
+            'gbar_ca': lambda x: 3e-3 * x
+        }
     }
 
     cell = Cell(name, pos, sections, synapses, topology, sect_loc)
