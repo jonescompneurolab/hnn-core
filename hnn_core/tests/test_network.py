@@ -114,6 +114,10 @@ def test_network_cell_positions():
                        match='Layer separation must be positive'):
         net.set_cell_positions(layer_separation=0.)
 
+    net.set_cell_positions(n_pyr_x=3, n_pyr_y=3)
+    assert np.isclose(net._inplane_distance, 2.)  # not default 1.
+    assert np.isclose(net._layer_separation, 1000.)  # not default 1307.4
+
     # Check that the origin of the drive cells matches the new 'origin'
     # when set_cell_positions is called after adding drives.
     # As the network dimensions increase, so does the center-of-mass of the
