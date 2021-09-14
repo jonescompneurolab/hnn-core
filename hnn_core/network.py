@@ -273,6 +273,12 @@ def pick_connection(net, src_gids=None, target_gids=None,
 class Network(object):
     """The Network class.
 
+    All hnn_core-models are organised in a square grid of pyramidal cells.
+    Basket cells are included at a ratio of 1:3. The separation between L2 and
+    L5 layers and the distance between grid points (i.e., pyramidal cell somas)
+    and the number of cells in the x- and y-directions are adjusted using the
+    set_cell_positions-method.
+
     Parameters
     ----------
     params : dict
@@ -381,7 +387,11 @@ class Network(object):
 
         self._N_pyr_x = self._params['N_pyr_x']
         self._N_pyr_y = self._params['N_pyr_y']
-        self.set_cell_positions(n_pyr_x=self._N_pyr_x, n_pyr_y=self._N_pyr_y)
+        self._inplane_distance = 1.0
+        self._layer_separation = 1307.4
+        self.set_cell_positions(n_pyr_x=self._N_pyr_x, n_pyr_y=self._N_pyr_y,
+                                inplane_distance=self._inplane_distance,
+                                layer_separation=self._layer_separation)
 
         for cell_name in cell_types:
             self._add_cell_type(cell_name, self.pos_dict[cell_name],
@@ -399,20 +409,18 @@ class Network(object):
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self._params['N_pyr_x'], self._params['N_pyr_y']))
+             % (self._N_pyr_x, self._N_pyr_y))
         s += ("\n%d L2 basket cells\n%d L5 basket cells"
               % (len(self.pos_dict['L2_basket']),
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
 
-    def set_cell_positions(self, *, n_pyr_x=10, n_pyr_y=10,
-                           inplane_distance=1., layer_separation=1307.4):
-        """Set relative positions of cells arranged in a square grid
+    def set_cell_positions(self, *, n_pyr_x=None, n_pyr_y=None,
+                           inplane_distance=None, layer_separation=None):
+        """Set number and relative positions of cells arranged in a square grid
 
-        All hnn_core-models are organised in a square grid of
-        (n_pyr_x, n_pyr_y) pyramidal cells. Basket cells are included at a
-        ratio of 1:3. The separation between L2 and L5 layers and the
-        distance between grid points (i.e., pyramidal cells) can be adjusted.
+        Note that it is possible to change only a subset of the parameters
+        (the default value of each is None, which implies no change).
 
         Parameters
         ----------
@@ -423,23 +431,32 @@ class Network(object):
         inplane_distance : float
             The in plane-distance (in um) between pyramidal cell somas in the
             square grid. Note that this parameter does not affect the amplitude
-            of the dipole moment. Default: 1.0 um.
+            of the dipole moment.
         layer_separation : float
-            The default separation of pyramidal cell somas in layers 2/3 and 5
-            is 1307.4 um. Note that this parameter does not affect the
-            amplitude of the dipole moment.
+            The separation of pyramidal cell soma layers 2/3 and 5. Note that
+            this parameter does not affect the amplitude of the dipole moment.
         """
+        if n_pyr_x is None:
+            n_pyr_x = self._N_pyr_x
         _validate_type(n_pyr_x, (float, int), 'n_pyr_x')
+
+        if n_pyr_y is None:
+            n_pyr_y = self._N_pyr_y
         _validate_type(n_pyr_y, (float, int), 'n_pyr_y')
+
         if not (n_pyr_x > 0 and n_pyr_y > 0):
             raise ValueError('Number of pyramidal cells in each direction must'
                              f'be positive; got: ({n_pyr_x}, {n_pyr_y})')
 
+        if inplane_distance is None:
+            inplane_distance = self._inplane_distance
         _validate_type(inplane_distance, (float, int), 'inplane_distance')
         if not inplane_distance > 0.:
             raise ValueError('In-plane distance must be positive, '
                              f'got: {inplane_distance}')
 
+        if layer_separation is None:
+            layer_separation = self._layer_separation
         _validate_type(layer_separation, (float, int), 'layer_separation')
         if not layer_separation > 0.:
             raise ValueError('Layer separation must be positive, '
@@ -457,6 +474,8 @@ class Network(object):
             pos = [self.pos_dict['origin']] * drive['n_drive_cells']
             self.pos_dict[drive_name] = pos
 
+        self._N_pyr_x = n_pyr_x
+        self._N_pyr_y = n_pyr_y
         self._inplane_distance = inplane_distance
         self._layer_separation = layer_separation
 
