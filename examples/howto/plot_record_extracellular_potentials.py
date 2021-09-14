@@ -19,19 +19,10 @@ placed in and around the HNN network model.
 
 # sphinx_gallery_thumbnail_number = 3
 
-import os.path as op
 import matplotlib.pyplot as plt
 
-###############################################################################
-# Load the default parameter set and import the functions we'll need
-
-import hnn_core
-from hnn_core import read_params, jones_2009_model, simulate_dipole
+from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.network_models import add_erp_drives_to_jones_model
-
-hnn_core_root = op.dirname(hnn_core.__file__)
-params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = read_params(params_fname)
 
 ###############################################################################
 # The default network model defined in Jones et al. (2009) [1]_ consists of a
@@ -42,7 +33,7 @@ params = read_params(params_fname)
 # 30 um apart. To drive the network dynamics, we'll use three evoked 'ERP'
 # drives; see the event-related potential (ERP) example for details.
 
-net = jones_2009_model(params)
+net = jones_2009_model()
 add_erp_drives_to_jones_model(net)
 
 net.set_cell_positions(inplane_distance=30.)
