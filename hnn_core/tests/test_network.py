@@ -103,7 +103,7 @@ def test_network_cell_positions():
 
     with pytest.raises(ValueError,
                        match='Number of pyramidal cells in each direction'):
-        net.set_cell_positions(n_pyr_y=0)
+        net.set_cell_positions(n_pyr_x=0)
     with pytest.raises(ValueError,
                        match='Number of pyramidal cells in each direction'):
         net.set_cell_positions(n_pyr_y=0)
@@ -114,8 +114,12 @@ def test_network_cell_positions():
                        match='Layer separation must be positive'):
         net.set_cell_positions(layer_separation=0.)
 
-    # check that the origin of the drive cells matches the new 'origin'
-    # when set_cell_positions is called after adding drives
+    # Check that the origin of the drive cells matches the new 'origin'
+    # when set_cell_positions is called after adding drives.
+    # As the network dimensions increase, so does the center-of-mass of the
+    # grid points, which is where all hnn drives should be located. The lamtha-
+    # dependent weights and delays of the drives are calculated with respect to
+    # this origin.
     add_erp_drives_to_jones_model(net)
     net.set_cell_positions(inplane_distance=20.)
     for drive_name, drive in net.external_drives.items():

@@ -337,7 +337,6 @@ class Network(object):
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 inplane_distance=1., layer_separation=1307.4,
                  legacy_mode=True):
         # Save the parameters used to create the Network
         self._params = params
@@ -549,10 +548,10 @@ class Network(object):
             weights and delays within the simulated column. The constant is
             measured in the units of ``inplane_distance`` of
             :class:`~hnn_core.Network`. For example, for ``space_constant=3``,
-            the weights and delays are modulated by the factor
-            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
+            the weights are modulated by the factor
+            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where x is the
             physical distance (in um) between the connected cells in the xy
-            plane.
+            plane (delays are modulated by the inverse of this factor).
         seedcore : int
             Optional initial seed for random number generator (default: 2).
         """
