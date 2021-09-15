@@ -32,7 +32,12 @@ def jones_2009_model(params=None, add_drives_from_params=False):
 
     Notes
     -----
-    Network is composed of an all-to-all connectivity pattern between cells.
+    The network is composed of a square grid of pyramidal cells, arranged in
+    two layers (L5 and L2). The default in-plane separation of the grid points
+    is 1.0 um, and the layer separation 1307.4 um. These can be adjusted after
+    the net is created using the set_cell_positions-method. An all-to-all
+    connectivity pattern is applied between cells. Inhibitory basket cells are
+    present at a 1:3-ratio.
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
