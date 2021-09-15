@@ -23,9 +23,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
 
 
@@ -93,10 +93,10 @@
 <li><a class="reference internal" href="#api">API</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id36">0.1</a><ul>
-<li><a class="reference internal" href="#id38">Changelog</a></li>
-<li><a class="reference internal" href="#id58">Bug</a></li>
-<li><a class="reference internal" href="#id67">API</a></li>
+<li><a class="reference internal" href="#id37">0.1</a><ul>
+<li><a class="reference internal" href="#id39">Changelog</a></li>
+<li><a class="reference internal" href="#id59">Bug</a></li>
+<li><a class="reference internal" href="#id68">API</a></li>
 <li><a class="reference internal" href="#people-who-contributed-to-this-release-in-alphabetical-order">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
@@ -174,6 +174,7 @@
 <li><p>Drives in <code class="xref py py-attr docutils literal notranslate"><span class="pre">external_drives</span></code> no longer contain a <em class="xref py py-obj">‘conn’</em> key and the <code class="xref py py-attr docutils literal notranslate"><span class="pre">connectivity</span></code> list contains more items when adding drives from a param file or when in legacy mode, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a>, <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a>, and <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/369">#369</a></p></li>
 <li><p>Add <code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code> to optimize the timing and weights of driving inputs for simulating
 evoked responses, by <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> and <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/77">#77</a></p></li>
+<li><p>Add method for setting in-plane cell distances and layer separation in the network <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_cell_positions()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/370">#370</a></p></li>
 </ul>
 </section>
 <section id="bug">
@@ -208,10 +209,10 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 </ul>
 </section>
 </section>
-<section id="id36">
-<span id="id37"></span><h2>0.1<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h2>
-<section id="id38">
-<h3>Changelog<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
+<section id="id37">
+<span id="id38"></span><h2>0.1<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h2>
+<section id="id39">
+<h3>Changelog<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add ability to simulate multiple trials in parallel using joblibs, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/44">#44</a></p></li>
 <li><p>Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting their start times to exceed the simulation stop time, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/105">#105</a></p></li>
@@ -234,8 +235,8 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 <li><p>Add Savitzky-Golay filtering method <a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter" title="hnn_core.dipole.Dipole.savgol_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>; copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v0.24)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 </ul>
 </section>
-<section id="id58">
-<h3>Bug<a class="headerlink" href="#id58" title="Permalink to this headline">¶</a></h3>
+<section id="id59">
+<h3>Bug<a class="headerlink" href="#id59" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix missing autapses in network construction, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/50">#50</a></p></li>
 <li><p>Fix rhythmic input feed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/98">#98</a></p></li>
@@ -247,8 +248,8 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
 <li><p>Fix bug in network to add empty spike when empty file is read in, by <a class="reference external" href="https://github.com/samikane">Samika Kanekar</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/207">#207</a></p></li>
 </ul>
 </section>
-<section id="id67">
-<h3>API<a class="headerlink" href="#id67" title="Permalink to this headline">¶</a></h3>
+<section id="id68">
+<h3>API<a class="headerlink" href="#id68" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Make a context manager for Network class, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/86">#86</a></p></li>
 <li><p>Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/96">#96</a></p></li>
@@ -289,7 +290,7 @@ in a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_cor
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

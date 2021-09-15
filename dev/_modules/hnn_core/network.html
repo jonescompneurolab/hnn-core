@@ -22,9 +22,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
 
 
@@ -154,7 +154,7 @@
 <span class="kn">from</span> <span class="nn">.check</span> <span class="kn">import</span> <span class="n">_check_gids</span><span class="p">,</span> <span class="n">_gid_to_type</span><span class="p">,</span> <span class="n">_string_input_to_list</span>
 
 
-<span class="k">def</span> <span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="o">=</span><span class="mf">1307.4</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Creates coordinate grid and place cells in it.</span>
 
 <span class="sd">    Parameters</span>
@@ -163,11 +163,16 @@
 <span class="sd">        The number of Pyramidal cells in x direction.</span>
 <span class="sd">    n_pyr_y : int</span>
 <span class="sd">        The number of Pyramidal cells in y direction.</span>
-
 <span class="sd">    zdiff : float</span>
-<span class="sd">        Expressed as a positive DEPTH of L2 relative to L5, where L5 is defined</span>
-<span class="sd">        to lie at z==0. Interlaminar weight/delay calculations (lamtha) are not</span>
-<span class="sd">        affected.</span>
+<span class="sd">        Expressed as a positive DEPTH of L2 relative to L5 pyramidal cell</span>
+<span class="sd">        somas, where L5 is defined to lie at z==0. Interlaminar weight/delay</span>
+<span class="sd">        calculations (lamtha) are not affected. The basket cells are</span>
+<span class="sd">        arbitrarily placed slightly above (L5) and slightly below (L2) their</span>
+<span class="sd">        respective pyramidal cell layers.</span>
+<span class="sd">    inplane_distance : float</span>
+<span class="sd">        The grid spacing of pyramidal cells (in um). Note that basket cells are</span>
+<span class="sd">        placed in an uneven formation. Each one of them lies on a grid point</span>
+<span class="sd">        together with a pyramidal cell, though (overlapping).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -184,8 +189,8 @@
     <span class="n">pos_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="c1"># PYRAMIDAL CELLS</span>
-    <span class="n">xxrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">)</span>
-    <span class="n">yyrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_y</span><span class="p">)</span>
+    <span class="n">xxrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+    <span class="n">yyrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_y</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
 
     <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
@@ -193,11 +198,11 @@
         <span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="n">zdiff</span><span class="p">])]</span>
 
     <span class="c1"># BASKET CELLS</span>
-    <span class="n">xzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-    <span class="n">xone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">xzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+    <span class="n">xone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
     <span class="c1"># split even and odd y vals</span>
-    <span class="n">yeven</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">yodd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">yeven</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+    <span class="n">yodd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
     <span class="c1"># create general list of x,y coords and sort it</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
         <span class="n">xzero</span><span class="p">,</span> <span class="n">yeven</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xone</span><span class="p">,</span> <span class="n">yodd</span><span class="p">)]</span>
@@ -205,10 +210,10 @@
     <span class="c1"># append the z value for position for L2 and L5</span>
     <span class="c1"># print(len(coords_sorted))</span>
 
-    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_basket&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos_xy</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="k">for</span>
+    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_basket&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pos_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="n">zdiff</span><span class="p">)</span> <span class="k">for</span>
                              <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span><span class="p">]</span>
-    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">pos_xy</span> <span class="o">+</span> <span class="p">(</span><span class="n">zdiff</span><span class="p">,)</span> <span class="k">for</span> <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span><span class="p">]</span>
+    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pos_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">zdiff</span><span class="p">)</span> <span class="k">for</span>
+                             <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span><span class="p">]</span>
 
     <span class="c1"># ORIGIN</span>
     <span class="c1"># origin&#39;s z component isn&#39;t really used in</span>
@@ -458,12 +463,11 @@
 <span class="sd">    ----</span>
 <span class="sd">    `net = jones_2009_model(params)` is the reccomended path for creating a</span>
 <span class="sd">    network. Instantiating the network as `net = Network(params)` will</span>
-<span class="sd">    produce a network with no cell to cell connections. As such,</span>
+<span class="sd">    produce a network with no cell-to-cell connections. As such,</span>
 <span class="sd">    connectivity information contained in `params` will be ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># Save the parameters used to create the Network</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="c1"># Initialise a dictionary of cell ID&#39;s, which get used when the</span>
@@ -504,13 +508,16 @@
         <span class="c1"># cell counts, real and artificial</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">pos</span> <span class="o">=</span> <span class="n">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_x&#39;</span><span class="p">],</span>
-                                  <span class="n">n_pyr_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_y&#39;</span><span class="p">],</span>
-                                  <span class="n">zdiff</span><span class="o">=</span><span class="mf">1307.4</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_x&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_y&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># XXX hard-coded default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span> <span class="o">=</span> <span class="mf">1307.4</span>  <span class="c1"># XXX hard-coded default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_cell_positions</span><span class="p">(</span><span class="n">inplane_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span><span class="p">,</span>
+                                <span class="n">layer_separation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_cell_type</span><span class="p">(</span><span class="n">cell_name</span><span class="p">,</span> <span class="n">pos</span><span class="p">[</span><span class="n">cell_name</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_cell_type</span><span class="p">(</span><span class="n">cell_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">],</span>
                                 <span class="n">cell_template</span><span class="o">=</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_name</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -525,11 +532,57 @@
 <div class="viewcode-block" id="Network.__repr__"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> x </span><span class="si">%d</span><span class="s2"> Pyramidal cells (L2, L5)&quot;</span>
-             <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_x&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_y&#39;</span><span class="p">]))</span>
+             <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span><span class="p">))</span>
         <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> L2 basket cells</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> L5 basket cells&quot;</span>
               <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">]),</span>
                  <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_basket&#39;</span><span class="p">])))</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> | </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Network.set_cell_positions"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions">[docs]</a>    <span class="k">def</span> <span class="nf">set_cell_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">layer_separation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set relative positions of cells arranged in a square grid</span>
+
+<span class="sd">        Note that it is possible to change only a subset of the parameters</span>
+<span class="sd">        (the default value of each is None, which implies no change).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inplane_distance : float</span>
+<span class="sd">            The in plane-distance (in um) between pyramidal cell somas in the</span>
+<span class="sd">            square grid. Note that this parameter does not affect the amplitude</span>
+<span class="sd">            of the dipole moment.</span>
+<span class="sd">        layer_separation : float</span>
+<span class="sd">            The separation of pyramidal cell soma layers 2/3 and 5. Note that</span>
+<span class="sd">            this parameter does not affect the amplitude of the dipole moment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplane_distance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inplane_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">inplane_distance</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;inplane_distance&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inplane_distance</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In-plane distance must be positive, &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;got: </span><span class="si">{</span><span class="n">inplane_distance</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">layer_separation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">layer_separation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">layer_separation</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;layer_separation&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">layer_separation</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Layer separation must be positive, &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;got: </span><span class="si">{</span><span class="n">layer_separation</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span><span class="p">,</span>
+                                  <span class="n">zdiff</span><span class="o">=</span><span class="n">layer_separation</span><span class="p">,</span>
+                                  <span class="n">inplane_distance</span><span class="o">=</span><span class="n">inplane_distance</span><span class="p">)</span>
+        <span class="c1"># update positions of the real cells</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">pos</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># update drives to be positioned at network origin</span>
+        <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">drive_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span> <span class="o">=</span> <span class="n">inplane_distance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span> <span class="o">=</span> <span class="n">layer_separation</span></div>
 
 <div class="viewcode-block" id="Network.copy"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a copy of the Network instance</span>
@@ -615,8 +668,14 @@
 <span class="sd">            a function of the space_constant. If float, applies to all target</span>
 <span class="sd">            cell types. Use dict to create delay-&gt;cell mapping.</span>
 <span class="sd">        space_constant : float</span>
-<span class="sd">            Describes lateral dispersion (from column origin) of synaptic</span>
-<span class="sd">            weights and delays within the simulated column</span>
+<span class="sd">            Describes lateral dispersion (from the column origin) of synaptic</span>
+<span class="sd">            weights and delays within the simulated column. The constant is</span>
+<span class="sd">            measured in the units of ``inplane_distance`` of</span>
+<span class="sd">            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,</span>
+<span class="sd">            the weights are modulated by the factor</span>
+<span class="sd">            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where x is the</span>
+<span class="sd">            physical distance (in um) between the connected cells in the xy</span>
+<span class="sd">            plane (delays are modulated by the inverse of this factor).</span>
 <span class="sd">        seedcore : int</span>
 <span class="sd">            Optional initial seed for random number generator (default: 2).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -686,8 +745,14 @@
 <span class="sd">            a function of the space_constant. If float, applies to all target</span>
 <span class="sd">            cell types. Use dict to create delay-&gt;cell mapping.</span>
 <span class="sd">        space_constant : float</span>
-<span class="sd">            Describes lateral dispersion (from column origin) of synaptic</span>
-<span class="sd">            weigths and delays within the simulated column</span>
+<span class="sd">            Describes lateral dispersion (from the column origin) of synaptic</span>
+<span class="sd">            weights and delays within the simulated column. The constant is</span>
+<span class="sd">            measured in the units of ``inplane_distance`` of</span>
+<span class="sd">            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,</span>
+<span class="sd">            the weights and delays are modulated by the factor</span>
+<span class="sd">            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the</span>
+<span class="sd">            physical distance (in um) between the connected cells in the xy</span>
+<span class="sd">            plane.</span>
 <span class="sd">        seedcore : int</span>
 <span class="sd">            Optional initial seed for random number generator (default: 2).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -777,8 +842,14 @@
 <span class="sd">            a function of the space_constant. If float, applies to all target</span>
 <span class="sd">            cell types. Use dict to create delay-&gt;cell mapping.</span>
 <span class="sd">        space_constant : float</span>
-<span class="sd">            Describes lateral dispersion (from column origin) of synaptic</span>
-<span class="sd">            weights and delays within the simulated column</span>
+<span class="sd">            Describes lateral dispersion (from the column origin) of synaptic</span>
+<span class="sd">            weights and delays within the simulated column. The constant is</span>
+<span class="sd">            measured in the units of ``inplane_distance`` of</span>
+<span class="sd">            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,</span>
+<span class="sd">            the weights and delays are modulated by the factor</span>
+<span class="sd">            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the</span>
+<span class="sd">            physical distance (in um) between the connected cells in the xy</span>
+<span class="sd">            plane.</span>
 <span class="sd">        seedcore : int</span>
 <span class="sd">            Optional initial seed for random number generator (default: 2).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -824,9 +895,15 @@
 <span class="sd">        location : str</span>
 <span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
 <span class="sd">        space_constant : float</span>
-<span class="sd">            Describes lateral dispersion (from column origin) of synaptic</span>
-<span class="sd">            weights and delays within the simulated column</span>
-<span class="sd">        synaptic_delays : dict or float</span>
+<span class="sd">            Describes lateral dispersion (from the column origin) of synaptic</span>
+<span class="sd">            weights and delays within the simulated column. The constant is</span>
+<span class="sd">            measured in the units of ``inplane_distance`` of</span>
+<span class="sd">            :class:`~hnn_core.Network`. For example, for ``space_constant=3``,</span>
+<span class="sd">            the weights and delays are modulated by the factor</span>
+<span class="sd">            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the</span>
+<span class="sd">            physical distance (in um) between the connected cells in the xy</span>
+<span class="sd">            plane.</span>
+<span class="sd">        synaptic_delays : dict</span>
 <span class="sd">            Synaptic delay (in ms) at the column origin, dispersed laterally as</span>
 <span class="sd">            a function of the space_constant</span>
 <span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
@@ -1402,7 +1479,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

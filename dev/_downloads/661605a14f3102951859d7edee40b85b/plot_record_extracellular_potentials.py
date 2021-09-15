@@ -19,22 +19,24 @@ placed in and around the HNN network model.
 
 # sphinx_gallery_thumbnail_number = 3
 
-import os.path as op
 import matplotlib.pyplot as plt
 
+from hnn_core import jones_2009_model, simulate_dipole
+from hnn_core.network_models import add_erp_drives_to_jones_model
+
 ###############################################################################
-# We will use the default network with three evoked drives; see
-# :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>` for
-# details. We'll go ahead and use the drive features defined in the parameter
-# file.
+# The default network model defined in Jones et al. (2009) [1]_ consists of a
+# square grid of pyramidal cells. The in-plane distance between pyramidal cell
+# somas on the grid can be set by the user, which will have an influence on the
+# extracellular potentials (but not on the calculated net intracellular dipole
+# moment). In this example, we'll simulate a network of model cells spaced
+# 30 um apart. To drive the network dynamics, we'll use three evoked 'ERP'
+# drives; see the event-related potential (ERP) example for details.
 
-import hnn_core
-from hnn_core import read_params, jones_2009_model, simulate_dipole
+net = jones_2009_model()
+add_erp_drives_to_jones_model(net)
 
-hnn_core_root = op.dirname(hnn_core.__file__)
-params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = read_params(params_fname)
-net = jones_2009_model(params, add_drives_from_params=True)
+net.set_cell_positions(inplane_distance=30.)
 
 ###############################################################################
 # Extracellular recordings require specifying the electrode postions. It can be
@@ -46,17 +48,17 @@ net.plot_cells()
 # The default network consists of 2 layers (L2 and L5), within which the cell
 # somas are arranged in a regular grid, and apical dendrites are aligned along
 # the z-axis. We can simulate a linear multielectrode array with 100 um
-# intercontact spacing [1]_ by specifying a list of (x, y, z) coordinate
+# intercontact spacing [2]_ by specifying a list of (x, y, z) coordinate
 # triplets. The L5 pyramidal cell somas are at z=0 um, with apical dendrites
-# extending up to approximately z=2000 um. L2 pyramidal cell somas reside at
-# z=1300 um, and have apical dendrites extending to z=2300 um. We'll place the
+# extending up to z~2000 um. L2 pyramidal cell somas reside at
+# z~1300 um, and have apical dendrites extending to z~2300 um. We'll place the
 # recording array in the center of the network. By default, a value of
 # 0.3 S/m is used for the constant extracellular conductivity and the
 # 'point source approximation' for calculations; see
 # :meth:`hnn_core.Network.add_electrode_array` for details.
 
-depths = list(range(-525, 2750, 100))
-electrode_pos = [(4.5, 4.5, dep) for dep in depths]
+depths = list(range(-325, 2150, 100))
+electrode_pos = [(135, 135, dep) for dep in depths]
 net.add_electrode_array('shank1', electrode_pos)
 
 ###############################################################################
@@ -66,8 +68,7 @@ net.add_electrode_array('shank1', electrode_pos)
 # calculating the extracellular potentials requires additional computational
 # resources and will thus slightly slow down the simulation.
 # :ref:`Using MPI <sphx_glr_auto_examples_plot_simulate_mpi_backend.py>` will
-# speed up computation considerably. Note that we will perform smoothing of the
-# dipole time series during plotting (``postproc=False``)
+# speed up computation considerably.
 print(net.rec_arrays)
 net.plot_cells()
 
@@ -89,10 +90,11 @@ dpl[trial_idx].copy().smooth(
     window_len=window_len).plot(ax=axs[0], decim=decimate,
                                 show=False)
 
-voltage_offset = 300  # the spacing between individual traces
-voltage_scalebar = 500  # can be different from offset
+voltage_offset = 50  # the spacing between individual traces
+voltage_scalebar = 200  # can be different from offset
 # we can assign each electrode a unique color using a linear colormap
 colors = plt.get_cmap('cividis', len(electrode_pos))
+
 # use the same smoothing window on the LFP traces to allow comparison to dipole
 net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
     ax=axs[1], contact_labels=depths, color=colors, decim=decimate, show=False,
@@ -108,5 +110,8 @@ plt.show()
 ###############################################################################
 # References
 # ----------
-# .. [1] Kajikawa, Y. & Schroeder, C. E. How local is the local field
+# .. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
+#    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
+#    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
+# .. [2] Kajikawa, Y. & Schroeder, C. E. How local is the local field
 #        potential? Neuron 72, 847–858 (2011).
