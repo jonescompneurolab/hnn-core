@@ -129,6 +129,8 @@ API
 - Target cell types and their connections are created for each drive according to the synaptic weight
   and delay dictionaries assigned in ``Network.add_xxx_drive()``, by `Ryan Thorpe`_ in :gh:`369`
 
+- Cell objects can no longer be accessed from :class:`~hnn_core.Network` as the :attr:`~hnn_core.Network.cells` attribute has been removed, by `Ryan Thorpe`_ in `#436 <https://github.com/jonescompneurolab/hnn-core/pull/436>`_
+
 .. _0.1:
 
 0.1
