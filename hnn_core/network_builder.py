@@ -274,7 +274,7 @@ class NetworkBuilder(object):
         # - _PC.set_gid2node(gid, rank)
         # - _PC.cell(gid, nrn_netcon) (or _PC.cell(drive_cell.gid, nrn_netcon))
 
-        # cells from self.net.cells assigned to the current host/thread
+        # cells from the network assigned to the current host/thread
         self._cells = list()
 
         # artificial cells must be appended to a list in order to preserve
@@ -363,8 +363,6 @@ class NetworkBuilder(object):
         if n_hosts is None:
             n_hosts = _get_nhosts()
 
-        self.net._update_cells()  # updates net.n_cells
-
         # round robin assignment of cell gids
         for gid in range(self._rank, self.net.n_cells, n_hosts):
             self._gid_list.append(gid)
@@ -412,9 +410,13 @@ class NetworkBuilder(object):
         # on this rank (MPI)
         for gid in self._gid_list:
             src_type = self.net.gid_to_type(gid)
-            cell = self.net._gid_to_cell(gid)
+            gid_idx = gid - self.net.gid_ranges[src_type][0]
+            if src_type in self.net.cell_types:
+                # copy cell object from template cell type in Network
+                cell = self.net.cell_types[src_type].copy()
+                cell.gid = gid
+                cell.pos = self.net.pos_dict[src_type][gid_idx]
 
-            if cell is not None:
                 # instantiate NEURON object
                 if src_type in ('L2_pyramidal', 'L5_pyramidal'):
                     cell.build(sec_name_apical='apical_trunk')
@@ -435,7 +437,6 @@ class NetworkBuilder(object):
 
             # external driving inputs are special types of artificial-cells
             else:
-                gid_idx = gid - self.net.gid_ranges[src_type][0]
                 event_times = self.net.external_drives[
                     src_type]['events'][self.trial_idx][gid_idx]
                 drive_cell = _ArtificialCell(event_times, threshold, gid=gid)

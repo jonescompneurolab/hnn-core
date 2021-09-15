@@ -143,7 +143,7 @@ def test_network():
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
-    network_builder = NetworkBuilder(net)  # needed to populate net.cells
+    network_builder = NetworkBuilder(net)  # needed to instantiate cells
 
     # Assert that params are conserved across Network initialization
     for p in params:

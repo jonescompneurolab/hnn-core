@@ -375,6 +375,7 @@ class Network(object):
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
+        self.n_cells = 0
         self.pos_dict = dict()
         self.cell_types = dict()
 
@@ -388,12 +389,6 @@ class Network(object):
         for cell_name in cell_types:
             self._add_cell_type(cell_name, self.pos_dict[cell_name],
                                 cell_template=cell_types[cell_name])
-
-        self.cells = dict()
-
-        # set n_cells, EXCLUDING Artificial ones
-        self.n_cells = sum(len(self.pos_dict[src]) for src in
-                           self.cell_types)
 
         if add_drives_from_params:
             _add_drives_from_params(self)
@@ -470,27 +465,10 @@ class Network(object):
             A copy of the instance with previous simulation results and
             ``events`` of external drives removed.
         """
-        # clear cells containing Neuron objects to avoid pickling error
-        self.cells = dict()
         net_copy = deepcopy(self)
         net_copy._reset_drives()
         net_copy._reset_rec_arrays()
         return net_copy
-
-    def _update_cells(self):
-        """Populate the network with cell objects"""
-
-        self.n_cells = 0
-        for cell_type in self.pos_dict.keys():
-            if cell_type in self.cell_types:
-                cells = list()
-                for cell_idx, pos in enumerate(self.pos_dict[cell_type]):
-                    cell = deepcopy(self.cell_types[cell_type])
-                    cell.gid = self.gid_ranges[cell_type][cell_idx]
-                    cell.pos = pos
-                    cells.append(cell)
-                self.cells[cell_type] = cells
-                self.n_cells += len(cells)
 
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
                          n_drive_cells='n_cells', cell_specific=True,
@@ -985,6 +963,7 @@ class Network(object):
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
+            self.n_cells += len(pos)
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
