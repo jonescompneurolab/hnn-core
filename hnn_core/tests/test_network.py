@@ -87,36 +87,30 @@ def test_network_cell_positions():
     """"Test manipulation of cell positions in the network object"""
 
     net = jones_2009_model()
-    assert np.isclose(net._inplane_distance, 1.)
-    assert np.isclose(net._layer_separation, 1307.4)
+    assert np.isclose(net._inplane_distance, 1.)  # default
+    assert np.isclose(net._layer_separation, 1307.4)  # default
 
+    # change both from their default values
     net.set_cell_positions(inplane_distance=2.)
+    assert np.isclose(net._layer_separation, 1307.4)  # still the default
+    net.set_cell_positions(layer_separation=1000.)
+    assert np.isclose(net._inplane_distance, 2.)  # mustn't change
+
     # check that in-plane distance is now 2. for the default 10 x 10 grid
     assert np.allclose(  # x-coordinate jumps every 10th gid
         np.diff(np.array(net.pos_dict['L5_pyramidal'])[9::10, 0], axis=0), 2.)
     assert np.allclose(  # test first 10 y-coordinates
         np.diff(np.array(net.pos_dict['L5_pyramidal'])[:9, 1], axis=0), 2.)
 
-    net.set_cell_positions(layer_separation=1000.)
-    # check that layer separation has changed (L5 is zero)
+    # check that layer separation has changed (L5 is zero) tp 1000.
     assert np.isclose(net.pos_dict['L2_pyramidal'][0][2], 1000.)
 
-    with pytest.raises(ValueError,
-                       match='Number of pyramidal cells in each direction'):
-        net.set_cell_positions(n_pyr_x=0)
-    with pytest.raises(ValueError,
-                       match='Number of pyramidal cells in each direction'):
-        net.set_cell_positions(n_pyr_y=0)
     with pytest.raises(ValueError,
                        match='In-plane distance must be positive'):
         net.set_cell_positions(inplane_distance=0.)
     with pytest.raises(ValueError,
                        match='Layer separation must be positive'):
         net.set_cell_positions(layer_separation=0.)
-
-    net.set_cell_positions(n_pyr_x=3, n_pyr_y=3)
-    assert np.isclose(net._inplane_distance, 2.)  # not default 1.
-    assert np.isclose(net._layer_separation, 1000.)  # not default 1307.4
 
     # Check that the origin of the drive cells matches the new 'origin'
     # when set_cell_positions is called after adding drives.
