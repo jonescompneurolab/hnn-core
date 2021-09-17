@@ -180,6 +180,9 @@ class Section:
         self.mechs = dict()
         self.syns = list()
 
+    def __repr__(self):
+        return f'L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}'
+
     @property
     def L(self):
         return self._L
@@ -197,6 +200,7 @@ class Section:
             sec_pt[1] = y0 + (sec_pt[1] - y0) * factor
             sec_pt[2] = z0 + (sec_pt[2] - z0) * factor
         self._L = val
+
 
 class Cell:
     """Create a cell object.
