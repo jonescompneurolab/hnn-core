@@ -5,6 +5,7 @@ https://pytest.org/en/stable/example/simple.html#incremental-testing-test-steps
 
 from typing import Dict, Tuple
 import pytest
+import pickle
 
 import os.path as op
 import hnn_core
@@ -110,6 +111,9 @@ def run_hnn_core_fixture():
             dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                    record_isoma=record_vsoma,
                                    postproc=postproc, tstop=tstop)
+
+        # check that the network object is picklable after the simulation
+        pickle.dumps(net)
 
         # number of trials simulated
         for drive in net.external_drives.values():
