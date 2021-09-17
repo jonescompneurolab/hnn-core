@@ -16,7 +16,7 @@ def test_cell():
 
     name = 'test'
     pos = (0., 0., 0.)
-    sections = {'blah': 1}
+    sections = {'blah': Section(L=1, diam=5, Ra=3, cm=100)}
     synapses = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
     topology = None
     sect_loc = {'proximal': 'soma'}
@@ -74,16 +74,16 @@ def test_cell():
     # can be updated
     net = jones_2009_model()
     net._add_cell_type('mycell', pos=[(0., 0., 0.)], cell_template=cell.copy())
-    net.cell_types['mycell'].sections['soma']['L'] = 63.
+    net.cell_types['mycell'].sections['soma'].L = 63.
     nrn_net = NetworkBuilder(net)
     assert nrn_net.net.cells['mycell'][0]._nrn_sections['soma'].L == 63.
 
     # test successful build
     cell.build()
     assert 'soma' in cell._nrn_sections
-    assert cell._nrn_sections['soma'].L == sections['soma']['L']
+    assert cell._nrn_sections['soma'].L == sections['soma'].L
     assert cell._nrn_sections['soma'].gbar_km == sections[
-        'soma']['mechs']['km']['gbar_km']
+        'soma'].mechs['km']['gbar_km']
     # test building cell with a dipole oriented to a nonexitent section
     with pytest.raises(ValueError, match='sec_name_apical must be an'):
         cell.build(sec_name_apical='blah')

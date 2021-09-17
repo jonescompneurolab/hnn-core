@@ -38,6 +38,7 @@ from hnn_core.viz import plot_dipole
 # inside it.
 net = jones_2009_model()
 net.plot_cells()
+sdfdfd
 net.cell_types['L5_pyramidal'].plot_morphology()
 
 ###############################################################################
