@@ -372,7 +372,7 @@ class Network(object):
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
-        self.n_cells = 0
+        self._n_cells = 0  # currently only used for tests
         self.pos_dict = dict()
         self.cell_types = dict()
 
@@ -960,7 +960,7 @@ class Network(object):
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
-            self.n_cells += len(pos)
+            self._n_cells += len(pos)
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
