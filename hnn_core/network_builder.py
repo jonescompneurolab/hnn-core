@@ -364,7 +364,7 @@ class NetworkBuilder(object):
             n_hosts = _get_nhosts()
 
         # round robin assignment of cell gids
-        for gid in range(self._rank, self.net.n_cells, n_hosts):
+        for gid in range(self._rank, self.net._n_cells, n_hosts):
             self._gid_list.append(gid)
 
         for drive in self.net.external_drives.values():

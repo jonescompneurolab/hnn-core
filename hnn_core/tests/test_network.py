@@ -253,9 +253,9 @@ def test_network():
     # Assert that all external drives are initialized
     # Assumes legacy mode where cell-specific drives create artificial cells
     # for all network cells regardless of connectivity
-    n_evoked_sources = 3 * net.n_cells
-    n_pois_sources = net.n_cells
-    n_gaus_sources = net.n_cells
+    n_evoked_sources = 3 * net._n_cells
+    n_pois_sources = net._n_cells
+    n_gaus_sources = net._n_cells
     n_bursty_sources = (net.external_drives['bursty1']['n_drive_cells'] +
                         net.external_drives['bursty2']['n_drive_cells'])
     # test that expected number of external driving events are created
@@ -264,10 +264,10 @@ def test_network():
                                                  n_gaus_sources +
                                                  n_bursty_sources)
     assert len(network_builder._gid_list) ==\
-        len(network_builder._drive_cells) + net.n_cells
+        len(network_builder._drive_cells) + net._n_cells
     # first 'evoked drive' comes after real cells and bursty drive cells
     assert network_builder._drive_cells[n_bursty_sources].gid ==\
-        net.n_cells + n_bursty_sources
+        net._n_cells + n_bursty_sources
 
     # Assert that netcons are created properly
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
@@ -471,7 +471,7 @@ def test_add_cell_type():
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
 
-    n_total_cells = net.n_cells
+    n_total_cells = net._n_cells
     pos = [(0, idx, 0) for idx in range(10)]
     tau1 = 0.6
 
@@ -486,7 +486,7 @@ def test_add_cell_type():
                        lamtha=2)
 
     network_builder = NetworkBuilder(net)
-    assert net.n_cells == n_total_cells + len(pos)
+    assert net._n_cells == n_total_cells + len(pos)
     n_basket = len(net.gid_ranges['L2_basket'])
     n_connections = n_basket * n_new_type
     assert len(network_builder.ncs['L2Basket_new_type_gabaa']) == n_connections
