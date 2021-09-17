@@ -433,9 +433,6 @@
 <span class="sd">        Dictionary containing the coordinate positions of all cells.</span>
 <span class="sd">        Keys are &#39;L2_pyramidal&#39;, &#39;L5_pyramidal&#39;, &#39;L2_basket&#39;, &#39;L5_basket&#39;,</span>
 <span class="sd">        or any external drive name</span>
-<span class="sd">    cells : list of Cell objects.</span>
-<span class="sd">        The list of cells of the network, each containing features used in a</span>
-<span class="sd">        NEURON simulation.</span>
 <span class="sd">    cell_response : CellResponse</span>
 <span class="sd">        An instance of the CellResponse object.</span>
 <span class="sd">    external_drives : dict (keys: drive names) of dict (keys: parameters)</span>
@@ -506,6 +503,7 @@
 
         <span class="c1"># contents of pos_dict determines all downstream inferences of</span>
         <span class="c1"># cell counts, real and artificial</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_cells</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># currently only used for tests</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
@@ -519,12 +517,6 @@
         <span class="k">for</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_cell_type</span><span class="p">(</span><span class="n">cell_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">],</span>
                                 <span class="n">cell_template</span><span class="o">=</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_name</span><span class="p">])</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
-        <span class="c1"># set n_cells, EXCLUDING Artificial ones</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_cells</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">src</span><span class="p">])</span> <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">add_drives_from_params</span><span class="p">:</span>
             <span class="n">_add_drives_from_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -601,27 +593,10 @@
 <span class="sd">            A copy of the instance with previous simulation results and</span>
 <span class="sd">            ``events`` of external drives removed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># clear cells containing Neuron objects to avoid pickling error</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">net_copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">net_copy</span><span class="o">.</span><span class="n">_reset_drives</span><span class="p">()</span>
         <span class="n">net_copy</span><span class="o">.</span><span class="n">_reset_rec_arrays</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">net_copy</span></div>
-
-    <span class="k">def</span> <span class="nf">_update_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Populate the network with cell objects&quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_cells</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
-                <span class="n">cells</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">cell_idx</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]):</span>
-                    <span class="n">cell</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">])</span>
-                    <span class="n">cell</span><span class="o">.</span><span class="n">gid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">][</span><span class="n">cell_idx</span><span class="p">]</span>
-                    <span class="n">cell</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span>
-                    <span class="n">cells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cells</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_cells</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Network.add_evoked_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive">[docs]</a>    <span class="k">def</span> <span class="nf">add_evoked_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                          <span class="n">n_drive_cells</span><span class="o">=</span><span class="s1">&#39;n_cells&#39;</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1116,24 +1091,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
         <span class="k">if</span> <span class="n">cell_template</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">cell_name</span><span class="p">:</span> <span class="n">cell_template</span><span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_cells</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Network.gid_to_type"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.gid_to_type">[docs]</a>    <span class="k">def</span> <span class="nf">gid_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reverse lookup of gid to type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_gid_to_type</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_gid_to_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Reverse lookup of gid to cell.</span>
-
-<span class="sd">        Returns None if not a cell; should only be called after self.cells is</span>
-<span class="sd">        populated.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">src_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_to_type</span><span class="p">(</span><span class="n">gid</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">src_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
-            <span class="n">cell</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">type_pos_ind</span> <span class="o">=</span> <span class="n">gid</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">src_type</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="n">src_type</span><span class="p">][</span><span class="n">type_pos_ind</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">cell</span>
 
 <div class="viewcode-block" id="Network.add_connection"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_connection">[docs]</a>    <span class="k">def</span> <span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_gids</span><span class="p">,</span> <span class="n">target_gids</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span>
                        <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

@@ -17,7 +17,7 @@ Changelog
 - Store all connectivity information under :attr:`~hnn_core.Network.connectivity` before building
   the network, by `Nick Tolley`_ in :gh:`276`
 
-- Add new function :func:`~hnn_core.viz.plot_cell_morphology` to visualize cell morphology, 
+- Add new function :func:`~hnn_core.viz.plot_cell_morphology` to visualize cell morphology,
   by `Mainak Jas`_ in :gh:`319`
 
 - Compute dipole component in z-direction automatically from cell morphology instead of hard coding,
@@ -68,7 +68,7 @@ Changelog
 Bug
 ~~~
 
-- Remove rounding error caused by repositioning of NEURON cell sections, by `Mainak Jas`_ 
+- Remove rounding error caused by repositioning of NEURON cell sections, by `Mainak Jas`_
   and `Ryan Thorpe`_ in :gh:`314`
 
 - Fix issue where common drives use the same parameters for all cell types, by `Nick Tolley`_
@@ -128,6 +128,9 @@ API
 
 - Target cell types and their connections are created for each drive according to the synaptic weight
   and delay dictionaries assigned in ``Network.add_xxx_drive()``, by `Ryan Thorpe`_ in :gh:`369`
+
+- Cell objects can no longer be accessed from :class:`~hnn_core.Network` as the
+  :attr:`~hnn_core.Network.cells` attribute has been removed, by `Ryan Thorpe`_ in :gh:`436`
 
 .. _0.1:
 
