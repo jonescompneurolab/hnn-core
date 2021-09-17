@@ -302,9 +302,6 @@ class Network(object):
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
         or any external drive name
-    cells : list of Cell objects.
-        The list of cells of the network, each containing features used in a
-        NEURON simulation.
     cell_response : CellResponse
         An instance of the CellResponse object.
     external_drives : dict (keys: drive names) of dict (keys: parameters)
@@ -968,20 +965,6 @@ class Network(object):
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
         return _gid_to_type(gid, self.gid_ranges)
-
-    def _gid_to_cell(self, gid):
-        """Reverse lookup of gid to cell.
-
-        Returns None if not a cell; should only be called after self.cells is
-        populated.
-        """
-        src_type = self.gid_to_type(gid)
-        if src_type not in self.cell_types:
-            cell = None
-        else:
-            type_pos_ind = gid - self.gid_ranges[src_type][0]
-            cell = self.cells[src_type][type_pos_ind]
-        return cell
 
     def add_connection(self, src_gids, target_gids, loc, receptor,
                        weight, delay, lamtha, allow_autapses=True,
