@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn_core.optimization &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../auto_examples/index.html">Examples</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../../glossary.html">Glossary</a></li>
+                <li><a href="../../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.2.dev0
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hnn_core.optimization</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Parameter optimization functions.&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Blake Caldwell &lt;blake_caldwell@brown.edu&gt;</span>
+<span class="c1">#          Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fmin_cobyla</span>
+
+<span class="kn">from</span> <span class="nn">.network_models</span> <span class="kn">import</span> <span class="n">jones_2009_model</span>
+<span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">_rmse</span>
+
+
+<span class="k">def</span> <span class="nf">_get_range</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get range of values to sweep over.&quot;&quot;&quot;</span>
+    <span class="n">range_min</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">val</span> <span class="o">-</span> <span class="n">val</span> <span class="o">*</span> <span class="n">multiplier</span> <span class="o">/</span> <span class="mf">100.</span><span class="p">)</span>
+    <span class="n">range_max</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">val</span> <span class="o">*</span> <span class="n">multiplier</span> <span class="o">/</span> <span class="mf">100.</span>
+    <span class="n">ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;initial&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">,</span> <span class="s1">&#39;minval&#39;</span><span class="p">:</span> <span class="n">range_min</span><span class="p">,</span> <span class="s1">&#39;maxval&#39;</span><span class="p">:</span> <span class="n">range_max</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">ranges</span>
+
+
+<span class="k">def</span> <span class="nf">_split_by_evinput</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">sigma_range_multiplier</span><span class="p">,</span> <span class="n">timing_range_multiplier</span><span class="p">,</span>
+                      <span class="n">synweight_range_multiplier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sorts parameter ranges by evoked inputs into a dictionary</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params: an instance of Params</span>
+<span class="sd">        Full set of simulation parameters</span>
+<span class="sd">    sigma_range_multiplier : float</span>
+<span class="sd">        The scale of sigma values to sweep over.</span>
+<span class="sd">    timing_range_multiplier : float</span>
+<span class="sd">        The scale of timing values to sweep over.</span>
+<span class="sd">    synweight_range_multiplier : float</span>
+<span class="sd">        The scale of input synaptic weights to sweep over.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sorted_evinput_params: dict</span>
+<span class="sd">        Dictionary with parameters grouped by evoked inputs.</span>
+<span class="sd">        Keys for each evoked input are</span>
+<span class="sd">        &#39;mean&#39;, &#39;sigma&#39;, &#39;ranges&#39;, &#39;start&#39;, and &#39;end&#39;.</span>
+<span class="sd">        sorted_evinput_params[&#39;evprox1&#39;][&#39;ranges&#39;] is a dict</span>
+<span class="sd">        with keys as the parameters to be optimized and values</span>
+<span class="sd">        indicating the ranges over which they should be</span>
+<span class="sd">        optimized. E.g.,</span>
+<span class="sd">        sorted_evinput[&#39;evprox1&#39;][&#39;ranges&#39;] =</span>
+<span class="sd">        {</span>
+<span class="sd">            &#39;gbar_evprox_1_L2Pyr_ampa&#39;:</span>
+<span class="sd">                {</span>
+<span class="sd">                    &#39;initial&#39;: 0.05125,</span>
+<span class="sd">                    &#39;minval&#39;: 0,</span>
+<span class="sd">                    &#39;maxval&#39;: 0.0915</span>
+<span class="sd">                }</span>
+<span class="sd">        }</span>
+<span class="sd">        Elements are sorted by their start time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">evinput_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">evinput_t</span> <span class="ow">in</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;t_*&#39;</span><span class="p">]:</span>
+        <span class="n">id_str</span> <span class="o">=</span> <span class="n">evinput_t</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;t_&#39;</span><span class="p">)</span>
+        <span class="n">timing_mean</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">evinput_t</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="sa">f</span><span class="s1">&#39;sigma_</span><span class="si">{</span><span class="n">evinput_t</span><span class="si">}</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">timing_sigma</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;sigma_&#39;</span> <span class="o">+</span> <span class="n">evinput_t</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timing_sigma</span> <span class="o">=</span> <span class="mf">3.0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t fing timing_sigma. Using default </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span>
+                  <span class="n">timing_sigma</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">timing_sigma</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="c1"># sigma of 0 will not produce a CDF</span>
+            <span class="n">timing_sigma</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+        <span class="n">evinput_params</span><span class="p">[</span><span class="n">id_str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="n">timing_mean</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">timing_sigma</span><span class="p">,</span>
+                                  <span class="s1">&#39;ranges&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+
+        <span class="n">evinput_params</span><span class="p">[</span><span class="n">id_str</span><span class="p">][</span><span class="s1">&#39;ranges&#39;</span><span class="p">][</span><span class="s1">&#39;sigma_&#39;</span> <span class="o">+</span> <span class="n">evinput_t</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">_get_range</span><span class="p">(</span><span class="n">timing_sigma</span><span class="p">,</span> <span class="n">sigma_range_multiplier</span><span class="p">)</span>
+
+        <span class="c1"># calculate range for time</span>
+        <span class="n">timing_bound</span> <span class="o">=</span> <span class="n">timing_sigma</span> <span class="o">*</span> <span class="n">timing_range_multiplier</span>
+        <span class="n">range_min</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">timing_mean</span> <span class="o">-</span> <span class="n">timing_bound</span><span class="p">)</span>
+        <span class="n">range_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]),</span> <span class="n">timing_mean</span> <span class="o">+</span> <span class="n">timing_bound</span><span class="p">)</span>
+
+        <span class="n">evinput_params</span><span class="p">[</span><span class="n">id_str</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">range_min</span>
+        <span class="n">evinput_params</span><span class="p">[</span><span class="n">id_str</span><span class="p">][</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">range_max</span>
+        <span class="n">evinput_params</span><span class="p">[</span><span class="n">id_str</span><span class="p">][</span><span class="s1">&#39;ranges&#39;</span><span class="p">][</span><span class="n">evinput_t</span><span class="p">]</span> <span class="o">=</span>  \
+            <span class="p">{</span><span class="s1">&#39;initial&#39;</span><span class="p">:</span> <span class="n">timing_mean</span><span class="p">,</span> <span class="s1">&#39;minval&#39;</span><span class="p">:</span> <span class="n">range_min</span><span class="p">,</span> <span class="s1">&#39;maxval&#39;</span><span class="p">:</span> <span class="n">range_max</span><span class="p">}</span>
+
+        <span class="c1"># calculate ranges for syn. weights</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;gbar_</span><span class="si">{</span><span class="n">id_str</span><span class="si">}</span><span class="s1">*&#39;</span><span class="p">]:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+            <span class="n">ranges</span> <span class="o">=</span> <span class="n">_get_range</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">synweight_range_multiplier</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">ranges</span><span class="p">[</span><span class="s1">&#39;minval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="n">ranges</span><span class="p">[</span><span class="s1">&#39;maxval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">evinput_params</span><span class="p">[</span><span class="n">id_str</span><span class="p">][</span><span class="s1">&#39;ranges&#39;</span><span class="p">][</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">ranges</span>
+
+    <span class="n">sorted_evinput_params</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">evinput_params</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+                                               <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">sorted_evinput_params</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_weights</span><span class="p">(</span><span class="n">evinput_params</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">decay_multiplier</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculation of weight function for wRMSE calcuation</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    evinput_params : dict</span>
+<span class="sd">        Adds the keys &#39;weights&#39;, &#39;opt_start&#39;, &#39;opt_end&#39;</span>
+<span class="sd">        to evinput_params[input_name] and removes &#39;mean&#39;</span>
+<span class="sd">        and &#39;sigma&#39; which were needed to compute &#39;weights&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+    <span class="n">num_step</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">tstop</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">num_step</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">evinput_this</span> <span class="ow">in</span> <span class="n">evinput_params</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="c1"># calculate cdf using start time (minival of optimization range)</span>
+        <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;cdf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span>
+            <span class="n">times</span><span class="p">,</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">input_name</span><span class="p">,</span> <span class="n">evinput_this</span> <span class="ow">in</span> <span class="n">evinput_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;cdf&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">other_input</span><span class="p">,</span> <span class="n">evinput_other</span> <span class="ow">in</span> <span class="n">evinput_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># check ordering to only use inputs after us</span>
+            <span class="c1"># and don&#39;t subtract our own cdf(s)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">evinput_other</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="ow">or</span>
+                    <span class="n">input_name</span> <span class="o">==</span> <span class="n">other_input</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">decay_factor</span> <span class="o">=</span> <span class="n">decay_multiplier</span> <span class="o">*</span> \
+                <span class="p">(</span><span class="n">evinput_other</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">tstop</span>
+            <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">evinput_other</span><span class="p">[</span><span class="s1">&#39;cdf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">decay_factor</span>
+
+        <span class="c1"># weights should not drop below 0</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">],</span> <span class="n">a_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">out</span><span class="o">=</span><span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span>
+
+        <span class="c1"># start and stop optimization where the weights are insignificant</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">)</span>
+        <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span>
+                                        <span class="n">times</span><span class="p">[</span><span class="n">indices</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">],</span>
+                                      <span class="n">times</span><span class="p">[</span><span class="n">indices</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># convert to multiples of dt</span>
+        <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+        <span class="n">evinput_params</span><span class="p">[</span><span class="n">input_name</span><span class="p">][</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span>
+            <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="k">for</span> <span class="n">evinput_this</span> <span class="ow">in</span> <span class="n">evinput_params</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">del</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">],</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">],</span> <span class="n">evinput_this</span><span class="p">[</span><span class="s1">&#39;cdf&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">evinput_params</span>
+
+
+<span class="k">def</span> <span class="nf">_create_last_chunk</span><span class="p">(</span><span class="n">input_chunks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This creates a chunk that combines parameters for</span>
+<span class="sd">    all chunks in input_chunks (final step)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_chunks: List</span>
+<span class="sd">        List of ordered chunks for optimization</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    chunk: dict</span>
+<span class="sd">        Dictionary of with parameters for combined</span>
+<span class="sd">        chunk (final step)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;ranges&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;opt_start&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+             <span class="s1">&#39;opt_end&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">evinput</span> <span class="ow">in</span> <span class="n">input_chunks</span><span class="p">:</span>
+        <span class="n">chunk</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">evinput</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">])</span>
+        <span class="n">chunk</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">evinput</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">evinput</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">chunk</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]:</span>
+            <span class="n">chunk</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evinput</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span>
+
+    <span class="c1"># wRMSE with weights of 1&#39;s is the same as regular RMSE.</span>
+    <span class="n">chunk</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">input_chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">chunk</span>
+
+
+<span class="k">def</span> <span class="nf">_consolidate_chunks</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Consolidates inputs into optimization &quot;chunks&quot; defined by</span>
+<span class="sd">    opt_start and opt_end</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inputs: dict</span>
+<span class="sd">        Sorted dictionary of inputs with their parameters</span>
+<span class="sd">        and weight functions</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    chunks: list</span>
+<span class="sd">        Combine the evinput_params whenever the end is overlapping</span>
+<span class="sd">        with the next.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">input_name</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+        <span class="n">input_dict</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="n">input_name</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_name</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>
+                <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;end&#39;</span><span class="p">]):</span>
+            <span class="c1"># update previous chunk</span>
+            <span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">])</span>
+            <span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span>
+            <span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;ranges&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">])</span>
+            <span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;opt_end&#39;</span><span class="p">],</span>
+                                        <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">])</span>
+            <span class="c1"># average the weights</span>
+            <span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">chunks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span> <span class="o">+</span>
+                                     <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># new chunk</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+
+    <span class="c1"># add one last chunk to the end</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">last_chunk</span> <span class="o">=</span> <span class="n">_create_last_chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last_chunk</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">chunks</span>
+
+
+<span class="k">def</span> <span class="nf">_optrun</span><span class="p">(</span><span class="n">new_params</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">opt_dpls</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span>
+            <span class="n">smooth_window_len</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is the function to run a simulation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    new_params: array</span>
+<span class="sd">        List or numpy array with the parameters chosen by</span>
+<span class="sd">        optimization engine. Order is consistent with</span>
+<span class="sd">        opt_params[&#39;ranges&#39;].</span>
+<span class="sd">    opt_params : dict</span>
+<span class="sd">        The optimization parameters</span>
+<span class="sd">    params : dict</span>
+<span class="sd">        The params dictionary.</span>
+<span class="sd">    opt_dpls : dict</span>
+<span class="sd">        Dictionary with keys &#39;target_dpl&#39; and &#39;best&#39; for</span>
+<span class="sd">        the experimental dipole and best dipole.</span>
+<span class="sd">    scale_factor : float</span>
+<span class="sd">        Scales the simulated dipoles by scale_factor to match</span>
+<span class="sd">        exp_dpl.</span>
+<span class="sd">    smooth_window_len : int</span>
+<span class="sd">        The length of the hamming window (in samples) to smooth the</span>
+<span class="sd">        simulated dipole waveform in each optimization step.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    avg_rmse: float</span>
+<span class="sd">        Weighted RMSE between data in dpl and exp_dpl</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization step </span><span class="si">%d</span><span class="s2">, iteration </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;cur_step&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                                  <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;optiter&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="kn">from</span> <span class="nn">.parallel_backends</span> <span class="kn">import</span> <span class="n">_BACKEND</span><span class="p">,</span> <span class="n">JoblibBackend</span>
+    <span class="k">if</span> <span class="n">_BACKEND</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_BACKEND</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># set parameters</span>
+    <span class="c1"># tiny negative weights are possible. Clip them to 0.</span>
+    <span class="n">new_params</span><span class="p">[</span><span class="n">new_params</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">test_value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">new_params</span><span class="p">):</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_value</span>
+
+    <span class="c1"># run the simulation, but stop early if possible</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tstop</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_instantiate_drives</span><span class="p">(</span><span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
+    <span class="n">avg_dpl</span> <span class="o">=</span> <span class="n">_BACKEND</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">avg_dpl</span> <span class="o">=</span> <span class="n">avg_dpl</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">scale_factor</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">smooth_window_len</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">avg_dpl</span> <span class="o">=</span> <span class="n">avg_dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">smooth_window_len</span><span class="p">)</span>
+
+    <span class="n">avg_rmse</span> <span class="o">=</span> <span class="n">_rmse</span><span class="p">(</span><span class="n">avg_dpl</span><span class="p">,</span> <span class="n">opt_dpls</span><span class="p">[</span><span class="s1">&#39;target_dpl&#39;</span><span class="p">],</span>
+                     <span class="n">tstart</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">],</span>
+                     <span class="n">tstop</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">],</span>
+                     <span class="n">weights</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">avg_rmse</span> <span class="o">&lt;</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;stepminopterr&#39;</span><span class="p">]:</span>
+        <span class="n">best</span> <span class="o">=</span> <span class="s2">&quot;[best] &quot;</span>
+        <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;stepminopterr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_rmse</span>
+        <span class="n">opt_dpls</span><span class="p">[</span><span class="s1">&#39;best_dpl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_dpl</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">best</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">weighted RMSE: </span><span class="si">%.2f</span><span class="s2"> over range [</span><span class="si">%3.3f</span><span class="s2">-</span><span class="si">%3.3f</span><span class="s2">] ms&quot;</span> <span class="o">%</span>
+          <span class="p">(</span><span class="n">best</span><span class="p">,</span> <span class="n">avg_rmse</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">],</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]))</span>
+
+    <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;optiter&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">avg_rmse</span>  <span class="c1"># nlopt expects error</span>
+
+
+<span class="k">def</span> <span class="nf">_run_optimization</span><span class="p">(</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">param_ranges</span><span class="p">,</span> <span class="n">optrun</span><span class="p">):</span>
+
+    <span class="n">cons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">):</span>
+        <span class="n">x0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param_name</span><span class="p">][</span><span class="s1">&#39;initial&#39;</span><span class="p">])</span>
+        <span class="n">cons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="n">param_ranges</span><span class="p">[</span><span class="n">param_name</span><span class="p">][</span><span class="s1">&#39;maxval&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="n">cons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">param_ranges</span><span class="p">[</span><span class="n">param_name</span><span class="p">][</span><span class="s1">&#39;minval&#39;</span><span class="p">])</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fmin_cobyla</span><span class="p">(</span><span class="n">optrun</span><span class="p">,</span> <span class="n">cons</span><span class="o">=</span><span class="n">cons</span><span class="p">,</span> <span class="n">rhobeg</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">rhoend</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+                         <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">catol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<div class="viewcode-block" id="optimize_evoked"><a class="viewcode-back" href="../../generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked">[docs]</a><span class="k">def</span> <span class="nf">optimize_evoked</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">target_dpl</span><span class="p">,</span> <span class="n">initial_dpl</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                    <span class="n">timing_range_multiplier</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">sigma_range_multiplier</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+                    <span class="n">synweight_range_multiplier</span><span class="o">=</span><span class="mf">500.0</span><span class="p">,</span> <span class="n">decay_multiplier</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span>
+                    <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">smooth_window_len</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Optimize drives to generate evoked response.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : dict</span>
+<span class="sd">        The initial params</span>
+<span class="sd">    target_dpl : instance of Dipole</span>
+<span class="sd">        The target experimental dipole.</span>
+<span class="sd">    initial_dpl : instance of Dipole</span>
+<span class="sd">        The initial dipole to start the optimization.</span>
+<span class="sd">    maxiter : int</span>
+<span class="sd">        The maximum number of simulations to run for optimizing</span>
+<span class="sd">        one &quot;chunk&quot;.</span>
+<span class="sd">    timing_range_multiplier : float</span>
+<span class="sd">        The scale of timing values to sweep over.</span>
+<span class="sd">    sigma_range_multiplier : float</span>
+<span class="sd">        The scale of sigma values to sweep over.</span>
+<span class="sd">    synweight_range_multiplier : float</span>
+<span class="sd">        The scale of input synaptic weights to sweep over.</span>
+<span class="sd">    decay_multiplier : float</span>
+<span class="sd">        The decay multiplier.</span>
+<span class="sd">    scale_factor : float</span>
+<span class="sd">        Scales the simulated dipoles by scale_factor to match</span>
+<span class="sd">        target_dpl.</span>
+<span class="sd">    smooth_window_len : int</span>
+<span class="sd">        The length of the hamming window (in samples) to smooth the</span>
+<span class="sd">        simulated dipole waveform in each optimization step.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    params : dict</span>
+<span class="sd">        The optimized params dictionary.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This optimization protocol utilizes the Constrained Optimization</span>
+<span class="sd">    By Linear Approximation (COBYLA) method:</span>
+<span class="sd">    https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_cobyla.html  # noqa</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.parallel_backends</span> <span class="kn">import</span> <span class="n">_BACKEND</span><span class="p">,</span> <span class="n">JoblibBackend</span>
+
+    <span class="k">if</span> <span class="n">_BACKEND</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_BACKEND</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Create a sorted dictionary with the inputs and parameters</span>
+    <span class="c1"># belonging to each.</span>
+    <span class="c1"># Then, calculate the appropriate weight function to be used</span>
+    <span class="c1"># in RMSE using the CDF defined by the input timing&#39;s mean and</span>
+    <span class="c1"># std. deviation parameters.</span>
+    <span class="c1"># Lastly, use the weights to define non-overlapping &quot;chunks&quot; of</span>
+    <span class="c1"># the simulation timeframe to optimize. Chunks are consolidated if</span>
+    <span class="c1"># more than one input should</span>
+    <span class="c1"># be optimized at a time.</span>
+    <span class="n">evinput_params</span> <span class="o">=</span> <span class="n">_split_by_evinput</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">sigma_range_multiplier</span><span class="p">,</span>
+                                       <span class="n">timing_range_multiplier</span><span class="p">,</span>
+                                       <span class="n">synweight_range_multiplier</span><span class="p">)</span>
+    <span class="n">evinput_params</span> <span class="o">=</span> <span class="n">_generate_weights</span><span class="p">(</span><span class="n">evinput_params</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span>
+                                       <span class="n">decay_multiplier</span><span class="p">)</span>
+    <span class="n">param_chunks</span> <span class="o">=</span> <span class="n">_consolidate_chunks</span><span class="p">(</span><span class="n">evinput_params</span><span class="p">)</span>
+
+    <span class="n">avg_rmse</span> <span class="o">=</span> <span class="n">_rmse</span><span class="p">(</span><span class="n">initial_dpl</span><span class="p">,</span> <span class="n">target_dpl</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial RMSE: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_rmse</span><span class="p">)</span>
+
+    <span class="n">opt_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param_chunks</span><span class="p">)):</span>
+        <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;cur_step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span>
+        <span class="n">total_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_chunks</span><span class="p">)</span>
+
+        <span class="c1"># param_chunks is the optimization information for all steps.</span>
+        <span class="c1"># opt_params is a pointer to the params for each step</span>
+        <span class="n">opt_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">param_chunks</span><span class="p">[</span><span class="n">step</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">maxiter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping optimization step </span><span class="si">%d</span><span class="s2"> (0 simulations)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;cur_step&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>
+                <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;cur_step&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">total_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># update currently used params</span>
+            <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">]:</span>
+                <span class="n">params</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">][</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;initial&#39;</span><span class="p">]</span>
+
+            <span class="c1"># For the last step (all inputs), recalculate ranges and update</span>
+            <span class="c1"># param_chunks. If previous optimization steps increased</span>
+            <span class="c1"># std. dev. this could result in fewer optimization steps as</span>
+            <span class="c1"># inputs may be deemed too close together and be grouped in a</span>
+            <span class="c1"># single optimization step.</span>
+            <span class="c1">#</span>
+            <span class="c1"># The purpose of the last step (with regular RMSE) is to clean up</span>
+            <span class="c1"># overfitting introduced by local weighted RMSE optimization.</span>
+
+            <span class="n">evinput_params</span> <span class="o">=</span> <span class="n">_split_by_evinput</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">sigma_range_multiplier</span><span class="p">,</span>
+                                               <span class="n">timing_range_multiplier</span><span class="p">,</span>
+                                               <span class="n">synweight_range_multiplier</span><span class="p">)</span>
+            <span class="n">evinput_params</span> <span class="o">=</span> <span class="n">_generate_weights</span><span class="p">(</span><span class="n">evinput_params</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span>
+                                               <span class="n">decay_multiplier</span><span class="p">)</span>
+            <span class="n">param_chunks</span> <span class="o">=</span> <span class="n">_consolidate_chunks</span><span class="p">(</span><span class="n">evinput_params</span><span class="p">)</span>
+
+            <span class="c1"># reload opt_params for the last step in case the number of</span>
+            <span class="c1"># steps was changed by updateoptparams()</span>
+            <span class="n">opt_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">param_chunks</span><span class="p">[</span><span class="n">total_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting optimization step </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">total_steps</span><span class="p">))</span>
+
+        <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;optiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;stepminopterr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e9</span>  <span class="c1"># min optimization error so far</span>
+        <span class="n">opt_dpls</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">best_dpl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_dpl</span><span class="o">=</span><span class="n">target_dpl</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_myoptrun</span><span class="p">(</span><span class="n">new_params</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_optrun</span><span class="p">(</span><span class="n">new_params</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">,</span>
+                           <span class="n">params</span><span class="p">,</span> <span class="n">opt_dpls</span><span class="o">=</span><span class="n">opt_dpls</span><span class="p">,</span>
+                           <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span>
+                           <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">smooth_window_len</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimizing from [</span><span class="si">%3.3f</span><span class="s1">-</span><span class="si">%3.3f</span><span class="s1">] ms&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">],</span>
+                                                    <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]))</span>
+        <span class="n">opt_results</span> <span class="o">=</span> <span class="n">_run_optimization</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+                                        <span class="n">param_ranges</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">],</span>
+                                        <span class="n">optrun</span><span class="o">=</span><span class="n">_myoptrun</span><span class="p">)</span>
+        <span class="c1"># tiny negative weights are possible. Clip them to 0.</span>
+        <span class="n">opt_results</span><span class="p">[</span><span class="n">opt_results</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># update opt_params for the next round</span>
+        <span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">],</span> <span class="n">opt_results</span><span class="p">):</span>
+            <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">][</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;initial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c1"># save the optimized params</span>
+    <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">]:</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;ranges&#39;</span><span class="p">][</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;initial&#39;</span><span class="p">]</span>
+
+    <span class="n">avg_rmse</span> <span class="o">=</span> <span class="n">_rmse</span><span class="p">(</span><span class="n">opt_dpls</span><span class="p">[</span><span class="s1">&#39;best_dpl&#39;</span><span class="p">],</span> <span class="n">target_dpl</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Final RMSE: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_rmse</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">params</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

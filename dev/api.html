@@ -88,9 +88,8 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">API Documentation</a><ul>
 <li><a class="reference internal" href="#simulation-hnn-core">Simulation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
-<li><a class="reference internal" href="#published-models-hnn-core">Published Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
-<li><a class="reference internal" href="#unpublished-models-hnn-core">Unpublished Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
-<li><a class="reference internal" href="#optimization-hnn-core">Optimization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
+<li><a class="reference internal" href="#network-models-hnn-core">Network Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):</a></li>
+<li><a class="reference internal" href="#optimization-hnn-core-optimization">Optimization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.optimization</span></code>):</a></li>
 <li><a class="reference internal" href="#dipole-hnn-core-dipole">Dipole (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.dipole</span></code>):</a></li>
 <li><a class="reference internal" href="#extracellulararray-hnn-core-extracellular">ExtracellularArray (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.extracellular</span></code>):</a></li>
 <li><a class="reference internal" href="#visualization-hnn-core-viz">Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):</a></li>
@@ -169,11 +168,14 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CellResponse</span></code></a>([spike_times, spike_gids, ...])</p></td>
 <td><p>The CellResponse class.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.pick_connection.html#hnn_core.pick_connection" title="hnn_core.pick_connection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pick_connection</span></code></a>(net[, src_gids, ...])</p></td>
+<td><p>Returns indices of connections that match search parameters.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
-<section id="published-models-hnn-core">
-<h2>Published Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):<a class="headerlink" href="#published-models-hnn-core" title="Permalink to this headline">¶</a></h2>
+<section id="network-models-hnn-core">
+<h2>Network Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):<a class="headerlink" href="#network-models-hnn-core" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -186,28 +188,25 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model" title="hnn_core.law_2021_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">law_2021_model</span></code></a>()</p></td>
 <td><p>Instantiate the beta modulated ERP network model.</p></td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="unpublished-models-hnn-core">
-<h2>Unpublished Models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):<a class="headerlink" href="#unpublished-models-hnn-core" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.calcium_model.html#hnn_core.calcium_model" title="hnn_core.calcium_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calcium_model</span></code></a>([params, add_drives_from_params])</p></td>
 <td><p>Instantiate the Jones 2009 model with improved calcium dynamics.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="optimization-hnn-core">
-<h2>Optimization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core</span></code>):<a class="headerlink" href="#optimization-hnn-core" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><p>optimize_evoked</p>
-</div></blockquote>
+<section id="optimization-hnn-core-optimization">
+<h2>Optimization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.optimization</span></code>):<a class="headerlink" href="#optimization-hnn-core-optimization" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked" title="hnn_core.optimization.optimize_evoked"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_evoked</span></code></a>(params, target_dpl, initial_dpl)</p></td>
+<td><p>Optimize drives to generate evoked response.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="dipole-hnn-core-dipole">
 <h2>Dipole (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.dipole</span></code>):<a class="headerlink" href="#dipole-hnn-core-dipole" title="Permalink to this headline">¶</a></h2>
