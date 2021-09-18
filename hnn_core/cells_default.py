@@ -66,7 +66,7 @@ def _cell_L2Pyr(override_params, pos=(0., 0., 0), gid=0.):
                           section_names=section_names)
     sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr')
 
-    sec_pts = {
+    end_pts = {
         'soma': [[-50, 0, 765], [-50, 0, 778]],
         'apical_trunk': [[-50, 0, 778], [-50, 0, 813]],
         'apical_oblique': [[-50, 0, 813], [-250, 0, 813]],
@@ -86,7 +86,7 @@ def _cell_L2Pyr(override_params, pos=(0., 0., 0), gid=0.):
                              mechanisms)
 
     for sec_name, section in sections.items():
-        section.sec_pts = sec_pts[sec_name]
+        section.end_pts = end_pts[sec_name]
 
         if sec_name == 'soma':
             section.syns = ['gabaa', 'gabab']
@@ -137,7 +137,7 @@ def _cell_L5Pyr(override_params, pos=(0., 0., 0), gid=0.):
                           section_names=section_names)
     sections['soma'] = _get_pyr_soma(p_all, 'L5Pyr')
 
-    sec_pts = {
+    end_pts = {
         'soma': [[0, 0, 0], [0, 0, 23]],
         'apical_trunk': [[0, 0, 23], [0, 0, 83]],
         'apical_oblique': [[0, 0, 83], [-150, 0, 83]],
@@ -164,7 +164,7 @@ def _cell_L5Pyr(override_params, pos=(0., 0., 0), gid=0.):
                              mechanisms)
 
     for sec_name, section in sections.items():
-        section.sec_pts = sec_pts[sec_name]
+        section.end_pts = end_pts[sec_name]
 
         if sec_name == 'soma':
             section.syns = ['gabaa', 'gabab']
@@ -205,13 +205,13 @@ def _cell_L5Pyr(override_params, pos=(0., 0., 0), gid=0.):
 
 
 def _get_basket_soma(cell_name):
-    sec_pts = [[0, 0, 0], [0, 0, 39.]]
+    end_pts = [[0, 0, 0], [0, 0, 39.]]
     return Section(
         L=39.,
         diam=20.,
         cm=0.85,
         Ra=200.,
-        sec_pts=sec_pts
+        end_pts=end_pts
     )
 
 

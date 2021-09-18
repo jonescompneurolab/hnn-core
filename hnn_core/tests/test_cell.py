@@ -55,7 +55,7 @@ def test_cell():
             diam=20,
             cm=0.85,
             Ra=200.,
-            sec_pts=[[0, 0, 0], [0, 39., 0]]
+            end_pts=[[0, 0, 0], [0, 39., 0]]
         )
     }
     sections['soma'].syns = ['ampa']

@@ -723,12 +723,12 @@ def plot_cell_morphology(cell, ax, show=True):
 
     for sec_name, section in cell.sections.items():
         linewidth = _linewidth_from_data_units(ax, section.diam)
-        sec_pts = section.sec_pts
+        end_pts = section.end_pts
         xs, ys, zs = list(), list(), list()
-        for pt in sec_pts:
-            dx = cell.pos[0] - cell.sections['soma'].sec_pts[0][0]
-            dy = cell.pos[1] - cell.sections['soma'].sec_pts[0][1]
-            dz = cell.pos[2] - cell.sections['soma'].sec_pts[0][2]
+        for pt in end_pts:
+            dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
+            dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
+            dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
             xs.append(pt[0] + dx)
             ys.append(pt[1] + dz)
             zs.append(pt[2] + dy)

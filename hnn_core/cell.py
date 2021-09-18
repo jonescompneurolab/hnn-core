@@ -18,11 +18,11 @@ from .viz import plot_cell_morphology
 
 def _get_cos_theta(sections, sec_name_apical):
     """Get cos(theta) to compute dipole along the apical dendrite."""
-    a = (np.array(sections[sec_name_apical].sec_pts[1]) -
-         np.array(sections[sec_name_apical].sec_pts[0]))
+    a = (np.array(sections[sec_name_apical].end_pts[1]) -
+         np.array(sections[sec_name_apical].end_pts[0]))
     cos_thetas = dict()
     for sec_name, section in sections.items():
-        b = np.array(section.sec_pts[1]) - np.array(section.sec_pts[0])
+        b = np.array(section.end_pts[1]) - np.array(section.end_pts[0])
         cos_thetas[sec_name] = np.dot(a, b) / (norm(a) * norm(b))
     return cos_thetas
 
@@ -167,15 +167,15 @@ class Section:
     Ra : float
         axial resistivity in ohm-cm
     """
-    def __init__(self, L, diam, Ra, cm, sec_pts=None):
+    def __init__(self, L, diam, Ra, cm, end_pts=None):
 
         self._L = L
         self.diam = diam
         self.Ra = Ra
         self.cm = cm
-        if sec_pts is None:
-            sec_pts = list()
-        self.sec_pts = sec_pts
+        if end_pts is None:
+            end_pts = list()
+        self.end_pts = end_pts
 
         self.mechs = dict()
         self.syns = list()
@@ -191,11 +191,11 @@ class Section:
     def L(self, val):
         factor = val / self._L
 
-        x0 = self.sec_pts[0][0]
-        y0 = self.sec_pts[0][1]
-        z0 = self.sec_pts[0][2]
+        x0 = self.end_pts[0][0]
+        y0 = self.end_pts[0][1]
+        z0 = self.end_pts[0][2]
 
-        for sec_pt in self.sec_pts:
+        for sec_pt in self.end_pts:
             sec_pt[0] = x0 + (sec_pt[0] - x0) * factor
             sec_pt[1] = y0 + (sec_pt[1] - y0) * factor
             sec_pt[2] = z0 + (sec_pt[2] - z0) * factor
@@ -274,7 +274,7 @@ class Cell:
             diam=20,
             cm=0.85,
             Ra=200.,
-            sec_pts=[[0, 0, 0], [0, 39., 0]]
+            end_pts=[[0, 0, 0], [0, 39., 0]]
         )
     """
 
@@ -367,9 +367,9 @@ class Cell:
         """
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
-        dx = self.pos[0] - self.sections['soma'].sec_pts[0][0]
-        dy = self.pos[1] - self.sections['soma'].sec_pts[0][1]
-        dz = self.pos[2] - self.sections['soma'].sec_pts[0][2]
+        dx = self.pos[0] - self.sections['soma'].end_pts[0][0]
+        dy = self.pos[1] - self.sections['soma'].end_pts[0][1]
+        dz = self.pos[2] - self.sections['soma'].end_pts[0][2]
 
         for sec_name in sections:
             sec = h.Section(name=f'{self.name}_{sec_name}')
@@ -377,7 +377,7 @@ class Cell:
 
             h.pt3dclear(sec=sec)
             h.pt3dconst(0, sec=sec)  # be explicit, see documentation
-            for pt in sections[sec_name].sec_pts:
+            for pt in sections[sec_name].end_pts:
                 h.pt3dadd(pt[0] + dx,
                           pt[1] + dy,
                           pt[2] + dz, 1, sec=sec)
