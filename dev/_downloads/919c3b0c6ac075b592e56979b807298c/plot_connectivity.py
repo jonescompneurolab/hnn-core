@@ -16,14 +16,7 @@ import os.path as op
 # Let us import ``hnn_core``.
 
 import hnn_core
-from hnn_core import read_params, jones_2009_model, simulate_dipole
-
-hnn_core_root = op.dirname(hnn_core.__file__)
-
-###############################################################################
-# Then we read the parameters file
-params_fname = op.join(hnn_core_root, 'param', 'default.json')
-params = read_params(params_fname)
+from hnn_core import jones_2009_model, simulate_dipole
 
 ###############################################################################
 # To explore how to modify network connectivity, we will start with simulating
@@ -32,7 +25,7 @@ params = read_params(params_fname)
 # explore how it changes with new connections. We first instantiate the
 # network. (Note: Setting ``add_drives_from_params=True`` loads a set of
 # predefined drives without the drives API shown previously).
-net_erp = jones_2009_model(params, add_drives_from_params=True)
+net_erp = jones_2009_model(add_drives_from_params=True)
 
 ###############################################################################
 # Instantiating the network comes with a predefined set of connections that
@@ -77,7 +70,7 @@ net_erp.cell_response.plot_spikes_raster()
 # connections to be specified with either cell names, or the cell IDs (gids)
 # directly.
 def get_network(probability=1.0):
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = jones_2009_model(add_drives_from_params=True)
     net.clear_connectivity()
 
     # Pyramidal cell connections

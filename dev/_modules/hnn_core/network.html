@@ -466,6 +466,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># Save the parameters used to create the Network</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="c1"># Initialise a dictionary of cell ID&#39;s, which get used when the</span>
         <span class="c1"># network is constructed (&#39;built&#39;) in NetworkBuilder</span>

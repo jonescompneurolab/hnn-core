@@ -47,16 +47,13 @@ pattern of cells in the HNN model.
 
 Let us import ``hnn_core``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-25
+.. GENERATED FROM PYTHON SOURCE LINES 18-22
 
 .. code-block:: default
 
 
     import hnn_core
-    from hnn_core import (read_params, read_spikes, jones_2009_model,
-                          simulate_dipole)
-
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    from hnn_core import read_spikes, jones_2009_model, simulate_dipole
 
 
 
@@ -65,36 +62,18 @@ Let us import ``hnn_core``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-27
-
-Then we read the parameters file
-
-.. GENERATED FROM PYTHON SOURCE LINES 27-30
-
-.. code-block:: default
-
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 31-33
+.. GENERATED FROM PYTHON SOURCE LINES 23-25
 
 Now let's build the network. We have used the same weights as in the
 :ref:`evoked example <sphx_glr_auto_examples_plot_simulate_evoked.py>`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-37
+.. GENERATED FROM PYTHON SOURCE LINES 25-29
 
 .. code-block:: default
 
     import matplotlib.pyplot as plt
 
-    net = jones_2009_model(params)
+    net = jones_2009_model()
 
 
 
@@ -103,7 +82,7 @@ Now let's build the network. We have used the same weights as in the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-43
+.. GENERATED FROM PYTHON SOURCE LINES 30-35
 
 ``net`` does not have any driving inputs and only defines the local network
 connectivity. Let us go ahead and first add a distal evoked drive.
@@ -111,7 +90,7 @@ We need to define the AMPA and NMDA weights for the connections. An
 "evoked drive" defines inputs that are normally distributed with a certain
 mean and standard deviation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-55
+.. GENERATED FROM PYTHON SOURCE LINES 35-47
 
 .. code-block:: default
 
@@ -134,14 +113,14 @@ mean and standard deviation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-60
+.. GENERATED FROM PYTHON SOURCE LINES 48-52
 
 The reason it is called an "evoked drive" is it can be used to simulate
 waveforms resembling evoked responses. Here, we show how to do it with two
 proximal drives which drive current up the dendrite and one distal drive
 which drives current down the dendrite producing the negative deflection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-71
+.. GENERATED FROM PYTHON SOURCE LINES 52-63
 
 .. code-block:: default
 
@@ -163,13 +142,13 @@ which drives current down the dendrite producing the negative deflection.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-75
+.. GENERATED FROM PYTHON SOURCE LINES 64-67
 
 Now we add the second proximal evoked drive and simulate the network
 dynamics with somatic voltage recordings enabled. Note: only AMPA weights
 differ from first.
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-85
+.. GENERATED FROM PYTHON SOURCE LINES 67-77
 
 .. code-block:: default
 
@@ -218,14 +197,14 @@ differ from first.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-90
+.. GENERATED FROM PYTHON SOURCE LINES 78-82
 
 Here, we explain more details about the data structures and how they can
 be used to better interpret the data. The cell IDs (gids) uniquely define
 neurons in the network and are stored in the :class:`~hnn_core.Network`
 object as a dictionary
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-93
+.. GENERATED FROM PYTHON SOURCE LINES 82-85
 
 .. code-block:: default
 
@@ -247,13 +226,13 @@ object as a dictionary
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-97
+.. GENERATED FROM PYTHON SOURCE LINES 86-89
 
 Simulated voltage in the soma is stored in :class:`~hnn_core.CellResponse`
 as a dictionary. The CellResponse object stores data produced by individual
 cells including spikes, somatic voltages and currents.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-101
+.. GENERATED FROM PYTHON SOURCE LINES 89-93
 
 .. code-block:: default
 
@@ -276,11 +255,11 @@ cells including spikes, somatic voltages and currents.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-103
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 We can plot the firing pattern of individual cells by indexing with the gid
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-111
+.. GENERATED FROM PYTHON SOURCE LINES 95-103
 
 .. code-block:: default
 
@@ -303,14 +282,14 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-116
+.. GENERATED FROM PYTHON SOURCE LINES 104-108
 
 Also, we can plot the spikes in the network and write them to text files.
 Note that we can use formatting syntax to specify the filename pattern
 with which each trial will be written ('spk_1.txt', 'spk_2.txt, ...). To
 read spikes back in, we can use wildcard expressions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-122
+.. GENERATED FROM PYTHON SOURCE LINES 108-114
 
 .. code-block:: default
 
@@ -350,12 +329,12 @@ read spikes back in, we can use wildcard expressions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-125
+.. GENERATED FROM PYTHON SOURCE LINES 115-117
 
 We can additionally calculate the mean spike rates for each cell class by
 specifying a time window with ``tstart`` and ``tstop``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-136
+.. GENERATED FROM PYTHON SOURCE LINES 117-128
 
 .. code-block:: default
 
@@ -388,12 +367,12 @@ specifying a time window with ``tstart`` and ``tstop``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-139
+.. GENERATED FROM PYTHON SOURCE LINES 129-131
 
 Finally, we can plot the soma voltage along with the spiking activity with
 raster plots and histograms for the pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-151
+.. GENERATED FROM PYTHON SOURCE LINES 131-143
 
 .. code-block:: default
 
@@ -431,7 +410,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  0.902 seconds)
+   **Total running time of the script:** ( 1 minutes  18.742 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:

@@ -78,7 +78,7 @@ Let us import hnn_core
 
 Read the parameter file and print the between-cell connectivity parameters.
 Note that these are different compared with the 'default' parameter set used
-in, e.g., :ref:`sphx_glr_auto_examples_plot_simulate_alpha.py`.
+in, e.g., :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`.
 
 .. GENERATED FROM PYTHON SOURCE LINES 38-42
 
@@ -490,7 +490,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 12 minutes  14.308 seconds)
+   **Total running time of the script:** ( 4 minutes  16.483 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:

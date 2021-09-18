@@ -62,7 +62,7 @@ Let us import hnn_core
 
 
     import hnn_core
-    from hnn_core import simulate_dipole, read_params, jones_2009_model
+    from hnn_core import simulate_dipole, jones_2009_model
 
 
 
@@ -71,26 +71,7 @@ Let us import hnn_core
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-33
-
-Then we setup the directories and read the default parameters file
-
-.. GENERATED FROM PYTHON SOURCE LINES 33-37
-
-.. code-block:: default
-
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 38-45
+.. GENERATED FROM PYTHON SOURCE LINES 32-39
 
 Now let's simulate the dipole and plot it. To excite the network, we add a
 ~10 Hz "bursty" drive starting at 50 ms and continuing to the end of the
@@ -100,11 +81,11 @@ amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization. The drive is only connected to the 
 :term:`proximal` (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-64
+.. GENERATED FROM PYTHON SOURCE LINES 39-58
 
 .. code-block:: default
 
-    net = jones_2009_model(params)
+    net = jones_2009_model()
 
     location = 'proximal'
     burst_std = 20
@@ -169,11 +150,11 @@ time with unique randomization. The drive is only connected to the
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7fab9a7affd0>
+    <hnn_core.dipole.Dipole object at 0x7fd7ee809d30>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-71
+.. GENERATED FROM PYTHON SOURCE LINES 59-65
 
 Prior to plotting, we can choose to smooth the dipole waveform (note that the
 :meth:`~hnn_core.dipole.smooth`-method operates in-place, *i.e.*, it alters
@@ -182,7 +163,7 @@ signal summation from a larger number and greater volume of neurons than are
 included in our biophysical model. We can confirm that what we simulate is
 indeed 10 Hz activity by plotting the power spectral density (PSD).
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-91
+.. GENERATED FROM PYTHON SOURCE LINES 65-85
 
 .. code-block:: default
 
@@ -220,13 +201,13 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:90: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:84: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
       plt.tight_layout()
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-97
+.. GENERATED FROM PYTHON SOURCE LINES 86-91
 
 The next step is to add a simultaneous 10 Hz :term:`distal` drive with a
 lower within-burst spread of spike times (``burst_std``) compared with the
@@ -234,7 +215,7 @@ proximal one. The different arrival times of spikes at opposite ends of
 the pyramidal cells will tend to produce bursts of 15-30 Hz power known
 as beta frequency events.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-108
+.. GENERATED FROM PYTHON SOURCE LINES 91-102
 
 .. code-block:: default
 
@@ -298,7 +279,7 @@ as beta frequency events.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-114
+.. GENERATED FROM PYTHON SOURCE LINES 103-108
 
 We can verify that beta frequency activity was produced by inspecting the PSD
 of the most recent simulation. The dominant power in the signal is shifted
@@ -306,7 +287,7 @@ from alpha (~10 Hz) to beta (15-25 Hz) frequency range. All plotting and
 smoothing parameters are as above, but here no scaling is applied, leading to
 smaller absolute values in the plots.
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-126
+.. GENERATED FROM PYTHON SOURCE LINES 108-120
 
 .. code-block:: default
 
@@ -336,13 +317,13 @@ smaller absolute values in the plots.
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:124: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:118: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
       plt.tight_layout()
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-132
+.. GENERATED FROM PYTHON SOURCE LINES 121-126
 
 References
 ----------
@@ -353,7 +334,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 9 minutes  31.169 seconds)
+   **Total running time of the script:** ( 3 minutes  23.897 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

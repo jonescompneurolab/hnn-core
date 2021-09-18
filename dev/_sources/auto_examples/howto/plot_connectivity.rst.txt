@@ -46,15 +46,13 @@ This example demonstrates how to modify the network connectivity.
 
 Let us import ``hnn_core``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-23
+.. GENERATED FROM PYTHON SOURCE LINES 17-21
 
 .. code-block:: default
 
 
     import hnn_core
-    from hnn_core import read_params, jones_2009_model, simulate_dipole
-
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    from hnn_core import jones_2009_model, simulate_dipole
 
 
 
@@ -63,25 +61,7 @@ Let us import ``hnn_core``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-25
-
-Then we read the parameters file
-
-.. GENERATED FROM PYTHON SOURCE LINES 25-28
-
-.. code-block:: default
-
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 29-35
+.. GENERATED FROM PYTHON SOURCE LINES 22-28
 
 To explore how to modify network connectivity, we will start with simulating
 the evoked response from the
@@ -90,11 +70,11 @@ explore how it changes with new connections. We first instantiate the
 network. (Note: Setting ``add_drives_from_params=True`` loads a set of
 predefined drives without the drives API shown previously).
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-37
+.. GENERATED FROM PYTHON SOURCE LINES 28-30
 
 .. code-block:: default
 
-    net_erp = jones_2009_model(params, add_drives_from_params=True)
+    net_erp = jones_2009_model(add_drives_from_params=True)
 
 
 
@@ -103,7 +83,7 @@ predefined drives without the drives API shown previously).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-46
+.. GENERATED FROM PYTHON SOURCE LINES 31-39
 
 Instantiating the network comes with a predefined set of connections that
 reflect the canonical neocortical microcircuit. ``net.connectivity``
@@ -114,7 +94,7 @@ connection. The weights of these connections can be visualized with
 connections using ``pick_connection`` which returns the indices
 of ``net.connectivity`` that match the provided parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-62
+.. GENERATED FROM PYTHON SOURCE LINES 39-55
 
 .. code-block:: default
 
@@ -170,13 +150,13 @@ of ``net.connectivity`` that match the provided parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-66
+.. GENERATED FROM PYTHON SOURCE LINES 56-59
 
 Data recorded during simulations are stored under
 :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
 a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-62
 
 .. code-block:: default
 
@@ -223,7 +203,7 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-79
+.. GENERATED FROM PYTHON SOURCE LINES 63-72
 
 We can also define our own connections to test the effect of different
 connectivity patterns. To start, ``net.clear_connectivity()`` can be used
@@ -235,12 +215,12 @@ and L2 basket cells. :meth:`hnn_core.Network.add_connection` allows
 connections to be specified with either cell names, or the cell IDs (gids)
 directly.
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-104
+.. GENERATED FROM PYTHON SOURCE LINES 72-97
 
 .. code-block:: default
 
     def get_network(probability=1.0):
-        net = jones_2009_model(params, add_drives_from_params=True)
+        net = jones_2009_model(add_drives_from_params=True)
         net.clear_connectivity()
 
         # Pyramidal cell connections
@@ -299,13 +279,13 @@ directly.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-108
+.. GENERATED FROM PYTHON SOURCE LINES 98-101
 
 We can additionally use the ``probability`` argument to create a sparse
 connectivity pattern instead of all-to-all. Let's try creating the same
 network with a 10% chance of cells connecting to each other.
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-111
+.. GENERATED FROM PYTHON SOURCE LINES 101-104
 
 .. code-block:: default
 
@@ -347,7 +327,7 @@ network with a 10% chance of cells connecting to each other.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-117
+.. GENERATED FROM PYTHON SOURCE LINES 105-110
 
 With the previous connection pattern there appears to be synchronous rhythmic
 firing of the L5 pyramidal cells with a period of 10 ms. The synchronous
@@ -355,7 +335,7 @@ activity is visible as vertical lines where several cells fire simultaneously
 Using the sparse connectivity pattern produced a lot more spiking in
 the L5 pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-120
+.. GENERATED FROM PYTHON SOURCE LINES 110-113
 
 .. code-block:: default
 
@@ -392,11 +372,11 @@ the L5 pyramidal cells.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-122
+.. GENERATED FROM PYTHON SOURCE LINES 114-115
 
 We can plot the sparse connectivity pattern between cell populations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-129
+.. GENERATED FROM PYTHON SOURCE LINES 115-122
 
 .. code-block:: default
 
@@ -426,12 +406,12 @@ We can plot the sparse connectivity pattern between cell populations.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-132
+.. GENERATED FROM PYTHON SOURCE LINES 123-125
 
 Note that the sparsity is in addition to the weight decay with distance
 from the source cell.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-135
+.. GENERATED FROM PYTHON SOURCE LINES 125-128
 
 .. code-block:: default
 
@@ -457,14 +437,14 @@ from the source cell.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-140
+.. GENERATED FROM PYTHON SOURCE LINES 129-133
 
 In the sparse network, there still appears to be some rhythmicity
 where the cells are firing synchronously with a smaller period of 4-5 ms.
 As a final step, we can see how this change in spiking activity impacts
 the aggregate current dipole.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-155
+.. GENERATED FROM PYTHON SOURCE LINES 133-148
 
 .. code-block:: default
 
@@ -505,7 +485,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 6 minutes  19.483 seconds)
+   **Total running time of the script:** ( 4 minutes  14.382 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

@@ -147,8 +147,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    params : dict | None</span>
-<span class="sd">        The parameters to use for constructing the network.</span>
+<span class="sd">    params : str | dict | None</span>
+<span class="sd">        The path to the parameter file for constructing the network.</span>
 <span class="sd">        If None, parameters loaded from default.json</span>
 <span class="sd">        Default: None</span>
 <span class="sd">    add_drives_from_params : bool</span>
@@ -171,9 +171,10 @@
 <span class="sd">    present at a 1:3-ratio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-    <span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hnn_core_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.json&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hnn_core_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.json&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="n">add_drives_from_params</span><span class="p">)</span>
 
