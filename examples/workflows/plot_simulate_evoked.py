@@ -52,7 +52,6 @@ print(params['L2Pyr_soma*'])
 # inside it.
 net = jones_2009_model(params)
 net.plot_cells()
-sdfdfd
 net.cell_types['L5_pyramidal'].plot_morphology()
 
 ###############################################################################

@@ -76,7 +76,8 @@ def test_cell():
     net._add_cell_type('mycell', pos=[(0., 0., 0.)], cell_template=cell.copy())
     net.cell_types['mycell'].sections['soma'].L = 63.
     nrn_net = NetworkBuilder(net)
-    assert nrn_net.net.cells['mycell'][0]._nrn_sections['soma'].L == 63.
+    gid = net.gid_ranges['mycell'][0]
+    assert nrn_net._cells[gid]._nrn_sections['soma'].L == 63.
 
     # test successful build
     cell.build()
