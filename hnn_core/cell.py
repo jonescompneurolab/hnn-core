@@ -166,16 +166,37 @@ class Section:
         membrane capacitance in micro-Farads
     Ra : float
         axial resistivity in ohm-cm
+    end_pts : list of [x, y, z]
+        The start and stop points of the section.
+
+    Attributes
+    ----------
+    mechs : dict
+        Mechanisms to insert in this section. The keys
+        are the names of the mechanisms and values
+        are the properties. For e.g., {'ca': {'gbar_ca': 60}}
+    syns : list of str
+        The synaptic mechanisms to add in this section
+    end_pts : list of [x, y, z]
+        The start and stop points of the section. Cannot be changed.
+    L : float
+        length of a section in microns. Cannot be changed.
+    diam : float
+        diameter of a section in microns. Cannot be changed.
+    cm : float
+        membrane capacitance in micro-Farads
+    Ra : float
+        axial resistivity in ohm-cm
     """
     def __init__(self, L, diam, Ra, cm, end_pts=None):
 
         self._L = L
-        self.diam = diam
+        self._diam = diam
         self.Ra = Ra
         self.cm = cm
         if end_pts is None:
             end_pts = list()
-        self.end_pts = end_pts
+        self._end_pts = end_pts
 
         self.mechs = dict()
         self.syns = list()
@@ -187,19 +208,13 @@ class Section:
     def L(self):
         return self._L
 
-    @L.setter
-    def L(self, val):
-        factor = val / self._L
+    @property
+    def diam(self):
+        return self._diam
 
-        x0 = self.end_pts[0][0]
-        y0 = self.end_pts[0][1]
-        z0 = self.end_pts[0][2]
-
-        for sec_pt in self.end_pts:
-            sec_pt[0] = x0 + (sec_pt[0] - x0) * factor
-            sec_pt[1] = y0 + (sec_pt[1] - y0) * factor
-            sec_pt[2] = z0 + (sec_pt[2] - z0) * factor
-        self._L = val
+    @property
+    def end_pts(self):
+        return self._end_pts
 
 
 class Cell:
@@ -211,14 +226,8 @@ class Cell:
         The name of the cell.
     pos : tuple
         The (x, y, z) coordinates.
-    sections : nested dict
+    sections : dict of Section
         Dictionary with keys as section name.
-        sections[sec_name] is a dictionary with keys
-        L, diam, Ra, cm, syns and mech.
-        syns is a list specifying the synapses at that section.
-        The properties of syn are specified in synapses.
-        mech is a dict with keys as the mechanism names. The
-        values are dictionaries with properties of the mechanism.
     synapses : dict of dict
         Keys are name of synaptic mechanism. Each synaptic mechanism
         has keys for parameters of the mechanism, e.g., 'e', 'tau1',
