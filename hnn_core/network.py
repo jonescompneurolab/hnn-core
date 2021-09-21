@@ -923,6 +923,7 @@ class Network(object):
                         lamtha=space_constant, probability=probability,
                         conn_seed=drive['conn_seed'] + seed_increment)
                     # Ensure that AMPA/NMDA connections target the same gids
+                    # when probability < 1
                     if receptor_idx > 0:
                         self.connectivity[-1]['src_gids'] = \
                             self.connectivity[-2]['src_gids']
