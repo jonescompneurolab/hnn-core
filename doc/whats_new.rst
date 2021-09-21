@@ -65,6 +65,9 @@ Changelog
 
 - Add method for setting in-plane cell distances and layer separation in the network :func:`~hnn_core.Network.set_cell_positions`, by `Christopher Bailey`_ in `#370 <https://github.com/jonescompneurolab/hnn-core/pull/370>`_
 
+- External drives API now accepts probability argument for targetting subsets of cells, 
+  by `Nick Tolley`_ in :gh:`416`
+
 Bug
 ~~~
 
