@@ -124,17 +124,19 @@ def test_dipole_simulation():
                         record_isoma=0)
 
     # test Network.copy() returns 'bare' network after simulating
+    dpl = simulate_dipole(net, tstop=25., n_trials=1)[0]
+    net_copy = net.copy()
+    assert len(net_copy.external_drives['evprox1']['events']) == 0
+
+    # test that Dipole.copy() returns the expected exact copy
+    assert_allclose(dpl.data['agg'], dpl.copy().data['agg'])
+
     with pytest.raises(Warning, match='No connections'):
-        dpl = simulate_dipole(net, tstop=25., n_trials=1)[0]
-        net_copy = net.copy()
-        assert len(net_copy.external_drives['evprox1']['events']) == 0
-
-        # test that Dipole.copy() returns the expected exact copy
-        assert_allclose(dpl.data['agg'], dpl.copy().data['agg'])
-
-        # Test raster plot with no spikes
         net = Network(params)
+        # warning triggered on simulate_dipole()
         simulate_dipole(net, tstop=0.1, n_trials=1)
+
+        # Smoke test for raster plot with no spikes
         net.cell_response.plot_spikes_raster()
 
 
