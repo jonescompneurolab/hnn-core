@@ -530,9 +530,23 @@ class Network(object):
         event_seed : int
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
+            Not fixed across trials (see Notes)
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
             Used to randomly remove connections when probablity < 1.0.
+            Fixed across trials (see Notes)
+
+        Notes
+        -----
+        Random seeding behavior across trials is different for event_seed
+        and conn_seed (n_trials > 1 in simulate_dipole(..., n_trials)
+        event_seed
+            Across trials, the random seed is incremented leading such that
+            the exact spike times are different
+        conn_seed
+            The random seed does not change across trials. This means for
+            probability < 1.0, the random subset of gids targeted is the same.
+
         """
         if not self._legacy_mode:
             _check_drive_parameter_values('evoked', sigma=sigma,
