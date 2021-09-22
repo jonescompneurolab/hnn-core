@@ -41,9 +41,9 @@ law_fall = net.cell_types['L5_pyramidal'].synapses['gabab']['tau2']
 print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}\n')
 
 print('Apical Dendrite Channels:')
-print(net.cell_types['L5_pyramidal'].sections['apical_1']['mechs'].keys())
+print(net.cell_types['L5_pyramidal'].sections['apical_1'].mechs.keys())
 print("\nBasal Dendrite Channels ('ca' missing):")
-print(net.cell_types['L5_pyramidal'].sections['basal_1']['mechs'].keys())
+print(net.cell_types['L5_pyramidal'].sections['basal_1'].mechs.keys())
 
 ###############################################################################
 # A major change to the Jones 2009 model is the addition of a

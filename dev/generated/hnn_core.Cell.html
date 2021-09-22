@@ -149,13 +149,7 @@
 </dd>
 <dt><strong>pos</strong><span class="classifier">tuple</span></dt><dd><p>The (x, y, z) coordinates.</p>
 </dd>
-<dt><strong>sections</strong><span class="classifier">nested dict</span></dt><dd><p>Dictionary with keys as section name.
-sections[sec_name] is a dictionary with keys
-L, diam, Ra, cm, syns and mech.
-syns is a list specifying the synapses at that section.
-The properties of syn are specified in synapses.
-mech is a dict with keys as the mechanism names. The
-values are dictionaries with properties of the mechanism.</p>
+<dt><strong>sections</strong><span class="classifier">dict of Section</span></dt><dd><p>Dictionary with keys as section name.</p>
 </dd>
 <dt><strong>synapses</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
 has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
@@ -180,22 +174,13 @@ yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sections</span> <span class="o">=</span> <span class="p">{</span>
-<span class="go">    &#39;soma&#39;:</span>
-<span class="go">    {</span>
-<span class="go">        &#39;L&#39;: 39,</span>
-<span class="go">        &#39;diam&#39;: 20,</span>
-<span class="go">        &#39;cm&#39;: 0.85,</span>
-<span class="go">        &#39;Ra&#39;: 200.,</span>
-<span class="go">        &#39;sec_pts&#39;: [[0, 0, 0], [0, 39., 0]],</span>
-<span class="go">        &#39;syns&#39;: [&#39;ampa&#39;, &#39;gabaa&#39;, &#39;nmda&#39;],</span>
-<span class="go">        &#39;mechs&#39; : {</span>
-<span class="go">            &#39;ca&#39;: {</span>
-<span class="go">                &#39;gbar_ca&#39;: 60</span>
-<span class="go">            }</span>
-<span class="go">        }</span>
-<span class="go">    }</span>
-<span class="go">}</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">section_soma</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span>
+<span class="go">        L=39,</span>
+<span class="go">        diam=20,</span>
+<span class="go">        cm=0.85,</span>
+<span class="go">        Ra=200.,</span>
+<span class="go">        end_pts=[[0, 0, 0], [0, 39., 0]]</span>
+<span class="go">    )</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
