@@ -171,7 +171,8 @@ synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evprox1', mu=21., sigma=4., numspikes=1, location='proximal',
     n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_p,
-    weights_nmda=weights_nmda_p, synaptic_delays=synaptic_delays_p, seedcore=6)
+    weights_nmda=weights_nmda_p, synaptic_delays=synaptic_delays_p,
+    event_seed=6)
 
 # Late proximal drive
 weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0039,
@@ -184,7 +185,8 @@ synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evprox2', mu=134., sigma=4.5, numspikes=1, location='proximal',
     n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_p,
-    weights_nmda=weights_nmda_p, synaptic_delays=synaptic_delays_p, seedcore=5)
+    weights_nmda=weights_nmda_p, synaptic_delays=synaptic_delays_p,
+    event_seed=5)
 
 # Early distal drive
 weights_ampa_d = {'L2_basket': 0.0043, 'L2_pyramidal': 0.0032,
@@ -197,7 +199,8 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evdist1', mu=32., sigma=2.5, numspikes=1, location='distal',
     n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_d,
-    weights_nmda=weights_nmda_d, synaptic_delays=synaptic_delays_d, seedcore=5)
+    weights_nmda=weights_nmda_d, synaptic_delays=synaptic_delays_d,
+    event_seed=5)
 
 # Late distal drive
 weights_ampa_d = {'L2_basket': 0.0041, 'L2_pyramidal': 0.0019,
@@ -210,7 +213,8 @@ synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evdist2', mu=84., sigma=4.5, numspikes=1, location='distal',
     n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_d,
-    weights_nmda=weights_nmda_d, synaptic_delays=synaptic_delays_d, seedcore=2)
+    weights_nmda=weights_nmda_d, synaptic_delays=synaptic_delays_d,
+    event_seed=2)
 
 ###############################################################################
 # Now we run the simulation over 2 trials so that we can plot the average

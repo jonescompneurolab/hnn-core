@@ -88,7 +88,7 @@ def add_erp_drives(net, stimulus_start):
     net.add_evoked_drive(
         'evdist1', mu=70.0 + stimulus_start, sigma=0.0, numspikes=1,
         weights_ampa=weights_ampa_d1, weights_nmda=weights_nmda_d1,
-        location='distal', synaptic_delays=syn_delays_d1, seedcore=4)
+        location='distal', synaptic_delays=syn_delays_d1, event_seed=4)
 
     # Two proximal drives
     weights_ampa_p1 = {'L2_basket': 0.002, 'L2_pyramidal': 0.0011,
@@ -100,7 +100,7 @@ def add_erp_drives(net, stimulus_start):
     net.add_evoked_drive(
         'evprox1', mu=25.0 + stimulus_start, sigma=0.0, numspikes=1,
         weights_ampa=weights_ampa_p1, weights_nmda=None,
-        location='proximal', synaptic_delays=syn_delays_prox, seedcore=4)
+        location='proximal', synaptic_delays=syn_delays_prox, event_seed=4)
 
     # Second proximal evoked drive. NB: only AMPA weights differ from first
     weights_ampa_p2 = {'L2_basket': 0.005, 'L2_pyramidal': 0.005,
@@ -109,7 +109,7 @@ def add_erp_drives(net, stimulus_start):
     net.add_evoked_drive(
         'evprox2', mu=135.0 + stimulus_start, sigma=0.0, numspikes=1,
         weights_ampa=weights_ampa_p2, location='proximal',
-        synaptic_delays=syn_delays_prox, seedcore=4)
+        synaptic_delays=syn_delays_prox, event_seed=4)
 
     return net
 
@@ -127,9 +127,9 @@ def add_beta_drives(net, beta_start):
                      'L5_pyramidal': 0.5}
     net.add_bursty_drive(
         'beta_dist', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-        burst_rate=1., burst_std=10., numspikes=2, spike_isi=10, n_drive_cells=10,
-        location='distal', weights_ampa=weights_ampa_d1,
-        synaptic_delays=syn_delays_d1, seedcore=20)
+        burst_rate=1., burst_std=10., numspikes=2, spike_isi=10,
+        n_drive_cells=10, location='distal', weights_ampa=weights_ampa_d1,
+        synaptic_delays=syn_delays_d1, event_seed=20)
 
     # Proximal Drive
     weights_ampa_p1 = {'L2_basket': 0.00004, 'L2_pyramidal': 0.00002,
@@ -139,9 +139,9 @@ def add_beta_drives(net, beta_start):
 
     net.add_bursty_drive(
         'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-        burst_rate=1., burst_std=20., numspikes=2, spike_isi=10, n_drive_cells=10,
-        location='proximal', weights_ampa=weights_ampa_p1,
-        synaptic_delays=syn_delays_p1, seedcore=20)
+        burst_rate=1., burst_std=20., numspikes=2, spike_isi=10,
+        n_drive_cells=10, location='proximal', weights_ampa=weights_ampa_p1,
+        synaptic_delays=syn_delays_p1, event_seed=20)
 
     return net
 

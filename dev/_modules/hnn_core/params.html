@@ -297,7 +297,7 @@
                              <span class="s1">&#39;spike_isi&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>  <span class="c1"># not exposed in params-files</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;space_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span>
-        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -351,7 +351,7 @@
             <span class="c1"># XXX Force random states to be the same as HNN-gui for the default</span>
             <span class="c1"># parameter set after increasing the number of bursty drive</span>
             <span class="c1"># gids from 2 to 20</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">18</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">18</span>
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -370,7 +370,7 @@
                                  <span class="s1">&#39;numspikes&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>  <span class="c1"># NB hard-coded in GUI!</span>
                                  <span class="s1">&#39;sync_within_trial&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;space_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
 
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
@@ -384,7 +384,7 @@
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;poisson&#39;</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;space_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
 
             <span class="n">rate_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>

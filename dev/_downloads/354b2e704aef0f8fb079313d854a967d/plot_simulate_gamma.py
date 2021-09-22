@@ -51,7 +51,8 @@ synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
 rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
 net.add_poisson_drive(
     'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
-    location='proximal', synaptic_delays=synaptic_delays, seedcore=1079)
+    location='proximal', synaptic_delays=synaptic_delays,
+    event_seed=1079)
 
 ###############################################################################
 dpls = simulate_dipole(net, tstop=250.)
