@@ -308,6 +308,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
 
     cons = list()
     x0 = list()
+    print(param_ranges)
     for idx, param_name in enumerate(param_ranges):
         x0.append(param_ranges[param_name]['initial'])
         cons.append(
@@ -388,6 +389,7 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
     param_chunks = _consolidate_chunks(evinput_params)
 
     avg_rmse = _rmse(initial_dpl, target_dpl, tstop=params['tstop'])
+    opt_dpls = dict(best_dpl=initial_dpl, target_dpl=target_dpl)
     print("Initial RMSE: %.2f" % avg_rmse)
 
     opt_params = dict()
@@ -432,8 +434,10 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
         print("Starting optimization step %d/%d" % (step + 1, total_steps))
 
         opt_params['optiter'] = 0
-        opt_params['stepminopterr'] = 1e9  # min optimization error so far
-        opt_dpls = dict(best_dpl=None, target_dpl=target_dpl)
+        opt_params['stepminopterr'] = _rmse(opt_dpls['best_dpl'], target_dpl,
+                                            tstart=opt_params['opt_start'],
+                                            tstop=opt_params['opt_end'],
+                                            weights=opt_params['weights'])
 
         def _myoptrun(new_params):
             return _optrun(net_model, new_params, opt_params,
