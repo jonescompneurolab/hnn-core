@@ -69,8 +69,8 @@ with MPIBackend(n_procs=n_procs):
 from hnn_core.optimization import optimize_evoked
 
 with MPIBackend(n_procs=n_procs):
-    params_optim = optimize_evoked(params, exp_dpl, initial_dpl,
-                                   scale_factor=scale_factor,
+    params_optim = optimize_evoked(jones_2009_model, params, exp_dpl,
+                                   initial_dpl, scale_factor=scale_factor,
                                    smooth_window_len=smooth_window_len)
 
 ###############################################################################

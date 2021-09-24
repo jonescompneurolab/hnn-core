@@ -10,7 +10,6 @@ import numpy as np
 import scipy.stats as stats
 from scipy.optimize import fmin_cobyla
 
-from .network_models import jones_2009_model
 from .dipole import _rmse
 
 
@@ -234,7 +233,7 @@ def _consolidate_chunks(inputs):
     return chunks
 
 
-def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
+def _optrun(net_model, new_params, opt_params, params, opt_dpls, scale_factor,
             smooth_window_len):
     """This is the function to run a simulation
 
@@ -277,7 +276,7 @@ def _optrun(new_params, opt_params, params, opt_dpls, scale_factor,
         params[param_name] = test_value
 
     # run the simulation, but stop early if possible
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = net_model(params, add_drives_from_params=True)
     tstop = params['tstop'] = opt_params['opt_end']
     net._instantiate_drives(n_trials=1, tstop=tstop)
     avg_dpl = _BACKEND.simulate(net, tstop=tstop, dt=0.025, n_trials=1)[0]
@@ -320,7 +319,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
     return result
 
 
-def optimize_evoked(params, target_dpl, initial_dpl, maxiter=50,
+def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
                     scale_factor=1., smooth_window_len=None):
@@ -328,6 +327,9 @@ def optimize_evoked(params, target_dpl, initial_dpl, maxiter=50,
 
     Parameters
     ----------
+    net_model : function
+        References the function that instantiates the version of network
+        model used to simulate evoked responses with.
     params : dict
         The initial params
     target_dpl : instance of Dipole
@@ -434,7 +436,7 @@ def optimize_evoked(params, target_dpl, initial_dpl, maxiter=50,
         opt_dpls = dict(best_dpl=None, target_dpl=target_dpl)
 
         def _myoptrun(new_params):
-            return _optrun(new_params, opt_params,
+            return _optrun(net_model, new_params, opt_params,
                            params, opt_dpls=opt_dpls,
                            scale_factor=scale_factor,
                            smooth_window_len=smooth_window_len)
