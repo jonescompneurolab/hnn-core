@@ -159,7 +159,7 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     return net
 
 
-def law_2021_model():
+def law_2021_model(params=None, add_drives_from_params=False):
     """Instantiate the beta modulated ERP network model.
 
     Returns
@@ -185,11 +185,13 @@ def law_2021_model():
     6) Addition of L5_basket -> L5_pyramidal distal connection
     """
 
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
+    if params is not None:
+        hnn_core_root = op.dirname(hnn_core.__file__)
+        params_fname = op.join(hnn_core_root, 'param', 'default.json')
+        params = read_params(params_fname)
 
-    net = jones_2009_model(params)
+    net = jones_2009_model(params=params,
+                           add_drives_from_params=add_drives_from_params)
 
     # Update biophysics (increase gabab duration of inhibition)
     net.cell_types['L2_pyramidal'].synapses['gabab']['tau1'] = 45.0
