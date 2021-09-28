@@ -73,11 +73,14 @@ with MPIBackend(n_procs=n_procs):
     best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
-# Finally, we can plot the results against experimental data:
+# Finally, we can plot the results against experimental data along with the
+# input histograms:
 # 1. Initial dipole
 # 2. Optimized dipole fit
 #
-# Show the input histograms as well
+# Upon visualizing the change in optimized versus initial dipole, you should
+# consider exploring which parameters were changed to cause the improved dipole
+# fit.
 
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
