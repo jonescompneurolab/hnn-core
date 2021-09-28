@@ -244,10 +244,10 @@ tasks.
 
 .. only:: html
 
- .. figure:: /auto_examples/howto/images/thumb/sphx_glr_optimize_evoked_thumb.png
+ .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_optimize_evoked_thumb.png
      :alt: 05. Optimize simulated evoked response parameters
 
-     :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py`
+     :ref:`sphx_glr_auto_examples_howto_plot_optimize_evoked.py`
 
 .. raw:: html
 
@@ -257,7 +257,7 @@ tasks.
 .. toctree::
    :hidden:
 
-   /auto_examples/howto/optimize_evoked
+   /auto_examples/howto/plot_optimize_evoked
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

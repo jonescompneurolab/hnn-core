@@ -132,10 +132,10 @@ start the simulation across the number of processors (cores) specified by
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
-    [eb0c209cd758:01814] Read -1, expected 113151, errno = 1
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+    [996c886ba048:01818] Read -1, expected 113151, errno = 1
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     [Done]
     running trial 1 on 2 cores
     Simulation time: 0.03 ms...
@@ -169,15 +169,15 @@ start the simulation across the number of processors (cores) specified by
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    [eb0c209cd758:01814] Read -1, expected 49608, errno = 1
-    [eb0c209cd758:01813] Read -1, expected 49600, errno = 1
-    [eb0c209cd758:01813] Read -1, expected 49608, errno = 1
-    [eb0c209cd758:01814] Read -1, expected 49600, errno = 1
-    [eb0c209cd758:01814] Read -1, expected 49608, errno = 1
-    [eb0c209cd758:01813] Read -1, expected 49600, errno = 1
-    [eb0c209cd758:01814] Read -1, expected 49600, errno = 1
-    [eb0c209cd758:01813] Read -1, expected 49608, errno = 1
-    [eb0c209cd758:01813] Read -1, expected 5616, errno = 1
+    [996c886ba048:01818] Read -1, expected 49608, errno = 1
+    [996c886ba048:01817] Read -1, expected 49600, errno = 1
+    [996c886ba048:01818] Read -1, expected 49600, errno = 1
+    [996c886ba048:01817] Read -1, expected 49608, errno = 1
+    [996c886ba048:01818] Read -1, expected 49608, errno = 1
+    [996c886ba048:01817] Read -1, expected 49600, errno = 1
+    [996c886ba048:01818] Read -1, expected 49600, errno = 1
+    [996c886ba048:01817] Read -1, expected 49608, errno = 1
+    [996c886ba048:01817] Read -1, expected 5616, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -186,7 +186,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  11.340 seconds)
+   **Total running time of the script:** ( 0 minutes  44.961 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:
@@ -201,7 +201,7 @@ start the simulation across the number of processors (cores) specified by
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb
+      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.2/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb
       :alt: Launch binder
       :width: 150 px
 
