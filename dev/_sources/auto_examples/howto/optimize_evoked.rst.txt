@@ -131,15 +131,18 @@ Now, let's simulate the dipole with the optimized parameters.
         best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-81
+.. GENERATED FROM PYTHON SOURCE LINES 76-84
 
-Finally, we can plot the results against experimental data:
+Finally, we can plot the results against experimental data along with the
+input histograms:
 1. Initial dipole
 2. Optimized dipole fit
 
-Show the input histograms as well
+Upon visualizing the change in optimized versus initial dipole, you should
+consider exploring which parameters were changed to cause the improved dipole
+fit.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-88
+.. GENERATED FROM PYTHON SOURCE LINES 84-91
 
 .. code-block:: default
 

@@ -115,16 +115,28 @@ net.cell_response.plot_spikes_hist(ax=axes[1],
 
 ###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
-# synchronous and see what happens. This is achieved by setting the parameter
-# ``sync_within_trial`` to ``True``. Using the ``copy``-method, we can create
-# a clone of the network defined above, and then modify the drive dynamics for
-# each drive. Making a copy removes any existing outputs from the network
-# such as spiking information and voltages at the soma.
+# synchronous and see what happens. This is achieved by setting
+# ``n_drive_cells=1`` and ``cell_specific=False`` when adding each drive.
 
-net_sync = net.copy()
-net_sync.external_drives['evdist1']['dynamics']['sync_within_trial'] = True
-net_sync.external_drives['evprox1']['dynamics']['sync_within_trial'] = True
-net_sync.external_drives['evprox2']['dynamics']['sync_within_trial'] = True
+net_sync = jones_2009_model()
+
+n_drive_cells=1
+cell_specific=False
+
+net_sync.add_evoked_drive(
+    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
+    weights_nmda=weights_nmda_d1, location='distal', n_drive_cells=n_drive_cells,
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_d1, event_seed=4)
+
+net_sync.add_evoked_drive(
+    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
+    weights_nmda=None, location='proximal', n_drive_cells=n_drive_cells,
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=4)
+
+net_sync.add_evoked_drive(
+    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
+    weights_ampa=weights_ampa_p2, location='proximal', n_drive_cells=n_drive_cells,
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=4)
 
 ###############################################################################
 # You may interrogate current values defining the spike event time dynamics by
