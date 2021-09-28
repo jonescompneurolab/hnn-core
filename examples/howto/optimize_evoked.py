@@ -19,8 +19,11 @@ import matplotlib.pyplot as plt
 # Let us import hnn_core
 
 import hnn_core
-from hnn_core.dipole import simulate_dipole, read_dipole
-from hnn_core import Dipole, MPIBackend, jones_2009_model
+from hnn_core import (MPIBackend, jones_2009_model, read_params,
+                      simulate_dipole, read_dipole)
+
+
+hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
 # The number of cores may need modifying depending on your current machine.
 n_procs = 10
@@ -39,6 +42,11 @@ urlretrieve(data_url, 'S1_SupraT.txt')
 exp_dpl = read_dipole('S1_SupraT.txt')
 
 ###############################################################################
+# Read the base parameters from a file
+params_fname = op.join(hnn_core_root, 'param', 'default.json')
+params = read_params(params_fname)
+
+###############################################################################
 # Let's first simulate the dipole with some initial parameters. The parameter
 # definitions also contain the drives. Even though we could add drives
 # explicitly through our API
@@ -49,7 +57,7 @@ exp_dpl = read_dipole('S1_SupraT.txt')
 scale_factor = 3000.
 smooth_window_len = 30.
 tstop = exp_dpl.times[-1]
-net = jones_2009_model(add_drives_from_params=True)
+net = jones_2009_model(params=params, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
     print("Running simulation with initial parameters")
     initial_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
@@ -61,13 +69,13 @@ with MPIBackend(n_procs=n_procs):
 from hnn_core.optimization import optimize_evoked
 
 with MPIBackend(n_procs=n_procs):
-    params_optim = optimize_evoked(exp_dpl, initial_dpl,
+    params_optim = optimize_evoked(params, exp_dpl, initial_dpl,
                                    scale_factor=scale_factor,
                                    smooth_window_len=smooth_window_len)
 
 ###############################################################################
 # Now, let's simulate the dipole with the optimized parameters.
-net = jones_2009_model(add_drives_from_params=True)
+net = jones_2009_model(params=params_optim, add_drives_from_params=True)
 with MPIBackend(n_procs=n_procs):
     best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
     best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)

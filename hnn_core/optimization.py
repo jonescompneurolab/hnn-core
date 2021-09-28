@@ -356,7 +356,7 @@ def optimize_evoked(params, target_dpl, initial_dpl, maxiter=50,
     -------
     params : dict
         The optimized params dictionary.
-    
+
     Notes
     -----
     This optimization protocol utilizes the Constrained Optimization
@@ -368,6 +368,7 @@ def optimize_evoked(params, target_dpl, initial_dpl, maxiter=50,
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
 
+    params = params.copy()
     # Create a sorted dictionary with the inputs and parameters
     # belonging to each.
     # Then, calculate the appropriate weight function to be used
