@@ -487,7 +487,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    params : dict</span>
 <span class="sd">        The optimized params dictionary.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    This optimization protocol utilizes the Constrained Optimization</span>
@@ -499,6 +499,7 @@
     <span class="k">if</span> <span class="n">_BACKEND</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_BACKEND</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
+    <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="c1"># Create a sorted dictionary with the inputs and parameters</span>
     <span class="c1"># belonging to each.</span>
     <span class="c1"># Then, calculate the appropriate weight function to be used</span>

@@ -43,20 +43,23 @@ of the model simulation to match an experimental dipole waveform.
 
 Let us import hnn_core
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-28
+.. GENERATED FROM PYTHON SOURCE LINES 20-31
 
 .. code-block:: default
 
 
     import hnn_core
-    from hnn_core.dipole import simulate_dipole, read_dipole
-    from hnn_core import Dipole, MPIBackend, jones_2009_model
+    from hnn_core import (MPIBackend, jones_2009_model, read_params,
+                          simulate_dipole, read_dipole)
+
+
+    hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
     # The number of cores may need modifying depending on your current machine.
     n_procs = 10
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-34
+.. GENERATED FROM PYTHON SOURCE LINES 32-37
 
 First, we will load experimental data into Dipole object.
 
@@ -64,7 +67,7 @@ This is a different experiment than the one to which the base parameters were
 tuned. So, the initial RMSE will be large, giving the optimization procedure
 a lot to work with.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-41
+.. GENERATED FROM PYTHON SOURCE LINES 37-44
 
 .. code-block:: default
 
@@ -76,7 +79,19 @@ a lot to work with.
     exp_dpl = read_dipole('S1_SupraT.txt')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-48
+.. GENERATED FROM PYTHON SOURCE LINES 45-46
+
+Read the base parameters from a file
+
+.. GENERATED FROM PYTHON SOURCE LINES 46-49
+
+.. code-block:: default
+
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 50-56
 
 Let's first simulate the dipole with some initial parameters. The parameter
 definitions also contain the drives. Even though we could add drives
@@ -85,7 +100,7 @@ explicitly through our API
 for conciseness,
 we add them automatically from the parameter files
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-58
+.. GENERATED FROM PYTHON SOURCE LINES 56-66
 
 .. code-block:: default
 
@@ -93,18 +108,18 @@ we add them automatically from the parameter files
     scale_factor = 3000.
     smooth_window_len = 30.
     tstop = exp_dpl.times[-1]
-    net = jones_2009_model(add_drives_from_params=True)
+    net = jones_2009_model(params=params, add_drives_from_params=True)
     with MPIBackend(n_procs=n_procs):
         print("Running simulation with initial parameters")
         initial_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
         initial_dpl = initial_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-60
+.. GENERATED FROM PYTHON SOURCE LINES 67-68
 
 Now we start the optimization!
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-68
+.. GENERATED FROM PYTHON SOURCE LINES 68-76
 
 .. code-block:: default
 
@@ -112,26 +127,26 @@ Now we start the optimization!
     from hnn_core.optimization import optimize_evoked
 
     with MPIBackend(n_procs=n_procs):
-        params_optim = optimize_evoked(exp_dpl, initial_dpl,
+        params_optim = optimize_evoked(params, exp_dpl, initial_dpl,
                                        scale_factor=scale_factor,
                                        smooth_window_len=smooth_window_len)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-70
+.. GENERATED FROM PYTHON SOURCE LINES 77-78
 
 Now, let's simulate the dipole with the optimized parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-75
+.. GENERATED FROM PYTHON SOURCE LINES 78-83
 
 .. code-block:: default
 
-    net = jones_2009_model(add_drives_from_params=True)
+    net = jones_2009_model(params=params_optim, add_drives_from_params=True)
     with MPIBackend(n_procs=n_procs):
         best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
         best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-84
+.. GENERATED FROM PYTHON SOURCE LINES 84-92
 
 Finally, we can plot the results against experimental data along with the
 input histograms:
@@ -142,7 +157,7 @@ Upon visualizing the change in optimized versus initial dipole, you should
 consider exploring which parameters were changed to cause the improved dipole
 fit.
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-91
+.. GENERATED FROM PYTHON SOURCE LINES 92-99
 
 .. code-block:: default
 
