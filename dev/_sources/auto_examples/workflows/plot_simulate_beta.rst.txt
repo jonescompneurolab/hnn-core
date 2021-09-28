@@ -520,9 +520,10 @@ is an assymetric beta event with a long positive tail.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_001.png
-    :alt: Beta Event Generation, Aggregate (L2 + L5), Spike Raster
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_001.png
+   :alt: Beta Event Generation, Aggregate (L2 + L5), Spike Raster
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -560,9 +561,10 @@ input to the cortical column occurs ~100 ms after the beta event.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_002.png
-    :alt: Beta Event + ERP, Input Drives Histogram, Spike Raster
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_002.png
+   :alt: Beta Event + ERP, Input Drives Histogram, Spike Raster
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -604,9 +606,10 @@ the sensory response which is associated with a reduced ERP amplitude
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_003.png
-    :alt: Beta ERP Comparison, Beta + ERP Spike Raster, ERP Spike Raster
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_003.png
+   :alt: Beta ERP Comparison, Beta + ERP Spike Raster, ERP Spike Raster
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_003.png
+   :class: sphx-glr-single-img
 
 
 
@@ -634,7 +637,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 19 minutes  27.693 seconds)
+   **Total running time of the script:** ( 17 minutes  39.895 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:

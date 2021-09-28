@@ -96,9 +96,10 @@ each electrode.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_001.png
-    :alt: plot record extracellular potentials
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_001.png
+   :alt: plot record extracellular potentials
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -164,9 +165,10 @@ speed up computation considerably.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_002.png
-    :alt: plot record extracellular potentials
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_002.png
+   :alt: plot record extracellular potentials
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -243,9 +245,10 @@ steps). Decimation speeds up plotting significantly.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
-    :alt: Aggregate (L2 + L5)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
+   :alt: Aggregate (L2 + L5)
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
+   :class: sphx-glr-single-img
 
 
 
@@ -264,7 +267,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  45.255 seconds)
+   **Total running time of the script:** ( 2 minutes  47.186 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:

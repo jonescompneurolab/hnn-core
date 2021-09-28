@@ -122,15 +122,17 @@ of ``net.connectivity`` that match the provided parameters.
 
     *
 
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_001.png
-          :alt: L5_basket -> L5_pyramidal (soma, gabaa)
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_001.png
+         :alt: L5_basket -> L5_pyramidal (soma, gabaa)
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_001.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_002.png
-          :alt: L5_basket-> L5_pyramidal (soma, gabaa)
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_002.png
+         :alt: L5_basket-> L5_pyramidal (soma, gabaa)
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_002.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -166,9 +168,10 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_003.png
-    :alt: plot connectivity
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_003.png
+   :alt: plot connectivity
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_003.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -350,15 +353,17 @@ the L5 pyramidal cells.
 
     *
 
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_004.png
-          :alt: plot connectivity
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_004.png
+         :alt: plot connectivity
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_004.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_005.png
-          :alt: plot connectivity
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_005.png
+         :alt: plot connectivity
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_005.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -390,9 +395,10 @@ We can plot the sparse connectivity pattern between cell populations.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_006.png
-    :alt: L2_basket -> L2_basket (soma, gabaa)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_006.png
+   :alt: L2_basket -> L2_basket (soma, gabaa)
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_006.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -421,9 +427,10 @@ from the source cell.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_007.png
-    :alt: L2_basket-> L2_basket (soma, gabaa)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_007.png
+   :alt: L2_basket-> L2_basket (soma, gabaa)
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_007.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -466,9 +473,10 @@ the aggregate current dipole.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
-    :alt: Aggregate (L2 + L5)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
+   :alt: Aggregate (L2 + L5)
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -485,7 +493,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 10 minutes  18.042 seconds)
+   **Total running time of the script:** ( 8 minutes  15.270 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

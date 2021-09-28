@@ -214,9 +214,10 @@ varied pattern, in which only a fraction of cells reach firing threshold.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_001.png
-    :alt: plot simulate gamma
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_001.png
+   :alt: plot simulate gamma
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -261,9 +262,10 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_002.png
-    :alt: Aggregate (L2 + L5)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_002.png
+   :alt: Aggregate (L2 + L5)
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -298,9 +300,10 @@ is applied to the entire duration of the simulation.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_003.png
-    :alt: Aggregate (L2 + L5)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_003.png
+   :alt: Aggregate (L2 + L5)
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_003.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -362,9 +365,10 @@ referred to as “strong” PING.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_004.png
-    :alt: plot simulate gamma
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_004.png
+   :alt: plot simulate gamma
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_004.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -393,9 +397,10 @@ frequency is lower compared with the "weak" PING simulation above.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_005.png
-    :alt: plot simulate gamma
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_005.png
+   :alt: plot simulate gamma
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_005.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -434,9 +439,10 @@ frequency from ~50 to ~65 Hz.
 
 
 
-.. image:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_006.png
-    :alt: Aggregate (L2 + L5)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_006.png
+   :alt: Aggregate (L2 + L5)
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_006.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -491,7 +497,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 10 minutes  27.795 seconds)
+   **Total running time of the script:** ( 11 minutes  32.129 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:

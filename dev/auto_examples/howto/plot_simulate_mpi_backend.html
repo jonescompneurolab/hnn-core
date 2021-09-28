@@ -8,10 +8,10 @@
     <title>04. Use MPI backend for parallelization &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -190,12 +190,11 @@ start the simulation across the number of processors (cores) specified by
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trial_idx</span></a><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="Aggregate (L2 + L5)" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
+<img src="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" srcset="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
 Running 1 trials...
 numprocs=2
-[6c70fa937882:01816] Read -1, expected 113151, errno = 1
+[0a8ee45bc770:01812] Read -1, expected 113151, errno = 1
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.6/site-packages/hnn_core-0.2.dev0-py3.6.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -232,20 +231,20 @@ Simulation time: 270.0 ms...
 Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
-[6c70fa937882:01816] Read -1, expected 49608, errno = 1
-[6c70fa937882:01815] Read -1, expected 49600, errno = 1
-[6c70fa937882:01816] Read -1, expected 49600, errno = 1
-[6c70fa937882:01815] Read -1, expected 49608, errno = 1
-[6c70fa937882:01816] Read -1, expected 49608, errno = 1
-[6c70fa937882:01815] Read -1, expected 49600, errno = 1
-[6c70fa937882:01816] Read -1, expected 49600, errno = 1
-[6c70fa937882:01815] Read -1, expected 49608, errno = 1
-[6c70fa937882:01815] Read -1, expected 5616, errno = 1
+[0a8ee45bc770:01812] Read -1, expected 49608, errno = 1
+[0a8ee45bc770:01811] Read -1, expected 49600, errno = 1
+[0a8ee45bc770:01812] Read -1, expected 49600, errno = 1
+[0a8ee45bc770:01811] Read -1, expected 49608, errno = 1
+[0a8ee45bc770:01812] Read -1, expected 49608, errno = 1
+[0a8ee45bc770:01811] Read -1, expected 49600, errno = 1
+[0a8ee45bc770:01812] Read -1, expected 49600, errno = 1
+[0a8ee45bc770:01811] Read -1, expected 49608, errno = 1
+[0a8ee45bc770:01811] Read -1, expected 5616, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  30.471 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  51.654 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>

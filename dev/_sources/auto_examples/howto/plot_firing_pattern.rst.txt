@@ -274,9 +274,10 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_001.png
-    :alt: L5_pyramidal (gid=170)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_001.png
+   :alt: L5_pyramidal (gid=170)
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -307,15 +308,17 @@ read spikes back in, we can use wildcard expressions.
 
     *
 
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_002.png
-          :alt: plot firing pattern
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_002.png
+         :alt: plot firing pattern
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_002.png
+         :class: sphx-glr-multi-img
 
     *
 
-      .. image:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_003.png
-          :alt: plot firing pattern
-          :class: sphx-glr-multi-img
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_003.png
+         :alt: plot firing pattern
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_003.png
+         :class: sphx-glr-multi-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -391,9 +394,10 @@ raster plots and histograms for the pyramidal cells.
 
 
 
-.. image:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_004.png
-    :alt: plot firing pattern
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_004.png
+   :alt: plot firing pattern
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_004.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -410,7 +414,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  31.677 seconds)
+   **Total running time of the script:** ( 2 minutes  36.250 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:
