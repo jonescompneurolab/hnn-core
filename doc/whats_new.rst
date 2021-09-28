@@ -9,8 +9,23 @@ What's new?
 
 .. _0.2:
 
-Current
--------
+0.2
+---
+
+Notable Changes
+---------------
+- Local field potentials can now be recorded during simulations 
+  :ref:`[Example] <sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py>`
+
+- Ability to optimize parameters to reproduce event related potentials from real data 
+  :ref:`[Example] <sphx_glr_auto_examples_howto_plot_optimize_evoked.py>`
+
+- Published models using HNN were added and can be loaded via dedicated functions
+
+- Several improvements enabling easy modification of connectivity and cell properties
+  :ref:`[Example] <sphx_glr_auto_examples_howto_plot_connectivity.py>`
+
+- Improved visualization including spectral analysis, connectivity, and cell morphology
 
 Changelog
 ~~~~~~~~~
@@ -47,7 +62,7 @@ Changelog
   by `Mainak Jas`_ in :gh:`376`
 
 - Add :func:`~hnn_core.calcium_model` with a distance dependent calcium channel conductivity,
-  by `Nick Tolley`_ in :gh:`348`
+  by `Nick Tolley`_ and `Sarah Pugliese`_ in :gh:`348`
 
 - Each drive spike train sampled through an independent process corresponds to a single artificial
   drive cell, the number of which users can set when adding drives with ``n_drive_cells`` and
@@ -134,6 +149,19 @@ API
 
 - Cell objects can no longer be accessed from :class:`~hnn_core.Network` as the
   :attr:`~hnn_core.Network.cells` attribute has been removed, by `Ryan Thorpe`_ in :gh:`436`
+
+People who contributed to this release (in alphabetical order):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`Alex Rockhill`_
+`Blake Caldwell`_
+`Christopher J. Bailey`_
+`Dylan Daniels`_
+`Kenneth Loi`_
+`Mainak Jas`_
+`Nick Tolley`_
+`Ryan Thorpe`_
+`Sarah Pugliese`_
+`Stephanie R. Jones`_
 
 .. _0.1:
 
@@ -229,14 +257,17 @@ People who contributed to this release (in alphabetical order):
 - `Nick Tolley`_
 - `Ryan Thorpe`_
 - `Samika Kanekar`_
-- `Stephanie Jones`_
+- `Stephanie R. Jones`_
 
+.. _Alex Rockhill: https://github.com/alexrockhill
 .. _Blake Caldwell: https://github.com/blakecaldwell
 .. _Christopher Bailey: https://github.com/cjayb
 .. _Carmen Kohl: https://github.com/kohl-carmen
+.. _Dylan Daniels: https://github.com/dylansdaniels
 .. _Kenneth Loi: https://github.com/kenloi
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Nick Tolley: https://github.com/ntolley
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane
-.. _Stephanie Jones: https://github.com/stephanie-r-jones
+.. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese 
+.. _Stephanie R. Jones: https://github.com/stephanie-r-jones
