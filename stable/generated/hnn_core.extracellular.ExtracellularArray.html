@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>hnn_core.extracellular.ExtracellularArray &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../auto_examples/index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../glossary.html">Glossary</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hnn_core.extracellular.ExtracellularArray</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/generated/hnn_core.extracellular.ExtracellularArray.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.2
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hnn-core-extracellular-extracellulararray">
+<h1>hnn_core.extracellular.ExtracellularArray<a class="headerlink" href="#hnn-core-extracellular-extracellulararray" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.extracellular.</span></span><span class="sig-name descname"><span class="pre">ExtracellularArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for recording extracellular potential fields with electrode array</p>
+<p>Note that to add an electrode array to a simulation, you should use the
+<a class="reference internal" href="hnn_core.Network.html#hnn_core.Network.add_electrode_array" title="hnn_core.Network.add_electrode_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hnn_core.Network.add_electrode_array()</span></code></a>-method. After simulation,
+the network will contain a dictionary of <a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray" title="hnn_core.extracellular.ExtracellularArray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtracellularArray</span></code></a>-objects
+in <code class="docutils literal notranslate"><span class="pre">net.rec_arrays</span></code> (each array must be added with a unique name). An
+<a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray" title="hnn_core.extracellular.ExtracellularArray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtracellularArray</span></code></a> contains the voltages at each electrode contact,
+along with the time points at which the voltages were sampled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>positions</strong><span class="classifier">tuple | list of tuple</span></dt><dd><p>The (x, y, z) coordinates (in um) of the extracellular electrodes.</p>
+</dd>
+<dt><strong>conductivity</strong><span class="classifier">float</span></dt><dd><p>Extracellular conductivity, in S/m, of the assumed infinite,
+homogeneous volume conductor that the cell and electrode are in.</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>Approximation to use. <code class="docutils literal notranslate"><span class="pre">'psa'</span></code> (point source approximation) treats
+each segment junction as a point extracellular current source.
+<code class="docutils literal notranslate"><span class="pre">'lsa'</span></code> (line source approximation) treats each segment as a line
+source of current, which extends from the previous to the next segment
+center point: <a href="#id3"><span class="problematic" id="id4">|---x---|</span></a>, where x is the current segment flanked by <a href="#id1"><span class="problematic" id="id2">|</span></a>.</p>
+</dd>
+<dt><strong>min_distance</strong><span class="classifier">float (default: 0.5; unit: um)</span></dt><dd><p>To avoid numerical errors in calculating potentials, apply a minimum
+distance limit between the electrode contacts and the active neuronal
+membrane elements that act as sources of current. The default value of
+0.5 um corresponds to 1 um diameter dendrites.</p>
+</dd>
+<dt><strong>times</strong><span class="classifier">array-like, shape (n_times,) | None</span></dt><dd><p>Optionally, provide precomputed voltage sampling times for electrodes
+at <em class="xref py py-obj">positions</em>.</p>
+</dd>
+<dt><strong>voltages</strong><span class="classifier">array-like, shape (n_trials, n_electrodes, n_times) | None</span></dt><dd><p>Optionally, provide precomputed voltages for electrodes at
+<code class="docutils literal notranslate"><span class="pre">positions</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The length of an <code class="docutils literal notranslate"><span class="pre">ExtracellularArray</span></code> is equal to the number of trials of
+data it contains. Slicing an <code class="docutils literal notranslate"><span class="pre">ExtracellularArray</span></code> returns a <a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a> of the
+corresponding trials: <code class="docutils literal notranslate"><span class="pre">array[:5]</span></code> returns a new array of length 5, etc.</p>
+<p>See Table 5 in <a class="reference external" href="http://jn.physiology.org/content/104/6/3388.long">http://jn.physiology.org/content/104/6/3388.long</a> for
+measured values of conductivity in rat cortex (note units there are mS/cm)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>times</strong><span class="classifier">array, shape (n_times,)</span></dt><dd><p>The time points the extracellular voltages are sampled at (ms)</p>
+</dd>
+<dt><strong>voltages</strong><span class="classifier">array, shape (n_trials, n_electrodes, n_times)</span></dt><dd><p>The measured extracellular voltages</p>
+</dd>
+<dt><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.sfreq" title="hnn_core.extracellular.ExtracellularArray.sfreq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sfreq</span></code></a><span class="classifier">float</span></dt><dd><p>Return the sampling rate of the extracellular data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Return a copy of the ExtracellularArray instance</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot" title="hnn_core.extracellular.ExtracellularArray.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(*[, trial_no, contact_no, tmin, tmax, …])</p></td>
+<td><p>Plot extracellular electrode array voltage time series.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.smooth" title="hnn_core.extracellular.ExtracellularArray.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(window_len)</p></td>
+<td><p>Smooth extracellular waveforms using Hamming-windowed convolution</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of the ExtracellularArray instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>array_copy</strong><span class="classifier">instance of ExtracellularArray</span></dt><dd><p>A copy of the array instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_no</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_no</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_scalebar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot extracellular electrode array voltage time series.</p>
+<p>One plot is created for each trial. Multiple trials can be overlaid
+with or without (default) and offset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>trial_no</strong><span class="classifier">int | list of int | slice</span></dt><dd><p>Trial number(s) to plot</p>
+</dd>
+<dt><strong>contact_no</strong><span class="classifier">int | list of int | slice</span></dt><dd><p>Electrode contact number(s) to plot</p>
+</dd>
+<dt><strong>tmin</strong><span class="classifier">float | None</span></dt><dd><p>Start time of plot in milliseconds. If None, plot entire
+simulation.</p>
+</dd>
+<dt><strong>tmax</strong><span class="classifier">float | None</span></dt><dd><p>End time of plot in milliseconds. If None, plot entire simulation.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis</p>
+</dd>
+<dt><strong>decim</strong><span class="classifier">int | list of int | None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole
+traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.8.0.dev0+1755.a612462)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
+which recommends values &lt;13. To achieve higher decimation factors,
+a list of ints can be provided. These are applied successively.</p>
+</dd>
+<dt><strong>color</strong><span class="classifier">string | array of floats | matplotlib.colors.ListedColormap</span></dt><dd><p>The color to use for plotting (optional). The usual Matplotlib
+standard color strings may be used (e.g., ‘b’ for blue). A color
+can also be defined as an RGBA-quadruplet, or an array of
+RGBA-values (one for each electrode contact trace to plot). An
+instance of <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListedColormap</span></code></a> may also be
+provided.</p>
+</dd>
+<dt><strong>voltage_offset</strong><span class="classifier">float | None (optional)</span></dt><dd><p>Amount to offset traces by on the voltage-axis. Useful for plotting
+laminar arrays.</p>
+</dd>
+<dt><strong>voltage_scalebar</strong><span class="classifier">float | None (optional)</span></dt><dd><p>Height, in units of uV, of a scale bar to plot in the top-left
+corner of the plot.</p>
+</dd>
+<dt><strong>contact_labels</strong><span class="classifier">list (optional)</span></dt><dd><p>Labels associated with the contacts to plot. Passed as-is to
+<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.set_yticklabels.html#matplotlib.axes.Axes.set_yticklabels" title="(in Matplotlib v3.4.3)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_yticklabels()</span></code></a>.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of plt.fig</span></dt><dd><p>The matplotlib figure handle into which time series were plotted.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.sfreq">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sfreq</span></span><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.sfreq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sampling rate of the extracellular data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.smooth">
+<span class="sig-name descname"><span class="pre">smooth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_len</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.smooth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.smooth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth extracellular waveforms using Hamming-windowed convolution</p>
+<p>Note that this method operates in-place, i.e., it will alter the data.
+If you prefer a filtered copy, consider using the
+<a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a>-method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.22.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
+data with.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>extracellular_copy</strong><span class="classifier">instance of ExtraCellularArray</span></dt><dd><p>The modified ExtraCellularArray instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="sphx-glr-backreferences-hnn-core-extracellular-extracellulararray"></span></section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn_core.dipole &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../auto_examples/index.html">Examples</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../../glossary.html">Glossary</a></li>
+                <li><a href="../../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.2
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hnn_core.dipole</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Class to handle the dipoles.&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
+<span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_dipole</span><span class="p">,</span> <span class="n">plot_psd</span><span class="p">,</span> <span class="n">plot_tfr_morlet</span>
+
+
+<div class="viewcode-block" id="simulate_dipole"><a class="viewcode-back" href="../../generated/hnn_core.simulate_dipole.html#hnn_core.dipole.simulate_dipole">[docs]</a><span class="k">def</span> <span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsoma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">record_isoma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simulate a dipole given the experiment parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : Network object</span>
+<span class="sd">        The Network object specifying how cells are</span>
+<span class="sd">        connected.</span>
+<span class="sd">    tstop : float</span>
+<span class="sd">        The simulation stop time (ms).</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        The integration time step of h.CVode (ms)</span>
+<span class="sd">    n_trials : int | None</span>
+<span class="sd">        The number of trials to simulate. If None, the &#39;N_trials&#39; value</span>
+<span class="sd">        of the ``params`` used to create ``net`` is used (must be &gt;0)</span>
+<span class="sd">    record_vsoma : bool</span>
+<span class="sd">        Option to record somatic voltages from cells</span>
+<span class="sd">    record_isoma : bool</span>
+<span class="sd">        Option to record somatic currents from cells</span>
+<span class="sd">    postproc : bool</span>
+<span class="sd">        If True, smoothing (``dipole_smooth_win``) and scaling</span>
+<span class="sd">        (``dipole_scalefctr``) values are read from the parameter file, and</span>
+<span class="sd">        applied to the dipole objects before returning. Note that this setting</span>
+<span class="sd">        only affects the dipole waveforms, and not somatic voltages, possible</span>
+<span class="sd">        extracellular recordings etc. The preferred way is to use the</span>
+<span class="sd">        :meth:`~hnn_core.dipole.Dipole.smooth` and</span>
+<span class="sd">        :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dpls: list</span>
+<span class="sd">        List of dipole objects for each trials</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">.parallel_backends</span> <span class="kn">import</span> <span class="n">_BACKEND</span><span class="p">,</span> <span class="n">JoblibBackend</span>
+
+    <span class="k">if</span> <span class="n">_BACKEND</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_BACKEND</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_trials</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_trials</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_trials&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_trials</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of simulations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">n_trials</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="s1">&#39;No connections instantiated in network. Consider using &#39;</span>
+                      <span class="s1">&#39;net = jones_2009_model() or net = law_2021_model() to &#39;</span>
+                      <span class="s1">&#39;create a predefined network from published models.&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">][</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">][</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
+    <span class="k">for</span> <span class="n">bias_name</span><span class="p">,</span> <span class="n">bias</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_biases</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">bias_cell_type</span> <span class="ow">in</span> <span class="n">bias</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span>
+            <span class="k">if</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;End time of tonic input cannot be negative&#39;</span><span class="p">)</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">bias_cell_type</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">duration</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Duration of tonic input cannot be negative&#39;</span><span class="p">)</span>
+
+    <span class="n">net</span><span class="o">.</span><span class="n">_instantiate_drives</span><span class="p">(</span><span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_reset_rec_arrays</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_vsoma</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;record_vsoma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_vsoma</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;record_vsoma must be bool, got </span><span class="si">%s</span><span class="s2">&quot;</span>
+                        <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">record_vsoma</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_isoma</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;record_isoma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_isoma</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;record_isoma must be bool, got </span><span class="si">%s</span><span class="s2">&quot;</span>
+                        <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">record_isoma</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">postproc</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The postproc-argument is deprecated and will be removed&#39;</span>
+                      <span class="s1">&#39; in a future release of hnn-core. Please define &#39;</span>
+                      <span class="s1">&#39;smoothing and scaling explicitly using Dipole methods.&#39;</span><span class="p">,</span>
+                      <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="n">dpls</span> <span class="o">=</span> <span class="n">_BACKEND</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dpls</span></div>
+
+
+<div class="viewcode-block" id="read_dipole"><a class="viewcode-back" href="../../generated/hnn_core.read_dipole.html#hnn_core.dipole.read_dipole">[docs]</a><span class="k">def</span> <span class="nf">read_dipole</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read dipole values from a file and create a Dipole instance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path to the input file (.txt)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dpl : Dipole</span>
+<span class="sd">        The instance of Dipole class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
+    <span class="k">return</span> <span class="n">dpl</span></div>
+
+
+<div class="viewcode-block" id="average_dipoles"><a class="viewcode-back" href="../../generated/hnn_core.dipole.average_dipoles.html#hnn_core.dipole.average_dipoles">[docs]</a><span class="k">def</span> <span class="nf">average_dipoles</span><span class="p">(</span><span class="n">dpls</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute dipole averages over a list of Dipole objects.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dpls: list of Dipole objects</span>
+<span class="sd">        Contains list of dipole objects, each with a `data` member containing</span>
+<span class="sd">        &#39;L2&#39;, &#39;L5&#39; and &#39;agg&#39; components</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dpl: instance of Dipole</span>
+<span class="sd">        A new dipole object with each component of `dpl.data` representing the</span>
+<span class="sd">        average over the same components in the input list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">dpl_idx</span><span class="p">,</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dpls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;All elements in the list should be instances of &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Dipole. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dpl</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dpl</span><span class="o">.</span><span class="n">nave</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dipole at index </span><span class="si">%d</span><span class="s2"> was already an average of </span><span class="si">%d</span><span class="s2">&quot;</span>
+                             <span class="s2">&quot; trials. Cannot reaverage&quot;</span> <span class="o">%</span>
+                             <span class="p">(</span><span class="n">dpl_idx</span><span class="p">,</span> <span class="n">dpl</span><span class="o">.</span><span class="n">nave</span><span class="p">))</span>
+
+    <span class="n">avg_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
+        <span class="n">avg_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">avg_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">avg_data</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">avg_dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">avg_data</span><span class="p">)</span>
+
+    <span class="c1"># set nave to the number of trials averaged in this dipole</span>
+    <span class="n">avg_dpl</span><span class="o">.</span><span class="n">nave</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">avg_dpl</span></div>
+
+
+<span class="k">def</span> <span class="nf">_rmse</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">exp_dpl</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculates RMSE between data in dpl and exp_dpl</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dpl: instance of Dipole</span>
+<span class="sd">        A dipole object with simulated data</span>
+<span class="sd">    exp_dpl: instance of Dipole</span>
+<span class="sd">        A dipole object with experimental data</span>
+<span class="sd">    tstart | None: float</span>
+<span class="sd">        Time at beginning of range over which to calculate RMSE</span>
+<span class="sd">    tstop | None: float</span>
+<span class="sd">        Time at end of range over which to calculate RMSE</span>
+<span class="sd">    weights | None: array</span>
+<span class="sd">        An array of weights to be applied to each point in</span>
+<span class="sd">        simulated dpl. Must have length &gt;= dpl.data</span>
+<span class="sd">        If None, weights will be replaced with 1&#39;s for typical RMSE</span>
+<span class="sd">        calculation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    err: float</span>
+<span class="sd">        Weighted RMSE between data in dpl and exp_dpl</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+
+    <span class="n">exp_times</span> <span class="o">=</span> <span class="n">exp_dpl</span><span class="o">.</span><span class="n">times</span>
+    <span class="n">sim_times</span> <span class="o">=</span> <span class="n">dpl</span><span class="o">.</span><span class="n">times</span>
+
+    <span class="c1"># do tstart and tstop fall within both datasets?</span>
+    <span class="c1"># if not, use the closest data point as the new tstop/tstart</span>
+    <span class="k">for</span> <span class="n">tseries</span> <span class="ow">in</span> <span class="p">[</span><span class="n">exp_times</span><span class="p">,</span> <span class="n">sim_times</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">tstart</span> <span class="o">&lt;</span> <span class="n">tseries</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">tstart</span> <span class="o">=</span> <span class="n">tseries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tstop</span> <span class="o">&gt;</span> <span class="n">tseries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">tstop</span> <span class="o">=</span> <span class="n">tseries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># make sure start and end times are valid for both dipoles</span>
+    <span class="n">exp_start_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">exp_times</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">exp_end_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">exp_times</span> <span class="o">-</span> <span class="n">tstop</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">exp_length</span> <span class="o">=</span> <span class="n">exp_end_index</span> <span class="o">-</span> <span class="n">exp_start_index</span>
+
+    <span class="n">sim_start_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sim_times</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">sim_end_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sim_times</span> <span class="o">-</span> <span class="n">tstop</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">sim_length</span> <span class="o">=</span> <span class="n">sim_end_index</span> <span class="o">-</span> <span class="n">sim_start_index</span>
+
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># weighted RMSE with weights of all 1&#39;s is equivalent to</span>
+        <span class="c1"># normal RMSE</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sim_times</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">sim_end_index</span><span class="p">]))</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">sim_start_index</span><span class="p">:</span><span class="n">sim_end_index</span><span class="p">]</span>
+
+    <span class="n">dpl1</span> <span class="o">=</span> <span class="n">dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="n">sim_start_index</span><span class="p">:</span><span class="n">sim_end_index</span><span class="p">]</span>
+    <span class="n">dpl2</span> <span class="o">=</span> <span class="n">exp_dpl</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">][</span><span class="n">exp_start_index</span><span class="p">:</span><span class="n">exp_end_index</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">sim_length</span> <span class="o">&gt;</span> <span class="n">exp_length</span><span class="p">):</span>
+        <span class="c1"># downsample simulation timeseries to match exp data</span>
+        <span class="n">dpl1</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">dpl1</span><span class="p">,</span> <span class="n">exp_length</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">exp_length</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">weights</span> <span class="o">&lt;</span> <span class="mf">1e-4</span><span class="p">)</span>
+        <span class="n">weights</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">sim_length</span> <span class="o">&lt;</span> <span class="n">exp_length</span><span class="p">):</span>
+        <span class="c1"># downsample exp timeseries to match simulation data</span>
+        <span class="n">dpl2</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">dpl2</span><span class="p">,</span> <span class="n">sim_length</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">weights</span> <span class="o">*</span> <span class="p">((</span><span class="n">dpl1</span> <span class="o">-</span> <span class="n">dpl2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="Dipole"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole">[docs]</a><span class="k">class</span> <span class="nc">Dipole</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dipole class.</span>
+
+<span class="sd">    An instance of the ``Dipole``-class contains the simulated dipole moment</span>
+<span class="sd">    timecourses for L2 and L5 pyramidal cells, as well as their aggregate</span>
+<span class="sd">    (``&#39;agg&#39;``). The units of the dipole moment are in ``nAm``</span>
+<span class="sd">    (1e-9 Ampere-meters).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    times : array (n_times,)</span>
+<span class="sd">        The time vector (in ms)</span>
+<span class="sd">    data : array, shape (n_times x n_layers)</span>
+<span class="sd">        The data. The first column represents &#39;agg&#39; (the total diple),</span>
+<span class="sd">        the second &#39;L2&#39; layer and the last one &#39;L5&#39; layer. For experimental</span>
+<span class="sd">        data, it can contain only one column.</span>
+<span class="sd">    nave : int</span>
+<span class="sd">        Number of trials that were averaged to produce this Dipole. Defaults</span>
+<span class="sd">        to 1</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    times : array-like</span>
+<span class="sd">        The time vector (in ms)</span>
+<span class="sd">    sfreq : float</span>
+<span class="sd">        The sampling frequency (in Hz)</span>
+<span class="sd">    data : dict of array</span>
+<span class="sd">        Dipole moment timecourse arrays with keys &#39;agg&#39;, &#39;L2&#39; and &#39;L5&#39;</span>
+<span class="sd">    nave : int</span>
+<span class="sd">        Number of trials that were averaged to produce this Dipole</span>
+<span class="sd">    scale_applied : int or float</span>
+<span class="sd">        The total factor by which the dipole has been scaled (using</span>
+<span class="sd">        :meth:`~hnn_core.dipole.Dipole.scale`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nave</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># noqa: D102</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;L5&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]}</span>
+        <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nave</span> <span class="o">=</span> <span class="n">nave</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># NB assumes len &gt; 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># for visualisation</span>
+
+<div class="viewcode-block" id="Dipole.copy"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a copy of the Dipole instance</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dpl_copy : instance of Dipole</span>
+<span class="sd">            A copy of the Dipole instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">,</span> <span class="n">fctr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply scaling and smoothing from param-files (DEPRECATE)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        window_len : int</span>
+<span class="sd">            Smoothing window in ms</span>
+<span class="sd">        fctr : int</span>
+<span class="sd">            Scaling factor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">fctr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">window_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># this is to allow param-files with len==0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">window_len</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_convert_fAm_to_nAm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The NEURON simulator output is in fAm, convert to nAm</span>
+
+<span class="sd">        NB! Must be run `after` :meth:`Dipole.baseline_renormalization`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">1e-6</span>
+
+<div class="viewcode-block" id="Dipole.scale"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale (multiply) the dipole moment by a fixed factor</span>
+
+<span class="sd">        The attribute ``Dipole.scale_applied`` is updated to reflect factors</span>
+<span class="sd">        applied and displayed in plots.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor : int</span>
+<span class="sd">            Scaling factor, applied to the data in-place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Dipole.smooth"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.smooth">[docs]</a>    <span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Hamming-windowed convolution</span>
+
+<span class="sd">        Note that this method operates in-place, i.e., it will alter the data.</span>
+<span class="sd">        If you prefer a filtered copy, consider using the</span>
+<span class="sd">        :meth:`~hnn_core.dipole.Dipole.copy`-method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        window_len : float</span>
+<span class="sd">            The length (in ms) of a `~numpy.hamming` window to convolve the</span>
+<span class="sd">            data with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dpl_copy : instance of Dipole</span>
+<span class="sd">            A copy of the modified Dipole instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smooth_waveform</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">smooth_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">window_len</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Dipole.savgol_filter"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter">[docs]</a>    <span class="k">def</span> <span class="nf">savgol_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h_freq</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Savitzky-Golay filtering</span>
+
+<span class="sd">        Note that this method operates in-place, i.e., it will alter the data.</span>
+<span class="sd">        If you prefer a filtered copy, consider using the</span>
+<span class="sd">        :meth:`~hnn_core.dipole.Dipole.copy`-method. The high-frequency cutoff</span>
+<span class="sd">        value of a Savitzky-Golay filter is approximate; see the SciPy</span>
+<span class="sd">        reference: :func:`~scipy.signal.savgol_filter`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        h_freq : float or None</span>
+<span class="sd">            Approximate high cutoff frequency in Hz. Note that this</span>
+<span class="sd">            is not an exact cutoff, since Savitzky-Golay filtering</span>
+<span class="sd">            is done using polynomial fits</span>
+<span class="sd">            instead of FIR/IIR filtering. This parameter is thus used to</span>
+<span class="sd">            determine the length of the window over which a 5th-order</span>
+<span class="sd">            polynomial smoothing is applied.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dpl_copy : instance of Dipole</span>
+<span class="sd">            A copy of the modified Dipole instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">_savgol_filter</span>
+        <span class="k">if</span> <span class="n">h_freq</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;h_freq cannot be negative&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">h_freq</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;h_freq must be less than half the sample rate&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_savgol_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
+                                            <span class="n">h_freq</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Dipole.plot"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simple layer-specific plot function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tmin : float or None</span>
+<span class="sd">            Start time of plot (in ms). If None, plot entire simulation.</span>
+<span class="sd">        tmax : float or None</span>
+<span class="sd">            End time of plot (in ms). If None, plot entire simulation.</span>
+<span class="sd">        layer : str</span>
+<span class="sd">            The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
+<span class="sd">        decimate : int</span>
+<span class="sd">            Factor by which to decimate the raw dipole traces (optional)</span>
+<span class="sd">        ax : instance of matplotlib figure | None</span>
+<span class="sd">            The matplotlib axis</span>
+<span class="sd">        color : tuple of float</span>
+<span class="sd">            RGBA value to use for plotting (optional)</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the figure</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of plt.fig</span>
+<span class="sd">            The matplotlib figure handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">plot_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">layer</span><span class="p">,</span>
+                           <span class="n">decim</span><span class="o">=</span><span class="n">decim</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dipole.plot_psd"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot_psd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span>
+                 <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot power spectral density (PSD) of dipole time course</span>
+
+<span class="sd">        Applies `~scipy.signal.periodogram` from SciPy with</span>
+<span class="sd">        ``window=&#39;hamming&#39;``.</span>
+<span class="sd">        Note that no spectral averaging is applied across time, as most</span>
+<span class="sd">        ``hnn_core`` simulations are short-duration. However, passing a list of</span>
+<span class="sd">        `Dipole` instances will plot their average (Hamming-windowed) power,</span>
+<span class="sd">        which resembles the `Welch`-method applied over time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dpl : instance of Dipole | list of Dipole instances</span>
+<span class="sd">            The Dipole object.</span>
+<span class="sd">        fmin : float</span>
+<span class="sd">            Minimum frequency to plot (in Hz). Default: 0 Hz</span>
+<span class="sd">        fmax : float</span>
+<span class="sd">            Maximum frequency to plot (in Hz). Default: None (plot up to</span>
+<span class="sd">            Nyquist)</span>
+<span class="sd">        tmin : float or None</span>
+<span class="sd">            Start time of data to include (in ms). If None, use entire</span>
+<span class="sd">            simulation.</span>
+<span class="sd">        tmax : float or None</span>
+<span class="sd">            End time of data to include (in ms). If None, use entire</span>
+<span class="sd">            simulation.</span>
+<span class="sd">        layer : str, default &#39;agg&#39;</span>
+<span class="sd">            The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
+<span class="sd">        ax : instance of matplotlib figure | None</span>
+<span class="sd">            The matplotlib axis.</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the figure</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of matplotlib Figure</span>
+<span class="sd">            The matplotlib figure handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">plot_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="n">fmax</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span>
+                        <span class="n">layer</span><span class="o">=</span><span class="n">layer</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dipole.plot_tfr_morlet"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot_tfr_morlet">[docs]</a>    <span class="k">def</span> <span class="nf">plot_tfr_morlet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mf">7.</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot Morlet time-frequency representation of dipole time course</span>
+
+<span class="sd">        NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be</span>
+<span class="sd">        installed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dpl : instance of Dipole | list of Dipole instances</span>
+<span class="sd">            The Dipole object. If a list of dipoles is given, the power is</span>
+<span class="sd">            calculated separately for each trial, then averaged.</span>
+<span class="sd">        freqs : array</span>
+<span class="sd">            Frequency range of interest.</span>
+<span class="sd">        n_cycles : float or array of float, default 7.0</span>
+<span class="sd">            Number of cycles. Fixed number or one per frequency.</span>
+<span class="sd">        tmin : float or None</span>
+<span class="sd">            Start time of plot in milliseconds. If None, plot entire</span>
+<span class="sd">            simulation.</span>
+<span class="sd">        tmax : float or None</span>
+<span class="sd">            End time of plot in milliseconds. If None, plot entire simulation.</span>
+<span class="sd">        layer : str, default &#39;agg&#39;</span>
+<span class="sd">            The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
+<span class="sd">        decim : int or list of int or None (default)</span>
+<span class="sd">            Optional (integer) factor by which to decimate the raw dipole</span>
+<span class="sd">            traces. The SciPy function :func:`~scipy.signal.decimate` is used,</span>
+<span class="sd">            which recommends values &lt;13. To achieve higher decimation factors,</span>
+<span class="sd">            a list of ints can be provided. These are applied successively.</span>
+<span class="sd">        padding : str or None</span>
+<span class="sd">            Optional padding of the dipole time course beyond the plotting</span>
+<span class="sd">            limits. Possible values are: &#39;zeros&#39; for padding with 0&#39;s</span>
+<span class="sd">            (default), &#39;mirror&#39; for mirror-image padding.</span>
+<span class="sd">        ax : instance of matplotlib figure | None</span>
+<span class="sd">            The matplotlib axis</span>
+<span class="sd">        colormap : str</span>
+<span class="sd">            The name of a matplotlib colormap, e.g., &#39;viridis&#39;. Default:</span>
+<span class="sd">            &#39;inferno&#39;</span>
+<span class="sd">        colorbar : bool</span>
+<span class="sd">            If True (default), adjust figure to include colorbar.</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the figure</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of matplotlib Figure</span>
+<span class="sd">            The matplotlib figure handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">plot_tfr_morlet</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="n">n_cycles</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span>
+            <span class="n">layer</span><span class="o">=</span><span class="n">layer</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="n">decim</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="n">colorbar</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_baseline_renormalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Only baseline renormalize if the units are fAm.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        N_pyr_x : int</span>
+<span class="sd">            Nr of cells (x)</span>
+<span class="sd">        N_pyr_y : int</span>
+<span class="sd">            Nr of cells (y)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># N_pyr cells in grid. This is PER LAYER</span>
+        <span class="n">N_pyr</span> <span class="o">=</span> <span class="n">N_pyr_x</span> <span class="o">*</span> <span class="n">N_pyr_y</span>
+        <span class="c1"># dipole offset calculation: increasing number of pyr</span>
+        <span class="c1"># cells (L2 and L5, simultaneously)</span>
+        <span class="c1"># with no inputs resulted in an aggregate dipole over the</span>
+        <span class="c1"># interval [50., 1000.] ms that</span>
+        <span class="c1"># eventually plateaus at -48 fAm. The range over this interval</span>
+        <span class="c1"># is something like 3 fAm</span>
+        <span class="c1"># so the resultant correction is here, per dipole</span>
+        <span class="c1"># dpl_offset = N_pyr * 50.207</span>
+        <span class="n">dpl_offset</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># these values will be subtracted</span>
+            <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="n">N_pyr</span> <span class="o">*</span> <span class="mf">0.0443</span><span class="p">,</span>
+            <span class="s1">&#39;L5&#39;</span><span class="p">:</span> <span class="n">N_pyr</span> <span class="o">*</span> <span class="o">-</span><span class="mf">49.0502</span>
+            <span class="c1"># &#39;L5&#39;: N_pyr * -48.3642,</span>
+            <span class="c1"># will be calculated next, this is a placeholder</span>
+            <span class="c1"># &#39;agg&#39;: None,</span>
+        <span class="p">}</span>
+        <span class="c1"># L2 dipole offset can be roughly baseline shifted over</span>
+        <span class="c1"># the entire range of t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">dpl_offset</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span>
+        <span class="c1"># L5 dipole offset should be different for interval [50., 500.]</span>
+        <span class="c1"># and then it can be offset</span>
+        <span class="c1"># slope (m) and intercept (b) params for L5 dipole offset</span>
+        <span class="c1"># uncorrected for N_cells</span>
+        <span class="c1"># these values were fit over the range [37., 750.)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mf">3.4770508e-3</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mf">51.231085</span>
+        <span class="c1"># these values were fit over the range [750., 5000]</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="mf">750.</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="mf">1.01e-4</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">48.412078</span>
+        <span class="c1"># piecewise normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">&lt;=</span> <span class="mf">37.</span><span class="p">]</span> <span class="o">-=</span> <span class="n">dpl_offset</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">][(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">&gt;</span> <span class="mf">37.</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">&lt;</span> <span class="n">t1</span><span class="p">)]</span> <span class="o">-=</span> <span class="n">N_pyr</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">&gt;</span> <span class="mf">37.</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">&lt;</span> <span class="n">t1</span><span class="p">)]</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">&gt;=</span> <span class="n">t1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">N_pyr</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">m1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">&gt;=</span> <span class="n">t1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b1</span><span class="p">)</span>
+        <span class="c1"># recalculate the aggregate dipole based on the baseline</span>
+        <span class="c1"># normalized ones</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Dipole.write"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write dipole values to a file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fname : str</span>
+<span class="sd">            Full path to the output file (.txt)</span>
+
+<span class="sd">        Outputs</span>
+<span class="sd">        -------</span>
+<span class="sd">        A tab separatd txt file where rows correspond</span>
+<span class="sd">            to samples and columns correspond to</span>
+<span class="sd">            1) time (s),</span>
+<span class="sd">            2) aggregate current dipole (scaled nAm),</span>
+<span class="sd">            3) L2/3 current dipole (scaled nAm), and</span>
+<span class="sd">            4) L5 current dipole (scaled nAm)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nave</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Saving Dipole to file that is an average of </span><span class="si">%d</span><span class="s2">&quot;</span>
+                          <span class="s2">&quot; trials&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nave</span><span class="p">)</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">]</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%3.3f</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">X</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+﻿hnn_core.optimization.optimize_evoked
+=====================================
+
+.. currentmodule:: hnn_core.optimization
+
+.. autofunction:: optimize_evoked
+
+.. _sphx_glr_backreferences_hnn_core.optimization.optimize_evoked:
+.. minigallery:: hnn_core.optimization.optimize_evoked
+   :add-heading:

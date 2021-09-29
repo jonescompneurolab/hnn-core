@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn_core.cell_response &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../auto_examples/index.html">Examples</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../../glossary.html">Glossary</a></li>
+                <li><a href="../../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.2
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for hnn_core.cell_response</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;CellResponse class.&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
+<span class="c1">#          Ryan Thorpe &lt;ryan_thorpe@brown.edu&gt;</span>
+<span class="c1">#          Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
+
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_spikes_hist</span><span class="p">,</span> <span class="n">plot_spikes_raster</span>
+
+
+<div class="viewcode-block" id="CellResponse"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse">[docs]</a><span class="k">class</span> <span class="nc">CellResponse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The CellResponse class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spike_times : list (n_trials,) of list (n_spikes,) of float, shape | None</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        The inner list contains the time stamps of spikes.</span>
+<span class="sd">    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape | None</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        The inner list contains the cell IDs of neurons that</span>
+<span class="sd">        spiked.</span>
+<span class="sd">    spike_types : list (n_trials,) of list (n_spikes,) of float, shape | None</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        The inner list contains the type of spike (e.g., evprox1</span>
+<span class="sd">        or L2_pyramidal) that occured at the corresonding time stamp.</span>
+<span class="sd">        Each gid corresponds to a type via Network().gid_ranges.</span>
+<span class="sd">    times : numpy array | None</span>
+<span class="sd">        Array of time points for samples in continuous data.</span>
+<span class="sd">        This includes vsoma and isoma.</span>
+<span class="sd">    cell_type_names : list</span>
+<span class="sd">        List of unique cell type names that are explicitly modeled in the</span>
+<span class="sd">        network</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spike_times : list (n_trials,) of list (n_spikes,) of float, shape</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        The inner list contains the time stamps of spikes.</span>
+<span class="sd">    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        The inner list contains the cell IDs of neurons that</span>
+<span class="sd">        spiked.</span>
+<span class="sd">    spike_types : list (n_trials,) of list (n_spikes,) of float, shape</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        The inner list contains the type of spike (e.g., evprox1</span>
+<span class="sd">        or L2_pyramidal) that occured at the corresonding time stamp.</span>
+<span class="sd">        Each gid corresponds to a type via Network::gid_ranges.</span>
+<span class="sd">    vsoma : list (n_trials,) of dict, shape</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        Dictionary indexed by gids containing somatic voltages.</span>
+<span class="sd">    isoma : list (n_trials,) of dict, shape</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        Dictionary indexed by gids containing somatic currents.</span>
+<span class="sd">    times : array-like, shape (n_times,)</span>
+<span class="sd">        Array of time points for samples in continuous data.</span>
+<span class="sd">        This includes vsoma and isoma.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    reset()</span>
+<span class="sd">        Reset all recorded attributes to empty lists.</span>
+<span class="sd">    update_types(gid_ranges)</span>
+<span class="sd">        Update spike types in the current instance of CellResponse.</span>
+<span class="sd">    plot(ax=None, show=True)</span>
+<span class="sd">        Plot and return a matplotlib Figure object showing the</span>
+<span class="sd">        aggregate network spiking activity according to cell type.</span>
+<span class="sd">    mean_rates(tstart, tstop, gid_ranges, mean_type=&#39;all&#39;)</span>
+<span class="sd">        Calculate mean firing rate for each cell type. Specify</span>
+<span class="sd">        averaging method with mean_type argument.</span>
+<span class="sd">    write(fname)</span>
+<span class="sd">        Write spiking activity to a collection of spike trial files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cell_type_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">spike_times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spike_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">spike_gids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spike_gids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">spike_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spike_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">cell_type_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cell_type_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Validate arguments</span>
+        <span class="n">arg_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;spike_times&#39;</span><span class="p">,</span> <span class="s1">&#39;spike_gids&#39;</span><span class="p">,</span> <span class="s1">&#39;spike_types&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">arg_idx</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">spike_gids</span><span class="p">,</span> <span class="n">spike_types</span><span class="p">]):</span>
+            <span class="c1"># Validate outer list</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> should be a list of lists&#39;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="n">arg_names</span><span class="p">[</span><span class="n">arg_idx</span><span class="p">],))</span>
+            <span class="c1"># If arg is not an empty list, validate inner list</span>
+            <span class="k">for</span> <span class="n">trial_list</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> should be a list of lists&#39;</span>
+                                    <span class="o">%</span> <span class="p">(</span><span class="n">arg_names</span><span class="p">[</span><span class="n">arg_idx</span><span class="p">],))</span>
+            <span class="c1"># Set the length of &#39;spike_times&#39; as a references and validate</span>
+            <span class="c1"># uniform length</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="n">spike_times</span><span class="p">:</span>
+                <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_trials</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;spike times, gids, and types should be &#39;</span>
+                                 <span class="s1">&#39;lists of the same length&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="o">=</span> <span class="n">spike_gids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">=</span> <span class="n">spike_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">times</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;times&#39; is an np.ndarray of simulation times&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cell_type_names</span> <span class="o">=</span> <span class="n">cell_type_names</span>
+
+<div class="viewcode-block" id="CellResponse.__repr__"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> | </span><span class="si">%d</span><span class="s1"> simulation trials&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CellResponse</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="c1"># Round each time element</span>
+        <span class="n">times_self</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">trial</span><span class="p">]</span>
+                      <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">]</span>
+        <span class="n">times_other</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">trial</span><span class="p">]</span>
+                       <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">times_self</span> <span class="o">==</span> <span class="n">times_other</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CellResponse.__getitem__"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a CellResponse object with a copied subset filtered by gid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gid_item : int | slice</span>
+<span class="sd">            Subset of gids .</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cell_response : instance of CellResponse</span>
+<span class="sd">            See below for use cases.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">gid_item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">gid_item</span><span class="o">.</span><span class="n">stop</span><span class="p">)[</span><span class="n">gid_item</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">gid_item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gid_item</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">gid_item</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ndarray cannot exceed 1 dimension&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">gid_item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gid_item</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;indices must be int, slice, or array-like, &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gid_item</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">gid_item</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gids must be of dtype int, &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;not </span><span class="si">{</span><span class="n">gid_item</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">)</span>
+        <span class="n">times_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">gids_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">types_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">vsoma_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">isoma_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+            <span class="n">gid_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">],</span> <span class="n">gid_item</span><span class="p">)</span>
+            <span class="n">times_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])[</span><span class="n">gid_mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">gids_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])[</span><span class="n">gid_mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">types_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])[</span><span class="n">gid_mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+            <span class="n">vsoma_trial</span> <span class="o">=</span> <span class="p">{</span><span class="n">gid</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">gid</span><span class="p">]</span> <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">gid_item</span>
+                           <span class="k">if</span> <span class="n">gid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+            <span class="n">isoma_trial</span> <span class="o">=</span> <span class="p">{</span><span class="n">gid</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">gid</span><span class="p">]</span> <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">gid_item</span>
+                           <span class="k">if</span> <span class="n">gid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+            <span class="n">times_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">times_trial</span><span class="p">)</span>
+            <span class="n">gids_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gids_trial</span><span class="p">)</span>
+            <span class="n">types_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">types_trial</span><span class="p">)</span>
+            <span class="n">vsoma_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vsoma_trial</span><span class="p">)</span>
+            <span class="n">isoma_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isoma_trial</span><span class="p">)</span>
+
+        <span class="n">cell_response_slice</span> <span class="o">=</span> <span class="n">CellResponse</span><span class="p">(</span><span class="n">spike_times</span><span class="o">=</span><span class="n">times_slice</span><span class="p">,</span>
+                                           <span class="n">spike_gids</span><span class="o">=</span><span class="n">gids_slice</span><span class="p">,</span>
+                                           <span class="n">spike_types</span><span class="o">=</span><span class="n">types_slice</span><span class="p">)</span>
+        <span class="n">cell_response_slice</span><span class="o">.</span><span class="n">_vsoma</span> <span class="o">=</span> <span class="n">vsoma_slice</span>
+        <span class="n">cell_response_slice</span><span class="o">.</span><span class="n">_isoma</span> <span class="o">=</span> <span class="n">isoma_slice</span>
+
+        <span class="k">return</span> <span class="n">cell_response_slice</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spike_gids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spike_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vsoma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isoma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_times</span>
+
+<div class="viewcode-block" id="CellResponse.update_types"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.update_types">[docs]</a>    <span class="k">def</span> <span class="nf">update_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_ranges</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update spike types in the current instance of CellResponse.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gid_ranges : dict of lists or range objects</span>
+<span class="sd">            Dictionary with keys &#39;evprox1&#39;, &#39;evdist1&#39; etc.</span>
+<span class="sd">            containing the range of Cell or input IDs of different</span>
+<span class="sd">            cell or input types.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Validate gid_ranges</span>
+        <span class="n">all_gid_ranges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">gid_ranges</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">item_idx_1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_gid_ranges</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">item_idx_2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">item_idx_1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_gid_ranges</span><span class="p">)):</span>
+                <span class="n">gid_set_1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_gid_ranges</span><span class="p">[</span><span class="n">item_idx_1</span><span class="p">])</span>
+                <span class="n">gid_set_2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_gid_ranges</span><span class="p">[</span><span class="n">item_idx_2</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">gid_set_1</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="n">gid_set_2</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;gid_ranges should contain only disjoint &#39;</span>
+                                     <span class="s1">&#39;sets of gid values&#39;</span><span class="p">)</span>
+
+        <span class="n">spike_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">)):</span>
+            <span class="n">spike_types_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">],</span>
+                                              <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;U36&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">gidtype</span><span class="p">,</span> <span class="n">gids</span> <span class="ow">in</span> <span class="n">gid_ranges</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">spike_gids_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">],</span> <span class="n">gids</span><span class="p">)</span>
+                <span class="n">spike_types_trial</span><span class="p">[</span><span class="n">spike_gids_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">gidtype</span>
+            <span class="n">spike_types</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">spike_types_trial</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">=</span> <span class="n">spike_types</span></div>
+
+<div class="viewcode-block" id="CellResponse.mean_rates"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.mean_rates">[docs]</a>    <span class="k">def</span> <span class="nf">mean_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tstart</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">gid_ranges</span><span class="p">,</span> <span class="n">mean_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Mean spike rates (Hz) by cell type.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tstart : int | float | None</span>
+<span class="sd">            Value defining the start time of all trials.</span>
+<span class="sd">        tstop : int | float | None</span>
+<span class="sd">            Value defining the stop time of all trials.</span>
+<span class="sd">        gid_ranges : dict of lists or range objects</span>
+<span class="sd">            Dictionary with keys &#39;evprox1&#39;, &#39;evdist1&#39; etc.</span>
+<span class="sd">            containing the range of Cell or input IDs of different</span>
+<span class="sd">            cell or input types.</span>
+<span class="sd">        mean_type : str</span>
+<span class="sd">            &#39;all&#39; : Average over trials and cells</span>
+<span class="sd">                Returns mean rate for cell types</span>
+<span class="sd">            &#39;trial&#39; : Average over cell types</span>
+<span class="sd">                Returns trial mean rate for cell types</span>
+<span class="sd">            &#39;cell&#39; : Average over individual cells</span>
+<span class="sd">                Returns trial mean rate for individual cells</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        spike_rate : dict</span>
+<span class="sd">            Dictionary with keys &#39;L5_pyramidal&#39;, &#39;L5_basket&#39;, etc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spike_rates</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">mean_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;trial&#39;</span><span class="p">,</span> <span class="s1">&#39;cell&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mean_type. Valid arguments include &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;&#39;all&#39;, &#39;trial&#39;, or &#39;cell&#39;. Got </span><span class="si">{</span><span class="n">mean_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Validate tstart, tstop</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tstart</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">tstop</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;tstart and tstop must be of type int or float&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">tstop</span> <span class="o">&lt;=</span> <span class="n">tstart</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;tstop must be greater than tstart&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cell_type_names</span><span class="p">:</span>
+            <span class="n">cell_type_gids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">])</span>
+            <span class="n">n_trials</span><span class="p">,</span> <span class="n">n_cells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_type_gids</span><span class="p">)</span>
+            <span class="n">gid_spike_rate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_cells</span><span class="p">))</span>
+
+            <span class="n">trial_data</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">trial_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">spike_types</span><span class="p">,</span> <span class="n">spike_gids</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trial_data</span><span class="p">):</span>
+                <span class="n">trial_type_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">spike_types</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">)</span>
+                <span class="n">gids</span><span class="p">,</span> <span class="n">gid_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="n">spike_gids</span><span class="p">)[</span><span class="n">trial_type_mask</span><span class="p">],</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="n">gid_spike_rate</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">cell_type_gids</span><span class="p">,</span> <span class="n">gids</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">gid_counts</span> <span class="o">/</span> <span class="p">(</span><span class="n">tstop</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">))</span> <span class="o">*</span> <span class="mi">1000</span>
+
+            <span class="k">if</span> <span class="n">mean_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+                <span class="n">spike_rates</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                    <span class="n">gid_spike_rate</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">mean_type</span> <span class="o">==</span> <span class="s1">&#39;trial&#39;</span><span class="p">:</span>
+                <span class="n">spike_rates</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                    <span class="n">gid_spike_rate</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">mean_type</span> <span class="o">==</span> <span class="s1">&#39;cell&#39;</span><span class="p">:</span>
+                <span class="n">spike_rates</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">gid_trial_rate</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                                          <span class="k">for</span> <span class="n">gid_trial_rate</span> <span class="ow">in</span> <span class="n">gid_spike_rate</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">spike_rates</span></div>
+
+<div class="viewcode-block" id="CellResponse.plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spikes_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot the aggregate spiking activity according to cell type.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : instance of matplotlib axis | None</span>
+<span class="sd">            An axis object from matplotlib. If None,</span>
+<span class="sd">            a new figure is created.</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the figure.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of matplotlib Figure</span>
+<span class="sd">            The matplotlib figure object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">plot_spikes_raster</span><span class="p">(</span><span class="n">cell_response</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CellResponse.plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_hist">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot the histogram of spiking activity across trials.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : instance of matplotlib axis | None</span>
+<span class="sd">            An axis object from matplotlib. If None,</span>
+<span class="sd">            a new figure is created.</span>
+<span class="sd">        spike_types: string | list | dictionary | None</span>
+<span class="sd">            String input of a valid spike type is plotted individually.</span>
+<span class="sd">                Ex: &#39;common&#39;, &#39;evdist&#39;, &#39;evprox&#39;, &#39;extgauss&#39;, &#39;extpois&#39;</span>
+<span class="sd">            List of valid string inputs will plot each spike type individually.</span>
+<span class="sd">                Ex: [&#39;common&#39;, &#39;evdist&#39;]</span>
+<span class="sd">            Dictionary of valid lists will plot list elements as a group.</span>
+<span class="sd">                Ex: {&#39;Evoked&#39;: [&#39;evdist&#39;, &#39;evprox&#39;], &#39;External&#39;: [&#39;extpois&#39;]}</span>
+<span class="sd">            If None, all input spike types are plotted individually if any</span>
+<span class="sd">            are present. Otherwise spikes from all cells are plotted.</span>
+<span class="sd">            Valid strings also include leading characters of spike types</span>
+<span class="sd">                Example: &#39;ext&#39; is equivalent to [&#39;extgauss&#39;, &#39;extpois&#39;]</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the figure.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of matplotlib Figure</span>
+<span class="sd">            The matplotlib figure handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">plot_spikes_hist</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="n">spike_types</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CellResponse.write"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write spiking activity per trial to a collection of files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fname : str</span>
+<span class="sd">            String format (e.g., &#39;&lt;pathname&gt;/spk_%d.txt&#39;) of the</span>
+<span class="sd">            path to the output spike file(s).</span>
+
+<span class="sd">        Outputs</span>
+<span class="sd">        -------</span>
+<span class="sd">        A tab separated txt file for each trial where rows</span>
+<span class="sd">            correspond to spikes, and columns correspond to</span>
+<span class="sd">            1) spike time (s),</span>
+<span class="sd">            2) spike gid, and</span>
+<span class="sd">            3) gid type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">)):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">trial_idx</span><span class="p">,),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">spike_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="se">\t</span><span class="si">{}</span><span class="se">\t</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">spike_idx</span><span class="p">],</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">spike_idx</span><span class="p">]),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">spike_idx</span><span class="p">]))</span></div></div>
+
+
+<div class="viewcode-block" id="read_spikes"><a class="viewcode-back" href="../../generated/hnn_core.read_spikes.html#hnn_core.read_spikes">[docs]</a><span class="k">def</span> <span class="nf">read_spikes</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">gid_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read spiking activity from a collection of spike trial files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Wildcard expression (e.g., &#39;&lt;pathname&gt;/spk_*.txt&#39;) of the</span>
+<span class="sd">        path to the spike file(s).</span>
+<span class="sd">    gid_ranges : dict of lists or range objects | None</span>
+<span class="sd">        Dictionary with keys &#39;evprox1&#39;, &#39;evdist1&#39; etc.</span>
+<span class="sd">        containing the range of Cell or input IDs of different</span>
+<span class="sd">        cell or input types. If None, each spike file must contain</span>
+<span class="sd">        a 3rd column for spike type.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cell_response : CellResponse</span>
+<span class="sd">        An instance of the CellResponse object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">spike_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">spike_gids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">spike_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">))):</span>
+        <span class="n">spike_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">spike_trial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">spike_times</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">spike_trial</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))]</span>
+            <span class="n">spike_gids</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">spike_trial</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))]</span>
+
+            <span class="c1"># Note that legacy HNN &#39;spk.txt&#39; files don&#39;t contain a 3rd column</span>
+            <span class="c1"># for spike type. If reading a legacy version, ensure that a</span>
+            <span class="c1"># gid_dict is provided.</span>
+            <span class="k">if</span> <span class="n">spike_trial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">spike_types</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">spike_trial</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">gid_ranges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gid_ranges must be provided if spike &quot;</span>
+                                     <span class="s2">&quot;types are unspecified in the &quot;</span>
+                                     <span class="s2">&quot;file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file</span><span class="p">,))</span>
+                <span class="n">spike_types</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spike_times</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">()]</span>
+            <span class="n">spike_gids</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">()]</span>
+            <span class="n">spike_types</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">list</span><span class="p">()]</span>
+
+    <span class="n">cell_response</span> <span class="o">=</span> <span class="n">CellResponse</span><span class="p">(</span><span class="n">spike_times</span><span class="o">=</span><span class="n">spike_times</span><span class="p">,</span>
+                                 <span class="n">spike_gids</span><span class="o">=</span><span class="n">spike_gids</span><span class="p">,</span>
+                                 <span class="n">spike_types</span><span class="o">=</span><span class="n">spike_types</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gid_ranges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cell_response</span><span class="o">.</span><span class="n">update_types</span><span class="p">(</span><span class="n">gid_ranges</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cell_response</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

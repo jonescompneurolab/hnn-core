@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>hnn_core.Cell &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../auto_examples/index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../glossary.html">Glossary</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+                <li><a href="../roadmap.html">Roadmap</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hnn_core.Cell</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/generated/hnn_core.Cell.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.2
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hnn-core-cell">
+<h1>hnn_core.Cell<a class="headerlink" href="#hnn-core-cell" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="hnn_core.Cell">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a cell object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the cell.</p>
+</dd>
+<dt><strong>pos</strong><span class="classifier">tuple</span></dt><dd><p>The (x, y, z) coordinates.</p>
+</dd>
+<dt><strong>sections</strong><span class="classifier">dict of Section</span></dt><dd><p>Dictionary with keys as section name.</p>
+</dd>
+<dt><strong>synapses</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
+has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
+‘tau2’.</p>
+</dd>
+<dt><strong>topology</strong><span class="classifier">list of list</span></dt><dd><p>The topology of cell sections. Each element is a list of
+4 items in the format
+[parent_sec, parent_loc, child_sec, child_loc] where
+parent_sec and parent_loc are float between 0 and 1
+specifying the location in the section to connect and
+parent_sec and child_sec are names of the connecting
+sections.</p>
+</dd>
+<dt><strong>sect_loc</strong><span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
+names of section locations that are proximal or distal.</p>
+</dd>
+<dt><strong>gid</strong><span class="classifier">int or None (optional)</span></dt><dd><p>Each cell in a network is uniquely identified by it’s “global ID”: GID.
+The GID is an integer from 0 to n_cells, or None if the cell is not
+yet attached to a network. Once the GID is set, it cannot be changed.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">section_soma</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span>
+<span class="go">        L=39,</span>
+<span class="go">        diam=20,</span>
+<span class="go">        cm=0.85,</span>
+<span class="go">        Ra=200.,</span>
+<span class="go">        end_pts=[[0, 0, 0], [0, 39., 0]]</span>
+<span class="go">    )</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pos</strong><span class="classifier">list of length 3</span></dt><dd><p>The position of the cell.</p>
+</dd>
+<dt><strong>sections</strong><span class="classifier">nested dict</span></dt><dd><p>The section parameters. The key is the name of the section
+and the value is a dictionary parametrizing the morphology
+of the section and the mechanisms inserted.</p>
+</dd>
+<dt><strong>synapses</strong><span class="classifier">dict</span></dt><dd><p>The synapses that the cell can use for connections.</p>
+</dd>
+<dt><strong>dipole_pp</strong><span class="classifier">list of h.Dipole()</span></dt><dd><p>The Dipole objects (see dipole.mod).</p>
+</dd>
+<dt><strong>rec_v</strong><span class="classifier">h.Vector()</span></dt><dd><p>Recording of somatic voltage. Must be enabled
+by running simulate_dipole(net, record_vsoma=True)</p>
+</dd>
+<dt><strong>rec_i</strong><span class="classifier">dict</span></dt><dd><p>Contains recording of somatic currents indexed
+by synapse type. (keys are soma_gabaa, soma_gabab etc.)
+Must be enabled by running simulate_dipole(net, record_isoma=True)</p>
+</dd>
+<dt><strong>tonic_biases</strong><span class="classifier">list of h.IClamp</span></dt><dd><p>The current clamps inserted at each section of the cell
+for tonic biasing inputs.</p>
+</dd>
+<dt><strong>gid</strong><span class="classifier">int</span></dt><dd><p>GID of the cell in a network (or None if not yet assigned)</p>
+</dd>
+<dt><strong>sect_loc</strong><span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
+names of section locations that are proximal or distal.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.build" title="hnn_core.Cell.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>([sec_name_apical])</p></td>
+<td><p>Build cell in Neuron and insert dipole if applicable.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.copy" title="hnn_core.Cell.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Return copy of instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tonic_bias</span></code></a>(amplitude, t0, tstop[, loc])</p></td>
+<td><p>Create tonic bias at the soma.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, …)</p></td>
+<td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, cell_types, show])</p></td>
+<td><p>Plot the cell morphology.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
+<td><p>Record current and voltage at soma.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
+<td><p>Created for _PC.cell and specifies SOURCES of spikes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
+<td><p>Create an h.Exp2Syn synapse.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sec_name_apical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build cell in Neuron and insert dipole if applicable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sec_name_apical</strong><span class="classifier">str | None</span></dt><dd><p>If not None, a dipole will be inserted in this cell in alignment
+with this section. The section should belong to the apical dendrite
+of a pyramidal neuron.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return copy of instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.create_tonic_bias">
+<span class="sig-name descname"><span class="pre">create_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.create_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.create_tonic_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create tonic bias at the soma.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>amplitude</strong><span class="classifier">float</span></dt><dd><p>The amplitude of the input.</p>
+</dd>
+<dt><strong>t0</strong><span class="classifier">float</span></dt><dd><p>The start time of tonic input (in ms).</p>
+</dd>
+<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms).</p>
+</dd>
+<dt><strong>loc</strong><span class="classifier">float (0 to 1)</span></dt><dd><p>The location of the input in the soma section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.parconnect_from_src">
+<span class="sig-name descname"><span class="pre">parconnect_from_src</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_presyn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nc_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postsyn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplane_distance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.parconnect_from_src"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.parconnect_from_src" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Parallel receptor-centric connect FROM presyn TO this cell,</dt><dd><p>based on GID.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gid_presyn</strong><span class="classifier">int</span></dt><dd><p>The cell ID of the presynaptic neuron</p>
+</dd>
+<dt><strong>nc_dict</strong><span class="classifier">dict</span></dt><dd><p>Dictionary with keys: pos_src, A_weight, A_delay, lamtha
+Defines the connection parameters</p>
+</dd>
+<dt><strong>postsyn</strong><span class="classifier">instance of h.Exp2Syn</span></dt><dd><p>The postsynaptic cell object.</p>
+</dd>
+<dt><strong>inplane_distance</strong><span class="classifier">float</span></dt><dd><p>The in plane-distance (in um) between pyramidal cell somas in the
+square grid.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>nc</strong><span class="classifier">instance of h.NetCon</span></dt><dd><p>A network connection object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.plot_morphology">
+<span class="sig-name descname"><span class="pre">plot_morphology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.plot_morphology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.plot_morphology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the cell morphology.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the plot</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>axes</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>The matplotlib 3D axis handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.record_soma">
+<span class="sig-name descname"><span class="pre">record_soma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.record_soma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.record_soma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record current and voltage at soma.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>record_vsoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic voltages from cells</p>
+</dd>
+<dt><strong>record_isoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic currents from cells</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.setup_source_netcon">
+<span class="sig-name descname"><span class="pre">setup_source_netcon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.setup_source_netcon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.setup_source_netcon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Created for _PC.cell and specifies SOURCES of spikes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>The voltage threshold for action potential.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.syn_create">
+<span class="sig-name descname"><span class="pre">syn_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.syn_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.syn_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an h.Exp2Syn synapse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>secloc</strong><span class="classifier">instance of nrn.Segment</span></dt><dd><p>The section location. E.g., soma(0.5).</p>
+</dd>
+<dt><strong>e: float</strong></dt><dd><p>Reverse potential (in mV)</p>
+</dd>
+<dt><strong>tau1: float</strong></dt><dd><p>Rise time (in ms)</p>
+</dd>
+<dt><strong>tau2: float</strong></dt><dd><p>Decay time (in ms)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>syn</strong><span class="classifier">instance of h.Exp2Syn</span></dt><dd><p>A two state kinetic scheme synapse.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="sphx-glr-backreferences-hnn-core-cell"></span></section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
