@@ -308,7 +308,6 @@ def _run_optimization(maxiter, param_ranges, optrun):
 
     cons = list()
     x0 = list()
-    print(param_ranges)
     for idx, param_name in enumerate(param_ranges):
         x0.append(param_ranges[param_name]['initial'])
         cons.append(
@@ -407,10 +406,6 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
 
         if (opt_params['cur_step'] > 0 and
                 opt_params['cur_step'] == total_steps - 1):
-            # update currently used params
-            for var_name in opt_params['ranges']:
-                params[var_name] = opt_params['ranges'][var_name]['initial']
-
             # For the last step (all inputs), recalculate ranges and update
             # param_chunks. If previous optimization steps increased
             # std. dev. this could result in fewer optimization steps as
@@ -420,10 +415,11 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
             # The purpose of the last step (with regular RMSE) is to clean up
             # overfitting introduced by local weighted RMSE optimization.
 
-            evinput_params = _split_by_evinput(params, sigma_range_multiplier,
+            evinput_params = _split_by_evinput(params.copy(),
+                                               sigma_range_multiplier,
                                                timing_range_multiplier,
                                                synweight_range_multiplier)
-            evinput_params = _generate_weights(evinput_params, params,
+            evinput_params = _generate_weights(evinput_params, params.copy(),
                                                decay_multiplier)
             param_chunks = _consolidate_chunks(evinput_params)
 
@@ -453,14 +449,17 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
         # tiny negative weights are possible. Clip them to 0.
         opt_results[opt_results < 0] = 0
 
-        # update opt_params for the next round
-        for var_name, value in zip(opt_params['ranges'], opt_results):
-            opt_params['ranges'][var_name]['initial'] = value
+        # update opt_params for the next round if total rmse decreased
+        new_avg_rmse = _rmse(opt_dpls['best_dpl'], target_dpl,
+                             tstop=params['tstop'],
+                             weights=None)
+        if new_avg_rmse <= avg_rmse:
+            for var_name, value in zip(opt_params['ranges'], opt_results):
+                opt_params['ranges'][var_name]['initial'] = value
 
     # save the optimized params
     for var_name in opt_params['ranges']:
         params[var_name] = opt_params['ranges'][var_name]['initial']
 
-    avg_rmse = _rmse(opt_dpls['best_dpl'], target_dpl, tstop=params['tstop'])
-    print("Final RMSE: %.2f" % avg_rmse)
+    print("Final RMSE: %.2f" % new_avg_rmse)
     return params
