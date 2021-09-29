@@ -152,16 +152,17 @@ API
 
 People who contributed to this release (in alphabetical order):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`Alex Rockhill`_
-`Blake Caldwell`_
-`Christopher J. Bailey`_
-`Dylan Daniels`_
-`Kenneth Loi`_
-`Mainak Jas`_
-`Nick Tolley`_
-`Ryan Thorpe`_
-`Sarah Pugliese`_
-`Stephanie R. Jones`_
+
+- `Alex Rockhill`_
+- `Blake Caldwell`_
+- `Christopher Bailey`_
+- `Dylan Daniels`_
+- `Kenneth Loi`_
+- `Mainak Jas`_
+- `Nick Tolley`_
+- `Ryan Thorpe`_
+- `Sarah Pugliese`_
+- `Stephanie R. Jones`_
 
 .. _0.1:
 
