@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.3.dev0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -87,19 +87,25 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">What’s new?</a><ul>
-<li><a class="reference internal" href="#id1">0.2</a></li>
-<li><a class="reference internal" href="#notable-changes">Notable Changes</a><ul>
+<li><a class="reference internal" href="#current">Current</a><ul>
 <li><a class="reference internal" href="#changelog">Changelog</a></li>
 <li><a class="reference internal" href="#bug">Bug</a></li>
 <li><a class="reference internal" href="#api">API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">0.2</a></li>
+<li><a class="reference internal" href="#notable-changes">Notable Changes</a><ul>
+<li><a class="reference internal" href="#id3">Changelog</a></li>
+<li><a class="reference internal" href="#id5">Bug</a></li>
+<li><a class="reference internal" href="#id6">API</a></li>
 <li><a class="reference internal" href="#people-who-contributed-to-this-release-in-alphabetical-order">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id4">0.1</a><ul>
-<li><a class="reference internal" href="#id6">Changelog</a></li>
-<li><a class="reference internal" href="#id26">Bug</a></li>
-<li><a class="reference internal" href="#id35">API</a></li>
-<li><a class="reference internal" href="#id44">People who contributed to this release (in alphabetical order):</a></li>
+<li><a class="reference internal" href="#id7">0.1</a><ul>
+<li><a class="reference internal" href="#id9">Changelog</a></li>
+<li><a class="reference internal" href="#id29">Bug</a></li>
+<li><a class="reference internal" href="#id38">API</a></li>
+<li><a class="reference internal" href="#id47">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
 </ul>
@@ -124,13 +130,14 @@
           
 <div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
   <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v0.2
+    v0.3.dev0
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
     <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
     <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
     <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
   </ul>
 </div>
 
@@ -155,6 +162,18 @@
       
   <section id="what-s-new">
 <span id="whats-new"></span><h1>What’s new?<a class="headerlink" href="#what-s-new" title="Permalink to this headline">¶</a></h1>
+<section id="current">
+<h2>Current<a class="headerlink" href="#current" title="Permalink to this headline">¶</a></h2>
+<section id="changelog">
+<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bug">
+<h3>Bug<a class="headerlink" href="#bug" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
 <section id="id1">
 <span id="id2"></span><h2>0.2<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 </section>
@@ -164,14 +183,14 @@
 <li><p>Local field potentials can now be recorded during simulations
 <a class="reference internal" href="auto_examples/howto/plot_record_extracellular_potentials.html#sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"><span class="std std-ref">[Example]</span></a></p></li>
 <li><p>Ability to optimize parameters to reproduce event related potentials from real data
-<a class="reference internal" href="auto_examples/howto/plot_optimize_evoked.html#sphx-glr-auto-examples-howto-plot-optimize-evoked-py"><span class="std std-ref">[Example]</span></a></p></li>
+<span class="xref std std-ref">[Example]</span></p></li>
 <li><p>Published models using HNN were added and can be loaded via dedicated functions</p></li>
 <li><p>Several improvements enabling easy modification of connectivity and cell properties
 <a class="reference internal" href="auto_examples/howto/plot_connectivity.html#sphx-glr-auto-examples-howto-plot-connectivity-py"><span class="std std-ref">[Example]</span></a></p></li>
 <li><p>Improved visualization including spectral analysis, connectivity, and cell morphology</p></li>
 </ul>
-<section id="changelog">
-<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
+<section id="id3">
+<h3>Changelog<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Store all connectivity information under <code class="xref py py-attr docutils literal notranslate"><span class="pre">connectivity</span></code> before building
 the network, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/276">#276</a></p></li>
@@ -212,8 +231,8 @@ inputs for simulating evoked responses, by <a class="reference external" href="h
 by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/416">#416</a></p></li>
 </ul>
 </section>
-<section id="bug">
-<h3>Bug<a class="headerlink" href="#bug" title="Permalink to this headline">¶</a></h3>
+<section id="id5">
+<h3>Bug<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Remove rounding error caused by repositioning of NEURON cell sections, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a>
 and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/314">#314</a></p></li>
@@ -232,8 +251,8 @@ and <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas<
 (<code class="docutils literal notranslate"><span class="pre">times</span></code> and <code class="docutils literal notranslate"><span class="pre">data</span></code>), by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/421">#421</a></p></li>
 </ul>
 </section>
-<section id="api">
-<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<section id="id6">
+<h3>API<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>New API for defining cell-cell connections. Custom connections can be added with
 <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_connection" title="hnn_core.Network.add_connection"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_connection()</span></code></a>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/276">#276</a></p></li>
@@ -266,22 +285,24 @@ and delay dictionaries assigned in <code class="docutils literal notranslate"><s
 </section>
 <section id="people-who-contributed-to-this-release-in-alphabetical-order">
 <h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="https://github.com/alexrockhill">Alex Rockhill</a>
-<a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a>
-<a href="#id45"><span class="problematic" id="id46">`Christopher J. Bailey`_</span></a>
-<a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a>
-<a class="reference external" href="https://github.com/kenloi">Kenneth Loi</a>
-<a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a>
-<a class="reference external" href="https://github.com/ntolley">Nick Tolley</a>
-<a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a>
-<a class="reference external" href="https://bcs.mit.edu/directory/sarah-pugliese">Sarah Pugliese</a>
-<a class="reference external" href="https://github.com/stephanie-r-jones">Stephanie R. Jones</a></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/alexrockhill">Alex Rockhill</a></p></li>
+<li><p><a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a></p></li>
+<li><p><a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a></p></li>
+<li><p><a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a></p></li>
+<li><p><a class="reference external" href="https://github.com/kenloi">Kenneth Loi</a></p></li>
+<li><p><a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a></p></li>
+<li><p><a class="reference external" href="https://github.com/ntolley">Nick Tolley</a></p></li>
+<li><p><a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a></p></li>
+<li><p><a class="reference external" href="https://bcs.mit.edu/directory/sarah-pugliese">Sarah Pugliese</a></p></li>
+<li><p><a class="reference external" href="https://github.com/stephanie-r-jones">Stephanie R. Jones</a></p></li>
+</ul>
 </section>
 </section>
-<section id="id4">
-<span id="id5"></span><h2>0.1<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<section id="id6">
-<h3>Changelog<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<section id="id7">
+<span id="id8"></span><h2>0.1<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<section id="id9">
+<h3>Changelog<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add ability to simulate multiple trials in parallel using joblibs, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/44">#44</a></p></li>
 <li><p>Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting their start times to exceed the simulation stop time, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/105">#105</a></p></li>
@@ -304,8 +325,8 @@ and delay dictionaries assigned in <code class="docutils literal notranslate"><s
 <li><p>Add Savitzky-Golay filtering method <a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter" title="hnn_core.dipole.Dipole.savgol_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>; copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v0.24)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 </ul>
 </section>
-<section id="id26">
-<h3>Bug<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<section id="id29">
+<h3>Bug<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix missing autapses in network construction, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/50">#50</a></p></li>
 <li><p>Fix rhythmic input feed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/98">#98</a></p></li>
@@ -317,8 +338,8 @@ and delay dictionaries assigned in <code class="docutils literal notranslate"><s
 <li><p>Fix bug in network to add empty spike when empty file is read in, by <a class="reference external" href="https://github.com/samikane">Samika Kanekar</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/207">#207</a></p></li>
 </ul>
 </section>
-<section id="id35">
-<h3>API<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
+<section id="id38">
+<h3>API<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Make a context manager for Network class, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/86">#86</a></p></li>
 <li><p>Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/96">#96</a></p></li>
@@ -330,8 +351,8 @@ and delay dictionaries assigned in <code class="docutils literal notranslate"><s
 <li><p>Force conversion to nAm (from fAm) for output of <code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code> regardless of <code class="docutils literal notranslate"><span class="pre">postproc</span></code>-argument, which now only controls parameter file-based smoothing and scaling, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/264">#264</a></p></li>
 </ul>
 </section>
-<section id="id44">
-<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h3>
+<section id="id47">
+<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id47" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a></p></li>
 <li><p><a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a></p></li>

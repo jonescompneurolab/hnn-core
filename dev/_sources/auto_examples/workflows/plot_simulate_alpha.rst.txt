@@ -150,7 +150,7 @@ time with unique randomization. The drive is only connected to the
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7f4b8de5e358>
+    <hnn_core.dipole.Dipole object at 0x7ff81723c4e0>
 
 
 
@@ -336,7 +336,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  12.095 seconds)
+   **Total running time of the script:** ( 4 minutes  10.596 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:
@@ -351,7 +351,7 @@ References
   .. container:: binder-badge
 
     .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.2/notebooks/auto_examples/workflows/plot_simulate_alpha.ipynb
+      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_alpha.ipynb
       :alt: Launch binder
       :width: 150 px
 
