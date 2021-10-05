@@ -271,6 +271,7 @@ def _optrun(net_model, new_params, opt_params, params, opt_dpls, scale_factor,
 
     # set parameters
     # tiny negative weights are possible. Clip them to 0.
+    params = params.copy()
     new_params[new_params < 0] = 0
     for param_name, test_value in zip(opt_params['ranges'].keys(), new_params):
         params[param_name] = test_value
@@ -289,15 +290,11 @@ def _optrun(net_model, new_params, opt_params, params, opt_dpls, scale_factor,
                      tstop=opt_params['opt_end'],
                      weights=opt_params['weights'])
 
-    if avg_rmse < opt_params['stepminopterr']:
-        best = "[best] "
-        opt_params['stepminopterr'] = avg_rmse
-        opt_dpls['best_dpl'] = avg_dpl
-    else:
-        best = ""
+    opt_params['stepminopterr'] = avg_rmse
+    opt_dpls['best_dpl'] = avg_dpl
 
-    print("%sweighted RMSE: %.2f over range [%3.3f-%3.3f] ms" %
-          (best, avg_rmse, opt_params['opt_start'], opt_params['opt_end']))
+    print("weighted RMSE: %.2f over range [%3.3f-%3.3f] ms" %
+          (avg_rmse, opt_params['opt_start'], opt_params['opt_end']))
 
     opt_params['optiter'] += 1
 
@@ -415,11 +412,11 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
             # The purpose of the last step (with regular RMSE) is to clean up
             # overfitting introduced by local weighted RMSE optimization.
 
-            evinput_params = _split_by_evinput(params.copy(),
+            evinput_params = _split_by_evinput(params,
                                                sigma_range_multiplier,
                                                timing_range_multiplier,
                                                synweight_range_multiplier)
-            evinput_params = _generate_weights(evinput_params, params.copy(),
+            evinput_params = _generate_weights(evinput_params, params,
                                                decay_multiplier)
             param_chunks = _consolidate_chunks(evinput_params)
 
@@ -430,7 +427,8 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
         print("Starting optimization step %d/%d" % (step + 1, total_steps))
 
         opt_params['optiter'] = 0
-        opt_params['stepminopterr'] = _rmse(opt_dpls['best_dpl'], target_dpl,
+        opt_params['stepminopterr'] = _rmse(opt_dpls['best_dpl'],
+                                            opt_dpls['target_dpl'],
                                             tstart=opt_params['opt_start'],
                                             tstop=opt_params['opt_end'],
                                             weights=opt_params['weights'])
@@ -450,7 +448,8 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
         opt_results[opt_results < 0] = 0
 
         # update opt_params for the next round if total rmse decreased
-        new_avg_rmse = _rmse(opt_dpls['best_dpl'], target_dpl,
+        new_avg_rmse = _rmse(opt_dpls['best_dpl'],
+                             opt_dpls['target_dpl'],
                              tstop=params['tstop'],
                              weights=None)
         if new_avg_rmse <= avg_rmse:
