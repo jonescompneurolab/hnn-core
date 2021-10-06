@@ -384,9 +384,9 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
                                        decay_multiplier)
     param_chunks = _consolidate_chunks(evinput_params)
 
-    avg_rmse = _rmse(initial_dpl, target_dpl, tstop=params['tstop'])
+    best_rmse = _rmse(initial_dpl, target_dpl, tstop=params['tstop'])
     opt_dpls = dict(best_dpl=initial_dpl, target_dpl=target_dpl)
-    print("Initial RMSE: %.2f" % avg_rmse)
+    print("Initial RMSE: %.2f" % best_rmse)
 
     opt_params = dict()
     for step in range(len(param_chunks)):
@@ -448,11 +448,12 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
         opt_results[opt_results < 0] = 0
 
         # update opt_params for the next round if total rmse decreased
-        new_avg_rmse = _rmse(opt_dpls['best_dpl'],
+        avg_rmse = _rmse(opt_dpls['best_dpl'],
                              opt_dpls['target_dpl'],
                              tstop=params['tstop'],
                              weights=None)
-        if new_avg_rmse <= avg_rmse:
+        if avg_rmse <= best_rmse:
+            best_rmse = avg_rmse
             for var_name, value in zip(opt_params['ranges'], opt_results):
                 opt_params['ranges'][var_name]['initial'] = value
 
@@ -460,5 +461,5 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
     for var_name in opt_params['ranges']:
         params[var_name] = opt_params['ranges'][var_name]['initial']
 
-    print("Final RMSE: %.2f" % new_avg_rmse)
+    print("Final RMSE: %.2f" % best_rmse)
     return params
