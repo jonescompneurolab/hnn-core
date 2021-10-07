@@ -457,9 +457,9 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
             for var_name, value in zip(opt_params['ranges'], opt_results):
                 opt_params['ranges'][var_name]['initial'] = value
 
-    # save the optimized params
-    for var_name in opt_params['ranges']:
-        params[var_name] = opt_params['ranges'][var_name]['initial']
+            # save the optimized params
+            for var_name in opt_params['ranges']:
+                params[var_name] = opt_params['ranges'][var_name]['initial']
 
     print("Final RMSE: %.2f" % best_rmse)
     return params
