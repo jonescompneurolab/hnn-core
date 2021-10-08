@@ -11,6 +11,7 @@ import scipy.stats as stats
 from scipy.optimize import fmin_cobyla
 
 from .dipole import _rmse
+from .network import pick_connection
 
 
 def _get_range(val, multiplier):
@@ -233,20 +234,23 @@ def _consolidate_chunks(inputs):
     return chunks
 
 
-def _optrun(net_model, new_params, opt_params, params, opt_dpls, scale_factor,
+def _optrun(net, new_params, opt_params, const_params, opt_dpls, scale_factor,
             smooth_window_len):
     """This is the function to run a simulation
 
     Parameters
     ----------
+    net : Network instance
+        Network instance with attached drives. This object will be modified
+        in-place.
     new_params: array
         List or numpy array with the parameters chosen by
         optimization engine. Order is consistent with
         opt_params['ranges'].
     opt_params : dict
         The optimization parameters
-    params : dict
-        The params dictionary.
+    const_params : list
+        Drive parameters that remain constant during optimization.
     opt_dpls : dict
         Dictionary with keys 'target_dpl' and 'best' for
         the experimental dipole and best dipole.
@@ -277,9 +281,39 @@ def _optrun(net_model, new_params, opt_params, params, opt_dpls, scale_factor,
         params[param_name] = test_value
 
     # run the simulation, but stop early if possible
-    net = net_model(params, add_drives_from_params=True)
     tstop = params['tstop'] = opt_params['opt_end']
-    net._instantiate_drives(n_trials=1, tstop=tstop)
+    for drive_idx in range(len(new_params)):
+        name = drive_params[idx]['name']
+        mu = 
+        sigma = 
+        numspikes = 
+        location, = 
+        n_drive_cells = 
+        cell_specific =
+        weights_ampa = 
+        weights_nmda =
+        space_constant = 
+        synaptic_delays = 
+        probability = 
+        event_seed = 
+        conn_seed = 
+
+        net.add_evoked_drive(
+            name=drive_params[idx]['name'],
+            mu=drive_params[idx]['mu'],
+            sigma=drive_params[idx]['sigma'],
+            numspikes=drive_params[idx]['numspikes'],
+            location=drive_params[idx]['location'],
+            n_drive_cells=drive_params[idx]['n_drive_cells'],
+            cell_specific=drive_params[idx]['cell_specific'],
+            weights_ampa=drive_params[idx]['weights_ampa'],
+            weights_nmda=drive_params[idx]['weights_nmda'],
+            space_constant=drive_params[idx]['space_constant'],
+            synaptic_delays=drive_params[idx]['synaptic_delays'],
+            probability=drive_params[idx]['probability'],
+            event_seed=drive_params[idx]['event_seed'],
+            conn_seed=drive_params[idx]['conn_seed)']
+        )
     avg_dpl = _BACKEND.simulate(net, tstop=tstop, dt=0.025, n_trials=1)[0]
     avg_dpl = avg_dpl.scale(scale_factor)
     if smooth_window_len is not None:
@@ -316,7 +350,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
     return result
 
 
-def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
+def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
                     scale_factor=1., smooth_window_len=None):
@@ -324,11 +358,9 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
 
     Parameters
     ----------
-    net_model : function
-        References the function that instantiates the version of network
-        model used to simulate evoked responses with.
-    params : dict
-        The initial params
+    net : Network instance
+        Network instance with the initial configuration of attached drives to
+        be optimized. This object will be modified in-place.
     target_dpl : instance of Dipole
         The target experimental dipole.
     initial_dpl : instance of Dipole
@@ -353,8 +385,8 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
 
     Returns
     -------
-    params : dict
-        The optimized params dictionary.
+    net_opt_drives : Instance of Network object
+        Network instance with the optimized configuration of attached drives.
 
     Notes
     -----
@@ -367,7 +399,27 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
 
-    params = params.copy()
+
+    drive_names = list()
+    drive_dynamics = list()
+    drive_syn_weights = list()
+    for drive in net.external_drives.values():
+        if drive['type'] == 'evoked':
+            drive_names.append(drive['name'])
+            drive_dynamics.append(drive['dynamics'])
+
+            conn_idxs = pick_connections(net, src_gids=drive['name'])
+            weights = dict()
+            for conn_idx in conn_idxs:
+                target_type = net.connectivity[conn_idx]['target_type']
+                target_receptor = net.connectivity[conn_idx]['receptor']
+                weight = net.connectivity[conn_idx]['nc_dict']['A_weight']
+                if target_receptor == "ampa":
+                    weights.update({f'{target_type}_ampa': weight})
+                if target_receptor == "nmda":
+                    weights.update({f'{target_type}_nmda': weight})
+            drive_syn_weights.append(weights)
+
     # Create a sorted dictionary with the inputs and parameters
     # belonging to each.
     # Then, calculate the appropriate weight function to be used
@@ -377,7 +429,11 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
     # the simulation timeframe to optimize. Chunks are consolidated if
     # more than one input should
     # be optimized at a time.
-    evinput_params = _split_by_evinput(params, sigma_range_multiplier,
+
+    evinput_params = _split_by_evinput(drive_names,
+                                       drive_dynamics,
+                                       drive_syn_weights,
+                                       sigma_range_multiplier,
                                        timing_range_multiplier,
                                        synweight_range_multiplier)
     evinput_params = _generate_weights(evinput_params, params,
@@ -435,7 +491,7 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
 
         def _myoptrun(new_params):
             return _optrun(net_model, new_params, opt_params,
-                           params, opt_dpls=opt_dpls,
+                           const_params, opt_dpls=opt_dpls,
                            scale_factor=scale_factor,
                            smooth_window_len=smooth_window_len)
 
@@ -462,4 +518,4 @@ def optimize_evoked(net_model, params, target_dpl, initial_dpl, maxiter=50,
                 params[var_name] = opt_params['ranges'][var_name]['initial']
 
     print("Final RMSE: %.2f" % best_rmse)
-    return params
+    return net_opt_drives
