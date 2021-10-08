@@ -822,8 +822,12 @@ class Network(object):
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
         """
+        # clear connectivity for this drive if it already exists
         if name in self.external_drives:
-            raise ValueError(f"Drive {name} already defined")
+            conn_idxs = pick_connection(self, src_gids=name)
+            self.connectivity = [conn for conn_idx, conn
+                                in enumerate(self.connectivity)
+                                if conn_idx not in conn_idxs]
         if location not in ['distal', 'proximal']:
             raise ValueError("Allowed drive target locations are: 'distal', "
                              f"and 'proximal', got {location}")
@@ -1039,7 +1043,7 @@ class Network(object):
     def _add_cell_type(self, cell_name, pos, cell_template=None):
         """Add cell type by updating pos_dict and gid_ranges."""
         ll = self._n_gids
-        self._n_gids = ll + len(pos)
+        self._n_gids += len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
 
         self.pos_dict[cell_name] = pos
