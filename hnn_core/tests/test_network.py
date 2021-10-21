@@ -464,7 +464,7 @@ def test_network():
     net.clear_drives()
     assert len(net.connectivity) == 0
 
-    with pytest.raises(Warning, match='No connections'):
+    with pytest.warns(UserWarning, match='No connections'):
         simulate_dipole(net, tstop=10)
 
 
