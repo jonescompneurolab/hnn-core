@@ -131,7 +131,7 @@ def test_dipole_simulation():
     # test that Dipole.copy() returns the expected exact copy
     assert_allclose(dpl.data['agg'], dpl.copy().data['agg'])
 
-    with pytest.raises(Warning, match='No connections'):
+    with pytest.warns(UserWarning, match='No connections'):
         net = Network(params)
         # warning triggered on simulate_dipole()
         simulate_dipole(net, tstop=0.1, n_trials=1)
