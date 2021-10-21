@@ -58,7 +58,8 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     if not net.connectivity:
         warnings.warn('No connections instantiated in network. Consider using '
                       'net = jones_2009_model() or net = law_2021_model() to '
-                      'create a predefined network from published models.')
+                      'create a predefined network from published models.',
+                      UserWarning)
 
     for drive_name, drive in net.external_drives.items():
         if 'tstop' in drive['dynamics']:
