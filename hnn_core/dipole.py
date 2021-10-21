@@ -56,7 +56,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
     if not net.connectivity:
-        raise Warning('No connections instantiated in network. Consider using '
+        warnings.warn('No connections instantiated in network. Consider using '
                       'net = jones_2009_model() or net = law_2021_model() to '
                       'create a predefined network from published models.')
 
