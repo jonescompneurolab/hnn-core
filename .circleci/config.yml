@@ -29,7 +29,7 @@ jobs:
                   conda create -n testenv --yes pip python=3.7
                   source activate testenv
                   conda install --yes scipy numpy matplotlib
-                  pip install mne psutil mpi4py joblib
+                  pip install mne pooch tqdm psutil mpi4py joblib
 
           - run:
               name: Setup doc building stuff
