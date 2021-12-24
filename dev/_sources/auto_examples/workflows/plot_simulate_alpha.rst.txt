@@ -150,7 +150,7 @@ time with unique randomization. The drive is only connected to the
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7ff0230dc470>
+    <hnn_core.dipole.Dipole object at 0x7f8bf9745c10>
 
 
 
@@ -202,7 +202,7 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:84: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:84: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
       plt.tight_layout()
 
 
@@ -288,20 +288,22 @@ from alpha (~10 Hz) to beta (15-25 Hz) frequency range. All plotting and
 smoothing parameters are as above, but here no scaling is applied, leading to
 smaller absolute values in the plots.
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-120
+.. GENERATED FROM PYTHON SOURCE LINES 108-122
 
 .. code-block:: default
 
-    fig, axes = plt.subplots(2, 1, constrained_layout=True)
+    fig, axes = plt.subplots(3, 1, constrained_layout=True)
+
+    net.cell_response.plot_spikes_hist(ax=axes[0])
 
     # We'll again make a copy of the dipole before smoothing
     smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 
     # Note that using the ``plot_*``-functions are available as ``Dipole``-methods:
-    dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
-    smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[0], show=False)
+    dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[1], show=False)
+    smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[1], show=False)
 
-    dpl[trial_idx].plot_psd(fmin=0., fmax=40., tmin=tmin, ax=axes[1])
+    dpl[trial_idx].plot_psd(fmin=0., fmax=40., tmin=tmin, ax=axes[2])
     plt.tight_layout()
 
 
@@ -319,13 +321,13 @@ smaller absolute values in the plots.
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:118: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False. 
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:120: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
       plt.tight_layout()
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-126
+.. GENERATED FROM PYTHON SOURCE LINES 123-128
 
 References
 ----------
@@ -336,7 +338,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  8.214 seconds)
+   **Total running time of the script:** ( 2 minutes  29.154 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

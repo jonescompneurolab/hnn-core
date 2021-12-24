@@ -141,7 +141,7 @@
 <h1>hnn_core.extracellular.ExtracellularArray<a class="headerlink" href="#hnn-core-extracellular-extracellulararray" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hnn_core.extracellular.</span></span><span class="sig-name descname"><span class="pre">ExtracellularArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.extracellular.</span></span><span class="sig-name descname"><span class="pre">ExtracellularArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for recording extracellular potential fields with electrode array</p>
 <p>Note that to add an electrode array to a simulation, you should use the
 <a class="reference internal" href="hnn_core.Network.html#hnn_core.Network.add_electrode_array" title="hnn_core.Network.add_electrode_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hnn_core.Network.add_electrode_array()</span></code></a>-method. After simulation,
@@ -254,7 +254,7 @@ simulation.</p>
 <dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis</p>
 </dd>
 <dt><strong>decim</strong><span class="classifier">int | list of int | None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole
-traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.8.0.dev0+1867.597a2ef)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
+traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.9.0.dev0+1108.bdefc81)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
 which recommends values &lt;13. To achieve higher decimation factors,
 a list of ints can be provided. These are applied successively.</p>
 </dd>
@@ -262,7 +262,7 @@ a list of ints can be provided. These are applied successively.</p>
 standard color strings may be used (e.g., ‘b’ for blue). A color
 can also be defined as an RGBA-quadruplet, or an array of
 RGBA-values (one for each electrode contact trace to plot). An
-instance of <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.4.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListedColormap</span></code></a> may also be
+instance of <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListedColormap</span></code></a> may also be
 provided.</p>
 </dd>
 <dt><strong>voltage_offset</strong><span class="classifier">float | None (optional)</span></dt><dd><p>Amount to offset traces by on the voltage-axis. Useful for plotting
@@ -272,7 +272,7 @@ laminar arrays.</p>
 corner of the plot.</p>
 </dd>
 <dt><strong>contact_labels</strong><span class="classifier">list (optional)</span></dt><dd><p>Labels associated with the contacts to plot. Passed as-is to
-<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.set_yticklabels.html#matplotlib.axes.Axes.set_yticklabels" title="(in Matplotlib v3.4.3)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_yticklabels()</span></code></a>.</p>
+<a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.set_yticklabels.html#matplotlib.axes.Axes.set_yticklabels" title="(in Matplotlib v3.5.1)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_yticklabels()</span></code></a>.</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
 </dd>
@@ -289,7 +289,7 @@ corner of the plot.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.sfreq">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sfreq</span></span><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.sfreq" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sfreq</span></span><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.sfreq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the sampling rate of the extracellular data.</p>
 </dd></dl>
 
@@ -303,7 +303,7 @@ If you prefer a filtered copy, consider using the
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.22.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
+<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.23.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
 data with.</p>
 </dd>
 </dl>
@@ -334,7 +334,7 @@ data with.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br/>
     </p>
   </div>
 </footer>
