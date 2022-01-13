@@ -396,7 +396,7 @@ class CellResponse(object):
         except TypeError:
             fname.format(0)
             old_style = False
-        except TypeError as err:
+        except TypeError:
             fname.replace('.txt', '_%d.txt')
 
         for trial_idx in range(len(self._spike_times)):
