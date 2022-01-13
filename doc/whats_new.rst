@@ -18,6 +18,9 @@ Bug
 - Fix bugs in drives API to enable: rate constant argument as float; evoked drive with
   connection probability, by `Nick Tolley`_ in :gh:`458`
 
+- Allow regular strings as filenames in :meth:`~hnn_core.Cell_response.write` by
+  `Mainak Jas`_ in :gh:456.
+
 API
 ~~~
 
