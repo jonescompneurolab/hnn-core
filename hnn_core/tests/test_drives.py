@@ -12,6 +12,7 @@ from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
                              _create_bursty_input)
 from hnn_core.params import create_pext
 from hnn_core.network import pick_connection
+from hnn_core.network_builder import NetworkBuilder
 
 
 def test_external_drive_times():
@@ -217,6 +218,7 @@ def test_add_drives():
             assert num_connections == \
                 np.around(len(net.gid_ranges[cell_type]) *
                           probability[cell_type]).astype(int)
+    NetworkBuilder(net)  # smoke test
 
     # evoked
     with pytest.raises(ValueError,
