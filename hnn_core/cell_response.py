@@ -376,8 +376,10 @@ class CellResponse(object):
         Parameters
         ----------
         fname : str
-            String format (e.g., '<pathname>/spk_%d.txt') of the
-            path to the output spike file(s).
+            String format (e.g., 'spk_%d.txt' or 'spk_{0}.txt') of the
+            path to the output spike file(s). If no string format
+            is provided, the trial index will be automatically
+            appended to the file name.
 
         Outputs
         -------
@@ -387,9 +389,22 @@ class CellResponse(object):
             2) spike gid, and
             3) gid type
         """
+        fname = str(fname)
+        old_style = True
+        try:
+            fname % 0
+        except TypeError:
+            fname.format(0)
+            old_style = False
+        except TypeError as err:
+            fname.replace('.txt', '_%d.txt')
 
         for trial_idx in range(len(self._spike_times)):
-            with open(str(fname) % (trial_idx,), 'w') as f:
+            if old_style:
+                this_fname = fname % (trial_idx,)
+            else:
+                this_fname = fname.format(trial_idx)
+            with open(this_fname, 'w') as f:
                 for spike_idx in range(len(self._spike_times[trial_idx])):
                     f.write('{:.3f}\t{}\t{}\n'.format(
                         self._spike_times[trial_idx][spike_idx],

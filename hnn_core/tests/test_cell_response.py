@@ -44,6 +44,8 @@ def test_cell_response(tmpdir):
     empty_spike = CellResponse(spike_times=[[], []], spike_gids=[[], []],
                                spike_types=[[], []])
     empty_spike.write(tmpdir.join('empty_spk_%d.txt'))
+    empty_spike.write(tmpdir.join('empty_spk.txt'))
+    empty_spike.write(tmpdir.join('empty_spk_{0}.txt'))
     assert empty_spike == read_spikes(tmpdir.join('empty_spk_*.txt'))
 
     assert ("CellResponse | 2 simulation trials" in repr(empty_spike))
