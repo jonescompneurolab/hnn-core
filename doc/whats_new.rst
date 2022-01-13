@@ -16,6 +16,9 @@ Changelog
 Bug
 ~~~
 
+- Allow regular strings as filenames in :meth:`~hnn_core.Cell_response.write` by
+  `Mainak Jas`_ in :gh:456.
+
 API
 ~~~
 
