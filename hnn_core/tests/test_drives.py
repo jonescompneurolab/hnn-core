@@ -139,7 +139,7 @@ def test_add_drives():
     n_drive_cells = 'n_cells'  # default for evoked drive
     cell_specific = True
     net.add_evoked_drive(
-        'evoked_dist', mu=1.0, sigma=1.0, numspikes=1.0,
+        'evoked_dist', mu=1.0, sigma=1.0, numspikes=1,
         weights_ampa=weights_ampa, location='distal',
         synaptic_delays=syn_delays, cell_specific=True)
 
@@ -201,7 +201,7 @@ def test_add_drives():
     # drives with cell_specific=True
     probability = {'L2_basket': 0.1, 'L2_pyramidal': 0.25, 'L5_pyramidal': 0.5}
     net.add_evoked_drive(
-        'evoked_prob', mu=1.0, sigma=1.0, numspikes=1.0,
+        'evoked_prob', mu=1.0, sigma=1.0, numspikes=1,
         weights_ampa=weights_ampa, weights_nmda=weights_nmda,
         location='distal', synaptic_delays=syn_delays, cell_specific=True,
         probability=probability)
