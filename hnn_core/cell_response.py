@@ -404,6 +404,7 @@ class CellResponse(object):
                 this_fname = fname % (trial_idx,)
             else:
                 this_fname = fname.format(trial_idx)
+            print(f'Writing file {this_fname}')
             with open(this_fname, 'w') as f:
                 for spike_idx in range(len(self._spike_times[trial_idx])):
                     f.write('{:.3f}\t{}\t{}\n'.format(
