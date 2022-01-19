@@ -218,7 +218,8 @@ def test_add_drives():
             assert num_connections == \
                 np.around(len(net.gid_ranges[cell_type]) *
                           probability[cell_type]).astype(int)
-    simulate_dipole(net, tstop=1)  # smoke test
+    # Round trip test to ensure drives API produces a functioning Network
+    simulate_dipole(net, tstop=1)
 
     # evoked
     with pytest.raises(ValueError,
