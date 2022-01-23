@@ -15,6 +15,8 @@ Changelog
 
 Bug
 ~~~
+- Fix bugs in drives API to enable: rate constant argument as float; evoked drive with
+  connection probability, by `Nick Tolley`_ in :gh:`458`
 
 API
 ~~~

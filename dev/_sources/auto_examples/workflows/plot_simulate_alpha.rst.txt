@@ -110,8 +110,6 @@ time with unique randomization. The drive is only connected to the
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     joblib will run over 1 jobs
@@ -150,7 +148,7 @@ time with unique randomization. The drive is only connected to the
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7f8bf9745c10>
+    <hnn_core.dipole.Dipole object at 0x7f822eb91710>
 
 
 
@@ -198,8 +196,6 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     /home/circleci/project/examples/workflows/plot_simulate_alpha.py:84: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
@@ -236,8 +232,6 @@ as beta frequency events.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -317,8 +311,6 @@ smaller absolute values in the plots.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     /home/circleci/project/examples/workflows/plot_simulate_alpha.py:120: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
@@ -338,7 +330,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  29.154 seconds)
+   **Total running time of the script:** ( 2 minutes  36.602 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

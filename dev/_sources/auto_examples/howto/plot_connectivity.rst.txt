@@ -137,8 +137,6 @@ of ``net.connectivity`` that match the provided parameters.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     66
@@ -175,8 +173,6 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -253,8 +249,6 @@ directly.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     joblib will run over 1 jobs
@@ -300,8 +294,6 @@ network with a 10% chance of cells connecting to each other.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -368,8 +360,6 @@ the L5 pyramidal cells.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -403,8 +393,6 @@ We can plot the sparse connectivity pattern between cell populations.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -434,8 +422,6 @@ from the source cell.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -481,8 +467,6 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -493,7 +477,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  18.680 seconds)
+   **Total running time of the script:** ( 2 minutes  49.069 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

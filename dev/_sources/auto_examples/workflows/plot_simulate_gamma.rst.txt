@@ -94,8 +94,6 @@ in, e.g., :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     {
@@ -161,8 +159,6 @@ simulate the dipole moment in a single trial (the default value used by
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     joblib will run over 1 jobs
@@ -222,8 +218,6 @@ varied pattern, in which only a fraction of cells reach firing threshold.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -270,8 +264,6 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -307,8 +299,6 @@ is applied to the entire duration of the simulation.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -373,8 +363,6 @@ referred to as “strong” PING.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -404,8 +392,6 @@ frequency is lower compared with the "weak" PING simulation above.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -446,8 +432,6 @@ frequency from ~50 to ~65 Hz.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -497,7 +481,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  18.922 seconds)
+   **Total running time of the script:** ( 3 minutes  37.389 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:

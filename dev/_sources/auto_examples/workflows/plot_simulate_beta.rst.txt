@@ -100,8 +100,6 @@ contains information on the biophysics and geometry of each cell.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     GABAb Rise (ms): 1.0 -> 45.0
@@ -135,8 +133,6 @@ the distal dendrites of L5 pyramidal cells.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -172,8 +168,6 @@ L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -351,8 +345,6 @@ can influence sensory input to the cortical column.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     joblib will run over 1 jobs
@@ -528,8 +520,6 @@ is an assymetric beta event with a long positive tail.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -568,8 +558,6 @@ input to the cortical column occurs ~100 ms after the beta event.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -637,7 +625,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 4 minutes  50.769 seconds)
+   **Total running time of the script:** ( 5 minutes  29.790 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:

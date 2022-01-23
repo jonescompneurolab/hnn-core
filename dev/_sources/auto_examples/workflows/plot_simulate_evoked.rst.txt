@@ -112,8 +112,6 @@ inside it.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -215,8 +213,6 @@ across trials.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     joblib will run over 2 jobs
@@ -271,8 +267,6 @@ Plot the amplitudes of the simulated aggregate dipole moments over time
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -335,8 +329,6 @@ You may interrogate current values defining the spike event time dynamics by
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     {'mu': 63.53, 'sigma': 3.85, 'numspikes': 1}
@@ -382,8 +374,6 @@ object, this time we make a copy of it before smoothing and scaling.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     joblib will run over 1 jobs
@@ -424,7 +414,7 @@ modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  40.484 seconds)
+   **Total running time of the script:** ( 1 minutes  42.984 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

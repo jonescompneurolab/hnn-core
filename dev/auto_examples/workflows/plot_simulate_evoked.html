@@ -184,7 +184,6 @@ inside it.</p>
 <li><img src="../../_images/sphx_glr_plot_simulate_evoked_001.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_001.png" alt="plot simulate evoked" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_simulate_evoked_002.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_002.png" alt="plot simulate evoked" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes3DSubplot:&gt;
 </pre></div>
 </div>
@@ -242,7 +241,6 @@ across trials.</p>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">170.</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 2 jobs
 </pre></div>
 </div>
@@ -264,8 +262,7 @@ operate in-place, i.e., the objects are modified.</p>
                                    <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;evprox&#39;</span><span class="p">,</span> <span class="s1">&#39;evdist&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_simulate_evoked_003.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_003.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
+<img src="../../_images/sphx_glr_plot_simulate_evoked_003.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_003.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
 </pre></div>
 </div>
 <p>Now, let us try to make the exogenous driving inputs to the cells
@@ -296,7 +293,6 @@ synchronous and see what happens. This is achieved by setting
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_sync</span><span class="o">.</span><span class="n">external_drives</span></a><span class="p">[</span><span class="s1">&#39;evdist1&#39;</span><span class="p">][</span><span class="s1">&#39;dynamics&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;mu&#39;: 63.53, &#39;sigma&#39;: 3.85, &#39;numspikes&#39;: 1}
 </pre></div>
 </div>
@@ -313,7 +309,6 @@ object, this time we make a copy of it before smoothing and scaling.</p>
 <li><img src="../../_images/sphx_glr_plot_simulate_evoked_004.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_004.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_simulate_evoked_005.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_005.png" alt="plot simulate evoked" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
@@ -349,7 +344,7 @@ Simulation time: 160.0 ms...
 </dl>
 <p>a combined magnetoencephalography and biophysically based computational
 modeling study.” Journal of Neuroscience 27.40 (2007): 10751-10764.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  40.484 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  42.984 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>
@@ -378,7 +373,7 @@ modeling study.” Journal of Neuroscience 27.40 (2007): 10751-10764.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br/>
     </p>
   </div>
 </footer>
