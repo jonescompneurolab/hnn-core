@@ -12,6 +12,7 @@ from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
                              _create_bursty_input)
 from hnn_core.params import create_pext
 from hnn_core.network import pick_connection
+from hnn_core import simulate_dipole
 
 
 def test_external_drive_times():
@@ -138,7 +139,7 @@ def test_add_drives():
     n_drive_cells = 'n_cells'  # default for evoked drive
     cell_specific = True
     net.add_evoked_drive(
-        'evoked_dist', mu=1.0, sigma=1.0, numspikes=1.0,
+        'evoked_dist', mu=1.0, sigma=1.0, numspikes=1,
         weights_ampa=weights_ampa, location='distal',
         synaptic_delays=syn_delays, cell_specific=True)
 
@@ -200,7 +201,7 @@ def test_add_drives():
     # drives with cell_specific=True
     probability = {'L2_basket': 0.1, 'L2_pyramidal': 0.25, 'L5_pyramidal': 0.5}
     net.add_evoked_drive(
-        'evoked_prob', mu=1.0, sigma=1.0, numspikes=1.0,
+        'evoked_prob', mu=1.0, sigma=1.0, numspikes=1,
         weights_ampa=weights_ampa, weights_nmda=weights_nmda,
         location='distal', synaptic_delays=syn_delays, cell_specific=True,
         probability=probability)
@@ -217,6 +218,8 @@ def test_add_drives():
             assert num_connections == \
                 np.around(len(net.gid_ranges[cell_type]) *
                           probability[cell_type]).astype(int)
+    # Round trip test to ensure drives API produces a functioning Network
+    simulate_dipole(net, tstop=1)
 
     # evoked
     with pytest.raises(ValueError,

@@ -375,8 +375,11 @@ class NetworkBuilder(object):
                     conn_idxs = pick_connection(self.net, src_gids=src_gid)
                     target_gids = list()
                     for conn_idx in conn_idxs:
-                        target_gids += (self.net.connectivity[conn_idx]
-                                        ['gid_pairs'][src_gid])
+                        gid_pairs = self.net.connectivity[
+                            conn_idx]['gid_pairs']
+                        if src_gid in gid_pairs:
+                            target_gids += (self.net.connectivity[conn_idx]
+                                            ['gid_pairs'][src_gid])
 
                     for target_gid in set(target_gids):
                         if (target_gid in self._gid_list and

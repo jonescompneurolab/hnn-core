@@ -651,6 +651,9 @@ class Network(object):
                                  f"n_drive_cells='n_cells'. Got cell_specific"
                                  f" cell_specific={cell_specific} and "
                                  f"n_drive_cells={n_drive_cells}.")
+        elif isinstance(rate_constant, float):
+            rate_constant = {cell_type: rate_constant for cell_type in
+                             target_populations}
 
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
