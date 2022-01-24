@@ -6,9 +6,15 @@
 
 
 
+
 .. raw:: html
 
-    <div class="sphx-glr-clear"></div>
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    </div>
 
 
 
@@ -36,18 +42,25 @@ help users get started.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detaile...">
 
 .. only:: html
 
- .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
-     :alt: 01. Simulate Event Related Potentials (ERPs)
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+    :alt: 01. Simulate Event Related Potentials (ERPs)
 
-     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">01. Simulate Event Related Potentials (ERPs)</div>
     </div>
+
 
 
 .. toctree::
@@ -61,14 +74,16 @@ help users get started.
 
 .. only:: html
 
- .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
-     :alt: 02. Simulate Alpha and Beta Rhythms
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
+    :alt: 02. Simulate Alpha and Beta Rhythms
 
-     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">02. Simulate Alpha and Beta Rhythms</div>
     </div>
+
 
 
 .. toctree::
@@ -82,14 +97,16 @@ help users get started.
 
 .. only:: html
 
- .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
-     :alt: 03. Simulate Gamma Rhythms
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
+    :alt: 03. Simulate Gamma Rhythms
 
-     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py`
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">03. Simulate Gamma Rhythms</div>
     </div>
+
 
 
 .. toctree::
@@ -103,14 +120,16 @@ help users get started.
 
 .. only:: html
 
- .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
-     :alt: 04. From MEG sensor-space data to HNN simulation
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
+    :alt: 04. From MEG sensor-space data to HNN simulation
 
-     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py`
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">04. From MEG sensor-space data to HNN simulation</div>
     </div>
+
 
 
 .. toctree::
@@ -124,23 +143,26 @@ help users get started.
 
 .. only:: html
 
- .. figure:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_beta_thumb.png
-     :alt: 05. Simulate beta modulated ERP
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_beta_thumb.png
+    :alt: 05. Simulate beta modulated ERP
 
-     :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py`
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">05. Simulate beta modulated ERP</div>
     </div>
+
 
 
 .. toctree::
    :hidden:
 
    /auto_examples/workflows/plot_simulate_beta
+
 .. raw:: html
 
-    <div class="sphx-glr-clear"></div>
+    </div>
 
 
 
@@ -156,18 +178,25 @@ tasks.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model.">
 
 .. only:: html
 
- .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
-     :alt: 01. Plot firing pattern
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
+    :alt: 01. Plot firing pattern
 
-     :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py`
+  :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">01. Plot firing pattern</div>
     </div>
+
 
 
 .. toctree::
@@ -181,14 +210,16 @@ tasks.
 
 .. only:: html
 
- .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
-     :alt: 02. Record extracellular potentials
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
+    :alt: 02. Record extracellular potentials
 
-     :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py`
+  :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">02. Record extracellular potentials</div>
     </div>
+
 
 
 .. toctree::
@@ -202,14 +233,16 @@ tasks.
 
 .. only:: html
 
- .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_connectivity_thumb.png
-     :alt: 03. Modifying local connectivity
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_connectivity_thumb.png
+    :alt: 03. Modifying local connectivity
 
-     :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py`
+  :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">03. Modifying local connectivity</div>
     </div>
+
 
 
 .. toctree::
@@ -223,14 +256,16 @@ tasks.
 
 .. only:: html
 
- .. figure:: /auto_examples/howto/images/thumb/sphx_glr_plot_simulate_mpi_backend_thumb.png
-     :alt: 04. Use MPI backend for parallelization
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_simulate_mpi_backend_thumb.png
+    :alt: 04. Use MPI backend for parallelization
 
-     :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py`
+  :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">04. Use MPI backend for parallelization</div>
     </div>
+
 
 
 .. toctree::
@@ -244,23 +279,26 @@ tasks.
 
 .. only:: html
 
- .. figure:: /auto_examples/howto/images/thumb/sphx_glr_optimize_evoked_thumb.png
-     :alt: 05. Optimize simulated evoked response parameters
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_optimize_evoked_thumb.png
+    :alt: 05. Optimize simulated evoked response parameters
 
-     :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py`
+  :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">05. Optimize simulated evoked response parameters</div>
     </div>
+
 
 
 .. toctree::
    :hidden:
 
    /auto_examples/howto/optimize_evoked
+
 .. raw:: html
 
-    <div class="sphx-glr-clear"></div>
+    </div>
 
 
 

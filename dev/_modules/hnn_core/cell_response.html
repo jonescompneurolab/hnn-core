@@ -508,8 +508,10 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        fname : str</span>
-<span class="sd">            String format (e.g., &#39;&lt;pathname&gt;/spk_%d.txt&#39;) of the</span>
-<span class="sd">            path to the output spike file(s).</span>
+<span class="sd">            String format (e.g., &#39;spk_%d.txt&#39; or &#39;spk_{0}.txt&#39;) of the</span>
+<span class="sd">            path to the output spike file(s). If no string format</span>
+<span class="sd">            is provided, the trial index will be automatically</span>
+<span class="sd">            appended to the file name.</span>
 
 <span class="sd">        Outputs</span>
 <span class="sd">        -------</span>
@@ -519,9 +521,23 @@
 <span class="sd">            2) spike gid, and</span>
 <span class="sd">            3) gid type</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">old_style</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">%</span> <span class="mi">0</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">fname</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">old_style</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">fname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;_</span><span class="si">%d</span><span class="s1">.txt&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">)):</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">trial_idx</span><span class="p">,),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">old_style</span><span class="p">:</span>
+                <span class="n">this_fname</span> <span class="o">=</span> <span class="n">fname</span> <span class="o">%</span> <span class="p">(</span><span class="n">trial_idx</span><span class="p">,)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">this_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trial_idx</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Writing file </span><span class="si">{</span><span class="n">this_fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">this_fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">spike_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])):</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="se">\t</span><span class="si">{}</span><span class="se">\t</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">spike_idx</span><span class="p">],</span>

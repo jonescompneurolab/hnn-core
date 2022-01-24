@@ -364,8 +364,10 @@ cell or input types.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>String format (e.g., ‘&lt;pathname&gt;/spk_%d.txt’) of the
-path to the output spike file(s).</p>
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>String format (e.g., ‘spk_%d.txt’ or ‘spk_{0}.txt’) of the
+path to the output spike file(s). If no string format
+is provided, the trial index will be automatically
+appended to the file name.</p>
 </dd>
 </dl>
 </dd>
@@ -376,12 +378,9 @@ path to the output spike file(s).</p>
 
 <section id="examples-using-hnn-core-cellresponse">
 <span id="sphx-glr-backreferences-hnn-core-cellresponse"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.CellResponse</span></code><a class="headerlink" href="#examples-using-hnn-core-cellresponse" title="Permalink to this headline">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model."><figure class="align-default" id="id1">
-<img alt="01. Plot firing pattern" src="../_images/sphx_glr_plot_firing_pattern_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/howto/plot_firing_pattern.html#sphx-glr-auto-examples-howto-plot-firing-pattern-py"><span class="std std-ref">01. Plot firing pattern</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model."><img alt="01. Plot firing pattern" src="../_images/sphx_glr_plot_firing_pattern_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/howto/plot_firing_pattern.html#sphx-glr-auto-examples-howto-plot-firing-pattern-py"><span class="std std-ref">01. Plot firing pattern</span></a></p>
+  <div class="sphx-glr-thumbnail-title">01. Plot firing pattern</div>
 </div><div class="sphx-glr-clear"></div></section>
 </section>
 
