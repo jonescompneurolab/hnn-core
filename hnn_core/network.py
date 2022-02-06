@@ -965,7 +965,8 @@ class Network(object):
             for drive in self.external_drives.values():
                 event_times = list()  # new list for each trial and drive
                 for drive_cell_gid in self.gid_ranges[drive['name']]:
-                    drive_cell_gid_offset = drive_cell_gid - self.gid_ranges[drive['name']][0]
+                    drive_cell_gid_offset = (drive_cell_gid -
+                                             self.gid_ranges[drive['name']][0])
                     if drive['cell_specific']:
                         # loop over drives (one for each target cell
                         # population) and create event times
