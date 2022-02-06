@@ -217,10 +217,7 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                                  'numspikes': par['numspikes'],
                                  'n_drive_cells': n_drive_cells}
             drive['space_constant'] = par['lamtha']
-            # XXX Force random states to be the same as HNN-gui for the default
-            # parameter set after increasing the number of bursty drive
-            # gids from 2 to 20
-            drive['event_seed'] = par['prng_seedcore'] - 18
+            drive['event_seed'] = par['prng_seedcore']
             for cellname in cellname_list:
                 if cellname in par:
                     ampa_weight = par[cellname][0]
