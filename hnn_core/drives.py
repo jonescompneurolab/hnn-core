@@ -191,6 +191,9 @@ def _add_drives_from_params(net):
             t0=bias_specs['tonic'][cellname]['t0'],
             tstop=bias_specs['tonic'][cellname]['tstop'])
 
+    for drive_name, drive in net.external_drives.items():
+        drive['event_seed'] += net.gid_ranges[drive_name][0]
+
 
 def _get_prng(seed, gid, sync_evinput=False):
     """Random generator for this instance.
