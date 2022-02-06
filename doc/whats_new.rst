@@ -19,7 +19,12 @@ Bug
   connection probability, by `Nick Tolley`_ in :gh:`458`
 
 - Allow regular strings as filenames in :meth:`~hnn_core.Cell_response.write` by
-  `Mainak Jas`_ in :gh:456.
+  `Mainak Jas`_ in :gh:`456`.
+
+- Fix to make network output independent of the order in which drives are added to
+  the network by making the seed of the random process generating spike times in
+  drives use the offset of the gid with respect to the first gid in the population
+  by `Mainak Jas`_ in :gh:`462`.
 
 API
 ~~~
