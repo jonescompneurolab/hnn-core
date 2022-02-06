@@ -88,7 +88,7 @@ def add_erp_drives(net, stimulus_start):
     net.add_evoked_drive(
         'evdist1', mu=70.0 + stimulus_start, sigma=0.0, numspikes=1,
         weights_ampa=weights_ampa_d1, weights_nmda=weights_nmda_d1,
-        location='distal', synaptic_delays=syn_delays_d1, event_seed=4)
+        location='distal', synaptic_delays=syn_delays_d1, event_seed=274)
 
     # Two proximal drives
     weights_ampa_p1 = {'L2_basket': 0.002, 'L2_pyramidal': 0.0011,
@@ -100,7 +100,7 @@ def add_erp_drives(net, stimulus_start):
     net.add_evoked_drive(
         'evprox1', mu=25.0 + stimulus_start, sigma=0.0, numspikes=1,
         weights_ampa=weights_ampa_p1, weights_nmda=None,
-        location='proximal', synaptic_delays=syn_delays_prox, event_seed=4)
+        location='proximal', synaptic_delays=syn_delays_prox, event_seed=544)
 
     # Second proximal evoked drive. NB: only AMPA weights differ from first
     weights_ampa_p2 = {'L2_basket': 0.005, 'L2_pyramidal': 0.005,
@@ -109,7 +109,7 @@ def add_erp_drives(net, stimulus_start):
     net.add_evoked_drive(
         'evprox2', mu=135.0 + stimulus_start, sigma=0.0, numspikes=1,
         weights_ampa=weights_ampa_p2, location='proximal',
-        synaptic_delays=syn_delays_prox, event_seed=4)
+        synaptic_delays=syn_delays_prox, event_seed=814)
 
     return net
 

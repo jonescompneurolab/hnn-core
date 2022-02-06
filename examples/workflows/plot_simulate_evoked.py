@@ -61,7 +61,7 @@ synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal',
-    synaptic_delays=synaptic_delays_d1, event_seed=4)
+    synaptic_delays=synaptic_delays_d1, event_seed=274)
 
 ###############################################################################
 # Then, we add two proximal drives
@@ -73,7 +73,7 @@ synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
 net.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=4)
+    synaptic_delays=synaptic_delays_prox, event_seed=544)
 
 # Second proximal evoked drive. NB: only AMPA weights differ from first
 weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
@@ -82,7 +82,7 @@ weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
 net.add_evoked_drive(
     'evprox2', mu=137.12, sigma=8.33, numspikes=1,
     weights_ampa=weights_ampa_p2, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=4)
+    synaptic_delays=synaptic_delays_prox, event_seed=814)
 
 ###############################################################################
 # Now let's simulate the dipole, running 2 trials with the
@@ -126,17 +126,17 @@ cell_specific=False
 net_sync.add_evoked_drive(
     'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
     weights_nmda=weights_nmda_d1, location='distal', n_drive_cells=n_drive_cells,
-    cell_specific=cell_specific, synaptic_delays=synaptic_delays_d1, event_seed=4)
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_d1, event_seed=274)
 
 net_sync.add_evoked_drive(
     'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
     weights_nmda=None, location='proximal', n_drive_cells=n_drive_cells,
-    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=4)
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=544)
 
 net_sync.add_evoked_drive(
     'evprox2', mu=137.12, sigma=8.33, numspikes=1,
     weights_ampa=weights_ampa_p2, location='proximal', n_drive_cells=n_drive_cells,
-    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=4)
+    cell_specific=cell_specific, synaptic_delays=synaptic_delays_prox, event_seed=814)
 
 ###############################################################################
 # You may interrogate current values defining the spike event time dynamics by
