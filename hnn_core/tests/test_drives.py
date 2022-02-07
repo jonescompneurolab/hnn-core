@@ -12,6 +12,7 @@ from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
                              _create_bursty_input)
 from hnn_core.params import create_pext
 from hnn_core.network import pick_connection
+from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
 
 
@@ -402,3 +403,23 @@ def test_add_drives():
             weights_ampa={'L2_pyramidal': 1.},
             synaptic_delays={'L2_pyramidal': 1.},
             probability={'L2_pyramidal': 2.0})
+
+
+def test_drive_random_state():
+    """Tests to check same random state always gives same spike times."""
+
+    weights_ampa = {'L2_basket': 0.08, 'L2_pyramidal': 0.02,
+                    'L5_basket': 0.2, 'L5_pyramidal': 0.00865}
+    synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                       'L5_basket': 1., 'L5_pyramidal': 1.}
+
+    net = jones_2009_model()
+    for drive_name in ['evprox1', 'evprox2']:
+        net.add_evoked_drive(
+            drive_name, mu=137.12, sigma=8, numspikes=1,
+            weights_ampa=weights_ampa, weights_nmda=None,
+            location='proximal', synaptic_delays=synaptic_delays, event_seed=4)
+
+    net._instantiate_drives(tstop=170.)
+    assert (net.external_drives['evprox1']['events'] ==
+            net.external_drives['evprox2']['events'])
