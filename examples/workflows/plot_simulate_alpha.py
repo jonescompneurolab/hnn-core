@@ -95,7 +95,7 @@ syn_delays_d = {'L2_pyramidal': 5., 'L5_pyramidal': 5.}
 net.add_bursty_drive(
     'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
     spike_isi=10, n_drive_cells=10, location=location,
-    weights_ampa=weights_ampa_d, synaptic_delays=syn_delays_d, event_seed=286)
+    weights_ampa=weights_ampa_d, synaptic_delays=syn_delays_d, event_seed=296)
 dpl = simulate_dipole(net, tstop=310., n_trials=1)
 
 ###############################################################################
