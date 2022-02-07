@@ -26,6 +26,8 @@ Bug
   drives use the offset of the gid with respect to the first gid in the population
   by `Mainak Jas`_ in :gh:`462`.
 
+- Negative ``event_seed`` is no longer allowed by `Mainak Jas`_ in :gh:`462`.
+
 API
 ~~~
 
