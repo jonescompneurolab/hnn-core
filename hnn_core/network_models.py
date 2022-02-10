@@ -307,7 +307,7 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
     net.add_evoked_drive(
         'evdist1', mu=63.53 + tstart, sigma=3.85, numspikes=1,
         weights_ampa=weights_ampa_d1, weights_nmda=weights_nmda_d1,
-        location='distal', synaptic_delays=synaptic_delays_d1, event_seed=4)
+        location='distal', synaptic_delays=synaptic_delays_d1, event_seed=274)
 
     # Add proximal drives
     weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
@@ -317,11 +317,11 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
     net.add_evoked_drive(
         'evprox1', mu=26.61 + tstart, sigma=2.47, numspikes=1,
         weights_ampa=weights_ampa_p1, weights_nmda=None, location='proximal',
-        synaptic_delays=synaptic_delays_prox, event_seed=4)
+        synaptic_delays=synaptic_delays_prox, event_seed=544)
 
     weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
                        'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
     net.add_evoked_drive(
         'evprox2', mu=137.12 + tstart, sigma=8.33, numspikes=1,
         weights_ampa=weights_ampa_p2, location='proximal',
-        synaptic_delays=synaptic_delays_prox, event_seed=4)
+        synaptic_delays=synaptic_delays_prox, event_seed=814)
