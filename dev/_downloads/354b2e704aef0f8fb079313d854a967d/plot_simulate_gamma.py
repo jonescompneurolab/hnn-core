@@ -52,7 +52,7 @@ rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
 net.add_poisson_drive(
     'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
     location='proximal', synaptic_delays=synaptic_delays,
-    event_seed=1079)
+    event_seed=1349)
 
 ###############################################################################
 dpls = simulate_dipole(net, tstop=250.)

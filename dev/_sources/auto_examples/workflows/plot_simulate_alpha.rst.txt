@@ -95,7 +95,7 @@ time with unique randomization. The drive is only connected to the
     net.add_bursty_drive(
         'alpha_prox', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
         spike_isi=10, n_drive_cells=10, location=location,
-        weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p, event_seed=14)
+        weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p, event_seed=284)
 
     # simulate the dipole, but do not automatically scale or smooth the result
     dpl = simulate_dipole(net, tstop=310., n_trials=1)
@@ -148,7 +148,7 @@ time with unique randomization. The drive is only connected to the
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7fda8b33f310>
+    <hnn_core.dipole.Dipole object at 0x7f74b1261090>
 
 
 
@@ -212,7 +212,7 @@ proximal one. The different arrival times of spikes at opposite ends of
 the pyramidal cells will tend to produce bursts of 15-30 Hz power known
 as beta frequency events.
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-102
+.. GENERATED FROM PYTHON SOURCE LINES 91-101
 
 .. code-block:: default
 
@@ -223,8 +223,7 @@ as beta frequency events.
     net.add_bursty_drive(
         'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
         spike_isi=10, n_drive_cells=10, location=location,
-        weights_ampa=weights_ampa_d, synaptic_delays=syn_delays_d, event_seed=16)
-
+        weights_ampa=weights_ampa_d, synaptic_delays=syn_delays_d, event_seed=296)
     dpl = simulate_dipole(net, tstop=310., n_trials=1)
 
 
@@ -274,7 +273,7 @@ as beta frequency events.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-108
+.. GENERATED FROM PYTHON SOURCE LINES 102-107
 
 We can verify that beta frequency activity was produced by inspecting the PSD
 of the most recent simulation. The dominant power in the signal is shifted
@@ -282,7 +281,7 @@ from alpha (~10 Hz) to beta (15-25 Hz) frequency range. All plotting and
 smoothing parameters are as above, but here no scaling is applied, leading to
 smaller absolute values in the plots.
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-122
+.. GENERATED FROM PYTHON SOURCE LINES 107-121
 
 .. code-block:: default
 
@@ -313,13 +312,13 @@ smaller absolute values in the plots.
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:120: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:119: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
       plt.tight_layout()
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-128
+.. GENERATED FROM PYTHON SOURCE LINES 122-127
 
 References
 ----------
@@ -330,7 +329,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  31.002 seconds)
+   **Total running time of the script:** ( 3 minutes  30.074 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

@@ -221,7 +221,7 @@ above.
         net.add_evoked_drive(
             'evdist1', mu=70.0 + stimulus_start, sigma=0.0, numspikes=1,
             weights_ampa=weights_ampa_d1, weights_nmda=weights_nmda_d1,
-            location='distal', synaptic_delays=syn_delays_d1, event_seed=4)
+            location='distal', synaptic_delays=syn_delays_d1, event_seed=274)
 
         # Two proximal drives
         weights_ampa_p1 = {'L2_basket': 0.002, 'L2_pyramidal': 0.0011,
@@ -233,7 +233,7 @@ above.
         net.add_evoked_drive(
             'evprox1', mu=25.0 + stimulus_start, sigma=0.0, numspikes=1,
             weights_ampa=weights_ampa_p1, weights_nmda=None,
-            location='proximal', synaptic_delays=syn_delays_prox, event_seed=4)
+            location='proximal', synaptic_delays=syn_delays_prox, event_seed=544)
 
         # Second proximal evoked drive. NB: only AMPA weights differ from first
         weights_ampa_p2 = {'L2_basket': 0.005, 'L2_pyramidal': 0.005,
@@ -242,7 +242,7 @@ above.
         net.add_evoked_drive(
             'evprox2', mu=135.0 + stimulus_start, sigma=0.0, numspikes=1,
             weights_ampa=weights_ampa_p2, location='proximal',
-            synaptic_delays=syn_delays_prox, event_seed=4)
+            synaptic_delays=syn_delays_prox, event_seed=814)
 
         return net
 
@@ -261,7 +261,7 @@ drives. The input is just strong enough to evoke spiking in the
 L2 basket cells. This spiking causes GABAb mediated inhibition
 of the network, and ultimately suppressed sensory detection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-149
+.. GENERATED FROM PYTHON SOURCE LINES 122-148
 
 .. code-block:: default
 
@@ -275,7 +275,7 @@ of the network, and ultimately suppressed sensory detection.
             'beta_dist', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
             burst_rate=1., burst_std=10., numspikes=2, spike_isi=10,
             n_drive_cells=10, location='distal', weights_ampa=weights_ampa_d1,
-            synaptic_delays=syn_delays_d1, event_seed=20)
+            synaptic_delays=syn_delays_d1, event_seed=290)
 
         # Proximal Drive
         weights_ampa_p1 = {'L2_basket': 0.00004, 'L2_pyramidal': 0.00002,
@@ -287,8 +287,7 @@ of the network, and ultimately suppressed sensory detection.
             'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
             burst_rate=1., burst_std=20., numspikes=2, spike_isi=10,
             n_drive_cells=10, location='proximal', weights_ampa=weights_ampa_p1,
-            synaptic_delays=syn_delays_p1, event_seed=20)
-
+            synaptic_delays=syn_delays_p1, event_seed=300)
         return net
 
 
@@ -299,12 +298,12 @@ of the network, and ultimately suppressed sensory detection.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-152
+.. GENERATED FROM PYTHON SOURCE LINES 149-151
 
 We can now use our functions to create three distinct simulations:
 1) beta event only, 2) ERP only, and 3) beta event + ERP.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-162
+.. GENERATED FROM PYTHON SOURCE LINES 151-161
 
 .. code-block:: default
 
@@ -325,13 +324,13 @@ We can now use our functions to create three distinct simulations:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 163-166
+.. GENERATED FROM PYTHON SOURCE LINES 162-165
 
 And finally we simulate. Note that the default simulation time has been
 increased to 400 ms to observe the long time course over which beta events
 can influence sensory input to the cortical column.
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-170
+.. GENERATED FROM PYTHON SOURCE LINES 165-169
 
 .. code-block:: default
 
@@ -483,7 +482,7 @@ can influence sensory input to the cortical column.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-176
+.. GENERATED FROM PYTHON SOURCE LINES 170-175
 
 By inspecting the activity during the beta event, we can see that spiking
 occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
@@ -491,7 +490,7 @@ and distal inputs. This spiking activity leads to sustained GABAb mediated
 inhibition of the L2 and L5 pyrmaidal cells. One effect of this inhibition
 is an assymetric beta event with a long positive tail.
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-190
+.. GENERATED FROM PYTHON SOURCE LINES 175-189
 
 .. code-block:: default
 
@@ -527,14 +526,14 @@ is an assymetric beta event with a long positive tail.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-195
+.. GENERATED FROM PYTHON SOURCE LINES 190-194
 
 Next we will inspect what happens when a sensory stimulus is delivered 75 ms
 after a beta event. Note that the delay time for a tactile stimulus at the
 hand to arrive at the cortex is roughly 25 ms, which means the first proximal
 input to the cortical column occurs ~100 ms after the beta event.
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-205
+.. GENERATED FROM PYTHON SOURCE LINES 194-204
 
 .. code-block:: default
 
@@ -566,7 +565,7 @@ input to the cortical column occurs ~100 ms after the beta event.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-211
+.. GENERATED FROM PYTHON SOURCE LINES 205-210
 
 To help understand the effect of beta mediated inhibition on the response to
 incoming sensory stimuli, we can compare the ERP and spiking activity due to
@@ -574,7 +573,7 @@ sensory input with and without a beta event.
 The sustained inhibition of the network ultimately depresses
 the sensory response which is associated with a reduced ERP amplitude
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-224
+.. GENERATED FROM PYTHON SOURCE LINES 210-223
 
 .. code-block:: default
 
@@ -603,7 +602,7 @@ the sensory response which is associated with a reduced ERP amplitude
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-241
+.. GENERATED FROM PYTHON SOURCE LINES 224-240
 
 References
 ----------
@@ -625,7 +624,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 5 minutes  28.945 seconds)
+   **Total running time of the script:** ( 6 minutes  5.908 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:

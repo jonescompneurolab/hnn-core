@@ -173,7 +173,12 @@
 <li><p>Fix bugs in drives API to enable: rate constant argument as float; evoked drive with
 connection probability, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/458">#458</a></p></li>
 <li><p>Allow regular strings as filenames in <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> by
-<a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in :gh:456.</p></li>
+<a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/456">#456</a>.</p></li>
+<li><p>Fix to make network output independent of the order in which drives are added to
+the network by making the seed of the random process generating spike times in
+drives use the offset of the gid with respect to the first gid in the population
+by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/462">#462</a>.</p></li>
+<li><p>Negative <code class="docutils literal notranslate"><span class="pre">event_seed</span></code> is no longer allowed by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/462">#462</a>.</p></li>
 </ul>
 </section>
 <section id="api">

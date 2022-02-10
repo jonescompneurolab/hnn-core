@@ -1097,6 +1097,8 @@
             <span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="n">event_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>  <span class="c1"># new list for each trial and drive</span>
                 <span class="k">for</span> <span class="n">drive_cell_gid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]:</span>
+                    <span class="n">drive_cell_gid_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">drive_cell_gid</span> <span class="o">-</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]:</span>
                         <span class="c1"># loop over drives (one for each target cell</span>
                         <span class="c1"># population) and create event times</span>
@@ -1111,7 +1113,7 @@
                                 <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">],</span>
                                 <span class="n">target_type</span><span class="o">=</span><span class="n">target_type</span><span class="p">,</span>
                                 <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
-                                <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid</span><span class="p">,</span>
+                                <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid_offset</span><span class="p">,</span>
                                 <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">],</span>
                                 <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
                             <span class="p">)</span>
@@ -1122,7 +1124,7 @@
                             <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
                             <span class="n">target_type</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span>
                             <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
-                            <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid</span><span class="p">,</span>
+                            <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid_offset</span><span class="p">,</span>
                             <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">])</span>
                         <span class="n">event_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src_event_times</span><span class="p">)</span>
                 <span class="c1"># &#39;events&#39;: nested list (n_trials x n_drive_cells x n_events)</span>

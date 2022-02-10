@@ -104,7 +104,7 @@ mean and standard deviation.
     net.add_evoked_drive(
         'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
         weights_nmda=weights_nmda_d1, location='distal',
-        synaptic_delays=synaptic_delays_d1, event_seed=4)
+        synaptic_delays=synaptic_delays_d1, event_seed=274)
 
 
 
@@ -133,7 +133,7 @@ which drives current down the dendrite producing the negative deflection.
     net.add_evoked_drive(
         'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
         weights_nmda=None, location='proximal',
-        synaptic_delays=synaptic_delays_prox, event_seed=4)
+        synaptic_delays=synaptic_delays_prox, event_seed=544)
 
 
 
@@ -158,7 +158,7 @@ differ from first.
     net.add_evoked_drive(
         'evprox2', mu=137.12, sigma=8.33, numspikes=1,
         weights_ampa=weights_ampa_p2, location='proximal',
-        synaptic_delays=synaptic_delays_prox, event_seed=4)
+        synaptic_delays=synaptic_delays_prox, event_seed=814)
 
     dpls = simulate_dipole(net, tstop=170., record_vsoma=True)
 
@@ -319,7 +319,7 @@ read spikes back in, we can use wildcard expressions.
 
  .. code-block:: none
 
-    Writing file /tmp/tmpzq7r8_gv/spk_0.txt
+    Writing file /tmp/tmpio5ixrf5/spk_0.txt
 
     <Figure size 640x480 with 1 Axes>
 
@@ -403,7 +403,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  49.141 seconds)
+   **Total running time of the script:** ( 0 minutes  48.277 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:
