@@ -826,8 +826,8 @@ class Network(object):
         if name in self.external_drives:
             conn_idxs = pick_connection(self, src_gids=name)
             self.connectivity = [conn for conn_idx, conn
-                                in enumerate(self.connectivity)
-                                if conn_idx not in conn_idxs]
+                                 in enumerate(self.connectivity)
+                                 if conn_idx not in conn_idxs]
         if location not in ['distal', 'proximal']:
             raise ValueError("Allowed drive target locations are: 'distal', "
                              f"and 'proximal', got {location}")
