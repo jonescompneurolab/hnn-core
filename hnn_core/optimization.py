@@ -22,14 +22,21 @@ def _get_range(val, multiplier):
     return ranges
 
 
-def _split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
+def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
+                      sigma_range_multiplier, timing_range_multiplier,
                       synweight_range_multiplier):
     """ Sorts parameter ranges by evoked inputs into a dictionary
 
     Parameters
     ----------
-    params: an instance of Params
-        Full set of simulation parameters
+    drive_names : list of str
+        Names corresponding to n Network drives.
+    drive_dynamics : list of dict
+        Dynamics parameters for each drive specified in drive_names.
+    drive_syn_weights : list of dict
+        Synaptic weight parameters for each drive specified in drive_names.
+    tstop : float
+        The simulation stop time (ms).
     sigma_range_multiplier : float
         The scale of sigma values to sweep over.
     timing_range_multiplier : float
@@ -60,45 +67,40 @@ def _split_by_evinput(params, sigma_range_multiplier, timing_range_multiplier,
     """
 
     evinput_params = {}
-    for evinput_t in params['t_*']:
-        id_str = evinput_t.lstrip('t_')
-        timing_mean = float(params[evinput_t])
-
-        if f'sigma_{evinput_t}' in params:
-            timing_sigma = float(params['sigma_' + evinput_t])
-        else:
-            timing_sigma = 3.0
-            print("Couldn't fing timing_sigma. Using default %f" %
-                  timing_sigma)
+    for drive_idx, drive_name in enumerate(drive_names):
+        timing_mean = drive_dynamics[drive_idx]['mu']
+        timing_sigma = drive_dynamics[drive_idx]['sigma']
 
         if timing_sigma == 0.0:
             # sigma of 0 will not produce a CDF
             timing_sigma = 0.01
 
-        evinput_params[id_str] = {'mean': timing_mean, 'sigma': timing_sigma,
-                                  'ranges': {}}
+        evinput_params[drive_name] = {'mean': timing_mean,
+                                      'sigma': timing_sigma,
+                                      'ranges': {}}
 
-        evinput_params[id_str]['ranges']['sigma_' + evinput_t] = \
+        evinput_params[drive_name]['ranges']['sigma'] = \
             _get_range(timing_sigma, sigma_range_multiplier)
 
         # calculate range for time
         timing_bound = timing_sigma * timing_range_multiplier
         range_min = max(0, timing_mean - timing_bound)
-        range_max = min(float(params['tstop']), timing_mean + timing_bound)
+        range_max = min(tstop, timing_mean + timing_bound)
 
-        evinput_params[id_str]['start'] = range_min
-        evinput_params[id_str]['end'] = range_max
-        evinput_params[id_str]['ranges'][evinput_t] =  \
+        evinput_params[drive_name]['start'] = range_min
+        evinput_params[drive_name]['end'] = range_max
+        evinput_params[drive_name]['ranges']['mu'] = \
             {'initial': timing_mean, 'minval': range_min, 'maxval': range_max}
 
         # calculate ranges for syn. weights
-        for label in params[f'gbar_{id_str}*']:
-            value = params[label]
-            ranges = _get_range(value, synweight_range_multiplier)
-            if value == 0.0:
-                ranges['minval'] = value
+        for syn_weight_key in drive_syn_weights[drive_idx]:
+            weight = drive_syn_weights[drive_idx][syn_weight_key]
+            ranges = _get_range(weight, synweight_range_multiplier)
+            if weight == 0.0:
+                ranges['minval'] = weight
                 ranges['maxval'] = 1.0
-            evinput_params[id_str]['ranges'][label] = ranges
+            evinput_params[drive_name]['ranges']['gbar_' + syn_weight_key] = \
+                ranges
 
     sorted_evinput_params = OrderedDict(sorted(evinput_params.items(),
                                                key=lambda x: x[1]['start']))
@@ -350,7 +352,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
     return result
 
 
-def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
+def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
                     scale_factor=1., smooth_window_len=None):
@@ -361,6 +363,8 @@ def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
     net : Network instance
         Network instance with the initial configuration of attached drives to
         be optimized. This object will be modified in-place.
+    tstop : float
+        The simulation stop time (ms).
     target_dpl : instance of Dipole
         The target experimental dipole.
     initial_dpl : instance of Dipole
@@ -399,7 +403,6 @@ def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
 
-
     drive_names = list()
     drive_dynamics = list()
     drive_syn_weights = list()
@@ -408,7 +411,7 @@ def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
             drive_names.append(drive['name'])
             drive_dynamics.append(drive['dynamics'])
 
-            conn_idxs = pick_connections(net, src_gids=drive['name'])
+            conn_idxs = pick_connection(net, src_gids=drive['name'])
             weights = dict()
             for conn_idx in conn_idxs:
                 target_type = net.connectivity[conn_idx]['target_type']
@@ -419,6 +422,10 @@ def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
                 if target_receptor == "nmda":
                     weights.update({f'{target_type}_nmda': weight})
             drive_syn_weights.append(weights)
+
+    if len(drive_names) == 0:
+        raise ValueError(f'The current Network instance lacks any drives. Got '
+                         f'{net.external_drives}')
 
     # Create a sorted dictionary with the inputs and parameters
     # belonging to each.
@@ -433,6 +440,7 @@ def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
     evinput_params = _split_by_evinput(drive_names,
                                        drive_dynamics,
                                        drive_syn_weights,
+                                       tstop,
                                        sigma_range_multiplier,
                                        timing_range_multiplier,
                                        synweight_range_multiplier)
@@ -440,7 +448,7 @@ def optimize_evoked(net, target_dpl, initial_dpl, maxiter=50,
                                        decay_multiplier)
     param_chunks = _consolidate_chunks(evinput_params)
 
-    best_rmse = _rmse(initial_dpl, target_dpl, tstop=params['tstop'])
+    best_rmse = _rmse(initial_dpl, target_dpl, tstop=tstop)
     opt_dpls = dict(best_dpl=initial_dpl, target_dpl=target_dpl)
     print("Initial RMSE: %.2f" % best_rmse)
 
