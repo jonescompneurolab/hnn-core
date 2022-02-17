@@ -107,7 +107,7 @@ def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
     return sorted_evinput_params
 
 
-def _generate_weights(evinput_params, params, decay_multiplier):
+def _generate_weights(evinput_params, tstop, dt, decay_multiplier):
     """Calculation of weight function for wRMSE calcuation
 
     Returns
@@ -117,7 +117,6 @@ def _generate_weights(evinput_params, params, decay_multiplier):
         to evinput_params[input_name] and removes 'mean'
         and 'sigma' which were needed to compute 'weights'.
     """
-    tstop, dt = params['tstop'], params['dt']
     num_step = ceil(tstop / dt) + 1
     times = np.linspace(0, tstop, num_step)
 
@@ -237,7 +236,7 @@ def _consolidate_chunks(inputs):
 
 
 def _optrun(net, new_params, opt_params, const_params, opt_dpls, scale_factor,
-            smooth_window_len):
+            smooth_window_len, tstop, dt):
     """This is the function to run a simulation
 
     Parameters
@@ -316,7 +315,7 @@ def _optrun(net, new_params, opt_params, const_params, opt_dpls, scale_factor,
             event_seed=drive_params[idx]['event_seed'],
             conn_seed=drive_params[idx]['conn_seed)']
         )
-    avg_dpl = _BACKEND.simulate(net, tstop=tstop, dt=0.025, n_trials=1)[0]
+    avg_dpl = _BACKEND.simulate(net, tstop=tstop, dt=dt, n_trials=1)[0]
     avg_dpl = avg_dpl.scale(scale_factor)
     if smooth_window_len is not None:
         avg_dpl = avg_dpl.smooth(smooth_window_len)
@@ -355,7 +354,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
 def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
-                    scale_factor=1., smooth_window_len=None):
+                    scale_factor=1., smooth_window_len=None, dt=0.025):
     """Optimize drives to generate evoked response.
 
     Parameters
@@ -444,7 +443,7 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
                                        sigma_range_multiplier,
                                        timing_range_multiplier,
                                        synweight_range_multiplier)
-    evinput_params = _generate_weights(evinput_params, params,
+    evinput_params = _generate_weights(evinput_params, tstop, dt,
                                        decay_multiplier)
     param_chunks = _consolidate_chunks(evinput_params)
 
@@ -476,11 +475,14 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
             # The purpose of the last step (with regular RMSE) is to clean up
             # overfitting introduced by local weighted RMSE optimization.
 
-            evinput_params = _split_by_evinput(params,
+            evinput_params = _split_by_evinput(drive_names,
+                                               drive_dynamics,
+                                               drive_syn_weights,
+                                               tstop,
                                                sigma_range_multiplier,
                                                timing_range_multiplier,
                                                synweight_range_multiplier)
-            evinput_params = _generate_weights(evinput_params, params,
+            evinput_params = _generate_weights(evinput_params, tstop, dt,
                                                decay_multiplier)
             param_chunks = _consolidate_chunks(evinput_params)
 
@@ -498,10 +500,11 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
                                             weights=opt_params['weights'])
 
         def _myoptrun(new_params):
-            return _optrun(net_model, new_params, opt_params,
+            return _optrun(net, new_params, opt_params,
                            const_params, opt_dpls=opt_dpls,
                            scale_factor=scale_factor,
-                           smooth_window_len=smooth_window_len)
+                           smooth_window_len=smooth_window_len,
+                           dt=dt)
 
         print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                     opt_params['opt_end']))
@@ -513,9 +516,9 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
 
         # update opt_params for the next round if total rmse decreased
         avg_rmse = _rmse(opt_dpls['best_dpl'],
-                             opt_dpls['target_dpl'],
-                             tstop=params['tstop'],
-                             weights=None)
+                         opt_dpls['target_dpl'],
+                         tstop=tstop,
+                         weights=None)
         if avg_rmse <= best_rmse:
             best_rmse = avg_rmse
             for var_name, value in zip(opt_params['ranges'], opt_results):
