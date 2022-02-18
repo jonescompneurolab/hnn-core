@@ -273,10 +273,6 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
     print("Optimization step %d, iteration %d" % (opt_params['cur_step'] + 1,
                                                   opt_params['optiter'] + 1))
 
-    from .parallel_backends import _BACKEND, JoblibBackend
-    if _BACKEND is None:
-        _BACKEND = JoblibBackend(n_jobs=1)
-
     # set parameters
     # tiny negative weights are possible. Clip them to 0.
     drive_params_updated = drive_params_updated.copy()
@@ -314,7 +310,7 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
         )
 
     # run the simulation
-    dpls = _BACKEND.simulate(net, tstop=tstop, dt=dt, n_trials=n_trials)
+    dpls = simulate_dipole(net, tstop=tstop, dt=dt, n_trials=n_trials)
     # order of operations: scale, smooth, then average
     dpls = [dpl.scale(scale_factor) for dpl in dpls]
     if smooth_window_len is not None:
@@ -457,10 +453,6 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     By Linear Approximation (COBYLA) method:
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_cobyla.html  # noqa
     """
-    from .parallel_backends import _BACKEND, JoblibBackend
-
-    if _BACKEND is None:
-        _BACKEND = JoblibBackend(n_jobs=1)
 
     drive_names = [key for key in net.external_drives.keys()
                    if net.external_drives[key]['type'] == 'evoked']
@@ -543,10 +535,11 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                                             tstop=opt_params['opt_end'],
                                             weights=opt_params['weights'])
 
+        net_opt = net.copy()
         # XXX use functools.partial instead?
         # updated_drive_params must be a list for compatability with the args
         # in the optimization engine, scipy.optimize.fmin_cobyla
-        net_opt = net.copy()
+
         def _myoptrun(drive_params_updated):
 
             return _optrun(net=net_opt,
