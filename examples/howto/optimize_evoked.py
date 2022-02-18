@@ -69,7 +69,7 @@ with MPIBackend(n_procs=n_procs):
 from hnn_core.optimization import optimize_evoked
 
 with MPIBackend(n_procs=n_procs):
-    net_opt = optimize_evoked(net.copy(), tstop=tstop, n_trials=1,
+    net_opt = optimize_evoked(net, tstop=tstop, n_trials=1,
                               target_dpl=exp_dpl, initial_dpl=initial_dpl,
                               scale_factor=scale_factor,
                               smooth_window_len=smooth_window_len)
