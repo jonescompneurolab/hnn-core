@@ -553,6 +553,7 @@ class Network(object):
                                           numspikes=numspikes)
         drive = _NetworkDrive()
         drive['type'] = 'evoked'
+        drive['location'] = location
         if name == 'extgauss':
             drive['type'] = 'gaussian'  # XXX needed to pass legacy tests!
         drive['n_drive_cells'] = n_drive_cells
@@ -657,6 +658,7 @@ class Network(object):
 
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
+        drive['location'] = location
         drive['n_drive_cells'] = n_drive_cells
         drive['event_seed'] = event_seed
         drive['conn_seed'] = conn_seed
@@ -755,6 +757,7 @@ class Network(object):
 
         drive = _NetworkDrive()
         drive['type'] = 'bursty'
+        drive['location'] = location
         drive['n_drive_cells'] = n_drive_cells
         drive['event_seed'] = event_seed
         drive['conn_seed'] = conn_seed
@@ -1349,6 +1352,8 @@ class _NetworkDrive(dict):
     ----------
     name : str
         Name of drive (must be unique)
+    location : str
+        Target location of synapses ('distal' or 'proximal')
     type : str
         Examples: 'evoked', 'gaussian', 'poisson', 'bursty'
     events : list of lists
