@@ -1,10 +1,7 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-import os.path as op
 import numpy as np
 
-import hnn_core
-from hnn_core import read_params
 from hnn_core.optimization import (_consolidate_chunks, _split_by_evinput,
                                    _generate_weights)
 
@@ -46,24 +43,27 @@ def test_consolidate_chunks():
 
 def test_split_by_evinput():
     """Test splitting evoked input."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
+    drive_names = ['ev_drive_1', 'ev_drive_2']
+    drive_dynamics = [{'mu': 5., 'sigma': .1}, {'mu': 10., 'sigma': .2}]
+    drive_syn_weights = [{'ampa_L2_pyramidal': 1.}, {'nmda_L5_basket': 2.}]
+    tstop = 20.
+    dt = 0.025
 
     timing_range_multiplier = 3.0
     sigma_range_multiplier = 50.0
     synweight_range_multiplier = 500.0
     decay_multiplier = 1.6
-    evinput_params = _split_by_evinput(params, sigma_range_multiplier,
+    evinput_params = _split_by_evinput(drive_names, drive_dynamics,
+                                       drive_syn_weights, tstop,
+                                       sigma_range_multiplier,
                                        timing_range_multiplier,
                                        synweight_range_multiplier)
-    assert list(evinput_params.keys()) == [
-        'evprox_1', 'evdist_1', 'evprox_2']
+    assert list(evinput_params.keys()) == drive_names
     for evinput in evinput_params.values():
         assert list(evinput.keys()) == ['mean', 'sigma', 'ranges',
                                         'start', 'end']
 
-    evinput_params = _generate_weights(evinput_params, params,
+    evinput_params = _generate_weights(evinput_params, tstop, dt,
                                        decay_multiplier)
     for evinput in evinput_params.values():
         assert list(evinput.keys()) == ['ranges', 'start', 'end',
