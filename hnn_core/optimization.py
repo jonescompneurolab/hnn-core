@@ -5,6 +5,7 @@
 
 from math import ceil, floor
 from collections import OrderedDict
+import fnmatch
 
 import numpy as np
 import scipy.stats as stats
@@ -79,7 +80,7 @@ def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
                                       'sigma': timing_sigma,
                                       'ranges': {}}
 
-        evinput_params[drive_name]['ranges']['sigma'] = \
+        evinput_params[drive_name]['ranges'][drive_name + '_sigma'] = \
             _get_range(timing_sigma, sigma_range_multiplier)
 
         # calculate range for time
@@ -89,18 +90,18 @@ def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
 
         evinput_params[drive_name]['start'] = range_min
         evinput_params[drive_name]['end'] = range_max
-        evinput_params[drive_name]['ranges']['mu'] = \
+        evinput_params[drive_name]['ranges'][drive_name + '_mu'] = \
             {'initial': timing_mean, 'minval': range_min, 'maxval': range_max}
 
         # calculate ranges for syn. weights
         for syn_weight_key in drive_syn_weights[drive_idx]:
+            new_key = drive_name + '_gbar_' + syn_weight_key
             weight = drive_syn_weights[drive_idx][syn_weight_key]
             ranges = _get_range(weight, synweight_range_multiplier)
             if weight == 0.0:
                 ranges['minval'] = weight
                 ranges['maxval'] = 1.0
-            evinput_params[drive_name]['ranges']['gbar_' + syn_weight_key] = \
-                ranges
+            evinput_params[drive_name]['ranges'][new_key] = ranges
 
     sorted_evinput_params = OrderedDict(sorted(evinput_params.items(),
                                                key=lambda x: x[1]['start']))
@@ -235,8 +236,8 @@ def _consolidate_chunks(inputs):
     return chunks
 
 
-def _optrun(net, new_params, opt_params, const_params, opt_dpls, scale_factor,
-            smooth_window_len, tstop, dt):
+def _optrun(net, drive_params_updated, drive_params_static, opt_params,
+            opt_dpls, scale_factor, smooth_window_len, tstop, dt):
     """This is the function to run a simulation
 
     Parameters
@@ -244,14 +245,15 @@ def _optrun(net, new_params, opt_params, const_params, opt_dpls, scale_factor,
     net : Network instance
         Network instance with attached drives. This object will be modified
         in-place.
-    new_params: array
+    drive_params_updated : array
         List or numpy array with the parameters chosen by
         optimization engine. Order is consistent with
         opt_params['ranges'].
+    drive_params_static : dict
+        Drive parameters that remain constant throughout optimization. Keys
+        correspond to the drive names that are being optimized in this chunk.
     opt_params : dict
-        The optimization parameters
-    const_params : list
-        Drive parameters that remain constant during optimization.
+        The optimization parameters.
     opt_dpls : dict
         Dictionary with keys 'target_dpl' and 'best' for
         the experimental dipole and best dipole.
@@ -276,45 +278,41 @@ def _optrun(net, new_params, opt_params, const_params, opt_dpls, scale_factor,
 
     # set parameters
     # tiny negative weights are possible. Clip them to 0.
-    params = params.copy()
-    new_params[new_params < 0] = 0
-    for param_name, test_value in zip(opt_params['ranges'].keys(), new_params):
-        params[param_name] = test_value
+    drive_params_updated = drive_params_updated.copy()
+    drive_params_updated[drive_params_updated < 0] = 0
+    params_dict = dict()
+    for param_name, test_value in zip(opt_params['ranges'].keys(),
+                                      drive_params_updated):
+        params_dict[param_name] = test_value
 
-    # run the simulation, but stop early if possible
-    tstop = params['tstop'] = opt_params['opt_end']
-    for drive_idx in range(len(new_params)):
-        name = drive_params[idx]['name']
-        mu = 
-        sigma = 
-        numspikes = 
-        location, = 
-        n_drive_cells = 
-        cell_specific =
-        weights_ampa = 
-        weights_nmda =
-        space_constant = 
-        synaptic_delays = 
-        probability = 
-        event_seed = 
-        conn_seed = 
-
+    # modify drives according to the drive names in the current chunk
+    for drive_idx, drive_name in enumerate(opt_params['inputs']):
+        keys_ampa = fnmatch.filter(list(params_dict.keys()),
+                                   drive_name + '_gbar_ampa_*')
+        keys_nmda = fnmatch.filter(list(params_dict.keys()),
+                                   drive_name + '_gbar_nmda_*')
+        weights_ampa = {key.lstrip(drive_name + '_gbar_ampa_'):
+                        params_dict[key] for key in keys_ampa}
+        weights_nmda = {key.lstrip(drive_name + '_gbar_nmda_'):
+                        params_dict[key] for key in keys_nmda}
         net.add_evoked_drive(
-            name=drive_params[idx]['name'],
-            mu=drive_params[idx]['mu'],
-            sigma=drive_params[idx]['sigma'],
-            numspikes=drive_params[idx]['numspikes'],
-            location=drive_params[idx]['location'],
-            n_drive_cells=drive_params[idx]['n_drive_cells'],
-            cell_specific=drive_params[idx]['cell_specific'],
-            weights_ampa=drive_params[idx]['weights_ampa'],
-            weights_nmda=drive_params[idx]['weights_nmda'],
-            space_constant=drive_params[idx]['space_constant'],
-            synaptic_delays=drive_params[idx]['synaptic_delays'],
-            probability=drive_params[idx]['probability'],
-            event_seed=drive_params[idx]['event_seed'],
-            conn_seed=drive_params[idx]['conn_seed)']
+            name=drive_name,
+            mu=params_dict[drive_name + '_mu'],
+            sigma=params_dict[drive_name + '_sigma'],
+            numspikes=drive_params_static[drive_name]['numspikes'],
+            location=drive_params_static[drive_name]['numspikes'],
+            n_drive_cells=drive_params_static[drive_name]['numspikes'],
+            cell_specific=drive_params_static[drive_name]['numspikes'],
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            space_constant=drive_params_static[drive_name]['space_constant'],
+            synaptic_delays=drive_params_static[drive_name]['synaptic_delays'],
+            probability=drive_params_static[drive_name]['probability'],
+            event_seed=drive_params_static[drive_name]['event_seed'],
+            conn_seed=drive_params_static[drive_name]['conn_seed']
         )
+
+    # run the simulation
     avg_dpl = _BACKEND.simulate(net, tstop=tstop, dt=dt, n_trials=1)[0]
     avg_dpl = avg_dpl.scale(scale_factor)
     if smooth_window_len is not None:
@@ -349,6 +347,64 @@ def _run_optimization(maxiter, param_ranges, optrun):
     result = fmin_cobyla(optrun, cons=cons, rhobeg=0.1, rhoend=1e-4,
                          x0=x0, maxfun=maxiter, catol=0.0)
     return result
+
+
+def _get_drive_params(net, drive_names):
+    """Get evoked drive parameters from a Network instance."""
+
+    drive_dynamics = list()
+    drive_syn_weights = list()
+    drive_static_params = dict()
+    for drive in drive_names:
+        drive_dynamics.append(drive['dynamics'])
+        conn_idxs = pick_connection(net, src_gids=drive['name'])
+        weights = dict()
+        delays = dict()
+        probabilities = dict()
+        for conn_idx in conn_idxs:
+            target_type = net.connectivity[conn_idx]['target_type']
+            target_receptor = net.connectivity[conn_idx]['receptor']
+            weight = net.connectivity[conn_idx]['nc_dict']['A_weight']
+            # note that for each drive, the weights dict should be unnested
+            # accross target cell types and receptors for ease-of-use when
+            # these values get restructured into a list downstream
+            if target_receptor == "ampa":
+                weights.update({f'ampa_{target_type}': weight})
+            if target_receptor == "nmda":
+                weights.update({f'nmda_{target_type}': weight})
+            # delay should be constant across AMPA and NMDA receptor types
+            delay = net.connectivity[conn_idx]['nc_dict']['A_delay']
+            delays.update({target_type: delay})
+            # space constant should be constant across drive connections
+            space_const = net.connectivity[conn_idx]['nc_dict']['lamtha']
+            # probability should be constant across AMPA and NMDA receptor
+            # types
+            probability = net.connectivity[conn_idx]['probability']
+            probabilities.update({target_type: probability})
+
+            drive_syn_weights.append(weights)
+
+            static_params = dict()
+            static_params['numspikes'] = drive['dynamics']['numspikes']
+            static_params['location'] = drive['location']
+            if drive['cell_specific']:
+                static_params['n_drive_cells'] = 'n_cells'
+            else:
+                static_params['n_drive_cells'] = drive['n_drive_cells']
+            static_params['cell_specific'] = drive['cell_specific']
+            static_params['space_constant'] = space_const
+            static_params['synaptic_delays'] = delays
+            static_params['probability'] = probabilities
+            static_params['event_seed'] = drive['event_seed']
+            static_params['conn_seed'] = drive['conn_seed']
+
+            drive_static_params.update({drive['name']: static_params})
+
+    if len(drive_names) == 0:
+        raise ValueError(f'The current Network instance lacks any evoked '
+                         f'drives. Got {net.external_drives}')
+
+    return drive_dynamics, drive_syn_weights, drive_static_params
 
 
 def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
@@ -388,7 +444,7 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
 
     Returns
     -------
-    net_opt_drives : Instance of Network object
+    net : Instance of Network object
         Network instance with the optimized configuration of attached drives.
 
     Notes
@@ -402,29 +458,10 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
 
-    drive_names = list()
-    drive_dynamics = list()
-    drive_syn_weights = list()
-    for drive in net.external_drives.values():
-        if drive['type'] == 'evoked':
-            drive_names.append(drive['name'])
-            drive_dynamics.append(drive['dynamics'])
-
-            conn_idxs = pick_connection(net, src_gids=drive['name'])
-            weights = dict()
-            for conn_idx in conn_idxs:
-                target_type = net.connectivity[conn_idx]['target_type']
-                target_receptor = net.connectivity[conn_idx]['receptor']
-                weight = net.connectivity[conn_idx]['nc_dict']['A_weight']
-                if target_receptor == "ampa":
-                    weights.update({f'{target_type}_ampa': weight})
-                if target_receptor == "nmda":
-                    weights.update({f'{target_type}_nmda': weight})
-            drive_syn_weights.append(weights)
-
-    if len(drive_names) == 0:
-        raise ValueError(f'The current Network instance lacks any drives. Got '
-                         f'{net.external_drives}')
+    drive_names = [key for key in net.external_drives.keys()
+                   if net.external_drives[key]['type'] == 'evoked']
+    drive_dynamics, drive_syn_weights, drive_static_params = \
+        _get_drive_params(net, drive_names)
 
     # Create a sorted dictionary with the inputs and parameters
     # belonging to each.
@@ -499,11 +536,20 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
                                             tstop=opt_params['opt_end'],
                                             weights=opt_params['weights'])
 
-        def _myoptrun(new_params):
-            return _optrun(net, new_params, opt_params,
-                           const_params, opt_dpls=opt_dpls,
+        # XXX use functools.partial instead?
+        # updated_drive_params must be a list for compatability with the args
+        # in the optimization engine, scipy.optimize.fmin_cobyla
+        net_opt = net.copy()
+        def _myoptrun(drive_params_updated):
+
+            return _optrun(net=net_opt,
+                           drive_params_updated=drive_params_updated,
+                           drive_params_static=drive_static_params,
+                           opt_params=opt_params,
+                           opt_dpls=opt_dpls,
                            scale_factor=scale_factor,
                            smooth_window_len=smooth_window_len,
+                           tstop=tstop,
                            dt=dt)
 
         print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
@@ -524,9 +570,7 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
             for var_name, value in zip(opt_params['ranges'], opt_results):
                 opt_params['ranges'][var_name]['initial'] = value
 
-            # save the optimized params
-            for var_name in opt_params['ranges']:
-                params[var_name] = opt_params['ranges'][var_name]['initial']
+            net = net_opt
 
     print("Final RMSE: %.2f" % best_rmse)
-    return net_opt_drives
+    return net
