@@ -412,8 +412,10 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     Parameters
     ----------
     net : Network instance
-        Network instance with the initial configuration of attached drives to
-        be optimized. This object will be modified in-place.
+        An instance of the Network object with attached evoked drives. Timing 
+        and synaptic weight parameters will be optimized for each attached 
+        evoked drive. Note that no new drives will be created or old drives 
+        destroyed.
     tstop : float
         The simulation stop time (ms).
     n_trials : int
@@ -444,8 +446,9 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
 
     Returns
     -------
-    net : Instance of Network object
-        Network instance with the optimized configuration of attached drives.
+    net : Network instance
+        An instance of the Network object with the optimized configuration of
+        attached drives.
 
     Notes
     -----
@@ -453,6 +456,8 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     By Linear Approximation (COBYLA) method:
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_cobyla.html  # noqa
     """
+
+    net = net.copy()
 
     drive_names = [key for key in net.external_drives.keys()
                    if net.external_drives[key]['type'] == 'evoked']
