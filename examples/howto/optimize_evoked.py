@@ -69,14 +69,15 @@ with MPIBackend(n_procs=n_procs):
 from hnn_core.optimization import optimize_evoked
 
 with MPIBackend(n_procs=n_procs):
-    net_opt_drives = optimize_evoked(net.copy(), exp_dpl, initial_dpl,
-                                     scale_factor=scale_factor,
-                                     smooth_window_len=smooth_window_len)
+    net_opt = optimize_evoked(net.copy(), tstop=tstop, n_trials=1,
+                              target_dpl=exp_dpl, initial_dpl=initial_dpl,
+                              scale_factor=scale_factor,
+                              smooth_window_len=smooth_window_len)
 
 ###############################################################################
 # Now, let's simulate the dipole with the optimized drive parameters.
 with MPIBackend(n_procs=n_procs):
-    best_dpl = simulate_dipole(net_opt_drives, tstop=tstop, n_trials=1)[0]
+    best_dpl = simulate_dipole(net_opt, tstop=tstop, n_trials=1)[0]
     best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
@@ -95,4 +96,4 @@ exp_dpl.plot(ax=axes[0], layer='agg', show=False)
 initial_dpl.plot(ax=axes[0], layer='agg', show=False)
 best_dpl.plot(ax=axes[0], layer='agg', show=False)
 axes[0].legend(['experimental', 'initial', 'optimized'])
-net_opt_drives.cell_response.plot_spikes_hist(ax=axes[1])
+net_opt.cell_response.plot_spikes_hist(ax=axes[1])

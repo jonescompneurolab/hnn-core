@@ -11,7 +11,7 @@ import numpy as np
 import scipy.stats as stats
 from scipy.optimize import fmin_cobyla
 
-from .dipole import _rmse, average_dipoles
+from .dipole import simulate_dipole, _rmse, average_dipoles
 from .network import pick_connection
 
 
@@ -301,9 +301,9 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
             mu=params_dict[drive_name + '_mu'],
             sigma=params_dict[drive_name + '_sigma'],
             numspikes=drive_params_static[drive_name]['numspikes'],
-            location=drive_params_static[drive_name]['numspikes'],
-            n_drive_cells=drive_params_static[drive_name]['numspikes'],
-            cell_specific=drive_params_static[drive_name]['numspikes'],
+            location=drive_params_static[drive_name]['location'],
+            n_drive_cells=drive_params_static[drive_name]['n_drive_cells'],
+            cell_specific=drive_params_static[drive_name]['cell_specific'],
             weights_ampa=weights_ampa,
             weights_nmda=weights_nmda,
             space_constant=drive_params_static[drive_name]['space_constant'],
@@ -358,9 +358,10 @@ def _get_drive_params(net, drive_names):
     drive_dynamics = list()
     drive_syn_weights = list()
     drive_static_params = dict()
-    for drive in drive_names:
+    for drive_name in drive_names:
+        drive = net.external_drives[drive_name]
         drive_dynamics.append(drive['dynamics'])
-        conn_idxs = pick_connection(net, src_gids=drive['name'])
+        conn_idxs = pick_connection(net, src_gids=drive_name)
         weights = dict()
         delays = dict()
         probabilities = dict()
@@ -401,11 +402,7 @@ def _get_drive_params(net, drive_names):
             static_params['event_seed'] = drive['event_seed']
             static_params['conn_seed'] = drive['conn_seed']
 
-            drive_static_params.update({drive['name']: static_params})
-
-    if len(drive_names) == 0:
-        raise ValueError(f'The current Network instance lacks any evoked '
-                         f'drives. Got {net.external_drives}')
+            drive_static_params.update({drive_name: static_params})
 
     return drive_dynamics, drive_syn_weights, drive_static_params
 
@@ -467,6 +464,9 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
 
     drive_names = [key for key in net.external_drives.keys()
                    if net.external_drives[key]['type'] == 'evoked']
+    if len(drive_names) == 0:
+        raise ValueError(f'The current Network instance lacks any evoked '
+                         f'drives. Got {net.external_drives}')
     drive_dynamics, drive_syn_weights, drive_static_params = \
         _get_drive_params(net, drive_names)
 
