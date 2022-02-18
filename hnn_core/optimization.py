@@ -11,7 +11,7 @@ import numpy as np
 import scipy.stats as stats
 from scipy.optimize import fmin_cobyla
 
-from .dipole import _rmse
+from .dipole import _rmse, average_dipoles
 from .network import pick_connection
 
 
@@ -236,8 +236,9 @@ def _consolidate_chunks(inputs):
     return chunks
 
 
-def _optrun(net, drive_params_updated, drive_params_static, opt_params,
-            opt_dpls, scale_factor, smooth_window_len, tstop, dt):
+def _optrun(net, tstop, dt, n_trials, drive_params_updated,
+            drive_params_static, opt_params, opt_dpls, scale_factor,
+            smooth_window_len):
     """This is the function to run a simulation
 
     Parameters
@@ -313,10 +314,12 @@ def _optrun(net, drive_params_updated, drive_params_static, opt_params,
         )
 
     # run the simulation
-    avg_dpl = _BACKEND.simulate(net, tstop=tstop, dt=dt, n_trials=1)[0]
-    avg_dpl = avg_dpl.scale(scale_factor)
+    dpls = _BACKEND.simulate(net, tstop=tstop, dt=dt, n_trials=n_trials)
+    # order of operations: scale, smooth, then average
+    dpls = [dpl.scale(scale_factor) for dpl in dpls]
     if smooth_window_len is not None:
-        avg_dpl = avg_dpl.smooth(smooth_window_len)
+        dpls = [dpl.smooth(smooth_window_len) for dpl in dpls]
+    avg_dpl = average_dipoles(dpls)
 
     avg_rmse = _rmse(avg_dpl, opt_dpls['target_dpl'],
                      tstart=opt_params['opt_start'],
@@ -407,7 +410,7 @@ def _get_drive_params(net, drive_names):
     return drive_dynamics, drive_syn_weights, drive_static_params
 
 
-def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
+def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
                     scale_factor=1., smooth_window_len=None, dt=0.025):
@@ -420,6 +423,8 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
         be optimized. This object will be modified in-place.
     tstop : float
         The simulation stop time (ms).
+    n_trials : int
+        The number of trials to simulate.
     target_dpl : instance of Dipole
         The target experimental dipole.
     initial_dpl : instance of Dipole
@@ -441,6 +446,8 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
     smooth_window_len : int
         The length of the hamming window (in samples) to smooth the
         simulated dipole waveform in each optimization step.
+    dt : float
+        The integration time step (ms) of h.CVode during simulation.
 
     Returns
     -------
@@ -543,14 +550,15 @@ def optimize_evoked(net, tstop, target_dpl, initial_dpl, maxiter=50,
         def _myoptrun(drive_params_updated):
 
             return _optrun(net=net_opt,
+                           tstop=tstop,
+                           dt=dt,
+                           n_trials=n_trials,
                            drive_params_updated=drive_params_updated,
                            drive_params_static=drive_static_params,
                            opt_params=opt_params,
                            opt_dpls=opt_dpls,
                            scale_factor=scale_factor,
-                           smooth_window_len=smooth_window_len,
-                           tstop=tstop,
-                           dt=dt)
+                           smooth_window_len=smooth_window_len)
 
         print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                     opt_params['opt_end']))
