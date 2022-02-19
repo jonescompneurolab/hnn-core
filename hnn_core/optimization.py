@@ -368,37 +368,41 @@ def _get_drive_params(net, drive_names):
             # note that for each drive, the weights dict should be unnested
             # accross target cell types and receptors for ease-of-use when
             # these values get restructured into a list downstream
-            if target_receptor == "ampa":
-                weights.update({f'ampa_{target_type}': weight})
-            if target_receptor == "nmda":
-                weights.update({f'nmda_{target_type}': weight})
-            # delay should be constant across AMPA and NMDA receptor types
-            delay = net.connectivity[conn_idx]['nc_dict']['A_delay']
-            delays.update({target_type: delay})
-            # space constant should be constant across drive connections
-            space_const = net.connectivity[conn_idx]['nc_dict']['lamtha']
-            # probability should be constant across AMPA and NMDA receptor
-            # types
-            probability = net.connectivity[conn_idx]['probability']
-            probabilities.update({target_type: probability})
 
-            drive_syn_weights.append(weights)
+            # legacy_mode hack: don't include invalid connections that have
+            # been added in Network when legacy_mode=True
+            if not (drive['location'] == 'distal' and
+                    target_type == 'L5_basket'):
+                if target_receptor == "ampa":
+                    weights.update({f'ampa_{target_type}': weight})
+                if target_receptor == "nmda":
+                    weights.update({f'nmda_{target_type}': weight})
+                # delay should be constant across AMPA and NMDA receptor types
+                delay = net.connectivity[conn_idx]['nc_dict']['A_delay']
+                delays.update({target_type: delay})
+                # space constant should be constant across drive connections
+                space_const = net.connectivity[conn_idx]['nc_dict']['lamtha']
+                # probability should be constant across AMPA and NMDA receptor
+                # types
+                probability = net.connectivity[conn_idx]['probability']
+                probabilities.update({target_type: probability})
 
-            static_params = dict()
-            static_params['numspikes'] = drive['dynamics']['numspikes']
-            static_params['location'] = drive['location']
-            if drive['cell_specific']:
-                static_params['n_drive_cells'] = 'n_cells'
-            else:
-                static_params['n_drive_cells'] = drive['n_drive_cells']
-            static_params['cell_specific'] = drive['cell_specific']
-            static_params['space_constant'] = space_const
-            static_params['synaptic_delays'] = delays
-            static_params['probability'] = probabilities
-            static_params['event_seed'] = drive['event_seed']
-            static_params['conn_seed'] = drive['conn_seed']
+        drive_syn_weights.append(weights)
 
-            drive_static_params.update({drive_name: static_params})
+        static_params = dict()
+        static_params['numspikes'] = drive['dynamics']['numspikes']
+        static_params['location'] = drive['location']
+        if drive['cell_specific']:
+            static_params['n_drive_cells'] = 'n_cells'
+        else:
+            static_params['n_drive_cells'] = drive['n_drive_cells']
+        static_params['cell_specific'] = drive['cell_specific']
+        static_params['space_constant'] = space_const
+        static_params['synaptic_delays'] = delays
+        static_params['probability'] = probabilities
+        static_params['event_seed'] = drive['event_seed']
+        static_params['conn_seed'] = drive['conn_seed']
+        drive_static_params.update({drive_name: static_params})
 
     return drive_dynamics, drive_syn_weights, drive_static_params
 
@@ -476,7 +480,6 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     # the simulation timeframe to optimize. Chunks are consolidated if
     # more than one input should
     # be optimized at a time.
-
     evinput_params = _split_by_evinput(drive_names,
                                        drive_dynamics,
                                        drive_syn_weights,
