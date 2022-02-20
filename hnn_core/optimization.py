@@ -246,7 +246,13 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
     net : Network instance
         Network instance with attached drives. This object will be modified
         in-place.
-    drive_params_updated : array
+    tstop : float
+        The simulation stop time (ms).
+    dt : float
+        The integration time step (ms) of h.CVode during simulation.
+    n_trials : int
+        The number of trials to simulate.
+    drive_params_updated : array-like, shape (n_params, )
         List or numpy array with the parameters chosen by
         optimization engine. Order is consistent with
         opt_params['ranges'].
@@ -276,7 +282,7 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
     # set parameters
     # tiny negative weights are possible. Clip them to 0.
     drive_params_updated = drive_params_updated.copy()
-    drive_params_updated[drive_params_updated < 0] = 0
+    drive_params_updated = [0 for val in drive_params_updated if val < 0]
     params_dict = dict()
     for param_name, test_value in zip(opt_params['ranges'].keys(),
                                       drive_params_updated):
@@ -467,8 +473,9 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     drive_names = [key for key in net.external_drives.keys()
                    if net.external_drives[key]['type'] == 'evoked']
     if len(drive_names) == 0:
-        raise ValueError(f'The current Network instance lacks any evoked '
-                         f'drives. Got {net.external_drives}')
+        raise ValueError('The current Network instance lacks any evoked '
+                         'drives. Consider adding drives using '
+                         'net.add_evoked_drive')
     drive_dynamics, drive_syn_weights, drive_static_params = \
         _get_drive_params(net, drive_names)
 
@@ -546,7 +553,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
 
         net_opt = net.copy()
         # XXX use functools.partial instead?
-        # updated_drive_params must be a list for compatability with the args
+        # drive_params_updated must be a list for compatability with the args
         # in the optimization engine, scipy.optimize.fmin_cobyla
 
         def _myoptrun(drive_params_updated):
