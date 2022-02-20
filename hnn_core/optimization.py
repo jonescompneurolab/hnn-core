@@ -30,11 +30,11 @@ def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
 
     Parameters
     ----------
-    drive_names : list of str
+    drive_names : list of str, shape (n_drives, )
         Names corresponding to n Network drives.
-    drive_dynamics : list of dict
+    drive_dynamics : list of dict, shape (n_drives, )
         Dynamics parameters for each drive specified in drive_names.
-    drive_syn_weights : list of dict
+    drive_syn_weights : list of dict, shape (n_drives, )
         Synaptic weight parameters for each drive specified in drive_names.
     tstop : float
         The simulation stop time (ms).
