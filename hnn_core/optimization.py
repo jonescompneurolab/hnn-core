@@ -80,7 +80,7 @@ def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
                                       'sigma': timing_sigma,
                                       'ranges': {}}
 
-        evinput_params[drive_name]['ranges'][drive_name + '_sigma'] = \
+        evinput_params[drive_name]['ranges'][f'{drive_name}_sigma'] = \
             _get_range(timing_sigma, sigma_range_multiplier)
 
         # calculate range for time
@@ -90,12 +90,12 @@ def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
 
         evinput_params[drive_name]['start'] = range_min
         evinput_params[drive_name]['end'] = range_max
-        evinput_params[drive_name]['ranges'][drive_name + '_mu'] = \
+        evinput_params[drive_name]['ranges'][f'{drive_name}_mu'] = \
             {'initial': timing_mean, 'minval': range_min, 'maxval': range_max}
 
         # calculate ranges for syn. weights
         for syn_weight_key in drive_syn_weights[drive_idx]:
-            new_key = drive_name + '_gbar_' + syn_weight_key
+            new_key = f'{drive_name}_gbar_{syn_weight_key}'
             weight = drive_syn_weights[drive_idx][syn_weight_key]
             ranges = _get_range(weight, synweight_range_multiplier)
             if weight == 0.0:
@@ -284,13 +284,14 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
 
     # modify drives according to the drive names in the current chunk
     for drive_idx, drive_name in enumerate(opt_params['inputs']):
-        keys_ampa = fnmatch.filter(list(params_dict.keys()),
-                                   drive_name + '_gbar_ampa_*')
-        keys_nmda = fnmatch.filter(list(params_dict.keys()),
-                                   drive_name + '_gbar_nmda_*')
-        weights_ampa = {key.lstrip(drive_name + '_gbar_ampa_'):
+        keys_ampa = fnmatch.filter(params_dict.keys(),
+                                   f'{drive_name}_gbar_ampa_*')
+        keys_nmda = fnmatch.filter(params_dict.keys(),
+                                   f'{drive_name}_gbar_nmda_*')
+        # syn weight dicts should have keys that correspond to cell types
+        weights_ampa = {key.lstrip(f'{drive_name}_gbar_ampa_'):
                         params_dict[key] for key in keys_ampa}
-        weights_nmda = {key.lstrip(drive_name + '_gbar_nmda_'):
+        weights_nmda = {key.lstrip(f'{drive_name}_gbar_nmda_'):
                         params_dict[key] for key in keys_nmda}
         net.add_evoked_drive(
             name=drive_name,
@@ -356,7 +357,7 @@ def _get_drive_params(net, drive_names):
     drive_static_params = dict()
     for drive_name in drive_names:
         drive = net.external_drives[drive_name]
-        drive_dynamics.append(drive['dynamics'])
+        drive_dynamics.append(drive['dynamics'].copy())
         conn_idxs = pick_connection(net, src_gids=drive_name)
         weights = dict()
         delays = dict()
