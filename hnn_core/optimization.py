@@ -279,17 +279,17 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
     print("Optimization step %d, iteration %d" % (opt_params['cur_step'] + 1,
                                                   opt_params['optiter'] + 1))
 
-    # set parameters
-    # tiny negative weights are possible. Clip them to 0.
-    drive_params_updated = drive_params_updated.copy()
-    drive_params_updated = [0 for val in drive_params_updated if val < 0]
+    # match parameter values contained in list to their respective key names
     params_dict = dict()
     for param_name, test_value in zip(opt_params['ranges'].keys(),
                                       drive_params_updated):
+        # tiny negative weights are possible. Clip them to 0.
+        if test_value < 0:
+            test_value = 0
         params_dict[param_name] = test_value
 
     # modify drives according to the drive names in the current chunk
-    for drive_idx, drive_name in enumerate(opt_params['inputs']):
+    for drive_name in opt_params['inputs']:
         keys_ampa = fnmatch.filter(params_dict.keys(),
                                    f'{drive_name}_gbar_ampa_*')
         keys_nmda = fnmatch.filter(params_dict.keys(),
