@@ -1353,7 +1353,7 @@ class _NetworkDrive(dict):
     name : str
         Name of drive (must be unique)
     location : str
-        Target location of synapses ('distal' or 'proximal')
+        Target location of synapses ('distal' or 'proximal').
     type : str
         Examples: 'evoked', 'gaussian', 'poisson', 'bursty'
     events : list of lists
@@ -1383,6 +1383,7 @@ class _NetworkDrive(dict):
         entr = f"<External drive '{self['name']}'"
         if 'type' in self.keys():
             entr += f"\ndrive class: {self['type']}"
+            entr += f"\ntarget location: {self['location']}"
             entr += f"\ntarget cell types: {self['target_types']}"
             entr += f"\nnumber of drive cells: {self['n_drive_cells']}"
             entr += f"\ncell-specific: {self['cell_specific']}"
