@@ -332,7 +332,7 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
     opt_params['stepminopterr'] = avg_rmse
     opt_dpls['best_dpl'] = avg_dpl
 
-    print("weighted RMSE: %.2f over range [%3.3f-%3.3f] ms" %
+    print("weighted RMSE: %.2e over range [%3.3f-%3.3f] ms" %
           (avg_rmse, opt_params['opt_start'], opt_params['opt_end']))
 
     opt_params['optiter'] += 1
@@ -501,7 +501,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
 
     best_rmse = _rmse(initial_dpl, target_dpl, tstop=tstop)
     opt_dpls = dict(best_dpl=initial_dpl, target_dpl=target_dpl)
-    print("Initial RMSE: %.2f" % best_rmse)
+    print("Initial RMSE: %.2e" % best_rmse)
 
     opt_params = dict()
     for step in range(len(param_chunks)):
@@ -589,5 +589,5 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
 
             net = net_opt
 
-    print("Final RMSE: %.2f" % best_rmse)
+    print("Final RMSE: %.2e" % best_rmse)
     return net
