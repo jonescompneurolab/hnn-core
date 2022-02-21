@@ -6,7 +6,7 @@ import numpy as np
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
 from hnn_core.optimization import (_consolidate_chunks, _split_by_evinput,
-                                   _generate_weights,_get_drive_params,
+                                   _generate_weights, _get_drive_params,
                                    optimize_evoked)
 
 
