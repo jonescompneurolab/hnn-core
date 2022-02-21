@@ -1,9 +1,13 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
+import os.path as op
 import numpy as np
 
+import hnn_core
+from hnn_core import read_params, jones_2009_model, simulate_dipole
 from hnn_core.optimization import (_consolidate_chunks, _split_by_evinput,
-                                   _generate_weights)
+                                   _generate_weights,_get_drive_params,
+                                   optimize_evoked)
 
 
 def test_consolidate_chunks():
@@ -69,3 +73,58 @@ def test_split_by_evinput():
         assert list(evinput.keys()) == ['ranges', 'start', 'end',
                                         'weights', 'opt_start',
                                         'opt_end']
+
+
+def test_optimize_evoked():
+    """Test running the full routine in a reduced network."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+    tstop = 10.
+    n_trials = 1
+
+    # simulate a dipole to establish ground-truth drive parameters
+    mu_orig = 6.
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3,
+                   't_evprox_1': mu_orig,
+                   'sigma_t_evprox_1': 2.})
+    net_orig = jones_2009_model(params, add_drives_from_params=True)
+    del net_orig.external_drives['evprox2']
+    del net_orig.external_drives['evdist1']
+    dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
+
+    # simulate a dipole with a time-shifted drive
+    mu_offset = 4.
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3,
+                   't_evprox_1': mu_offset,
+                   'sigma_t_evprox_1': 2.})
+    net_offset = jones_2009_model(params, add_drives_from_params=True)
+    del net_offset.external_drives['evprox2']
+    del net_offset.external_drives['evdist1']
+    dpl_offset = simulate_dipole(net_offset, tstop=tstop, n_trials=n_trials)[0]
+    # get drive params from the pre-optimization Network instance
+    _, _, drive_static_params_orig = _get_drive_params(net_offset, ['evprox1'])
+
+    net_opt = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
+                              target_dpl=dpl_orig, initial_dpl=dpl_offset,
+                              timing_range_multiplier=3.,
+                              sigma_range_multiplier=50.,
+                              synweight_range_multiplier=500.,
+                              maxiter=10)
+
+    # the names of drives should be preserved during optimization
+    assert net_offset.external_drives.keys() == net_opt.external_drives.keys()
+
+    drive_dynamics_opt, drive_syn_weights_opt, drive_static_params_opt = \
+        _get_drive_params(net_opt, ['evprox1'])
+
+    # ensure that params corresponding to only one evoked drive are discovered
+    assert (len(drive_dynamics_opt) ==
+            len(drive_syn_weights_opt) ==
+            len(drive_static_params_opt) == 1)
+
+    # static drive params should remain constant
+    assert drive_static_params_opt == drive_static_params_orig
