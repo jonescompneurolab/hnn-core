@@ -6,6 +6,7 @@
 from math import ceil, floor
 from collections import OrderedDict
 import fnmatch
+from functools import partial
 
 import numpy as np
 import scipy.stats as stats
@@ -236,13 +237,19 @@ def _consolidate_chunks(inputs):
     return chunks
 
 
-def _optrun(net, tstop, dt, n_trials, drive_params_updated,
-            drive_params_static, opt_params, opt_dpls, scale_factor,
-            smooth_window_len):
+def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
+            n_trials, opt_params, opt_dpls, scale_factor, smooth_window_len):
     """This is the function to run a simulation
 
     Parameters
     ----------
+    drive_params_updated : array-like, shape (n_params, )
+        List or numpy array with the parameters chosen by
+        optimization engine. Order is consistent with
+        opt_params['ranges'].
+    drive_params_static : dict
+        Drive parameters that remain constant throughout optimization. Keys
+        correspond to the drive names that are being optimized in this chunk.
     net : Network instance
         Network instance with attached drives. This object will be modified
         in-place.
@@ -252,13 +259,6 @@ def _optrun(net, tstop, dt, n_trials, drive_params_updated,
         The integration time step (ms) of h.CVode during simulation.
     n_trials : int
         The number of trials to simulate.
-    drive_params_updated : array-like, shape (n_params, )
-        List or numpy array with the parameters chosen by
-        optimization engine. Order is consistent with
-        opt_params['ranges'].
-    drive_params_static : dict
-        Drive parameters that remain constant throughout optimization. Keys
-        correspond to the drive names that are being optimized in this chunk.
     opt_params : dict
         The optimization parameters.
     opt_dpls : dict
@@ -552,22 +552,18 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                                             weights=opt_params['weights'])
 
         net_opt = net.copy()
-        # XXX use functools.partial instead?
         # drive_params_updated must be a list for compatability with the args
         # in the optimization engine, scipy.optimize.fmin_cobyla
-
-        def _myoptrun(drive_params_updated):
-
-            return _optrun(net=net_opt,
-                           tstop=tstop,
-                           dt=dt,
-                           n_trials=n_trials,
-                           drive_params_updated=drive_params_updated,
-                           drive_params_static=drive_static_params,
-                           opt_params=opt_params,
-                           opt_dpls=opt_dpls,
-                           scale_factor=scale_factor,
-                           smooth_window_len=smooth_window_len)
+        _myoptrun = partial(_optrun,
+                            drive_params_static=drive_static_params,
+                            net=net_opt,
+                            tstop=tstop,
+                            dt=dt,
+                            n_trials=n_trials,
+                            opt_params=opt_params,
+                            opt_dpls=opt_dpls,
+                            scale_factor=scale_factor,
+                            smooth_window_len=smooth_window_len)
 
         print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                     opt_params['opt_end']))
