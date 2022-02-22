@@ -825,12 +825,8 @@ class Network(object):
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
         """
-        # clear connectivity for this drive if it already exists
         if name in self.external_drives:
-            conn_idxs = pick_connection(self, src_gids=name)
-            self.connectivity = [conn for conn_idx, conn
-                                 in enumerate(self.connectivity)
-                                 if conn_idx not in conn_idxs]
+            raise ValueError(f"Drive {name} already defined")
         if location not in ['distal', 'proximal']:
             raise ValueError("Allowed drive target locations are: 'distal', "
                              f"and 'proximal', got {location}")
