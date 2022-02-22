@@ -185,7 +185,6 @@ def law_2021_model(params=None, add_drives_from_params=False):
     6) Addition of L5_basket -> L5_pyramidal distal connection
     """
 
-
     net = jones_2009_model(params=params,
                            add_drives_from_params=add_drives_from_params)
 
