@@ -238,6 +238,10 @@ def test_add_drives():
         net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
                              location='bogus_location')
     with pytest.raises(ValueError,
+                       match='Drive evoked_dist already defined'):
+        net.add_evoked_drive('evoked_dist', mu=10, sigma=1, numspikes=1,
+                             location='distal')
+    with pytest.raises(ValueError,
                        match='No target cell types have been given a synaptic '
                        'weight'):
         net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
@@ -336,6 +340,12 @@ def test_add_drives():
                              spike_isi=50)
 
     # attaching drives
+    with pytest.raises(ValueError,
+                       match='Drive evoked_dist already defined'):
+        net.add_poisson_drive('evoked_dist', location='distal',
+                              rate_constant=10.,
+                              weights_ampa=weights_ampa,
+                              synaptic_delays=syn_delays)
     with pytest.raises(ValueError,
                        match='Allowed drive target locations are:'):
         net.add_poisson_drive('weird_poisson', location='inbetween',
