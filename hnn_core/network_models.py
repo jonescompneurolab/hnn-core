@@ -185,10 +185,6 @@ def law_2021_model(params=None, add_drives_from_params=False):
     6) Addition of L5_basket -> L5_pyramidal distal connection
     """
 
-    if params is not None:
-        hnn_core_root = op.dirname(hnn_core.__file__)
-        params_fname = op.join(hnn_core_root, 'param', 'default.json')
-        params = read_params(params_fname)
 
     net = jones_2009_model(params=params,
                            add_drives_from_params=add_drives_from_params)
