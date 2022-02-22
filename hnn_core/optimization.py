@@ -290,15 +290,25 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
 
     # modify drives according to the drive names in the current chunk
     for drive_name in opt_params['inputs']:
+
+        # clear drive and its connectivity
+        del net.external_drives[drive_name]
+        conn_idxs = pick_connection(net, src_gids=drive_name)
+        net.connectivity = [conn for conn_idx, conn
+                            in enumerate(net.connectivity)
+                            if conn_idx not in conn_idxs]
+
+        # extract syn weights: final weights dicts should have keys that
+        # correspond to cell types
         keys_ampa = fnmatch.filter(params_dict.keys(),
                                    f'{drive_name}_gbar_ampa_*')
         keys_nmda = fnmatch.filter(params_dict.keys(),
                                    f'{drive_name}_gbar_nmda_*')
-        # syn weight dicts should have keys that correspond to cell types
         weights_ampa = {key.lstrip(f'{drive_name}_gbar_ampa_'):
                         params_dict[key] for key in keys_ampa}
         weights_nmda = {key.lstrip(f'{drive_name}_gbar_nmda_'):
                         params_dict[key] for key in keys_nmda}
+
         net.add_evoked_drive(
             name=drive_name,
             mu=params_dict[drive_name + '_mu'],
