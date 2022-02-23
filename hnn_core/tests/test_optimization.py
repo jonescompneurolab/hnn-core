@@ -2,6 +2,7 @@
 
 import os.path as op
 import numpy as np
+import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
@@ -107,6 +108,13 @@ def test_optimize_evoked():
     dpl_offset = simulate_dipole(net_offset, tstop=tstop, n_trials=n_trials)[0]
     # get drive params from the pre-optimization Network instance
     _, _, drive_static_params_orig = _get_drive_params(net_offset, ['evprox1'])
+
+    with pytest.raises(ValueError, match='The current Network instance lacks '
+                       'any evoked drives'):
+        net_empty = net_offset.copy()
+        del net_empty.external_drives['evprox1']
+        net_opt = optimize_evoked(net_empty, tstop=tstop, n_trials=n_trials,
+                                  target_dpl=dpl_orig, initial_dpl=dpl_offset)
 
     net_opt = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
                               target_dpl=dpl_orig, initial_dpl=dpl_offset,
