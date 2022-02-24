@@ -69,26 +69,22 @@ with MPIBackend(n_procs=n_procs):
 from hnn_core.optimization import optimize_evoked
 
 with MPIBackend(n_procs=n_procs):
-    params_optim = optimize_evoked(params, exp_dpl, initial_dpl,
-                                   scale_factor=scale_factor,
-                                   smooth_window_len=smooth_window_len)
+    net_opt = optimize_evoked(net, tstop=tstop, n_trials=1,
+                              target_dpl=exp_dpl, initial_dpl=initial_dpl,
+                              scale_factor=scale_factor,
+                              smooth_window_len=smooth_window_len)
 
 ###############################################################################
-# Now, let's simulate the dipole with the optimized parameters.
-net = jones_2009_model(params=params_optim, add_drives_from_params=True)
+# Now, let's simulate the dipole with the optimized drive parameters.
 with MPIBackend(n_procs=n_procs):
-    best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
+    best_dpl = simulate_dipole(net_opt, tstop=tstop, n_trials=1)[0]
     best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
-# Finally, we can plot the results against experimental data along with the
-# input histograms:
-# 1. Initial dipole
-# 2. Optimized dipole fit
-#
-# Upon visualizing the change in optimized versus initial dipole, you should
-# consider exploring which parameters were changed to cause the improved dipole
-# fit.
+# Finally, we can plot the pre- and post-optimization simulations alongside the
+# experimental data. Upon visualizing the change in optimized versus initial
+# dipole, you should consider exploring which parameters were changed to cause
+# the improved dipole fit.
 
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
@@ -96,4 +92,4 @@ exp_dpl.plot(ax=axes[0], layer='agg', show=False)
 initial_dpl.plot(ax=axes[0], layer='agg', show=False)
 best_dpl.plot(ax=axes[0], layer='agg', show=False)
 axes[0].legend(['experimental', 'initial', 'optimized'])
-net.cell_response.plot_spikes_hist(ax=axes[1])
+net_opt.cell_response.plot_spikes_hist(ax=axes[1])

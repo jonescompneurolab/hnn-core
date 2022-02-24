@@ -685,6 +685,7 @@
                                           <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">)</span>
         <span class="n">drive</span> <span class="o">=</span> <span class="n">_NetworkDrive</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;evoked&#39;</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">location</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;extgauss&#39;</span><span class="p">:</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span>  <span class="c1"># XXX needed to pass legacy tests!</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_drive_cells</span>
@@ -789,6 +790,7 @@
 
         <span class="n">drive</span> <span class="o">=</span> <span class="n">_NetworkDrive</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;poisson&#39;</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">location</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_drive_cells</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_seed</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;conn_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conn_seed</span>
@@ -887,6 +889,7 @@
 
         <span class="n">drive</span> <span class="o">=</span> <span class="n">_NetworkDrive</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bursty&#39;</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">location</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_drive_cells</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_seed</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;conn_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conn_seed</span>
@@ -1171,7 +1174,7 @@
     <span class="k">def</span> <span class="nf">_add_cell_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_name</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">cell_template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add cell type by updating pos_dict and gid_ranges.&quot;&quot;&quot;</span>
         <span class="n">ll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span> <span class="o">=</span> <span class="n">ll</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
@@ -1477,6 +1480,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    name : str</span>
 <span class="sd">        Name of drive (must be unique)</span>
+<span class="sd">    location : str</span>
+<span class="sd">        Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;).</span>
 <span class="sd">    type : str</span>
 <span class="sd">        Examples: &#39;evoked&#39;, &#39;gaussian&#39;, &#39;poisson&#39;, &#39;bursty&#39;</span>
 <span class="sd">    events : list of lists</span>
@@ -1506,6 +1511,7 @@
         <span class="n">entr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;External drive &#39;</span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">drive class: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">target location: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">target cell types: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;target_types&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">number of drive cells: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">cell-specific: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>

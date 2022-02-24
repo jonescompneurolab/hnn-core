@@ -119,7 +119,7 @@ we add them automatically from the parameter files
 
 Now we start the optimization!
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-76
+.. GENERATED FROM PYTHON SOURCE LINES 68-77
 
 .. code-block:: default
 
@@ -127,37 +127,33 @@ Now we start the optimization!
     from hnn_core.optimization import optimize_evoked
 
     with MPIBackend(n_procs=n_procs):
-        params_optim = optimize_evoked(params, exp_dpl, initial_dpl,
-                                       scale_factor=scale_factor,
-                                       smooth_window_len=smooth_window_len)
+        net_opt = optimize_evoked(net, tstop=tstop, n_trials=1,
+                                  target_dpl=exp_dpl, initial_dpl=initial_dpl,
+                                  scale_factor=scale_factor,
+                                  smooth_window_len=smooth_window_len)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-78
+.. GENERATED FROM PYTHON SOURCE LINES 78-79
 
-Now, let's simulate the dipole with the optimized parameters.
+Now, let's simulate the dipole with the optimized drive parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-83
+.. GENERATED FROM PYTHON SOURCE LINES 79-83
 
 .. code-block:: default
 
-    net = jones_2009_model(params=params_optim, add_drives_from_params=True)
     with MPIBackend(n_procs=n_procs):
-        best_dpl = simulate_dipole(net, tstop=tstop, n_trials=1)[0]
+        best_dpl = simulate_dipole(net_opt, tstop=tstop, n_trials=1)[0]
         best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-92
+.. GENERATED FROM PYTHON SOURCE LINES 84-88
 
-Finally, we can plot the results against experimental data along with the
-input histograms:
-1. Initial dipole
-2. Optimized dipole fit
+Finally, we can plot the pre- and post-optimization simulations alongside the
+experimental data. Upon visualizing the change in optimized versus initial
+dipole, you should consider exploring which parameters were changed to cause
+the improved dipole fit.
 
-Upon visualizing the change in optimized versus initial dipole, you should
-consider exploring which parameters were changed to cause the improved dipole
-fit.
-
-.. GENERATED FROM PYTHON SOURCE LINES 92-100
+.. GENERATED FROM PYTHON SOURCE LINES 88-96
 
 .. code-block:: default
 
@@ -168,7 +164,7 @@ fit.
     initial_dpl.plot(ax=axes[0], layer='agg', show=False)
     best_dpl.plot(ax=axes[0], layer='agg', show=False)
     axes[0].legend(['experimental', 'initial', 'optimized'])
-    net.cell_response.plot_spikes_hist(ax=axes[1])
+    net_opt.cell_response.plot_spikes_hist(ax=axes[1])
 
 
 .. rst-class:: sphx-glr-timing

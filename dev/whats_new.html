@@ -179,10 +179,19 @@ the network by making the seed of the random process generating spike times in
 drives use the offset of the gid with respect to the first gid in the population
 by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/462">#462</a>.</p></li>
 <li><p>Negative <code class="docutils literal notranslate"><span class="pre">event_seed</span></code> is no longer allowed by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/462">#462</a>.</p></li>
+<li><p>Evoked drive optimization no longer assigns a default timing sigma value to
+a drive if it is not already specified, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/446">#446</a>.</p></li>
 </ul>
 </section>
 <section id="api">
 <h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Optimization of the evoked drives can be conducted on any <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>
+template model by passing a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> instance directly into
+<a class="reference internal" href="generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked" title="hnn_core.optimization.optimize_evoked"><code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code></a>. Simulations run during
+optimization can now consist of multiple trials over which the simulated
+dipole is averaged, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/446">#446</a>.</p></li>
+</ul>
 </section>
 </section>
 <section id="id1">

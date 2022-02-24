@@ -28,8 +28,16 @@ Bug
 
 - Negative ``event_seed`` is no longer allowed by `Mainak Jas`_ in :gh:`462`.
 
+- Evoked drive optimization no longer assigns a default timing sigma value to
+  a drive if it is not already specified, by `Ryan Thorpe`_ in :gh:`446`.
+
 API
 ~~~
+- Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
+  template model by passing a :class:`~hnn_core.Network` instance directly into
+  :func:`~hnn_core.optimization.optimize_evoked`. Simulations run during 
+  optimization can now consist of multiple trials over which the simulated
+  dipole is averaged, by `Ryan Thorpe`_ in :gh:`446`.
 
 .. _0.2:
 
