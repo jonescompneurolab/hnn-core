@@ -152,12 +152,11 @@ dpls_sync[trial_idx].copy().smooth(window_len).scale(scaling_factor).plot()
 net_sync.cell_response.plot_spikes_hist()
 
 ###############################################################################
-#.. warning::
-#    - Always look at dipoles in conjunction with raster plots and spike histogram to avoid misinterpretation.
-#    
-#     
-#                    
-#    - Run multiple trials of your simulation to get an average of different drives seeds before drawing conclusions.
+# .. warning::
+#    - Always look at dipoles in conjunction with raster plots and spike
+#      histogram to avoid misinterpretation.                
+#    - Run multiple trials of your simulation to get an average of different
+#      drives seeds before drawing conclusions.
 
 ###############################################################################
 # References
