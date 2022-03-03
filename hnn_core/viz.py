@@ -284,13 +284,16 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     return ax.get_figure()
 
 
-def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
+def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
+                     show=True):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
     ----------
     cell_response : instance of CellResponse
         The CellResponse object from net.cell_response
+    trial_idx : int | list of int | None
+        Index of trials to be plotted. If None, all trials plotted.
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None,
         a new figure is created.
@@ -314,8 +317,26 @@ def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    spike_times = np.array(sum(cell_response._spike_times, []))
-    spike_types_data = np.array(sum(cell_response._spike_types, []))
+    n_trials = len(cell_response.spike_times)
+    if trial_idx is None:
+        trial_idx = list(range(n_trials))
+
+    _validate_type(trial_idx, (int, list), 'trial_idx', 'int, list of int')
+
+    if isinstance(trial_idx, int):
+        trial_idx = [trial_idx]
+
+    # Extract desired trials
+    if cell_response._spike_times[0]:
+        spike_times = np.concatenate(
+            np.array(cell_response._spike_times)[trial_idx])
+        spike_types_data = np.concatenate(
+            np.array(cell_response._spike_types)[trial_idx])
+    else:
+        spike_times = np.array([])
+        spike_types_data = np.array([])
+    # spike_times = np.array(sum(cell_response._spike_times, []))
+    # spike_types_data = np.array(sum(cell_response._spike_types, []))
 
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
@@ -390,11 +411,9 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     cell_response : instance of CellResponse
         The CellResponse object from net.cell_response
     trial_idx : int | list of int | None
-        Index of trials to be plotted. If None,
-        all trials plotted
+        Index of trials to be plotted. If None, all trials plotted
     ax : instance of matplotlib axis | None
-        An axis object from matplotlib. If None,
-        a new figure is created.
+        An axis object from matplotlib. If None, a new figure is created.
     show : bool
         If True, show the figure.
 
