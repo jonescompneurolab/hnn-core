@@ -382,13 +382,16 @@ def plot_spikes_hist(cell_response, ax=None, spike_types=None, show=True):
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, ax=None, show=True):
+def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
     ----------
     cell_response : instance of CellResponse
         The CellResponse object from net.cell_response
+    trial_idx : int | list of int | None
+        Index of trials to be plotted. If None,
+        all trials plotted
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None,
         a new figure is created.
@@ -402,9 +405,28 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
     """
 
     import matplotlib.pyplot as plt
-    spike_times = np.array(sum(cell_response._spike_times, []))
-    spike_types = np.array(sum(cell_response._spike_types, []))
-    spike_gids = np.array(sum(cell_response._spike_gids, []))
+    n_trials = len(cell_response.spike_times)
+    if trial_idx is None:
+        trial_idx = list(range(n_trials))
+
+    _validate_type(trial_idx, (int, list), 'trial_idx', 'int, list of int')
+
+    if isinstance(trial_idx, int):
+        trial_idx = [trial_idx]
+
+    # Extract desired trials
+    if cell_response._spike_times[0]:
+        spike_times = np.concatenate(
+            np.array(cell_response._spike_times)[trial_idx])
+        spike_types = np.concatenate(
+            np.array(cell_response._spike_types)[trial_idx])
+        spike_gids = np.concatenate(
+            np.array(cell_response._spike_gids)[trial_idx])
+    else:
+        spike_times = np.array([])
+        spike_types = np.array([])
+        spike_gids = np.array([])
+
     cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
     cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
                         'L2_pyramidal': 'g', 'L2_basket': 'w'}
@@ -425,12 +447,9 @@ def plot_spikes_raster(cell_response, ax=None, show=True):
         if cell_type_times:
             cell_type_times = np.concatenate(cell_type_times)
             cell_type_ypos = np.concatenate(cell_type_ypos)
-        else:
-            cell_type_times = []
-            cell_type_ypos = []
 
-        ax.scatter(cell_type_times, cell_type_ypos, label=cell_type,
-                   color=cell_type_colors[cell_type])
+            ax.scatter(cell_type_times, cell_type_ypos, label=cell_type,
+                       color=cell_type_colors[cell_type])
 
     ax.legend(loc=1)
     ax.set_facecolor('k')
