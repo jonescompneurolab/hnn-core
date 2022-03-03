@@ -66,7 +66,7 @@ def test_network_visualization():
                        'L5_basket', 'soma',
                        'ampa', 0.00025, 1.0, lamtha=3.0,
                        probability=0.8)
-    fig = plot_cell_connectivity(net, conn_idx)
+    fig = plot_cell_connectivity(net, conn_idx, show=False)
     ax_src, ax_target, _ = fig.axes
 
     pos = net.pos_dict['L2_pyramidal'][2]
@@ -99,17 +99,18 @@ def test_dipole_visualization():
     dpls[0].copy().savgol_filter(h_freq=30).plot(ax=axes)  # on top
 
     # test decimation options
-    plot_dipole(dpls[0], decim=2)
+    plot_dipole(dpls[0], decim=2, show=False)
     for dec in [-1, [2, 2.]]:
         with pytest.raises(ValueError,
                            match='each decimation factor must be a positive'):
-            plot_dipole(dpls[0], decim=dec)
+            plot_dipole(dpls[0], decim=dec, show=False)
 
     # test plotting multiple dipoles as overlay
-    fig = plot_dipole(dpls)
+    fig = plot_dipole(dpls, show=False)
 
     # multiple TFRs get averaged
-    fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.), n_cycles=3)
+    fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.), n_cycles=3,
+                          show=False)
 
     with pytest.raises(RuntimeError,
                        match="All dipoles must be scaled equally!"):
@@ -125,11 +126,11 @@ def test_dipole_visualization():
 
     # test cell response plotting
     with pytest.raises(TypeError, match="trial_idx must be an instance of"):
-        net.cell_response.plot_spikes_raster(trial_idx='blah')
-    net.cell_response.plot_spikes_raster(trial_idx=0)
-    net.cell_response.plot_spikes_raster(trial_idx=[0, 1])
+        net.cell_response.plot_spikes_raster(trial_idx='blah', show=False)
+    net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
+    net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
 
     with pytest.raises(TypeError, match="trial_idx must be an instance of"):
         net.cell_response.plot_spikes_hist(trial_idx='blah')
-    net.cell_response.plot_spikes_hist(trial_idx=0)
-    net.cell_response.plot_spikes_hist(trial_idx=[0, 1])
+    net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
+    net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
