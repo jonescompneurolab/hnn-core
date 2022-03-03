@@ -122,3 +122,9 @@ def test_dipole_visualization():
         dpl_sfreq = dpls[0].copy()
         dpl_sfreq.sfreq /= 10
         plot_psd([dpls[0], dpl_sfreq])
+
+    # test cell response plotting
+    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+        net.cell_response.plot_spikes_raster(trial_idx='blah')
+    net.cell_response.plot_spikes_raster(trial_idx=0)
+    net.cell_response.plot_spikes_raster(trial_idx=[0, 1])
