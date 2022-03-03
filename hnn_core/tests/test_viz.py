@@ -128,3 +128,8 @@ def test_dipole_visualization():
         net.cell_response.plot_spikes_raster(trial_idx='blah')
     net.cell_response.plot_spikes_raster(trial_idx=0)
     net.cell_response.plot_spikes_raster(trial_idx=[0, 1])
+
+    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+        net.cell_response.plot_spikes_hist(trial_idx='blah')
+    net.cell_response.plot_spikes_hist(trial_idx=0)
+    net.cell_response.plot_spikes_hist(trial_idx=[0, 1])

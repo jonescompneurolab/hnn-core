@@ -328,11 +328,9 @@ class CellResponse(object):
         Parameters
         ----------
         trial_idx : int | list of int | None
-            Index of trials to be plotted. If None,
-            all trials plotted
+            Index of trials to be plotted. If None, all trials plotted.
         ax : instance of matplotlib axis | None
-            An axis object from matplotlib. If None,
-            a new figure is created.
+            An axis object from matplotlib. If None, a new figure is created.
         show : bool
             If True, show the figure.
 
@@ -344,14 +342,16 @@ class CellResponse(object):
         return plot_spikes_raster(
             cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
 
-    def plot_spikes_hist(self, ax=None, spike_types=None, show=True):
+    def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
+                         show=True):
         """Plot the histogram of spiking activity across trials.
 
         Parameters
         ----------
+        trial_idx : int | list of int | None
+            Index of trials to be plotted. If None, all trials plotted.
         ax : instance of matplotlib axis | None
-            An axis object from matplotlib. If None,
-            a new figure is created.
+            An axis object from matplotlib. If None, a new figure is created.
         spike_types: string | list | dictionary | None
             String input of a valid spike type is plotted individually.
                 Ex: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
@@ -371,8 +371,8 @@ class CellResponse(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_spikes_hist(
-            self, ax=ax, spike_types=spike_types, show=show)
+        return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
+                                spike_types=spike_types, show=show)
 
     def write(self, fname):
         """Write spiking activity per trial to a collection of files.
