@@ -334,8 +334,6 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     else:
         spike_times = np.array([])
         spike_types_data = np.array([])
-    # spike_times = np.array(sum(cell_response._spike_times, []))
-    # spike_types_data = np.array(sum(cell_response._spike_types, []))
 
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
