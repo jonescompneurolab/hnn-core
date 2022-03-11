@@ -321,10 +321,9 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     if trial_idx is None:
         trial_idx = list(range(n_trials))
 
-    _validate_type(trial_idx, (int, list), 'trial_idx', 'int, list of int')
-
     if isinstance(trial_idx, int):
         trial_idx = [trial_idx]
+    _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
 
     # Extract desired trials
     if cell_response._spike_times[0]:
@@ -428,10 +427,9 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     if trial_idx is None:
         trial_idx = list(range(n_trials))
 
-    _validate_type(trial_idx, (int, list), 'trial_idx', 'int, list of int')
-
     if isinstance(trial_idx, int):
         trial_idx = [trial_idx]
+    _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
 
     # Extract desired trials
     if cell_response._spike_times[0]:
