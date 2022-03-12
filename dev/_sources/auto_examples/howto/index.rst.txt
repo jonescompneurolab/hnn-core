@@ -1,0 +1,116 @@
+
+
+.. _sphx_glr_auto_examples_howto:
+
+How to
+------
+
+These are short examples that show how to use HNN-core API to accomplish specific
+tasks.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model.">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
+    :alt: 01. Plot firing pattern
+
+  :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">01. Plot firing pattern</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular curren...">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
+    :alt: 02. Record extracellular potentials
+
+  :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">02. Record extracellular potentials</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity.">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_connectivity_thumb.png
+    :alt: 03. Modifying local connectivity
+
+  :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">03. Modifying local connectivity</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_simulate_mpi_backend_thumb.png
+    :alt: 04. Use MPI backend for parallelization
+
+  :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">04. Use MPI backend for parallelization</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the parameters of the model simulation to match an ex...">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_optimize_evoked_thumb.png
+    :alt: 05. Optimize simulated evoked response parameters
+
+  :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">05. Optimize simulated evoked response parameters</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/howto/plot_firing_pattern
+   /auto_examples/howto/plot_record_extracellular_potentials
+   /auto_examples/howto/plot_connectivity
+   /auto_examples/howto/plot_simulate_mpi_backend
+   /auto_examples/howto/optimize_evoked
+

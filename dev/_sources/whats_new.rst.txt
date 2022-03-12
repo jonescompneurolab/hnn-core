@@ -31,6 +31,9 @@ Bug
 - Evoked drive optimization no longer assigns a default timing sigma value to
   a drive if it is not already specified, by `Ryan Thorpe`_ in :gh:`446`.
 
+- Subsets of trials can be indexed when using :func:`~hnn_core.viz.plot_spikes_raster`
+  and :func:`~hnn_core.viz.plot_spikes_hist`, by `Nick Tolley`_ in :gh:`472`.
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`

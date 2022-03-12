@@ -454,14 +454,15 @@
 
         <span class="k">return</span> <span class="n">spike_rates</span></div>
 
-<div class="viewcode-block" id="CellResponse.plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spikes_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="CellResponse.plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spikes_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plot the aggregate spiking activity according to cell type.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        trial_idx : int | list of int | None</span>
+<span class="sd">            Index of trials to be plotted. If None, all trials plotted.</span>
 <span class="sd">        ax : instance of matplotlib axis | None</span>
-<span class="sd">            An axis object from matplotlib. If None,</span>
-<span class="sd">            a new figure is created.</span>
+<span class="sd">            An axis object from matplotlib. If None, a new figure is created.</span>
 <span class="sd">        show : bool</span>
 <span class="sd">            If True, show the figure.</span>
 
@@ -470,16 +471,19 @@
 <span class="sd">        fig : instance of matplotlib Figure</span>
 <span class="sd">            The matplotlib figure object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">plot_spikes_raster</span><span class="p">(</span><span class="n">cell_response</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">plot_spikes_raster</span><span class="p">(</span>
+            <span class="n">cell_response</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CellResponse.plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_hist">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="CellResponse.plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_hist">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plot the histogram of spiking activity across trials.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        trial_idx : int | list of int | None</span>
+<span class="sd">            Index of trials to be plotted. If None, all trials plotted.</span>
 <span class="sd">        ax : instance of matplotlib axis | None</span>
-<span class="sd">            An axis object from matplotlib. If None,</span>
-<span class="sd">            a new figure is created.</span>
+<span class="sd">            An axis object from matplotlib. If None, a new figure is created.</span>
 <span class="sd">        spike_types: string | list | dictionary | None</span>
 <span class="sd">            String input of a valid spike type is plotted individually.</span>
 <span class="sd">                Ex: &#39;common&#39;, &#39;evdist&#39;, &#39;evprox&#39;, &#39;extgauss&#39;, &#39;extpois&#39;</span>
@@ -499,8 +503,8 @@
 <span class="sd">        fig : instance of matplotlib Figure</span>
 <span class="sd">            The matplotlib figure handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">plot_spikes_hist</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="n">spike_types</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">plot_spikes_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                                <span class="n">spike_types</span><span class="o">=</span><span class="n">spike_types</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CellResponse.write"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Write spiking activity per trial to a collection of files.</span>

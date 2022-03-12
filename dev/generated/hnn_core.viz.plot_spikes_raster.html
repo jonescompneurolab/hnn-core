@@ -141,15 +141,16 @@
 <h1>hnn_core.viz.plot_spikes_raster<a class="headerlink" href="#hnn-core-viz-plot-spikes-raster" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_spikes_raster">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_spikes_raster" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_spikes_raster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the aggregate spiking activity according to cell type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cell_response</strong><span class="classifier">instance of CellResponse</span></dt><dd><p>The CellResponse object from net.cell_response</p>
 </dd>
-<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None,
-a new figure is created.</p>
+<dt><strong>trial_idx</strong><span class="classifier">int | list of int | None</span></dt><dd><p>Index of trials to be plotted. If None, all trials plotted</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib axis | None</span></dt><dd><p>An axis object from matplotlib. If None, a new figure is created.</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
 </dd>
