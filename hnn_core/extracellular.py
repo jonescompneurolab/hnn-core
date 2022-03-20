@@ -430,12 +430,11 @@ class ExtracellularArray:
         return fig
 
     def csd_plot(self,
-                 trial_no: int = 0,
-                 method: Literal["delta", "step", "spline",
-                                 "standard"] = "standard",
+                 trial_no=0,
+                 method="spline",
                  f_type="gaussian",
-                 filtered: bool = True,
-                 show_cb: bool = False,
+                 filtered=True,
+                 show_cb=False,
                  cmap="jet_r",
                  ax=None,
                  show=True,
@@ -444,7 +443,6 @@ class ExtracellularArray:
         """
         import icsd
         from .viz import plot_csd
-        print(kwargs)
         pos_err_info = "The X & Y coordinates should be the same."
         _xs = [i[0] for i in self.positions]
         _ys = [i[1] for i in self.positions]
@@ -453,7 +451,10 @@ class ExtracellularArray:
 
         lfp_data = plot_data * pq.V * 1E-6
         z_data = np.array([p[2] for p in self.positions]) * 1e-6 * pq.m
+        # the z_data should be monotonously increasing.
+        # default parameters used by iCSD methods below
         sigma = self.conductivity * pq.S / pq.m
+        diam = 500E-6 * pq.m  # [m]
 
         if method == "standard":
             csd_obj = icsd.StandardCSD(lfp=lfp_data,
@@ -464,13 +465,16 @@ class ExtracellularArray:
         elif method == "spline":
             csd_obj = icsd.SplineiCSD(lfp=lfp_data,
                                       coord_electrode=z_data,
+                                      diam=diam,
                                       sigma=sigma,
+                                      sigma_top=sigma,
+                                      num_steps=201,
                                       f_type=f_type,
                                       f_order=(3, 1),
                                       **kwargs)
         else:
             raise NotImplementedError(
-                "Currently only standard csd is supported")
+                "Currently only standard and spline CSD are supported")
 
         csd = csd_obj.get_csd()
         if filtered:

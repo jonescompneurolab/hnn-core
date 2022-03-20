@@ -1047,10 +1047,10 @@ def plot_csd(csd,
              method,
              filtered,
              show_cb=True,
-             cmap="brw",
+             cmap="bwr",
              ax=None,
              show=True):
-    """Plot synaptic weight of connections.
+    """Plot CSD.
 
     TODO: add other plotting parameters, e.g., colormaps.
     Parameters
