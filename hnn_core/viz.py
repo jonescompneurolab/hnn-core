@@ -269,7 +269,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
             if i == len(dpls) - 1:
                 # the last one (average dpl) or the single dpl
-                ax.plot(times, data, color="green")
+                ax.plot(times, data, color=color)
             else:
                 ax.plot(times, data, color="gray")
 
