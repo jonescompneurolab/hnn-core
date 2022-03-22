@@ -217,7 +217,7 @@ def plot_dipole(dpl,
                 decim=None,
                 color=None,
                 average=True,
-                individual_alpha=0.5,
+                alpha=0.5,
                 linewidth=1.5,
                 show=True):
     """Simple layer-specific plot function.
@@ -244,7 +244,7 @@ def plot_dipole(dpl,
         RGBA value to use for plotting (optional)
     average : bool
         If True, render the average across all dpls.
-    individual_alpha : float
+    alpha : float
         The alpha value of individual dpls.
     linewidth : float
         The width of dpl lines.
@@ -265,7 +265,7 @@ def plot_dipole(dpl,
     if isinstance(dpl, Dipole):
         dpl = [dpl]
         average = False
-        individual_alpha = 1
+        alpha = 1
     else:
         # add average plot when we have dpl>1 and `average` is specified.
         if average:
@@ -293,11 +293,7 @@ def plot_dipole(dpl,
                         label="average",
                         lw=linewidth * 1.5)
             else:
-                ax.plot(times,
-                        data,
-                        color="gray",
-                        alpha=individual_alpha,
-                        lw=linewidth)
+                ax.plot(times, data, color="gray", alpha=alpha, lw=linewidth)
     if average:
         ax.legend()
 
