@@ -242,16 +242,19 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    from .dipole import Dipole
+    from .dipole import Dipole, average_dipoles
 
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     if isinstance(dpl, Dipole):
-        dpl = [dpl]
+        dpls = [dpl]
+    else:
+        # add average plot only when we have  trials>1.
+        dpls = dpl + [average_dipoles(dpl)]
 
-    scale_applied = dpl[0].scale_applied
-    for dpl_trial in dpl:
+    scale_applied = dpls[0].scale_applied
+    for i, dpl_trial in enumerate(dpls):
         if dpl_trial.scale_applied != scale_applied:
             raise RuntimeError('All dipoles must be scaled equally!')
 
@@ -259,12 +262,16 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
             # extract scaled data and times
             data, times = _get_plot_data_trange(dpl_trial.times,
-                                                dpl_trial.data[layer],
-                                                tmin, tmax)
+                                                dpl_trial.data[layer], tmin,
+                                                tmax)
             if decim is not None:
                 data, times = _decimate_plot_data(decim, data, times)
 
-            ax.plot(times, data, color=color)
+            if i == len(dpls) - 1:
+                # the last one (average dpl) or the single dpl
+                ax.plot(times, data, color="green")
+            else:
+                ax.plot(times, data, color="gray")
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
