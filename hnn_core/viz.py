@@ -209,8 +209,17 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
     return ax.get_figure()
 
 
-def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color=None, show=True):
+def plot_dipole(dpl,
+                tmin=None,
+                tmax=None,
+                ax=None,
+                layer='agg',
+                decim=None,
+                color=None,
+                average=True,
+                individual_alpha=0.5,
+                linewidth=1.5,
+                show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -233,6 +242,12 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         ints can be provided. These are applied successively.
     color : tuple of float
         RGBA value to use for plotting (optional)
+    average : bool
+        If True, render the average across all dpls.
+    individual_alpha : float
+        The alpha value of individual dpls.
+    linewidth : float
+        The width of dpl lines.
     show : bool
         If True, show the figure
 
@@ -248,13 +263,16 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     if isinstance(dpl, Dipole):
-        dpls = [dpl]
+        dpl = [dpl]
+        average = False
+        individual_alpha = 1
     else:
-        # add average plot only when we have  trials>1.
-        dpls = dpl + [average_dipoles(dpl)]
+        # add average plot when we have dpl>1 and `average` is specified.
+        if average:
+            dpl = dpl + [average_dipoles(dpl)]
 
-    scale_applied = dpls[0].scale_applied
-    for i, dpl_trial in enumerate(dpls):
+    scale_applied = dpl[0].scale_applied
+    for idx, dpl_trial in enumerate(dpl):
         if dpl_trial.scale_applied != scale_applied:
             raise RuntimeError('All dipoles must be scaled equally!')
 
@@ -267,11 +285,21 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
             if decim is not None:
                 data, times = _decimate_plot_data(decim, data, times)
 
-            if i == len(dpls) - 1:
+            if idx == len(dpl) - 1 and average:
                 # the last one (average dpl) or the single dpl
-                ax.plot(times, data, color=color)
+                ax.plot(times,
+                        data,
+                        color=color,
+                        label="average",
+                        lw=linewidth * 1.5)
             else:
-                ax.plot(times, data, color="gray")
+                ax.plot(times,
+                        data,
+                        color="gray",
+                        alpha=individual_alpha,
+                        lw=linewidth)
+    if average:
+        ax.legend()
 
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
     ax.set_xlabel('Time (ms)')
