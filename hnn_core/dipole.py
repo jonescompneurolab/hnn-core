@@ -151,6 +151,8 @@ def average_dipoles(dpls):
         )
     avg_data = np.c_[avg_data].T
     avg_dpl = Dipole(dpls[0].times, avg_data)
+    # The averaged scale should equal all scals in the input dpl list.
+    avg_dpl.scale_applied = dpls[0].scale_applied
 
     # set nave to the number of trials averaged in this dipole
     avg_dpl.nave = len(dpls)
