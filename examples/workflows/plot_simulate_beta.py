@@ -1,6 +1,6 @@
 """
 ===============================
-05. Simulate beta modulated ERP
+05. Simulate beta modulated ERP 
 ===============================
 
 This example demonstrates how event related potentials (ERP) are modulated
