@@ -256,7 +256,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     if isinstance(dpl, Dipole):
         dpl = [dpl]
         average = False
-        alpha = 1
     else:
         # add average plot when we have dpl>1 and `average` is specified.
         if average:
