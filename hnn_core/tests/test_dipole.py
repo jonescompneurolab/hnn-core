@@ -49,6 +49,12 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
         assert_allclose(dipole_read.data[dpl_key],
                         dipole.data[dpl_key], rtol=0, atol=0.000051)
 
+    # dpls with different scale_applied should not be averaged.
+    with pytest.raises(RuntimeError, match="All dipoles must be scaled equally"
+                       "!"):
+        dipole_avg = average_dipoles([dipole, dipole_read])
+    # force the scale_applied to be identical across dpls to allow averaging.
+    dipole.scale_applied = dipole_read.scale_applied
     # average two identical dipole objects
     dipole_avg = average_dipoles([dipole, dipole_read])
     for dpl_key in dipole_avg.data.keys():
