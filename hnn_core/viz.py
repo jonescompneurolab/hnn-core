@@ -280,7 +280,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                         label="average",
                         lw=linewidth * 1.5)
             else:
-                ax.plot(times, data, color="gray", alpha=0.5, lw=linewidth)
+                alpha = 0.5 if average else 1.
+                ax.plot(times, data, color=color, alpha=alpha, lw=linewidth)
     if average:
         ax.legend()
 
