@@ -210,7 +210,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color=None, average=False, show=True):
+                color='k', average=False, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -232,7 +232,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
     color : tuple of float
-        RGBA value to use for plotting (optional)
+        RGBA value to use for plotting. By default, 'k' (black)
     average : bool
         If True, render the average across all dpls.
     show : bool
@@ -251,10 +251,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     if isinstance(dpl, Dipole):
         dpl = [dpl]
-    else:
-        dpl = dpl + [average_dipoles(dpl)]
+    dpl = dpl + [average_dipoles(dpl)]
 
-    linewidth = 1.5
     scale_applied = dpl[0].scale_applied
     for idx, dpl_trial in enumerate(dpl):
         if dpl_trial.scale_applied != scale_applied:
@@ -270,15 +268,12 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                 data, times = _decimate_plot_data(decim, data, times)
 
             if idx == len(dpl) - 1 and average:
-                # the last one (average dpl)
-                ax.plot(times,
-                        data,
-                        color='g',
-                        label="average",
-                        lw=linewidth * 1.5)
+                # the average dpl
+                ax.plot(times, data, color='g', label="average", lw=1.5)
             else:
                 alpha = 0.5 if average else 1.
-                ax.plot(times, data, color=color, alpha=alpha, lw=linewidth)
+                ax.plot(times, data, color=color, alpha=alpha, lw=1.)
+
     if average:
         ax.legend()
 
