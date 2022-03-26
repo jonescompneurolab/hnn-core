@@ -210,7 +210,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color=None, average=True, show=True):
+                color=None, average=False, show=True):
     """Simple layer-specific plot function.
 
     Parameters
