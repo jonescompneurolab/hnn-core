@@ -252,7 +252,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     if isinstance(dpl, Dipole):
         dpl = [dpl]
     else:
-        if average:
             dpl = dpl + [average_dipoles(dpl)]
 
     linewidth = 1.5
