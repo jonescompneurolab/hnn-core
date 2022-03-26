@@ -210,7 +210,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color=None, average=True, alpha=0.5, linewidth=1.5, show=True):
+                color=None, average=True, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -235,10 +235,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         RGBA value to use for plotting (optional)
     average : bool
         If True, render the average across all dpls.
-    alpha : float
-        The alpha value of individual dpls.
-    linewidth : float
-        The width of dpl lines.
     show : bool
         If True, show the figure
 
@@ -261,6 +257,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         if average:
             dpl = dpl + [average_dipoles(dpl)]
 
+    linewidth = 1.5
     scale_applied = dpl[0].scale_applied
     for idx, dpl_trial in enumerate(dpl):
         if dpl_trial.scale_applied != scale_applied:
@@ -283,7 +280,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                         label="average",
                         lw=linewidth * 1.5)
             else:
-                ax.plot(times, data, color="gray", alpha=alpha, lw=linewidth)
+                ax.plot(times, data, color="gray", alpha=0.5, lw=linewidth)
     if average:
         ax.legend()
 

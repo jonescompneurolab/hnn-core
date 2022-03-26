@@ -34,6 +34,9 @@ Bug
 - Subsets of trials can be indexed when using :func:`~hnn_core.viz.plot_spikes_raster`
   and :func:`~hnn_core.viz.plot_spikes_hist`, by `Nick Tolley`_ in :gh:`472`.
 
+- Add option to plot the averaged dipole in `~hnn_core.viz.plot_dipole` when `dpl` is a list of dipoles, 
+  by `Huzi Cheng`_ in :gh:`475`.
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
