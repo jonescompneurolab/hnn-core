@@ -276,7 +276,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                 # the last one (average dpl)
                 ax.plot(times,
                         data,
-                        color=color,
+                        color='g',
                         label="average",
                         lw=linewidth * 1.5)
             else:
