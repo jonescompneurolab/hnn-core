@@ -265,7 +265,10 @@
 <span class="sd">        A new dipole object with each component of `dpl.data` representing the</span>
 <span class="sd">        average over the same components in the input list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scale_applied</span> <span class="o">=</span> <span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scale_applied</span>
     <span class="k">for</span> <span class="n">dpl_idx</span><span class="p">,</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dpls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dpl</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">!=</span> <span class="n">scale_applied</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;All dipoles must be scaled equally!&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;All elements in the list should be instances of &quot;</span>
@@ -283,6 +286,8 @@
         <span class="p">)</span>
     <span class="n">avg_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">avg_data</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
     <span class="n">avg_dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">avg_data</span><span class="p">)</span>
+    <span class="c1"># The averaged scale should equal all scals in the input dpl list.</span>
+    <span class="n">avg_dpl</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">=</span> <span class="n">scale_applied</span>
 
     <span class="c1"># set nave to the number of trials averaged in this dipole</span>
     <span class="n">avg_dpl</span><span class="o">.</span><span class="n">nave</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls</span><span class="p">)</span>
@@ -519,7 +524,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="Dipole.plot"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+             <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Simple layer-specific plot function.</span>
 
 <span class="sd">        Parameters</span>
@@ -535,7 +540,7 @@
 <span class="sd">        ax : instance of matplotlib figure | None</span>
 <span class="sd">            The matplotlib axis</span>
 <span class="sd">        color : tuple of float</span>
-<span class="sd">            RGBA value to use for plotting (optional)</span>
+<span class="sd">            RGBA value to use for plotting. By default, &#39;k&#39; (black)</span>
 <span class="sd">        show : bool</span>
 <span class="sd">            If True, show the figure</span>
 
@@ -737,7 +742,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
     </p>
   </div>
 </footer>

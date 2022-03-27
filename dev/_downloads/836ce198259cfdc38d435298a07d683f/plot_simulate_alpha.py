@@ -74,10 +74,9 @@ dpl_smooth = dpl[trial_idx].copy().smooth(window_len)
 
 # Overlay the traces for comparison. The function plot_dipole can plot a list
 # of dipoles at once
-dpl_list = [dpl[trial_idx], dpl_smooth]
-plot_dipole(dpl_list, tmin=tmin, tmax=tmax, ax=axes[0], show=False)
+dpl[trial_idx].plot(tmin=tmin, tmax=tmax, color='b', ax=axes[0], show=False)
+dpl_smooth.plot(tmin=tmin, tmax=tmax, color='r', ax=axes[0], show=False)
 axes[0].set_xlim((1, 399))
-axes[0].legend(['orig', 'smooth'])
 
 plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False)
 axes[1].set_xscale('log')
@@ -112,8 +111,8 @@ net.cell_response.plot_spikes_hist(ax=axes[0])
 smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 
 # Note that using the ``plot_*``-functions are available as ``Dipole``-methods:
-dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[1], show=False)
-smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[1], show=False)
+dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[1], color='b', show=False)
+smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[1], color='r', show=False)
 
 dpl[trial_idx].plot_psd(fmin=0., fmax=40., tmin=tmin, ax=axes[2])
 plt.tight_layout()

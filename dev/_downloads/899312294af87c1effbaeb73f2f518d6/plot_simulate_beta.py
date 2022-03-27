@@ -178,7 +178,7 @@ fig, axes = plt.subplots(4, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
 net_beta.cell_response.plot_spikes_hist(ax=axes[0], show=False)
 axes[0].set_title('Beta Event Generation')
-plot_dipole(dpls_beta, ax=axes[1], layer='agg', tmin=1.0, show=False)
+plot_dipole(dpls_beta, ax=axes[1], layer='agg', tmin=1.0, color='b', show=False)
 net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
 axes[2].set_title('Spike Raster')
 
@@ -194,7 +194,8 @@ dpls_beta[0].plot_tfr_morlet(freqs, n_cycles=7, ax=axes[3])
 dpls_beta_erp[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
-plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, show=False)
+plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, color='r',
+            show=False)
 axes[0].set_title('Beta Event + ERP')
 net_beta_erp.cell_response.plot_spikes_hist(ax=axes[1], show=False)
 axes[1].set_title('Input Drives Histogram')
@@ -210,8 +211,9 @@ axes[2].set_title('Spike Raster')
 dpls_erp[0].smooth(45)
 fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
                          constrained_layout=True)
-plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, show=False)
-plot_dipole(dpls_erp, ax=axes[0], layer='agg', tmin=1.0, show=False)
+plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, color='r',
+            show=False)
+plot_dipole(dpls_erp, ax=axes[0], layer='agg', tmin=1.0, color='b', show=False)
 axes[0].set_title('Beta ERP Comparison')
 axes[0].legend(['ERP + Beta', 'ERP'])
 net_beta_erp.cell_response.plot_spikes_raster(ax=axes[1], show=False)

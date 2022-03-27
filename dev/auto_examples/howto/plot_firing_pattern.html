@@ -272,7 +272,7 @@ Note that we can use formatting syntax to specify the filename pattern
 with which each trial will be written (‘spk_1.txt’, ‘spk_2.txt, …). To
 read spikes back in, we can use wildcard expressions.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">()</span>
-<span class="k">with</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory" title="tempfile.TemporaryDirectory" class="sphx-glr-backref-module-tempfile sphx-glr-backref-type-py-function"><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span></a><span class="p">()</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp_dir_name</span></a><span class="p">:</span>
+<span class="k">with</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory" title="tempfile.TemporaryDirectory" class="sphx-glr-backref-module-tempfile sphx-glr-backref-type-py-class"><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span></a><span class="p">()</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp_dir_name</span></a><span class="p">:</span>
     <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.write" title="hnn_core.CellResponse.write" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">write</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp_dir_name</span></a><span class="p">,</span> <span class="s1">&#39;spk_</span><span class="si">%d</span><span class="s1">.txt&#39;</span><span class="p">))</span>
     <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cell_response</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_spikes</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp_dir_name</span></a><span class="p">,</span> <span class="s1">&#39;spk_*.txt&#39;</span><span class="p">))</span>
 <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">()</span>
@@ -282,7 +282,7 @@ read spikes back in, we can use wildcard expressions.</p>
 <li><img src="../../_images/sphx_glr_plot_firing_pattern_002.png" srcset="../../_images/sphx_glr_plot_firing_pattern_002.png" alt="plot firing pattern" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_plot_firing_pattern_003.png" srcset="../../_images/sphx_glr_plot_firing_pattern_003.png" alt="plot firing pattern" class = "sphx-glr-multi-img"/></li>
 </ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Writing file /tmp/tmpvnm8a6_m/spk_0.txt
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Writing file /tmp/tmpeoi9yvip/spk_0.txt
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
@@ -325,7 +325,7 @@ raster plots and histograms for the pyramidal cells.</p>
 <img src="../../_images/sphx_glr_plot_firing_pattern_004.png" srcset="../../_images/sphx_glr_plot_firing_pattern_004.png" alt="plot firing pattern" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 500x700 with 3 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  1.474 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  55.556 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-firing-pattern-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_firing_pattern.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
@@ -353,7 +353,7 @@ raster plots and histograms for the pyramidal cells.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
     </p>
   </div>
 </footer>
