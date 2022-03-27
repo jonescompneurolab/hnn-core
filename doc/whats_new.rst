@@ -303,6 +303,7 @@ People who contributed to this release (in alphabetical order):
 .. _Christopher Bailey: https://github.com/cjayb
 .. _Carmen Kohl: https://github.com/kohl-carmen
 .. _Dylan Daniels: https://github.com/dylansdaniels
+.. _Huzi Cheng: https://github.com/chenghuzi
 .. _Kenneth Loi: https://github.com/kenloi
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Nick Tolley: https://github.com/ntolley
