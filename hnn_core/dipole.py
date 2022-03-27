@@ -133,7 +133,10 @@ def average_dipoles(dpls):
         A new dipole object with each component of `dpl.data` representing the
         average over the same components in the input list
     """
+    scale_applied = dpls[0].scale_applied
     for dpl_idx, dpl in enumerate(dpls):
+        if dpl.scale_applied != scale_applied:
+            raise RuntimeError('All dipoles must be scaled equally!')
         if not isinstance(dpl, Dipole):
             raise ValueError(
                 f"All elements in the list should be instances of "
@@ -151,6 +154,8 @@ def average_dipoles(dpls):
         )
     avg_data = np.c_[avg_data].T
     avg_dpl = Dipole(dpls[0].times, avg_data)
+    # The averaged scale should equal all scals in the input dpl list.
+    avg_dpl.scale_applied = scale_applied
 
     # set nave to the number of trials averaged in this dipole
     avg_dpl.nave = len(dpls)
@@ -387,7 +392,7 @@ class Dipole(object):
         return self
 
     def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             color=None, show=True):
+             color='k', show=True):
         """Simple layer-specific plot function.
 
         Parameters
@@ -403,7 +408,7 @@ class Dipole(object):
         ax : instance of matplotlib figure | None
             The matplotlib axis
         color : tuple of float
-            RGBA value to use for plotting (optional)
+            RGBA value to use for plotting. By default, 'k' (black)
         show : bool
             If True, show the figure
 

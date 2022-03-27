@@ -108,6 +108,9 @@ def test_dipole_visualization():
     # test plotting multiple dipoles as overlay
     fig = plot_dipole(dpls, show=False)
 
+    # test plotting multiple dipoles with average
+    fig = plot_dipole(dpls, average=True, show=False)
+
     # multiple TFRs get averaged
     fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.), n_cycles=3,
                           show=False)
