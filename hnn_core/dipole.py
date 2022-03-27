@@ -392,7 +392,7 @@ class Dipole(object):
         return self
 
     def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             color=None, show=True):
+             color='k', show=True):
         """Simple layer-specific plot function.
 
         Parameters
@@ -408,7 +408,7 @@ class Dipole(object):
         ax : instance of matplotlib figure | None
             The matplotlib axis
         color : tuple of float
-            RGBA value to use for plotting (optional)
+            RGBA value to use for plotting. By default, 'k' (black)
         show : bool
             If True, show the figure
 
