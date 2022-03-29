@@ -427,7 +427,7 @@ def _get_drive_params(net, drive_names):
 def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
-                    scale_factor=1., smooth_window_len=None, dt=0.025):
+                    scale_factor=1., smooth_window_len=None, dt=0.025, which_drives='all'):
     """Optimize drives to generate evoked response.
 
     Parameters
@@ -464,6 +464,9 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
         simulated dipole waveform in each optimization step.
     dt : float
         The integration time step (ms) of h.CVode during simulation.
+    which_drives: 'all' or list
+        Evoked drives to optimize. If 'all', will opimize all evoked drives.
+        If a subset list of evoked drives, will optimize only the evoked drives in the list.
 
     Returns
     -------
@@ -480,8 +483,12 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
 
     net = net.copy()
 
-    drive_names = [key for key in net.external_drives.keys()
-                   if net.external_drives[key]['type'] == 'evoked']
+    if which_drives == 'all':
+        drive_names = [key for key in net.external_drives.keys()
+                       if net.external_drives[key]['type'] == 'evoked']
+    else:
+        drive_names = [key for key in net.external_drives.keys()
+                       if net.external_drives[key]['type'] == 'evoked' and key in which_drives]
     if len(drive_names) == 0:
         raise ValueError('The current Network instance lacks any evoked '
                          'drives. Consider adding drives using '
