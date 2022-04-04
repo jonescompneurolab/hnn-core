@@ -427,7 +427,8 @@ def _get_drive_params(net, drive_names):
 def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
-                    scale_factor=1., smooth_window_len=None, dt=0.025, which_drives='all'):
+                    scale_factor=1., smooth_window_len=None, dt=0.025,
+                    which_drives='all'):
     """Optimize drives to generate evoked response.
 
     Parameters
@@ -484,7 +485,8 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     net = net.copy()
 
     evoked_drive_names = [key for key in net.external_drives.keys()
-                       if net.external_drives[key]['type'] == 'evoked']
+                          if net.external_drives[key]['type'] == 'evoked']
+
     if len(evoked_drive_names) == 0:
         raise ValueError('The current Network instance lacks any evoked '
                          'drives. Consider adding drives using '
@@ -492,10 +494,11 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     elif which_drives == 'all':
         drive_names = evoked_drive_names
     else:
-        drive_names = [mydrive for mydrive in np.unique(which_drives) if mydrive in evoked_drive_names]
+        drive_names = [mydrive for mydrive in np.unique(which_drives)
+                       if mydrive in evoked_drive_names]
     if len(drive_names) == 0:
-        raise ValueError('The drives selected to be optimized are not evoked drives.'
-                          'Optimization works only evoked drives.')
+        raise ValueError('The drives selected to be optimized are not evoked '
+                         'drives. Optimization works only evoked drives.')
 
     drive_dynamics, drive_syn_weights, drive_static_params = \
         _get_drive_params(net, drive_names)

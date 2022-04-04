@@ -137,9 +137,10 @@ def test_optimize_evoked():
     # static drive params should remain constant
     assert drive_static_params_opt == drive_static_params_orig
 
+
 def test_optimize_evoked_selectedDrive():
-    """Test running optimzing a selected drive while parameters of other drives stay
-    the same in a reduced network."""
+    """Test running optimzing a selected drive while parameters of other drives
+    stay the same in a reduced network."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
@@ -156,7 +157,7 @@ def test_optimize_evoked_selectedDrive():
                    't_evdist_1': mu_orig + 2,
                    'sigma_t_evdist_1': 2.})
     net_orig = jones_2009_model(params, add_drives_from_params=True)
-    del net_orig.external_drives['evprox2'] # will keep evprox1 and evdist1
+    del net_orig.external_drives['evprox2']  # will keep evprox1 and evdist1
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # simulate a dipole with a time-shifted evprox1 and evdist1 drives
@@ -181,11 +182,14 @@ def test_optimize_evoked_selectedDrive():
         net_opt = optimize_evoked(net_empty, tstop=tstop, n_trials=n_trials,
                                   target_dpl=dpl_orig, initial_dpl=dpl_offset)
 
-    with pytest.raises(ValueError, match='The drives selected to be optimized are not evoked drives'):
+    with pytest.raises(ValueError, match='The drives selected to be optimized '
+                       'are not evoked drives'):
         net_testBursty = net_offset.copy()
         which_drives = ['bursty1']
-        net_opt = optimize_evoked(net_testBursty, tstop=tstop, n_trials=n_trials,
-                                  target_dpl=dpl_orig, initial_dpl=dpl_offset, which_drives=which_drives)
+        net_opt = optimize_evoked(net_testBursty, tstop=tstop,
+                                  n_trials=n_trials, target_dpl=dpl_orig,
+                                  initial_dpl=dpl_offset,
+                                  which_drives=which_drives)
 
     # run optimization only on evprox1
     which_drives = ['evprox1']
@@ -210,12 +214,12 @@ def test_optimize_evoked_selectedDrive():
     # static drive params should remain constant
     assert drive_static_params_opt == drive_static_params_orig
 
-
-    # ensure that only the drive that we wanted to optimzie over made that change, while the others were constant.  CONTINUE HERERERERERERE
-    drive_evdist1_dynamics_offset, drive_evdist1_syn_weights_offset, drive_static_params_offset = \
-        _get_drive_params(net_offset, ['evdist1'])
-    drive_evdist1_dynamics_opt, drive_evdist1_syn_weights_opt, drive_static_params_opt = \
-        _get_drive_params(net_opt, ['evdist1'])
+    # ensure that only the drive that we wanted to optimzie over changed,
+    # while the others remained unchanged.
+    drive_evdist1_dynamics_offset, drive_evdist1_syn_weights_offset,\
+        drive_static_params_offset = _get_drive_params(net_offset, ['evdist1'])
+    drive_evdist1_dynamics_opt, drive_evdist1_syn_weights_opt,\
+        drive_static_params_opt = _get_drive_params(net_opt, ['evdist1'])
 
     # assert that evdist1 did NOT change
     assert drive_evdist1_dynamics_opt == drive_evdist1_dynamics_offset
