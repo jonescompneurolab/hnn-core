@@ -181,6 +181,12 @@ def test_optimize_evoked_selectedDrive():
         net_opt = optimize_evoked(net_empty, tstop=tstop, n_trials=n_trials,
                                   target_dpl=dpl_orig, initial_dpl=dpl_offset)
 
+    with pytest.raises(ValueError, match='The drives selected to be optimized are not evoked drives'):
+        net_testBursty = net_offset.copy()
+        which_drives = ['bursty1']
+        net_opt = optimize_evoked(net_testBursty, tstop=tstop, n_trials=n_trials,
+                                  target_dpl=dpl_orig, initial_dpl=dpl_offset, which_drives=which_drives)
+
     # run optimization only on evprox1
     which_drives = ['evprox1']
     net_opt = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
