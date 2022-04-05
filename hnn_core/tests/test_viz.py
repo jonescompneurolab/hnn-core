@@ -116,6 +116,7 @@ def test_dipole_visualization():
     # test plotting dipoles with multiple layers
     fig, ax = plt.subplots()
     fig = plot_dipole(dpls, show=False, ax=[ax], layer=['L2'])
+    fig = plot_dipole(dpls, show=False, layer=['L2', 'L5', 'agg'])
     fig, axes = plt.subplots(nrows=3, ncols=1)
     fig = plot_dipole(dpls, show=False, ax=axes, layer=['L2', 'L5', 'agg'])
     fig, axes = plt.subplots(nrows=3, ncols=1)
@@ -123,11 +124,6 @@ def test_dipole_visualization():
                       show=False,
                       ax=[axes[0], axes[1], axes[2]],
                       layer=['L2', 'L5', 'agg'])
-
-    with pytest.raises(
-            AssertionError,
-            match="When passing list to layer, ax should also be a list"):
-        fig = plot_dipole(dpls, show=False, layer=['L2', 'L5', 'agg'])
 
     with pytest.raises(AssertionError,
                        match="ax and layer should have the same size"):

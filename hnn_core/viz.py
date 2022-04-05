@@ -246,8 +246,10 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     import matplotlib.pyplot as plt
     from .dipole import Dipole, average_dipoles
 
+    layers = layer if isinstance(layer, list) else [layer]
     if ax is None:
-        _, ax = plt.subplots(1, 1, constrained_layout=True)
+        _, ax = plt.subplots(len(layers), 1, constrained_layout=True)
+    axes = ax if isinstance(ax, (list, np.ndarray)) else [ax]
 
     if isinstance(dpl, Dipole):
         dpl = [dpl]
@@ -255,55 +257,49 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         dpl = dpl + [average_dipoles(dpl)]
 
     scale_applied = dpl[0].scale_applied
-    if isinstance(layer, str):
-        layer = [layer]
-        ax = [ax]
-    else:
-        assert isinstance(layer, list) and isinstance(
-            ax, (list, np.ndarray
-                 )), "When passing list to layer, ax should also be a list"
-        assert len(layer) == len(ax), "ax and layer should have the same size"
 
-    for _layer, _ax in zip(layer, ax):
+    assert len(layers) == len(axes), "ax and layer should have the same size"
+
+    for layer, ax in zip(layers, axes):
         for idx, dpl_trial in enumerate(dpl):
             if dpl_trial.scale_applied != scale_applied:
                 raise RuntimeError('All dipoles must be scaled equally!')
 
-            if _layer in dpl_trial.data.keys():
+            if layer in dpl_trial.data.keys():
 
                 # extract scaled data and times
                 data, times = _get_plot_data_trange(dpl_trial.times,
-                                                    dpl_trial.data[_layer],
+                                                    dpl_trial.data[layer],
                                                     tmin, tmax)
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
 
                 if idx == len(dpl) - 1 and average:
                     # the average dpl
-                    _ax.plot(times, data, color='g', label="average", lw=1.5)
+                    ax.plot(times, data, color='g', label="average", lw=1.5)
                 else:
                     alpha = 0.5 if average else 1.
-                    _ax.plot(times, data, color=color, alpha=alpha, lw=1.)
+                    ax.plot(times, data, color=color, alpha=alpha, lw=1.)
 
         if average:
-            _ax.legend()
+            ax.legend()
 
-        _ax.ticklabel_format(axis='both', scilimits=(-2, 3))
-        _ax.set_xlabel('Time (ms)')
+        ax.ticklabel_format(axis='both', scilimits=(-2, 3))
+        ax.set_xlabel('Time (ms)')
         if scale_applied == 1:
             ylabel = 'Dipole moment (nAm)'
         else:
             ylabel = 'Dipole moment\n(nAm ' +\
                 r'$\times$ {:.0f})'.format(scale_applied)
-        _ax.set_ylabel(ylabel, multialignment='center')
-        if _layer == 'agg':
+        ax.set_ylabel(ylabel, multialignment='center')
+        if layer == 'agg':
             title_str = 'Aggregate (L2 + L5)'
         else:
-            title_str = _layer
-        _ax.set_title(title_str)
+            title_str = layer
+        ax.set_title(title_str)
 
     plt_show(show)
-    return ax[0].get_figure()
+    return axes[0].get_figure()
 
 
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
