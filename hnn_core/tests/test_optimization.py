@@ -90,10 +90,12 @@ def test_optimize_evoked():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    't_evprox_1': mu_orig,
-                   'sigma_t_evprox_1': 2.})
+                   'sigma_t_evprox_1': 2.,
+                   't_evdist_1': mu_orig + 2,
+                   'sigma_t_evdist_1': 2.})
     net_orig = jones_2009_model(params, add_drives_from_params=True)
     del net_orig.external_drives['evprox2']
-    del net_orig.external_drives['evdist1']
+    # del net_orig.external_drives['evdist1']
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # simulate a dipole with a time-shifted drive
@@ -101,10 +103,12 @@ def test_optimize_evoked():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3,
                    't_evprox_1': mu_offset,
-                   'sigma_t_evprox_1': 2.})
+                   'sigma_t_evprox_1': 2.,
+                   't_evdist_1': mu_offset + 2,
+                   'sigma_t_evdist_1': 2.})
     net_offset = jones_2009_model(params, add_drives_from_params=True)
     del net_offset.external_drives['evprox2']
-    del net_offset.external_drives['evdist1']
+    # del net_offset.external_drives['evdist1']
     dpl_offset = simulate_dipole(net_offset, tstop=tstop, n_trials=n_trials)[0]
     # get drive params from the pre-optimization Network instance
     _, _, drive_static_params_orig = _get_drive_params(net_offset, ['evprox1'])
@@ -113,15 +117,26 @@ def test_optimize_evoked():
                        'any evoked drives'):
         net_empty = net_offset.copy()
         del net_empty.external_drives['evprox1']
+        del net_empty.external_drives['evdist1']
         net_opt = optimize_evoked(net_empty, tstop=tstop, n_trials=n_trials,
                                   target_dpl=dpl_orig, initial_dpl=dpl_offset)
 
+    with pytest.raises(ValueError, match='The drives selected to be optimized '
+                       'are not evoked drives'):
+        net_testBursty = net_offset.copy()
+        which_drives = ['bursty1']
+        net_opt = optimize_evoked(net_testBursty, tstop=tstop,
+                                  n_trials=n_trials, target_dpl=dpl_orig,
+                                  initial_dpl=dpl_offset,
+                                  which_drives=which_drives)
+
+    which_drives = ['evprox1']  # drive selected to optimize
     net_opt = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
                               target_dpl=dpl_orig, initial_dpl=dpl_offset,
                               timing_range_multiplier=3.,
                               sigma_range_multiplier=50.,
                               synweight_range_multiplier=500.,
-                              maxiter=10)
+                              maxiter=10, which_drives=which_drives)
 
     # the names of drives should be preserved during optimization
     assert net_offset.external_drives.keys() == net_opt.external_drives.keys()
@@ -136,6 +151,17 @@ def test_optimize_evoked():
 
     # static drive params should remain constant
     assert drive_static_params_opt == drive_static_params_orig
+
+    # ensure that only the drive that we wanted to optimzie over changed,
+    # while the other remained unchanged.
+    drive_evdist1_dynamics_offset, drive_evdist1_syn_weights_offset,\
+        drive_static_params_offset = _get_drive_params(net_offset, ['evdist1'])
+    drive_evdist1_dynamics_opt, drive_evdist1_syn_weights_opt,\
+        drive_static_params_opt = _get_drive_params(net_opt, ['evdist1'])
+
+    # assert that evdist1 did NOT change
+    assert drive_evdist1_dynamics_opt == drive_evdist1_dynamics_offset
+    assert drive_evdist1_syn_weights_opt == drive_evdist1_syn_weights_offset
 
 
 def test_optimize_evoked_selectedDrive():
