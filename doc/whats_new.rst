@@ -12,6 +12,9 @@ Current
 
 Changelog
 ~~~~~~~~~
+- Ability to select which drives to optimize for event related potentials. 
+  :ref:`[Example] <sphx_glr_auto_examples_howto_plot_optimize_evoked.py>`
+
 
 Bug
 ~~~
@@ -55,8 +58,7 @@ Notable Changes
 - Local field potentials can now be recorded during simulations 
   :ref:`[Example] <sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py>`
 
-- Ability to optimize parameters to reproduce event related potentials from real data,
-  with the option of selecting which drives to optimize
+- Ability to optimize parameters to reproduce event related potentials from real data.
   :ref:`[Example] <sphx_glr_auto_examples_howto_plot_optimize_evoked.py>`
 
 - Published models using HNN were added and can be loaded via dedicated functions
