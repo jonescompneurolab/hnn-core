@@ -117,7 +117,8 @@ def test_optimize_evoked():
         del net_empty.external_drives['evprox1']
         del net_empty.external_drives['evdist1']
         net_opt = optimize_evoked(net_empty, tstop=tstop, n_trials=n_trials,
-                                  target_dpl=dpl_orig, initial_dpl=dpl_offset)
+                                  target_dpl=dpl_orig, initial_dpl=dpl_offset,
+                                  maxiter=10)
 
     with pytest.raises(ValueError, match='The drives selected to be optimized '
                        'are not evoked drives'):
@@ -126,7 +127,7 @@ def test_optimize_evoked():
         net_opt = optimize_evoked(net_test_bursty, tstop=tstop,
                                   n_trials=n_trials, target_dpl=dpl_orig,
                                   initial_dpl=dpl_offset,
-                                  which_drives=which_drives)
+                                  which_drives=which_drives, maxiter=10)
 
     which_drives = ['evprox1']  # drive selected to optimize
     net_opt = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
