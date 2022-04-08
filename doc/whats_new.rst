@@ -58,7 +58,7 @@ Notable Changes
 - Local field potentials can now be recorded during simulations 
   :ref:`[Example] <sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py>`
 
-- Ability to optimize parameters to reproduce event related potentials from real data.
+- Ability to optimize parameters to reproduce event related potentials from real data
   :ref:`[Example] <sphx_glr_auto_examples_howto_plot_optimize_evoked.py>`
 
 - Published models using HNN were added and can be loaded via dedicated functions
