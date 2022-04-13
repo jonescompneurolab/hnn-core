@@ -296,7 +296,6 @@ People who contributed to this release (in alphabetical order):
 - `Christopher Bailey`_
 - `Carmen Kohl`_
 - `Mainak Jas`_
-- `Mohamed A. Sherif`_
 - `Nick Tolley`_
 - `Ryan Thorpe`_
 - `Samika Kanekar`_
