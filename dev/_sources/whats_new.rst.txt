@@ -12,6 +12,9 @@ Current
 
 Changelog
 ~~~~~~~~~
+- Add option to select drives using argument 'which_drives' in
+  :func:`~hnn_core.optimization.optimize_evoked`, by `Mohamed A. Sherif`_ in :gh:`478`.
+
 
 Bug
 ~~~
@@ -55,7 +58,7 @@ Notable Changes
 - Local field potentials can now be recorded during simulations 
   :ref:`[Example] <sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py>`
 
-- Ability to optimize parameters to reproduce event related potentials from real data 
+- Ability to optimize parameters to reproduce event related potentials from real data
   :ref:`[Example] <sphx_glr_auto_examples_howto_plot_optimize_evoked.py>`
 
 - Published models using HNN were added and can be loaded via dedicated functions
@@ -306,6 +309,7 @@ People who contributed to this release (in alphabetical order):
 .. _Huzi Cheng: https://github.com/chenghuzi
 .. _Kenneth Loi: https://github.com/kenloi
 .. _Mainak Jas: http://jasmainak.github.io/
+.. _Mohamed A. Sherif: https://github.com/mohdsherif/
 .. _Nick Tolley: https://github.com/ntolley
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane

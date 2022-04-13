@@ -88,8 +88,8 @@ with MPIBackend(n_procs=n_procs):
 
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
-exp_dpl.plot(ax=axes[0], layer='agg', show=False)
-initial_dpl.plot(ax=axes[0], layer='agg', show=False)
-best_dpl.plot(ax=axes[0], layer='agg', show=False)
+exp_dpl.plot(ax=axes[0], layer='agg', show=False, color='tab:blue')
+initial_dpl.plot(ax=axes[0], layer='agg', show=False, color='tab:orange')
+best_dpl.plot(ax=axes[0], layer='agg', show=False, color='tab:green')
 axes[0].legend(['experimental', 'initial', 'optimized'])
 net_opt.cell_response.plot_spikes_hist(ax=axes[1])
