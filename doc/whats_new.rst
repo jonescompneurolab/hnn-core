@@ -12,8 +12,8 @@ Current
 
 Changelog
 ~~~~~~~~~
-- Ability to select which drives to optimize for event related potentials. 
-  :ref:`[Example] <sphx_glr_auto_examples_howto_plot_optimize_evoked.py>`
+- Add option to select drives using argument 'which_drives' in
+  :func:`~hnn_core.optimization.optimize_evoked`, by `Mohamed A. Sherif`_ in :gh:`478`.
 
 
 Bug
@@ -296,6 +296,7 @@ People who contributed to this release (in alphabetical order):
 - `Christopher Bailey`_
 - `Carmen Kohl`_
 - `Mainak Jas`_
+- `Mohamed A. Sherif`_
 - `Nick Tolley`_
 - `Ryan Thorpe`_
 - `Samika Kanekar`_
@@ -309,6 +310,7 @@ People who contributed to this release (in alphabetical order):
 .. _Huzi Cheng: https://github.com/chenghuzi
 .. _Kenneth Loi: https://github.com/kenloi
 .. _Mainak Jas: http://jasmainak.github.io/
+.. _Mohamed A. Sherif: https://github.com/mohdsherif/
 .. _Nick Tolley: https://github.com/ntolley
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane
