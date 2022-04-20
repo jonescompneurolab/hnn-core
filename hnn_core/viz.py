@@ -248,7 +248,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     layers = layer if isinstance(layer, list) else [layer]
     if ax is None:
-        _, ax = plt.subplots(len(layers), 1, constrained_layout=True)
+        _, ax = plt.subplots(len(layers),
+                             1,
+                             constrained_layout=True,
+                             sharex=True,
+                             sharey=True)
     axes = ax if isinstance(ax, (list, np.ndarray)) else [ax]
 
     if isinstance(dpl, Dipole):
