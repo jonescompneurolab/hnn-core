@@ -114,6 +114,14 @@ net.cell_response.plot_spikes_hist(ax=axes[1],
                                    spike_types=['evprox', 'evdist'])
 
 ###############################################################################
+# If you want to analyze how the different cortical layers contribute to
+# different net waveform features, then instead of passing ``'agg'`` to
+# ``layer``, you can provide a list of layers to be visualized and optionally
+# a list of axes to ``ax`` to visualize the dipole moments separately.
+plot_dipole(dpls, average=False, layer=['L2', 'L5', 'agg'], show=False)
+
+
+###############################################################################
 # Now, let us try to make the exogenous driving inputs to the cells
 # synchronous and see what happens. This is achieved by setting
 # ``n_drive_cells=1`` and ``cell_specific=False`` when adding each drive.
@@ -154,7 +162,7 @@ net_sync.cell_response.plot_spikes_hist()
 ###############################################################################
 # .. warning::
 #    - Always look at dipoles in conjunction with raster plots and spike
-#      histogram to avoid misinterpretation.                
+#      histogram to avoid misinterpretation.
 #    - Run multiple trials of your simulation to get an average of different
 #      drives seeds before drawing conclusions.
 

@@ -319,7 +319,7 @@ read spikes back in, we can use wildcard expressions.
 
  .. code-block:: none
 
-    Writing file /tmp/tmpmhr24kjc/spk_0.txt
+    Writing file /tmp/tmperwq748e/spk_0.txt
 
     <Figure size 640x480 with 1 Axes>
 
@@ -403,7 +403,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  2.805 seconds)
+   **Total running time of the script:** ( 0 minutes  46.515 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:

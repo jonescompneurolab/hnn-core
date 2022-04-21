@@ -48,6 +48,9 @@ API
   optimization can now consist of multiple trials over which the simulated
   dipole is averaged, by `Ryan Thorpe`_ in :gh:`446`.
 
+- `~hnn_core.viz.plot_dipole` now supports separate visualizations of different
+  layers, by `Huzi Cheng`_ in :gh:`479`.
+
 .. _0.2:
 
 0.2

@@ -262,12 +262,22 @@ operate in-place, i.e., the objects are modified.</p>
                                    <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;evprox&#39;</span><span class="p">,</span> <span class="s1">&#39;evdist&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_simulate_evoked_003.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_003.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:343: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
+<img src="../../_images/sphx_glr_plot_simulate_evoked_003.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_003.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:353: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
   np.array(cell_response._spike_times)[trial_idx])
-/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:345: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
+/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:355: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
   np.array(cell_response._spike_types)[trial_idx])
 
 &lt;Figure size 600x600 with 2 Axes&gt;
+</pre></div>
+</div>
+<p>If you want to analyze how the different cortical layers contribute to
+different net waveform features, then instead of passing <code class="docutils literal notranslate"><span class="pre">'agg'</span></code> to
+<code class="docutils literal notranslate"><span class="pre">layer</span></code>, you can provide a list of layers to be visualized and optionally
+a list of axes to <code class="docutils literal notranslate"><span class="pre">ax</span></code> to visualize the dipole moments separately.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_dipole</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">,</span> <span class="s1">&#39;L5&#39;</span><span class="p">,</span> <span class="s1">&#39;agg&#39;</span><span class="p">],</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_plot_simulate_evoked_004.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_004.png" alt="L2, L5, Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>Now, let us try to make the exogenous driving inputs to the cells
@@ -311,8 +321,8 @@ object, this time we make a copy of it before smoothing and scaling.</p>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img src="../../_images/sphx_glr_plot_simulate_evoked_004.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_004.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_simulate_evoked_005.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_005.png" alt="plot simulate evoked" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_simulate_evoked_005.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_005.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_simulate_evoked_006.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_006.png" alt="plot simulate evoked" class = "sphx-glr-multi-img"/></li>
 </ul>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>joblib will run over 1 jobs
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -358,7 +368,7 @@ drives seeds before drawing conclusions.</p></li>
 </dl>
 <p>a combined magnetoencephalography and biophysically based computational
 modeling study.” Journal of Neuroscience 27.40 (2007): 10751-10764.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  52.277 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  56.656 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>

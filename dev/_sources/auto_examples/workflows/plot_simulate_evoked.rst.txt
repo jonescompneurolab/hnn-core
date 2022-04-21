@@ -270,22 +270,54 @@ Plot the amplitudes of the simulated aggregate dipole moments over time
 
  .. code-block:: none
 
-    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:343: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:353: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
       np.array(cell_response._spike_times)[trial_idx])
-    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:345: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:355: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
       np.array(cell_response._spike_types)[trial_idx])
 
     <Figure size 600x600 with 2 Axes>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-120
+.. GENERATED FROM PYTHON SOURCE LINES 117-121
+
+If you want to analyze how the different cortical layers contribute to
+different net waveform features, then instead of passing ``'agg'`` to
+``layer``, you can provide a list of layers to be visualized and optionally
+a list of axes to ``ax`` to visualize the dipole moments separately.
+
+.. GENERATED FROM PYTHON SOURCE LINES 121-124
+
+.. code-block:: default
+
+    plot_dipole(dpls, average=False, layer=['L2', 'L5', 'agg'], show=False)
+
+
+
+
+
+.. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
+   :alt: L2, L5, Aggregate (L2 + L5)
+   :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <Figure size 640x480 with 3 Axes>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 125-128
 
 Now, let us try to make the exogenous driving inputs to the cells
 synchronous and see what happens. This is achieved by setting
 ``n_drive_cells=1`` and ``cell_specific=False`` when adding each drive.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-141
+.. GENERATED FROM PYTHON SOURCE LINES 128-149
 
 .. code-block:: default
 
@@ -317,11 +349,11 @@ synchronous and see what happens. This is achieved by setting
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-143
+.. GENERATED FROM PYTHON SOURCE LINES 150-151
 
 You may interrogate current values defining the spike event time dynamics by
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-145
+.. GENERATED FROM PYTHON SOURCE LINES 151-153
 
 .. code-block:: default
 
@@ -340,12 +372,12 @@ You may interrogate current values defining the spike event time dynamics by
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-148
+.. GENERATED FROM PYTHON SOURCE LINES 154-156
 
 Finally, let's simulate this network. Rather than modifying the dipole
 object, this time we make a copy of it before smoothing and scaling.
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-154
+.. GENERATED FROM PYTHON SOURCE LINES 156-162
 
 .. code-block:: default
 
@@ -363,16 +395,16 @@ object, this time we make a copy of it before smoothing and scaling.
 
     *
 
-      .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
+      .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
          :alt: Aggregate (L2 + L5)
-         :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
+         :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
          :class: sphx-glr-multi-img
 
     *
 
-      .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
+      .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_006.png
          :alt: plot simulate evoked
-         :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
+         :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_006.png
          :class: sphx-glr-multi-img
 
 
@@ -407,15 +439,15 @@ object, this time we make a copy of it before smoothing and scaling.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-160
+.. GENERATED FROM PYTHON SOURCE LINES 163-168
 
 .. warning::
    - Always look at dipoles in conjunction with raster plots and spike
-     histogram to avoid misinterpretation.                
+     histogram to avoid misinterpretation.
    - Run multiple trials of your simulation to get an average of different
      drives seeds before drawing conclusions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-167
+.. GENERATED FROM PYTHON SOURCE LINES 170-175
 
 References
 ----------
@@ -426,7 +458,7 @@ modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  52.277 seconds)
+   **Total running time of the script:** ( 1 minutes  56.656 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:
