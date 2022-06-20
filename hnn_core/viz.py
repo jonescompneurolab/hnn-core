@@ -768,6 +768,8 @@ def plot_cell_morphology(cell, ax, show=True):
     show : bool
         If True, show the plot
 
+    WIP: Make this update when lengths are changed
+    
     Returns
     -------
     axes : list of instance of Axes3D
