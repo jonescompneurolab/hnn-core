@@ -48,10 +48,13 @@ def _get_sliders(params, param_keys):
     return sliders
 
 
-def _get_cell_specific_widgets(layout, style):
+def _get_cell_specific_widgets(layout, style, location):
     kwargs = dict(layout=layout, style=style)
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket',
                   'L2_basket']
+    if location == "distal":
+        cell_types.remove('L5_basket')
+
     weights_ampa, weights_nmda, delays = dict(), dict(), dict()
     for cell_type in cell_types:
         weights_ampa[f'{cell_type}'] = FloatText(
@@ -72,7 +75,7 @@ def _get_cell_specific_widgets(layout, style):
     return widgets_list, widgets_dict
 
 
-def _get_rhythmic_widget(name, tstop_widget, layout, style):
+def _get_rhythmic_widget(name, tstop_widget, layout, style, location):
 
     kwargs = dict(layout=layout, style=style)
     tstart = FloatText(value=0., description='Start time (s)', **kwargs)
@@ -85,21 +88,20 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style):
     burst_std = FloatText(value=0, description='Burst std dev (Hz)', **kwargs)
     repeats = FloatText(value=1, description='Repeats', **kwargs)
     seedcore = IntText(value=14, description='Seed', **kwargs)
-    location = RadioButtons(options=['proximal', 'distal'])
 
-    widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
+    widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style, location)
     drive_box = VBox([tstart, tstart_std, tstop, burst_rate, burst_std,
-                      repeats, location, seedcore] + widgets_list)
+                      repeats, seedcore] + widgets_list)
     drive = dict(type='Rhythmic', name=name,
                  tstart=tstart, tstart_std=tstart_std,
                  burst_rate=burst_rate, burst_std=burst_std,
                  repeats=repeats, seedcore=seedcore,
-                 location=location, tstop=tstop)
+                 tstop=tstop)
     drive.update(widgets_dict)
     return drive, drive_box
 
 
-def _get_poisson_widget(name, tstop_widget, layout, style):
+def _get_poisson_widget(name, tstop_widget, layout, style, location):
     tstart = FloatText(value=0.0, description='Start time (s)',
                        layout=layout, style=style)
     tstop = BoundedFloatText(value=tstop_widget.value,
@@ -118,20 +120,21 @@ def _get_poisson_widget(name, tstop_widget, layout, style):
             value=8.5, description=f'{cell_type}:',
             layout=layout, style=style)
 
-    widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
+    widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style, location)
     widgets_dict.update({'rate_constant': rate_constant})
     widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
-    drive_box = VBox([tstart, tstop, seedcore, location] + widgets_list)
+    drive_box = VBox([tstart, tstop, seedcore] + widgets_list)
     drive = dict(type='Poisson', name=name, tstart=tstart,
                  tstop=tstop, rate_constant=rate_constant,
-                 seedcore=seedcore, location=location)
+                 seedcore=seedcore,
+                  )
     drive.update(widgets_dict)
     return drive, drive_box
 
 
-def _get_evoked_widget(name, layout, style):
+def _get_evoked_widget(name, layout, style, location):
     kwargs = dict(layout=layout, style=style)
     mu = FloatText(value=0, description='Mean time:', **kwargs)
     sigma = FloatText(value=1, description='Std dev time:',
@@ -139,38 +142,38 @@ def _get_evoked_widget(name, layout, style):
     numspikes = IntText(value=1, description='No. Spikes:',
                         **kwargs)
     seedcore = IntText(value=14, description='Seed: ', **kwargs)
-    location = RadioButtons(options=['proximal', 'distal'])
 
-    widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style)
-    drive_box = VBox([mu, sigma, numspikes, seedcore, location] +
+    widgets_list, widgets_dict = _get_cell_specific_widgets(layout, style, location)
+
+    drive_box = VBox([mu, sigma, numspikes, seedcore] +
                      widgets_list)
     drive = dict(type='Evoked', name=name,
                  mu=mu, sigma=sigma, numspikes=numspikes,
-                 seedcore=seedcore, location=location,
+                 seedcore=seedcore,
                  sync_within_trial=False)
     drive.update(widgets_dict)
     return drive, drive_box
 
 
 def add_drive_widget(drive_type, drive_boxes, drive_widgets,
-                     drives_out, tstop_widget):
+                     drives_out, tstop_widget, location):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
     drives_out.clear_output()
     with drives_out:
-        name = drive_type['new'] + str(len(drive_boxes))
+        name = drive_type + str(len(drive_boxes))
 
-        if drive_type['new'] == 'Rhythmic':
+        if drive_type == 'Rhythmic':
             drive, drive_box = _get_rhythmic_widget(name, tstop_widget,
-                                                    layout, style)
-        elif drive_type['new'] == 'Poisson':
+                                                    layout, style, location)
+        elif drive_type == 'Poisson':
             drive, drive_box = _get_poisson_widget(name, tstop_widget,
-                                                   layout, style)
-        elif drive_type['new'] == 'Evoked':
-            drive, drive_box = _get_evoked_widget(name, layout, style)
+                                                   layout, style, location)
+        elif drive_type == 'Evoked':
+            drive, drive_box = _get_evoked_widget(name, layout, style, location)
 
-        if drive_type['new'] in ['Evoked', 'Poisson', 'Rhythmic']:
+        if drive_type in ['Evoked', 'Poisson', 'Rhythmic']:
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
 
@@ -188,11 +191,11 @@ def update_plot_window(variables, plot_out, plot_type):
         return
 
     with plot_out:
-        if plot_type['new'] == 'spikes':
+        if plot_type['new'] == 'spikes': # BUG: got warning from matplotlib and numpy
             variables['net'].cell_response.plot_spikes_raster()
         elif plot_type['new'] == 'current dipole':
             variables['dpls'][0].plot()
-        elif plot_type['new'] == 'input histogram':
+        elif plot_type['new'] == 'input histogram': # BUG: got error here
             variables['net'].cell_response.plot_spikes_hist()
         elif plot_type['new'] == 'PSD':
             variables['dpls'][0].plot_psd(fmin=0, fmax=50)
@@ -204,7 +207,7 @@ def update_plot_window(variables, plot_out, plot_type):
             variables['net'].plot_cells()
 
 
-def on_upload_change(change, sliders, params):
+def on_upload_change(change, sliders, params, tstop, tstep, log_out):
     if len(change['owner'].value) == 0:
         return
 
@@ -217,16 +220,25 @@ def on_upload_change(change, sliders, params):
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
     params_network = read_func[ext](param_data)
 
+    log_out.clear_output()
+    with log_out:
+        print(f"parameters: {params_network.keys()}")
+
     for slider in sliders:
         for sl in slider:
             key = 'gbar_' + sl.description
             sl.value = params_network[key]
 
+    if 'tstop' in params_network.keys():
+        tstop.value = params_network['tstop']
+    if 'dt' in params_network.keys():
+        tstep.value = params_network['dt']
+
     params.update(params_network)
 
 
 def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
-                       tstop, params, b):
+                       tstop, ntrials, params, b):
     """Run the simulation and plot outputs."""
     plot_out.clear_output()
     log_out.clear_output()
@@ -234,62 +246,77 @@ def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
         params['dt'] = tstep.value
         params['tstop'] = tstop.value
         variables['net'] = Network(params, add_drives_from_params=False)
-    for drive in drive_widgets:
-        weights_ampa = {k: v.value for k, v in drive['weights_ampa'].items()}
-        weights_nmda = {k: v.value for k, v in drive['weights_nmda'].items()}
-        synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
-        if drive['type'] == 'Poisson':
-            rate_constant = {k: v.value for k, v in
-                             drive['rate_constant'].items() if v.value > 0}
-            weights_ampa = {k: v for k, v in weights_ampa.items() if k in
-                            rate_constant}
-            weights_nmda = {k: v for k, v in weights_nmda.items() if k in
-                            rate_constant}
-            variables['net'].add_poisson_drive(
-                name=drive['name'],
-                tstart=drive['tstart'].value,
-                tstop=drive['tstop'].value,
-                rate_constant=rate_constant,
-                location=drive['location'].value,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                space_constant=100.0,
-                seedcore=drive['seedcore'].value
-            )
-        elif drive['type'] == 'Evoked':
-            variables['net'].add_evoked_drive(
-                name=drive['name'],
-                mu=drive['mu'].value,
-                sigma=drive['sigma'].value,
-                numspikes=drive['numspikes'].value,
-                sync_within_trial=False,
-                location=drive['location'].value,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                space_constant=3.0,
-                seedcore=drive['seedcore'].value
-            )
-        elif drive['type'] == 'Rhythmic':
-            variables['net'].add_bursty_drive(
-                name=drive['name'],
-                tstart=drive['tstart'].value,
-                tstart_std=drive['tstart_std'].value,
-                burst_rate=drive['burst_rate'].value,
-                burst_std=drive['burst_std'].value,
-                repeats=drive['repeats'].value,
-                location=drive['location'].value,
-                tstop=drive['tstop'].value,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                seedcore=drive['seedcore'].value
-            )
+
+    try:
+        for drive in drive_widgets:
+            weights_ampa = {k: v.value for k, v in drive['weights_ampa'].items()}
+            weights_nmda = {k: v.value for k, v in drive['weights_nmda'].items()}
+            synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
+            if drive['type'] == 'Poisson':
+                rate_constant = {k: v.value for k, v in
+                                drive['rate_constant'].items() if v.value > 0}
+                weights_ampa = {k: v for k, v in weights_ampa.items() if k in
+                                rate_constant}
+                weights_nmda = {k: v for k, v in weights_nmda.items() if k in
+                                rate_constant}
+                variables['net'].add_poisson_drive(
+                    name=drive['name'],
+                    tstart=drive['tstart'].value,
+                    tstop=drive['tstop'].value,
+                    rate_constant=rate_constant,
+                    location=drive['location'].value,
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    space_constant=100.0,
+                    seedcore=drive['seedcore'].value
+                )
+            elif drive['type'] == 'Evoked':
+                variables['net'].add_evoked_drive(
+                    name=drive['name'],
+                    mu=drive['mu'].value,
+                    sigma=drive['sigma'].value,
+                    numspikes=drive['numspikes'].value,
+                    # sync_within_trial=False, # BUG it seems this is something unnecessary
+                    location=drive['location'].value,
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    space_constant=3.0,
+                    seedcore=drive['seedcore'].value
+                )
+            elif drive['type'] == 'Rhythmic':
+                variables['net'].add_bursty_drive(
+                    name=drive['name'],
+                    tstart=drive['tstart'].value,
+                    tstart_std=drive['tstart_std'].value,
+                    burst_rate=drive['burst_rate'].value,
+                    burst_std=drive['burst_std'].value,
+                    # repeats=drive['repeats'].value, # BUG
+                    location=drive['location'].value,
+                    tstop=drive['tstop'].value,
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    seedcore=drive['seedcore'].value
+                )
+    except Exception as e:
+        with log_out:
+            print(f"error in reading drives {e}")
+
     with log_out:
-        variables['dpls'] = simulate_dipole(variables['net'], n_trials=1)
+        log_out.clear_output()
+        print("start simulation")
+        variables['dpls'] = simulate_dipole(variables['net'], tstop=tstop.value, n_trials=ntrials.value)
     with plot_out:
         variables['dpls'][0].plot()
+
+
+def stop_button_clicked(log_out, b):
+    with log_out:
+        print("Terminating simulation...")
+    
+    pass
 
 
 def run_hnn_gui():
@@ -304,16 +331,16 @@ def run_hnn_gui():
     drive_boxes = list()
     variables = dict(net=None, dpls=None)
 
-    def _add_drive_widget(drive_type):
-        return add_drive_widget(drive_type, drive_boxes,
-                                drive_widgets, drives_out, tstop)
-
     def _run_button_clicked(b):
         return run_button_clicked(log_out, plot_out, drive_widgets, variables,
-                                  tstep, tstop, params, b)
+                                  tstep, tstop, ntrials, params, b)
+
+    def _stop_button_clicked(b):
+        return stop_button_clicked(log_out, b)
 
     def _on_upload_change(change):
-        return log_out.capture(on_upload_change(change, sliders, params))
+        return on_upload_change(change, sliders, params, tstop, tstep, log_out)
+        # return on_upload_change(change, sliders, params) # BUG: capture does not work, use log_out explicitly
 
     def _update_plot_window(plot_type):
         return update_plot_window(variables, plot_out, plot_type)
@@ -339,7 +366,8 @@ def run_hnn_gui():
     # Simulation parameters
     tstop = FloatText(value=170, description='tstop (s):', disabled=False)
     tstep = FloatText(value=0.025, description='tstep (s):', disabled=False)
-    simulation_box = VBox([tstop, tstep])
+    ntrials = IntText(value=1, description='Trials:', disabled=False)
+    simulation_box = VBox([tstop, tstep, ntrials])
 
     # Sliders to change local-connectivity params
     sliders = [_get_sliders(params,
@@ -363,17 +391,34 @@ def run_hnn_gui():
         accordian.set_title(idx, title)
 
     # Dropdown for different drives
-    layout = Layout(width='200px', height='auto')
-    drives_dropdown = Dropdown(
-        options=['Evoked', 'Poisson', 'Rhythmic', ''],
-        value='', description='Drive:', disabled=False,
+    layout = Layout(width='200px', height='100px')
+
+    drive_type_selection = RadioButtons(
+        options=['Evoked', 'Poisson', 'Rhythmic'],
+        value='Evoked',
+        description='Drive:',
+        disabled=False,
         layout=layout)
+
+    location_selection = RadioButtons(options=['proximal', 'distal'],
+                                      value='proximal',
+                                      description='Location',
+                                      disabled=False,
+                                      layout=layout)
+
+    add_drive_button = create_expanded_button('Add drive', 'primary', height='30px')
+
+    def _add_drive_button_clicked(b):
+        return add_drive_widget(drive_type_selection.value, drive_boxes,
+                                drive_widgets, drives_out, tstop,
+                                location_selection.value)
+
+    add_drive_button.on_click(_add_drive_button_clicked)
+    drive_selections = VBox([HBox([drive_type_selection, location_selection]), add_drive_button])
 
     # XXX: should be simpler to use Stacked class starting
     # from IPywidgets > 8.0
-    interactive(_add_drive_widget, drive_type='Evoked')
-    drives_dropdown.observe(_add_drive_widget, 'value')
-    drives_options = VBox([drives_dropdown, drives_out])
+    drives_options = VBox([drive_selections, drives_out])
 
     # Tabs for left pane
     left_tab = Tab()
@@ -393,17 +438,29 @@ def run_hnn_gui():
 
     # Run, delete drives and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
+    stop_button = create_expanded_button('Stop', 'danger', height='30px')
     style = {'button_color': '#8A2BE2', 'font_color': 'white'}
     load_button = FileUpload(accept='.json,.param', multiple=False,
                              style=style, description='Load network',
                              button_style='success')
     delete_button = create_expanded_button('Delete drives', 'success',
                                            height='30px')
+    debug_button = create_expanded_button('Debug', 'success', height='30px')
 
+    def _debug_change(b):
+        with log_out:
+            log_out.clear_output()
+            print("file uploaded")
+        pass
+    debug_button.on_click(_debug_change)
+    # load_button.observe(_debug_change)
+
+    # run_button.on_click(_debug_change)
     load_button.observe(_on_upload_change)
     run_button.on_click(_run_button_clicked)
+    stop_button.on_click(_stop_button_clicked)
     delete_button.on_click(_delete_drives_clicked)
-    footer = HBox([run_button, load_button, delete_button, plot_dropdown])
+    footer = HBox([run_button, stop_button, load_button, delete_button, debug_button, plot_dropdown])
 
     right_sidebar = VBox([plot_out, log_out])
 
