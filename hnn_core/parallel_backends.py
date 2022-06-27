@@ -572,27 +572,37 @@ class MPIBackend(object):
         attempt to detect number of cores (including hyperthreads) and start
         parallel simulation over all of them.
     mpi_cmd : str
-        The name of the mpi launcher executable. Will use 'mpiexec'
-        (openmpi) by default.
+        Applicable only when mpi_comm_spawn is False (default): The name of the
+        mpi launcher executable. Will use 'mpiexec' (openmpi) by default.
+    mpi_comm_spawn : bool
+        Spawns new MPI subprocesses from an existing MPI process instead of
+        calling mpi_cmd. This allows for the MPI processes and associated
+        hardware resources to be pre-instantiated e.g. on a computing cluster.
+    mpi_comm_spawn_info : mpi4py.MPI.Info | None
+        Appliable only when mpi_comm_spawn is True: an mpi4py.MPI.Info instance
+        that grants the user control over how MPI configures spawned processes.
 
     Attributes
     ----------
-
     n_procs : int
         The number of processes MPI will actually use (spread over cores). If 1
         is specified or mpi4py could not be loaded, the simulation will be run
         with the JoblibBackend
     mpi_cmd : list of str
-        The mpi command with number of procs and options to be passed to Popen
+        The mpi command with number of procs and options to be passed to Popen.
+    spawn_intercomm : mpi4py.MPI.Intercomm | None
+        The spawned intercommunicator instance if a new MPI subprocess was
+        spawned. Otherwise, None.
     expected_data_length : int
         Used to check consistency between data that was sent and what
         MPIBackend received.
     proc_queue : threading.Queue
         A Queue object to hold process handles from Popen in a thread-safe way.
-        There will be a valid process handle present the queue when a MPI
-        åsimulation is running.
+        There will be a valid process handle present in the queue when an MPI
+        simulation is running.
     """
-    def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
+    def __init__(self, n_procs=None, mpi_cmd='mpiexec', mpi_comm_spawn=False,
+                 mpi_comm_spawn_info=None):
         self.expected_data_length = 0
         self.proc = None
         self.proc_queue = Queue()
@@ -629,23 +639,26 @@ class MPIBackend(object):
             warn(f'{packages} not installed. Will run on single processor')
             self.n_procs = 1
 
-        self.mpi_cmd = mpi_cmd
-
         if self.n_procs == 1:
             print("Backend will use 1 core. Running simulation without MPI")
             return
         else:
             print("MPI will run over %d processes" % (self.n_procs))
 
-        if hyperthreading:
-            self.mpi_cmd += ' --use-hwthread-cpus'
+        if mpi_comm_spawn:
+            self.mpi_cmd = ''
+        else:
+            self.mpi_cmd = mpi_cmd
 
-        if oversubscribe:
-            self.mpi_cmd += ' --oversubscribe'
+            if hyperthreading:
+                self.mpi_cmd += ' --use-hwthread-cpus'
 
-        self.mpi_cmd += ' -np ' + str(self.n_procs)
+            if oversubscribe:
+                self.mpi_cmd += ' --oversubscribe'
 
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
+            self.mpi_cmd += ' -np ' + str(self.n_procs) + ' '
+
+        self.mpi_cmd += 'nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
@@ -656,6 +669,10 @@ class MPIBackend(object):
         else:
             use_posix = False
         self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
+
+        self.mpi_comm_spawn = mpi_comm_spawn
+        self.mpi_comm_spawn_info = mpi_comm_spawn_info
+        self.spawn_intercomm = None
 
     def __enter__(self):
         global _BACKEND
