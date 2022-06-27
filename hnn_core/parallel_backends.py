@@ -588,8 +588,8 @@ class MPIBackend(object):
         The number of processes MPI will actually use (spread over cores). If 1
         is specified or mpi4py could not be loaded, the simulation will be run
         with the JoblibBackend
-    mpi_cmd : list of str
-        The mpi command with number of procs and options to be passed to Popen.
+    command : list of str | str
+        Command to run as subprocess (see subprocess.Popen documentation).
     spawn_intercomm : mpi4py.MPI.Intercomm | None
         The spawned intercommunicator instance if a new MPI subprocess was
         spawned. Otherwise, None.
@@ -644,19 +644,19 @@ class MPIBackend(object):
             self.n_procs = 1
 
         if mpi_comm_spawn:
-            self.mpi_cmd = ''
+            self.command = ''
         else:
-            self.mpi_cmd = mpi_cmd
+            self.command = mpi_cmd
 
             if hyperthreading:
-                self.mpi_cmd += ' --use-hwthread-cpus'
+                self.command += ' --use-hwthread-cpus'
 
             if oversubscribe:
-                self.mpi_cmd += ' --oversubscribe'
+                self.command += ' --oversubscribe'
 
-            self.mpi_cmd += ' -np ' + str(self.n_procs) + ' '
+            self.command += ' -np ' + str(self.n_procs) + ' '
 
-        self.mpi_cmd += 'nrniv -python -mpi -nobanner ' + \
+        self.command += 'nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
@@ -666,7 +666,7 @@ class MPIBackend(object):
             use_posix = True
         else:
             use_posix = False
-        self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
+        self.command = shlex.split(self.command, posix=use_posix)
 
         self.mpi_comm_spawn = mpi_comm_spawn
         self.mpi_comm_spawn_info = mpi_comm_spawn_info
@@ -725,7 +725,7 @@ class MPIBackend(object):
         env = _get_mpi_env()
 
         self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
+            command=self.command, obj=[net, tstop, dt, n_trials], timeout=30,
             proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
             universal_newlines=True)
 
