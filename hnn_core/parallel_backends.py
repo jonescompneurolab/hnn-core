@@ -610,8 +610,12 @@ class MPIBackend(object):
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
             self.n_procs = n_logical_cores
+        elif n_procs == 1:
+            print("Backend will use 1 core. Running simulation without MPI")
+            return
         else:
             self.n_procs = n_procs
+            print("MPI will run over %d processes" % (self.n_procs))
 
         # did user try to force running on more cores than available?
         oversubscribe = False
@@ -638,12 +642,6 @@ class MPIBackend(object):
             packages = ' and '.join(packages)
             warn(f'{packages} not installed. Will run on single processor')
             self.n_procs = 1
-
-        if self.n_procs == 1:
-            print("Backend will use 1 core. Running simulation without MPI")
-            return
-        else:
-            print("MPI will run over %d processes" % (self.n_procs))
 
         if mpi_comm_spawn:
             self.mpi_cmd = ''
