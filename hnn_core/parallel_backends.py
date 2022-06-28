@@ -588,7 +588,7 @@ class MPIBackend(object):
         The number of processes MPI will actually use (spread over cores). If 1
         is specified or mpi4py could not be loaded, the simulation will be run
         with the JoblibBackend
-    command : list of str | str
+    command : list of str
         Command to run as subprocess (see subprocess.Popen documentation).
     spawn_intercomm : mpi4py.MPI.Intercomm | None
         The spawned intercommunicator instance if a new MPI subprocess was
@@ -670,7 +670,7 @@ class MPIBackend(object):
 
         self.mpi_comm_spawn = mpi_comm_spawn
         self.mpi_comm_spawn_info = mpi_comm_spawn_info
-        self.spawn_intercomm = None
+        self.spawn_intercomm = None  # updated in self.simulate
 
     def __enter__(self):
         global _BACKEND
@@ -719,10 +719,18 @@ class MPIBackend(object):
                                                     n_trials=n_trials,
                                                     postproc=postproc)
 
+        from mpi4py import MPI
+
+        env = _get_mpi_env()
+
         print("Running %d trials..." % (n_trials))
         dpls = []
 
-        env = _get_mpi_env()
+        if self.mpi_comm_spawn:
+            subcomm = MPI.COMM_SELF.Spawn('nrniv', args=self.command,
+                                          info=self.mpi_comm_spawn_info,
+                                          maxprocs=self.n_procs)
+            self.spawn_intercomm = subcomm
 
         self.proc, sim_data = run_subprocess(
             command=self.command, obj=[net, tstop, dt, n_trials], timeout=30,
