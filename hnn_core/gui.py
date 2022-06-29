@@ -1,11 +1,11 @@
 """IPywidgets GUI."""
 
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
+#          Huzi Cheng <hzcheng15@icloud.com>
+
 import codecs
-import json
 import os.path as op
 import subprocess
-from functools import partial, update_wrapper
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +13,7 @@ from IPython.display import display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText, Button,
                         Dropdown, FileUpload, FloatLogSlider, FloatText, Text,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, VBox,
-                        fixed, interact, interactive, interactive_output)
+                        interactive, interactive_output)
 
 import hnn_core
 from hnn_core import Network, read_params, simulate_dipole, MPIBackend
@@ -221,6 +221,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 
 
 def update_plot_window(variables, _plot_out, plot_type):
+    # TODO need to add more informaion about "no data"
     _plot_out.clear_output()
 
     if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
