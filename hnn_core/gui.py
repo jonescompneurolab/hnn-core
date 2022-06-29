@@ -229,8 +229,8 @@ def update_plot_window(variables, _plot_out, plot_type):
 
     with _plot_out:
         fig, ax = plt.subplots()
-        if plot_type[
-                'new'] == 'spikes':  # BUG: got warning from matplotlib and numpy
+
+        if plot_type['new'] == 'spikes':
             if variables['net'] is not None and sum(
                 [len(_)
                  for _ in variables['net'].cell_response._spike_times]) > 0:
@@ -357,7 +357,8 @@ def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
                     mu=drive['mu'].value,
                     sigma=drive['sigma'].value,
                     numspikes=drive['numspikes'].value,
-                    # sync_within_trial=False, # BUG it seems this is something unnecessary
+                    # sync_within_trial=False,
+                    # BUG it seems this is something unnecessary
                     location=drive['location'].value,
                     weights_ampa=weights_ampa,
                     weights_nmda=weights_nmda,
@@ -412,6 +413,7 @@ def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
 
 
 def stop_button_clicked(variables, log_out, b):
+    # BUG: this cannot work properly now.
     with log_out:
         if "backend" in variables:
             print("Terminating simulation...")
@@ -423,6 +425,7 @@ def stop_button_clicked(variables, log_out, b):
 def test_del_widget(plot_out_1):
     del plot_out_1
     pass
+
 
 def run_hnn_gui():
     """Create the HNN GUI."""
@@ -445,7 +448,8 @@ def run_hnn_gui():
 
     def _on_upload_change(change):
         return on_upload_change(change, sliders, params, tstop, tstep, log_out)
-        # return on_upload_change(change, sliders, params) # BUG: capture does not work, use log_out explicitly
+        # BUG: capture does not work, use log_out explicitly
+        # return on_upload_change(change, sliders, params)
 
     def _update_plot_window(plot_type):
         return update_plot_window(variables, plot_out, plot_type)
@@ -601,7 +605,6 @@ def run_hnn_gui():
                                            height='30px')
     debug_button = create_expanded_button('Debug', 'success', height='30px')
 
-
     debug_button.on_click(_debug_change)
     # load_button.observe(_debug_change)
 
@@ -624,11 +627,10 @@ def run_hnn_gui():
     ])
 
     # Final layout of the app
-    hnn_gui = AppLayout(
-        header=header_button,
-        left_sidebar=left_tab,
-        right_sidebar=right_sidebar,
-        footer=footer,
-        pane_widths=['380px', '0px', '1000px'],
-        pane_heights=[1, '500px', 1])
+    hnn_gui = AppLayout(header=header_button,
+                        left_sidebar=left_tab,
+                        right_sidebar=right_sidebar,
+                        footer=footer,
+                        pane_widths=['380px', '0px', '1000px'],
+                        pane_heights=[1, '500px', 1])
     return hnn_gui
