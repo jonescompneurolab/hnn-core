@@ -32,22 +32,13 @@ bibliography: paper.bib
 
 # Summary
 
-Understanding the mechanistic origin of magneto- and electroencephalographic (MEG/EEG)
-signals is essential for biologically grounded interpretations of 
+Magneto- and electroencephalography (MEG/EEG) are powerful techniques to non-invasively record human brain activity. Their primary utility is providing markers of healthy brain function and disease states. However, the explanatory power of MEG/EEG biomarkers is challenged by a lack of understanding of how these signals are generated at the cell and circuit level. To address this challenge, the Human Neocortical Neurosolver (HNN) neural modeling software was created [@neymotin:2020]. HNN is a biophysically detailed neocortical column model which simulates the neural activity that generates the primary electrical currents underlying MEG/EEG signals.
+
+`hnn-core` is a lightweight Pythonic Interface to the cortical column model implemented in the Human Neocortical Neurosolver (HNN) software. HNN was initially introduced as a standalone software operated through a graphical user interface.
 
 # Statement of need
 
-`hnn-core` is a lightweight Pythonic Interface to the cortical column model implemented 
-in the Human Neocortical Neurosolver (HNN) software. HNN was previously published as a
-standalone software that was primarily operated through a graphical user interface.
-
-`hnn-core` was created to enable the core functionality of HNN
-simulations in a Pythonic environment. By recreating HNN according to modern
-open source development standards, the software can now be easily extended, maintained,
-and integrated into existing data analysis workflows. Since its creation, significant
-enhancements have been made on top of the existing functionality in HNN. This includes
-the ability to record local field potentials, modify network connectivity, and an expanded
-suite of visualization functions. 
+`hnn-core` was created to enable the core functionality of HNN simulations in a Pythonic environment. By recreating HNN according to modern open source development standards, the software can now be easily extended, maintained, and integrated into existing data analysis workflows. Since its creation, significant enhancements have been made on top of the existing functionality in HNN. This includes the ability to record local field potentials, modify network connectivity, and an expanded suite of visualization functions. 
 
 
 # Citations
