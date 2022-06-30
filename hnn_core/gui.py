@@ -4,28 +4,23 @@
 #          Huzi Cheng <hzcheng15@icloud.com>
 
 import codecs
+import multiprocessing
 import os.path as op
-import subprocess
-
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText, Button,
-                        Dropdown, FileUpload, FloatLogSlider, FloatText, Text,
-                        HBox, IntText, Layout, Output, RadioButtons, Tab, VBox,
-                        interactive, interactive_output)
+                        Checkbox, Dropdown, FileUpload, FloatLogSlider,
+                        FloatText, HBox, IntText, Layout, Output, RadioButtons,
+                        Tab, Text, VBox, interactive, interactive_output)
 
 import hnn_core
-from hnn_core import Network, read_params, simulate_dipole, MPIBackend
-from hnn_core.params import _read_json, _read_legacy_params
-import multiprocessing
-
-
-def cmd_exists(cmd):
-    return subprocess.call("type " + cmd,
-                           shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE) == 0
+from hnn_core import (MPIBackend, JoblibBackend, Network, jones_2009_model,
+                      read_params, simulate_dipole)
+from hnn_core.params import (_read_json, _read_legacy_params,
+                             _extract_drive_specs_from_hnn_params)
+from hnn_core.viz import plot_dipole
 
 
 def create_expanded_button(description, button_style, height):
@@ -61,7 +56,35 @@ def _get_sliders(params, param_keys):
     return sliders
 
 
-def _get_cell_specific_widgets(layout, style, location):
+def _get_cell_specific_widgets(layout,
+                               style,
+                               location,
+                               data={},
+                               default_data={
+                                   'weights_ampa': {
+                                       'L5_pyramidal': 0.,
+                                       'L2_pyramidal': 0.,
+                                       'L5_basket': 0.,
+                                       'L2_basket': 0.
+                                   },
+                                   'weights_nmda': {
+                                       'L5_pyramidal': 0.,
+                                       'L2_pyramidal': 0.,
+                                       'L5_basket': 0.,
+                                       'L2_basket': 0.
+                                   },
+                                   'delays': {
+                                       'L5_pyramidal': 0.1,
+                                       'L2_pyramidal': 0.1,
+                                       'L5_basket': 0.1,
+                                       'L2_basket': 0.1
+                                   },
+                               }):
+
+    for k in default_data.keys():
+        if k in data:
+            default_data[k].update(data[k])
+
     kwargs = dict(layout=layout, style=style)
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
     if location == "distal":
@@ -69,15 +92,18 @@ def _get_cell_specific_widgets(layout, style, location):
 
     weights_ampa, weights_nmda, delays = dict(), dict(), dict()
     for cell_type in cell_types:
-        weights_ampa[f'{cell_type}'] = FloatText(value=0.,
-                                                 description=f'{cell_type}:',
-                                                 **kwargs)
-        weights_nmda[f'{cell_type}'] = FloatText(value=0.,
-                                                 description=f'{cell_type}:',
-                                                 **kwargs)
-        delays[f'{cell_type}'] = FloatText(value=0.1,
-                                           description=f'{cell_type}:',
-                                           **kwargs)
+        weights_ampa[f'{cell_type}'] = FloatText(
+            value=default_data['weights_ampa'][cell_type],
+            description=f'{cell_type}:',
+            **kwargs)
+        weights_nmda[f'{cell_type}'] = FloatText(
+            value=default_data['weights_nmda'][cell_type],
+            description=f'{cell_type}:',
+            **kwargs)
+        delays[f'{cell_type}'] = FloatText(
+            value=default_data['delays'][cell_type],
+            description=f'{cell_type}:',
+            **kwargs)
 
     widgets_dict = {
         'weights_ampa': weights_ampa,
@@ -93,22 +119,62 @@ def _get_cell_specific_widgets(layout, style, location):
     return widgets_list, widgets_dict
 
 
-def _get_rhythmic_widget(name, tstop_widget, layout, style, location):
-
+def _get_rhythmic_widget(
+    name,
+    tstop_widget,
+    layout,
+    style,
+    location,
+    data={},
+    default_data={
+        'tstart': 0.,
+        'tstart_std': 0.,
+        'tstop': 0.,
+        'burst_rate': 7.5,
+        'burst_std': 0,
+        'repeats': 1,
+        'seedcore': 14,
+    },
+    default_weights_ampa={},
+    default_weights_nmda={},
+    default_delays={},
+):
+    default_data.update(data)
     kwargs = dict(layout=layout, style=style)
-    tstart = FloatText(value=0., description='Start time (s)', **kwargs)
-    tstart_std = FloatText(value=0, description='Start time dev (s)', **kwargs)
-    tstop = BoundedFloatText(value=tstop_widget.value,
+    tstart = FloatText(value=default_data['tstart'],
+                       description='Start time (ms)',
+                       **kwargs)
+    tstart_std = FloatText(value=default_data['tstart_std'],
+                           description='Start time dev (s)',
+                           **kwargs)
+    tstop = BoundedFloatText(value=tstop_widget.value if default_data['tstop']
+                             == 0 else default_data['tstop'],
                              description='Stop time (s)',
                              max=tstop_widget.value,
                              **kwargs)
-    burst_rate = FloatText(value=7.5, description='Burst rate (Hz)', **kwargs)
-    burst_std = FloatText(value=0, description='Burst std dev (Hz)', **kwargs)
-    repeats = FloatText(value=1, description='Repeats', **kwargs)
-    seedcore = IntText(value=14, description='Seed', **kwargs)
+    burst_rate = FloatText(value=default_data['burst_rate'],
+                           description='Burst rate (Hz)',
+                           **kwargs)
+    burst_std = FloatText(value=default_data['burst_std'],
+                          description='Burst std dev (Hz)',
+                          **kwargs)
+    repeats = FloatText(value=default_data['repeats'],
+                        description='Repeats',
+                        **kwargs)
+    seedcore = IntText(value=default_data['seedcore'],
+                       description='Seed',
+                       **kwargs)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
-        layout, style, location)
+        layout,
+        style,
+        location,
+        data={
+            'weights_ampa': default_weights_ampa,
+            'weights_nmda': default_weights_nmda,
+            'delays': default_delays,
+        },
+    )
     drive_box = VBox(
         [tstart, tstart_std, tstop, burst_rate, burst_std, repeats, seedcore] +
         widgets_list)
@@ -125,17 +191,40 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location):
     return drive, drive_box
 
 
-def _get_poisson_widget(name, tstop_widget, layout, style, location):
-    tstart = FloatText(value=0.0,
+def _get_poisson_widget(
+    name,
+    tstop_widget,
+    layout,
+    style,
+    location,
+    data={},
+    default_data={
+        'tstart': 0.0,
+        'tstop': 0.0,
+        'seedcore': 14,
+        'rate_constant': {
+            'L5_pyramidal': 8.5,
+            'L2_pyramidal': 8.5,
+            'L5_basket': 8.5,
+            'L2_basket': 8.5,
+        }
+    },
+    default_weights_ampa={},
+    default_weights_nmda={},
+    default_delays={},
+):
+    default_data.update(data)
+    tstart = FloatText(value=default_data['tstart'],
                        description='Start time (s)',
                        layout=layout,
                        style=style)
-    tstop = BoundedFloatText(value=tstop_widget.value,
+    tstop = BoundedFloatText(value=tstop_widget.value if default_data['tstop']
+                             == 0 else default_data['tstop'],
                              max=tstop_widget.value,
                              description='Stop time (s)',
                              layout=layout,
                              style=style)
-    seedcore = IntText(value=14,
+    seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        layout=layout,
                        style=style)
@@ -144,13 +233,22 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location):
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
     rate_constant = dict()
     for cell_type in cell_types:
-        rate_constant[f'{cell_type}'] = FloatText(value=8.5,
-                                                  description=f'{cell_type}:',
-                                                  layout=layout,
-                                                  style=style)
+        rate_constant[f'{cell_type}'] = FloatText(
+            value=default_data['rate_constant'][cell_type],
+            description=f'{cell_type}:',
+            layout=layout,
+            style=style)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
-        layout, style, location)
+        layout,
+        style,
+        location,
+        data={
+            'weights_ampa': default_weights_ampa,
+            'weights_nmda': default_weights_nmda,
+            'delays': default_delays,
+        },
+    )
     widgets_dict.update({'rate_constant': rate_constant})
     widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
                         list(widgets_dict['rate_constant'].values()))
@@ -168,15 +266,47 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location):
     return drive, drive_box
 
 
-def _get_evoked_widget(name, layout, style, location):
+def _get_evoked_widget(
+    name,
+    layout,
+    style,
+    location,
+    data={},
+    default_data={
+        'mu': 0,
+        'sigma': 1,
+        'numspikes': 1,
+        'seedcore': 14,
+    },
+    default_weights_ampa={},
+    default_weights_nmda={},
+    default_delays={},
+):
+    default_data.update(data)
     kwargs = dict(layout=layout, style=style)
-    mu = FloatText(value=0, description='Mean time:', **kwargs)
-    sigma = FloatText(value=1, description='Std dev time:', **kwargs)
-    numspikes = IntText(value=1, description='No. Spikes:', **kwargs)
-    seedcore = IntText(value=14, description='Seed: ', **kwargs)
+    mu = FloatText(value=default_data['mu'],
+                   description='Mean time:',
+                   **kwargs)
+    sigma = FloatText(value=default_data['sigma'],
+                      description='Std dev time:',
+                      **kwargs)
+    numspikes = IntText(value=default_data['numspikes'],
+                        description='No. Spikes:',
+                        **kwargs)
+    seedcore = IntText(value=default_data['seedcore'],
+                       description='Seed: ',
+                       **kwargs)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
-        layout, style, location)
+        layout,
+        style,
+        location,
+        data={
+            'weights_ampa': default_weights_ampa,
+            'weights_nmda': default_weights_nmda,
+            'delays': default_delays,
+        },
+    )
 
     drive_box = VBox([mu, sigma, numspikes, seedcore] + widgets_list)
     drive = dict(type='Evoked',
@@ -190,34 +320,80 @@ def _get_evoked_widget(name, layout, style, location):
     return drive, drive_box
 
 
-def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
-                     tstop_widget, location):
+def add_drive_widget(
+    drive_type,
+    drive_boxes,
+    drive_widgets,
+    drives_out,
+    tstop_widget,
+    location,
+    prespecified_drive_name=None,
+    prespecified_drive_data={},
+    prespecified_weights_ampa={},
+    prespecified_weights_nmda={},
+    prespecified_delays={},
+    render=True,
+    expand_last_drive=True,
+):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
     drives_out.clear_output()
     with drives_out:
-        name = drive_type + str(len(drive_boxes))
+        if not prespecified_drive_name:
+            name = drive_type + str(len(drive_boxes))
+        else:
+            name = prespecified_drive_name
 
         if drive_type == 'Rhythmic':
-            drive, drive_box = _get_rhythmic_widget(name, tstop_widget, layout,
-                                                    style, location)
+            drive, drive_box = _get_rhythmic_widget(
+                name,
+                tstop_widget,
+                layout,
+                style,
+                location,
+                data=prespecified_drive_data,
+                default_weights_ampa=prespecified_weights_ampa,
+                default_weights_nmda=prespecified_weights_nmda,
+                default_delays=prespecified_delays,
+            )
         elif drive_type == 'Poisson':
-            drive, drive_box = _get_poisson_widget(name, tstop_widget, layout,
-                                                   style, location)
+            drive, drive_box = _get_poisson_widget(
+                name,
+                tstop_widget,
+                layout,
+                style,
+                location,
+                data=prespecified_drive_data,
+                default_weights_ampa=prespecified_weights_ampa,
+                default_weights_nmda=prespecified_weights_nmda,
+                default_delays=prespecified_delays,
+            )
         elif drive_type == 'Evoked':
-            drive, drive_box = _get_evoked_widget(name, layout, style,
-                                                  location)
+            drive, drive_box = _get_evoked_widget(
+                name,
+                layout,
+                style,
+                location,
+                data=prespecified_drive_data,
+                default_weights_ampa=prespecified_weights_ampa,
+                default_weights_nmda=prespecified_weights_nmda,
+                default_delays=prespecified_delays,
+            )
 
         if drive_type in ['Evoked', 'Poisson', 'Rhythmic']:
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
 
-        accordion = Accordion(children=drive_boxes,
-                              selected_index=len(drive_boxes) - 1)
-        for idx, drive in enumerate(drive_widgets):
-            accordion.set_title(idx, drive['name'])
-        display(accordion)
+        if render:
+            accordion = Accordion(
+                children=drive_boxes,
+                selected_index=len(drive_boxes) -
+                1 if expand_last_drive else None,
+            )
+            for idx, drive in enumerate(drive_widgets):
+                accordion.set_title(idx, drive['name'])
+            display(accordion)
 
 
 def update_plot_window(variables, _plot_out, plot_type):
@@ -228,55 +404,50 @@ def update_plot_window(variables, _plot_out, plot_type):
         return
 
     with _plot_out:
-        fig, ax = plt.subplots()
-
         if plot_type['new'] == 'spikes':
-            if variables['net'] is not None and sum(
-                [len(_)
-                 for _ in variables['net'].cell_response._spike_times]) > 0:
-                variables['net'].cell_response.plot_spikes_raster(ax=ax)
-            else:
-                print("No data")
+            fig, ax = plt.subplots()
+            variables['net'].cell_response.plot_spikes_raster(ax=ax)
 
         elif plot_type['new'] == 'current dipole':
-            if variables['dpls'] is not None:
-                variables['dpls'][0].plot(ax=ax)
-            else:
-                print("No data")
+            fig, ax = plt.subplots()
+            # variables['dpls'][0].plot(ax=ax)
+            plot_dipole(variables['dpls'], ax=ax, average=True)
 
         elif plot_type['new'] == 'input histogram':
             # BUG: got error here, need a better way to handle exception
-            if variables['net'] is not None and sum(
-                [len(_)
-                 for _ in variables['net'].cell_response._spike_times]) > 0:
-                variables['net'].cell_response.plot_spikes_hist(ax=ax)
-            else:
-                print("No data")
+            fig, ax = plt.subplots()
+            variables['net'].cell_response.plot_spikes_hist(ax=ax)
 
         elif plot_type['new'] == 'PSD':
-            if variables['dpls'] is not None:
-                variables['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
-            else:
-                print("No data")
+            fig, ax = plt.subplots()
+            variables['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
 
         elif plot_type['new'] == 'spectogram':
             freqs = np.arange(10., 100., 1.)
             n_cycles = freqs / 8.
-            if variables['dpls'] is not None:
-                variables['dpls'][0].plot_tfr_morlet(freqs,
-                                                     n_cycles=n_cycles,
-                                                     ax=ax)
-            else:
-                print("No data")
-
+            fig, ax = plt.subplots()
+            variables['dpls'][0].plot_tfr_morlet(freqs,
+                                                 n_cycles=n_cycles,
+                                                 ax=ax)
         elif plot_type['new'] == 'network':
-            if variables['net'] is not None:
-                variables['net'].plot_cells(ax=ax)
-            else:
-                print("No data")
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            variables['net'].plot_cells(ax=ax)
 
 
-def on_upload_change(change, sliders, params, tstop, tstep, log_out):
+def on_upload_change(
+    change,
+    sliders,
+    params,
+    tstop,
+    tstep,
+    log_out,
+    variables,
+    # for adding drives
+    drive_boxes,
+    drive_widgets,
+    drives_out,
+):
     if len(change['owner'].value) == 0:
         return
 
@@ -305,16 +476,59 @@ def on_upload_change(change, sliders, params, tstop, tstep, log_out):
 
     params.update(params_network)
 
+    variables['net'] = Network(
+        params,
+        add_drives_from_params=False,
+    )
+
+    log_out.clear_output()
+    with log_out:
+        drive_specs = _extract_drive_specs_from_hnn_params(
+            variables['net']._params, list(variables['net'].cell_types.keys()))
+
+        # clear before adding drives
+        drives_out.clear_output()
+        while len(drive_widgets) > 0:
+            drive_widgets.pop()
+            drive_boxes.pop()
+
+        drive_names = sorted(drive_specs.keys())
+        for idx, drive_name in enumerate(drive_names):  # order matters
+            specs = drive_specs[drive_name]
+            print(
+                f"load drive (drive_name={drive_name}, type={specs['type']})")
+            print(f"space_constant={specs['space_constant']}")
+            add_drive_widget(
+                specs['type'].capitalize(),
+                drive_boxes,
+                drive_widgets,
+                drives_out,
+                tstop,
+                specs['location'],
+                prespecified_drive_name=drive_name,
+                prespecified_drive_data=specs['dynamics'],
+                prespecified_weights_ampa=specs['weights_ampa'],
+                prespecified_weights_nmda=specs['weights_nmda'],
+                prespecified_delays=specs['synaptic_delays'],
+                render=idx == len(drive_names) - 1,
+                expand_last_drive=False,
+            )
+
 
 def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
-                       tstop, ntrials, mpi_cmd, params, b):
+                       tstop, ntrials, backend_selection, mpi_cmd,
+                       add_drive_from_params, params, b):
     """Run the simulation and plot outputs."""
     plot_out.clear_output()
     log_out.clear_output()
     with log_out:
         params['dt'] = tstep.value
         params['tstop'] = tstop.value
-        variables['net'] = Network(params, add_drives_from_params=False)
+        variables['net'] = Network(
+            params,
+            # add_drives_from_params=add_drive_from_params.value,
+            add_drives_from_params=False,
+        )
 
     try:
         for drive in drive_widgets:
@@ -386,40 +600,103 @@ def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
     with log_out:
         log_out.clear_output()
         print("start simulation")
-        if cmd_exists(mpi_cmd.value):
-            # should further allow users to adjust cores to use
-            # with MPIBackend(n_procs=multiprocessing.cpu_count() - 1,
-            #                 mpi_cmd=mpi_cmd.value):
-            # variables['dpls'] = simulate_dipole(variables['net'],
-            #                                     tstop=tstop.value,
-            #                                     n_trials=ntrials.value)
+
+        variables['net'] = jones_2009_model()
+
+        weights_ampa_d1 = {
+            'L2_basket': 0.006562,
+            'L2_pyramidal': .000007,
+            'L5_pyramidal': 0.142300
+        }
+        weights_nmda_d1 = {
+            'L2_basket': 0.019482,
+            'L2_pyramidal': 0.004317,
+            'L5_pyramidal': 0.080074
+        }
+        synaptic_delays_d1 = {
+            'L2_basket': 0.1,
+            'L2_pyramidal': 0.1,
+            'L5_pyramidal': 0.1
+        }
+        variables['net'].add_evoked_drive('evdist1',
+                                          mu=63.53,
+                                          sigma=3.85,
+                                          numspikes=1,
+                                          weights_ampa=weights_ampa_d1,
+                                          weights_nmda=weights_nmda_d1,
+                                          location='distal',
+                                          synaptic_delays=synaptic_delays_d1,
+                                          event_seed=4)
+
+        weights_ampa_p1 = {
+            'L2_basket': 0.08831,
+            'L2_pyramidal': 0.01525,
+            'L5_basket': 0.19934,
+            'L5_pyramidal': 0.00865
+        }
+        synaptic_delays_prox = {
+            'L2_basket': 0.1,
+            'L2_pyramidal': 0.1,
+            'L5_basket': 1.,
+            'L5_pyramidal': 1.
+        }
+        # all NMDA weights are zero; pass None explicitly
+        variables['net'].add_evoked_drive('evprox1',
+                                          mu=26.61,
+                                          sigma=2.47,
+                                          numspikes=1,
+                                          weights_ampa=weights_ampa_p1,
+                                          weights_nmda=None,
+                                          location='proximal',
+                                          synaptic_delays=synaptic_delays_prox,
+                                          event_seed=4)
+
+        # Second proximal evoked drive. NB: only AMPA weights differ from first
+        weights_ampa_p2 = {
+            'L2_basket': 0.000003,
+            'L2_pyramidal': 1.438840,
+            'L5_basket': 0.008958,
+            'L5_pyramidal': 0.684013
+        }
+        # all NMDA weights are zero; omit weights_nmda (defaults to None)
+        variables['net'].add_evoked_drive('evprox2',
+                                          mu=137.12,
+                                          sigma=8.33,
+                                          numspikes=1,
+                                          weights_ampa=weights_ampa_p2,
+                                          location='proximal',
+                                          synaptic_delays=synaptic_delays_prox,
+                                          event_seed=4)
+
+        if backend_selection.value == "MPI":
             variables['backend'] = MPIBackend(
                 n_procs=multiprocessing.cpu_count() - 1, mpi_cmd=mpi_cmd.value)
-            variables['dpls'] = variables['backend'].simulate(
-                variables['net'],
-                tstop.value,
-                tstep.value,
-                n_trials=ntrials.value)
-
         else:
+            variables['backend'] = JoblibBackend(n_jobs=2)
+
+        with variables['backend']:
             variables['dpls'] = simulate_dipole(variables['net'],
                                                 tstop=tstop.value,
                                                 n_trials=ntrials.value)
 
-    # Default case
     with plot_out:
+        dpl_smooth_win = 20
+        dpl_scalefctr = 12
+        for dpl in variables['dpls']:
+            dpl.smooth(dpl_smooth_win)
+            dpl.scale(dpl_scalefctr)
+
         fig, ax = plt.subplots()
-        variables['dpls'][0].plot(ax=ax)
+        # variables['dpls'][0].plot(ax=ax)
+        plot_dipole(variables['dpls'], ax=ax, average=True)
 
 
-def stop_button_clicked(variables, log_out, b):
-    # BUG: this cannot work properly now.
-    with log_out:
-        if "backend" in variables:
-            print("Terminating simulation...")
-            variables["backend"].terminate()
-        else:
-            print("No Backends or running simulations. Cannot terminate")
+
+def handle_backend_change(backend_type, mpi_cmd_config, mpi_cmd):
+    mpi_cmd_config.clear_output()
+    if backend_type == "MPI":
+        with mpi_cmd_config:
+            display(mpi_cmd)
 
 
 def test_del_widget(plot_out_1):
@@ -441,13 +718,14 @@ def run_hnn_gui():
 
     def _run_button_clicked(b):
         return run_button_clicked(log_out, plot_out, drive_widgets, variables,
-                                  tstep, tstop, ntrials, mpi_cmd, params, b)
+                                  tstep, tstop, ntrials, backend_selection,
+                                  mpi_cmd, add_drive_from_params, params, b)
 
-    def _stop_button_clicked(b):
-        return stop_button_clicked(variables, log_out, b)
 
     def _on_upload_change(change):
-        return on_upload_change(change, sliders, params, tstop, tstep, log_out)
+        return on_upload_change(change, sliders, params, tstop, tstep, log_out,
+                                variables, drive_boxes, drive_widgets,
+                                drives_out)
         # BUG: capture does not work, use log_out explicitly
         # return on_upload_change(change, sliders, params)
 
@@ -465,13 +743,7 @@ def run_hnn_gui():
             drive_widgets.pop()
             drive_boxes.pop()
 
-    def _debug_change(b):
-        test_del_widget(plot_out_1)
 
-        with log_out:
-            log_out.clear_output()
-            print("file uploaded")
-        pass
 
     # Output windows
     drives_out = Output()  # window to add new drives
@@ -480,7 +752,8 @@ def run_hnn_gui():
         'height': '150px',
         'overflow_y': 'auto'
     })
-    height_plot = '350px'
+
+    height_plot = '500px'
     plot_out = Output(layout={
         'border': '1px solid gray',
         'height': height_plot
@@ -499,11 +772,41 @@ def run_hnn_gui():
     tstop = FloatText(value=170, description='tstop (s):', disabled=False)
     tstep = FloatText(value=0.025, description='tstep (s):', disabled=False)
     ntrials = IntText(value=1, description='Trials:', disabled=False)
+    # temporarily keep this
+    add_drive_from_params = Checkbox(value=False,
+                                     description='Add drives from parameters:',
+                                     disabled=False)
+
+    backend_selection = Dropdown(
+        options=[('Joblib', 'Joblib'), ('MPI', 'MPI')],
+        value='MPI' if os.getenv("USEMPI", '0') == '1' else 'Joblib',
+        description='Backend:',
+    )
+
     mpi_cmd = Text(value='mpiexec',
                    placeholder='Fill if applies',
                    description='MPI cmd:',
                    disabled=False)
-    simulation_box = VBox([tstop, tstep, ntrials, mpi_cmd])
+
+    mpi_cmd_config = Output()
+
+    def _handle_backend_change(backend_type):
+        return handle_backend_change(backend_type.new, mpi_cmd_config, mpi_cmd)
+
+    handle_backend_change(backend_selection.value, mpi_cmd_config, mpi_cmd)
+    backend_selection.observe(_handle_backend_change, 'value')
+
+    simulation_box = VBox([
+        tstop,
+        tstep,
+        ntrials,
+        add_drive_from_params,
+        backend_selection,
+        # mpi_cmd,
+        mpi_cmd_config
+    ])
+
+
 
     # Sliders to change local-connectivity params
     sliders = [
@@ -593,7 +896,7 @@ def run_hnn_gui():
 
     # Run, delete drives and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
-    stop_button = create_expanded_button('Stop', 'danger', height='30px')
+
     style = {'button_color': '#8A2BE2', 'font_color': 'white'}
     load_button = FileUpload(accept='.json,.param',
                              multiple=False,
@@ -603,34 +906,33 @@ def run_hnn_gui():
     delete_button = create_expanded_button('Delete drives',
                                            'success',
                                            height='30px')
-    debug_button = create_expanded_button('Debug', 'success', height='30px')
 
-    debug_button.on_click(_debug_change)
-    # load_button.observe(_debug_change)
-
-    # run_button.on_click(_debug_change)
     load_button.observe(_on_upload_change)
     run_button.on_click(_run_button_clicked)
-    # Not working currently
-    stop_button.on_click(_stop_button_clicked)
-    delete_button.on_click(_delete_drives_clicked)
-    footer = HBox(
-        [run_button, stop_button, load_button, delete_button, debug_button])
 
-    plot_dropdown_1.layout.width = "500px"
-    plot_out.layout.width = "500px"
-    right_sidebar = VBox([
+    delete_button.on_click(_delete_drives_clicked)
+    footer = VBox([
         HBox([
-            VBox([plot_dropdown, plot_out]),
-            VBox([plot_dropdown_1, plot_out_1])
+            run_button, load_button, delete_button,
         ]), log_out
     ])
 
+    plot_out_width = "500px"
+    plot_out.layout.width = plot_out_width
+    plot_out_1.layout.width = plot_out_width
+
+    plotting_panels = HBox(
+        [VBox([plot_dropdown, plot_out]),
+         VBox([plot_dropdown_1, plot_out_1])])
+
     # Final layout of the app
-    hnn_gui = AppLayout(header=header_button,
-                        left_sidebar=left_tab,
-                        right_sidebar=right_sidebar,
-                        footer=footer,
-                        pane_widths=['380px', '0px', '1000px'],
-                        pane_heights=[1, '500px', 1])
+    hnn_gui = AppLayout(
+        header=header_button,
+        left_sidebar=left_tab,
+        right_sidebar=plotting_panels,
+        footer=footer,
+        # pane_widths=['380px', '0px', '1000px'],
+        pane_widths=['380px', '0', '1'],
+        pane_heights=['50px', '500px', '200px'],
+    )
     return hnn_gui
