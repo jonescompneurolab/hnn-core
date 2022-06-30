@@ -711,6 +711,14 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
+        from mpi4py import MPI
+        
+        # allow only the root rank to run a simulation if the user created it
+        # in parallel via a parent MPI process
+        # XXX this is a failsafe: ideally, the user will control for this by
+        # only running the simulation on a single rank
+        if self.mpi_comm_spawn and MPI.COMM_WORLD.Get_rank() != 0:
+            return list()
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
@@ -719,21 +727,24 @@ class MPIBackend(object):
                                                     n_trials=n_trials,
                                                     postproc=postproc)
 
-        from mpi4py import MPI
-
         env = _get_mpi_env()
+        command = self.command
+        if self.mpi_comm_spawn:
+            # add new env variable that can be accessed by mpi_child.py once
+            # started by Popen
+            mpi_child_fname = os.path.join(
+                os.path.dirname(sys.modules[__name__].__file__),
+                'mpi_child.py')
+            command = [sys.executable, mpi_child_fname]
+            env['HNN_CORE_MPI_COMM_SPAWN'] = '1'
+            env['HNN_CORE_SPAWN_CMD'] = self.command
+            env['HNN_CORE_SPAWN_INFO'] = 
 
         print("Running %d trials..." % (n_trials))
-        dpls = []
-
-        if self.mpi_comm_spawn:
-            subcomm = MPI.COMM_SELF.Spawn('nrniv', args=self.command,
-                                          info=self.mpi_comm_spawn_info,
-                                          maxprocs=self.n_procs)
-            self.spawn_intercomm = subcomm
+        dpls = list()
 
         self.proc, sim_data = run_subprocess(
-            command=self.command, obj=[net, tstop, dt, n_trials], timeout=30,
+            command=command, obj=[net, tstop, dt, n_trials], timeout=30,
             proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
             universal_newlines=True)
 

@@ -8,6 +8,7 @@ import sys
 import pickle
 import base64
 import re
+from os import environ
 
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
 
@@ -147,12 +148,25 @@ if __name__ == '__main__':
     rc = 0
 
     try:
-        with MPISimulation() as mpi_sim:
-            # XXX: _read_net -> _read_obj, fix later
-            net, tstop, dt, n_trials = mpi_sim._read_net()
-            sim_data = mpi_sim.run(net, tstop, dt, n_trials)
-            mpi_sim._write_data_stderr(sim_data)
-            mpi_sim._wait_for_exit_signal()
+        if 'HNN_CORE_MPI_COMM_SPAWN' in environ:
+            spawn = bool(environ['HNN_CORE_MPI_COMM_SPAWN'])
+            cmd = environ['HNN_CORE_SPAWN_CMD']
+            n_procs = int(environ['HNN_CORE_SPAWN_N_PROCS'])
+            if spawn:
+                from mpi4py import MPI
+
+                environ['HNN_CORE_MPI_COMM_SPAWN'] = '0'
+                subcomm = MPI.COMM_SELF.Spawn('nrniv', args=cmd,
+                                              info=self.mpi_comm_spawn_info,
+                                              maxprocs=n_procs)
+        else:
+
+            with MPISimulation() as mpi_sim:
+                # XXX: _read_net -> _read_obj, fix later
+                net, tstop, dt, n_trials = mpi_sim._read_net()
+                sim_data = mpi_sim.run(net, tstop, dt, n_trials)
+                mpi_sim._write_data_stderr(sim_data)
+                mpi_sim._wait_for_exit_signal()
     except Exception:
         # This can be useful to indicate the problem to the
         # caller (in parallel_backends.py)
