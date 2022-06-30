@@ -70,4 +70,4 @@ Continuous Integration
 The repository is tested via continuous integration with Travis and Circle. The automated
 tests run on Travis while the documentation is built on Circle.
 
-.. _parallel_backends: https://jonescompneurolab.github.io/hnn-core/parallel.html
+.. _parallel_backends: https://github.com/jonescompneurolab/hnn-core/blob/master/doc/parallel.rst
