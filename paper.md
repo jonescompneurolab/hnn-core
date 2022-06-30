@@ -1,5 +1,5 @@
 ---
-title: 'HNN-core: Biophysical modeling for the cellular and network interpretation of human MEG and EEG signals'
+title: 'HNN-core: Biophysical modeling for the cell and circuit level interpretation of human MEG and EEG signals'
 tags:
   - Python
   - neuroscience
@@ -32,40 +32,14 @@ bibliography: paper.bib
 
 # Summary
 
-Magneto- and electroencephalography (MEG/EEG) are powerful techniques to non-invasively record human brain activity. Their primary utility is providing markers of healthy brain function and disease states. However, the explanatory power of MEG/EEG biomarkers is challenged by a lack of understanding of how these signals are generated at the cell and circuit level. To address this challenge, the Human Neocortical Neurosolver (HNN) neural modeling software was created [@neymotin:2020]. HNN is a biophysically detailed neocortical column model which simulates the neural activity that generates the primary electrical currents underlying MEG/EEG signals.
+Magneto- and electroencephalography (MEG/EEG) are powerful techniques to non-invasively record human brain activity. Their primary utility is providing markers of healthy brain function and disease states. However, the explanatory power of MEG/EEG biomarkers is challenged by a lack of understanding of how these signals are generated at the cell and circuit level. To address this challenge, the Human Neocortical Neurosolver (HNN) neural modeling software was created [@neymotin2020human]. HNN is a biophysically detailed neocortical column model which simulates the neural activity that generates the primary electrical currents underlying MEG/EEG signals. `hnn-core` is a lightweight Pythonic Interface to the cortical column model implemented in HNN that retains all of the existing functionality. 
 
-`hnn-core` is a lightweight Pythonic Interface to the cortical column model implemented in the Human Neocortical Neurosolver (HNN) software. HNN was initially introduced as a standalone software operated through a graphical user interface.
+Activity in HNN is driven by biologically realistic layer-specific inputs. By simulating activity at the level of individual neurons, the ouputs can be directly compared to experimental recordings. The mechanistic origins of several neural phenomenon have been previously characterized using HNN, namely evoked responses [] and brain rhythyms [].
 
 # Statement of need
 
-`hnn-core` was created to enable the core functionality of HNN simulations in a Pythonic environment. By recreating HNN according to modern open source development standards, the software can now be easily extended, maintained, and integrated into existing data analysis workflows. Since its creation, significant enhancements have been made on top of the existing functionality in HNN. This includes the ability to record local field potentials, modify network connectivity, and an expanded suite of visualization functions. 
-
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
-
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+`hnn-core` was created to enable the core functionality of HNN simulations in a Pythonic environment. The original implementation of HNN was with a graphical user interface (GUI) which allowed users to quickly test hypotheses on the mechanistic origins of specific current dipole activity patterns. While the GUI has made the software accessible to a wider range of neuroscientists, the lack of a low-level command line interface hampered improvements to the existing software. By recreating HNN according to modern open source development standards, the model can now be easily extended, maintained, and integrated into existing data analysis workflows. Since its creation, significant enhancements have been made on top of the existing functionality in HNN. This includes the ability to record local field potentials, modify network connectivity, and plot simulated outputs with an expanded suite of visualization functions. 
 
 # Acknowledgements
 
 We acknowledge support from
-
-# References
