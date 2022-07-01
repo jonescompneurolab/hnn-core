@@ -533,17 +533,12 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
             # add_drives_from_params=add_drive_from_params.value,
             add_drives_from_params=False,
         )
+        # add connections here
 
-    try:
+
         for drive in drive_widgets:
-            weights_ampa = {
-                k: v.value
-                for k, v in drive['weights_ampa'].items()
-            }
-            weights_nmda = {
-                k: v.value
-                for k, v in drive['weights_nmda'].items()
-            }
+            weights_ampa = {k: v.value for k, v in drive['weights_ampa'].items()}
+            weights_nmda = {k: v.value for k, v in drive['weights_nmda'].items()}
             synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
             if drive['type'] == 'Poisson':
                 rate_constant = {
@@ -597,80 +592,10 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
                     weights_nmda=weights_nmda,
                     synaptic_delays=synaptic_delays,
                     seedcore=drive['seedcore'].value)
-    except Exception as e:
-        with log_out:
-            print(f"error in reading drives {e}")
 
+    log_out.clear_output()
     with log_out:
-        log_out.clear_output()
         print("start simulation")
-
-        variables['net'] = jones_2009_model()
-
-        weights_ampa_d1 = {
-            'L2_basket': 0.006562,
-            'L2_pyramidal': .000007,
-            'L5_pyramidal': 0.142300
-        }
-        weights_nmda_d1 = {
-            'L2_basket': 0.019482,
-            'L2_pyramidal': 0.004317,
-            'L5_pyramidal': 0.080074
-        }
-        synaptic_delays_d1 = {
-            'L2_basket': 0.1,
-            'L2_pyramidal': 0.1,
-            'L5_pyramidal': 0.1
-        }
-        variables['net'].add_evoked_drive('evdist1',
-                                          mu=63.53,
-                                          sigma=3.85,
-                                          numspikes=1,
-                                          weights_ampa=weights_ampa_d1,
-                                          weights_nmda=weights_nmda_d1,
-                                          location='distal',
-                                          synaptic_delays=synaptic_delays_d1,
-                                          event_seed=4)
-
-        weights_ampa_p1 = {
-            'L2_basket': 0.08831,
-            'L2_pyramidal': 0.01525,
-            'L5_basket': 0.19934,
-            'L5_pyramidal': 0.00865
-        }
-        synaptic_delays_prox = {
-            'L2_basket': 0.1,
-            'L2_pyramidal': 0.1,
-            'L5_basket': 1.,
-            'L5_pyramidal': 1.
-        }
-        # all NMDA weights are zero; pass None explicitly
-        variables['net'].add_evoked_drive('evprox1',
-                                          mu=26.61,
-                                          sigma=2.47,
-                                          numspikes=1,
-                                          weights_ampa=weights_ampa_p1,
-                                          weights_nmda=None,
-                                          location='proximal',
-                                          synaptic_delays=synaptic_delays_prox,
-                                          event_seed=4)
-
-        # Second proximal evoked drive. NB: only AMPA weights differ from first
-        weights_ampa_p2 = {
-            'L2_basket': 0.000003,
-            'L2_pyramidal': 1.438840,
-            'L5_basket': 0.008958,
-            'L5_pyramidal': 0.684013
-        }
-        # all NMDA weights are zero; omit weights_nmda (defaults to None)
-        variables['net'].add_evoked_drive('evprox2',
-                                          mu=137.12,
-                                          sigma=8.33,
-                                          numspikes=1,
-                                          weights_ampa=weights_ampa_p2,
-                                          location='proximal',
-                                          synaptic_delays=synaptic_delays_prox,
-                                          event_seed=4)
 
         if backend_selection.value == "MPI":
             variables['backend'] = MPIBackend(
