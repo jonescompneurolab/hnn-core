@@ -6,14 +6,15 @@
 import codecs
 import multiprocessing
 import os.path as op
+import numpy as np
 import os
 import matplotlib.pyplot as plt
-import numpy as np
 from IPython.display import display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText, Button,
                         Checkbox, Dropdown, FileUpload, FloatLogSlider,
                         FloatText, HBox, IntText, Layout, Output, RadioButtons,
-                        Tab, Text, VBox, interactive, interactive_output)
+                        Tab, Text, VBox, interactive, interactive_output,
+                        GridspecLayout)
 
 import hnn_core
 from hnn_core import (MPIBackend, JoblibBackend, Network, jones_2009_model,
@@ -396,10 +397,13 @@ def add_drive_widget(
             display(accordion)
 
 
+def _debug_update_plot_window(variables, _plot_out, plot_type, idx):
+    update_plot_window(variables, _plot_out, plot_type)
+
+
 def update_plot_window(variables, _plot_out, plot_type):
     # TODO need to add more informaion about "no data"
     _plot_out.clear_output()
-
     if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
         return
 
@@ -515,11 +519,11 @@ def on_upload_change(
             )
 
 
-def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
-                       tstop, ntrials, backend_selection, mpi_cmd,
-                       add_drive_from_params, params, b):
+def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
+                       ntrials, backend_selection, mpi_cmd,
+                       add_drive_from_params, params, plot_outputs_list,
+                       plot_dropdowns_list, b):
     """Run the simulation and plot outputs."""
-    plot_out.clear_output()
     log_out.clear_output()
     with log_out:
         params['dt'] = tstep.value
@@ -679,17 +683,21 @@ def run_button_clicked(log_out, plot_out, drive_widgets, variables, tstep,
                                                 tstop=tstop.value,
                                                 n_trials=ntrials.value)
 
-    with plot_out:
-        dpl_smooth_win = 20
-        dpl_scalefctr = 12
-        for dpl in variables['dpls']:
-            dpl.smooth(dpl_smooth_win)
-            dpl.scale(dpl_scalefctr)
+            dpl_smooth_win = 20
+            dpl_scalefctr = 12
+            for dpl in variables['dpls']:
+                dpl.smooth(dpl_smooth_win)
+                dpl.scale(dpl_scalefctr)
 
-        fig, ax = plt.subplots()
-        # variables['dpls'][0].plot(ax=ax)
-        plot_dipole(variables['dpls'], ax=ax, average=True)
-
+    for idx in range(len(plot_outputs_list)):
+        with log_out:
+            print(f"updating {idx}")
+        update_plot_window(
+            variables, plot_outputs_list[idx], {
+                "type": "change",
+                "name": "value",
+                "new": plot_dropdowns_list[idx].value
+            })
 
 
 def handle_backend_change(backend_type, mpi_cmd_config, mpi_cmd):
@@ -699,9 +707,144 @@ def handle_backend_change(backend_type, mpi_cmd_config, mpi_cmd):
             display(mpi_cmd)
 
 
-def test_del_widget(plot_out_1):
-    del plot_out_1
-    pass
+def init_LR_viz_layout(plot_outputs,
+                       plot_dropdowns,
+                       window_height,
+                       variables,
+                       plot_options,
+                       border='1px solid gray'):
+    height_plot = window_height
+    plot_outputs_L = Output(layout={'border': border, 'height': height_plot})
+
+    plot_dropdown_L = Dropdown(
+        options=plot_options,
+        value=plot_options[0],
+        description='Plot:',
+        disabled=False,
+    )
+    plot_dropdown_L.observe(
+        lambda plot_type: _debug_update_plot_window(
+            variables,
+            plot_outputs_L,
+            plot_type,
+            "Left",
+        ),
+        'value',
+    )
+
+    plot_outputs.append(plot_outputs_L)
+    plot_dropdowns.append(plot_dropdown_L)
+
+    plot_outputs_R = Output(layout={'border': border, 'height': height_plot})
+
+    plot_dropdown_R = Dropdown(
+        options=plot_options,
+        value=plot_options[1],
+        description='Plot:',
+        disabled=False,
+    )
+    plot_dropdown_R.observe(
+        lambda plot_type: _debug_update_plot_window(
+            variables,
+            plot_outputs_R,
+            plot_type,
+            "Right",
+        ),
+        'value',
+    )
+    plot_outputs.append(plot_outputs_R)
+    plot_dropdowns.append(plot_dropdown_R)
+
+    grid = GridspecLayout(1, 2, height=window_height)
+    grid[0, 0] = VBox([plot_dropdown_L, plot_outputs_L])
+    grid[0, 1] = VBox([plot_dropdown_R, plot_outputs_R])
+    return grid
+
+
+def init_UD_viz_layout(plot_outputs,
+                       plot_dropdowns,
+                       window_height,
+                       variables,
+                       plot_options,
+                       border='1px solid gray'):
+    height_plot = window_height
+    plot_outputs_U = Output(layout={
+        'border': border,
+        'height': f"{float(height_plot[:-2])/2}px"
+    })
+
+    plot_dropdown_U = Dropdown(
+        options=plot_options,
+        value=plot_options[0],
+        description='Plot:',
+        disabled=False,
+    )
+    plot_dropdown_U.observe(
+        lambda plot_type: _debug_update_plot_window(
+            variables,
+            plot_outputs_U,
+            plot_type,
+            "Left",
+        ),
+        'value',
+    )
+
+    plot_outputs.append(plot_outputs_U)
+    plot_dropdowns.append(plot_dropdown_U)
+
+    # Down
+    plot_outputs_D = Output(layout={'border': border, 'height': height_plot})
+
+    plot_dropdown_D = Dropdown(
+        options=plot_options,
+        value=plot_options[1],
+        description='Plot:',
+        disabled=False,
+    )
+    plot_dropdown_D.observe(
+        lambda plot_type: _debug_update_plot_window(
+            variables,
+            plot_outputs_D,
+            plot_type,
+            "Right",
+        ),
+        'value',
+    )
+    plot_outputs.append(plot_outputs_D)
+    plot_dropdowns.append(plot_dropdown_D)
+
+    grid = GridspecLayout(2, 1, height=window_height)
+    grid[0, 0] = VBox([plot_dropdown_U, plot_outputs_U])
+    grid[1, 0] = VBox([plot_dropdown_D, plot_outputs_D])
+    return grid
+
+
+def initialize_viz_window(viz_window,
+                          variables,
+                          plot_outputs,
+                          plot_dropdowns,
+                          window_width,
+                          window_height,
+                          layout_option="L-R"):
+    plot_options = [
+        'current dipole', 'input histogram', 'spikes', 'PSD', 'spectogram',
+        'network'
+    ]
+    viz_window.clear_output()
+    while len(plot_outputs) > 0:
+        plot_outputs.pop()
+        plot_dropdowns.pop()
+
+    with viz_window:
+        # L-R configurations
+        if layout_option == "L-R":
+            grid = init_LR_viz_layout(plot_outputs, plot_dropdowns,
+                                      window_height, variables, plot_options)
+        elif layout_option == "U-D":
+            grid = init_UD_viz_layout(plot_outputs, plot_dropdowns,
+                                      window_height, variables, plot_options)
+
+        display(grid)
 
 
 def run_hnn_gui():
@@ -716,11 +859,14 @@ def run_hnn_gui():
     drive_boxes = list()
     variables = dict(net=None, dpls=None)
 
-    def _run_button_clicked(b):
-        return run_button_clicked(log_out, plot_out, drive_widgets, variables,
-                                  tstep, tstop, ntrials, backend_selection,
-                                  mpi_cmd, add_drive_from_params, params, b)
+    plot_outputs_list = list()
+    plot_dropdowns_list = list()
 
+    def _run_button_clicked(b):
+        return run_button_clicked(log_out, drive_widgets, variables, tstep,
+                                  tstop, ntrials, backend_selection, mpi_cmd,
+                                  add_drive_from_params, params,
+                                  plot_outputs_list, plot_dropdowns_list, b)
 
     def _on_upload_change(change):
         return on_upload_change(change, sliders, params, tstop, tstep, log_out,
@@ -728,12 +874,6 @@ def run_hnn_gui():
                                 drives_out)
         # BUG: capture does not work, use log_out explicitly
         # return on_upload_change(change, sliders, params)
-
-    def _update_plot_window(plot_type):
-        return update_plot_window(variables, plot_out, plot_type)
-
-    def _update_plot_window_1(plot_type):
-        return update_plot_window(variables, plot_out_1, plot_type)
 
     def _delete_drives_clicked(b):
         drives_out.clear_output()
@@ -743,8 +883,6 @@ def run_hnn_gui():
             drive_widgets.pop()
             drive_boxes.pop()
 
-
-
     # Output windows
     drives_out = Output()  # window to add new drives
     log_out = Output(layout={
@@ -752,15 +890,11 @@ def run_hnn_gui():
         'height': '150px',
         'overflow_y': 'auto'
     })
-
-    height_plot = '500px'
-    plot_out = Output(layout={
-        'border': '1px solid gray',
-        'height': height_plot
-    })
-    plot_out_1 = Output(layout={
-        'border': '1px solid gray',
-        'height': height_plot
+    viz_width = "1000px"
+    viz_height = "500px"
+    viz_window = Output(layout={
+        'height': viz_height,
+        'width': viz_width,
     })
 
     # header_button
@@ -769,13 +903,42 @@ def run_hnn_gui():
                                            height='40px')
 
     # Simulation parameters
-    tstop = FloatText(value=170, description='tstop (s):', disabled=False)
-    tstep = FloatText(value=0.025, description='tstep (s):', disabled=False)
+    tstop = FloatText(value=170, description='tstop (ms):', disabled=False)
+    tstep = FloatText(value=0.025, description='tstep (ms):', disabled=False)
     ntrials = IntText(value=1, description='Trials:', disabled=False)
     # temporarily keep this
     add_drive_from_params = Checkbox(value=False,
                                      description='Add drives from parameters:',
                                      disabled=False)
+
+    viz_layout_selection = Dropdown(
+        options=[('Horizontal', 'L-R'), ('Vertical', 'U-D')],
+        value='L-R',
+        description='Layout:',
+    )
+    # initialize
+    initialize_viz_window(
+        viz_window,
+        variables,
+        plot_outputs_list,
+        plot_dropdowns_list,
+        viz_width,
+        viz_height,
+        layout_option=viz_layout_selection.value,
+    )
+
+    def handle_viz_layout_change(layout_option):
+        return initialize_viz_window(
+            viz_window,
+            variables,
+            plot_outputs_list,
+            plot_dropdowns_list,
+            viz_width,
+            viz_height,
+            layout_option=layout_option.new,
+        )
+
+    viz_layout_selection.observe(handle_viz_layout_change, 'value')
 
     backend_selection = Dropdown(
         options=[('Joblib', 'Joblib'), ('MPI', 'MPI')],
@@ -802,11 +965,8 @@ def run_hnn_gui():
         ntrials,
         add_drive_from_params,
         backend_selection,
-        # mpi_cmd,
-        mpi_cmd_config
+        mpi_cmd_config,
     ])
-
-
 
     # Sliders to change local-connectivity params
     sliders = [
@@ -874,26 +1034,6 @@ def run_hnn_gui():
     for idx, title in enumerate(titles):
         left_tab.set_title(idx, title)
 
-    # Dropdown menu to switch between plots
-    plot_options = [
-        'input histogram', 'current dipole', 'spikes', 'PSD', 'spectogram',
-        'network'
-    ]
-    plot_dropdown = Dropdown(options=plot_options,
-                             value='current dipole',
-                             description='Plot:',
-                             disabled=False)
-
-    interactive(_update_plot_window, plot_type='current dipole')
-    plot_dropdown.observe(_update_plot_window, 'value')
-
-    plot_dropdown_1 = Dropdown(options=plot_options,
-                               value='current dipole',
-                               description='Plot:',
-                               disabled=False)
-    interactive(_update_plot_window_1, plot_type='current dipole')
-    plot_dropdown_1.observe(_update_plot_window_1, 'value')
-
     # Run, delete drives and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
 
@@ -911,28 +1051,22 @@ def run_hnn_gui():
     run_button.on_click(_run_button_clicked)
 
     delete_button.on_click(_delete_drives_clicked)
+    left_width = '380px'
     footer = VBox([
         HBox([
-            run_button, load_button, delete_button,
+            HBox([run_button, load_button, delete_button],
+                 layout={"width": left_width}),
+            viz_layout_selection,
         ]), log_out
     ])
-
-    plot_out_width = "500px"
-    plot_out.layout.width = plot_out_width
-    plot_out_1.layout.width = plot_out_width
-
-    plotting_panels = HBox(
-        [VBox([plot_dropdown, plot_out]),
-         VBox([plot_dropdown_1, plot_out_1])])
 
     # Final layout of the app
     hnn_gui = AppLayout(
         header=header_button,
         left_sidebar=left_tab,
-        right_sidebar=plotting_panels,
+        right_sidebar=viz_window,
         footer=footer,
-        # pane_widths=['380px', '0px', '1000px'],
-        pane_widths=['380px', '0', '1'],
-        pane_heights=['50px', '500px', '200px'],
+        pane_widths=[left_width, '0px', viz_width],
+        pane_heights=['50px', viz_height, '200px'],
     )
     return hnn_gui
