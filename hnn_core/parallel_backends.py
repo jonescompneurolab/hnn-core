@@ -37,7 +37,7 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     To be called after simulate(). Returns list of Dipoles, one for each trial,
     and saves spiking info in net (instance of Network).
     """
-    dpls = []
+    dpls = list()
 
     # Create array of equally sampled time points for simulating currents
     cell_type_names = list(net.cell_types.keys())
@@ -90,6 +90,20 @@ def _get_mpi_env():
         my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
         my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
     return my_env
+
+
+def spawn_subprocess(parent_comm, command, n_procs, info=None):
+    """Spawn child simulation processes from an existing MPI process"""
+
+    if info is None:
+        subcomm = parent_comm.Spawn('nrniv', args=command,
+                                    maxprocs=n_procs)
+    else:
+        subcomm = parent_comm.Spawn('nrniv', args=command,
+                                    info=info,
+                                    maxprocs=n_procs)
+    
+    return subcomm
 
 
 def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
@@ -603,7 +617,10 @@ class MPIBackend(object):
         self.expected_data_length = 0
         self.proc = None
         self.proc_queue = Queue()
+        self.mpi_comm_spawn = mpi_comm_spawn
+        self.mpi_comm_spawn_info = mpi_comm_spawn_info
         self._intracomm = None
+        self._selfcomm = None
         self._child_intercomm = None
 
         n_logical_cores = multiprocessing.cpu_count()
@@ -647,37 +664,43 @@ class MPIBackend(object):
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
 
-        if mpi_comm_spawn and _has_mpi4py():
+        if self.mpi_comm_spawn and _has_mpi4py():
             from mpi4py import MPI
 
             self._intracomm = MPI.COMM_WORLD
-            #self._child_intercomm = MPI.COMM_SELF
+            self._selfcomm = MPI.COMM_SELF
             if self._intracomm.Get_rank() != 0:
                 raise RuntimeError('MPI is attempting to spawn multiple '
                                    'child subprocesses. Make sure only one '
                                    'parent MPI process is running when '
                                    '"mpi_comm_spawn" is True.')
 
+            self.command = 'nrniv -python -mpi -nobanner ' + \
+                sys.executable + ' ' + \
+                os.path.join(os.path.dirname(sys.modules[__name__].__file__),
+                             'mpi_comm_spawn_child.py')
+
         else:
+            self.command = mpi_cmd + \
+                ' -np ' + str(self.n_procs)
+
             if hyperthreading:
-                self.command = '--use-hwthread-cpus ' + self.command
+                self.command += ' --use-hwthread-cpus'
 
             if oversubscribe:
-                self.command = '--oversubscribe ' + self.command
+                self.command += ' --oversubscribe'
 
-            self.command = mpi_cmd \
-                + ' -np ' + str(self.n_procs) + ' ' \
-                + self.command
+            self.command += ' nrniv -python -mpi -nobanner ' + \
+                sys.executable + ' ' + \
+                os.path.join(os.path.dirname(sys.modules[__name__].__file__),
+                             'mpi_child.py')
 
-            # Split the command into shell arguments for passing to Popen
-            if 'win' in sys.platform:
-                use_posix = True
-            else:
-                use_posix = False
-            self.command = shlex.split(self.command, posix=use_posix)
-
-        self.mpi_comm_spawn = mpi_comm_spawn
-        self.mpi_comm_spawn_info = mpi_comm_spawn_info
+        # Split the command into shell arguments for passing to Popen
+        if 'win' in sys.platform:
+            use_posix = True
+        else:
+            use_posix = False
+        self.command = shlex.split(self.command, posix=use_posix)
 
     def __enter__(self):
         global _BACKEND
@@ -726,26 +749,21 @@ class MPIBackend(object):
                                                     n_trials=n_trials,
                                                     postproc=postproc)
 
-        env = _get_mpi_env()
-        command = self.command
-        if self.mpi_comm_spawn:
-            # add new env variable that can be accessed by mpi_child.py once
-            # started by Popen
-            mpi_child_fname = os.path.join(
-                os.path.dirname(sys.modules[__name__].__file__),
-                'mpi_child.py')
-            command = [sys.executable, mpi_child_fname]
-            env['HNN_CORE_MPI_COMM_SPAWN'] = '1'
-            env['HNN_CORE_SPAWN_CMD'] = self.command
-            env['HNN_CORE_SPAWN_INFO'] = ''
-
         print("Running %d trials..." % (n_trials))
-        dpls = list()
 
-        self.proc, sim_data = run_subprocess(
-            command=command, obj=[net, tstop, dt, n_trials], timeout=30,
-            proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
-            universal_newlines=True)
+        if self.mpi_comm_spawn:
+            self._child_intercomm = spawn_subprocess(
+                parent_comm=self._selfcomm,
+                command=self.command,
+                n_procs=self.n_procs,
+                info=self.mpi_comm_spawn_info)
+
+        else:
+            env = _get_mpi_env()
+            self.proc, sim_data = run_subprocess(
+                command=self.command, obj=[net, tstop, dt, n_trials], timeout=30,
+                proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
+                universal_newlines=True)
 
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls

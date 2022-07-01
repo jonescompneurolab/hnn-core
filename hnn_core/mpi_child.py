@@ -151,39 +151,11 @@ if __name__ == '__main__':
     rc = 0
 
     try:
-        try:
-            if bool(environ['HNN_CORE_MPI_COMM_SPAWN']):
-                cmd = environ['HNN_CORE_SPAWN_CMD']
-                # Split the command into shell arguments for passing to Popen
-                if 'win' in sys.platform:
-                    use_posix = True
-                else:
-                    use_posix = False
-                cmd = shlex.split(cmd, posix=use_posix)
-
-                n_procs = int(environ['HNN_CORE_SPAWN_N_PROCS'])
-                info = environ['HNN_CORE_SPAWN_INFO']
-
-                # important: update MPI_COMM_SPAWN env var so that it can call
-                # mpi_child.py again without spawning its own child MPI process
-                environ['HNN_CORE_MPI_COMM_SPAWN'] = '0'
-                
-                if not info:
-                    subcomm = MPI.COMM_SELF.Spawn('nrniv', args=cmd,
-                                                  maxprocs=n_procs)
-                else:
-                    subcomm = MPI.COMM_SELF.Spawn('nrniv', args=cmd,
-                                                  info=info,
-                                                  maxprocs=n_procs)
-            else:
-                raise KeyError  # trigger exception where the simulation is run
-
-        except KeyError:
-            with MPISimulation() as mpi_sim:
-                net, tstop, dt, n_trials = mpi_sim._read_net()
-                sim_data = mpi_sim.run(net, tstop, dt, n_trials)
-                mpi_sim._write_data_stderr(sim_data)
-                mpi_sim._wait_for_exit_signal()
+        with MPISimulation() as mpi_sim:
+            net, tstop, dt, n_trials = mpi_sim._read_net()
+            sim_data = mpi_sim.run(net, tstop, dt, n_trials)
+            mpi_sim._write_data_stderr(sim_data)
+            mpi_sim._wait_for_exit_signal()
 
     except Exception:
         # This can be useful to indicate the problem to the
