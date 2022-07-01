@@ -3,12 +3,15 @@ This script is called directly from MPIBackend.simulate()
 """
 
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
+#          Ryan Thorpe <ryvthorpe@gmail.com>
 
 import sys
 import pickle
 import base64
 import re
+import shlex
 from os import environ
+from mpi4py import MPI
 
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
 
@@ -73,7 +76,7 @@ class MPISimulation(object):
             MPI.Finalize()
 
     def _read_net(self):
-        """Read net broadcasted to all ranks on stdin"""
+        """Read net and associated objects broadcasted to all ranks on stdin"""
 
         # read Network from stdin
         if self.rank == 0:
@@ -148,25 +151,40 @@ if __name__ == '__main__':
     rc = 0
 
     try:
-        if 'HNN_CORE_MPI_COMM_SPAWN' in environ:
-            spawn = bool(environ['HNN_CORE_MPI_COMM_SPAWN'])
-            cmd = environ['HNN_CORE_SPAWN_CMD']
-            n_procs = int(environ['HNN_CORE_SPAWN_N_PROCS'])
-            if spawn:
-                from mpi4py import MPI
+        try:
+            if bool(environ['HNN_CORE_MPI_COMM_SPAWN']):
+                cmd = environ['HNN_CORE_SPAWN_CMD']
+                # Split the command into shell arguments for passing to Popen
+                if 'win' in sys.platform:
+                    use_posix = True
+                else:
+                    use_posix = False
+                cmd = shlex.split(cmd, posix=use_posix)
 
+                n_procs = int(environ['HNN_CORE_SPAWN_N_PROCS'])
+                info = environ['HNN_CORE_SPAWN_INFO']
+
+                # important: update MPI_COMM_SPAWN env var so that it can call
+                # mpi_child.py again without spawning its own child MPI process
                 environ['HNN_CORE_MPI_COMM_SPAWN'] = '0'
-                subcomm = MPI.COMM_SELF.Spawn('nrniv', args=cmd,
-                                              info=self.mpi_comm_spawn_info,
-                                              maxprocs=n_procs)
-        else:
+                
+                if not info:
+                    subcomm = MPI.COMM_SELF.Spawn('nrniv', args=cmd,
+                                                  maxprocs=n_procs)
+                else:
+                    subcomm = MPI.COMM_SELF.Spawn('nrniv', args=cmd,
+                                                  info=info,
+                                                  maxprocs=n_procs)
+            else:
+                raise KeyError  # trigger exception where the simulation is run
 
+        except KeyError:
             with MPISimulation() as mpi_sim:
-                # XXX: _read_net -> _read_obj, fix later
                 net, tstop, dt, n_trials = mpi_sim._read_net()
                 sim_data = mpi_sim.run(net, tstop, dt, n_trials)
                 mpi_sim._write_data_stderr(sim_data)
                 mpi_sim._wait_for_exit_signal()
+
     except Exception:
         # This can be useful to indicate the problem to the
         # caller (in parallel_backends.py)

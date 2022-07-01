@@ -590,9 +590,6 @@ class MPIBackend(object):
         with the JoblibBackend
     command : list of str
         Command to run as subprocess (see subprocess.Popen documentation).
-    spawn_intercomm : mpi4py.MPI.Intercomm | None
-        The spawned intercommunicator instance if a new MPI subprocess was
-        spawned. Otherwise, None.
     expected_data_length : int
         Used to check consistency between data that was sent and what
         MPIBackend received.
@@ -606,6 +603,8 @@ class MPIBackend(object):
         self.expected_data_length = 0
         self.proc = None
         self.proc_queue = Queue()
+        self._intracomm = None
+        self._child_intercomm = None
 
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
@@ -643,34 +642,42 @@ class MPIBackend(object):
             warn(f'{packages} not installed. Will run on single processor')
             self.n_procs = 1
 
-        if mpi_comm_spawn:
-            self.command = ''
-        else:
-            self.command = mpi_cmd
-
-            if hyperthreading:
-                self.command += ' --use-hwthread-cpus'
-
-            if oversubscribe:
-                self.command += ' --oversubscribe'
-
-            self.command += ' -np ' + str(self.n_procs) + ' '
-
-        self.command += 'nrniv -python -mpi -nobanner ' + \
+        self.command = 'nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
 
-        # Split the command into shell arguments for passing to Popen
-        if 'win' in sys.platform:
-            use_posix = True
+        if mpi_comm_spawn and _has_mpi4py():
+            from mpi4py import MPI
+
+            self._intracomm = MPI.COMM_WORLD
+            #self._child_intercomm = MPI.COMM_SELF
+            if self._intracomm.Get_rank() != 0:
+                raise RuntimeError('MPI is attempting to spawn multiple '
+                                   'child subprocesses. Make sure only one '
+                                   'parent MPI process is running when '
+                                   '"mpi_comm_spawn" is True.')
+
         else:
-            use_posix = False
-        self.command = shlex.split(self.command, posix=use_posix)
+            if hyperthreading:
+                self.command = '--use-hwthread-cpus ' + self.command
+
+            if oversubscribe:
+                self.command = '--oversubscribe ' + self.command
+
+            self.command = mpi_cmd \
+                + ' -np ' + str(self.n_procs) + ' ' \
+                + self.command
+
+            # Split the command into shell arguments for passing to Popen
+            if 'win' in sys.platform:
+                use_posix = True
+            else:
+                use_posix = False
+            self.command = shlex.split(self.command, posix=use_posix)
 
         self.mpi_comm_spawn = mpi_comm_spawn
         self.mpi_comm_spawn_info = mpi_comm_spawn_info
-        self.spawn_intercomm = None  # updated in self.simulate
 
     def __enter__(self):
         global _BACKEND
@@ -711,14 +718,6 @@ class MPIBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
-        from mpi4py import MPI
-        
-        # allow only the root rank to run a simulation if the user created it
-        # in parallel via a parent MPI process
-        # XXX this is a failsafe: ideally, the user will control for this by
-        # only running the simulation on a single rank
-        if self.mpi_comm_spawn and MPI.COMM_WORLD.Get_rank() != 0:
-            return list()
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
@@ -738,7 +737,7 @@ class MPIBackend(object):
             command = [sys.executable, mpi_child_fname]
             env['HNN_CORE_MPI_COMM_SPAWN'] = '1'
             env['HNN_CORE_SPAWN_CMD'] = self.command
-            env['HNN_CORE_SPAWN_INFO'] = 
+            env['HNN_CORE_SPAWN_INFO'] = ''
 
         print("Running %d trials..." % (n_trials))
         dpls = list()
