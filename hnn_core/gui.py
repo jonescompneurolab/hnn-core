@@ -940,7 +940,7 @@ def run_hnn_gui():
     layout = Layout(width='200px', height='100px')
 
     drive_type_selection = RadioButtons(
-        options=['Evoked', 'Poisson', 'Rhythmic', 'Bursty'],
+        options=['Evoked', 'Poisson', 'Rhythmic'],
         value='Evoked',
         description='Drive:',
         disabled=False,
