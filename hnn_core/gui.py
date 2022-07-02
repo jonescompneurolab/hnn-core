@@ -147,11 +147,13 @@ def _get_rhythmic_widget(
     tstart_std = FloatText(value=default_data['tstart_std'],
                            description='Start time dev (ms)',
                            **kwargs)
-    tstop = BoundedFloatText(value=tstop_widget.value if default_data['tstop']
-                             == 0 else default_data['tstop'],
-                             description='Stop time (ms)',
-                             max=tstop_widget.value,
-                             **kwargs)
+    tstop = BoundedFloatText(
+        value=tstop_widget.value
+        if default_data['tstop'] == 0 else default_data['tstop'],
+        description='Stop time (ms)',
+        max=tstop_widget.value,
+        **kwargs,
+    )
     burst_rate = FloatText(value=default_data['burst_rate'],
                            description='Burst rate (Hz)',
                            **kwargs)
@@ -219,12 +221,14 @@ def _get_poisson_widget(
                        description='Start time (ms)',
                        layout=layout,
                        style=style)
-    tstop = BoundedFloatText(value=tstop_widget.value if default_data['tstop']
-                             == 0 else default_data['tstop'],
-                             max=tstop_widget.value,
-                             description='Stop time (ms)',
-                             layout=layout,
-                             style=style)
+    tstop = BoundedFloatText(
+        value=tstop_widget.value
+        if default_data['tstop'] == 0 else default_data['tstop'],
+        max=tstop_widget.value,
+        description='Stop time (ms)',
+        layout=layout,
+        style=style,
+    )
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        layout=layout,
@@ -782,7 +786,7 @@ def initialize_viz_window(viz_window,
         elif layout_option == "U-D":
             grid = init_UD_viz_layout(plot_outputs, plot_dropdowns,
                                       window_height, variables, plot_options)
-        # TODO: 2x2 grids
+        # TODO: 2x2
 
         display(grid)
 
