@@ -932,9 +932,9 @@ def run_hnn_gui():
         'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
         'Layer 5 Basket'
     ]
-    accordian = Accordion(children=boxes)
+    cell_connectivity = Accordion(children=boxes)
     for idx, title in enumerate(titles):
-        accordian.set_title(idx, title)
+        cell_connectivity.set_title(idx, title)
 
     # Dropdown for different drives
     layout = Layout(width='200px', height='100px')
@@ -971,7 +971,7 @@ def run_hnn_gui():
 
     # Tabs for left pane
     left_tab = Tab()
-    left_tab.children = [simulation_box, accordian, drives_options]
+    left_tab.children = [simulation_box, cell_connectivity, drives_options]
     titles = ['Simulation', 'Cell connectivity', 'Drives']
     for idx, title in enumerate(titles):
         left_tab.set_title(idx, title)
