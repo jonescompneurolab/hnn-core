@@ -60,30 +60,31 @@ def _add_connectivity():
     pass
 
 
-def _get_cell_specific_widgets(layout,
-                               style,
-                               location,
-                               data=None,
-                               default_data={
-                                   'weights_ampa': {
-                                       'L5_pyramidal': 0.,
-                                       'L2_pyramidal': 0.,
-                                       'L5_basket': 0.,
-                                       'L2_basket': 0.
-                                   },
-                                   'weights_nmda': {
-                                       'L5_pyramidal': 0.,
-                                       'L2_pyramidal': 0.,
-                                       'L5_basket': 0.,
-                                       'L2_basket': 0.
-                                   },
-                                   'delays': {
-                                       'L5_pyramidal': 0.1,
-                                       'L2_pyramidal': 0.1,
-                                       'L5_basket': 0.1,
-                                       'L2_basket': 0.1
-                                   },
-                               }):
+def _get_cell_specific_widgets(
+    layout,
+    style,
+    location,
+    data=None,
+    default_data={
+        'weights_ampa': {
+            'L5_pyramidal': 0.,
+            'L2_pyramidal': 0.,
+            'L5_basket': 0.,
+            'L2_basket': 0.
+        },
+        'weights_nmda': {
+            'L5_pyramidal': 0.,
+            'L2_pyramidal': 0.,
+            'L5_basket': 0.,
+            'L2_basket': 0.
+        },
+        'delays': {
+            'L5_pyramidal': 0.1,
+            'L2_pyramidal': 0.1,
+            'L5_basket': 0.1,
+            'L2_basket': 0.1
+        },
+    }):
     if isinstance(data, dict):
         for k in default_data.keys():
             if k in data:
