@@ -56,10 +56,14 @@ def _get_sliders(params, param_keys):
     return sliders
 
 
+def _add_connectivity():
+    pass
+
+
 def _get_cell_specific_widgets(layout,
                                style,
                                location,
-                               data={},
+                               data=None,
                                default_data={
                                    'weights_ampa': {
                                        'L5_pyramidal': 0.,
@@ -80,10 +84,10 @@ def _get_cell_specific_widgets(layout,
                                        'L2_basket': 0.1
                                    },
                                }):
-
-    for k in default_data.keys():
-        if k in data:
-            default_data[k].update(data[k])
+    if isinstance(data, dict):
+        for k in default_data.keys():
+            if k in data:
+                default_data[k].update(data[k])
 
     kwargs = dict(layout=layout, style=style)
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
@@ -125,7 +129,7 @@ def _get_rhythmic_widget(
     layout,
     style,
     location,
-    data={},
+    data=None,
     default_data={
         'tstart': 0.,
         'tstart_std': 0.,
@@ -135,11 +139,12 @@ def _get_rhythmic_widget(
         'repeats': 1,
         'seedcore': 14,
     },
-    default_weights_ampa={},
-    default_weights_nmda={},
-    default_delays={},
+    default_weights_ampa=None,
+    default_weights_nmda=None,
+    default_delays=None,
 ):
-    default_data.update(data)
+    if isinstance(data, dict):
+        default_data.update(data)
     kwargs = dict(layout=layout, style=style)
     tstart = FloatText(value=default_data['tstart'],
                        description='Start time (ms)',
@@ -200,7 +205,7 @@ def _get_poisson_widget(
     layout,
     style,
     location,
-    data={},
+    data=None,
     default_data={
         'tstart': 0.0,
         'tstop': 0.0,
@@ -212,11 +217,12 @@ def _get_poisson_widget(
             'L2_basket': 8.5,
         }
     },
-    default_weights_ampa={},
-    default_weights_nmda={},
-    default_delays={},
+    default_weights_ampa=None,
+    default_weights_nmda=None,
+    default_delays=None,
 ):
-    default_data.update(data)
+    if isinstance(data, dict):
+        default_data.update(data)
     tstart = FloatText(value=default_data['tstart'],
                        description='Start time (ms)',
                        layout=layout,
@@ -276,18 +282,19 @@ def _get_evoked_widget(
     layout,
     style,
     location,
-    data={},
+    data=None,
     default_data={
         'mu': 0,
         'sigma': 1,
         'numspikes': 1,
         'seedcore': 14,
     },
-    default_weights_ampa={},
-    default_weights_nmda={},
-    default_delays={},
+    default_weights_ampa=None,
+    default_weights_nmda=None,
+    default_delays=None,
 ):
-    default_data.update(data)
+    if isinstance(data, dict):
+        default_data.update(data)
     kwargs = dict(layout=layout, style=style)
     mu = FloatText(value=default_data['mu'],
                    description='Mean time:',
@@ -334,10 +341,10 @@ def add_drive_widget(
     tstop_widget,
     location,
     prespecified_drive_name=None,
-    prespecified_drive_data={},
-    prespecified_weights_ampa={},
-    prespecified_weights_nmda={},
-    prespecified_delays={},
+    prespecified_drive_data=None,
+    prespecified_weights_ampa=None,
+    prespecified_weights_nmda=None,
+    prespecified_delays=None,
     render=True,
     expand_last_drive=True,
     event_seed=14,
@@ -346,8 +353,10 @@ def add_drive_widget(
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
     drives_out.clear_output()
-
+    if not prespecified_drive_data:
+        prespecified_drive_data = {}
     prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
+
     with drives_out:
         if not prespecified_drive_name:
             name = drive_type + str(len(drive_boxes))
