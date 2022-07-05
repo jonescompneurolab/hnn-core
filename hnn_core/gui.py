@@ -333,22 +333,20 @@ def _get_evoked_widget(
     return drive, drive_box
 
 
-def add_drive_widget(
-    drive_type,
-    drive_boxes,
-    drive_widgets,
-    drives_out,
-    tstop_widget,
-    location,
-    prespecified_drive_name=None,
-    prespecified_drive_data=None,
-    prespecified_weights_ampa=None,
-    prespecified_weights_nmda=None,
-    prespecified_delays=None,
-    render=True,
-    expand_last_drive=True,
-    event_seed=14
-):
+def add_drive_widget(drive_type,
+                     drive_boxes,
+                     drive_widgets,
+                     drives_out,
+                     tstop_widget,
+                     location,
+                     prespecified_drive_name=None,
+                     prespecified_drive_data=None,
+                     prespecified_weights_ampa=None,
+                     prespecified_weights_nmda=None,
+                     prespecified_delays=None,
+                     render=True,
+                     expand_last_drive=True,
+                     event_seed=14):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
@@ -477,6 +475,7 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
         drive_names = sorted(drive_specs.keys())
         for idx, drive_name in enumerate(drive_names):  # order matters
             specs = drive_specs[drive_name]
+            should_render = idx == (len(drive_names) - 1)
             print(f"""load drive:
                 (name={drive_name},
                 type={specs['type']},
@@ -496,7 +495,7 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
                 prespecified_weights_ampa=specs['weights_ampa'],
                 prespecified_weights_nmda=specs['weights_nmda'],
                 prespecified_delays=specs['synaptic_delays'],
-                render=idx == len(drive_names) - 1,
+                render=should_render,
                 expand_last_drive=False,
                 event_seed=specs['event_seed'],
             )
