@@ -5,30 +5,32 @@
 
 import codecs
 import multiprocessing
-import os.path as op
-import numpy as np
 import os
+import os.path as op
+
 import matplotlib.pyplot as plt
+import numpy as np
 from IPython.display import display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText, Button,
-                        Dropdown, FileUpload, FloatLogSlider, FloatText, HBox,
-                        IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
-                        interactive_output, GridspecLayout)
+                        Dropdown, FileUpload, FloatLogSlider, FloatText,
+                        GridspecLayout, HBox, IntText, Layout, Output,
+                        RadioButtons, Tab, Text, VBox, interactive_output)
 
 import hnn_core
-from hnn_core import (MPIBackend, JoblibBackend, read_params, simulate_dipole,
-                      jones_2009_model)
-from hnn_core.params import (_read_json, _read_legacy_params,
-                             _extract_drive_specs_from_hnn_params)
+from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
+                      simulate_dipole)
+from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
+                             _read_legacy_params)
 from hnn_core.viz import plot_dipole
 
 
-def create_expanded_button(description, button_style, height):
+def create_expanded_button(description, button_style, height, disabled=False):
     style = {'button_color': '#8A2BE2'}
     return Button(description=description,
                   button_style=button_style,
                   layout=Layout(height=height, width='auto'),
-                  style=style)
+                  style=style,
+                  disabled=disabled)
 
 
 def _get_sliders(params, param_keys):
@@ -345,7 +347,7 @@ def add_drive_widget(
     prespecified_delays=None,
     render=True,
     expand_last_drive=True,
-    event_seed=14,
+    event_seed=14
 ):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
@@ -459,8 +461,7 @@ def update_plot_window(variables, _plot_out, plot_type):
 
 def load_drives(variables, params, log_out, drives_out, drive_widgets,
                 drive_boxes, tstop):
-    """Add drive ipywidgets from params.
-    """
+    """Add drive ipywidgets from params."""
     variables['net'] = jones_2009_model(params)
     log_out.clear_output()
     with log_out:
@@ -657,11 +658,11 @@ def handle_backend_change(backend_type, mpi_cmd_config, mpi_cmd):
 
 
 def init_left_right_viz_layout(plot_outputs,
-                       plot_dropdowns,
-                       window_height,
-                       variables,
-                       plot_options,
-                       border='1px solid gray'):
+                               plot_dropdowns,
+                               window_height,
+                               variables,
+                               plot_options,
+                               border='1px solid gray'):
     height_plot = window_height
     plot_outputs_L = Output(layout={'border': border, 'height': height_plot})
 
@@ -711,11 +712,11 @@ def init_left_right_viz_layout(plot_outputs,
 
 
 def init_upper_down_viz_layout(plot_outputs,
-                       plot_dropdowns,
-                       window_height,
-                       variables,
-                       plot_options,
-                       border='1px solid gray'):
+                               plot_dropdowns,
+                               window_height,
+                               variables,
+                               plot_options,
+                               border='1px solid gray'):
     height_plot = window_height
     plot_outputs_U = Output(layout={
         'border': border,
@@ -788,11 +789,13 @@ def initialize_viz_window(viz_window,
         # Left-Rright configuration
         if layout_option == "L-R":
             grid = init_left_right_viz_layout(plot_outputs, plot_dropdowns,
-                                      window_height, variables, plot_options)
+                                              window_height, variables,
+                                              plot_options)
         # Upper-Down configuration
         elif layout_option == "U-D":
             grid = init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
-                                      window_height, variables, plot_options)
+                                              window_height, variables,
+                                              plot_options)
         # TODO: 2x2
 
         display(grid)
@@ -853,7 +856,8 @@ def run_hnn_gui():
     # header_button
     header_button = create_expanded_button('HUMAN NEOCORTICAL NEUROSOLVER',
                                            'success',
-                                           height='40px')
+                                           height='40px',
+                                           disabled=True)
 
     # Simulation parameters
     tstop = FloatText(value=170, description='tstop (ms):', disabled=False)
