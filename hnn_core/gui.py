@@ -628,7 +628,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
                 n_procs=multiprocessing.cpu_count() - 1, mpi_cmd=mpi_cmd.value)
         else:
             variables['backend'] = JoblibBackend(n_jobs=joblib_cores.value)
-            print(f"Using Joblib as backend with {joblib_cores.value} core(s).")
+            print(f"Using Joblib with {joblib_cores.value} core(s).")
         with variables['backend']:
             variables['dpls'] = simulate_dipole(variables['net'],
                                                 tstop=tstop.value,
