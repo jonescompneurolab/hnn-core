@@ -16,8 +16,8 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText, Button,
                         interactive_output, GridspecLayout)
 
 import hnn_core
-from hnn_core import (MPIBackend, JoblibBackend, read_params,
-                      simulate_dipole, jones_2009_model)
+from hnn_core import (MPIBackend, JoblibBackend, read_params, simulate_dipole,
+                      jones_2009_model)
 from hnn_core.params import (_read_json, _read_legacy_params,
                              _extract_drive_specs_from_hnn_params)
 from hnn_core.viz import plot_dipole
@@ -930,7 +930,10 @@ def run_hnn_gui():
         ]),
         _get_sliders(params,
                      ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
-        _get_sliders(params, ['gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr'])
+        _get_sliders(params, [
+            'gbar_L2Pyr_L5Basket', 'gbar_L5Pyr_L5Basket',
+            'gbar_L5Basket_L5Basket'
+        ])
     ]
 
     # accordians to group local-connectivity by cell type
