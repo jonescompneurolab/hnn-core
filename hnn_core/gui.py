@@ -16,8 +16,8 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText, Button,
                         interactive_output, GridspecLayout)
 
 import hnn_core
-from hnn_core import (MPIBackend, JoblibBackend, Network, read_params,
-                      simulate_dipole)
+from hnn_core import (MPIBackend, JoblibBackend, read_params,
+                      simulate_dipole, jones_2009_model)
 from hnn_core.params import (_read_json, _read_legacy_params,
                              _extract_drive_specs_from_hnn_params)
 from hnn_core.viz import plot_dipole
@@ -54,10 +54,6 @@ def _get_sliders(params, param_keys):
 
     interactive_output(_update_params, {s.description: s for s in sliders})
     return sliders
-
-
-def _add_connectivity():
-    pass
 
 
 def _get_cell_specific_widgets(
@@ -465,7 +461,7 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
                 drive_boxes, tstop):
     """Add drive ipywidgets from params.
     """
-    variables['net'] = Network(params)
+    variables['net'] = jones_2009_model(params)
     log_out.clear_output()
     with log_out:
         drive_specs = _extract_drive_specs_from_hnn_params(
@@ -557,7 +553,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
         print(f"drive_widgets length={len(drive_widgets)}")
         params['dt'] = tstep.value
         params['tstop'] = tstop.value
-        variables['net'] = Network(
+        variables['net'] = jones_2009_model(
             params,
             add_drives_from_params=False,
         )
