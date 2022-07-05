@@ -656,7 +656,7 @@ def handle_backend_change(backend_type, mpi_cmd_config, mpi_cmd):
             display(mpi_cmd)
 
 
-def init_LR_viz_layout(plot_outputs,
+def init_left_right_viz_layout(plot_outputs,
                        plot_dropdowns,
                        window_height,
                        variables,
@@ -710,7 +710,7 @@ def init_LR_viz_layout(plot_outputs,
     return grid
 
 
-def init_UD_viz_layout(plot_outputs,
+def init_upper_down_viz_layout(plot_outputs,
                        plot_dropdowns,
                        window_height,
                        variables,
@@ -787,11 +787,11 @@ def initialize_viz_window(viz_window,
     with viz_window:
         # Left-Rright configuration
         if layout_option == "L-R":
-            grid = init_LR_viz_layout(plot_outputs, plot_dropdowns,
+            grid = init_left_right_viz_layout(plot_outputs, plot_dropdowns,
                                       window_height, variables, plot_options)
         # Upper-Down configuration
         elif layout_option == "U-D":
-            grid = init_UD_viz_layout(plot_outputs, plot_dropdowns,
+            grid = init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
                                       window_height, variables, plot_options)
         # TODO: 2x2
 
