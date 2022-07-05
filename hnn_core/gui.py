@@ -65,7 +65,8 @@ def _get_cell_specific_widgets(
     style,
     location,
     data=None,
-    default_data={
+):
+    default_data = {
         'weights_ampa': {
             'L5_pyramidal': 0.,
             'L2_pyramidal': 0.,
@@ -84,7 +85,7 @@ def _get_cell_specific_widgets(
             'L5_basket': 0.1,
             'L2_basket': 0.1
         },
-    }):
+    }
     if isinstance(data, dict):
         for k in default_data.keys():
             if k in data:
@@ -131,7 +132,11 @@ def _get_rhythmic_widget(
     style,
     location,
     data=None,
-    default_data={
+    default_weights_ampa=None,
+    default_weights_nmda=None,
+    default_delays=None,
+):
+    default_data = {
         'tstart': 0.,
         'tstart_std': 0.,
         'tstop': 0.,
@@ -139,11 +144,7 @@ def _get_rhythmic_widget(
         'burst_std': 0,
         'repeats': 1,
         'seedcore': 14,
-    },
-    default_weights_ampa=None,
-    default_weights_nmda=None,
-    default_delays=None,
-):
+    }
     if isinstance(data, dict):
         default_data.update(data)
     kwargs = dict(layout=layout, style=style)
@@ -207,7 +208,11 @@ def _get_poisson_widget(
     style,
     location,
     data=None,
-    default_data={
+    default_weights_ampa=None,
+    default_weights_nmda=None,
+    default_delays=None,
+):
+    default_data = {
         'tstart': 0.0,
         'tstop': 0.0,
         'seedcore': 14,
@@ -217,11 +222,7 @@ def _get_poisson_widget(
             'L5_basket': 8.5,
             'L2_basket': 8.5,
         }
-    },
-    default_weights_ampa=None,
-    default_weights_nmda=None,
-    default_delays=None,
-):
+    }
     if isinstance(data, dict):
         default_data.update(data)
     tstart = FloatText(value=default_data['tstart'],
@@ -284,16 +285,16 @@ def _get_evoked_widget(
     style,
     location,
     data=None,
-    default_data={
-        'mu': 0,
-        'sigma': 1,
-        'numspikes': 1,
-        'seedcore': 14,
-    },
     default_weights_ampa=None,
     default_weights_nmda=None,
     default_delays=None,
 ):
+    default_data = {
+        'mu': 0,
+        'sigma': 1,
+        'numspikes': 1,
+        'seedcore': 14,
+    }
     if isinstance(data, dict):
         default_data.update(data)
     kwargs = dict(layout=layout, style=style)
