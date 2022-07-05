@@ -114,5 +114,6 @@ if __name__ == "__main__":
               'mod/*',
               'mod/x86_64/*',
               'mod/x86_64/.lib/*']},
-          cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod}
+          cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod},
+          entry_points={'console_scripts': ['hnn-gui=hnn_core.gui:launch']}
           )
