@@ -11,10 +11,11 @@ import os.path as op
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
-from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText, Button,
-                        Dropdown, FileUpload, FloatLogSlider, FloatText,
-                        GridspecLayout, HBox, IntText, Layout, Output,
-                        RadioButtons, Tab, Text, VBox, interactive_output)
+from ipywidgets import (HTML, Accordion, AppLayout, BoundedIntText,
+                        BoundedFloatText, Button, Dropdown, FileUpload,
+                        FloatLogSlider, FloatText, GridspecLayout, HBox,
+                        IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
+                        interactive_output)
 
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
@@ -545,8 +546,8 @@ def on_upload_change(
 
 
 def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
-                       ntrials, backend_selection, mpi_cmd, params,
-                       plot_outputs_list, plot_dropdowns_list, b):
+                       ntrials, backend_selection, mpi_cmd, joblib_cores,
+                       params, plot_outputs_list, plot_dropdowns_list, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
@@ -626,8 +627,8 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
             variables['backend'] = MPIBackend(
                 n_procs=multiprocessing.cpu_count() - 1, mpi_cmd=mpi_cmd.value)
         else:
-            variables['backend'] = JoblibBackend(n_jobs=2)
-
+            variables['backend'] = JoblibBackend(n_jobs=joblib_cores.value)
+            print(f"Using Joblib as backend with {joblib_cores.value} core(s).")
         with variables['backend']:
             variables['dpls'] = simulate_dipole(variables['net'],
                                                 tstop=tstop.value,
@@ -649,11 +650,13 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
             })
 
 
-def handle_backend_change(backend_type, mpi_cmd_config, mpi_cmd):
-    mpi_cmd_config.clear_output()
-    if backend_type == "MPI":
-        with mpi_cmd_config:
+def handle_backend_change(backend_type, backend_config, mpi_cmd, joblib_cores):
+    backend_config.clear_output()
+    with backend_config:
+        if backend_type == "MPI":
             display(mpi_cmd)
+        elif backend_type == "Joblib":
+            display(joblib_cores)
 
 
 def init_left_right_viz_layout(plot_outputs,
@@ -818,7 +821,7 @@ def run_hnn_gui():
     def _run_button_clicked(b):
         return run_button_clicked(log_out, drive_widgets, variables, tstep,
                                   tstop, ntrials, backend_selection, mpi_cmd,
-                                  params, plot_outputs_list,
+                                  joblib_cores, params, plot_outputs_list,
                                   plot_dropdowns_list, b)
 
     def _on_upload_change(change):
@@ -904,12 +907,20 @@ def run_hnn_gui():
                    description='MPI cmd:',
                    disabled=False)
 
-    mpi_cmd_config = Output()
+    joblib_cores = BoundedIntText(value=1,
+                                  min=1,
+                                  max=multiprocessing.cpu_count(),
+                                  description='Cores:',
+                                  disabled=False)
+
+    backend_config = Output()
 
     def _handle_backend_change(backend_type):
-        return handle_backend_change(backend_type.new, mpi_cmd_config, mpi_cmd)
+        return handle_backend_change(backend_type.new, backend_config, mpi_cmd,
+                                     joblib_cores)
 
-    handle_backend_change(backend_selection.value, mpi_cmd_config, mpi_cmd)
+    handle_backend_change(backend_selection.value, backend_config, mpi_cmd,
+                          joblib_cores)
     backend_selection.observe(_handle_backend_change, 'value')
 
     simulation_box = VBox([
@@ -917,7 +928,7 @@ def run_hnn_gui():
         tstep,
         ntrials,
         backend_selection,
-        mpi_cmd_config,
+        backend_config,
     ])
 
     # Sliders to change local-connectivity params
