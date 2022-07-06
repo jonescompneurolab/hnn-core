@@ -664,13 +664,19 @@ def init_left_right_viz_layout(plot_outputs,
                                window_height,
                                variables,
                                plot_options,
-                               border='1px solid gray'):
+                               previous_outputs,
+                               border='1px solid gray',
+                               init=False):
     height_plot = window_height
     plot_outputs_L = Output(layout={'border': border, 'height': height_plot})
 
+    default_plot_types = [plot_options[0], plot_options[1]]
+    for idx, plot_type in enumerate(previous_outputs[:2]):
+        default_plot_types[idx] = plot_type
+
     plot_dropdown_L = Dropdown(
         options=plot_options,
-        value=plot_options[0],
+        value=default_plot_types[0],
         description='Plot:',
         disabled=False,
     )
@@ -691,7 +697,7 @@ def init_left_right_viz_layout(plot_outputs,
 
     plot_dropdown_R = Dropdown(
         options=plot_options,
-        value=plot_options[1],
+        value=default_plot_types[1],
         description='Plot:',
         disabled=False,
     )
@@ -704,8 +710,21 @@ def init_left_right_viz_layout(plot_outputs,
         ),
         'value',
     )
+
     plot_outputs.append(plot_outputs_R)
     plot_dropdowns.append(plot_dropdown_R)
+
+    if not init:
+        update_plot_window(variables, plot_outputs_L, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[0]
+        })
+        update_plot_window(variables, plot_outputs_R, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[1]
+        })
 
     grid = GridspecLayout(1, 2, height=window_height)
     grid[0, 0] = VBox([plot_dropdown_L, plot_outputs_L])
@@ -718,8 +737,14 @@ def init_upper_down_viz_layout(plot_outputs,
                                window_height,
                                variables,
                                plot_options,
-                               border='1px solid gray'):
+                               previous_outputs,
+                               border='1px solid gray',
+                               init=False):
     height_plot = window_height
+    default_plot_types = [plot_options[0], plot_options[1]]
+    for idx, plot_type in enumerate(previous_outputs[:2]):
+        default_plot_types[idx] = plot_type
+
     plot_outputs_U = Output(layout={
         'border': border,
         'height': f"{float(height_plot[:-2])/2}px"
@@ -727,7 +752,7 @@ def init_upper_down_viz_layout(plot_outputs,
 
     plot_dropdown_U = Dropdown(
         options=plot_options,
-        value=plot_options[0],
+        value=default_plot_types[0],
         description='Plot:',
         disabled=False,
     )
@@ -749,10 +774,11 @@ def init_upper_down_viz_layout(plot_outputs,
 
     plot_dropdown_D = Dropdown(
         options=plot_options,
-        value=plot_options[1],
+        value=default_plot_types[1],
         description='Plot:',
         disabled=False,
     )
+
     plot_dropdown_D.observe(
         lambda plot_type: _debug_update_plot_window(
             variables,
@@ -764,6 +790,18 @@ def init_upper_down_viz_layout(plot_outputs,
     )
     plot_outputs.append(plot_outputs_D)
     plot_dropdowns.append(plot_dropdown_D)
+
+    if not init:
+        update_plot_window(variables, plot_outputs_U, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[0]
+        })
+        update_plot_window(variables, plot_outputs_D, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[1]
+        })
 
     grid = GridspecLayout(2, 1, height=window_height)
     grid[0, 0] = VBox([plot_dropdown_U, plot_outputs_U])
@@ -777,27 +815,38 @@ def initialize_viz_window(viz_window,
                           plot_dropdowns,
                           window_width,
                           window_height,
-                          layout_option="L-R"):
+                          layout_option="L-R",
+                          init=False):
     plot_options = [
         'current dipole', 'input histogram', 'spikes', 'PSD', 'spectogram',
         'network'
     ]
     viz_window.clear_output()
+    previous_plot_outputs_values = []
     while len(plot_outputs) > 0:
         plot_outputs.pop()
-        plot_dropdowns.pop()
+        # plot_dropdowns.pop()
+        previous_plot_outputs_values.append(plot_dropdowns.pop().value)
 
     with viz_window:
         # Left-Rright configuration
         if layout_option == "L-R":
-            grid = init_left_right_viz_layout(plot_outputs, plot_dropdowns,
-                                              window_height, variables,
-                                              plot_options)
+            grid = init_left_right_viz_layout(plot_outputs,
+                                              plot_dropdowns,
+                                              window_height,
+                                              variables,
+                                              plot_options,
+                                              previous_plot_outputs_values,
+                                              init=init)
         # Upper-Down configuration
         elif layout_option == "U-D":
-            grid = init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
-                                              window_height, variables,
-                                              plot_options)
+            grid = init_upper_down_viz_layout(plot_outputs,
+                                              plot_dropdowns,
+                                              window_height,
+                                              variables,
+                                              plot_options,
+                                              previous_plot_outputs_values,
+                                              init=init)
         # TODO: 2x2
 
         display(grid)
@@ -881,6 +930,7 @@ def run_hnn_gui():
         viz_width,
         viz_height,
         layout_option=viz_layout_selection.value,
+        init=True
     )
 
     def handle_viz_layout_change(layout_option):
