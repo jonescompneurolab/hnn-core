@@ -1041,6 +1041,7 @@ def run_hnn_gui():
     )
     return hnn_gui
 
+
 def launch():
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), '..', 'hnn_widget.ipynb')
