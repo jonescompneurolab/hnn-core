@@ -1,6 +1,7 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
-from hnn_core.gui import run_hnn_gui
 import os
+
+from hnn_core.gui import run_hnn_gui
 
 
 def test_run_gui():
