@@ -99,7 +99,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     return pos_dict
 
 
-def _connection_probability(conn, probability, conn_seed=3):
+def _connection_probability(conn, probability, conn_seed=None):
     """Remove/keep a random subset of connections.
 
     Parameters
