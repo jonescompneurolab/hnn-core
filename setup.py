@@ -105,7 +105,7 @@ if __name__ == "__main__":
               'matplotlib',
               'scipy'
           ],
-          extra_requires={
+          extras_require={
               'gui': ['ipywidgets', 'voila']
           },
           packages=find_packages(),
