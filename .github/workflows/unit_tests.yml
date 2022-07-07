@@ -36,6 +36,7 @@ jobs:
           pip install flake8 pytest pytest-cov
           pip install mne psutil joblib
           pip install NEURON
+          pip install ipywidgets voila
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             pip install mpi4py
           else
@@ -44,8 +45,7 @@ jobs:
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .[gui]
+          python setup.py --verbose install
       - name: Lint with flake8
         shell: bash -el {0}
         run: |
