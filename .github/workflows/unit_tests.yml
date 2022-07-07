@@ -44,7 +44,8 @@ jobs:
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
-          python setup.py --verbose install
+          python -m pip install --upgrade pip
+          pip install -e .[gui]
       - name: Lint with flake8
         shell: bash -el {0}
         run: |
