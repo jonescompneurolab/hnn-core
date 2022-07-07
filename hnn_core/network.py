@@ -111,7 +111,7 @@ def _connection_probability(conn, probability, conn_seed=None):
         Probability of connection between any src-target pair.
         Defaults to 1.0 producing an all-to-all pattern.
     conn_seed : int
-        Optional initial seed for random number generator (default: 3).
+        Optional initial seed for random number generator (default: None).
         Used to randomly remove connections when probablity < 1.0.
 
     Notes
