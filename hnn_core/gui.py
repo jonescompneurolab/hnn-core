@@ -8,12 +8,13 @@ import logging
 import multiprocessing
 import os
 import os.path as op
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
-from ipywidgets import (HTML, Accordion, AppLayout, BoundedIntText,
-                        BoundedFloatText, Button, Dropdown, FileUpload,
+from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
+                        BoundedIntText, Button, Dropdown, FileUpload,
                         FloatLogSlider, FloatText, GridspecLayout, HBox,
                         IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
                         interactive_output)
@@ -24,7 +25,6 @@ from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
 from hnn_core.viz import plot_dipole
-
 
 log_file = os.getenv("HNNGUI_LOGFILE", None)
 debug_gui = os.getenv("DEBUG_HNNGUI", "0")
@@ -935,16 +935,14 @@ def run_hnn_gui():
         description='Layout:',
     )
     # initialize
-    initialize_viz_window(
-        viz_window,
-        variables,
-        plot_outputs_list,
-        plot_dropdowns_list,
-        viz_width,
-        viz_height,
-        layout_option=viz_layout_selection.value,
-        init=True
-    )
+    initialize_viz_window(viz_window,
+                          variables,
+                          plot_outputs_list,
+                          plot_dropdowns_list,
+                          viz_width,
+                          viz_height,
+                          layout_option=viz_layout_selection.value,
+                          init=True)
 
     def handle_viz_layout_change(layout_option):
         return initialize_viz_window(
@@ -1108,4 +1106,4 @@ def run_hnn_gui():
 def launch():
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), '..', 'hnn_widget.ipynb')
-    main([notebook_path])
+    main([notebook_path, *sys.argv[1:]])
