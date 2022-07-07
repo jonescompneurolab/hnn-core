@@ -1105,5 +1105,5 @@ def run_hnn_gui():
 
 def launch():
     from voila.app import main
-    notebook_path = op.join(op.dirname(__file__), '..', 'hnn_widget.ipynb')
+    notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
     main([notebook_path, *sys.argv[1:]])
