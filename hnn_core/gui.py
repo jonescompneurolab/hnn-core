@@ -4,6 +4,7 @@
 #          Huzi Cheng <hzcheng15@icloud.com>
 
 import codecs
+import logging
 import multiprocessing
 import os
 import os.path as op
@@ -23,6 +24,17 @@ from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
 from hnn_core.viz import plot_dipole
+
+
+log_file = os.getenv("HNNGUI_LOGFILE", None)
+debug_gui = os.getenv("DEBUG_HNNGUI", "0")
+if debug_gui == '1' and log_file is not None:
+    logging.basicConfig(filename=log_file,
+                        filemode='w',
+                        level=logging.DEBUG,
+                        format='%(name)s - %(levelname)s - %(message)s')
+else:
+    logging.basicConfig(level=logging.ERROR)
 
 
 def create_expanded_button(description, button_style, height, disabled=False):
@@ -52,7 +64,8 @@ def _get_sliders(params, param_keys):
                                 style=style)
         sliders.append(slider)
 
-    def _update_params(variables, **updates):
+    def _update_params(**updates):
+        logging.debug(f'Connectivity parameters updates: {updates}')
         params.update(dict(**updates))
 
     interactive_output(_update_params, {s.description: s for s in sliders})
@@ -895,7 +908,7 @@ def run_hnn_gui():
     log_out = Output(layout={
         'border': '1px solid gray',
         'height': log_out_heiht,
-        'overflow_y': 'auto'
+        'overflow': 'auto'
     })
     viz_width = "1000px"
     viz_height = "500px"
@@ -1053,7 +1066,7 @@ def run_hnn_gui():
     # Run, delete drives and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
 
-    style = {'button_color': '#8A2BE2', 'font_color': 'white'}
+    style = {'button_color': '#8A2BE2'}
     load_button = FileUpload(accept='.json,.param',
                              multiple=False,
                              style=style,
