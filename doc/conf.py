@@ -55,7 +55,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'numpydoc',
-    'gh_substitutions', # custom extension, see ./sphinxext/gh_substitutions.py
+    'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
 # generate autosummary even if no references
