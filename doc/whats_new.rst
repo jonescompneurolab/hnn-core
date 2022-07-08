@@ -14,7 +14,8 @@ Changelog
 ~~~~~~~~~
 - Add option to select drives using argument 'which_drives' in
   :func:`~hnn_core.optimization.optimize_evoked`, by `Mohamed A. Sherif`_ in :gh:`478`.
-
+- Changed `conn_seed` default to `None` (from `3`) in :func:`~/hnn_core.network.add_connection` 
+  and :func:`~/hnn_core.network._connection_probability`, by `Mattan Pelah`_ in :gh:`492`.
 
 Bug
 ~~~
@@ -135,7 +136,7 @@ Bug
 
 - Fix issue where common drives use the same parameters for all cell types, by `Nick Tolley`_
   in :gh:`350`
-
+	
 - Fix bug where depth of L5 and L2 cells were swapped, by `Christopher Bailey`_ in :gh:`352`
 
 - Fix bug where :func:`~hnn_core.dipole.average_dipoles` failed when there were less than two dipoles in the
@@ -312,6 +313,7 @@ People who contributed to this release (in alphabetical order):
 .. _Huzi Cheng: https://github.com/chenghuzi
 .. _Kenneth Loi: https://github.com/kenloi
 .. _Mainak Jas: http://jasmainak.github.io/
+.. _Mattan Pelah: https://github.com/mjpelah
 .. _Mohamed A. Sherif: https://github.com/mohdsherif/
 .. _Nick Tolley: https://github.com/ntolley
 .. _Ryan Thorpe: https://github.com/rythorpe
