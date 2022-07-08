@@ -14,8 +14,8 @@ Changelog
 ~~~~~~~~~
 - Add option to select drives using argument 'which_drives' in
   :func:`~hnn_core.optimization.optimize_evoked`, by `Mohamed A. Sherif`_ in :gh:`478`.
-- Changed `conn_seed` default to `None` (from `3`) in :func:`~/hnn_core.network.add_connection` 
-  and :func:`~/hnn_core.network._connection_probability`, by `Mattan Pelah`_ in :gh:`492`.
+- Changed `conn_seed` default to `None` (from `3`) in :func:`~hnn_core.network.add_connection` 
+  and :func:`~hnn_core.network._connection_probability`, by `Mattan Pelah`_ in :gh:`492`.
 
 Bug
 ~~~
