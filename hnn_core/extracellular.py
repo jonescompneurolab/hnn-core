@@ -172,7 +172,7 @@ class ExtracellularArray:
         each segment junction as a point extracellular current source.
         ``'lsa'`` (line source approximation) treats each segment as a line
         source of current, which extends from the previous to the next segment
-        center point: |---x---|, where x is the current segment flanked by |.
+        center point: /---x---/, where x is the current segment flanked by /.
     min_distance : float (default: 0.5; unit: um)
         To avoid numerical errors in calculating potentials, apply a minimum
         distance limit between the electrode contacts and the active neuronal
@@ -200,7 +200,7 @@ class ExtracellularArray:
     data it contains. Slicing an ``ExtracellularArray`` returns a `copy` of the
     corresponding trials: ``array[:5]`` returns a new array of length 5, etc.
 
-    See Table 5 in http://jn.physiology.org/content/104/6/3388.long for
+    See Table 5 in https://doi.org/10.1152/jn.00122.2010 for
     measured values of conductivity in rat cortex (note units there are mS/cm)
     """
 
