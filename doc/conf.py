@@ -61,7 +61,6 @@ extensions = [
 
 # generate autosummary even if no references
 autosummary_generate = True
-mock_autosummary_imports = ["numpy", "matplotlib", "scipy", "NEURON", "joblib"]
 autodoc_default_options = {'inherited-members': None}
 numpydoc_class_members_toctree = False
 numpydoc_attributes_as_param_list = True
