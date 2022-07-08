@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>hnn_core.extracellular.ExtracellularArray &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -138,7 +139,7 @@
     <div class="body col-md-12 content" role="main">
       
   <section id="hnn-core-extracellular-extracellulararray">
-<h1>hnn_core.extracellular.ExtracellularArray<a class="headerlink" href="#hnn-core-extracellular-extracellulararray" title="Permalink to this headline">¶</a></h1>
+<h1>hnn_core.extracellular.ExtracellularArray<a class="headerlink" href="#hnn-core-extracellular-extracellulararray" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.extracellular.</span></span><span class="sig-name descname"><span class="pre">ExtracellularArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray" title="Permalink to this definition">¶</a></dt>
@@ -150,7 +151,7 @@ in <code class="docutils literal notranslate"><span class="pre">net.rec_arrays</
 <a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray" title="hnn_core.extracellular.ExtracellularArray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtracellularArray</span></code></a> contains the voltages at each electrode contact,
 along with the time points at which the voltages were sampled.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>positions</strong><span class="classifier">tuple | list of tuple</span></dt><dd><p>The (x, y, z) coordinates (in um) of the extracellular electrodes.</p>
 </dd>
@@ -161,7 +162,7 @@ homogeneous volume conductor that the cell and electrode are in.</p>
 each segment junction as a point extracellular current source.
 <code class="docutils literal notranslate"><span class="pre">'lsa'</span></code> (line source approximation) treats each segment as a line
 source of current, which extends from the previous to the next segment
-center point: <a href="#id3"><span class="problematic" id="id4">|---x---|</span></a>, where x is the current segment flanked by <a href="#id1"><span class="problematic" id="id2">|</span></a>.</p>
+center point: /—x—/, where x is the current segment flanked by /.</p>
 </dd>
 <dt><strong>min_distance</strong><span class="classifier">float (default: 0.5; unit: um)</span></dt><dd><p>To avoid numerical errors in calculating potentials, apply a minimum
 distance limit between the electrode contacts and the active neuronal
@@ -181,10 +182,10 @@ at <em class="xref py py-obj">positions</em>.</p>
 <p>The length of an <code class="docutils literal notranslate"><span class="pre">ExtracellularArray</span></code> is equal to the number of trials of
 data it contains. Slicing an <code class="docutils literal notranslate"><span class="pre">ExtracellularArray</span></code> returns a <a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a> of the
 corresponding trials: <code class="docutils literal notranslate"><span class="pre">array[:5]</span></code> returns a new array of length 5, etc.</p>
-<p>See Table 5 in <a class="reference external" href="http://jn.physiology.org/content/104/6/3388.long">http://jn.physiology.org/content/104/6/3388.long</a> for
+<p>See Table 5 in <a class="reference external" href="https://doi.org/10.1152/jn.00122.2010">https://doi.org/10.1152/jn.00122.2010</a> for
 measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>times</strong><span class="classifier">array, shape (n_times,)</span></dt><dd><p>The time points the extracellular voltages are sampled at (ms)</p>
 </dd>
@@ -197,10 +198,6 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 </dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return a copy of the ExtracellularArray instance</p></td>
@@ -224,7 +221,7 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a copy of the ExtracellularArray instance</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>array_copy</strong><span class="classifier">instance of ExtracellularArray</span></dt><dd><p>A copy of the array instance.</p>
 </dd>
@@ -240,7 +237,7 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 <p>One plot is created for each trial. Multiple trials can be overlaid
 with or without (default) and offset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>trial_no</strong><span class="classifier">int | list of int | slice</span></dt><dd><p>Trial number(s) to plot</p>
 </dd>
@@ -254,7 +251,7 @@ simulation.</p>
 <dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis</p>
 </dd>
 <dt><strong>decim</strong><span class="classifier">int | list of int | None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole
-traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.9.0.dev0+1890.ced4d67)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
+traces. The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.10.0.dev0+1397.58b0bd1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used,
 which recommends values &lt;13. To achieve higher decimation factors,
 a list of ints can be provided. These are applied successively.</p>
 </dd>
@@ -262,7 +259,7 @@ a list of ints can be provided. These are applied successively.</p>
 standard color strings may be used (e.g., ‘b’ for blue). A color
 can also be defined as an RGBA-quadruplet, or an array of
 RGBA-values (one for each electrode contact trace to plot). An
-instance of <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListedColormap</span></code></a> may also be
+instance of <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListedColormap</span></code></a> may also be
 provided.</p>
 </dd>
 <dt><strong>voltage_offset</strong><span class="classifier">float | None (optional)</span></dt><dd><p>Amount to offset traces by on the voltage-axis. Useful for plotting
@@ -272,13 +269,13 @@ laminar arrays.</p>
 corner of the plot.</p>
 </dd>
 <dt><strong>contact_labels</strong><span class="classifier">list (optional)</span></dt><dd><p>Labels associated with the contacts to plot. Passed as-is to
-<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_yticklabels.html#matplotlib.axes.Axes.set_yticklabels" title="(in Matplotlib v3.5.1)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_yticklabels()</span></code></a>.</p>
+<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_yticklabels.html#matplotlib.axes.Axes.set_yticklabels" title="(in Matplotlib v3.5.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_yticklabels()</span></code></a>.</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>fig</strong><span class="classifier">instance of plt.fig</span></dt><dd><p>The matplotlib figure handle into which time series were plotted.</p>
 </dd>
@@ -301,14 +298,14 @@ corner of the plot.</p>
 If you prefer a filtered copy, consider using the
 <a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a>-method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.23.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
+<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.24.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
 data with.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>extracellular_copy</strong><span class="classifier">instance of ExtraCellularArray</span></dt><dd><p>The modified ExtraCellularArray instance.</p>
 </dd>
@@ -334,7 +331,7 @@ data with.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

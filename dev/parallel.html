@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Parallel backends &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -142,10 +143,10 @@
     <div class="body col-md-12 content" role="main">
       
   <section id="parallel-backends">
-<span id="parallel"></span><h1>Parallel backends<a class="headerlink" href="#parallel-backends" title="Permalink to this headline">¶</a></h1>
+<span id="parallel"></span><h1>Parallel backends<a class="headerlink" href="#parallel-backends" title="Permalink to this heading">¶</a></h1>
 <p>Two options are available for making use of multiple CPU cores. The first runs multiple trials in parallel with joblib. Alternatively, you can run each trial across multiple cores to reduce the runtime.</p>
 <section id="joblib">
-<h2>Joblib<a class="headerlink" href="#joblib" title="Permalink to this headline">¶</a></h2>
+<h2>Joblib<a class="headerlink" href="#joblib" title="Permalink to this heading">¶</a></h2>
 <p>This is the default backend and will execute multiple trials at the same time, with each trial running on a separate core in “embarrassingly parallel” execution. Note that with only 1 trial, there will be no parallelism.</p>
 <p><strong>Dependencies</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install joblib
@@ -161,7 +162,7 @@
 </div>
 </section>
 <section id="mpi">
-<h2>MPI<a class="headerlink" href="#mpi" title="Permalink to this headline">¶</a></h2>
+<h2>MPI<a class="headerlink" href="#mpi" title="Permalink to this heading">¶</a></h2>
 <p>This backend will use MPI (Message Passing Interface) on the system to split neurons across CPU cores (processors) and reduce the simulation time as more cores are used.</p>
 <p><strong>Linux Dependencies</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install libopenmpi-dev openmpi-bin
@@ -255,7 +256,7 @@ CellResponse object, and returns the simulation dipoles to the caller.</p></li>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

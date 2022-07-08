@@ -263,35 +263,30 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  52.320 seconds)
+   **Total running time of the script:** ( 1 minutes  20.052 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
-  .. container:: binder-badge
+    .. container:: binder-badge
 
-    .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_record_extracellular_potentials.ipynb
-      :alt: Launch binder
-      :width: 150 px
+      .. image:: images/binder_badge_logo.svg
+        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_record_extracellular_potentials.ipynb
+        :alt: Launch binder
+        :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_record_extracellular_potentials.py <plot_record_extracellular_potentials.py>`
 
-     :download:`Download Python source code: plot_record_extracellular_potentials.py <plot_record_extracellular_potentials.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_record_extracellular_potentials.ipynb <plot_record_extracellular_potentials.ipynb>`
+      :download:`Download Jupyter notebook: plot_record_extracellular_potentials.ipynb <plot_record_extracellular_potentials.ipynb>`
 
 
 .. only:: html

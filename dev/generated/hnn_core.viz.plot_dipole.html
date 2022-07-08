@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>hnn_core.viz.plot_dipole &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -141,13 +142,13 @@
     <div class="body col-md-12 content" role="main">
       
   <section id="hnn-core-viz-plot-dipole">
-<h1>hnn_core.viz.plot_dipole<a class="headerlink" href="#hnn-core-viz-plot-dipole" title="Permalink to this headline">¶</a></h1>
+<h1>hnn_core.viz.plot_dipole<a class="headerlink" href="#hnn-core-viz-plot-dipole" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_dipole">
 <span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_dipole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_dipole" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple layer-specific plot function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>dpl</strong><span class="classifier">instance of Dipole | list of Dipole instances</span></dt><dd><p>The Dipole object.</p>
 </dd>
@@ -161,7 +162,7 @@
 ‘agg’, ‘L2’, and ‘L5’</p>
 </dd>
 <dt><strong>decim</strong><span class="classifier">int or list of int or None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole traces.
-The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.9.0.dev0+1890.ced4d67)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used, which
+The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.10.0.dev0+1397.58b0bd1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used, which
 recommends values &lt;13. To achieve higher decimation factors, a list of
 ints can be provided. These are applied successively.</p>
 </dd>
@@ -173,7 +174,7 @@ ints can be provided. These are applied successively.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>fig</strong><span class="classifier">instance of plt.fig</span></dt><dd><p>The matplotlib figure handle.</p>
 </dd>
@@ -183,7 +184,7 @@ ints can be provided. These are applied successively.</p>
 </dd></dl>
 
 <section id="examples-using-hnn-core-viz-plot-dipole">
-<span id="sphx-glr-backreferences-hnn-core-viz-plot-dipole"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_dipole</span></code><a class="headerlink" href="#examples-using-hnn-core-viz-plot-dipole" title="Permalink to this headline">¶</a></h2>
+<span id="sphx-glr-backreferences-hnn-core-viz-plot-dipole"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_dipole</span></code><a class="headerlink" href="#examples-using-hnn-core-viz-plot-dipole" title="Permalink to this heading">¶</a></h2>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detaile..."><img alt="01. Simulate Event Related Potentials (ERPs)" src="../_images/sphx_glr_plot_simulate_evoked_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/workflows/plot_simulate_evoked.html#sphx-glr-auto-examples-workflows-plot-simulate-evoked-py"><span class="std std-ref">01. Simulate Event Related Potentials (ERPs)</span></a></p>
   <div class="sphx-glr-thumbnail-title">01. Simulate Event Related Potentials (ERPs)</div>
@@ -209,7 +210,7 @@ ints can be provided. These are applied successively.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

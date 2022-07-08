@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>hnn_core.Network &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -141,13 +142,13 @@
     <div class="body col-md-12 content" role="main">
       
   <section id="hnn-core-network">
-<h1>hnn_core.Network<a class="headerlink" href="#hnn-core-network" title="Permalink to this headline">¶</a></h1>
+<h1>hnn_core.Network<a class="headerlink" href="#hnn-core-network" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.Network">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Network class.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>The parameters to use for constructing the network.</p>
 </dd>
@@ -160,7 +161,7 @@ are added suitably. Will be deprecated in a future release.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Attributes</dt>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>cell_types</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing names of real cell types in the network
 (e.g. ‘L2_basket’) as keys and corresponding Cell instances as values.
@@ -210,10 +211,6 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 </dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_bursty_drive</span></code></a>(name, *[, tstart, ...])</p></td>
 <td><p>Add a bursty (rhythmic) external drive to all cells of the network</p></td>
@@ -264,7 +261,7 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <span class="sig-name descname"><span class="pre">add_bursty_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">burst_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">burst_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numspikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_isi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_bursty_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_bursty_drive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a bursty (rhythmic) external drive to all cells of the network</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Unique name for the drive</p>
 </dd>
@@ -342,7 +339,7 @@ Used to randomly remove connections when probablity &lt; 1.0.</p>
 <span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_autapses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Appends connections to connectivity list</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>src_gids</strong><span class="classifier">str | int | range | list of int</span></dt><dd><p>Identifier for source cells. Passing str arguments (‘evdist1’,
 ‘L2_pyramidal’, ‘L2_basket’, ‘L5_pyramidal’, ‘L5_basket’, etc.) is
@@ -394,7 +391,7 @@ where each src_gid indexes a list of all its targets.</p>
 <span class="sig-name descname"><span class="pre">add_electrode_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electrode_pos</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_electrode_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_electrode_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify coordinates of electrode array for extracellular recording.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Unique name of the array.</p>
 </dd>
@@ -408,8 +405,8 @@ homogeneous volume conductor that the cell and electrode are in.</p>
 each segment junction as a point extracellular current source.
 <code class="docutils literal notranslate"><span class="pre">'lsa'</span></code> (line source approximation) treats each segment as a line
 source of current, which extends from the previous to the next
-segment center point: <a href="#id3"><span class="problematic" id="id4">|---x---|</span></a>, where x is the current segment
-flanked by <a href="#id1"><span class="problematic" id="id2">|</span></a>.</p>
+segment center point: /—x—/, where x is the current segment
+flanked by /.</p>
 </dd>
 <dt><strong>min_distance</strong><span class="classifier">float (default: 0.5; unit: um)</span></dt><dd><p>To avoid numerical errors in calculating potentials, apply a
 minimum distance limit between the electrode contacts and the
@@ -426,7 +423,7 @@ The default value of 0.5 um corresponds to 1 um diameter dendrites.</p>
 <span class="sig-name descname"><span class="pre">add_evoked_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numspikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_cells'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_evoked_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_evoked_drive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an ‘evoked’ external drive to the network</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Unique name for the drive</p>
 </dd>
@@ -508,7 +505,7 @@ probability &lt; 1.0, the random subset of gids targeted is the same.</p>
 <span class="sig-name descname"><span class="pre">add_poisson_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate_constant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_cells'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_poisson_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_poisson_drive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a Poisson-distributed external drive to the network</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Unique name for the drive</p>
 </dd>
@@ -579,7 +576,7 @@ Used to randomly remove connections when probablity &lt; 1.0.</p>
 <span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attach parameters of tonic biasing input for a given cell type.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cell_type</strong><span class="classifier">str</span></dt><dd><p>The cell type whose cells will get the tonic input.
 Valid inputs are those in <em class="xref py py-obj">net.cell_types</em>.</p>
@@ -620,7 +617,7 @@ iterating over the values defining drive dynamics, without the need to
 re-define connectivity. Extracellular recording arrays are retained in
 the network, but cleared of existing data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>net_copy</strong><span class="classifier">instance of Network</span></dt><dd><p>A copy of the instance with previous simulation results and
 <code class="docutils literal notranslate"><span class="pre">events</span></code> of external drives removed.</p>
@@ -641,7 +638,7 @@ the network, but cleared of existing data.</p>
 <span class="sig-name descname"><span class="pre">plot_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.plot_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.plot_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the cells using Network.pos_dict.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ax</strong><span class="classifier">instance of matplotlib Axes3D | None</span></dt><dd><p>An axis object from matplotlib. If None,
 a new figure is created.</p>
@@ -650,7 +647,7 @@ a new figure is created.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure handle.</p>
 </dd>
@@ -666,7 +663,7 @@ a new figure is created.</p>
 <p>Note that it is possible to change only a subset of the parameters
 (the default value of each is None, which implies no change).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>inplane_distance</strong><span class="classifier">float</span></dt><dd><p>The in plane-distance (in um) between pyramidal cell somas in the
 square grid. Note that this parameter does not affect the amplitude
@@ -683,7 +680,7 @@ this parameter does not affect the amplitude of the dipole moment.</p>
 </dd></dl>
 
 <section id="examples-using-hnn-core-network">
-<span id="sphx-glr-backreferences-hnn-core-network"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code><a class="headerlink" href="#examples-using-hnn-core-network" title="Permalink to this headline">¶</a></h2>
+<span id="sphx-glr-backreferences-hnn-core-network"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code><a class="headerlink" href="#examples-using-hnn-core-network" title="Permalink to this heading">¶</a></h2>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detaile..."><img alt="01. Simulate Event Related Potentials (ERPs)" src="../_images/sphx_glr_plot_simulate_evoked_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/workflows/plot_simulate_evoked.html#sphx-glr-auto-examples-workflows-plot-simulate-evoked-py"><span class="std std-ref">01. Simulate Event Related Potentials (ERPs)</span></a></p>
   <div class="sphx-glr-thumbnail-title">01. Simulate Event Related Potentials (ERPs)</div>
@@ -727,7 +724,7 @@ this parameter does not affect the amplitude of the dipole moment.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

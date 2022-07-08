@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>hnn_core.viz.plot_cell_connectivity &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -141,7 +142,7 @@
     <div class="body col-md-12 content" role="main">
       
   <section id="hnn-core-viz-plot-cell-connectivity">
-<h1>hnn_core.viz.plot_cell_connectivity<a class="headerlink" href="#hnn-core-viz-plot-cell-connectivity" title="Permalink to this headline">¶</a></h1>
+<h1>hnn_core.viz.plot_cell_connectivity<a class="headerlink" href="#hnn-core-viz-plot-cell-connectivity" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_cell_connectivity">
 <span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_cell_connectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_cell_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_cell_connectivity" title="Permalink to this definition">¶</a></dt>
@@ -151,7 +152,7 @@ subplot and connectivity from a source cell to all the target cells
 in the right subplot. Click on the cells in the left subplot to
 explore how the connectivity pattern changes for different source cells.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>net</strong><span class="classifier">Instance of Network object</span></dt><dd><p>The Network object</p>
 </dd>
@@ -171,7 +172,7 @@ If None, the first cell from the list of valid src_gids is selected.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure handle.</p>
 </dd>
@@ -188,7 +189,7 @@ the connection corresponds to a drive, ex: poisson, bursty, etc.</p>
 </dd></dl>
 
 <section id="examples-using-hnn-core-viz-plot-cell-connectivity">
-<span id="sphx-glr-backreferences-hnn-core-viz-plot-cell-connectivity"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_cell_connectivity</span></code><a class="headerlink" href="#examples-using-hnn-core-viz-plot-cell-connectivity" title="Permalink to this headline">¶</a></h2>
+<span id="sphx-glr-backreferences-hnn-core-viz-plot-cell-connectivity"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.plot_cell_connectivity</span></code><a class="headerlink" href="#examples-using-hnn-core-viz-plot-cell-connectivity" title="Permalink to this heading">¶</a></h2>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity."><img alt="03. Modifying local connectivity" src="../_images/sphx_glr_plot_connectivity_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/howto/plot_connectivity.html#sphx-glr-auto-examples-howto-plot-connectivity-py"><span class="std std-ref">03. Modifying local connectivity</span></a></p>
   <div class="sphx-glr-thumbnail-title">03. Modifying local connectivity</div>
@@ -208,7 +209,7 @@ the connection corresponds to a drive, ex: poisson, bursty, etc.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

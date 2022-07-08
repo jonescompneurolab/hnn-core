@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>02. Record extracellular potentials &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -146,7 +147,7 @@
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
 <section class="sphx-glr-example-title" id="record-extracellular-potentials">
-<span id="sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"></span><h1>02. Record extracellular potentials<a class="headerlink" href="#record-extracellular-potentials" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"></span><h1>02. Record extracellular potentials<a class="headerlink" href="#record-extracellular-potentials" title="Permalink to this heading">¶</a></h1>
 <p>The main output of HNN simulations is the ‘dipole’ waveform, i.e., the net
 intracellular current flowing in pyramidal cell apical dendrites. At the large
 distances between cells and M/EEG sensors, this ‘primary’ current is the main
@@ -167,7 +168,7 @@ placed in and around the HNN network model.</p>
 <span class="kn">from</span> <span class="nn">hnn_core.network_models</span> <span class="kn">import</span> <span class="n">add_erp_drives_to_jones_model</span>
 </pre></div>
 </div>
-<p>The default network model defined in Jones et al. (2009) <a class="footnote-reference brackets" href="#id3" id="id1">1</a> consists of a
+<p>The default network model defined in Jones et al. (2009) <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> consists of a
 square grid of pyramidal cells. The in-plane distance between pyramidal cell
 somas on the grid can be set by the user, which will have an influence on the
 extracellular potentials (but not on the calculated net intracellular dipole
@@ -192,7 +193,7 @@ each electrode.</p>
 <p>The default network consists of 2 layers (L2 and L5), within which the cell
 somas are arranged in a regular grid, and apical dendrites are aligned along
 the z-axis. We can simulate a linear multielectrode array with 100 um
-intercontact spacing <a class="footnote-reference brackets" href="#id4" id="id2">2</a> by specifying a list of (x, y, z) coordinate
+intercontact spacing <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> by specifying a list of (x, y, z) coordinate
 triplets. The L5 pyramidal cell somas are at z=0 um, with apical dendrites
 extending up to z~2000 um. L2 pyramidal cell somas reside at
 z~1300 um, and have apical dendrites extending to z~2300 um. We’ll place the
@@ -276,20 +277,20 @@ steps). Decimation speeds up plotting significantly.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_plot_record_extracellular_potentials_003.png" srcset="../../_images/sphx_glr_plot_record_extracellular_potentials_003.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="footnote brackets">
-<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Jones, S. R. et al. Quantitative analysis and biophysically realistic
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h2>
+<aside class="footnote brackets" id="id3" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Jones, S. R. et al. Quantitative analysis and biophysically realistic
 neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
 sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).</p>
-</dd>
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>Kajikawa, Y. &amp; Schroeder, C. E. How local is the local field
+</aside>
+<aside class="footnote brackets" id="id4" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Kajikawa, Y. &amp; Schroeder, C. E. How local is the local field
 potential? Neuron 72, 847–858 (2011).</p>
-</dd>
-</dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  52.320 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-record-extracellular-potentials-py">
+</aside>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  20.052 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-record-extracellular-potentials-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_record_extracellular_potentials.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
 </div>
@@ -317,7 +318,7 @@ potential? Neuron 72, 847–858 (2011).</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

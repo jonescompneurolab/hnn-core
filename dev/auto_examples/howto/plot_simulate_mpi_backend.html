@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>04. Use MPI backend for parallelization &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -143,7 +144,7 @@
 to download the full example code or to run this example in your browser via Binder</p>
 </div>
 <section class="sphx-glr-example-title" id="use-mpi-backend-for-parallelization">
-<span id="sphx-glr-auto-examples-howto-plot-simulate-mpi-backend-py"></span><h1>04. Use MPI backend for parallelization<a class="headerlink" href="#use-mpi-backend-for-parallelization" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-howto-plot-simulate-mpi-backend-py"></span><h1>04. Use MPI backend for parallelization<a class="headerlink" href="#use-mpi-backend-for-parallelization" title="Permalink to this heading">¶</a></h1>
 <p>This example demonstrates how to use the MPI backend for
 simulating dipoles using HNN-core.</p>
 <p>The MPI backend allows running the simulation in parallel across neurons in the
@@ -194,7 +195,7 @@ start the simulation across the number of processors (cores) specified by
 <img src="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" srcset="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
 Running 1 trials...
 numprocs=2
-[e6670bc75372:01677] Read -1, expected 113158, errno = 1
+[37914c4d210b:01438] Read -1, expected 113158, errno = 1
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -231,21 +232,21 @@ Simulation time: 270.0 ms...
 Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
-[e6670bc75372:01677] Read -1, expected 49608, errno = 1
-[e6670bc75372:01676] Read -1, expected 49600, errno = 1
-[e6670bc75372:01677] Read -1, expected 49600, errno = 1
-[e6670bc75372:01676] Read -1, expected 49608, errno = 1
-[e6670bc75372:01677] Read -1, expected 49608, errno = 1
-[e6670bc75372:01676] Read -1, expected 49600, errno = 1
-[e6670bc75372:01677] Read -1, expected 49600, errno = 1
-[e6670bc75372:01676] Read -1, expected 49608, errno = 1
-[e6670bc75372:01676] Read -1, expected 5616, errno = 1
+[37914c4d210b:01438] Read -1, expected 49608, errno = 1
+[37914c4d210b:01437] Read -1, expected 49600, errno = 1
+[37914c4d210b:01437] Read -1, expected 49608, errno = 1
+[37914c4d210b:01438] Read -1, expected 49600, errno = 1
+[37914c4d210b:01437] Read -1, expected 49600, errno = 1
+[37914c4d210b:01438] Read -1, expected 49608, errno = 1
+[37914c4d210b:01438] Read -1, expected 49600, errno = 1
+[37914c4d210b:01437] Read -1, expected 49608, errno = 1
+[37914c4d210b:01437] Read -1, expected 5616, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  49.141 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-simulate-mpi-backend-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  50.559 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
 </div>
@@ -272,7 +273,7 @@ Simulation time: 300.0 ms...
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

@@ -130,7 +130,7 @@ start the simulation across the number of processors (cores) specified by
     MPI will run over 2 processes
     Running 1 trials...
     numprocs=2
-    [e6670bc75372:01677] Read -1, expected 113158, errno = 1
+    [37914c4d210b:01438] Read -1, expected 113158, errno = 1
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
     Building the NEURON model
     Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
@@ -167,15 +167,15 @@ start the simulation across the number of processors (cores) specified by
     Simulation time: 280.0 ms...
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
-    [e6670bc75372:01677] Read -1, expected 49608, errno = 1
-    [e6670bc75372:01676] Read -1, expected 49600, errno = 1
-    [e6670bc75372:01677] Read -1, expected 49600, errno = 1
-    [e6670bc75372:01676] Read -1, expected 49608, errno = 1
-    [e6670bc75372:01677] Read -1, expected 49608, errno = 1
-    [e6670bc75372:01676] Read -1, expected 49600, errno = 1
-    [e6670bc75372:01677] Read -1, expected 49600, errno = 1
-    [e6670bc75372:01676] Read -1, expected 49608, errno = 1
-    [e6670bc75372:01676] Read -1, expected 5616, errno = 1
+    [37914c4d210b:01438] Read -1, expected 49608, errno = 1
+    [37914c4d210b:01437] Read -1, expected 49600, errno = 1
+    [37914c4d210b:01437] Read -1, expected 49608, errno = 1
+    [37914c4d210b:01438] Read -1, expected 49600, errno = 1
+    [37914c4d210b:01437] Read -1, expected 49600, errno = 1
+    [37914c4d210b:01438] Read -1, expected 49608, errno = 1
+    [37914c4d210b:01438] Read -1, expected 49600, errno = 1
+    [37914c4d210b:01437] Read -1, expected 49608, errno = 1
+    [37914c4d210b:01437] Read -1, expected 5616, errno = 1
 
     <Figure size 640x480 with 1 Axes>
 
@@ -184,35 +184,30 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  49.141 seconds)
+   **Total running time of the script:** ( 0 minutes  50.559 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
-  .. container:: binder-badge
+    .. container:: binder-badge
 
-    .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb
-      :alt: Launch binder
-      :width: 150 px
+      .. image:: images/binder_badge_logo.svg
+        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb
+        :alt: Launch binder
+        :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_simulate_mpi_backend.py <plot_simulate_mpi_backend.py>`
 
-     :download:`Download Python source code: plot_simulate_mpi_backend.py <plot_simulate_mpi_backend.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_simulate_mpi_backend.ipynb <plot_simulate_mpi_backend.ipynb>`
+      :download:`Download Jupyter notebook: plot_simulate_mpi_backend.ipynb <plot_simulate_mpi_backend.ipynb>`
 
 
 .. only:: html

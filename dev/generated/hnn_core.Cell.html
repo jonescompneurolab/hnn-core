@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>hnn_core.Cell &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -138,13 +139,13 @@
     <div class="body col-md-12 content" role="main">
       
   <section id="hnn-core-cell">
-<h1>hnn_core.Cell<a class="headerlink" href="#hnn-core-cell" title="Permalink to this headline">¶</a></h1>
+<h1>hnn_core.Cell<a class="headerlink" href="#hnn-core-cell" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.Cell">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a cell object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the cell.</p>
 </dd>
@@ -185,7 +186,7 @@ yet attached to a network. Once the GID is set, it cannot be changed.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>pos</strong><span class="classifier">list of length 3</span></dt><dd><p>The position of the cell.</p>
 </dd>
@@ -217,10 +218,6 @@ names of section locations that are proximal or distal.</p>
 </dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.build" title="hnn_core.Cell.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>([sec_name_apical])</p></td>
 <td><p>Build cell in Neuron and insert dipole if applicable.</p></td>
@@ -259,7 +256,7 @@ names of section locations that are proximal or distal.</p>
 <span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sec_name_apical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.build" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build cell in Neuron and insert dipole if applicable.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>sec_name_apical</strong><span class="classifier">str | None</span></dt><dd><p>If not None, a dipole will be inserted in this cell in alignment
 with this section. The section should belong to the apical dendrite
@@ -281,7 +278,7 @@ of a pyramidal neuron.</p>
 <span class="sig-name descname"><span class="pre">create_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.create_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.create_tonic_bias" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create tonic bias at the soma.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>amplitude</strong><span class="classifier">float</span></dt><dd><p>The amplitude of the input.</p>
 </dd>
@@ -304,7 +301,7 @@ of a pyramidal neuron.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>gid_presyn</strong><span class="classifier">int</span></dt><dd><p>The cell ID of the presynaptic neuron</p>
 </dd>
@@ -318,7 +315,7 @@ square grid.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>nc</strong><span class="classifier">instance of h.NetCon</span></dt><dd><p>A network connection object.</p>
 </dd>
@@ -332,7 +329,7 @@ square grid.</p>
 <span class="sig-name descname"><span class="pre">plot_morphology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.plot_morphology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.plot_morphology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the cell morphology.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ax</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
 </dd>
@@ -340,7 +337,7 @@ square grid.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>axes</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>The matplotlib 3D axis handle.</p>
 </dd>
@@ -354,7 +351,7 @@ square grid.</p>
 <span class="sig-name descname"><span class="pre">record_soma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.record_soma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.record_soma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record current and voltage at soma.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>record_vsoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic voltages from cells</p>
 </dd>
@@ -370,7 +367,7 @@ square grid.</p>
 <span class="sig-name descname"><span class="pre">setup_source_netcon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.setup_source_netcon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.setup_source_netcon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Created for _PC.cell and specifies SOURCES of spikes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>The voltage threshold for action potential.</p>
 </dd>
@@ -384,7 +381,7 @@ square grid.</p>
 <span class="sig-name descname"><span class="pre">syn_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.syn_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.syn_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an h.Exp2Syn synapse.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>secloc</strong><span class="classifier">instance of nrn.Segment</span></dt><dd><p>The section location. E.g., soma(0.5).</p>
 </dd>
@@ -396,7 +393,7 @@ square grid.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>syn</strong><span class="classifier">instance of h.Exp2Syn</span></dt><dd><p>A two state kinetic scheme synapse.</p>
 </dd>
@@ -422,7 +419,7 @@ square grid.</p>
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>

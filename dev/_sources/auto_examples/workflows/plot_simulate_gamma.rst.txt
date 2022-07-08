@@ -481,35 +481,30 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 4 minutes  27.978 seconds)
+   **Total running time of the script:** ( 4 minutes  57.355 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
-  .. container:: binder-badge
+    .. container:: binder-badge
 
-    .. image:: images/binder_badge_logo.svg
-      :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_gamma.ipynb
-      :alt: Launch binder
-      :width: 150 px
+      .. image:: images/binder_badge_logo.svg
+        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_gamma.ipynb
+        :alt: Launch binder
+        :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_simulate_gamma.py <plot_simulate_gamma.py>`
 
-     :download:`Download Python source code: plot_simulate_gamma.py <plot_simulate_gamma.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_simulate_gamma.ipynb <plot_simulate_gamma.ipynb>`
+      :download:`Download Jupyter notebook: plot_simulate_gamma.ipynb <plot_simulate_gamma.ipynb>`
 
 
 .. only:: html

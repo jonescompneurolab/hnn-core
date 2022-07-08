@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,6 +14,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -304,7 +305,7 @@
 <span class="sd">        each segment junction as a point extracellular current source.</span>
 <span class="sd">        ``&#39;lsa&#39;`` (line source approximation) treats each segment as a line</span>
 <span class="sd">        source of current, which extends from the previous to the next segment</span>
-<span class="sd">        center point: |---x---|, where x is the current segment flanked by |.</span>
+<span class="sd">        center point: /---x---/, where x is the current segment flanked by /.</span>
 <span class="sd">    min_distance : float (default: 0.5; unit: um)</span>
 <span class="sd">        To avoid numerical errors in calculating potentials, apply a minimum</span>
 <span class="sd">        distance limit between the electrode contacts and the active neuronal</span>
@@ -332,7 +333,7 @@
 <span class="sd">    data it contains. Slicing an ``ExtracellularArray`` returns a `copy` of the</span>
 <span class="sd">    corresponding trials: ``array[:5]`` returns a new array of length 5, etc.</span>
 
-<span class="sd">    See Table 5 in http://jn.physiology.org/content/104/6/3388.long for</span>
+<span class="sd">    See Table 5 in https://doi.org/10.1152/jn.00122.2010 for</span>
 <span class="sd">    measured values of conductivity in rat cortex (note units there are mS/cm)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -727,7 +728,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
     </p>
   </div>
 </footer>
