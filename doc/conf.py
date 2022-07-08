@@ -26,7 +26,6 @@ import sphinx_bootstrap_theme
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'hnn_core')))
 sys.path.append(os.path.abspath(os.path.join(curdir, '..')))
-sys.path.append(os.path.abspath(os.path.join(curdir)))
 sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 
 # -- Project information -----------------------------------------------------
