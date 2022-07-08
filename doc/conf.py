@@ -25,7 +25,7 @@ import sphinx_bootstrap_theme
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'hnn_core')))
-sys.path.append(os.path.abspath(os.path.join(curdir, 'hnn_core')))
+sys.path.append(os.path.abspath(os.path.join(curdir, '..')))
 sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 
 # -- Project information -----------------------------------------------------
