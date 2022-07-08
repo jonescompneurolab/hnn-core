@@ -1234,8 +1234,8 @@ class Network(object):
             each segment junction as a point extracellular current source.
             ``'lsa'`` (line source approximation) treats each segment as a line
             source of current, which extends from the previous to the next
-            segment center point: |---x---|, where x is the current segment
-            flanked by |.
+            segment center point: /---x---/, where x is the current segment
+            flanked by /.
         min_distance : float (default: 0.5; unit: um)
             To avoid numerical errors in calculating potentials, apply a
             minimum distance limit between the electrode contacts and the

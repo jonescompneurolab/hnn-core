@@ -25,6 +25,7 @@ import sphinx_bootstrap_theme
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'hnn_core')))
+sys.path.append(os.path.abspath(os.path.join(curdir, '..')))
 sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 
 # -- Project information -----------------------------------------------------
@@ -55,7 +56,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'numpydoc',
-    'gh_substitutions', # custom extension, see ./sphinxext/gh_substitutions.py
+    'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
 # generate autosummary even if no references
