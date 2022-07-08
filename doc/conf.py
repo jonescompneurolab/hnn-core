@@ -25,7 +25,6 @@ import sphinx_bootstrap_theme
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 curdir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(curdir, '..', 'hnn_core')))
-sys.path.append(os.path.abspath(os.path.join(curdir, '.')))
 sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 
 # -- Project information -----------------------------------------------------
@@ -61,6 +60,7 @@ extensions = [
 
 # generate autosummary even if no references
 autosummary_generate = True
+mock_autosummary_imports = ["numpy", "matplotlib", "scipy", "NEURON"]
 autodoc_default_options = {'inherited-members': None}
 numpydoc_class_members_toctree = False
 numpydoc_attributes_as_param_list = True
