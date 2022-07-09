@@ -9,6 +9,7 @@ recursive-include hnn_core/mod/x86_64 *
 recursive-include hnn_core/mod/x86_64/.libs *
 
 recursive-include hnn_core *.py
+recursive-include hnn_core *.ipynb
 
 ### Exclude
 
