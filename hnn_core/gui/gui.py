@@ -6,12 +6,12 @@
 import codecs
 import logging
 import multiprocessing
-import os
 import os.path as op
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from IPython.display import display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
@@ -316,8 +316,9 @@ def _get_evoked_widget(name, layout, style, location, data=None,
 
 def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      tstop_widget, location,
-                     prespecified_drive_name=None, prespecified_drive_data=None,
-                     prespecified_weights_ampa=None, 
+                     prespecified_drive_name=None,
+                     prespecified_drive_data=None,
+                     prespecified_weights_ampa=None,
                      prespecified_weights_nmda=None,
                      prespecified_delays=None,
                      render=True, expand_last_drive=True, event_seed=14):
@@ -449,7 +450,7 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
             should_render = idx == (len(drive_names) - 1)
 
             add_drive_widget(
-                specs['type'].capitalize(), drive_boxes, 
+                specs['type'].capitalize(), drive_boxes,
                 drive_widgets, drives_out, tstop, specs['location'],
                 prespecified_drive_name=drive_name,
                 prespecified_drive_data=specs['dynamics'],
@@ -797,6 +798,8 @@ def run_hnn_gui():
     plot_outputs_list = list()
     plot_dropdowns_list = list()
 
+    # ##### Callbacks #######
+
     def _run_button_clicked(b):
         return run_button_clicked(log_out, drive_widgets, variables, tstep,
                                   tstop, ntrials, backend_selection, mpi_cmd,
@@ -817,6 +820,23 @@ def run_hnn_gui():
         while len(drive_widgets) > 0:
             drive_widgets.pop()
             drive_boxes.pop()
+
+    def handle_viz_layout_change(layout_option):
+        return initialize_viz_window(viz_window, variables,
+                                     plot_outputs_list, plot_dropdowns_list,
+                                     viz_width, viz_height,
+                                     layout_option=layout_option.new)
+
+    def _handle_backend_change(backend_type):
+        return handle_backend_change(backend_type.new, backend_config, mpi_cmd,
+                                     joblib_cores)
+
+    def _add_drive_button_clicked(b):
+        return add_drive_widget(drive_type_selection.value, drive_boxes,
+                                drive_widgets, drives_out, tstop,
+                                location_selection.value)
+
+    # ##### Layout #######
 
     # Output windows
     drives_out = Output()  # window to add new drives
@@ -843,7 +863,7 @@ def run_hnn_gui():
     tstop = FloatText(value=170, description='tstop (ms):', disabled=False)
     tstep = FloatText(value=0.025, description='tstep (ms):', disabled=False)
     ntrials = IntText(value=1, description='Trials:', disabled=False)
-    
+
     # visualization layout
     viz_layout_selection = Dropdown(
         options=[('Horizontal', 'L-R'), ('Vertical', 'U-D')],
@@ -853,12 +873,6 @@ def run_hnn_gui():
                           plot_dropdowns_list, viz_width,
                           viz_height, layout_option=viz_layout_selection.value,
                           init=True)
-
-    def handle_viz_layout_change(layout_option):
-        return initialize_viz_window(viz_window, variables,
-                                     plot_outputs_list, plot_dropdowns_list,
-                                     viz_width, viz_height,
-                                     layout_option=layout_option.new)
 
     viz_layout_selection.observe(handle_viz_layout_change, 'value')
 
@@ -875,10 +889,6 @@ def run_hnn_gui():
                                   description='Cores:', disabled=False)
 
     backend_config = Output()
-
-    def _handle_backend_change(backend_type):
-        return handle_backend_change(backend_type.new, backend_config, mpi_cmd,
-                                     joblib_cores)
 
     handle_backend_change(backend_selection.value, backend_config, mpi_cmd,
                           joblib_cores)
@@ -934,11 +944,6 @@ def run_hnn_gui():
 
     add_drive_button = create_expanded_button('Add drive', 'primary',
                                               height='30px')
-
-    def _add_drive_button_clicked(b):
-        return add_drive_widget(drive_type_selection.value, drive_boxes,
-                                drive_widgets, drives_out, tstop,
-                                location_selection.value)
 
     add_drive_button.on_click(_add_drive_button_clicked)
     drive_selections = VBox(
