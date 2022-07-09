@@ -30,7 +30,7 @@ log_file = os.getenv("HNNGUI_LOGFILE", None)
 debug_gui = os.getenv("DEBUG_HNNGUI", "0")
 if debug_gui == '1' and log_file is not None:
     logging.basicConfig(filename=log_file,
-                        filemode='w',
+                        filemode='a',
                         level=logging.DEBUG,
                         format='%(name)s - %(levelname)s - %(message)s')
 else:
@@ -170,8 +170,7 @@ def _get_rhythmic_widget(
                            description='Start time dev (ms)',
                            **kwargs)
     tstop = BoundedFloatText(
-        value=tstop_widget.value
-        if default_data['tstop'] == 0 else default_data['tstop'],
+        value=default_data['tstop'],
         description='Stop time (ms)',
         max=tstop_widget.value,
         **kwargs,
@@ -246,8 +245,7 @@ def _get_poisson_widget(
                        layout=layout,
                        style=style)
     tstop = BoundedFloatText(
-        value=tstop_widget.value
-        if default_data['tstop'] == 0 else default_data['tstop'],
+        value=default_data['tstop'],
         max=tstop_widget.value,
         description='Stop time (ms)',
         layout=layout,
@@ -383,8 +381,8 @@ def add_drive_widget(drive_type,
             name = drive_type + str(len(drive_boxes))
         else:
             name = prespecified_drive_name
-
-        if drive_type == 'Rhythmic':
+        logging.debug(f"add drive type to widget: {drive_type}")
+        if drive_type in ('Rhythmic', 'Bursty'):
             drive, drive_box = _get_rhythmic_widget(
                 name,
                 tstop_widget,
@@ -408,7 +406,7 @@ def add_drive_widget(drive_type,
                 default_weights_nmda=prespecified_weights_nmda,
                 default_delays=prespecified_delays,
             )
-        elif drive_type == 'Evoked':
+        elif drive_type in ('Evoked', 'Gaussian'):
             drive, drive_box = _get_evoked_widget(
                 name,
                 layout,
@@ -424,6 +422,8 @@ def add_drive_widget(drive_type,
                 'Evoked',
                 'Poisson',
                 'Rhythmic',
+                'Bursty',
+                'Gaussian',
         ]:
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
@@ -499,29 +499,25 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
         for idx, drive_name in enumerate(drive_names):  # order matters
             specs = drive_specs[drive_name]
             should_render = idx == (len(drive_names) - 1)
-            print(f"""load drive:
-                (name={drive_name},
-                type={specs['type']},
-                seed={specs['event_seed']},
-                space_constant={specs['space_constant']}
+            try:
+                add_drive_widget(
+                    specs['type'].capitalize(),
+                    drive_boxes,
+                    drive_widgets,
+                    drives_out,
+                    tstop,
+                    specs['location'],
+                    prespecified_drive_name=drive_name,
+                    prespecified_drive_data=specs['dynamics'],
+                    prespecified_weights_ampa=specs['weights_ampa'],
+                    prespecified_weights_nmda=specs['weights_nmda'],
+                    prespecified_delays=specs['synaptic_delays'],
+                    render=should_render,
+                    expand_last_drive=False,
+                    event_seed=specs['event_seed'],
                 )
-                """)
-            add_drive_widget(
-                specs['type'].capitalize(),
-                drive_boxes,
-                drive_widgets,
-                drives_out,
-                tstop,
-                specs['location'],
-                prespecified_drive_name=drive_name,
-                prespecified_drive_data=specs['dynamics'],
-                prespecified_weights_ampa=specs['weights_ampa'],
-                prespecified_weights_nmda=specs['weights_nmda'],
-                prespecified_delays=specs['synaptic_delays'],
-                render=should_render,
-                expand_last_drive=False,
-                event_seed=specs['event_seed'],
-            )
+            except Exception as e:
+                logging.debug(f"load drive from params err: {e}")
 
 
 def on_upload_change(
@@ -583,7 +579,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
         )
         # add drives to network
         for drive in drive_widgets:
-            print(drive['type'], drive['name'], drive['seedcore'].value)
+            logging.debug(f"add drive type to network: {drive['type']}")
             weights_ampa = {
                 k: v.value
                 for k, v in drive['weights_ampa'].items()
@@ -619,7 +615,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
                     synaptic_delays=synaptic_delays,
                     space_constant=100.0,
                     event_seed=drive['seedcore'].value)
-            elif drive['type'] == 'Evoked':
+            elif drive['type'] in ('Evoked', 'Gaussian'):
                 variables['net'].add_evoked_drive(
                     name=drive['name'],
                     mu=drive['mu'].value,
@@ -631,7 +627,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
                     synaptic_delays=synaptic_delays,
                     space_constant=3.0,
                     event_seed=drive['seedcore'].value)
-            elif drive['type'] == 'Rhythmic':
+            elif drive['type'] in ('Rhythmic', 'Bursty'):
                 variables['net'].add_bursty_drive(
                     name=drive['name'],
                     tstart=drive['tstart'].value,
@@ -1122,4 +1118,3 @@ def launch():
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
     main([notebook_path, *sys.argv[1:]])
-
