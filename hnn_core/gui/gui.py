@@ -499,25 +499,24 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
         for idx, drive_name in enumerate(drive_names):  # order matters
             specs = drive_specs[drive_name]
             should_render = idx == (len(drive_names) - 1)
-            try:
-                add_drive_widget(
-                    specs['type'].capitalize(),
-                    drive_boxes,
-                    drive_widgets,
-                    drives_out,
-                    tstop,
-                    specs['location'],
-                    prespecified_drive_name=drive_name,
-                    prespecified_drive_data=specs['dynamics'],
-                    prespecified_weights_ampa=specs['weights_ampa'],
-                    prespecified_weights_nmda=specs['weights_nmda'],
-                    prespecified_delays=specs['synaptic_delays'],
-                    render=should_render,
-                    expand_last_drive=False,
-                    event_seed=specs['event_seed'],
-                )
-            except Exception as e:
-                logging.debug(f"load drive from params err: {e}")
+
+            add_drive_widget(
+                specs['type'].capitalize(),
+                drive_boxes,
+                drive_widgets,
+                drives_out,
+                tstop,
+                specs['location'],
+                prespecified_drive_name=drive_name,
+                prespecified_drive_data=specs['dynamics'],
+                prespecified_weights_ampa=specs['weights_ampa'],
+                prespecified_weights_nmda=specs['weights_nmda'],
+                prespecified_delays=specs['synaptic_delays'],
+                render=should_render,
+                expand_last_drive=False,
+                event_seed=specs['event_seed'],
+            )
+
 
 
 def on_upload_change(
