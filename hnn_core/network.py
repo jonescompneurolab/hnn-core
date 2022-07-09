@@ -99,7 +99,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     return pos_dict
 
 
-def _connection_probability(conn, probability, conn_seed=3):
+def _connection_probability(conn, probability, conn_seed=None):
     """Remove/keep a random subset of connections.
 
     Parameters
@@ -111,7 +111,7 @@ def _connection_probability(conn, probability, conn_seed=3):
         Probability of connection between any src-target pair.
         Defaults to 1.0 producing an all-to-all pattern.
     conn_seed : int
-        Optional initial seed for random number generator (default: 3).
+        Optional initial seed for random number generator (default: None).
         Used to randomly remove connections when probablity < 1.0.
 
     Notes
@@ -1056,7 +1056,7 @@ class Network(object):
 
     def add_connection(self, src_gids, target_gids, loc, receptor,
                        weight, delay, lamtha, allow_autapses=True,
-                       probability=1.0, conn_seed=3):
+                       probability=1.0, conn_seed=None):
         """Appends connections to connectivity list
 
         Parameters
@@ -1091,7 +1091,7 @@ class Network(object):
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
         conn_seed : int
-            Optional initial seed for random number generator (default: 2).
+            Optional initial seed for random number generator (default: None).
             Used to randomly remove connections when probablity < 1.0.
 
         Notes
