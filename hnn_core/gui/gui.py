@@ -139,17 +139,9 @@ def _get_cell_specific_widgets(
     return widgets_list, widgets_dict
 
 
-def _get_rhythmic_widget(
-    name,
-    tstop_widget,
-    layout,
-    style,
-    location,
-    data=None,
-    default_weights_ampa=None,
-    default_weights_nmda=None,
-    default_delays=None,
-):
+def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
+                         data=None, default_weights_ampa=None,
+                         default_weights_nmda=None, default_delays=None):
     default_data = {
         'tstart': 0.,
         'tstart_std': 0.,
@@ -188,9 +180,7 @@ def _get_rhythmic_widget(
                        **kwargs)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
-        layout,
-        style,
-        location,
+        layout, style, location,
         data={
             'weights_ampa': default_weights_ampa,
             'weights_nmda': default_weights_nmda,
@@ -215,17 +205,9 @@ def _get_rhythmic_widget(
     return drive, drive_box
 
 
-def _get_poisson_widget(
-    name,
-    tstop_widget,
-    layout,
-    style,
-    location,
-    data=None,
-    default_weights_ampa=None,
-    default_weights_nmda=None,
-    default_delays=None,
-):
+def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
+                        default_weights_ampa=None, default_weights_nmda=None,
+                        default_delays=None):
     default_data = {
         'tstart': 0.0,
         'tstop': 0.0,
@@ -294,16 +276,9 @@ def _get_poisson_widget(
     return drive, drive_box
 
 
-def _get_evoked_widget(
-    name,
-    layout,
-    style,
-    location,
-    data=None,
-    default_weights_ampa=None,
-    default_weights_nmda=None,
-    default_delays=None,
-):
+def _get_evoked_widget(name, layout, style, location, data=None,
+                       default_weights_ampa=None, default_weights_nmda=None,
+                       default_delays=None):
     default_data = {
         'mu': 0,
         'sigma': 1,
@@ -353,20 +328,13 @@ def _get_evoked_widget(
     return drive, drive_box
 
 
-def add_drive_widget(drive_type,
-                     drive_boxes,
-                     drive_widgets,
-                     drives_out,
-                     tstop_widget,
-                     location,
-                     prespecified_drive_name=None,
-                     prespecified_drive_data=None,
-                     prespecified_weights_ampa=None,
+def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
+                     tstop_widget, location,
+                     prespecified_drive_name=None, prespecified_drive_data=None,
+                     prespecified_weights_ampa=None, 
                      prespecified_weights_nmda=None,
                      prespecified_delays=None,
-                     render=True,
-                     expand_last_drive=True,
-                     event_seed=14):
+                     render=True, expand_last_drive=True, event_seed=14):
     """Add a widget for a new drive."""
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
@@ -417,13 +385,8 @@ def add_drive_widget(drive_type,
                 default_delays=prespecified_delays,
             )
 
-        if drive_type in [
-                'Evoked',
-                'Poisson',
-                'Rhythmic',
-                'Bursty',
-                'Gaussian',
-        ]:
+        if drive_type in ['Evoked', 'Poisson', 'Rhythmic', 'Bursty',
+                          'Gaussian']:
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
 
@@ -500,12 +463,8 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
             should_render = idx == (len(drive_names) - 1)
 
             add_drive_widget(
-                specs['type'].capitalize(),
-                drive_boxes,
-                drive_widgets,
-                drives_out,
-                tstop,
-                specs['location'],
+                specs['type'].capitalize(), drive_boxes, 
+                drive_widgets, drives_out, tstop, specs['location'],
                 prespecified_drive_name=drive_name,
                 prespecified_drive_data=specs['dynamics'],
                 prespecified_weights_ampa=specs['weights_ampa'],
@@ -517,19 +476,8 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
             )
 
 
-def on_upload_change(
-    change,
-    sliders,
-    params,
-    tstop,
-    tstep,
-    log_out,
-    variables,
-    # for adding drives
-    drive_boxes,
-    drive_widgets,
-    drives_out,
-):
+def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
+                     drive_boxes, drive_widgets, drives_out):
     if len(change['owner'].value) == 0:
         return
 
@@ -677,14 +625,9 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, joblib_cores):
             display(joblib_cores)
 
 
-def init_left_right_viz_layout(plot_outputs,
-                               plot_dropdowns,
-                               window_height,
-                               variables,
-                               plot_options,
-                               previous_outputs,
-                               border='1px solid gray',
-                               init=False):
+def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
+                               variables, plot_options, previous_outputs,
+                               border='1px solid gray', init=False):
     height_plot = window_height
     plot_outputs_L = Output(layout={'border': border, 'height': height_plot})
 
@@ -750,13 +693,9 @@ def init_left_right_viz_layout(plot_outputs,
     return grid
 
 
-def init_upper_down_viz_layout(plot_outputs,
-                               plot_dropdowns,
-                               window_height,
-                               variables,
-                               plot_options,
-                               previous_outputs,
-                               border='1px solid gray',
+def init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
+                               window_height, variables, plot_options,
+                               previous_outputs, border='1px solid gray',
                                init=False):
     height_plot = window_height
     default_plot_types = [plot_options[0], plot_options[1]]
@@ -827,14 +766,9 @@ def init_upper_down_viz_layout(plot_outputs,
     return grid
 
 
-def initialize_viz_window(viz_window,
-                          variables,
-                          plot_outputs,
-                          plot_dropdowns,
-                          window_width,
-                          window_height,
-                          layout_option="L-R",
-                          init=False):
+def initialize_viz_window(viz_window, variables, plot_outputs,
+                          plot_dropdowns, window_width, window_height,
+                          layout_option="L-R", init=False):
     plot_options = [
         'current dipole', 'input histogram', 'spikes', 'PSD', 'spectogram',
         'network'
@@ -843,29 +777,21 @@ def initialize_viz_window(viz_window,
     previous_plot_outputs_values = []
     while len(plot_outputs) > 0:
         plot_outputs.pop()
-        # plot_dropdowns.pop()
         previous_plot_outputs_values.append(plot_dropdowns.pop().value)
 
     with viz_window:
         # Left-Rright configuration
         if layout_option == "L-R":
-            grid = init_left_right_viz_layout(plot_outputs,
-                                              plot_dropdowns,
-                                              window_height,
-                                              variables,
-                                              plot_options,
-                                              previous_plot_outputs_values,
-                                              init=init)
+            grid = init_left_right_viz_layout(
+                plot_outputs, plot_dropdowns, window_height, variables,
+                plot_options, previous_plot_outputs_values, init=init)
+
         # Upper-Down configuration
         elif layout_option == "U-D":
-            grid = init_upper_down_viz_layout(plot_outputs,
-                                              plot_dropdowns,
-                                              window_height,
-                                              variables,
-                                              plot_options,
-                                              previous_plot_outputs_values,
-                                              init=init)
-        # TODO: 2x2
+            grid = init_upper_down_viz_layout(
+                plot_outputs, plot_dropdowns, window_height,
+                variables, plot_options, previous_plot_outputs_values,
+                init=init)
 
         display(grid)
 
@@ -931,52 +857,38 @@ def run_hnn_gui():
     tstop = FloatText(value=170, description='tstop (ms):', disabled=False)
     tstep = FloatText(value=0.025, description='tstep (ms):', disabled=False)
     ntrials = IntText(value=1, description='Trials:', disabled=False)
-    # temporarily keep this
-
+    
+    # visualization layout
     viz_layout_selection = Dropdown(
         options=[('Horizontal', 'L-R'), ('Vertical', 'U-D')],
-        value='L-R',
-        description='Layout:',
-    )
+        value='L-R', description='Layout:')
     # initialize
-    initialize_viz_window(viz_window,
-                          variables,
-                          plot_outputs_list,
-                          plot_dropdowns_list,
-                          viz_width,
-                          viz_height,
-                          layout_option=viz_layout_selection.value,
+    initialize_viz_window(viz_window, variables, plot_outputs_list,
+                          plot_dropdowns_list, viz_width,
+                          viz_height, layout_option=viz_layout_selection.value,
                           init=True)
 
     def handle_viz_layout_change(layout_option):
-        return initialize_viz_window(
-            viz_window,
-            variables,
-            plot_outputs_list,
-            plot_dropdowns_list,
-            viz_width,
-            viz_height,
-            layout_option=layout_option.new,
-        )
+        return initialize_viz_window(viz_window, variables,
+                                     plot_outputs_list, plot_dropdowns_list,
+                                     viz_width, viz_height,
+                                     layout_option=layout_option.new)
 
     viz_layout_selection.observe(handle_viz_layout_change, 'value')
 
+    # select backends
     backend_selection = Dropdown(
         options=[('Joblib', 'Joblib'), ('MPI', 'MPI')],
         value='MPI' if os.getenv("USEMPI", '0') == '1' else 'Joblib',
         description='Backend:',
     )
 
-    mpi_cmd = Text(value='mpiexec',
-                   placeholder='Fill if applies',
-                   description='MPI cmd:',
-                   disabled=False)
+    mpi_cmd = Text(value='mpiexec', placeholder='Fill if applies',
+                   description='MPI cmd:', disabled=False)
 
-    joblib_cores = BoundedIntText(value=1,
-                                  min=1,
+    joblib_cores = BoundedIntText(value=1, min=1,
                                   max=multiprocessing.cpu_count(),
-                                  description='Cores:',
-                                  disabled=False)
+                                  description='Cores:', disabled=False)
 
     backend_config = Output()
 
@@ -988,13 +900,8 @@ def run_hnn_gui():
                           joblib_cores)
     backend_selection.observe(_handle_backend_change, 'value')
 
-    simulation_box = VBox([
-        tstop,
-        tstep,
-        ntrials,
-        backend_selection,
-        backend_config,
-    ])
+    simulation_box = VBox([tstop, tstep, ntrials, backend_selection,
+                           backend_config])
 
     # Sliders to change local-connectivity params
     sliders = [
@@ -1041,8 +948,7 @@ def run_hnn_gui():
                                       disabled=False,
                                       layout=layout)
 
-    add_drive_button = create_expanded_button('Add drive',
-                                              'primary',
+    add_drive_button = create_expanded_button('Add drive', 'primary',
                                               height='30px')
 
     def _add_drive_button_clicked(b):
@@ -1072,13 +978,10 @@ def run_hnn_gui():
     run_button = create_expanded_button('Run', 'success', height='30px')
 
     style = {'button_color': THEMECOLOR}
-    load_button = FileUpload(accept='.json,.param',
-                             multiple=False,
-                             style=style,
-                             description='Load network',
+    load_button = FileUpload(accept='.json,.param', multiple=False,
+                             style=style, description='Load network',
                              button_style='success')
-    delete_button = create_expanded_button('Delete drives',
-                                           'success',
+    delete_button = create_expanded_button('Delete drives', 'success',
                                            height='30px')
 
     load_button.observe(_on_upload_change)
