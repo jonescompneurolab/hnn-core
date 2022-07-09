@@ -16,8 +16,8 @@ from IPython.display import display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
                         FloatLogSlider, FloatText, GridspecLayout, HBox,
-                        IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
-                        interactive_output)
+                        IntText, Label, Layout, Output, RadioButtons, Tab,
+                        Text, VBox, interactive_output)
 
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
@@ -37,8 +37,11 @@ else:
     logging.basicConfig(level=logging.ERROR)
 
 
+THEMECOLOR = "#8A2BE2"
+
+
 def create_expanded_button(description, button_style, height, disabled=False):
-    style = {'button_color': '#8A2BE2'}
+    style = {'button_color': THEMECOLOR}
     return Button(description=description,
                   button_style=button_style,
                   layout=Layout(height=height, width='auto'),
@@ -196,9 +199,10 @@ def _get_rhythmic_widget(
             'delays': default_delays,
         },
     )
-    drive_box = VBox(
-        [tstart, tstart_std, tstop, burst_rate, burst_std, repeats, seedcore] +
-        widgets_list)
+    drive_box = VBox([
+        HTML(value=f"<p>Location: {location}</p>"), tstart, tstart_std, tstop,
+        burst_rate, burst_std, repeats, seedcore
+    ] + widgets_list)
     drive = dict(type='Rhythmic',
                  name=name,
                  tstart=tstart,
@@ -277,7 +281,9 @@ def _get_poisson_widget(
     widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
-    drive_box = VBox([tstart, tstop, seedcore] + widgets_list)
+    drive_box = VBox(
+        [HTML(value=f"<p>Location: {location}</p>"), tstart, tstop, seedcore] +
+        widgets_list)
     drive = dict(
         type='Poisson',
         name=name,
@@ -334,7 +340,10 @@ def _get_evoked_widget(
         },
     )
 
-    drive_box = VBox([mu, sigma, numspikes, seedcore] + widgets_list)
+    drive_box = VBox([
+        HTML(value=f"<p>Location: {location}</p>"), mu, sigma, numspikes,
+        seedcore
+    ] + widgets_list)
     drive = dict(type='Evoked',
                  name=name,
                  mu=mu,
@@ -560,7 +569,8 @@ def on_upload_change(
 
 def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
                        ntrials, backend_selection, mpi_cmd, joblib_cores,
-                       params, plot_outputs_list, plot_dropdowns_list, b):
+                       params, plot_outputs_list, plot_dropdowns_list,
+                       simulation_status, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
@@ -643,11 +653,13 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
             variables['backend'] = JoblibBackend(n_jobs=joblib_cores.value)
             print(f"Using Joblib with {joblib_cores.value} core(s).")
         with variables['backend']:
+            simulation_status.value = "Running..."
             variables['dpls'] = simulate_dipole(variables['net'],
                                                 tstop=tstop.value,
                                                 n_trials=ntrials.value)
 
             window_len, scaling_factor = 30, 3000
+            simulation_status.value = "Simulation finished"
             for dpl in variables['dpls']:
                 dpl.smooth(window_len).scale(scaling_factor)
 
@@ -884,7 +896,7 @@ def run_hnn_gui():
         return run_button_clicked(log_out, drive_widgets, variables, tstep,
                                   tstop, ntrials, backend_selection, mpi_cmd,
                                   joblib_cores, params, plot_outputs_list,
-                                  plot_dropdowns_list, b)
+                                  plot_dropdowns_list, simulation_status, b)
 
     def _on_upload_change(change):
         return on_upload_change(change, sliders, params, tstop, tstep, log_out,
@@ -918,10 +930,10 @@ def run_hnn_gui():
     })
 
     # header_button
-    header_button = create_expanded_button('HUMAN NEOCORTICAL NEUROSOLVER',
-                                           'success',
-                                           height='40px',
-                                           disabled=True)
+    header_button = HTML(
+        value=
+        f"""<div style='background:{THEMECOLOR}; text-align: center; color: white;'>
+    HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
     # Simulation parameters
     tstop = FloatText(value=170, description='tstop (ms):', disabled=False)
@@ -1061,10 +1073,13 @@ def run_hnn_gui():
     for idx, title in enumerate(titles):
         left_tab.set_title(idx, title)
 
+    # Running status
+    simulation_status = Label(value="Not running")
+
     # Run, delete drives and load button
     run_button = create_expanded_button('Run', 'success', height='30px')
 
-    style = {'button_color': '#8A2BE2'}
+    style = {'button_color': THEMECOLOR}
     load_button = FileUpload(accept='.json,.param',
                              multiple=False,
                              style=style,
@@ -1084,7 +1099,7 @@ def run_hnn_gui():
             HBox([run_button, load_button, delete_button],
                  layout={"width": left_width}),
             viz_layout_selection,
-        ]), log_out
+        ]), log_out, simulation_status
     ])
 
     # initialize drive ipywidgets
@@ -1107,3 +1122,4 @@ def launch():
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
     main([notebook_path, *sys.argv[1:]])
+
