@@ -36,7 +36,6 @@ if debug_gui == '1' and log_file is not None:
 else:
     logging.basicConfig(level=logging.ERROR)
 
-
 THEMECOLOR = "#8A2BE2"
 
 
@@ -518,7 +517,6 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
             )
 
 
-
 def on_upload_change(
     change,
     sliders,
@@ -925,10 +923,9 @@ def run_hnn_gui():
     })
 
     # header_button
-    header_button = HTML(
-        value=
-        f"""<div style='background:{THEMECOLOR}; text-align: center; color: white;'>
-    HUMAN NEOCORTICAL NEUROSOLVER</div>""")
+    header_button = HTML(value=f"""<div
+        style='background:{THEMECOLOR};text-align:center;color:white;'>
+        HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
     # Simulation parameters
     tstop = FloatText(value=170, description='tstop (ms):', disabled=False)
