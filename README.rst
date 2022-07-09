@@ -77,6 +77,10 @@ To install the GUI dependencies along with ``hnn-core``, a simple tweak to the a
 
    $ pip install hnn_core[gui]
 
+To start the GUI, please do::
+
+   $ hnn-gui
+
 **Parallel backends**
 
 For further instructions on installation and usage of parallel backends for using more
