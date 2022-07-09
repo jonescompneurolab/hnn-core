@@ -253,9 +253,11 @@ directly.</p>
     <span class="n">location</span><span class="p">,</span> <span class="n">receptor</span> <span class="o">=</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;ampa&#39;</span>
     <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">70</span>
     <span class="n">src</span> <span class="o">=</span> <span class="s1">&#39;L5_pyramidal&#39;</span>
+    <span class="n">conn_seed</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">]:</span>
         <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span>
-                           <span class="n">delay</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">probability</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+                           <span class="n">delay</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">probability</span><span class="o">=</span><span class="n">probability</span><span class="p">,</span>
+                       <span class="n">conn_seed</span><span class="o">=</span><span class="n">conn_seed</span><span class="p">)</span>
 
     <span class="c1"># Basket cell connections</span>
     <span class="n">location</span><span class="p">,</span> <span class="n">receptor</span> <span class="o">=</span> <span class="s1">&#39;soma&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa&#39;</span>
@@ -263,7 +265,8 @@ directly.</p>
     <span class="n">src</span> <span class="o">=</span> <span class="s1">&#39;L2_basket&#39;</span>
     <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">]:</span>
         <span class="n">net</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span>
-                           <span class="n">delay</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">probability</span><span class="o">=</span><span class="n">probability</span><span class="p">)</span>
+                           <span class="n">delay</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">probability</span><span class="o">=</span><span class="n">probability</span><span class="p">,</span>
+                       <span class="n">conn_seed</span><span class="o">=</span><span class="n">conn_seed</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">net</span>
 
 
@@ -385,7 +388,7 @@ the aggregate current dipole.</p>
 <img src="../../_images/sphx_glr_plot_connectivity_008.png" srcset="../../_images/sphx_glr_plot_connectivity_008.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  9.663 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  48.600 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-connectivity-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_connectivity.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
