@@ -26,15 +26,6 @@ from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
 from hnn_core.viz import plot_dipole
 
-log_file = os.getenv("HNNGUI_LOGFILE", None)
-debug_gui = os.getenv("DEBUG_HNNGUI", "0")
-if debug_gui == '1' and log_file is not None:
-    logging.basicConfig(filename=log_file,
-                        filemode='a',
-                        level=logging.DEBUG,
-                        format='%(name)s - %(levelname)s - %(message)s')
-else:
-    logging.basicConfig(level=logging.ERROR)
 
 THEMECOLOR = "#8A2BE2"
 
@@ -74,12 +65,7 @@ def _get_sliders(params, param_keys):
     return sliders
 
 
-def _get_cell_specific_widgets(
-    layout,
-    style,
-    location,
-    data=None,
-):
+def _get_cell_specific_widgets(layout, style, location, data=None):
     default_data = {
         'weights_ampa': {
             'L5_pyramidal': 0.,
@@ -878,10 +864,8 @@ def run_hnn_gui():
 
     # select backends
     backend_selection = Dropdown(
-        options=[('Joblib', 'Joblib'), ('MPI', 'MPI')],
-        value='MPI' if os.getenv("USEMPI", '0') == '1' else 'Joblib',
-        description='Backend:',
-    )
+        options=[('Joblib', 'Joblib'), ('MPI', 'MPI')], value='Joblib',
+        description='Backend:')
 
     mpi_cmd = Text(value='mpiexec', placeholder='Fill if applies',
                    description='MPI cmd:', disabled=False)
