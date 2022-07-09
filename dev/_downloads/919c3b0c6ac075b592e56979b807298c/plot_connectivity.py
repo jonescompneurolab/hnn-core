@@ -77,11 +77,9 @@ def get_network(probability=1.0):
     location, receptor = 'distal', 'ampa'
     weight, delay, lamtha = 1.0, 1.0, 70
     src = 'L5_pyramidal'
-    conn_seed = 3
     for target in ['L5_pyramidal', 'L2_basket']:
         net.add_connection(src, target, location, receptor,
-                           delay, weight, lamtha, probability=probability,
-			   conn_seed=conn_seed)
+                           delay, weight, lamtha, probability=probability)
 
     # Basket cell connections
     location, receptor = 'soma', 'gabaa'
@@ -89,8 +87,7 @@ def get_network(probability=1.0):
     src = 'L2_basket'
     for target in ['L5_pyramidal', 'L2_basket']:
         net.add_connection(src, target, location, receptor,
-                           delay, weight, lamtha, probability=probability,
-			   conn_seed=conn_seed)
+                           delay, weight, lamtha, probability=probability)
     return net
 
 

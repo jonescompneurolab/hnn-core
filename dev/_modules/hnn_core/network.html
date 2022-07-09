@@ -232,7 +232,7 @@
     <span class="k">return</span> <span class="n">pos_dict</span>
 
 
-<span class="k">def</span> <span class="nf">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Remove/keep a random subset of connections.</span>
 
 <span class="sd">    Parameters</span>
@@ -244,7 +244,7 @@
 <span class="sd">        Probability of connection between any src-target pair.</span>
 <span class="sd">        Defaults to 1.0 producing an all-to-all pattern.</span>
 <span class="sd">    conn_seed : int</span>
-<span class="sd">        Optional initial seed for random number generator (default: None).</span>
+<span class="sd">        Optional initial seed for random number generator (default: 3).</span>
 <span class="sd">        Used to randomly remove connections when probablity &lt; 1.0.</span>
 
 <span class="sd">    Notes</span>
@@ -1189,7 +1189,7 @@
 
 <div class="viewcode-block" id="Network.add_connection"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_connection">[docs]</a>    <span class="k">def</span> <span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_gids</span><span class="p">,</span> <span class="n">target_gids</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span>
                        <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">probability</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                       <span class="n">probability</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Appends connections to connectivity list</span>
 
 <span class="sd">        Parameters</span>
@@ -1224,7 +1224,7 @@
 <span class="sd">            Probability of connection between any src-target pair.</span>
 <span class="sd">            Defaults to 1.0 producing an all-to-all pattern.</span>
 <span class="sd">        conn_seed : int</span>
-<span class="sd">            Optional initial seed for random number generator (default: None).</span>
+<span class="sd">            Optional initial seed for random number generator (default: 2).</span>
 <span class="sd">            Used to randomly remove connections when probablity &lt; 1.0.</span>
 
 <span class="sd">        Notes</span>
