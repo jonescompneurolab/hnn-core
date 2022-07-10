@@ -841,10 +841,10 @@ def run_hnn_gui():
     # Output windows
     drives_out = Output()  # window to add new drives
 
-    log_out_heiht = "100px"
+    log_out_height = "100px"
     log_out = Output(layout={
         'border': '1px solid gray',
-        'height': log_out_heiht,
+        'height': log_out_height,
         'overflow': 'auto'
     })
     viz_width = "1000px"
@@ -874,8 +874,6 @@ def run_hnn_gui():
                           viz_height, layout_option=viz_layout_selection.value,
                           init=True)
 
-    viz_layout_selection.observe(handle_viz_layout_change, 'value')
-
     # select backends
     backend_selection = Dropdown(
         options=[('Joblib', 'Joblib'), ('MPI', 'MPI')], value='Joblib',
@@ -889,10 +887,8 @@ def run_hnn_gui():
                                   description='Cores:', disabled=False)
 
     backend_config = Output()
-
     handle_backend_change(backend_selection.value, backend_config, mpi_cmd,
                           joblib_cores)
-    backend_selection.observe(_handle_backend_change, 'value')
 
     simulation_box = VBox([tstop, tstep, ntrials, backend_selection,
                            backend_config])
@@ -945,7 +941,6 @@ def run_hnn_gui():
     add_drive_button = create_expanded_button('Add drive', 'primary',
                                               height='30px')
 
-    add_drive_button.on_click(_add_drive_button_clicked)
     drive_selections = VBox(
         [HBox([drive_type_selection, location_selection]), add_drive_button])
 
@@ -970,17 +965,13 @@ def run_hnn_gui():
     load_button = FileUpload(accept='.json,.param', multiple=False,
                              style=style, description='Load network',
                              button_style='success')
-    delete_button = create_expanded_button('Delete drives', 'success',
-                                           height='30px')
+    delete_drive_button = create_expanded_button('Delete drives', 'success',
+                                                 height='30px')
 
-    load_button.observe(_on_upload_change)
-    run_button.on_click(_run_button_clicked)
-
-    delete_button.on_click(_delete_drives_clicked)
     left_width = '380px'
     footer = VBox([
         HBox([
-            HBox([run_button, load_button, delete_button],
+            HBox([run_button, load_button, delete_drive_button],
                  layout={"width": left_width}),
             viz_layout_selection,
         ]), log_out, simulation_status
@@ -999,6 +990,15 @@ def run_hnn_gui():
         pane_widths=[left_width, '0px', viz_width],
         pane_heights=['50px', viz_height, "1"],
     )
+
+    # ######## connect to callbacks ##########
+    backend_selection.observe(_handle_backend_change, 'value')
+    add_drive_button.on_click(_add_drive_button_clicked)
+    delete_drive_button.on_click(_delete_drives_clicked)
+    load_button.observe(_on_upload_change)
+    run_button.on_click(_run_button_clicked)
+    viz_layout_selection.observe(handle_viz_layout_change, 'value')
+
     return hnn_gui
 
 
