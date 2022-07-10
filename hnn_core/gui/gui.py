@@ -88,7 +88,7 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
     }
     if isinstance(data, dict):
         for k in default_data.keys():
-            if k in data:
+            if k in data and data[k] is not None:
                 default_data[k].update(data[k])
 
     kwargs = dict(layout=layout, style=style)
