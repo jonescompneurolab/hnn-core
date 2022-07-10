@@ -1,6 +1,4 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
-import os
-
 from hnn_core.gui.gui import run_hnn_gui
 
 
