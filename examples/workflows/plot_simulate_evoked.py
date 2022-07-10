@@ -170,5 +170,5 @@ net_sync.cell_response.plot_spikes_hist()
 # References
 # ----------
 # .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
-# a combined magnetoencephalography and biophysically based computational
-# modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
+#        a combined magnetoencephalography and biophysically based computational
+#        modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.

@@ -121,5 +121,5 @@ plt.tight_layout()
 # References
 # ----------
 # .. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
-#    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
-#    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
+#        neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
+#        sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).

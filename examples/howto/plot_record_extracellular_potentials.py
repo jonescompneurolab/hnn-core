@@ -111,7 +111,7 @@ plt.show()
 # References
 # ----------
 # .. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
-#    neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
-#    sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
+#        neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
+#        sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 # .. [2] Kajikawa, Y. & Schroeder, C. E. How local is the local field
 #        potential? Neuron 72, 847–858 (2011).
