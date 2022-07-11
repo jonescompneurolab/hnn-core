@@ -89,7 +89,11 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">hnn-core</a><ul>
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li><a class="reference internal" href="#optional-dependencies">Optional dependencies</a></li>
+<li><a class="reference internal" href="#optional-dependencies">Optional dependencies</a><ul>
+<li><a class="reference internal" href="#gui">GUI</a></li>
+<li><a class="reference internal" href="#parallel-processing">Parallel processing</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
@@ -151,7 +155,8 @@
 <a class="reference external image-reference" href="https://circleci.com/gh/jonescompneurolab/hnn-core"><img alt="CircleCi" src="https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg" /></a>
 <a class="reference external image-reference" href="https://travis-ci.org/jonescompneurolab/hnn-core"><img alt="Build Status" src="https://api.travis-ci.org/jonescompneurolab/hnn-core.svg?branch=master" /></a>
 <a class="reference external image-reference" href="https://codecov.io/gh/jonescompneurolab/hnn-core"><img alt="Test coverage" src="https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg" /></a>
-<p>This is a leaner and cleaner version of the code based off the <a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN repository</a>. However, a Graphical User Interface is not supported at the moment in this repository.</p>
+<a class="reference external image-reference" href="https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png"><img alt="HNN-core GUI" src="https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png" /></a>
+<p>This is a leaner and cleaner version of the code based off the <a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN repository</a>.</p>
 <p>It is early Work in Progress. Contributors are very welcome.</p>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">¶</a></h2>
@@ -164,6 +169,15 @@
 </section>
 <section id="optional-dependencies">
 <h2>Optional dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this heading">¶</a></h2>
+<section id="gui">
+<h3>GUI<a class="headerlink" href="#gui" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>ipywidgets</p></li>
+<li><p>voila</p></li>
+</ul>
+</section>
+<section id="parallel-processing">
+<h3>Parallel processing<a class="headerlink" href="#parallel-processing" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>joblib (for simulating trials simultaneously)</p></li>
 <li><p>mpi4py (for simulating the cells in parallel for a single trial). Also depends on:</p>
@@ -173,6 +187,7 @@
 </ul>
 </li>
 </ul>
+</section>
 </section>
 </section>
 <section id="installation">
@@ -195,6 +210,15 @@ because the pip installer works better with virtual environments such as the one
 </pre></div>
 </div>
 <p>and it should not give any error messages.</p>
+<p><strong>GUI installation</strong></p>
+<p>To install the GUI dependencies along with <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, a simple tweak to the above command is needed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core[gui]
+</pre></div>
+</div>
+<p>To start the GUI, please do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ hnn-gui
+</pre></div>
+</div>
 <p><strong>Parallel backends</strong></p>
 <p>For further instructions on installation and usage of parallel backends for using more
 than one CPU core, refer to <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/parallel.html">parallel_backends</a></p>
