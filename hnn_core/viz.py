@@ -1165,3 +1165,57 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     plt_show(show)
 
     return ax.get_figure()
+
+    
+def _plot_cell(ax, cell_type=None, show=True):
+    """Plot the cell morphology of a specific cell type
+
+    parameters
+    ----------
+    cell_type : instance of net.cell_type[]
+            The type of cell to be plotted. If None,
+            generic cell type 
+    ax : instance of Axes3D
+        Matplotlib 3D axis
+    show : bool
+        if True, show the plot
+    
+    """
+
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+
+    if ax is none:
+        plt.figure()
+        ax = plt.axes(projection='3d')
+
+    return ax
+
+
+def plot_cell_morphologies(net, ax=None, show=true):
+    """Plot the morphology of the network cells
+
+    Parameters
+    ----------
+    net : instance of Network
+        The network object
+    ax : instance of matplotlib Axes3D | None
+        An axis object from matplotlib. If none,
+        a new figure is created.
+    Show : bool
+        If True, show the figure
+
+    Returns
+    -------
+    fig : instance of matplotlib figure
+        The matplotlib figure handle
+    """
+
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+    return ax.get_figure()
