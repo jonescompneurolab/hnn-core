@@ -28,40 +28,47 @@ from hnn_core.viz import plot_dipole
 
 
 class HNNGUI:
+    """HNN GUI class
 
-    def __init__(self, theme_color="#8A2BE2", log_out_height="100px",
-                 viz_width="1000px", viz_height="500px",
-                 left_sidebar_width='380px'):
+    Parameters
+    ----------
+    theme_color : str
+        The theme color of the whole dashboard.
+    log_window_height: str
+        The height of the log output window (in pixel).
+    visualization_window_width: str
+        The width of the visualization window (in pixel).
+    visualization_window_height: str
+        The height of the visualization window (in pixel).
+    left_sidebar_width: str
+        The width of the left side bar (in pixel).
+    TODO: add more parameters.
+
+    Attributes
+    ----------
+    params: dict
+        The parameters to use for constructing the network.
+    TODO: add more attributes
+    """
+
+    def __init__(self, theme_color="#8A2BE2", log_window_height="100px",
+                 visualization_window_width="1000px",
+                 visualization_window_height="500px",
+                 left_sidebar_width='380px',
+                 drive_widget_width="200px"):
         # set up styling.
         self.theme_color = theme_color
-        self.log_out_height = log_out_height
-        self.viz_width = viz_width
-        self.viz_height = viz_height
+        self.log_window_height = log_window_height
+        self.visualization_window_width = visualization_window_width
+        self.visualization_window_height = visualization_window_height
         self.left_sidebar_width = left_sidebar_width
+        self.drive_widget_width = drive_widget_width
 
         # load default parameters
         self.params = self.load_parameters()
 
         # In-memory storage of all simulation related variables
         self.variables = dict(net=None, dpls=None)
-
-        self.log_out = Output(
-            layout={
-                'border': '1px solid gray',
-                'height': self.log_out_height,
-                'overflow': 'auto'
-            })
-
-        self.viz_window = Output(layout={
-            'height': self.viz_height,
-            'width': self.viz_width,
-        })
-
-        # header
-        self.header = HTML(value=f"""<div
-            style='background:{self.theme_color};
-            text-align:center;color:white;'>
-            HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
         # Simulation parameters
         self.tstop = FloatText(value=170,
@@ -95,32 +102,17 @@ class HNNGUI:
                                            description='Cores:',
                                            disabled=False)
 
-        self.backend_config = Output()
-
-        # Visualization figure list
-        self.plot_outputs_list = list()
-        self.plot_dropdowns_list = list()
-        self.sliders = self.init_cell_connectivity(self.params)
-
-        # Add drive section
-        self.drive_widgets = list()
-        self.drive_boxes = list()
-        self.drives_out = Output()  # window to add new drives
-
-        layout = Layout(width='200px')
-
         self.drive_type_selection = RadioButtons(
             options=['Evoked', 'Poisson', 'Rhythmic'],
             value='Evoked',
             description='Drive:',
             disabled=False,
-            layout=layout)
+            layout=Layout(width=self.drive_widget_width))
 
-        self.location_selection = RadioButtons(options=['proximal', 'distal'],
-                                               value='proximal',
-                                               description='Location',
-                                               disabled=False,
-                                               layout=layout)
+        self.location_selection = RadioButtons(
+            options=['proximal', 'distal'], value='proximal',
+            description='Location', disabled=False,
+            layout=Layout(width=self.drive_widget_width))
 
         self.add_drive_button = create_expanded_button(
             'Add drive', 'primary', height='30px',
@@ -131,11 +123,6 @@ class HNNGUI:
                                                  height='30px',
                                                  button_color=self.theme_color)
 
-        # Running status
-        self.simulation_status = HTML(value="""<div
-            style='background:gray;padding-left:10px;color:white;'>
-            Not running</div>""")
-
         self.load_button = FileUpload(accept='.json,.param',
                                       multiple=False,
                                       style={'button_color': self.theme_color},
@@ -145,6 +132,57 @@ class HNNGUI:
         self.delete_drive_button = create_expanded_button(
             'Delete drives', 'success', height='30px',
             button_color=self.theme_color)
+
+        # Visualization figure list
+        self.plot_outputs_list = list()
+        self.plot_dropdowns_list = list()
+        # Add drive section
+        self.drive_widgets = list()
+        self.drive_boxes = list()
+
+        self._init_ui_components()
+
+    def _init_ui_components(self):
+        """Initialize larger UI components and dynamical output windows. It's
+        not encouraged for users to modify or access attributes in this part.
+        """
+        self.sliders = self.init_cell_connectivity(self.params)
+        # dynamic larger components
+        self.drives_out = Output()  # window to add new drives
+        self.log_out = Output(
+            layout={
+                'border': '1px solid gray',
+                'height': self.log_window_height,
+                'overflow': 'auto'
+            })
+        # visualization window
+        self.visualization_window = Output(layout={
+            'height': self.visualization_window_height,
+            'width': self.visualization_window_width,
+        })
+        # detailed configuration of backends
+        self.backend_config = Output()
+
+        # static parts
+        # Running status
+        self.simulation_status = HTML(value="""<div
+            style='background:gray;padding-left:10px;color:white;'>
+            Not running</div>""")
+
+        # footer
+        self.footer = VBox([
+            HBox([
+                HBox([
+                    self.run_button, self.load_button, self.delete_drive_button
+                ], layout={"width": self.left_sidebar_width}),
+                self.viz_layout_selection,
+            ]), self.log_out, self.simulation_status
+        ])
+        # title
+        self.header = HTML(value=f"""<div
+            style='background:{self.theme_color};
+            text-align:center;color:white;'>
+            HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
     def load_parameters(self, params_fname=None):
         if not params_fname:
@@ -174,55 +212,7 @@ class HNNGUI:
             ])
         ]
 
-    def run(self):
-        # compose widgets
-        simulation_box = VBox([
-            self.tstop, self.tstep, self.ntrials, self.backend_selection,
-            self.backend_config
-        ])
-
-        # accordians to group local-connectivity by cell type
-        boxes = [VBox(slider) for slider in self.sliders]
-        titles = [
-            'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
-            'Layer 5 Basket'
-        ]
-        cell_connectivity = Accordion(children=boxes)
-        for idx, title in enumerate(titles):
-            cell_connectivity.set_title(idx, title)
-
-        drive_selections = VBox([
-            self.drive_type_selection, self.location_selection,
-            self.add_drive_button
-        ])
-        # from IPywidgets > 8.0
-        drives_options = VBox([drive_selections, self.drives_out])
-        # Tabs for left pane
-        left_tab = Tab()
-        left_tab.children = [simulation_box, cell_connectivity, drives_options]
-        titles = ['Simulation', 'Cell connectivity', 'Drives']
-
-        # footer
-        footer = VBox([
-            HBox([
-                HBox([
-                    self.run_button, self.load_button, self.delete_drive_button
-                ], layout={"width": self.left_sidebar_width}),
-                self.viz_layout_selection,
-            ]), self.log_out, self.simulation_status
-        ])
-        for idx, title in enumerate(titles):
-            left_tab.set_title(idx, title)
-
-        hnn_gui = AppLayout(
-            header=self.header,
-            left_sidebar=left_tab,
-            right_sidebar=self.viz_window,
-            footer=footer,
-            pane_widths=[self.left_sidebar_width, '0px', self.viz_width],
-            pane_heights=['50px', self.viz_height, "1"],
-        )
-
+    def _link_callbacks(self):
         # link callbacks
         def _handle_backend_change(backend_type):
             return handle_backend_change(backend_type.new, self.backend_config,
@@ -256,12 +246,12 @@ class HNNGUI:
                 self.plot_dropdowns_list, self.simulation_status, b)
 
         def _handle_viz_layout_change(layout_option):
-            return initialize_viz_window(self.viz_window,
+            return initialize_viz_window(self.visualization_window,
                                          self.variables,
                                          self.plot_outputs_list,
                                          self.plot_dropdowns_list,
-                                         self.viz_width,
-                                         self.viz_height,
+                                         self.visualization_window_width,
+                                         self.visualization_window_height,
                                          layout_option=layout_option.new)
 
         self.backend_selection.observe(_handle_backend_change, 'value')
@@ -271,13 +261,56 @@ class HNNGUI:
         self.run_button.on_click(_run_button_clicked)
         self.viz_layout_selection.observe(_handle_viz_layout_change, 'value')
 
+    def run(self):
+        # compose widgets
+        simulation_box = VBox([
+            self.tstop, self.tstep, self.ntrials, self.backend_selection,
+            self.backend_config
+        ])
+
+        # accordians to group local-connectivity by cell type
+        boxes = [VBox(slider) for slider in self.sliders]
+        connectivity_names = [
+            'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
+            'Layer 5 Basket'
+        ]
+        cell_connectivity = Accordion(children=boxes)
+        for idx, connectivity_name in enumerate(connectivity_names):
+            cell_connectivity.set_title(idx, connectivity_name)
+
+        drive_selections = VBox([
+            self.drive_type_selection, self.location_selection,
+            self.add_drive_button
+        ])
+        # from IPywidgets > 8.0
+        drives_options = VBox([drive_selections, self.drives_out])
+        # Tabs for left pane
+        left_tab = Tab()
+        left_tab.children = [simulation_box, cell_connectivity, drives_options]
+        titles = ['Simulation', 'Cell connectivity', 'Drives']
+        for idx, title in enumerate(titles):
+            left_tab.set_title(idx, title)
+
+        hnn_gui = AppLayout(
+            header=self.header,
+            left_sidebar=left_tab,
+            right_sidebar=self.visualization_window,
+            footer=self.footer,
+            pane_widths=[
+                self.left_sidebar_width, '0px', self.visualization_window_width
+            ],
+            pane_heights=['50px', self.visualization_window_height, "1"],
+        )
+
+        self._link_callbacks()
+
         # initialize visualization
-        initialize_viz_window(self.viz_window,
+        initialize_viz_window(self.visualization_window,
                               self.variables,
                               self.plot_outputs_list,
                               self.plot_dropdowns_list,
-                              self.viz_width,
-                              self.viz_height,
+                              self.visualization_window_width,
+                              self.visualization_window_height,
                               layout_option=self.viz_layout_selection.value,
                               init=True)
 
