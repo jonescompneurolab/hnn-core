@@ -26,15 +26,18 @@ from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
 from hnn_core.viz import plot_dipole
 
-THEMECOLOR = "#8A2BE2"
-
 
 class HNNGUI:
 
-    def __init__(self):
-        log_out_height = "100px"
-        self.viz_width = "1000px"
-        self.viz_height = "500px"
+    def __init__(self, theme_color="#8A2BE2", log_out_height="100px",
+                 viz_width="1000px", viz_height="500px",
+                 left_sidebar_width='380px'):
+        # set up styling.
+        self.theme_color = theme_color
+        self.log_out_height = log_out_height
+        self.viz_width = viz_width
+        self.viz_height = viz_height
+        self.left_sidebar_width = left_sidebar_width
 
         # load default parameters
         self.params = self.load_parameters()
@@ -45,7 +48,7 @@ class HNNGUI:
         self.log_out = Output(
             layout={
                 'border': '1px solid gray',
-                'height': log_out_height,
+                'height': self.log_out_height,
                 'overflow': 'auto'
             })
 
@@ -56,7 +59,8 @@ class HNNGUI:
 
         # header
         self.header = HTML(value=f"""<div
-            style='background:{THEMECOLOR};text-align:center;color:white;'>
+            style='background:{self.theme_color};
+            text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
         # Simulation parameters
@@ -118,29 +122,29 @@ class HNNGUI:
                                                disabled=False,
                                                layout=layout)
 
-        self.add_drive_button = create_expanded_button('Add drive',
-                                                       'primary',
-                                                       height='30px')
+        self.add_drive_button = create_expanded_button(
+            'Add drive', 'primary', height='30px',
+            button_color=self.theme_color)
 
         # Run, delete drives and load button
-        self.run_button = create_expanded_button('Run',
-                                                 'success',
-                                                 height='30px')
+        self.run_button = create_expanded_button('Run', 'success',
+                                                 height='30px',
+                                                 button_color=self.theme_color)
 
         # Running status
         self.simulation_status = HTML(value="""<div
             style='background:gray;padding-left:10px;color:white;'>
             Not running</div>""")
 
-        style = {'button_color': THEMECOLOR}
         self.load_button = FileUpload(accept='.json,.param',
                                       multiple=False,
-                                      style=style,
+                                      style={'button_color': self.theme_color},
                                       description='Load network',
                                       button_style='success')
-        self.delete_drive_button = create_expanded_button('Delete drives',
-                                                          'success',
-                                                          height='30px')
+
+        self.delete_drive_button = create_expanded_button(
+            'Delete drives', 'success', height='30px',
+            button_color=self.theme_color)
 
     def load_parameters(self, params_fname=None):
         if not params_fname:
@@ -199,12 +203,11 @@ class HNNGUI:
         titles = ['Simulation', 'Cell connectivity', 'Drives']
 
         # footer
-        left_width = '380px'
         footer = VBox([
             HBox([
                 HBox([
                     self.run_button, self.load_button, self.delete_drive_button
-                ], layout={"width": left_width}),
+                ], layout={"width": self.left_sidebar_width}),
                 self.viz_layout_selection,
             ]), self.log_out, self.simulation_status
         ])
@@ -216,7 +219,7 @@ class HNNGUI:
             left_sidebar=left_tab,
             right_sidebar=self.viz_window,
             footer=footer,
-            pane_widths=[left_width, '0px', self.viz_width],
+            pane_widths=[self.left_sidebar_width, '0px', self.viz_width],
             pane_heights=['50px', self.viz_height, "1"],
         )
 
@@ -286,12 +289,11 @@ class HNNGUI:
         return hnn_gui
 
 
-def create_expanded_button(description, button_style, height, disabled=False):
-    style = {'button_color': THEMECOLOR}
-    return Button(description=description,
-                  button_style=button_style,
+def create_expanded_button(description, button_style, height, disabled=False,
+                           button_color="#8A2BE2"):
+    return Button(description=description, button_style=button_style,
                   layout=Layout(height=height, width='auto'),
-                  style=style,
+                  style={'button_color': button_color},
                   disabled=disabled)
 
 
@@ -1110,4 +1112,3 @@ def launch():
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
     main([notebook_path, *sys.argv[1:]])
-
