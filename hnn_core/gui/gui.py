@@ -16,8 +16,8 @@ from IPython.display import display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
                         FloatLogSlider, FloatText, GridspecLayout, HBox,
-                        IntText, Layout, Output, RadioButtons, Tab,
-                        Text, VBox, interactive_output)
+                        IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
+                        interactive_output)
 
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
@@ -27,6 +27,263 @@ from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
 from hnn_core.viz import plot_dipole
 
 THEMECOLOR = "#8A2BE2"
+
+
+class HNNGUI:
+
+    def __init__(self):
+        log_out_height = "100px"
+        self.viz_width = "1000px"
+        self.viz_height = "500px"
+
+        # load default parameters
+        self.params = self.load_parameters()
+
+        # In-memory storage of all simulation related variables
+        self.variables = dict(net=None, dpls=None)
+
+        self.log_out = Output(
+            layout={
+                'border': '1px solid gray',
+                'height': log_out_height,
+                'overflow': 'auto'
+            })
+
+        self.viz_window = Output(layout={
+            'height': self.viz_height,
+            'width': self.viz_width,
+        })
+
+        # header
+        self.header = HTML(value=f"""<div
+            style='background:{THEMECOLOR};text-align:center;color:white;'>
+            HUMAN NEOCORTICAL NEUROSOLVER</div>""")
+
+        # Simulation parameters
+        self.tstop = FloatText(value=170,
+                               description='tstop (ms):',
+                               disabled=False)
+        self.tstep = FloatText(value=0.025,
+                               description='tstep (ms):',
+                               disabled=False)
+        self.ntrials = IntText(value=1, description='Trials:', disabled=False)
+
+        # select backends
+        self.backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
+                                                   ('MPI', 'MPI')],
+                                          value='Joblib',
+                                          description='Backend:')
+
+        # visualization layout
+        self.viz_layout_selection = Dropdown(options=[('Horizontal', 'L-R'),
+                                                      ('Vertical', 'U-D')],
+                                             value='L-R',
+                                             description='Layout:')
+
+        self.mpi_cmd = Text(value='mpiexec',
+                            placeholder='Fill if applies',
+                            description='MPI cmd:',
+                            disabled=False)
+
+        self.joblib_cores = BoundedIntText(value=1,
+                                           min=1,
+                                           max=multiprocessing.cpu_count(),
+                                           description='Cores:',
+                                           disabled=False)
+
+        self.backend_config = Output()
+
+        # Visualization figure list
+        self.plot_outputs_list = list()
+        self.plot_dropdowns_list = list()
+        self.sliders = self.init_cell_connectivity(self.params)
+
+        # Add drive section
+        self.drive_widgets = list()
+        self.drive_boxes = list()
+        self.drives_out = Output()  # window to add new drives
+
+        layout = Layout(width='200px')
+
+        self.drive_type_selection = RadioButtons(
+            options=['Evoked', 'Poisson', 'Rhythmic'],
+            value='Evoked',
+            description='Drive:',
+            disabled=False,
+            layout=layout)
+
+        self.location_selection = RadioButtons(options=['proximal', 'distal'],
+                                               value='proximal',
+                                               description='Location',
+                                               disabled=False,
+                                               layout=layout)
+
+        self.add_drive_button = create_expanded_button('Add drive',
+                                                       'primary',
+                                                       height='30px')
+
+        # Run, delete drives and load button
+        self.run_button = create_expanded_button('Run',
+                                                 'success',
+                                                 height='30px')
+
+        # Running status
+        self.simulation_status = HTML(value="""<div
+            style='background:gray;padding-left:10px;color:white;'>
+            Not running</div>""")
+
+        style = {'button_color': THEMECOLOR}
+        self.load_button = FileUpload(accept='.json,.param',
+                                      multiple=False,
+                                      style=style,
+                                      description='Load network',
+                                      button_style='success')
+        self.delete_drive_button = create_expanded_button('Delete drives',
+                                                          'success',
+                                                          height='30px')
+
+    def load_parameters(self, params_fname=None):
+        if not params_fname:
+            # by default load default.json
+            hnn_core_root = op.join(op.dirname(hnn_core.__file__))
+            params_fname = op.join(hnn_core_root, 'param', 'default.json')
+
+        return read_params(params_fname)
+
+    @staticmethod
+    def init_cell_connectivity(params):
+        return [
+            _get_sliders(params, [
+                'gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
+                'gbar_L2Basket_L2Pyr_gabaa', 'gbar_L2Basket_L2Pyr_gabab'
+            ]),
+            _get_sliders(params, [
+                'gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr',
+                'gbar_L5Pyr_L5Pyr_ampa', 'gbar_L5Pyr_L5Pyr_nmda',
+                'gbar_L5Basket_L5Pyr_gabaa', 'gbar_L5Basket_L5Pyr_gabab'
+            ]),
+            _get_sliders(params,
+                         ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
+            _get_sliders(params, [
+                'gbar_L2Pyr_L5Basket', 'gbar_L5Pyr_L5Basket',
+                'gbar_L5Basket_L5Basket'
+            ])
+        ]
+
+    def run(self):
+        # compose widgets
+        simulation_box = VBox([
+            self.tstop, self.tstep, self.ntrials, self.backend_selection,
+            self.backend_config
+        ])
+
+        # accordians to group local-connectivity by cell type
+        boxes = [VBox(slider) for slider in self.sliders]
+        titles = [
+            'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
+            'Layer 5 Basket'
+        ]
+        cell_connectivity = Accordion(children=boxes)
+        for idx, title in enumerate(titles):
+            cell_connectivity.set_title(idx, title)
+
+        drive_selections = VBox([
+            self.drive_type_selection, self.location_selection,
+            self.add_drive_button
+        ])
+        # from IPywidgets > 8.0
+        drives_options = VBox([drive_selections, self.drives_out])
+        # Tabs for left pane
+        left_tab = Tab()
+        left_tab.children = [simulation_box, cell_connectivity, drives_options]
+        titles = ['Simulation', 'Cell connectivity', 'Drives']
+
+        # footer
+        left_width = '380px'
+        footer = VBox([
+            HBox([
+                HBox([
+                    self.run_button, self.load_button, self.delete_drive_button
+                ], layout={"width": left_width}),
+                self.viz_layout_selection,
+            ]), self.log_out, self.simulation_status
+        ])
+        for idx, title in enumerate(titles):
+            left_tab.set_title(idx, title)
+
+        hnn_gui = AppLayout(
+            header=self.header,
+            left_sidebar=left_tab,
+            right_sidebar=self.viz_window,
+            footer=footer,
+            pane_widths=[left_width, '0px', self.viz_width],
+            pane_heights=['50px', self.viz_height, "1"],
+        )
+
+        # link callbacks
+        def _handle_backend_change(backend_type):
+            return handle_backend_change(backend_type.new, self.backend_config,
+                                         self.mpi_cmd, self.joblib_cores)
+
+        def _add_drive_button_clicked(b):
+            return add_drive_widget(self.drive_type_selection.value,
+                                    self.drive_boxes, self.drive_widgets,
+                                    self.drives_out, self.tstop,
+                                    self.location_selection.value)
+
+        def _delete_drives_clicked(b):
+            self.drives_out.clear_output()
+            # black magic: the following does not work
+            # global drive_widgets; drive_widgets = list()
+            while len(self.drive_widgets) > 0:
+                self.drive_widgets.pop()
+                self.drive_boxes.pop()
+
+        def _on_upload_change(change):
+            return on_upload_change(change, self.sliders, self.params,
+                                    self.tstop, self.tstep, self.log_out,
+                                    self.variables, self.drive_boxes,
+                                    self.drive_widgets, self.drives_out)
+
+        def _run_button_clicked(b):
+            return run_button_clicked(
+                self.log_out, self.drive_widgets, self.variables, self.tstep,
+                self.tstop, self.ntrials, self.backend_selection, self.mpi_cmd,
+                self.joblib_cores, self.params, self.plot_outputs_list,
+                self.plot_dropdowns_list, self.simulation_status, b)
+
+        def _handle_viz_layout_change(layout_option):
+            return initialize_viz_window(self.viz_window,
+                                         self.variables,
+                                         self.plot_outputs_list,
+                                         self.plot_dropdowns_list,
+                                         self.viz_width,
+                                         self.viz_height,
+                                         layout_option=layout_option.new)
+
+        self.backend_selection.observe(_handle_backend_change, 'value')
+        self.add_drive_button.on_click(_add_drive_button_clicked)
+        self.delete_drive_button.on_click(_delete_drives_clicked)
+        self.load_button.observe(_on_upload_change)
+        self.run_button.on_click(_run_button_clicked)
+        self.viz_layout_selection.observe(_handle_viz_layout_change, 'value')
+
+        # initialize visualization
+        initialize_viz_window(self.viz_window,
+                              self.variables,
+                              self.plot_outputs_list,
+                              self.plot_dropdowns_list,
+                              self.viz_width,
+                              self.viz_height,
+                              layout_option=self.viz_layout_selection.value,
+                              init=True)
+
+        # load initial drives
+        # initialize drive ipywidgets
+        load_drives(self.variables, self.params, self.log_out, self.drives_out,
+                    self.drive_widgets, self.drive_boxes, self.tstop)
+
+        return hnn_gui
 
 
 def create_expanded_button(description, button_style, height, disabled=False):
@@ -849,245 +1106,8 @@ def initialize_viz_window(viz_window,
         display(grid)
 
 
-def run_hnn_gui():
-    """Create the HNN GUI."""
-
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__))
-
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-    drive_widgets = list()
-    drive_boxes = list()
-    variables = dict(net=None, dpls=None)
-
-    plot_outputs_list = list()
-    plot_dropdowns_list = list()
-
-    # ##### Callbacks #######
-
-    def _run_button_clicked(b):
-        return run_button_clicked(log_out, drive_widgets, variables, tstep,
-                                  tstop, ntrials, backend_selection, mpi_cmd,
-                                  joblib_cores, params, plot_outputs_list,
-                                  plot_dropdowns_list, simulation_status, b)
-
-    def _on_upload_change(change):
-        return on_upload_change(change, sliders, params, tstop, tstep, log_out,
-                                variables, drive_boxes, drive_widgets,
-                                drives_out)
-        # BUG: capture does not work, use log_out explicitly
-        # return on_upload_change(change, sliders, params)
-
-    def _delete_drives_clicked(b):
-        drives_out.clear_output()
-        # black magic: the following does not work
-        # global drive_widgets; drive_widgets = list()
-        while len(drive_widgets) > 0:
-            drive_widgets.pop()
-            drive_boxes.pop()
-
-    def handle_viz_layout_change(layout_option):
-        return initialize_viz_window(viz_window,
-                                     variables,
-                                     plot_outputs_list,
-                                     plot_dropdowns_list,
-                                     viz_width,
-                                     viz_height,
-                                     layout_option=layout_option.new)
-
-    def _handle_backend_change(backend_type):
-        return handle_backend_change(backend_type.new, backend_config, mpi_cmd,
-                                     joblib_cores)
-
-    def _add_drive_button_clicked(b):
-        return add_drive_widget(drive_type_selection.value, drive_boxes,
-                                drive_widgets, drives_out, tstop,
-                                location_selection.value)
-
-    # ##### Layout #######
-
-    # Output windows
-    drives_out = Output()  # window to add new drives
-
-    log_out_height = "100px"
-    log_out = Output(layout={
-        'border': '1px solid gray',
-        'height': log_out_height,
-        'overflow': 'auto'
-    })
-    viz_width = "1000px"
-    viz_height = "500px"
-    viz_window = Output(layout={
-        'height': viz_height,
-        'width': viz_width,
-    })
-
-    # header_button
-    header_button = HTML(value=f"""<div
-        style='background:{THEMECOLOR};text-align:center;color:white;'>
-        HUMAN NEOCORTICAL NEUROSOLVER</div>""")
-
-    # Simulation parameters
-    tstop = FloatText(value=170, description='tstop (ms):', disabled=False)
-    tstep = FloatText(value=0.025, description='tstep (ms):', disabled=False)
-    ntrials = IntText(value=1, description='Trials:', disabled=False)
-
-    # visualization layout
-    viz_layout_selection = Dropdown(options=[('Horizontal', 'L-R'),
-                                             ('Vertical', 'U-D')],
-                                    value='L-R',
-                                    description='Layout:')
-    # initialize
-    initialize_viz_window(viz_window,
-                          variables,
-                          plot_outputs_list,
-                          plot_dropdowns_list,
-                          viz_width,
-                          viz_height,
-                          layout_option=viz_layout_selection.value,
-                          init=True)
-
-    # select backends
-    backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
-                                          ('MPI', 'MPI')],
-                                 value='Joblib',
-                                 description='Backend:')
-
-    mpi_cmd = Text(value='mpiexec',
-                   placeholder='Fill if applies',
-                   description='MPI cmd:',
-                   disabled=False)
-
-    joblib_cores = BoundedIntText(value=1,
-                                  min=1,
-                                  max=multiprocessing.cpu_count(),
-                                  description='Cores:',
-                                  disabled=False)
-
-    backend_config = Output()
-    handle_backend_change(backend_selection.value, backend_config, mpi_cmd,
-                          joblib_cores)
-
-    simulation_box = VBox(
-        [tstop, tstep, ntrials, backend_selection, backend_config])
-
-    # Sliders to change local-connectivity params
-    sliders = [
-        _get_sliders(params, [
-            'gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
-            'gbar_L2Basket_L2Pyr_gabaa', 'gbar_L2Basket_L2Pyr_gabab'
-        ]),
-        _get_sliders(params, [
-            'gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr', 'gbar_L5Pyr_L5Pyr_ampa',
-            'gbar_L5Pyr_L5Pyr_nmda', 'gbar_L5Basket_L5Pyr_gabaa',
-            'gbar_L5Basket_L5Pyr_gabab'
-        ]),
-        _get_sliders(params,
-                     ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
-        _get_sliders(params, [
-            'gbar_L2Pyr_L5Basket', 'gbar_L5Pyr_L5Basket',
-            'gbar_L5Basket_L5Basket'
-        ])
-    ]
-
-    # accordians to group local-connectivity by cell type
-    boxes = [VBox(slider) for slider in sliders]
-    titles = [
-        'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
-        'Layer 5 Basket'
-    ]
-    cell_connectivity = Accordion(children=boxes)
-    for idx, title in enumerate(titles):
-        cell_connectivity.set_title(idx, title)
-
-    # Dropdown for different drives
-    layout = Layout(width='200px')
-
-    drive_type_selection = RadioButtons(
-        options=['Evoked', 'Poisson', 'Rhythmic'],
-        value='Evoked',
-        description='Drive:',
-        disabled=False,
-        layout=layout)
-
-    location_selection = RadioButtons(options=['proximal', 'distal'],
-                                      value='proximal',
-                                      description='Location',
-                                      disabled=False,
-                                      layout=layout)
-
-    add_drive_button = create_expanded_button('Add drive',
-                                              'primary',
-                                              height='30px')
-
-    drive_selections = VBox(
-        [drive_type_selection, location_selection, add_drive_button])
-
-    # XXX: should be simpler to use Stacked class starting
-    # from IPywidgets > 8.0
-    drives_options = VBox([drive_selections, drives_out])
-
-    # Tabs for left pane
-    left_tab = Tab()
-    left_tab.children = [simulation_box, cell_connectivity, drives_options]
-    titles = ['Simulation', 'Cell connectivity', 'Drives']
-    for idx, title in enumerate(titles):
-        left_tab.set_title(idx, title)
-
-    # Running status
-    simulation_status = HTML(value="""<div
-        style='background:gray;padding-left:10px;color:white;'>
-         Not running</div>""")
-
-    # Run, delete drives and load button
-    run_button = create_expanded_button('Run', 'success', height='30px')
-
-    style = {'button_color': THEMECOLOR}
-    load_button = FileUpload(accept='.json,.param',
-                             multiple=False,
-                             style=style,
-                             description='Load network',
-                             button_style='success')
-    delete_drive_button = create_expanded_button('Delete drives',
-                                                 'success',
-                                                 height='30px')
-
-    left_width = '380px'
-    footer = VBox([
-        HBox([
-            HBox([run_button, load_button, delete_drive_button],
-                 layout={"width": left_width}),
-            viz_layout_selection,
-        ]), log_out, simulation_status
-    ])
-
-    # initialize drive ipywidgets
-    load_drives(variables, params, log_out, drives_out, drive_widgets,
-                drive_boxes, tstop)
-
-    # Final layout of the app
-    hnn_gui = AppLayout(
-        header=header_button,
-        left_sidebar=left_tab,
-        right_sidebar=viz_window,
-        footer=footer,
-        pane_widths=[left_width, '0px', viz_width],
-        pane_heights=['50px', viz_height, "1"],
-    )
-
-    # ######## connect to callbacks ##########
-    backend_selection.observe(_handle_backend_change, 'value')
-    add_drive_button.on_click(_add_drive_button_clicked)
-    delete_drive_button.on_click(_delete_drives_clicked)
-    load_button.observe(_on_upload_change)
-    run_button.on_click(_run_button_clicked)
-    viz_layout_selection.observe(handle_viz_layout_change, 'value')
-
-    return hnn_gui
-
-
 def launch():
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
     main([notebook_path, *sys.argv[1:]])
+
