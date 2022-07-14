@@ -1,5 +1,6 @@
 import pytest
 import pickle
+import numpy as np
 
 import matplotlib
 
@@ -78,6 +79,14 @@ def test_cell():
     # test building cell with a dipole oriented to a nonexitent section
     with pytest.raises(ValueError, match='sec_name_apical must be an'):
         cell.build(sec_name_apical='blah')
+
+    # Test length modification
+    sec_name = 'apical_trunk'
+    new_L = 30.0
+    cell.change_sec_length(sec_name, new_L)
+    new_pts = np.array(cell.sections[sec_name].end_pts)
+    new_dist = np.linalg.norm(new_pts[0, :] - new_pts[1, :])
+    np.isclose(new_L, new_dist)
 
 
 def test_artificial_cell():
