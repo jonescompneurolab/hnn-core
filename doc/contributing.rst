@@ -72,5 +72,6 @@ use the command::
 Continuous Integration
 ======================
 
-The repository is tested via continuous integration with Travis and Circle. The automated
-tests run on Travis while the documentation is built on Circle.
+The repository is tested via continuous integration with GitHub Actions and
+Circle. The automated tests run on GitHub Actions while the documentation is
+built on Circle.
