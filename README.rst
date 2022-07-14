@@ -1,7 +1,7 @@
 hnn-core
 ========
 
-|tests| |CircleCI| |Codecov|
+|tests| |CircleCI| |Codecov| |PyPI|
 
 |HNN-GUI|
 
@@ -13,6 +13,9 @@ hnn-core
 
 .. |Codecov| image:: https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg
 	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
+
+.. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
+	:target: https://pypi.org/project/hnn-core/
 
 .. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
 
