@@ -146,7 +146,7 @@ class HNNGUI:
         """Initialize larger UI components and dynamical output windows. It's
         not encouraged for users to modify or access attributes in this part.
         """
-        self.sliders = self.init_cell_connectivity(self.params)
+        self.connectivity_sliders = self.init_cell_connectivity(self.params)
         # dynamic larger components
         self.drives_out = Output()  # window to add new drives
         self.log_out = Output(
@@ -233,10 +233,11 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_change(change):
-            return on_upload_change(change, self.sliders, self.params,
-                                    self.tstop, self.tstep, self.log_out,
-                                    self.variables, self.drive_boxes,
-                                    self.drive_widgets, self.drives_out)
+            return on_upload_change(change, self.connectivity_sliders,
+                                    self.params, self.tstop, self.tstep,
+                                    self.log_out, self.variables,
+                                    self.drive_boxes, self.drive_widgets,
+                                    self.drives_out)
 
         def _run_button_clicked(b):
             return run_button_clicked(
@@ -269,7 +270,7 @@ class HNNGUI:
         ])
 
         # accordians to group local-connectivity by cell type
-        boxes = [VBox(slider) for slider in self.sliders]
+        boxes = [VBox(slider) for slider in self.connectivity_sliders]
         connectivity_names = [
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
             'Layer 5 Basket'
@@ -828,6 +829,80 @@ def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
                 drive_boxes, tstop)
 
 
+def init_network_from_widgets(params, tstep, tstop, variables, drive_widgets):
+    """Construct network and add drives."""
+    print("init network")
+    params['dt'] = tstep.value
+    params['tstop'] = tstop.value
+    variables['net'] = jones_2009_model(
+        params,
+        add_drives_from_params=False,
+    )
+    # add drives to network
+    for drive in drive_widgets:
+        logging.debug(f"add drive type to network: {drive['type']}")
+        weights_ampa = {
+            k: v.value
+            for k, v in drive['weights_ampa'].items()
+        }
+        weights_nmda = {
+            k: v.value
+            for k, v in drive['weights_nmda'].items()
+        }
+        synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
+        print(
+            f"drive type is {drive['type']}, location={drive['location']}")
+        if drive['type'] == 'Poisson':
+            rate_constant = {
+                k: v.value
+                for k, v in drive['rate_constant'].items() if v.value > 0
+            }
+            weights_ampa = {
+                k: v
+                for k, v in weights_ampa.items() if k in rate_constant
+            }
+            weights_nmda = {
+                k: v
+                for k, v in weights_nmda.items() if k in rate_constant
+            }
+            variables['net'].add_poisson_drive(
+                name=drive['name'],
+                tstart=drive['tstart'].value,
+                tstop=drive['tstop'].value,
+                rate_constant=rate_constant,
+                location=drive['location'],
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
+                synaptic_delays=synaptic_delays,
+                space_constant=100.0,
+                event_seed=drive['seedcore'].value)
+        elif drive['type'] in ('Evoked', 'Gaussian'):
+            variables['net'].add_evoked_drive(
+                name=drive['name'],
+                mu=drive['mu'].value,
+                sigma=drive['sigma'].value,
+                numspikes=drive['numspikes'].value,
+                location=drive['location'],
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
+                synaptic_delays=synaptic_delays,
+                space_constant=3.0,
+                event_seed=drive['seedcore'].value)
+        elif drive['type'] in ('Rhythmic', 'Bursty'):
+            variables['net'].add_bursty_drive(
+                name=drive['name'],
+                tstart=drive['tstart'].value,
+                tstart_std=drive['tstart_std'].value,
+                burst_rate=drive['burst_rate'].value,
+                burst_std=drive['burst_std'].value,
+                location=drive['location'],
+                tstop=drive['tstop'].value,
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
+                synaptic_delays=synaptic_delays,
+                event_seed=drive['seedcore'].value)
+
+
 def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
                        ntrials, backend_selection, mpi_cmd, joblib_cores,
                        params, plot_outputs_list, plot_dropdowns_list,
@@ -835,76 +910,8 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
-        print(f"drive_widgets length={len(drive_widgets)}")
-        params['dt'] = tstep.value
-        params['tstop'] = tstop.value
-        variables['net'] = jones_2009_model(
-            params,
-            add_drives_from_params=False,
-        )
-        # add drives to network
-        for drive in drive_widgets:
-            logging.debug(f"add drive type to network: {drive['type']}")
-            weights_ampa = {
-                k: v.value
-                for k, v in drive['weights_ampa'].items()
-            }
-            weights_nmda = {
-                k: v.value
-                for k, v in drive['weights_nmda'].items()
-            }
-            synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
-            print(
-                f"drive type is {drive['type']}, location={drive['location']}")
-            if drive['type'] == 'Poisson':
-                rate_constant = {
-                    k: v.value
-                    for k, v in drive['rate_constant'].items() if v.value > 0
-                }
-                weights_ampa = {
-                    k: v
-                    for k, v in weights_ampa.items() if k in rate_constant
-                }
-                weights_nmda = {
-                    k: v
-                    for k, v in weights_nmda.items() if k in rate_constant
-                }
-                variables['net'].add_poisson_drive(
-                    name=drive['name'],
-                    tstart=drive['tstart'].value,
-                    tstop=drive['tstop'].value,
-                    rate_constant=rate_constant,
-                    location=drive['location'],
-                    weights_ampa=weights_ampa,
-                    weights_nmda=weights_nmda,
-                    synaptic_delays=synaptic_delays,
-                    space_constant=100.0,
-                    event_seed=drive['seedcore'].value)
-            elif drive['type'] in ('Evoked', 'Gaussian'):
-                variables['net'].add_evoked_drive(
-                    name=drive['name'],
-                    mu=drive['mu'].value,
-                    sigma=drive['sigma'].value,
-                    numspikes=drive['numspikes'].value,
-                    location=drive['location'],
-                    weights_ampa=weights_ampa,
-                    weights_nmda=weights_nmda,
-                    synaptic_delays=synaptic_delays,
-                    space_constant=3.0,
-                    event_seed=drive['seedcore'].value)
-            elif drive['type'] in ('Rhythmic', 'Bursty'):
-                variables['net'].add_bursty_drive(
-                    name=drive['name'],
-                    tstart=drive['tstart'].value,
-                    tstart_std=drive['tstart_std'].value,
-                    burst_rate=drive['burst_rate'].value,
-                    burst_std=drive['burst_std'].value,
-                    location=drive['location'],
-                    tstop=drive['tstop'].value,
-                    weights_ampa=weights_ampa,
-                    weights_nmda=weights_nmda,
-                    synaptic_delays=synaptic_delays,
-                    event_seed=drive['seedcore'].value)
+        init_network_from_widgets(params, tstep, tstop, variables,
+                                  drive_widgets)
 
         print("start simulation")
         if backend_selection.value == "MPI":
