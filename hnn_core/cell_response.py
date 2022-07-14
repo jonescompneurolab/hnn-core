@@ -370,6 +370,7 @@ class CellResponse(object):
         -------
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
+
         """
         return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
                                 spike_types=spike_types, show=show)

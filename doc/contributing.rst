@@ -60,9 +60,9 @@ You can build the documentation locally using the command::
     $ cd doc/
     $ make html
 
-While MNE is not needed to install hnn-core, as a developer you will need to install it
-to run all the examples successfully. Please find
-the installation instructions on the `MNE website <https://mne.tools/stable/install/mne_python.html>`_.
+While MNE is not needed to install hnn-core, as a developer you will need to
+install it to run all the examples successfully. Please find the installation
+instructions on the `MNE website <https://mne.tools/stable/install/index.html>`_.
 
 If you want to build the documentation locally without running all the examples,
 use the command::
