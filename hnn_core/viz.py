@@ -337,6 +337,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     -------
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
+
     """
     import matplotlib.pyplot as plt
     n_trials = len(cell_response.spike_times)

@@ -540,6 +540,7 @@ class Network(object):
         -----
         Random seeding behavior across trials is different for event_seed
         and conn_seed (n_trials > 1 in simulate_dipole(..., n_trials)
+
         event_seed
             Across trials, the random seed is incremented leading such that
             the exact spike times are different
@@ -1097,6 +1098,7 @@ class Network(object):
         Notes
         -----
         Connections are stored in:
+
         net.connectivity[idx]['gid_pairs'] : dict
             dict indexed by src gids with the format:
             {src_gid: [target_gids, ...], ...}
