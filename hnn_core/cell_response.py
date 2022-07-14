@@ -354,15 +354,22 @@ class CellResponse(object):
             An axis object from matplotlib. If None, a new figure is created.
         spike_types: string | list | dictionary | None
             String input of a valid spike type is plotted individually.
-                Ex: 'common', 'evdist', 'evprox', 'extgauss', 'extpois'
+
+            | Ex: ``'poisson'``, ``'evdist'``, ``'evprox'``, ...
+
             List of valid string inputs will plot each spike type individually.
-                Ex: ['common', 'evdist']
+
+            | Ex: ``['poisson', 'evdist']``
+
             Dictionary of valid lists will plot list elements as a group.
-                Ex: {'Evoked': ['evdist', 'evprox'], 'External': ['extpois']}
+
+            | Ex: ``{'Evoked': ['evdist', 'evprox'], 'Tonic': ['poisson']}``
+
             If None, all input spike types are plotted individually if any
             are present. Otherwise spikes from all cells are plotted.
             Valid strings also include leading characters of spike types
-                Example: 'ext' is equivalent to ['extgauss', 'extpois']
+
+            | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
         show : bool
             If True, show the figure.
 
@@ -370,7 +377,6 @@ class CellResponse(object):
         -------
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
-
         """
         return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
                                 spike_types=spike_types, show=show)
