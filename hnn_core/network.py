@@ -327,11 +327,11 @@ class Network(object):
         Synaptic delay in ms.
 
     Notes
-    ----
-    `net = jones_2009_model(params)` is the reccomended path for creating a
-    network. Instantiating the network as `net = Network(params)` will
+    -----
+    ``net = jones_2009_model(params)`` is the reccomended path for creating a
+    network. Instantiating the network as ``net = Network(params)`` will
     produce a network with no cell-to-cell connections. As such,
-    connectivity information contained in `params` will be ignored.
+    connectivity information contained in ``params`` will be ignored.
     """
 
     def __init__(self, params, add_drives_from_params=False, legacy_mode=True):
@@ -539,15 +539,14 @@ class Network(object):
         Notes
         -----
         Random seeding behavior across trials is different for event_seed
-        and conn_seed (n_trials > 1 in simulate_dipole(..., n_trials)
+        and conn_seed (n_trials > 1 in simulate_dipole(..., n_trials):
 
-        event_seed
+        - event_seed
             Across trials, the random seed is incremented leading such that
             the exact spike times are different
-        conn_seed
+        - conn_seed
             The random seed does not change across trials. This means for
             probability < 1.0, the random subset of gids targeted is the same.
-
         """
         if not self._legacy_mode:
             _check_drive_parameter_values('evoked', sigma=sigma,
@@ -1097,12 +1096,10 @@ class Network(object):
 
         Notes
         -----
-        Connections are stored in:
-
-        net.connectivity[idx]['gid_pairs'] : dict
-            dict indexed by src gids with the format:
-            {src_gid: [target_gids, ...], ...}
-            where each src_gid indexes a list of all its targets.
+        Connections are stored in ``net.connectivity[idx]['gid_pairs']``, a
+        dictionary indexed by src gids with the format:
+        {src_gid: [target_gids, ...], ...} where each src_gid indexes a list of
+        all its targets.
         """
         conn = _Connectivity()
         threshold = self.threshold

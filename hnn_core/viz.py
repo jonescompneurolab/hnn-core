@@ -321,15 +321,22 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         a new figure is created.
     spike_types: string | list | dictionary | None
         String input of a valid spike type is plotted individually.
-            Ex: 'poisson', 'evdist', 'evprox', ...
+
+        | Ex: ``'poisson'``, ``'evdist'``, ``'evprox'``, ...
+
         List of valid string inputs will plot each spike type individually.
-            Ex: ['poisson', 'evdist']
+
+        | Ex: ``['poisson', 'evdist']``
+
         Dictionary of valid lists will plot list elements as a group.
-            Ex: {'Evoked': ['evdist', 'evprox'], 'Tonic': ['poisson']}
+
+        | Ex: ``{'Evoked': ['evdist', 'evprox'], 'Tonic': ['poisson']}``
+
         If None, all input spike types are plotted individually if any
         are present. Otherwise spikes from all cells are plotted.
         Valid strings also include leading characters of spike types
-            Example: 'ev' is equivalent to ['evdist', 'evprox']
+
+        | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
     show : bool
         If True, show the figure.
 
@@ -337,7 +344,6 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     -------
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
-
     """
     import matplotlib.pyplot as plt
     n_trials = len(cell_response.spike_times)
