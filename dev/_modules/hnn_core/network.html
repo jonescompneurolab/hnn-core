@@ -460,11 +460,11 @@
 <span class="sd">        Synaptic delay in ms.</span>
 
 <span class="sd">    Notes</span>
-<span class="sd">    ----</span>
-<span class="sd">    `net = jones_2009_model(params)` is the reccomended path for creating a</span>
-<span class="sd">    network. Instantiating the network as `net = Network(params)` will</span>
+<span class="sd">    -----</span>
+<span class="sd">    ``net = jones_2009_model(params)`` is the reccomended path for creating a</span>
+<span class="sd">    network. Instantiating the network as ``net = Network(params)`` will</span>
 <span class="sd">    produce a network with no cell-to-cell connections. As such,</span>
-<span class="sd">    connectivity information contained in `params` will be ignored.</span>
+<span class="sd">    connectivity information contained in ``params`` will be ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -672,14 +672,14 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Random seeding behavior across trials is different for event_seed</span>
-<span class="sd">        and conn_seed (n_trials &gt; 1 in simulate_dipole(..., n_trials)</span>
-<span class="sd">        event_seed</span>
+<span class="sd">        and conn_seed (n_trials &gt; 1 in simulate_dipole(..., n_trials):</span>
+
+<span class="sd">        - event_seed</span>
 <span class="sd">            Across trials, the random seed is incremented leading such that</span>
 <span class="sd">            the exact spike times are different</span>
-<span class="sd">        conn_seed</span>
+<span class="sd">        - conn_seed</span>
 <span class="sd">            The random seed does not change across trials. This means for</span>
 <span class="sd">            probability &lt; 1.0, the random subset of gids targeted is the same.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
             <span class="n">_check_drive_parameter_values</span><span class="p">(</span><span class="s1">&#39;evoked&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
@@ -1229,11 +1229,10 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Connections are stored in:</span>
-<span class="sd">        net.connectivity[idx][&#39;gid_pairs&#39;] : dict</span>
-<span class="sd">            dict indexed by src gids with the format:</span>
-<span class="sd">            {src_gid: [target_gids, ...], ...}</span>
-<span class="sd">            where each src_gid indexes a list of all its targets.</span>
+<span class="sd">        Connections are stored in ``net.connectivity[idx][&#39;gid_pairs&#39;]``, a</span>
+<span class="sd">        dictionary indexed by src gids with the format:</span>
+<span class="sd">        {src_gid: [target_gids, ...], ...} where each src_gid indexes a list of</span>
+<span class="sd">        all its targets.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">_Connectivity</span><span class="p">()</span>
         <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>

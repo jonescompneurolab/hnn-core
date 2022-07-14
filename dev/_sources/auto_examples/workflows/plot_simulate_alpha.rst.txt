@@ -148,7 +148,7 @@ time with unique randomization. The drive is only connected to the
     Simulation time: 290.0 ms...
     Simulation time: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7f0a67d8cc50>
+    <hnn_core.dipole.Dipole object at 0x7fe79c3ffa90>
 
 
 
@@ -322,13 +322,13 @@ smaller absolute values in the plots.
 References
 ----------
 .. [1] Jones, S. R. et al. Quantitative analysis and biophysically realistic
-   neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
-   sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
+       neural modeling of the MEG mu rhythm: rhythmogenesis and modulation of
+       sensory-evoked responses. J. Neurophysiol. 102, 3554–3572 (2009).
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  14.188 seconds)
+   **Total running time of the script:** ( 2 minutes  41.288 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:

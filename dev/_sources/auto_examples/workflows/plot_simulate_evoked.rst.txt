@@ -270,9 +270,9 @@ Plot the amplitudes of the simulated aggregate dipole moments over time
 
  .. code-block:: none
 
-    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:353: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:360: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
       np.array(cell_response._spike_times)[trial_idx])
-    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:355: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:362: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
       np.array(cell_response._spike_types)[trial_idx])
 
     <Figure size 600x600 with 2 Axes>
@@ -452,13 +452,13 @@ object, this time we make a copy of it before smoothing and scaling.
 References
 ----------
 .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
-a combined magnetoencephalography and biophysically based computational
-modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
+       a combined magnetoencephalography and biophysically based computational
+       modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  47.065 seconds)
+   **Total running time of the script:** ( 2 minutes  22.612 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

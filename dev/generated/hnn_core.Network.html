@@ -161,8 +161,15 @@ are added suitably. Will be deprecated in a future release.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Attributes<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
+</dl>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">jones_2009_model(params)</span></code> is the reccomended path for creating a
+network. Instantiating the network as <code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">Network(params)</span></code> will
+produce a network with no cell-to-cell connections. As such,
+connectivity information contained in <code class="docutils literal notranslate"><span class="pre">params</span></code> will be ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>cell_types</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing names of real cell types in the network
 (e.g. ‘L2_basket’) as keys and corresponding Cell instances as values.
 The Cell instance associated with a given key is used as a template
@@ -200,12 +207,6 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 </dd>
 <dt><strong>delay</strong><span class="classifier">float</span></dt><dd><p>Synaptic delay in ms.</p>
 </dd>
-<dt><strong>Notes</strong></dt><dd></dd>
-<dt><strong>—-</strong></dt><dd></dd>
-<dt><strong>`net = jones_2009_model(params)` is the reccomended path for creating a</strong></dt><dd></dd>
-<dt><strong>network. Instantiating the network as `net = Network(params)` will</strong></dt><dd></dd>
-<dt><strong>produce a network with no cell-to-cell connections. As such,</strong></dt><dd></dd>
-<dt><strong>connectivity information contained in `params` will be ignored.</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -377,13 +378,10 @@ Used to randomly remove connections when probablity &lt; 1.0.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Connections are stored in:
-net.connectivity[idx][‘gid_pairs’] : dict</p>
-<blockquote>
-<div><p>dict indexed by src gids with the format:
-{src_gid: [target_gids, …], …}
-where each src_gid indexes a list of all its targets.</p>
-</div></blockquote>
+<p>Connections are stored in <code class="docutils literal notranslate"><span class="pre">net.connectivity[idx]['gid_pairs']</span></code>, a
+dictionary indexed by src gids with the format:
+{src_gid: [target_gids, …], …} where each src_gid indexes a list of
+all its targets.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -487,17 +485,21 @@ Fixed across trials (see Notes)</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>Random seeding behavior across trials is different for event_seed
-and conn_seed (n_trials &gt; 1 in simulate_dipole(…, n_trials)
-event_seed</p>
-<blockquote>
-<div><p>Across trials, the random seed is incremented leading such that
+and conn_seed (n_trials &gt; 1 in simulate_dipole(…, n_trials):</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>event_seed</dt><dd><p>Across trials, the random seed is incremented leading such that
 the exact spike times are different</p>
-</div></blockquote>
-<dl class="simple">
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
 <dt>conn_seed</dt><dd><p>The random seed does not change across trials. This means for
 probability &lt; 1.0, the random subset of gids targeted is the same.</p>
 </dd>
 </dl>
+</li>
+</ul>
 </dd></dl>
 
 <dl class="py method">

@@ -454,15 +454,22 @@
 <span class="sd">        a new figure is created.</span>
 <span class="sd">    spike_types: string | list | dictionary | None</span>
 <span class="sd">        String input of a valid spike type is plotted individually.</span>
-<span class="sd">            Ex: &#39;poisson&#39;, &#39;evdist&#39;, &#39;evprox&#39;, ...</span>
+
+<span class="sd">        | Ex: ``&#39;poisson&#39;``, ``&#39;evdist&#39;``, ``&#39;evprox&#39;``, ...</span>
+
 <span class="sd">        List of valid string inputs will plot each spike type individually.</span>
-<span class="sd">            Ex: [&#39;poisson&#39;, &#39;evdist&#39;]</span>
+
+<span class="sd">        | Ex: ``[&#39;poisson&#39;, &#39;evdist&#39;]``</span>
+
 <span class="sd">        Dictionary of valid lists will plot list elements as a group.</span>
-<span class="sd">            Ex: {&#39;Evoked&#39;: [&#39;evdist&#39;, &#39;evprox&#39;], &#39;Tonic&#39;: [&#39;poisson&#39;]}</span>
+
+<span class="sd">        | Ex: ``{&#39;Evoked&#39;: [&#39;evdist&#39;, &#39;evprox&#39;], &#39;Tonic&#39;: [&#39;poisson&#39;]}``</span>
+
 <span class="sd">        If None, all input spike types are plotted individually if any</span>
 <span class="sd">        are present. Otherwise spikes from all cells are plotted.</span>
 <span class="sd">        Valid strings also include leading characters of spike types</span>
-<span class="sd">            Example: &#39;ev&#39; is equivalent to [&#39;evdist&#39;, &#39;evprox&#39;]</span>
+
+<span class="sd">        | Ex: ``&#39;ev&#39;`` is equivalent to ``[&#39;evdist&#39;, &#39;evprox&#39;]``</span>
 <span class="sd">    show : bool</span>
 <span class="sd">        If True, show the figure.</span>
 
