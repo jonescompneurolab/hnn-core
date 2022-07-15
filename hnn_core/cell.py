@@ -313,6 +313,8 @@ class Cell:
         self.dipole_pp = list()
         self.rec_v = h.Vector()
         self.rec_i = dict()
+        self.rec_vsec = dict()
+        self.rec_isec = dict()
         # insert iclamp
         self.list_IClamp = list()
         self._gid = None
@@ -539,9 +541,9 @@ class Cell:
         Parameters
         ----------
         record_vsoma : bool
-            Option to record somatic voltages from cells
+            Option to record somatic voltages from cells. Default: False.
         record_isoma : bool
-            Option to record somatic currents from cells
+            Option to record somatic currents from cells. Default: False.
 
         """
         # a soma exists at self._nrn_sections['soma']
@@ -558,6 +560,38 @@ class Cell:
 
         if record_vsoma:
             self.rec_v.record(self._nrn_sections['soma'](0.5)._ref_v)
+
+    def record_sec(self, record_vsec=False, record_isec=False):
+        """ Record current and voltage from all sections
+
+        Parameters
+        ----------
+        record_vsec : bool
+            Option to record voltages from all sections. Default: False.
+        record_isec : bool
+            Option to record currents from all sections. Default: False.
+        """
+
+        section_names = list(self.sections.keys())
+        self.rec_isec = dict.fromkeys(section_names)
+        self.rec_vsec = dict.fromkeys(section_names)
+
+        if record_vsec:
+            for sec_name in self.rec_vsec:
+                self.rec_vsec[sec_name] = h.Vector()
+                self.rec_vsec[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_v)
+
+        if record_isec:
+            for sec_name in self.rec_isec:
+                list_syn = [key for key in self._nrn_synapses.keys()
+                            if key.startswith(f'{sec_name}_')]
+                self.rec_isec[sec_name] = dict.fromkeys(list_syn)
+
+                for syn_name in self.rec_isec[sec_name]:
+                    self.rec_isec[sec_name][syn_name] = h.Vector()
+
+                    self.rec_isec[syn_name][syn_name].record(
+                        self._nrn_synapses[syn_name]._ref_i)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.

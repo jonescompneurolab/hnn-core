@@ -94,6 +94,19 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         isoma_py[gid] = {key: rec_i.to_python()
                          for key, rec_i in rec_i.items()}
 
+    vsec_py = dict()
+    for gid, vsec_dict in neuron_net._vsec.items():
+        vsec_py[gid] = dict()
+        for sec_name, rec_v in vsec_dict.items():
+            vsec_py[gid][sec_name] = rec_v.to_python()
+
+    isec_py = dict()
+    for gid, isec_dict in neuron_net._isec.items():
+        isec_py[gid] = dict()
+        for sec_name, rec_i in isec_dict.items():
+            isec_py[gid][sec_name] = {
+                key: rec_i.to_python() for key, rec_i in rec_i.items()}
+
     dpl_data = np.c_[
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
         neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy(),
@@ -113,6 +126,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             'gid_ranges': net.gid_ranges,
             'vsoma': vsoma_py,
             'isoma': isoma_py,
+            'vsec': vsec_py,
+            'isec': isec_py,
             'rec_data': rec_arr_py,
             'rec_times': rec_times_py,
             'times': times.to_python()}
@@ -288,6 +303,8 @@ class NetworkBuilder(object):
 
         self._vsoma = dict()
         self._isoma = dict()
+        self._vsec = dict()
+        self._isec = dict()
         self._nrn_rec_arrays = dict()
         self._nrn_rec_callbacks = list()
 
@@ -324,9 +341,13 @@ class NetworkBuilder(object):
 
         record_vsoma = self.net._params['record_vsoma']
         record_isoma = self.net._params['record_isoma']
+        record_vsec = self.net._params['record_vsec']
+        record_isec = self.net._params['record_isec']
         self._create_cells_and_drives(threshold=self.net._params['threshold'],
                                       record_vsoma=record_vsoma,
-                                      record_isoma=record_isoma)
+                                      record_isoma=record_isoma,
+                                      record_vsec=record_vsec,
+                                      record_isec=record_isec)
 
         self.state_init()
 
@@ -396,7 +417,8 @@ class NetworkBuilder(object):
         self._gid_list.sort()
 
     def _create_cells_and_drives(self, threshold, record_vsoma=False,
-                                 record_isoma=False):
+                                 record_isoma=False, record_vsec=False,
+                                 record_isec=False):
         """Parallel create cells AND external drives
 
         NB: _Cell.__init__ calls h.Section -> non-picklable!
@@ -432,6 +454,7 @@ class NetworkBuilder(object):
                     cell.create_tonic_bias(**self.net.external_biases
                                            ['tonic'][src_type])
                 cell.record_soma(record_vsoma, record_isoma)
+                cell.record_sec(record_vsec, record_isec)
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
@@ -562,6 +585,9 @@ class NetworkBuilder(object):
             self._vsoma[cell.gid] = cell.rec_v
             self._isoma[cell.gid] = cell.rec_i
 
+            self._vsec[cell.gid] = cell.rec_vsec
+            self._isec[cell.gid] = cell.rec_isec
+
         # reduce across threads
         for nrn_dpl in self._nrn_dipoles.values():
             _PC.allreduce(nrn_dpl, 1)
@@ -571,6 +597,9 @@ class NetworkBuilder(object):
         # aggregate the currents and voltages independently on each proc
         vsoma_list = _PC.py_gather(self._vsoma, 0)
         isoma_list = _PC.py_gather(self._isoma, 0)
+
+        vsec_list = _PC.py_gather(self._vsec, 0)
+        isec_list = _PC.py_gather(self._isec, 0)
 
         # combine spiking data from each proc
         spike_times_list = _PC.py_gather(self._spike_times, 0)
@@ -586,6 +615,10 @@ class NetworkBuilder(object):
                 self._vsoma.update(vsoma)
             for isoma in isoma_list:
                 self._isoma.update(isoma)
+            for vsec in vsec_list:
+                self._vsoma.update(vsec)
+            for isec in isec_list:
+                self._isoma.update(isec)
 
         _PC.barrier()  # get all nodes to this place before continuing
 
