@@ -650,7 +650,7 @@ class Cell:
         return plot_cell_morphology(self, ax=ax, show=show)
 
     def update_end_pts(self):
-        """"Create cell and copy coordinates to Cell.end_pts"""
+        """"Create cell and copy coordinates to Section.end_pts"""
         self._create_sections(self.sections, self.topology)
         section_names = list(self.sections.keys())
 
