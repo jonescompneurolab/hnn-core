@@ -111,6 +111,8 @@ class CellResponse(object):
         self._spike_types = spike_types
         self._vsoma = list()
         self._isoma = list()
+        self._vsec = list()
+        self._isec = list()
         if times is not None:
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
@@ -221,6 +223,14 @@ class CellResponse(object):
     @property
     def isoma(self):
         return self._isoma
+
+    @property
+    def vsec(self):
+        return self._vsec
+
+    @property
+    def isec(self):
+        return self._isec
 
     @property
     def times(self):
