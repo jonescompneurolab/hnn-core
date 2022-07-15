@@ -81,9 +81,10 @@ def test_cell():
         cell.build(sec_name_apical='blah')
 
     # Test length modification
-    sec_name = 'apical_trunk'
-    new_L = 30.0
-    cell.change_sec_length(sec_name, new_L)
+    sec_name = 'soma'
+    new_L = 5.0
+    cell.sections[sec_name].L = new_L
+    cell.update_end_pts()
     new_pts = np.array(cell.sections[sec_name].end_pts)
     new_dist = np.linalg.norm(new_pts[0, :] - new_pts[1, :])
     np.isclose(new_L, new_dist)
