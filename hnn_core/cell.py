@@ -216,6 +216,37 @@ class Section:
     def end_pts(self):
         return self._end_pts
 
+    @end_pts.setter
+    def end_pts(self, value):
+        self._end_pts = value
+
+    def change_sec_length(self, new_L):
+        """Modify section length and update 3D point positions
+
+        Parameters
+        ----------
+        new_L : float | int
+            New length of section in um.
+        """
+
+        # Check that the points defined match L already?
+        old_L = self._L
+        self._L = new_L
+        fac = new_L / old_L
+
+        old_pts = self.end_pts
+        new_pts = old_pts
+        x0 = old_pts[0][0]
+        y0 = old_pts[0][1]
+        z0 = old_pts[0][2]
+
+        for pt_idx in range(2):
+            new_pts[pt_idx][0] = x0 + (old_pts[pt_idx][0] - x0) * fac
+            new_pts[pt_idx][1] = y0 + (old_pts[pt_idx][1] - y0) * fac
+            new_pts[pt_idx][2] = z0 + (old_pts[pt_idx][2] - z0) * fac
+
+        self.end_pts = new_pts
+
 
 class Cell:
     """Create a cell object.
@@ -439,35 +470,6 @@ class Cell:
             raise ValueError(f'sec_name_apical must be an existing '
                              f'section of the current cell or None. '
                              f'Got {sec_name_apical}.')
-
-    def change_sec_length(self, sec_name, new_L):
-        """Modify section length and update 3D point positions
-
-        Parameters
-        ----------
-        sec_name : str
-            Name of section to be modified.
-        new_L : float | int
-            New length of section in um.
-        """
-
-        # Check that the points defined match L already?
-        old_L = self.sections[sec_name]._L
-        self.sections[sec_name]._L = new_L
-        fac = new_L / old_L
-
-        old_pts = self.sections[sec_name].end_pts
-        new_pts = old_pts
-        x0 = old_pts[0][0]
-        y0 = old_pts[0][1]
-        z0 = old_pts[0][2]
-
-        for pt_idx in range(2):
-            new_pts[pt_idx][0] = x0 + (old_pts[pt_idx][0] - x0) * fac
-            new_pts[pt_idx][0] = y0 + (old_pts[pt_idx][1] - y0) * fac
-            new_pts[pt_idx][0] = z0 + (old_pts[pt_idx][2] - z0) * fac
-
-        self.sections[sec_name]._end_pts = new_pts
 
     def copy(self):
         """Return copy of instance."""
