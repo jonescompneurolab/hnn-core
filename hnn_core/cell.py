@@ -208,6 +208,10 @@ class Section:
     def L(self):
         return self._L
 
+    @L.setter
+    def L(self, value):
+        self._L = value
+
     @property
     def diam(self):
         return self._diam
@@ -219,33 +223,6 @@ class Section:
     @end_pts.setter
     def end_pts(self, value):
         self._end_pts = value
-
-    def change_sec_length(self, new_L):
-        """Modify section length and update 3D point positions
-
-        Parameters
-        ----------
-        new_L : float | int
-            New length of section in um.
-        """
-
-        # Check that the points defined match L already?
-        old_L = self._L
-        self._L = new_L
-        fac = new_L / old_L
-
-        old_pts = self.end_pts
-        new_pts = old_pts
-        x0 = old_pts[0][0]
-        y0 = old_pts[0][1]
-        z0 = old_pts[0][2]
-
-        for pt_idx in range(2):
-            new_pts[pt_idx][0] = x0 + (old_pts[pt_idx][0] - x0) * fac
-            new_pts[pt_idx][1] = y0 + (old_pts[pt_idx][1] - y0) * fac
-            new_pts[pt_idx][2] = z0 + (old_pts[pt_idx][2] - z0) * fac
-
-        self.end_pts = new_pts
 
 
 class Cell:
@@ -671,3 +648,20 @@ class Cell:
             The matplotlib 3D axis handle.
         """
         return plot_cell_morphology(self, ax=ax, show=show)
+
+    def update_end_pts(self):
+        """"Create cell and copy coordinates to Cell.end_pts"""
+        self._create_sections(self.sections, self.topology)
+        section_names = list(self.sections.keys())
+
+        for name in section_names:
+            nrn_pts = self._nrn_sections[name].psection()['morphology'][
+                'pts3d']
+
+            del self._nrn_sections[name]
+
+            x0, y0, z0 = nrn_pts[0][0], nrn_pts[0][1], nrn_pts[0][2]
+            x1, y1, z1 = nrn_pts[1][0], nrn_pts[1][1], nrn_pts[1][2]
+            self.sections[name]._end_pts = [[x0, y0, z0], [x1, y1, z1]]
+
+        self._nrn_sections = dict()
