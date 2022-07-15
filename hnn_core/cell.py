@@ -573,15 +573,16 @@ class Cell:
         """
 
         section_names = list(self.sections.keys())
-        self.rec_isec = dict.fromkeys(section_names)
-        self.rec_vsec = dict.fromkeys(section_names)
 
         if record_vsec:
+            self.rec_vsec = dict.fromkeys(section_names)
             for sec_name in self.rec_vsec:
                 self.rec_vsec[sec_name] = h.Vector()
-                self.rec_vsec[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_v)
+                self.rec_vsec[sec_name].record(
+                    self._nrn_sections[sec_name](0.5)._ref_v)
 
         if record_isec:
+            self.rec_isec = dict.fromkeys(section_names)
             for sec_name in self.rec_isec:
                 list_syn = [key for key in self._nrn_synapses.keys()
                             if key.startswith(f'{sec_name}_')]

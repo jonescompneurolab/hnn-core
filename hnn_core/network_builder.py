@@ -616,9 +616,9 @@ class NetworkBuilder(object):
             for isoma in isoma_list:
                 self._isoma.update(isoma)
             for vsec in vsec_list:
-                self._vsoma.update(vsec)
+                self._vsec.update(vsec)
             for isec in isec_list:
-                self._isoma.update(isec)
+                self._isec.update(isec)
 
         _PC.barrier()  # get all nodes to this place before continuing
 
