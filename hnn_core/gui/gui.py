@@ -96,11 +96,9 @@ class HNNGUI:
                             description='MPI cmd:',
                             disabled=False)
 
-        self.n_jobs = BoundedIntText(value=1,
-                                           min=1,
-                                           max=multiprocessing.cpu_count(),
-                                           description='Cores:',
-                                           disabled=False)
+        self.n_jobs = BoundedIntText(value=1, min=1,
+                                     max=multiprocessing.cpu_count(),
+                                     description='Cores:', disabled=False)
 
         self.drive_type_selection = RadioButtons(
             options=['Evoked', 'Poisson', 'Rhythmic'],
