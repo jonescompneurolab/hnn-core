@@ -68,7 +68,7 @@ class HNNGUI:
         self.params = self.load_parameters()
 
         # In-memory storage of all simulation related variables
-        self.variables = dict(net=None, dpls=None)
+        self.variables = dict(net=None, dpls=list())
 
         # Simulation parameters
         self.tstop = FloatText(value=170,
@@ -717,7 +717,7 @@ def update_plot_window(variables, _plot_out, plot_type):
                 print("No cell response data")
 
         elif plot_type['new'] == 'current dipole':
-            if variables['dpls'] is not None:
+            if len(variables['dpls']) > 0:
                 fig, ax = plt.subplots()
                 plot_dipole(variables['dpls'], ax=ax, average=True)
             else:
@@ -732,14 +732,14 @@ def update_plot_window(variables, _plot_out, plot_type):
                 print("No cell response data")
 
         elif plot_type['new'] == 'PSD':
-            if variables['dpls'] is not None:
+            if len(variables['dpls']) > 0:
                 fig, ax = plt.subplots()
                 variables['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
             else:
                 print("No dipole data")
 
         elif plot_type['new'] == 'spectogram':
-            if variables['dpls'] is not None:
+            if len(variables['dpls']) > 0:
                 freqs = np.arange(10., 100., 1.)
                 n_cycles = freqs / 8.
                 fig, ax = plt.subplots()
@@ -800,7 +800,8 @@ def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
     if len(change['owner'].value) == 0:
         return
 
-    params_fname = change['owner'].metadata[0]['name']
+    # params_fname = change['owner'].metadata[0]['name']
+    params_fname = list(change['owner'].value.keys())[0]
     file_uploaded = change['owner'].value
     param_data = list(file_uploaded.values())[0]['content']
     param_data = codecs.decode(param_data, encoding="utf-8")
