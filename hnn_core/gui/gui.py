@@ -96,7 +96,7 @@ class HNNGUI:
                             description='MPI cmd:',
                             disabled=False)
 
-        self.joblib_cores = BoundedIntText(value=1,
+        self.n_jobs = BoundedIntText(value=1,
                                            min=1,
                                            max=multiprocessing.cpu_count(),
                                            description='Cores:',
@@ -216,7 +216,7 @@ class HNNGUI:
         # link callbacks
         def _handle_backend_change(backend_type):
             return handle_backend_change(backend_type.new, self.backend_config,
-                                         self.mpi_cmd, self.joblib_cores)
+                                         self.mpi_cmd, self.n_jobs)
 
         def _add_drive_button_clicked(b):
             return add_drive_widget(self.drive_type_selection.value,
@@ -243,7 +243,7 @@ class HNNGUI:
             return run_button_clicked(
                 self.log_out, self.drive_widgets, self.variables, self.tstep,
                 self.tstop, self.ntrials, self.backend_selection, self.mpi_cmd,
-                self.joblib_cores, self.params, self.plot_outputs_list,
+                self.n_jobs, self.params, self.plot_outputs_list,
                 self.plot_dropdowns_list, self.simulation_status, b)
 
         def _handle_viz_layout_change(layout_option):
@@ -904,7 +904,7 @@ def init_network_from_widgets(params, tstep, tstop, variables, drive_widgets):
 
 
 def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
-                       ntrials, backend_selection, mpi_cmd, joblib_cores,
+                       ntrials, backend_selection, mpi_cmd, n_jobs,
                        params, plot_outputs_list, plot_dropdowns_list,
                        simulation_status, b):
     """Run the simulation and plot outputs."""
@@ -918,8 +918,8 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
             variables['backend'] = MPIBackend(
                 n_procs=multiprocessing.cpu_count() - 1, mpi_cmd=mpi_cmd.value)
         else:
-            variables['backend'] = JoblibBackend(n_jobs=joblib_cores.value)
-            print(f"Using Joblib with {joblib_cores.value} core(s).")
+            variables['backend'] = JoblibBackend(n_jobs=n_jobs.value)
+            print(f"Using Joblib with {n_jobs.value} core(s).")
         with variables['backend']:
             simulation_status.value = """<div
             style='background:orange;padding-left:10px;color:white;'>
@@ -947,13 +947,13 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
             })
 
 
-def handle_backend_change(backend_type, backend_config, mpi_cmd, joblib_cores):
+def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
     backend_config.clear_output()
     with backend_config:
         if backend_type == "MPI":
             display(mpi_cmd)
         elif backend_type == "Joblib":
-            display(joblib_cores)
+            display(n_jobs)
 
 
 def init_left_right_viz_layout(plot_outputs,
