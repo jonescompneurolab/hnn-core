@@ -829,7 +829,7 @@ def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
         print(f"parameter key: {params_network.keys()}")
         for slider in sliders:
             for sl in slider:
-                key = 'gbar_' + sl.description
+                key = 'gbar_' + sl.children[0].description
                 sl.value = params_network[key]
 
         if 'tstop' in params_network.keys():

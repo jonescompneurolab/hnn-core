@@ -92,7 +92,7 @@ def test_run_gui():
 # 3. Use modified parameters to construct the Network model
 # 4. (Optional) run simulation
 # 5. Check if the simulation results or network with modified parameters
-#    matches.
+#    match.
 
 # def test_gui_run_simulation():
 #     """Test if gui can reproduce the same results as using hnn-core"""
