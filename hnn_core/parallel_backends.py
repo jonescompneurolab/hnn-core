@@ -118,18 +118,18 @@ def spawn_job(command, obj, n_procs, info=None):
     from mpi4py import MPI
 
     if info is None:
-        intercomm = MPI.COMM_SELF.Spawn('nrniv', args=command,
+        intercomm = MPI.COMM_SELF.Spawn(command[0], args=command[1:],
                                         maxprocs=n_procs)
     else:
-        intercomm = MPI.COMM_SELF.Spawn('nrniv', args=command,
+        intercomm = MPI.COMM_SELF.Spawn(command[0], args=command[1:],
                                         info=info,
                                         maxprocs=n_procs)
-    
+
     # send Network + sim param objects to each child process
     intercomm.bcast(obj, root=MPI.ROOT)
 
     # receive data
-    child_data = intercomm.recv(source=0)
+    child_data = intercomm.recv(source=MPI.ANY_SOURCE)
 
     # close spawned communicator
     intercomm.Disconnect()
@@ -742,7 +742,7 @@ class MPIBackend(object):
         _BACKEND = self._old_backend
 
         # always kill nrniv processes for good measure
-        if self.n_procs > 1:
+        if (not self.mpi_comm_spawn) and self.n_procs > 1:
             kill_proc_name('nrniv')
 
     def simulate(self, net, tstop, dt, n_trials, postproc=False):
@@ -781,7 +781,6 @@ class MPIBackend(object):
 
         if self.mpi_comm_spawn:
             sim_data = spawn_job(
-                parent_comm=self._selfcomm,
                 command=self.command,
                 obj=sim_objs,
                 n_procs=self.n_procs,

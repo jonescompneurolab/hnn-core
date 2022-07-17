@@ -9,9 +9,6 @@ import sys
 import pickle
 import base64
 import re
-import shlex
-from os import environ
-from mpi4py import MPI
 
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
 
