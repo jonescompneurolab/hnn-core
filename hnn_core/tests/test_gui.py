@@ -51,24 +51,16 @@ def test_gui_upload_params():
     original_tstop = gui.tstop.value
     gui.tstop.value = 1
 
+    original_tstep = gui.tstep.value
+    gui.tstep.value = 1
+
     # manually send uploaded content
     gui.load_button.set_trait('value', uploaded_value)
 
     # check if parameter is reloaded.
     assert gui.tstop.value == original_tstop
+    assert gui.tstep.value == original_tstep
     assert len(gui.drive_widgets) == original_drive_count
-
-
-def test_run_gui():
-    """Test if main gui function gives proper ipywidget"""
-    gui = HNNGUI()
-    app_layout = gui.run()
-    assert app_layout is not None
-    gui.run_button.click()
-    dpls = gui.variables['dpls']
-    assert isinstance(gui.variables["net"], Network)
-    assert isinstance(dpls, list)
-    assert all([isinstance(dpl, Dipole) for dpl in dpls])
 
 
 def test_gui_init_network():
@@ -81,6 +73,26 @@ def test_gui_init_network():
     # copied from test_network.py
     assert np.isclose(gui.variables['net']._inplane_distance, 1.)  # default
     assert np.isclose(gui.variables['net']._layer_separation, 1307.4)
+
+
+def test_run_gui():
+    """Test if run button triggers simulation."""
+    gui = HNNGUI()
+    app_layout = gui.run()
+    assert app_layout is not None
+    gui.run_button.click()
+    dpls = gui.variables['dpls']
+    assert isinstance(gui.variables["net"], Network)
+    assert isinstance(dpls, list)
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+# For other tests, we can follow this paradigm:
+# 1. Initialize the gui
+# 2. Change some parameters from the widget interface.
+# 3. Use modified parameters to construct the Network model
+# 4. (Optional) run simulation
+# 5. Check if the simulation results or network with modified parameters
+#    matches.
 
 # def test_gui_run_simulation():
 #     """Test if gui can reproduce the same results as using hnn-core"""
