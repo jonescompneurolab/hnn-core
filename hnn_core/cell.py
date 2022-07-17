@@ -225,10 +225,6 @@ class Section:
     def end_pts(self):
         return self._end_pts
 
-    @end_pts.setter
-    def end_pts(self, value):
-        self._end_pts = value
-
 
 class Cell:
     """Create a cell object.
