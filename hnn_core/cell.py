@@ -11,7 +11,7 @@ from numpy.linalg import norm
 from neuron import h, nrn
 
 from .viz import plot_cell_morphology
-from .externals.mne import _validate_type
+from .externals.mne import _validate_type, _check_option
 
 # Units for e: mV
 # Units for gbar: S/cm^2
@@ -678,6 +678,8 @@ class Cell:
 
         Parameters
         ----------
+        sec_name : str
+            Name of section to be modified. Must be a key of Cell.sections
         L : float | int | None
             length of a section in microns. Default None.
         diam : float | int | None
@@ -691,6 +693,8 @@ class Cell:
         -----
         Leaving default of None produces no change.
         """
+        valid_sec_names = list(self.sections.keys())
+        _check_option('sec_name', sec_name, valid_sec_names)
 
         if L is not None:
             _validate_type(L, (float, int), 'L')
