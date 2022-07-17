@@ -670,10 +670,9 @@ class MPIBackend(object):
             self._intracomm = MPI.COMM_WORLD
             self._selfcomm = MPI.COMM_SELF
             if self._intracomm.Get_rank() != 0:
-                raise RuntimeError('MPI is attempting to spawn multiple '
-                                   'child subprocesses. Make sure only one '
-                                   'parent MPI process is running when '
-                                   '"mpi_comm_spawn" is True.')
+                raise RuntimeError('MPI is attempting to spawn multiple child '
+                                   'jobs. Make sure only one parent MPI job '
+                                   'is running when "mpi_comm_spawn" is True.')
 
             self.command = 'nrniv -python -mpi -nobanner ' + \
                 sys.executable + ' ' + \

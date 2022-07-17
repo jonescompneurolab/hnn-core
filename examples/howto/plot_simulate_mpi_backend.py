@@ -47,8 +47,11 @@ net.add_bursty_drive(
 # ``openmpi``, which must be installed on the system
 from hnn_core import MPIBackend
 
-with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-    dpls = simulate_dipole(net, tstop=310., n_trials=1)
+# to create a parent MPI job that uses MPIBackend to spawn child jobs, set
+# mpi_comm_spawn=True and call this script from terminal using
+# $ mpiexec -np 1 --oversubscribe python -m mpi4py /home/ryan/hnn-core/examples/howto/plot_simulate_mpi_backend.py
+with MPIBackend(n_procs=5, mpi_cmd='mpiexec', mpi_comm_spawn=False):
+    dpls = simulate_dipole(net, tstop=200., n_trials=1)
 
 trial_idx = 0
 dpls[trial_idx].plot()
