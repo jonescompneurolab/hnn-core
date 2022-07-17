@@ -92,8 +92,8 @@ def _get_mpi_env():
     return my_env
 
 
-def spawn_subprocess(parent_comm, command, n_procs, info=None):
-    """Spawn child simulation processes from an existing MPI process"""
+def spawn_job(parent_comm, command, n_procs, info=None):
+    """Spawn child simulation job from an existing MPI communicator"""
 
     if info is None:
         subcomm = parent_comm.Spawn('nrniv', args=command,
@@ -589,12 +589,12 @@ class MPIBackend(object):
         Applicable only when mpi_comm_spawn is False (default): The name of the
         mpi launcher executable. Will use 'mpiexec' (openmpi) by default.
     mpi_comm_spawn : bool
-        Spawns new MPI subprocesses from an existing MPI process instead of
-        calling mpi_cmd. This allows for the MPI processes and associated
+        Spawns new MPI jobs from an existing MPI communicator instead of
+        calling mpi_cmd. This allows for the parent MPI job and associated
         hardware resources to be pre-instantiated e.g. on a computing cluster.
     mpi_comm_spawn_info : mpi4py.MPI.Info | None
         Appliable only when mpi_comm_spawn is True: an mpi4py.MPI.Info instance
-        that grants the user control over how MPI configures spawned processes.
+        that grants the user control over how openMPI configures spawned jobs.
 
     Attributes
     ----------
@@ -751,7 +751,7 @@ class MPIBackend(object):
         print("Running %d trials..." % (n_trials))
 
         if self.mpi_comm_spawn:
-            self._child_intercomm = spawn_subprocess(
+            self._child_intercomm = spawn_job(
                 parent_comm=self._selfcomm,
                 command=self.command,
                 n_procs=self.n_procs,
