@@ -18,6 +18,9 @@ Changelog
 - Changed ``conn_seed`` default to ``None`` (from ``3``) in :func:`~hnn_core.network.add_connection`, 
   by `Mattan Pelah`_ in :gh:`492`.
 
+- Add interface to modify attributes of sections in
+ :func:`~hnn_core.viz.plot_morphology`, by `Nick Tolley`_ in :gh:`481`
+
 Bug
 ~~~
 - Fix bugs in drives API to enable: rate constant argument as float; evoked drive with
@@ -41,6 +44,9 @@ Bug
 
 - Add option to plot the averaged dipole in `~hnn_core.viz.plot_dipole` when `dpl`
   is a list of dipoles, by `Huzi Cheng`_ in :gh:`475`.
+
+- Fix bug where :func:`~hnn_core.viz.plot_morphology` did not accurately
+  reflect the shape of the cell being simulated, by `Nick Tolley`_ in :gh:`481`
 
 API
 ~~~
