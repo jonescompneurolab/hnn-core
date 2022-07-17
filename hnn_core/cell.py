@@ -11,6 +11,7 @@ from numpy.linalg import norm
 from neuron import h, nrn
 
 from .viz import plot_cell_morphology
+from .externals.mne import _validate_type
 
 # Units for e: mV
 # Units for gbar: S/cm^2
@@ -159,11 +160,11 @@ class Section:
     Parameters
     ----------
     L : float
-        length of a section in microns
+        length of a section in microns.
     diam : float
-        diameter of a section in microns
+        diameter of a section in microns.
     cm : float
-        membrane capacitance in micro-Farads
+        membrane capacitance in micro-Farads.
     Ra : float
         axial resistivity in ohm-cm
     end_pts : list of [x, y, z]
@@ -180,20 +181,20 @@ class Section:
     end_pts : list of [x, y, z]
         The start and stop points of the section. Cannot be changed.
     L : float
-        length of a section in microns. Cannot be changed.
+        length of a section in microns.
     diam : float
-        diameter of a section in microns. Cannot be changed.
+        diameter of a section in microns.
     cm : float
-        membrane capacitance in micro-Farads
+        membrane capacitance in micro-Farads.
     Ra : float
-        axial resistivity in ohm-cm
+        axial resistivity in ohm-cm.
     """
     def __init__(self, L, diam, Ra, cm, end_pts=None):
 
         self._L = L
         self._diam = diam
-        self.Ra = Ra
-        self.cm = cm
+        self._Ra = Ra
+        self._cm = cm
         if end_pts is None:
             end_pts = list()
         self._end_pts = end_pts
@@ -208,13 +209,17 @@ class Section:
     def L(self):
         return self._L
 
-    @L.setter
-    def L(self, value):
-        self._L = value
-
     @property
     def diam(self):
         return self._diam
+
+    @property
+    def cm(self):
+        return self._cm
+
+    @property
+    def Ra(self):
+        return self._Ra
 
     @property
     def end_pts(self):
@@ -319,6 +324,8 @@ class Cell:
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 
+        self._update_end_pts()
+
     def __repr__(self):
         class_name = self.__class__.__name__
         return f'<{class_name} | gid={self._gid}>'
@@ -382,6 +389,8 @@ class Cell:
         for height and xz plane for depth. This is opposite for model as a
         whole, but convention is followed in this function ease use of gui.
         """
+        if 'soma' not in self.sections:
+            raise KeyError('soma must be defined for cell')
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
         dx = self.pos[0] - self.sections['soma'].end_pts[0][0]
@@ -436,8 +445,6 @@ class Cell:
             with this section. The section should belong to the apical dendrite
             of a pyramidal neuron.
         """
-        if 'soma' not in self.sections:
-            raise KeyError('soma must be defined for cell')
         self._create_sections(self.sections, self.topology)
         self._create_synapses(self.sections, self.synapses)
         self._set_biophysics(self.sections)
@@ -649,7 +656,7 @@ class Cell:
         """
         return plot_cell_morphology(self, ax=ax, show=show)
 
-    def update_end_pts(self):
+    def _update_end_pts(self):
         """"Create cell and copy coordinates to Section.end_pts"""
         self._create_sections(self.sections, self.topology)
         section_names = list(self.sections.keys())
@@ -665,3 +672,40 @@ class Cell:
             self.sections[name]._end_pts = [[x0, y0, z0], [x1, y1, z1]]
 
         self._nrn_sections = dict()
+
+    def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
+        """Change attributes of section specified by `sec_name`
+
+        Parameters
+        ----------
+        L : float | int | None
+            length of a section in microns. Default None.
+        diam : float | int | None
+            diameter of a section in microns.
+        cm : float | int | None
+            membrane capacitance in micro-Farads.
+        Ra : float | int | None
+            axial resistivity in ohm-cm.
+
+        Notes
+        -----
+        Leaving default of None produces no change.
+        """
+
+        if L is not None:
+            _validate_type(L, (float, int), 'L')
+            self.sections[sec_name]._L = L
+
+        if diam is not None:
+            _validate_type(diam, (float, int), 'diam')
+            self.sections[sec_name]._diam = diam
+
+        if cm is not None:
+            _validate_type(cm, (float, int), 'cm')
+            self.sections[sec_name]._cm = cm
+
+        if Ra is not None:
+            _validate_type(Ra, (float, int), 'Ra')
+            self.sections[sec_name]._Ra = Ra
+
+        self._update_end_pts()

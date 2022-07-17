@@ -16,7 +16,8 @@ def test_cell():
 
     name = 'test'
     pos = (0., 0., 0.)
-    sections = {'blah': Section(L=1, diam=5, Ra=3, cm=100)}
+    sections = {'soma': Section(L=1, diam=5, Ra=3, cm=100,
+                                end_pts=[[0, 0, 0], [0, 39., 0]])}
     synapses = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
     topology = None
     sect_loc = {'proximal': 'soma'}
@@ -46,8 +47,12 @@ def test_cell():
         cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
 
     pickle.dumps(cell)  # check cell object is picklable until built
+
+    bad_sections = {'blah': Section(L=1, diam=5, Ra=3, cm=100,
+                    end_pts=[[0, 0, 0], [0, 39., 0]])}
+    # Check soma must be included in sections
     with pytest.raises(KeyError, match='soma must be defined'):
-        cell.build()
+        cell = Cell(name, pos, bad_sections, synapses, topology, sect_loc)
 
     sections = {
         'soma': Section(
@@ -80,14 +85,23 @@ def test_cell():
     with pytest.raises(ValueError, match='sec_name_apical must be an'):
         cell.build(sec_name_apical='blah')
 
-    # Test length modification
+    # Test section modification
     sec_name = 'soma'
-    new_L = 5.0
-    cell.sections[sec_name].L = new_L
-    cell.update_end_pts()
+    # good_args = {'L': 1.0, }
+    new_L = 1.0
+    new_diam = 2.0
+    new_cm = 3.0
+    new_Ra = 4.0
+    cell.modify_section(sec_name, L=new_L, diam=new_diam, cm=new_cm, Ra=new_Ra)
+
     new_pts = np.array(cell.sections[sec_name].end_pts)
     new_dist = np.linalg.norm(new_pts[0, :] - new_pts[1, :])
     np.isclose(new_L, new_dist)
+
+    assert cell.sections[sec_name].L == new_L
+    assert cell.sections[sec_name].diam == new_diam
+    assert cell.sections[sec_name].cm == new_cm
+    assert cell.sections[sec_name].Ra == new_Ra
 
 
 def test_artificial_cell():
