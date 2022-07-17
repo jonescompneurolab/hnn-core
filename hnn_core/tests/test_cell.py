@@ -87,13 +87,13 @@ def test_cell():
 
     # Test section modification
     sec_name = 'soma'
-    # good_args = {'L': 1.0, }
     new_L = 1.0
     new_diam = 2.0
     new_cm = 3.0
     new_Ra = 4.0
     cell.modify_section(sec_name, L=new_L, diam=new_diam, cm=new_cm, Ra=new_Ra)
 
+    # Make sure distance betweeen `Section.end_pts` matches `Section.L`
     new_pts = np.array(cell.sections[sec_name].end_pts)
     new_dist = np.linalg.norm(new_pts[0, :] - new_pts[1, :])
     np.isclose(new_L, new_dist)
