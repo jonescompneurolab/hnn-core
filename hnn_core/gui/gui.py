@@ -17,7 +17,7 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
                         FloatLogSlider, FloatText, GridspecLayout, HBox,
                         IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
-                        interactive_output)
+                        interactive_output, link)
 
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
@@ -268,12 +268,13 @@ class HNNGUI:
         ])
 
         # accordians to group local-connectivity by cell type
-        boxes = [VBox(slider) for slider in self.connectivity_sliders]
+        connectivity_boxes = [
+            VBox(slider) for slider in self.connectivity_sliders]
         connectivity_names = [
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
             'Layer 5 Basket'
         ]
-        cell_connectivity = Accordion(children=boxes)
+        cell_connectivity = Accordion(children=connectivity_boxes)
         for idx, connectivity_name in enumerate(connectivity_names):
             cell_connectivity.set_title(idx, connectivity_name)
 
@@ -334,24 +335,37 @@ def _get_sliders(params, param_keys):
     style = {'description_width': '150px'}
     sliders = list()
     for d in param_keys:
+        text_input = FloatText(value=params[d],
+                               disabled=False, continuous_update=False,
+                               description=d.split('gbar_')[1],
+                               style=style)
+
         slider = FloatLogSlider(value=params[d],
                                 min=-5,
                                 max=1,
                                 step=0.2,
-                                description=d.split('gbar_')[1],
+                                description=" ",
                                 disabled=False,
                                 continuous_update=False,
                                 orientation='horizontal',
-                                readout=True,
+                                readout=False,
                                 readout_format='.2e',
                                 style=style)
-        sliders.append(slider)
+
+        link((slider, 'value'), (text_input, 'value'))
+        sliders.append(
+            VBox([
+                text_input, slider,
+                HTML(value="<hr style='margin-bottom:5px'/>")
+            ]))
 
     def _update_params(**updates):
         logging.debug(f'Connectivity parameters updates: {updates}')
         params.update(dict(**updates))
-
-    interactive_output(_update_params, {s.description: s for s in sliders})
+    # must use the first one as it could be zero.
+    interactive_output(_update_params,
+                       {s.children[0].description: s.children[0]
+                        for s in sliders})
     return sliders
 
 
