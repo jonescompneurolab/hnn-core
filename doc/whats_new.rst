@@ -19,7 +19,10 @@ Changelog
   by `Mattan Pelah`_ in :gh:`492`.
 
 - Add interface to modify attributes of sections in
- :func:`~hnn_core.Cell.modify_section`, by `Nick Tolley`_ in :gh:`481`
+  :func:`~hnn_core.Cell.modify_section`, by `Nick Tolley`_ in :gh:`481`
+
+ - Add ability to target specific sections when adding drives or connections,
+   by `Nick Tolley`_ in :gh:`419`
 
 Bug
 ~~~
