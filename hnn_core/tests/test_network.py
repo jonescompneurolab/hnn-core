@@ -309,22 +309,45 @@ def test_network():
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
-    n_conn = len(network_builder.ncs['L2Basket_L2Pyr_gabaa'])
-    kwargs_default = dict(src_gids=[0, 1], target_gids=[35, 36],
-                          loc='soma', receptor='gabaa',
+    n_conn_prox = len(network_builder.ncs['L2Pyr_L2Pyr_ampa'])
+    kwargs_default = dict(src_gids=[35, 36], target_gids=[35, 36],
+                          loc='proximal', receptor='ampa',
                           weight=5e-4, delay=1.0, lamtha=1e9,
                           probability=1.0)
     net.add_connection(**kwargs_default)  # smoke test
+
+    # Test adding connection targeting single section
+    kwargs_trunk = kwargs_default.copy()
+    kwargs_trunk['loc'] = 'apical_trunk'
+    kwargs_trunk['receptor'] = 'nmda'
+    n_conn_trunk = len(network_builder.ncs['L2Pyr_L2Pyr_nmda'])
+    net.add_connection(**kwargs_trunk)
+
     network_builder = NetworkBuilder(net)
-    assert len(network_builder.ncs['L2Basket_L2Pyr_gabaa']) == n_conn + 4
-    nc = network_builder.ncs['L2Basket_L2Pyr_gabaa'][-1]
+    # Check proximal targeted connection count increased by right number
+    # (2*2 connections between cells, 3 sections in proximal target)
+    assert len(network_builder.ncs['L2Pyr_L2Pyr_ampa']) == n_conn_prox + 4 * 3
+    nc = network_builder.ncs['L2Pyr_L2Pyr_ampa'][-1]
     assert_allclose(nc.weight[0], kwargs_default['weight'])
+
+    # Check apical_trunk targeted connection count increased by right number
+    # (2*2 connections between cells, 1 section i.e. apical_turnk)
+    assert len(network_builder.ncs['L2Pyr_L2Pyr_nmda']) == n_conn_trunk + 4
+    nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][-1]
+    assert_allclose(nc.weight[0], kwargs_trunk['weight'])
+    # Check that exactly 4 apical_trunk connections appended
+    for idx in range(1, 5):
+        assert network_builder.ncs['L2Pyr_L2Pyr_nmda'][
+            -idx].postseg().__str__() == 'L2Pyr_apical_trunk(0.5)'
+    assert network_builder.ncs['L2Pyr_L2Pyr_nmda'][
+        -5].postseg().__str__() == 'L2Pyr_basal_3(0.5)'
 
     kwargs_good = [
         ('src_gids', 0), ('src_gids', 'L2_pyramidal'), ('src_gids', range(2)),
         ('target_gids', 35), ('target_gids', range(2)),
         ('target_gids', 'L2_pyramidal'),
-        ('target_gids', [[35, 36], [37, 38]]), ('probability', 0.5)]
+        ('target_gids', [[35, 36], [37, 38]]), ('probability', 0.5),
+        ('loc', 'apical_trunk')]
     for arg, item in kwargs_good:
         kwargs = kwargs_default.copy()
         kwargs[arg] = item
@@ -378,6 +401,15 @@ def test_network():
     with pytest.raises(ValueError, match='probability must be'):
         kwargs = kwargs_default.copy()
         kwargs['probability'] = -1.0
+        net.add_connection(**kwargs)
+
+    # Make sure warning raised if section targeted doesn't contain synapse
+    match = ('Invalid value for')
+    with pytest.raises(ValueError, match=match):
+        kwargs = kwargs_default.copy()
+        kwargs['target_gids'] = 'L5_pyramidal'
+        kwargs['loc'] = 'soma'
+        kwargs['receptor'] = 'ampa'
         net.add_connection(**kwargs)
 
     # Test net.pick_connection()
