@@ -19,7 +19,7 @@ Changelog
   by `Mattan Pelah`_ in :gh:`492`.
 
 - Add interface to modify attributes of sections in
- :func:`~hnn_core.viz.plot_morphology`, by `Nick Tolley`_ in :gh:`481`
+ :func:`~hnn_core.Cell.modify_section`, by `Nick Tolley`_ in :gh:`481`
 
 Bug
 ~~~
