@@ -1075,10 +1075,10 @@ class Network(object):
             equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
         loc : str
-            Location of synapse on target cell. Must be
-            'proximal', 'distal', or 'soma'. Note that inhibitory synapses
-            (receptor='gabaa' or 'gabab') of L2 pyramidal neurons are only
-            valid loc='soma'.
+            Location of synapse on target cell. Must be an element of
+            `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
+            group of sections, or an existing section such as 'soma' or
+            'apical_tuft' (defined in `Cell.sections`)
         receptor : str
             Synaptic receptor of connection. Must be one of:
             'ampa', 'nmda', 'gabaa', or 'gabab'.
@@ -1174,12 +1174,31 @@ class Network(object):
         _validate_type(loc, str, 'loc')
         _validate_type(receptor, str, 'receptor')
 
-        valid_loc = ['proximal', 'distal', 'soma']
+        target_sect_loc = self.cell_types[target_type].sect_loc
+        target_sections = self.cell_types[target_type].sections
+        valid_loc = list(
+            target_sect_loc.keys()) + list(target_sections.keys())
+
         _check_option('loc', loc, valid_loc)
         conn['loc'] = loc
 
-        valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
-        _check_option('receptor', receptor, valid_receptor)
+        # `loc` specifies a group of sections, all must contain the synapse
+        # specified by `receptor`
+        if loc in target_sect_loc:
+            for sec_name in target_sect_loc[loc]:
+                valid_receptor = target_sections[sec_name].syns
+                _check_option('receptor', receptor, valid_receptor,
+                              extra=f" (the '{receptor}' receptor is not "
+                                    f"defined for the '{sec_name}' of"
+                                    f"'{target_type}' cells)")
+        # `loc` specifies an individual section
+        else:
+            valid_receptor = target_sections[loc].syns
+            _check_option('receptor', receptor, valid_receptor,
+                          extra=f"(the '{receptor}' receptor is not "
+                                f"defined for the '{loc}' of"
+                                f"'{target_type}' cells)")
+
         conn['receptor'] = receptor
 
         # Create and validate nc_dict
