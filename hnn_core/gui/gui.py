@@ -57,12 +57,15 @@ class HNNGUI:
                  left_sidebar_width='380px',
                  drive_widget_width="200px"):
         # set up styling.
-        self.theme_color = theme_color
-        self.log_window_height = log_window_height
-        self.visualization_window_width = visualization_window_width
-        self.visualization_window_height = visualization_window_height
-        self.left_sidebar_width = left_sidebar_width
-        self.drive_widget_width = drive_widget_width
+        self.layout = {
+            "theme_color": theme_color,
+            "log_window_height": log_window_height,
+            "visualization_window_width": visualization_window_width,
+            "visualization_window_height": visualization_window_height,
+            "left_sidebar_width": left_sidebar_width,
+            "drive_widget_width": drive_widget_width,
+        }
+        self.layout['drive_widget_width'] = drive_widget_width
 
         # load default parameters
         self.params = self.load_parameters()
@@ -105,31 +108,31 @@ class HNNGUI:
             value='Evoked',
             description='Drive:',
             disabled=False,
-            layout=Layout(width=self.drive_widget_width))
+            layout=Layout(width=self.layout['drive_widget_width']))
 
         self.location_selection = RadioButtons(
             options=['proximal', 'distal'], value='proximal',
             description='Location', disabled=False,
-            layout=Layout(width=self.drive_widget_width))
+            layout=Layout(width=self.layout['drive_widget_width']))
 
         self.add_drive_button = create_expanded_button(
             'Add drive', 'primary', height='30px',
-            button_color=self.theme_color)
+            button_color=self.layout['theme_color'])
 
         # Run, delete drives and load button
-        self.run_button = create_expanded_button('Run', 'success',
-                                                 height='30px',
-                                                 button_color=self.theme_color)
+        self.run_button = create_expanded_button(
+            'Run', 'success', height='30px',
+            button_color=self.layout['theme_color'])
 
-        self.load_button = FileUpload(accept='.json,.param',
-                                      multiple=False,
-                                      style={'button_color': self.theme_color},
-                                      description='Load network',
-                                      button_style='success')
+        self.load_button = FileUpload(
+            accept='.json,.param', multiple=False,
+            style={'button_color': self.layout['theme_color']},
+            description='Load network',
+            button_style='success')
 
         self.delete_drive_button = create_expanded_button(
             'Delete drives', 'success', height='30px',
-            button_color=self.theme_color)
+            button_color=self.layout['theme_color'])
 
         # Visualization figure list
         self.plot_outputs_list = list()
@@ -150,13 +153,13 @@ class HNNGUI:
         self.log_out = Output(
             layout={
                 'border': '1px solid gray',
-                'height': self.log_window_height,
+                'height': self.layout['log_window_height'],
                 'overflow': 'auto'
             })
         # visualization window
         self.visualization_window = Output(layout={
-            'height': self.visualization_window_height,
-            'width': self.visualization_window_width,
+            'height': self.layout['visualization_window_height'],
+            'width': self.layout['visualization_window_width'],
         })
         # detailed configuration of backends
         self.backend_config = Output()
@@ -172,13 +175,13 @@ class HNNGUI:
             HBox([
                 HBox([
                     self.run_button, self.load_button, self.delete_drive_button
-                ], layout={"width": self.left_sidebar_width}),
+                ], layout={"width": self.layout['left_sidebar_width']}),
                 self.viz_layout_selection,
             ]), self.log_out, self.simulation_status
         ])
         # title
         self.header = HTML(value=f"""<div
-            style='background:{self.theme_color};
+            style='background:{self.layout['theme_color']};
             text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
@@ -245,13 +248,12 @@ class HNNGUI:
                 self.plot_dropdowns_list, self.simulation_status, b)
 
         def _handle_viz_layout_change(layout_option):
-            return initialize_viz_window(self.visualization_window,
-                                         self.variables,
-                                         self.plot_outputs_list,
-                                         self.plot_dropdowns_list,
-                                         self.visualization_window_width,
-                                         self.visualization_window_height,
-                                         layout_option=layout_option.new)
+            return initialize_viz_window(
+                self.visualization_window, self.variables,
+                self.plot_outputs_list, self.plot_dropdowns_list,
+                self.layout['visualization_window_width'],
+                self.layout['visualization_window_height'],
+                layout_option=layout_option.new)
 
         self.backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
@@ -292,14 +294,16 @@ class HNNGUI:
             left_tab.set_title(idx, title)
 
         hnn_gui = AppLayout(
-            header=self.header,
-            left_sidebar=left_tab,
+            header=self.header, left_sidebar=left_tab,
             right_sidebar=self.visualization_window,
             footer=self.footer,
             pane_widths=[
-                self.left_sidebar_width, '0px', self.visualization_window_width
+                self.layout['left_sidebar_width'], '0px',
+                self.layout['visualization_window_width']
             ],
-            pane_heights=['50px', self.visualization_window_height, "1"],
+            pane_heights=[
+                '50px', self.layout['visualization_window_height'], "1"
+            ],
         )
 
         self._link_callbacks()
@@ -309,8 +313,8 @@ class HNNGUI:
                               self.variables,
                               self.plot_outputs_list,
                               self.plot_dropdowns_list,
-                              self.visualization_window_width,
-                              self.visualization_window_height,
+                              self.layout['visualization_window_width'],
+                              self.layout['visualization_window_height'],
                               layout_option=self.viz_layout_selection.value,
                               init=True)
 
@@ -842,7 +846,7 @@ def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
                 drive_boxes, tstop)
 
 
-def init_network_from_widgets(params, tstep, tstop, variables, drive_widgets):
+def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets):
     """Construct network and add drives."""
     print("init network")
     params['dt'] = tstep.value
@@ -923,8 +927,8 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
-        init_network_from_widgets(params, tstep, tstop, variables,
-                                  drive_widgets)
+        _init_network_from_widgets(params, tstep, tstop, variables,
+                                   drive_widgets)
 
         print("start simulation")
         if backend_selection.value == "MPI":

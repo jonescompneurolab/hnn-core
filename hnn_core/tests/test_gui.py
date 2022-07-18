@@ -4,7 +4,7 @@ import os.path as op
 
 import hnn_core
 from hnn_core import Dipole, Network, Params
-from hnn_core.gui.gui import HNNGUI, init_network_from_widgets
+from hnn_core.gui.gui import HNNGUI, _init_network_from_widgets
 
 
 def test_gui_load_params():
@@ -67,8 +67,8 @@ def test_gui_init_network():
     """Test if gui initializes network properly"""
     gui = HNNGUI()
     # now the default parameter has been loaded.
-    init_network_from_widgets(gui.params, gui.tstep, gui.tstop, gui.variables,
-                              gui.drive_widgets)
+    _init_network_from_widgets(gui.params, gui.tstep, gui.tstop, gui.variables,
+                               gui.drive_widgets)
 
     # copied from test_network.py
     assert np.isclose(gui.variables['net']._inplane_distance, 1.)  # default
