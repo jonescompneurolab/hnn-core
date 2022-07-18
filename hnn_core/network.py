@@ -840,19 +840,6 @@ class Network(object):
         if name in self.external_drives:
             raise ValueError(f"Drive {name} already defined")
 
-        # cell_sections = [set(self.cell_types[cell_type].sections.keys()) for
-        #                  cell_type in drive['target_types']]
-        # sect_locs = [set(self.cell_types[cell_type].sect_loc.keys()) for
-        #              cell_type in drive['target_types']]
-
-        # valid_cell_sections = set.intersection(*cell_sections)
-        # valid_sect_locs = set.intersection(*sect_locs)
-        # valid_loc = list(valid_cell_sections) + list(valid_sect_locs)
-
-        # _check_option('location', location, valid_loc,
-        #               extra=(f" (the location '{location}' is not defined "
-        #                      "for one of the targeted cells)"))
-
         _validate_type(
             probability, (float, dict), 'probability', 'float or dict')
         # allow passing weights as None, convert to dict here
