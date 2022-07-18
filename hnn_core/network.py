@@ -490,7 +490,10 @@ class Network(object):
         numspikes : int
             Number of spikes at each target cell
         location : str
-            Target location of synapses ('distal' or 'proximal')
+            Target location of synapses. Must be an element of
+            `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
+            group of sections, or an existing section such as 'soma' or
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells)
         n_drive_cells : int | 'n_cells'
             The number of drive cells that each contribute an independently
             sampled synaptic spike to the network according to the Gaussian
@@ -593,7 +596,10 @@ class Network(object):
             provided as a dictionary, in which a key must be present for each
             cell type with non-zero AMPA or NMDA weights.
         location : str
-            Target location of synapses ('distal' or 'proximal')
+            Target location of synapses. Must be an element of
+            `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
+            group of sections, or an existing section such as 'soma' or
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells)
         n_drive_cells : int | 'n_cells'
             The number of drive cells that each contribute an independently
             sampled synaptic spike to the network according to a Poisson
@@ -695,7 +701,10 @@ class Network(object):
             End time of burst trains (defaults to None: tstop is set to the
             end of the simulation)
         location : str
-            Target location of synapses ('distal' or 'proximal')
+            Target location of synapses. Must be an element of
+            `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
+            group of sections, or an existing section such as 'soma' or
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells)
         burst_rate : float
             The mean rate at which cyclic bursts occur (unit: Hz)
         burst_std : float
@@ -802,7 +811,7 @@ class Network(object):
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
-        synaptic_delays : dict
+        synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant
         n_drive_cells : int | 'n_cells'
@@ -830,9 +839,19 @@ class Network(object):
         """
         if name in self.external_drives:
             raise ValueError(f"Drive {name} already defined")
-        if location not in ['distal', 'proximal']:
-            raise ValueError("Allowed drive target locations are: 'distal', "
-                             f"and 'proximal', got {location}")
+
+        # cell_sections = [set(self.cell_types[cell_type].sections.keys()) for
+        #                  cell_type in drive['target_types']]
+        # sect_locs = [set(self.cell_types[cell_type].sect_loc.keys()) for
+        #              cell_type in drive['target_types']]
+
+        # valid_cell_sections = set.intersection(*cell_sections)
+        # valid_sect_locs = set.intersection(*sect_locs)
+        # valid_loc = list(valid_cell_sections) + list(valid_sect_locs)
+
+        # _check_option('location', location, valid_loc,
+        #               extra=(f" (the location '{location}' is not defined "
+        #                      "for one of the targeted cells)"))
 
         _validate_type(
             probability, (float, dict), 'probability', 'float or dict')
@@ -846,6 +865,20 @@ class Network(object):
         if not target_populations.issubset(set(self.cell_types.keys())):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cell_types.keys()}')
+
+        # Ensure location exists for all target cells
+        cell_sections = [set(self.cell_types[cell_type].sections.keys()) for
+                         cell_type in target_populations]
+        sect_locs = [set(self.cell_types[cell_type].sect_loc.keys()) for
+                     cell_type in target_populations]
+
+        valid_cell_sections = set.intersection(*cell_sections)
+        valid_sect_locs = set.intersection(*sect_locs)
+        valid_loc = list(valid_cell_sections) + list(valid_sect_locs)
+
+        _check_option('location', location, valid_loc,
+                      extra=(f" (the location '{location}' is not defined "
+                             "for one of the targeted cells)"))
 
         if self._legacy_mode:
             # allows tests must match HNN GUI output by preserving original
@@ -1179,7 +1212,9 @@ class Network(object):
         valid_loc = list(
             target_sect_loc.keys()) + list(target_sections.keys())
 
-        _check_option('loc', loc, valid_loc)
+        _check_option('loc', loc, valid_loc,
+                      extra=(f" (the loc '{loc}' is not defined "
+                             f"for '{target_type}' cells)"))
         conn['loc'] = loc
 
         # `loc` specifies a group of sections, all must contain the synapse
