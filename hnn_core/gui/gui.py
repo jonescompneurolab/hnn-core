@@ -52,6 +52,44 @@ class HNNGUI:
         The parameters to use for constructing the network.
     variables: dict
         Simulation related objects, such as net and dpls.
+    tstop: Widget
+        Simulation stop time widget.
+    tstep: Widget
+        Simulation step size widget.
+    ntrials: Widget
+        Widget that controls the number of trials in a single simulation.
+    backend_selection: Widget
+        Widget that selects the backend used in simulations.
+    viz_layout_selection: Widget
+        Widget that selects the layout of visualization window.
+    mpi_cmd: Widget
+        Widget that specify the mpi command to use when the backend is
+        MPIBackend.
+    n_jobs: Widget
+        Widget that specify the cores in multi-trial simulations.
+    drive_type_selection: Widget
+        Widget that is used to select the drive to be added to the network.
+    location_selection: Widget.
+        Widget that specifies the location of network drives. Could be proximal
+        or distal.
+    add_drive_button: Widget
+        Clickable widget that is used to add a drive to the network.
+    run_button: Widget
+        Clickable widget that triggers simulation.
+    load_button: Widget
+        Clickable widget that receives uploaded parameter files.
+    delete_drive_button: Widget
+        Clickable widget that clear all existing network drives.
+    plot_outputs_list: list
+        A list of visualization panel outputs.
+    plot_dropdowns_list: list
+        A list of dropdown menus that control the plot types in
+        plot_outputs_list.
+    drive_widgets: list
+        A list of network drive widgets added by add_drive_button.
+    drive_widgets: list
+        A list of network drive layouts.
+
     TODO: add more attributes
     """
 
