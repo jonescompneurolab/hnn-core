@@ -68,8 +68,6 @@ def test_gui_change_connectivity():
     """
     gui = HNNGUI()
     _ = gui.run()
-    # first check if sliders and floattexts are synchornous
-    gui.connectivity_sliders
     for sliders in gui.connectivity_sliders:
         for slider in sliders:
             float_text, slider, _ = slider.children
@@ -79,6 +77,26 @@ def test_gui_change_connectivity():
             for val in (0.2, 0.4, 0.9):
                 slider.value = val
                 assert float_text.value == val
+
+
+def test_gui_add_drives():
+    """Test if gui add different type of drives."""
+    gui = HNNGUI()
+    _ = gui.run()
+
+    for val_drive_type in ("Poisson", "Evoked", "Rhythmic"):
+        for val_location in ("distal", "proximal"):
+            gui.delete_drive_button.click()
+            assert len(gui.drive_widgets) == 0
+
+            gui.drive_type_selection.value = val_drive_type
+            gui.location_selection.value = val_location
+            gui.add_drive_button.click()
+
+            assert len(gui.drive_widgets) == 1
+            assert gui.drive_widgets[0]['type'] == val_drive_type
+            assert gui.drive_widgets[0]['location'] == val_location
+            assert val_drive_type in gui.drive_widgets[0]['name']
 
 
 def test_gui_init_network():
