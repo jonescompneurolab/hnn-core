@@ -495,9 +495,11 @@ class NetworkBuilder(object):
 
                     # get synapse locations
                     syn_keys = list()
-                    if loc in ['proximal', 'distal']:
+                    # Targeting group of sections like proximal or distal
+                    if loc in target_cell.sect_loc:
                         for sect in target_cell.sect_loc[loc]:
                             syn_keys.append(f'{sect}_{receptor}')
+                    # Targeting individual section like soma or apical_tuft
                     else:
                         syn_keys = [f'{loc}_{receptor}']
 
