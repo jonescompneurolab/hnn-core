@@ -1,10 +1,11 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
-import numpy as np
 import os.path as op
 
 import hnn_core
+import numpy as np
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui.gui import HNNGUI, _init_network_from_widgets
+from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 
 def test_gui_load_params():
@@ -111,11 +112,27 @@ def test_gui_init_network():
     assert np.isclose(gui.variables['net']._layer_separation, 1307.4)
 
 
-def test_run_gui():
+@requires_mpi4py
+@requires_psutil
+def test_gui_run_simulation_mpi():
+    """Test if run button triggers simulation with MPIBackend."""
+    gui = HNNGUI()
+    _ = gui.run()
+    gui.backend_selection.value = "MPI"
+    gui.run_button.click()
+    dpls = gui.variables['dpls']
+    assert isinstance(gui.variables["net"], Network)
+    assert isinstance(dpls, list)
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+
+def test_gui_run_simulation():
     """Test if run button triggers simulation."""
     gui = HNNGUI()
     app_layout = gui.run()
     assert app_layout is not None
+    assert gui.backend_selection.value == "Joblib"
+    gui.tstop.value = 20  # speed up tests
     gui.run_button.click()
     dpls = gui.variables['dpls']
     assert isinstance(gui.variables["net"], Network)
@@ -130,21 +147,8 @@ def test_run_gui():
 # 5. Check if the simulation results or network with modified parameters
 #    match.
 
-# def test_gui_run_simulation():
-#     """Test if gui can reproduce the same results as using hnn-core"""
-#     pass
 
 # def test_gui_update_simulation_parameters():
-#     """Test if gui builds new network model after changing simulation
-#     parameters."""
-#     pass
-
-# def test_gui_update_cell_connectivity():
-#     """Test if gui builds new network model after changing simulation
-#     parameters."""
-#     pass
-
-# def test_gui_update_drives():
 #     """Test if gui builds new network model after changing simulation
 #     parameters."""
 #     pass
