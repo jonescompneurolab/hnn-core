@@ -153,38 +153,38 @@ class HNNGUI:
         """
         self.connectivity_sliders = self.init_cell_connectivity(self.params)
         # dynamic larger components
-        self.drives_out = Output()  # window to add new drives
-        self.log_out = Output(
+        self._drives_out = Output()  # window to add new drives
+        self._log_out = Output(
             layout={
                 'border': '1px solid gray',
                 'height': self.layout['log_window_height'],
                 'overflow': 'auto'
             })
         # visualization window
-        self.visualization_window = Output(layout={
+        self._visualization_window = Output(layout={
             'height': self.layout['visualization_window_height'],
             'width': self.layout['visualization_window_width'],
         })
         # detailed configuration of backends
-        self.backend_config = Output()
+        self._backend_config_out = Output()
 
         # static parts
         # Running status
-        self.simulation_status = HTML(value="""<div
+        self._simulation_status = HTML(value="""<div
             style='background:gray;padding-left:10px;color:white;'>
             Not running</div>""")
 
         # footer
-        self.footer = VBox([
+        self._footer = VBox([
             HBox([
                 HBox([
                     self.run_button, self.load_button, self.delete_drive_button
                 ], layout={"width": self.layout['left_sidebar_width']}),
                 self.viz_layout_selection,
-            ]), self.log_out, self.simulation_status
+            ]), self._log_out, self._simulation_status
         ])
         # title
-        self.header = HTML(value=f"""<div
+        self._header = HTML(value=f"""<div
             style='background:{self.layout['theme_color']};
             text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
@@ -220,17 +220,18 @@ class HNNGUI:
     def _link_callbacks(self):
         # link callbacks
         def _handle_backend_change(backend_type):
-            return handle_backend_change(backend_type.new, self.backend_config,
+            return handle_backend_change(backend_type.new,
+                                         self._backend_config_out,
                                          self.mpi_cmd, self.n_jobs)
 
         def _add_drive_button_clicked(b):
             return add_drive_widget(self.drive_type_selection.value,
                                     self.drive_boxes, self.drive_widgets,
-                                    self.drives_out, self.tstop,
+                                    self._drives_out, self.tstop,
                                     self.location_selection.value)
 
         def _delete_drives_clicked(b):
-            self.drives_out.clear_output()
+            self._drives_out.clear_output()
             # black magic: the following does not work
             # global drive_widgets; drive_widgets = list()
             while len(self.drive_widgets) > 0:
@@ -240,20 +241,20 @@ class HNNGUI:
         def _on_upload_change(change):
             return on_upload_change(change, self.connectivity_sliders,
                                     self.params, self.tstop, self.tstep,
-                                    self.log_out, self.variables,
+                                    self._log_out, self.variables,
                                     self.drive_boxes, self.drive_widgets,
-                                    self.drives_out)
+                                    self._drives_out)
 
         def _run_button_clicked(b):
             return run_button_clicked(
-                self.log_out, self.drive_widgets, self.variables, self.tstep,
+                self._log_out, self.drive_widgets, self.variables, self.tstep,
                 self.tstop, self.ntrials, self.backend_selection, self.mpi_cmd,
                 self.n_jobs, self.params, self.plot_outputs_list,
-                self.plot_dropdowns_list, self.simulation_status, b)
+                self.plot_dropdowns_list, self._simulation_status, b)
 
         def _handle_viz_layout_change(layout_option):
             return initialize_viz_window(
-                self.visualization_window, self.variables,
+                self._visualization_window, self.variables,
                 self.plot_outputs_list, self.plot_dropdowns_list,
                 self.layout['visualization_window_width'],
                 self.layout['visualization_window_height'],
@@ -270,7 +271,7 @@ class HNNGUI:
         # compose widgets
         simulation_box = VBox([
             self.tstop, self.tstep, self.ntrials, self.backend_selection,
-            self.backend_config
+            self._backend_config_out
         ])
 
         # accordians to group local-connectivity by cell type
@@ -289,7 +290,7 @@ class HNNGUI:
             self.add_drive_button
         ])
         # from IPywidgets > 8.0
-        drives_options = VBox([drive_selections, self.drives_out])
+        drives_options = VBox([drive_selections, self._drives_out])
         # Tabs for left pane
         left_tab = Tab()
         left_tab.children = [simulation_box, cell_connectivity, drives_options]
@@ -298,9 +299,9 @@ class HNNGUI:
             left_tab.set_title(idx, title)
 
         hnn_gui = AppLayout(
-            header=self.header, left_sidebar=left_tab,
-            right_sidebar=self.visualization_window,
-            footer=self.footer,
+            header=self._header, left_sidebar=left_tab,
+            right_sidebar=self._visualization_window,
+            footer=self._footer,
             pane_widths=[
                 self.layout['left_sidebar_width'], '0px',
                 self.layout['visualization_window_width']
@@ -313,7 +314,7 @@ class HNNGUI:
         self._link_callbacks()
 
         # initialize visualization
-        initialize_viz_window(self.visualization_window,
+        initialize_viz_window(self._visualization_window,
                               self.variables,
                               self.plot_outputs_list,
                               self.plot_dropdowns_list,
@@ -324,8 +325,9 @@ class HNNGUI:
 
         # load initial drives
         # initialize drive ipywidgets
-        load_drives(self.variables, self.params, self.log_out, self.drives_out,
-                    self.drive_widgets, self.drive_boxes, self.tstop)
+        load_drives(self.variables, self.params, self._log_out,
+                    self._drives_out, self.drive_widgets, self.drive_boxes,
+                    self.tstop)
 
         return hnn_gui
 
