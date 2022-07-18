@@ -228,19 +228,22 @@ names of section locations that are proximal or distal.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tonic_bias</span></code></a>(amplitude, t0, tstop[, loc])</p></td>
 <td><p>Create tonic bias at the soma.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.modify_section" title="hnn_core.Cell.modify_section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_section</span></code></a>(sec_name[, L, diam, cm, Ra])</p></td>
+<td><p>Change attributes of section specified by <em class="xref py py-obj">sec_name</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, ...)</p></td>
 <td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, cell_types, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, cell_types, show])</p></td>
 <td><p>Plot the cell morphology.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
 <td><p>Record current and voltage at soma.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
 <td><p>Created for _PC.cell and specifies SOURCES of spikes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
 <td><p>Create an h.Exp2Syn synapse.</p></td>
 </tr>
 </tbody>
@@ -291,6 +294,30 @@ of a pyramidal neuron.</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.modify_section">
+<span class="sig-name descname"><span class="pre">modify_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sec_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.modify_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.modify_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change attributes of section specified by <em class="xref py py-obj">sec_name</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sec_name</strong><span class="classifier">str</span></dt><dd><p>Name of section to be modified. Must be a key of Cell.sections</p>
+</dd>
+<dt><strong>L</strong><span class="classifier">float | int | None</span></dt><dd><p>length of a section in microns. Default None.</p>
+</dd>
+<dt><strong>diam</strong><span class="classifier">float | int | None</span></dt><dd><p>diameter of a section in microns.</p>
+</dd>
+<dt><strong>cm</strong><span class="classifier">float | int | None</span></dt><dd><p>membrane capacitance in micro-Farads.</p>
+</dd>
+<dt><strong>Ra</strong><span class="classifier">float | int | None</span></dt><dd><p>axial resistivity in ohm-cm.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Leaving default of None produces no change.</p>
 </dd></dl>
 
 <dl class="py method">

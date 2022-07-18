@@ -172,7 +172,11 @@
 <a class="reference internal" href="generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked" title="hnn_core.optimization.optimize_evoked"><code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code></a>, by <a class="reference external" href="https://github.com/mohdsherif/">Mohamed A. Sherif</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/478">#478</a>.</p></li>
 <li><p>Changed <code class="docutils literal notranslate"><span class="pre">conn_seed</span></code> default to <code class="docutils literal notranslate"><span class="pre">None</span></code> (from <code class="docutils literal notranslate"><span class="pre">3</span></code>) in <code class="xref py py-func docutils literal notranslate"><span class="pre">add_connection()</span></code>,
 by <a class="reference external" href="https://github.com/mjpelah">Mattan Pelah</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/492">#492</a>.</p></li>
+<li><p>Add interface to modify attributes of sections in</p></li>
 </ul>
+<blockquote>
+<div><p><a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell.modify_section" title="hnn_core.Cell.modify_section"><code class="xref py py-func docutils literal notranslate"><span class="pre">modify_section()</span></code></a>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/481">#481</a></p>
+</div></blockquote>
 </section>
 <section id="bug">
 <h3>Bug<a class="headerlink" href="#bug" title="Permalink to this heading">¶</a></h3>
@@ -192,6 +196,8 @@ a drive if it is not already specified, by <a class="reference external" href="h
 and <a class="reference internal" href="generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist" title="hnn_core.viz.plot_spikes_hist"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_spikes_hist()</span></code></a>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/472">#472</a>.</p></li>
 <li><p>Add option to plot the averaged dipole in <a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_dipole</span></code></a> when <em class="xref py py-obj">dpl</em>
 is a list of dipoles, by <a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/475">#475</a>.</p></li>
+<li><p>Fix bug where <code class="xref py py-func docutils literal notranslate"><span class="pre">plot_morphology()</span></code> did not accurately
+reflect the shape of the cell being simulated, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/481">#481</a></p></li>
 </ul>
 </section>
 <section id="api">
