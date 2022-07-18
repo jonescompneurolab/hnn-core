@@ -42,12 +42,16 @@ class HNNGUI:
         The height of the visualization window (in pixel).
     left_sidebar_width: str
         The width of the left side bar (in pixel).
-    TODO: add more parameters.
-
+    drive_widget_width: str
+        The width of network drive tab  (in pixel).
     Attributes
     ----------
+    layout: dict
+        The styling configuration of GUI.
     params: dict
         The parameters to use for constructing the network.
+    variables: dict
+        Simulation related objects, such as net and dpls.
     TODO: add more attributes
     """
 
