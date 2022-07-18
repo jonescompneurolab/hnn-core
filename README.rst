@@ -1,7 +1,7 @@
 hnn-core
 ========
 
-|tests| |CircleCI| |Codecov| |PyPI| |voila-binder|
+|tests| |CircleCI| |Codecov| |PyPI|
 
 |HNN-GUI|
 
@@ -16,9 +16,6 @@ hnn-core
 
 .. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
 	:target: https://pypi.org/project/hnn-core/
-
-.. |voila-binder| .. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/HEAD?urlpath=voila%2Frender%2Fhnn_core%2Fgui%2Fhnn_widget.ipynb
 
 .. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
 
