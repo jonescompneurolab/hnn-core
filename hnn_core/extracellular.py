@@ -24,8 +24,25 @@ import numpy as np
 from copy import deepcopy
 from numpy.linalg import norm
 from neuron import h
+import quantities as pq
 
 from .externals.mne import _validate_type, _check_option
+
+
+def csd1D_2ndD(data, ch_axis=0, delta=1):
+
+    # calculate 1-dimensional csd using 2nd spatial derivative method
+    # ref: Wójcik D.K. (2014) Current Source Density (CSD) Analysis.
+    # In: Jaeger D., Jung R. (eds) Encyclopedia of Computational Neuroscience.
+    csd2d = -np.diff(np.diff(data, axis=ch_axis), axis=ch_axis) / delta ** 2
+
+    # interpolates border electrodes
+    border_1 = np.take(csd2d, 0, axis=ch_axis) * 2 - np.take(csd2d, 1, axis=ch_axis)
+    border_2 = np.take(csd2d, -1, axis=ch_axis) * 2 - np.take(csd2d, -2, axis=ch_axis)
+
+    csd2d = np.concatenate([np.expand_dims(border_1, axis=ch_axis),
+                            csd2d, np.expand_dims(border_2, axis=ch_axis)], axis=ch_axis)
+    return csd2d
 
 
 def _transfer_resistance(section, electrode_pos, conductivity, method,
@@ -426,7 +443,24 @@ class ExtracellularArray:
                 contact_labels=contact_labels,
                 show=show)
         return fig
+   
+   
+    def tcsd(self, trial_no=0, colorbar=True, ax=None, show=True):
+        
+        from .viz import plot_tcsd
+        lfp = self.voltages[trial_no] * 1E-6 * pq.V
 
+        csd2d = csd1D_2ndD(data=lfp,
+                            ch_axis=0,
+                            delta=1)
+
+        fig = plot_tcsd(csd2d,
+                       self.times,
+                       ax=ax,
+                       colorbar=colorbar,
+                       show=show)
+      
+        return fig
 
 class _ExtracellularArrayBuilder(object):
     """The _ExtracellularArrayBuilder class
