@@ -11,7 +11,8 @@ from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
 
 
-def jones_2009_model(params=None, add_drives_from_params=False):
+def jones_2009_model(params=None, add_drives_from_params=False,
+                     legacy_mode=True):
     """Instantiate the Jones et al. 2009 model.
 
     Parameters
@@ -24,6 +25,9 @@ def jones_2009_model(params=None, add_drives_from_params=False):
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
+    legacy_mode : bool
+        Set to True by default to enable matching HNN GUI output when drives
+        are added suitably. Will be deprecated in a future release.
 
     Returns
     -------
@@ -45,7 +49,8 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     if isinstance(params, str):
         params = read_params(params)
 
-    net = Network(params, add_drives_from_params=add_drives_from_params)
+    net = Network(params, add_drives_from_params=add_drives_from_params,
+                  legacy_mode=legacy_mode)
 
     delay = net.delay
 
@@ -159,7 +164,8 @@ def jones_2009_model(params=None, add_drives_from_params=False):
     return net
 
 
-def law_2021_model(params=None, add_drives_from_params=False):
+def law_2021_model(params=None, add_drives_from_params=False,
+                   legacy_mode=True):
     """Instantiate the beta modulated ERP network model.
 
     Returns
@@ -237,7 +243,8 @@ def law_2021_model(params=None, add_drives_from_params=False):
 
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
-def calcium_model(params=None, add_drives_from_params=False):
+def calcium_model(params=None, add_drives_from_params=False,
+                  legacy_mode=True):
     """Instantiate the Jones 2009 model with improved calcium dynamics.
 
     Returns

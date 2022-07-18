@@ -173,6 +173,28 @@ def test_add_drives():
         assert drive_conn['nc_dict']['A_weight'] == weights_ampa[target_type]
         assert drive_conn['nc_dict']['A_delay'] == syn_delays[target_type]
 
+    # Test drive targetting specific section
+    # Section present on all cells indicated
+    location = 'apical_tuft'
+    weights_ampa_tuft = {'L2_pyramidal': 1.0, 'L5_pyramidal': 2.0}
+    syn_delays_tuft = {'L2_pyramidal': 1.0, 'L5_pyramidal': 2.0}
+    net.add_bursty_drive(
+        'bursty_tuft', location=location, burst_rate=10,
+        weights_ampa=weights_ampa_tuft, synaptic_delays=syn_delays_tuft,
+        n_drive_cells=10)
+    assert net.connectivity[-1]['loc'] == location
+
+    # Section not present on cells indicated
+    location = 'apical_tuft'
+    weights_ampa_no_tuft = {'L2_pyramidal': 1.0, 'L5_basket': 2.0}
+    syn_delays_no_tuft = {'L2_pyramidal': 1.0, 'L5_basket': 2.0}
+    match = ('Invalid value for')
+    with pytest.raises(ValueError, match=match):
+        net.add_bursty_drive(
+            'bursty_no_tuft', location=location, burst_rate=10,
+            weights_ampa=weights_ampa_no_tuft,
+            synaptic_delays=syn_delays_no_tuft, n_drive_cells=n_drive_cells)
+
     # Test probabalistic drive connections.
     # drive with cell_specific=False
     n_drive_cells = 10
@@ -234,9 +256,11 @@ def test_add_drives():
 
     # Test Network._attach_drive()
     with pytest.raises(ValueError,
-                       match=r'Allowed drive target locations are'):
+                       match='Invalid value for'):
         net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
-                             location='bogus_location')
+                             location='bogus_location',
+                             weights_ampa={'L5_basket': 1.},
+                             synaptic_delays={'L5_basket': .1})
     with pytest.raises(ValueError,
                        match='Drive evoked_dist already defined'):
         net.add_evoked_drive('evoked_dist', mu=10, sigma=1, numspikes=1,
@@ -347,7 +371,7 @@ def test_add_drives():
                               weights_ampa=weights_ampa,
                               synaptic_delays=syn_delays)
     with pytest.raises(ValueError,
-                       match='Allowed drive target locations are:'):
+                       match='Invalid value for the'):
         net.add_poisson_drive('weird_poisson', location='inbetween',
                               rate_constant=10.,
                               weights_ampa=weights_ampa,
