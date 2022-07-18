@@ -86,7 +86,7 @@ To start the GUI, please do::
 **Parallel backends**
 
 For further instructions on installation and usage of parallel backends for using more
-than one CPU core, refer to our :doc:`parallel backend guide <parallel>`.
+than one CPU core, refer to our `parallel backend guide`_.
 
 **Note for Windows users**
 
@@ -133,4 +133,5 @@ Interested in Contributing?
 
 Read our `contributing guide`_.
 
+.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
