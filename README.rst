@@ -131,4 +131,6 @@ report bugs. For user questions and scientific discussions, please join the
 Interested in Contributing?
 ===========================
 
-Read our :doc:`contributing guide <contributing>`.
+Read our `contributing guide`_.
+
+.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
