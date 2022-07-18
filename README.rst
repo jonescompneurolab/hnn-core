@@ -1,21 +1,23 @@
 hnn-core
 ========
 
-.. image:: https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg
+|tests| |CircleCI| |Codecov| |PyPI|
+
+|HNN-GUI|
+
+.. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
+   :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
+
+.. |CircleCI| image:: https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg
    :target: https://circleci.com/gh/jonescompneurolab/hnn-core
-   :alt: CircleCi
 
-.. image:: https://api.travis-ci.org/jonescompneurolab/hnn-core.svg?branch=master
-    :target: https://travis-ci.org/jonescompneurolab/hnn-core
-    :alt: Build Status
-
-.. image:: https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg
+.. |Codecov| image:: https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg
 	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
-	:alt: Test coverage
 
-.. image:: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
-   :target: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
-   :alt: HNN-core GUI
+.. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
+	:target: https://pypi.org/project/hnn-core/
+
+.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
 
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
@@ -84,7 +86,7 @@ To start the GUI, please do::
 **Parallel backends**
 
 For further instructions on installation and usage of parallel backends for using more
-than one CPU core, refer to our :doc:`parallel backend guide <parallel>`.
+than one CPU core, refer to our `parallel backend guide`_.
 
 **Note for Windows users**
 
@@ -129,4 +131,7 @@ report bugs. For user questions and scientific discussions, please join the
 Interested in Contributing?
 ===========================
 
-Read our :doc:`contributing guide <contributing>`.
+Read our `contributing guide`_.
+
+.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
+.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
