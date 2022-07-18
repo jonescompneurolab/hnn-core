@@ -82,8 +82,8 @@ dpl = simulate_dipole(net, tstop=170)
 trial_idx = 0
 window_len = 10  # ms
 decimate = [5, 4]  # from 40k to 8k to 2k
-fig, axs = plt.subplots(3, 1, sharex=True, figsize=(6, 8),
-                        gridspec_kw={'height_ratios': [1, 3, 2]})
+
+fig, axs = plt.subplots(4, 1, sharex=True, figsize=(6, 8), gridspec_kw={'height_ratios': [1, 3, 3, 3]})
 
 # Then plot the aggregate dipole time series on its own axis
 dpl[trial_idx].copy().smooth(
@@ -107,7 +107,7 @@ net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
 
 # Finally, add the CSD to the bottom subplot
 net.rec_arrays['shank1'].copy().smooth(window_len=window_len).tcsd(
-    colorbar=True, trial_no=0, ax=axs[3])
+    ax=axs[3], colorbar=True)
 
 plt.tight_layout()
 plt.show()
