@@ -102,8 +102,13 @@ net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
 
 axs[1].grid(True, which='major', axis='x')
 axs[1].set_xlabel('')
-# Finally, add the spike raster to the bottom subplot
+# Add the spike raster to the subplot
 net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
+
+# Finally, add the CSD to the bottom subplot
+net.rec_arrays['shank1'].copy().smooth(window_len=window_len).tcsd(
+    colorbar=True, trial_no=0, ax=axs[3])
+
 plt.tight_layout()
 plt.show()
 
