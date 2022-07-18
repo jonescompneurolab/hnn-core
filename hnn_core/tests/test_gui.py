@@ -63,6 +63,24 @@ def test_gui_upload_params():
     assert len(gui.drive_widgets) == original_drive_count
 
 
+def test_gui_change_connectivity():
+    """Test if GUI properly changes cell connectivity parameters.
+    """
+    gui = HNNGUI()
+    _ = gui.run()
+    # first check if sliders and floattexts are synchornous
+    gui.connectivity_sliders
+    for sliders in gui.connectivity_sliders:
+        for slider in sliders:
+            float_text, slider, _ = slider.children
+            for val in (0.2, 0.4, 0.9):
+                float_text.value = val
+                assert slider.value == val
+            for val in (0.2, 0.4, 0.9):
+                slider.value = val
+                assert float_text.value == val
+
+
 def test_gui_init_network():
     """Test if gui initializes network properly"""
     gui = HNNGUI()
