@@ -591,7 +591,7 @@ class Cell:
                 for syn_name in self.rec_isec[sec_name]:
                     self.rec_isec[sec_name][syn_name] = h.Vector()
 
-                    self.rec_isec[syn_name][syn_name].record(
+                    self.rec_isec[sec_name][syn_name].record(
                         self._nrn_synapses[syn_name]._ref_i)
 
     def syn_create(self, secloc, e, tau1, tau2):
