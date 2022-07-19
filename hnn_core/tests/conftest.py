@@ -76,7 +76,8 @@ def run_hnn_core_fixture():
     def _run_hnn_core_fixture(backend=None, n_procs=None, n_jobs=1,
                               reduced=False, record_vsoma=False,
                               record_isoma=False, postproc=False,
-                              electrode_array=None):
+                              electrode_array=None, record_vsec=False,
+                              record_isec=False):
         hnn_core_root = op.dirname(hnn_core.__file__)
 
         # default params
@@ -101,16 +102,22 @@ def run_hnn_core_fixture():
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                        record_isoma=record_vsoma,
-                                       postproc=postproc, tstop=tstop)
+                                       postproc=postproc, tstop=tstop,
+                                       record_vsec=record_vsec,
+                                       record_isec=record_isec)
         elif backend == 'joblib':
             with JoblibBackend(n_jobs=n_jobs):
                 dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                        record_isoma=record_vsoma,
-                                       postproc=postproc, tstop=tstop)
+                                       postproc=postproc, tstop=tstop,
+                                       record_vsec=record_vsec,
+                                       record_isec=record_isec)
         else:
             dpls = simulate_dipole(net, record_vsoma=record_isoma,
                                    record_isoma=record_vsoma,
-                                   postproc=postproc, tstop=tstop)
+                                   postproc=postproc, tstop=tstop,
+                                   record_vsec=record_vsec,
+                                   record_isec=record_isec)
 
         # check that the network object is picklable after the simulation
         pickle.dumps(net)
