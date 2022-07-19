@@ -987,6 +987,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
             Running...</div>"""
             variables['dpls'] = simulate_dipole(variables['net'],
                                                 tstop=tstop.value,
+                                                dt=tstep.value,
                                                 n_trials=ntrials.value)
 
             window_len, scaling_factor = 30, 3000
