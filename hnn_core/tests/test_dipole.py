@@ -155,9 +155,11 @@ def test_cell_response_backends(run_hnn_core_fixture):
     trial_idx, n_trials, gid = 0, 2, 7
     _, joblib_net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
                                          reduced=True, record_isoma=True,
-                                         record_vsoma=True)
+                                         record_vsoma=True, record_vsec=True,
+                                         record_isec=True)
     _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
-                                      record_isoma=True, record_vsoma=True)
+                                      record_isoma=True, record_vsoma=True,
+                                      record_vsec=True, record_isec=True)
     n_times = len(joblib_net.cell_response.times)
 
     assert len(joblib_net.cell_response.vsoma) == n_trials
@@ -173,6 +175,21 @@ def test_cell_response_backends(run_hnn_core_fixture):
                trial_idx][gid]['soma_gabaa']) == n_times
     assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
     assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
+
+    assert len(joblib_net.cell_response.vsec) == n_trials
+    assert len(joblib_net.cell_response.isec) == n_trials
+    assert len(joblib_net.cell_response.vsec[
+        trial_idx][gid]['soma']) == n_times
+    assert len(joblib_net.cell_response.isec[
+               trial_idx][gid]['soma']['soma_gabaa']) == n_times
+
+    assert len(mpi_net.cell_response.vsec) == n_trials
+    assert len(mpi_net.cell_response.isec) == n_trials
+    assert len(mpi_net.cell_response.vsec[trial_idx][gid]['soma']) == n_times
+    assert len(mpi_net.cell_response.isec[
+               trial_idx][gid]['soma']['soma_gabaa']) == n_times
+    assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
+    assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
 
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
