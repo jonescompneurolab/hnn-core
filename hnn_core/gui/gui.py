@@ -23,7 +23,7 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
                         FloatLogSlider, FloatSlider, FloatText, GridspecLayout,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
-                        VBox, interactive_output, link)
+                        VBox, link)
 
 
 class HNNGUI:
@@ -171,6 +171,10 @@ class HNNGUI:
             description='Load network',
             button_style='success')
 
+        self.clear_button = create_expanded_button(
+            'Clear uploaded parameters', 'danger', height='30px',
+            button_color=self.layout['theme_color'])
+
         self.delete_drive_button = create_expanded_button(
             'Delete drives', 'success', height='30px',
             button_color=self.layout['theme_color'])
@@ -186,13 +190,13 @@ class HNNGUI:
         # Connectivity list
         self.connectivity_sliders = list()
 
+        self._load_info = {"count": 0, "prev_param_data": b""}
         self._init_ui_components()
 
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows. It's
         not encouraged for users to modify or access attributes in this part.
         """
-        # self.connectivity_sliders = self.init_cell_connectivity(self.params)
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
@@ -220,8 +224,9 @@ class HNNGUI:
         self._footer = VBox([
             HBox([
                 HBox([
-                    self.run_button, self.load_button, self.delete_drive_button
-                ], layout={"width": self.layout['left_sidebar_width']}),
+                    self.run_button, self.load_button, self.clear_button,
+                    self.delete_drive_button
+                ]),
                 self.viz_layout_selection,
             ]), self._log_out, self._simulation_status
         ])
@@ -238,26 +243,6 @@ class HNNGUI:
             params_fname = op.join(hnn_core_root, 'param', 'default.json')
 
         return read_params(params_fname)
-
-    @staticmethod
-    def init_cell_connectivity(params):
-        return [
-            _get_sliders(params, [
-                'gbar_L2Pyr_L2Pyr_ampa', 'gbar_L2Pyr_L2Pyr_nmda',
-                'gbar_L2Basket_L2Pyr_gabaa', 'gbar_L2Basket_L2Pyr_gabab'
-            ]),
-            _get_sliders(params, [
-                'gbar_L2Pyr_L5Pyr', 'gbar_L2Basket_L5Pyr',
-                'gbar_L5Pyr_L5Pyr_ampa', 'gbar_L5Pyr_L5Pyr_nmda',
-                'gbar_L5Basket_L5Pyr_gabaa', 'gbar_L5Basket_L5Pyr_gabab'
-            ]),
-            _get_sliders(params,
-                         ['gbar_L2Pyr_L2Basket', 'gbar_L2Basket_L2Basket']),
-            _get_sliders(params, [
-                'gbar_L2Pyr_L5Basket', 'gbar_L5Pyr_L5Basket',
-                'gbar_L5Basket_L5Basket'
-            ])
-        ]
 
     def _link_callbacks(self):
         # link callbacks
@@ -281,11 +266,13 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_change(change):
+            with self._log_out:
+                print("received new uploaded params file...")
             return on_upload_change(change, self.params, self.tstop,
                                     self.tstep, self._log_out, self.variables,
                                     self.drive_boxes, self.drive_widgets,
                                     self._drives_out, self._connectivity_out,
-                                    self.connectivity_sliders)
+                                    self.connectivity_sliders, self._load_info)
 
         def _run_button_clicked(b):
             return run_button_clicked(
@@ -303,11 +290,16 @@ class HNNGUI:
                 self.layout['visualization_window_height'],
                 layout_option=layout_option.new)
 
+        def _clear_params(b):
+            self._load_info["count"] = 0
+            self._load_info["prev_param_data"] = 0
+
         self.backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
         self.load_button.observe(_on_upload_change)
         self.run_button.on_click(_run_button_clicked)
+        self.clear_button.on_click(_clear_params)
         self.viz_layout_selection.observe(_handle_viz_layout_change, 'value')
 
     def run(self):
@@ -368,12 +360,12 @@ class HNNGUI:
                               layout_option=self.viz_layout_selection.value,
                               init=True)
 
-        # load initial drives
-        # initialize drive ipywidgets
+        # initialize drive and connectivity ipywidgets
         load_drive_and_connectivity(self.variables, self.params, self._log_out,
                                     self._drives_out, self.drive_widgets,
                                     self.drive_boxes, self._connectivity_out,
-                                    self.connectivity_sliders, self.tstop)
+                                    self.connectivity_sliders, self.tstop,
+                                    self._load_info)
 
         return hnn_gui
 
@@ -386,46 +378,7 @@ def create_expanded_button(description, button_style, height, disabled=False,
                   disabled=disabled)
 
 
-def _get_sliders(params, param_keys):
-    """Get sliders"""
-    style = {'description_width': '150px'}
-    sliders = list()
-    for d in param_keys:
-        text_input = FloatText(value=params[d],
-                               disabled=False, continuous_update=False,
-                               description=d.split('gbar_')[1],
-                               style=style)
-
-        slider = FloatLogSlider(value=params[d],
-                                min=-5,
-                                max=1,
-                                step=0.2,
-                                description=" ",
-                                disabled=False,
-                                continuous_update=False,
-                                orientation='horizontal',
-                                readout=False,
-                                readout_format='.2e',
-                                style=style)
-
-        link((slider, 'value'), (text_input, 'value'))
-        sliders.append(
-            VBox([
-                text_input, slider,
-                HTML(value="<hr style='margin-bottom:5px'/>")
-            ]))
-
-    def _update_params(**updates):
-        logging.debug(f'Connectivity parameters updates: {updates}')
-        params.update(dict(**updates))
-    # must use the first one as it could be zero.
-    interactive_output(_update_params,
-                       {s.children[0].description: s.children[0]
-                        for s in sliders})
-    return sliders
-
-
-def _get_connectivity_sliders(conn_data):
+def _get_connectivity_widgets(conn_data):
     """Get sliders"""
     style = {'description_width': '150px'}
     style = {}
@@ -876,11 +829,9 @@ def update_plot_window(variables, _plot_out, plot_type):
 
 def load_drive_and_connectivity(variables, params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop):
+                                connectivity_sliders, tstop, load_info):
     """Add drive and connectivity ipywidgets from params."""
-    log_out.clear_output()
-    with log_out:
-        print("call load_drive_and_connectivity...")
+    load_info['count'] += 1
     # init the network.
     variables['net'] = jones_2009_model(params)
 
@@ -890,6 +841,7 @@ def load_drive_and_connectivity(variables, params, log_out, drives_out,
     locations = ('proximal', 'distal', 'soma')
 
     # clear existing connectivity
+    connectivity_out.clear_output()
     while len(connectivity_sliders) > 0:
         connectivity_sliders.pop()
 
@@ -924,14 +876,13 @@ def load_drive_and_connectivity(variables, params, log_out, drives_out,
                 connectivity_names.append(
                     f"{src_gids}→{target_gids} ({location})")
                 connectivity_sliders.append(
-                    _get_connectivity_sliders(receptor_related_conn))
+                    _get_connectivity_widgets(receptor_related_conn))
 
     connectivity_boxes = [VBox(slider) for slider in connectivity_sliders]
     cell_connectivity = Accordion(children=connectivity_boxes)
     for idx, connectivity_name in enumerate(connectivity_names):
         cell_connectivity.set_title(idx, connectivity_name)
 
-    connectivity_out.clear_output()
     with connectivity_out:
         display(cell_connectivity)
 
@@ -972,7 +923,7 @@ def load_drive_and_connectivity(variables, params, log_out, drives_out,
 
 def on_upload_change(change, params, tstop, tstep, log_out, variables,
                      drive_boxes, drive_widgets, drives_out, connectivity_out,
-                     connectivity_sliders):
+                     connectivity_sliders, load_info):
     if len(change['owner'].value) == 0:
         return
 
@@ -982,19 +933,20 @@ def on_upload_change(change, params, tstop, tstep, log_out, variables,
     param_data = list(file_uploaded.values())[0]['content']
     param_data = codecs.decode(param_data, encoding="utf-8")
 
+    if load_info['prev_param_data'] == param_data:
+        with log_out:
+            print("Same param. No reloading")
+        return
+    else:
+        load_info['prev_param_data'] = param_data
+
     ext = op.splitext(params_fname)[1]
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
     params_network = read_func[ext](param_data)
 
-    log_out.clear_output()
     # update simulation settings and params
+    log_out.clear_output()
     with log_out:
-        # print(f"parameter key: {params_network.keys()}")
-        # for slider in sliders:
-        #     for sl in slider:
-        #         key = 'gbar_' + sl.children[0].description
-        #         sl.value = params_network[key]
-
         if 'tstop' in params_network.keys():
             tstop.value = params_network['tstop']
         if 'dt' in params_network.keys():
@@ -1004,7 +956,7 @@ def on_upload_change(change, params, tstop, tstep, log_out, variables,
     # init network, add drives & connectivity
     load_drive_and_connectivity(variables, params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop)
+                                connectivity_sliders, tstop, load_info)
 
 
 def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
@@ -1017,7 +969,7 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
         params,
         add_drives_from_params=False,
     )
-    # adjust connectivity
+    # adjust connectivity according to the connectivity_tab
     for connectivity_slider in connectivity_sliders:
         for vbox in connectivity_slider:
             conn_indices = pick_connection(
