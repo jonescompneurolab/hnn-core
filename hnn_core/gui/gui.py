@@ -9,22 +9,21 @@ import multiprocessing
 import os.path as op
 import sys
 
+import hnn_core
 import matplotlib.pyplot as plt
 import numpy as np
-
-from IPython.display import display
-from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
-                        BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatLogSlider, FloatText, GridspecLayout, HBox,
-                        IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
-                        interactive_output, link)
-
-import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
                       simulate_dipole)
+from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
 from hnn_core.viz import plot_dipole
+from IPython.display import display
+from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
+                        BoundedIntText, Button, Dropdown, FileUpload,
+                        FloatLogSlider, FloatSlider, FloatText, GridspecLayout,
+                        HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
+                        VBox, interactive_output, link)
 
 
 class HNNGUI:
@@ -179,9 +178,13 @@ class HNNGUI:
         # Visualization figure list
         self.plot_outputs_list = list()
         self.plot_dropdowns_list = list()
+
         # Add drive section
         self.drive_widgets = list()
         self.drive_boxes = list()
+
+        # Connectivity list
+        self.connectivity_sliders = list()
 
         self._init_ui_components()
 
@@ -189,9 +192,10 @@ class HNNGUI:
         """Initialize larger UI components and dynamical output windows. It's
         not encouraged for users to modify or access attributes in this part.
         """
-        self.connectivity_sliders = self.init_cell_connectivity(self.params)
+        # self.connectivity_sliders = self.init_cell_connectivity(self.params)
         # dynamic larger components
-        self._drives_out = Output()  # window to add new drives
+        self._drives_out = Output()  # tab to add new drives
+        self._connectivity_out = Output()  # tab to tune connectivity.
         self._log_out = Output(
             layout={
                 'border': '1px solid gray',
@@ -277,18 +281,19 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_change(change):
-            return on_upload_change(change, self.connectivity_sliders,
-                                    self.params, self.tstop, self.tstep,
-                                    self._log_out, self.variables,
+            return on_upload_change(change, self.params, self.tstop,
+                                    self.tstep, self._log_out, self.variables,
                                     self.drive_boxes, self.drive_widgets,
-                                    self._drives_out)
+                                    self._drives_out, self._connectivity_out,
+                                    self.connectivity_sliders)
 
         def _run_button_clicked(b):
             return run_button_clicked(
                 self._log_out, self.drive_widgets, self.variables, self.tstep,
                 self.tstop, self.ntrials, self.backend_selection, self.mpi_cmd,
                 self.n_jobs, self.params, self.plot_outputs_list,
-                self.plot_dropdowns_list, self._simulation_status, b)
+                self.plot_dropdowns_list, self._simulation_status,
+                self.connectivity_sliders, b)
 
         def _handle_viz_layout_change(layout_option):
             return initialize_viz_window(
@@ -331,7 +336,9 @@ class HNNGUI:
         drives_options = VBox([drive_selections, self._drives_out])
         # Tabs for left pane
         left_tab = Tab()
-        left_tab.children = [simulation_box, cell_connectivity, drives_options]
+        left_tab.children = [
+            simulation_box, self._connectivity_out, drives_options
+        ]
         titles = ['Simulation', 'Cell connectivity', 'Drives']
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
@@ -363,9 +370,10 @@ class HNNGUI:
 
         # load initial drives
         # initialize drive ipywidgets
-        load_drives(self.variables, self.params, self._log_out,
-                    self._drives_out, self.drive_widgets, self.drive_boxes,
-                    self.tstop)
+        load_drive_and_connectivity(self.variables, self.params, self._log_out,
+                                    self._drives_out, self.drive_widgets,
+                                    self.drive_boxes, self._connectivity_out,
+                                    self.connectivity_sliders, self.tstop)
 
         return hnn_gui
 
@@ -414,6 +422,53 @@ def _get_sliders(params, param_keys):
     interactive_output(_update_params,
                        {s.children[0].description: s.children[0]
                         for s in sliders})
+    return sliders
+
+
+def _get_connectivity_sliders(conn_data):
+    """Get sliders"""
+    style = {'description_width': '150px'}
+    style = {}
+    sliders = list()
+    for receptor_name in conn_data.keys():
+        w_text_input = FloatText(value=conn_data[receptor_name]['weight'],
+                                 disabled=False, continuous_update=False,
+                                 description="weight",
+                                 style=style)
+
+        w_slider = FloatLogSlider(value=conn_data[receptor_name]['weight'],
+                                  min=-5,
+                                  max=1,
+                                  step=0.2,
+                                  description=" ",
+                                  disabled=False,
+                                  continuous_update=False,
+                                  orientation='horizontal',
+                                  readout=False,
+                                  readout_format='.2e',
+                                  style=style)
+
+        prob_slider_input = FloatSlider(
+            value=conn_data[receptor_name]['probability'], disabled=False,
+            min=0.0, max=1.0, step=0.01, continuous_update=False,
+            description="probability", style=style)
+
+        link((w_slider, 'value'), (w_text_input, 'value'))
+        conn_widget = VBox([
+            HTML(value=f"""<p>
+            Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
+            w_text_input, w_slider, prob_slider_input,
+            HTML(value="<hr style='margin-bottom:5px'/>")
+        ])
+
+        conn_widget._belongsto = {
+            "receptor": conn_data[receptor_name]['receptor'],
+            "location": conn_data[receptor_name]['location'],
+            "src_gids": conn_data[receptor_name]['src_gids'],
+            "target_gids": conn_data[receptor_name]['target_gids'],
+        }
+        sliders.append(conn_widget)
+
     return sliders
 
 
@@ -819,10 +874,68 @@ def update_plot_window(variables, _plot_out, plot_type):
                 print("No network data")
 
 
-def load_drives(variables, params, log_out, drives_out, drive_widgets,
-                drive_boxes, tstop):
-    """Add drive ipywidgets from params."""
+def load_drive_and_connectivity(variables, params, log_out, drives_out,
+                                drive_widgets, drive_boxes, connectivity_out,
+                                connectivity_sliders, tstop):
+    """Add drive and connectivity ipywidgets from params."""
+    log_out.clear_output()
+    with log_out:
+        print("call load_drive_and_connectivity...")
+    # init the network.
     variables['net'] = jones_2009_model(params)
+
+    # Add connectivity
+    cell_types = [ct for ct in variables['net'].cell_types.keys()]
+    receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
+    locations = ('proximal', 'distal', 'soma')
+
+    # clear existing connectivity
+    while len(connectivity_sliders) > 0:
+        connectivity_sliders.pop()
+
+    connectivity_names = []
+    for src_gids in cell_types:
+        for target_gids in cell_types:
+            for location in locations:
+                # the connectivity list should be built on this level
+                receptor_related_conn = {}
+                for receptor in receptors:
+                    conn_indices = pick_connection(net=variables['net'],
+                                                   src_gids=src_gids,
+                                                   target_gids=target_gids,
+                                                   loc=location,
+                                                   receptor=receptor)
+                    if len(conn_indices) > 0:
+                        conn_idx = conn_indices[0]
+                        current_w = variables['net'].connectivity[conn_idx][
+                            'nc_dict']['A_weight']
+                        current_p = variables['net'].connectivity[conn_idx][
+                            'probability']
+                        # valid connection
+                        receptor_related_conn[receptor] = {
+                            "weight": current_w,
+                            "probability": current_p,
+                            # info used to identify connection
+                            "receptor": receptor,
+                            "location": location,
+                            "src_gids": src_gids,
+                            "target_gids": target_gids,
+                        }
+                connectivity_names.append(
+                    f"{src_gids}→{target_gids} ({location})")
+                connectivity_sliders.append(
+                    _get_connectivity_sliders(receptor_related_conn))
+
+    connectivity_boxes = [VBox(slider) for slider in connectivity_sliders]
+    cell_connectivity = Accordion(children=connectivity_boxes)
+    for idx, connectivity_name in enumerate(connectivity_names):
+        cell_connectivity.set_title(idx, connectivity_name)
+
+    connectivity_out.clear_output()
+    with connectivity_out:
+        display(cell_connectivity)
+
+    # Add drives
     log_out.clear_output()
     with log_out:
         drive_specs = _extract_drive_specs_from_hnn_params(
@@ -857,8 +970,9 @@ def load_drives(variables, params, log_out, drives_out, drive_widgets,
             )
 
 
-def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
-                     drive_boxes, drive_widgets, drives_out):
+def on_upload_change(change, params, tstop, tstep, log_out, variables,
+                     drive_boxes, drive_widgets, drives_out, connectivity_out,
+                     connectivity_sliders):
     if len(change['owner'].value) == 0:
         return
 
@@ -873,12 +987,13 @@ def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
     params_network = read_func[ext](param_data)
 
     log_out.clear_output()
+    # update simulation settings and params
     with log_out:
-        print(f"parameter key: {params_network.keys()}")
-        for slider in sliders:
-            for sl in slider:
-                key = 'gbar_' + sl.children[0].description
-                sl.value = params_network[key]
+        # print(f"parameter key: {params_network.keys()}")
+        # for slider in sliders:
+        #     for sl in slider:
+        #         key = 'gbar_' + sl.children[0].description
+        #         sl.value = params_network[key]
 
         if 'tstop' in params_network.keys():
             tstop.value = params_network['tstop']
@@ -886,11 +1001,14 @@ def on_upload_change(change, sliders, params, tstop, tstep, log_out, variables,
             tstep.value = params_network['dt']
 
         params.update(params_network)
-    load_drives(variables, params, log_out, drives_out, drive_widgets,
-                drive_boxes, tstop)
+    # init network, add drives & connectivity
+    load_drive_and_connectivity(variables, params, log_out, drives_out,
+                                drive_widgets, drive_boxes, connectivity_out,
+                                connectivity_sliders, tstop)
 
 
-def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets):
+def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
+                               connectivity_sliders):
     """Construct network and add drives."""
     print("init network")
     params['dt'] = tstep.value
@@ -899,6 +1017,23 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets):
         params,
         add_drives_from_params=False,
     )
+    # adjust connectivity
+    for connectivity_slider in connectivity_sliders:
+        for vbox in connectivity_slider:
+            conn_indices = pick_connection(
+                net=variables['net'],
+                src_gids=vbox._belongsto['src_gids'],
+                target_gids=vbox._belongsto['target_gids'],
+                loc=vbox._belongsto['location'],
+                receptor=vbox._belongsto['receptor'])
+
+            if len(conn_indices) > 0:
+                conn_idx = conn_indices[0]
+                variables['net'].connectivity[conn_idx]['nc_dict'][
+                    'A_weight'] = vbox.children[1].value
+                variables['net'].connectivity[conn_idx][
+                    'probability'] = vbox.children[3].value
+
     # add drives to network
     for drive in drive_widgets:
         logging.debug(f"add drive type to network: {drive['type']}")
@@ -967,12 +1102,12 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets):
 def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
                        ntrials, backend_selection, mpi_cmd, n_jobs,
                        params, plot_outputs_list, plot_dropdowns_list,
-                       simulation_status, b):
+                       simulation_status, connectivity_sliders, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
         _init_network_from_widgets(params, tstep, tstop, variables,
-                                   drive_widgets)
+                                   drive_widgets, connectivity_sliders)
 
         print("start simulation")
         if backend_selection.value == "MPI":
