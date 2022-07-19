@@ -32,7 +32,7 @@ def test_cell_response(tmpdir):
     # reset clears all recorded variables, but leaves simulation time intact
     assert len(cell_response.times) == len(sim_times)
     sim_attributes = ['_spike_times', '_spike_gids', '_spike_types',
-                      '_vsoma', '_isoma']
+                      '_vsoma', '_isoma', '_vsec', 'isec']
     net_attributes = ['_times', '_cell_type_names']  # `Network.__init__`
     # creates these check that we always know which response attributes are
     # simulated see #291 for discussion; objective is to keep cell_response
