@@ -960,7 +960,7 @@ def on_upload_change(change, params, tstop, tstep, log_out, variables,
 
 
 def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
-                               connectivity_sliders):
+                               connectivity_sliders, add_drive=True):
     """Construct network and add drives."""
     print("init network")
     params['dt'] = tstep.value
@@ -986,6 +986,8 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
                 variables['net'].connectivity[conn_idx][
                     'probability'] = vbox.children[3].value
 
+    if add_drive is False:
+        return
     # add drives to network
     for drive in drive_widgets:
         logging.debug(f"add drive type to network: {drive['type']}")
