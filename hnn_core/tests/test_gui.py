@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui.gui import HNNGUI, _init_network_from_widgets
+from hnn_core.network import pick_connection
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 
@@ -70,15 +71,38 @@ def test_gui_change_connectivity():
     """
     gui = HNNGUI()
     _ = gui.run()
-    for sliders in gui.connectivity_sliders:
-        for slider in sliders:
-            float_text, slider, _ = slider.children
-            for val in (0.2, 0.4, 0.9):
-                float_text.value = val
-                assert slider.value == val
-            for val in (0.2, 0.4, 0.9):
-                slider.value = val
-                assert float_text.value == val
+
+    for w_val in (0.2, 0.9):
+        for p_val in (0.1, 1.0):
+            for connectivity_slider in gui.connectivity_sliders:
+                for vbox in connectivity_slider:
+                    # specify connection
+                    conn_indices = pick_connection(
+                        net=gui.variables['net'],
+                        src_gids=vbox._belongsto['src_gids'],
+                        target_gids=vbox._belongsto['target_gids'],
+                        loc=vbox._belongsto['location'],
+                        receptor=vbox._belongsto['receptor'])
+
+                    assert len(conn_indices) > 0
+                    conn_idx = conn_indices[0]
+
+                    # test if the slider and the input field are synchronous
+                    vbox.children[1].value = w_val
+                    assert vbox.children[2].value == w_val
+
+                    vbox.children[3].value = p_val
+
+            # re initialize network
+            _init_network_from_widgets(gui.params, gui.tstep,
+                                       gui.tstop, gui.variables,
+                                       gui.drive_widgets,
+                                       gui.connectivity_sliders,
+                                       add_drive=False)
+
+            # test if the new value is reflected in the network
+            assert gui.variables['net'].connectivity[conn_idx][
+                'nc_dict']['A_weight'] == w_val
 
 
 def test_gui_add_drives():
@@ -106,7 +130,7 @@ def test_gui_init_network():
     gui = HNNGUI()
     # now the default parameter has been loaded.
     _init_network_from_widgets(gui.params, gui.tstep, gui.tstop, gui.variables,
-                               gui.drive_widgets)
+                               gui.drive_widgets, gui.connectivity_sliders)
 
     # copied from test_network.py
     assert np.isclose(gui.variables['net']._inplane_distance, 1.)  # default
