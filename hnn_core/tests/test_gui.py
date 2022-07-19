@@ -3,6 +3,7 @@ import os.path as op
 
 import hnn_core
 import numpy as np
+import pytest
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui.gui import HNNGUI, _init_network_from_widgets
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -119,6 +120,7 @@ def test_gui_run_simulation_mpi():
     gui = HNNGUI()
     _ = gui.run()
     gui.backend_selection.value = "MPI"
+    gui.tstop.value = 30  # speed up tests
     gui.run_button.click()
     dpls = gui.variables['dpls']
     assert isinstance(gui.variables["net"], Network)
@@ -132,23 +134,27 @@ def test_gui_run_simulation():
     app_layout = gui.run()
     assert app_layout is not None
     assert gui.backend_selection.value == "Joblib"
-    gui.tstop.value = 20  # speed up tests
-    gui.run_button.click()
-    dpls = gui.variables['dpls']
-    assert isinstance(gui.variables["net"], Network)
-    assert isinstance(dpls, list)
-    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+    val_tstop = 20
+    val_ntrials = 1
+    for val_tstop in (10, 12):
+        for val_ntrials in (1, 2):
+            for val_tstep in (0.05, 0.08):
+                gui.tstop.value = val_tstop
+                gui.ntrials.value = val_ntrials
+                gui.tstep.value = val_tstep
 
-# For other tests, we can follow this paradigm:
-# 1. Initialize the gui
-# 2. Change some parameters from the widget interface.
-# 3. Use modified parameters to construct the Network model
-# 4. (Optional) run simulation
-# 5. Check if the simulation results or network with modified parameters
-#    match.
+                gui.run_button.click()
 
+                dpls = gui.variables['dpls']
 
-# def test_gui_update_simulation_parameters():
-#     """Test if gui builds new network model after changing simulation
-#     parameters."""
-#     pass
+                assert isinstance(gui.variables["net"], Network)
+                assert isinstance(dpls, list)
+                assert all([isinstance(dpl, Dipole) for dpl in dpls])
+                assert len(dpls) == val_ntrials
+                assert all([
+                    pytest.approx(dpl.times[-1]) == val_tstop for dpl in dpls
+                ])
+                assert all([
+                    pytest.approx(dpl.times[1] - dpl.times[0]) == val_tstep
+                    for dpl in dpls
+                ])
