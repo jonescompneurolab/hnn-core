@@ -2,12 +2,15 @@
 import os.path as op
 
 import hnn_core
+import matplotlib
 import numpy as np
 import pytest
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui.gui import HNNGUI, _init_network_from_widgets
 from hnn_core.network import pick_connection
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+
+matplotlib.use('agg')
 
 
 def test_gui_load_params():
