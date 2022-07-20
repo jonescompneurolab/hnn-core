@@ -107,7 +107,7 @@ Input and Output:
 GUI:
 -----------------
 
-.. currentmodule:: hnn_core.gui.gui
+.. currentmodule:: hnn_core.gui
 
 .. autosummary::
    :toctree: generated/
