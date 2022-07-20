@@ -35,7 +35,6 @@ def test_gui_upload_params():
     content = b""
     with open(params_fname, "rb") as f:
         for line in f:
-            pass
             content += line
     uploaded_value = {
         params_name: {
@@ -149,6 +148,9 @@ def test_gui_run_simulation_mpi():
     """Test if run button triggers simulation with MPIBackend."""
     gui = HNNGUI()
     _ = gui.run()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
     gui.backend_selection.value = "MPI"
     gui.tstop.value = 30  # speed up tests
     gui.run_button.click()
@@ -162,6 +164,9 @@ def test_gui_run_simulation():
     """Test if run button triggers simulation."""
     gui = HNNGUI()
     app_layout = gui.run()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
     assert app_layout is not None
     assert gui.backend_selection.value == "Joblib"
     val_tstop = 20
