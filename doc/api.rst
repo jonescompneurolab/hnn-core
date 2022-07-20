@@ -103,3 +103,14 @@ Input and Output:
    read_params
    read_dipole
    read_spikes
+
+GUI:
+-----------------
+
+.. currentmodule:: hnn_core.gui.gui
+
+.. autosummary::
+   :toctree: generated/
+
+   HNNGUI
+   launch
