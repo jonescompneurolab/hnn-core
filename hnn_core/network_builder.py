@@ -85,15 +85,6 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     neuron_net.aggregate_data(n_samples=times.size())
 
     # now convert data from Neuron into Python
-    vsoma_py = dict()
-    for gid, rec_v in neuron_net._vsoma.items():
-        vsoma_py[gid] = rec_v.to_python()
-
-    isoma_py = dict()
-    for gid, rec_i in neuron_net._isoma.items():
-        isoma_py[gid] = {key: rec_i.to_python()
-                         for key, rec_i in rec_i.items()}
-
     vsec_py = dict()
     for gid, vsec_dict in neuron_net._vsec.items():
         vsec_py[gid] = dict()
@@ -124,8 +115,6 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             'spike_times': neuron_net._all_spike_times.to_python(),
             'spike_gids': neuron_net._all_spike_gids.to_python(),
             'gid_ranges': net.gid_ranges,
-            'vsoma': vsoma_py,
-            'isoma': isoma_py,
             'vsec': vsec_py,
             'isec': isec_py,
             'rec_data': rec_arr_py,
@@ -301,8 +290,6 @@ class NetworkBuilder(object):
         self.ncs = dict()
         self._nrn_dipoles = dict()
 
-        self._vsoma = dict()
-        self._isoma = dict()
         self._vsec = dict()
         self._isec = dict()
         self._nrn_rec_arrays = dict()
@@ -453,8 +440,8 @@ class NetworkBuilder(object):
                         src_type in self.net.external_biases['tonic']):
                     cell.create_tonic_bias(**self.net.external_biases
                                            ['tonic'][src_type])
-                cell.record_soma(record_vsoma, record_isoma)
-                cell.record_sec(record_vsec, record_isec)
+                cell.record(record_vsoma, record_isoma,
+                            record_vsec, record_isec)
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
@@ -595,9 +582,6 @@ class NetworkBuilder(object):
             _PC.allreduce(nrn_arr._nrn_voltages, 1)
 
         # aggregate the currents and voltages independently on each proc
-        vsoma_list = _PC.py_gather(self._vsoma, 0)
-        isoma_list = _PC.py_gather(self._isoma, 0)
-
         vsec_list = _PC.py_gather(self._vsec, 0)
         isec_list = _PC.py_gather(self._isec, 0)
 
@@ -611,10 +595,6 @@ class NetworkBuilder(object):
                 self._all_spike_times.append(spike_vec)
             for spike_vec in spike_gids_list:
                 self._all_spike_gids.append(spike_vec)
-            for vsoma in vsoma_list:
-                self._vsoma.update(vsoma)
-            for isoma in isoma_list:
-                self._isoma.update(isoma)
             for vsec in vsec_list:
                 self._vsec.update(vsec)
             for isec in isec_list:

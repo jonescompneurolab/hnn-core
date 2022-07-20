@@ -535,8 +535,9 @@ class Cell:
         stim.amp = amplitude
         self.tonic_biases.append(stim)
 
-    def record_soma(self, record_vsoma=False, record_isoma=False):
-        """Record current and voltage at soma.
+    def record(self, record_vsoma=False, record_isoma=False,
+               record_vsec=False, record_isec=False):
+        """ Record current and voltage from all sections
 
         Parameters
         ----------
@@ -544,28 +545,6 @@ class Cell:
             Option to record somatic voltages from cells. Default: False.
         record_isoma : bool
             Option to record somatic currents from cells. Default: False.
-
-        """
-        # a soma exists at self._nrn_sections['soma']
-        if record_isoma:
-            # assumes that self._nrn_synapses is a dict that exists
-            list_syn_soma = [key for key in self._nrn_synapses.keys()
-                             if key.startswith('soma_')]
-            # matching dict from the list_syn_soma keys
-            self.rec_i = dict.fromkeys(list_syn_soma)
-            # iterate through keys and record currents appropriately
-            for key in self.rec_i:
-                self.rec_i[key] = h.Vector()
-                self.rec_i[key].record(self._nrn_synapses[key]._ref_i)
-
-        if record_vsoma:
-            self.rec_v.record(self._nrn_sections['soma'](0.5)._ref_v)
-
-    def record_sec(self, record_vsec=False, record_isec=False):
-        """ Record current and voltage from all sections
-
-        Parameters
-        ----------
         record_vsec : bool
             Option to record voltages from all sections. Default: False.
         record_isec : bool
@@ -574,14 +553,24 @@ class Cell:
 
         section_names = list(self.sections.keys())
 
-        if record_vsec:
+        # Logic checks if just recording soma, sections, or both
+        if record_vsoma and not record_vsec:
+            self.rec_vsec = dict(['soma'])
+        elif record_vsec:
             self.rec_vsec = dict.fromkeys(section_names)
+
+        if record_vsoma or record_vsec:
             for sec_name in self.rec_vsec:
                 self.rec_vsec[sec_name] = h.Vector()
                 self.rec_vsec[sec_name].record(
                     self._nrn_sections[sec_name](0.5)._ref_v)
 
-        if record_isec:
+        if record_isoma and not record_isec:
+            self.rec_isec = dict(['soma'])
+        elif record_isec:
+            self.rec_isec = dict.fromkeys(section_names)
+
+        if record_isoma or record_isec:
             self.rec_isec = dict.fromkeys(section_names)
             for sec_name in self.rec_isec:
                 list_syn = [key for key in self._nrn_synapses.keys()
