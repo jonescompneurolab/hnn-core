@@ -48,6 +48,9 @@ Bug
 - Fix bug where :func:`~hnn_core.viz.plot_morphology` did not accurately
   reflect the shape of the cell being simulated, by `Nick Tolley`_ in :gh:`481`
 
+- Fix bug where :func:`~hnn_core.network.pick_connection` did not return an
+  empty list when searching non existing connections, by `Nick Tolley`_ in :gh:`515`
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
