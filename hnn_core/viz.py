@@ -809,6 +809,7 @@ def _linewidth_from_data_units(ax, linewidth):
 
 def plot_cell_morphology(cell, ax, show=True):
     """Plot the cell morphology.
+
     Parameters
     ----------
     cell : instance of Cell
@@ -817,6 +818,7 @@ def plot_cell_morphology(cell, ax, show=True):
         Matplotlib 3D axis
     show : bool
         If True, show the plot
+
     Returns
     -------
     axes : list of instance of Axes3D
@@ -824,91 +826,67 @@ def plot_cell_morphology(cell, ax, show=True):
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D  # noqa
+    cell_list = list()
+    clr_index=0
+    colors = ['b', 'c', 'r', 'm']
+    multiple = 0
 
     if ax is None:
         plt.figure()
         ax = plt.axes(projection='3d')
+
+    if type(cell) is dict:
+        for ind_cell in cell:
+            cell_list = list(cell.values())
+        print("is dict")
+    else:
+        print("is not dict")
+        cell_list[0]=cell
 
     # Cell is in XZ plane
-    ax.set_xlim((cell.pos[1] - 250, cell.pos[1] + 150))
-    ax.set_zlim((cell.pos[2] - 100, cell.pos[2] + 1200))
+    #ax.set_xlim((cell_list[0].pos[1] - 250, cell_list[0].pos[1] + 150))
+    #ax.set_zlim((cell_list[0].pos[2] - 100, cell_list[0].pos[2] + 1200))
+    cell_radii = [0]
+    total_radius=0
+    for clr_index, cell in enumerate(cell_list):
+        radius = 0
 
-    ax = _plot_cell(cell, ax=ax, plt=plt, show=True)
+        # Calculating the radius for cell offset
+        for sec_name, section in cell.sections.items():
+            end_pts = section.end_pts
+            xs, ys, zs = list(), list(), list()
+            for pt in end_pts:
+                dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
+                dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
+                dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
+                if radius < pt[0]:
+                    radius = pt[0]
+            total_radius+=radius
 
-    plt.tight_layout()
-    plt_show(show)
-    return ax
-
-def plot_cell_morphologies(net, ax=None, show=True):
-    """Plot the morphology of the network cells
-
-    Parameters
-    ----------
-    net : instance of Network
-        The network object
-    ax : instance of matplotlib Axes3D | None
-        An axis object from matplotlib. If none,
-        a new figure is created.
-    Show : bool
-        If True, show the figure
-
-    Returns
-    -------
-    fig : instance of matplotlib figure
-        The matplotlib figure handle
-    """
-
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-
-    if ax is None:
-        plt.figure()
-        ax = plt.axes(projection='3d')
-
-    colors = ['b', 'c', 'r', 'm']
-    i=0
-
-    ax.set_xlim((list(net.cell_types.values())[0].pos[1] - 250, list(net.cell_types.values())[0].pos[1] + 150))
-    ax.set_zlim((list(net.cell_types.values())[0].pos[2] - 100, list(net.cell_types.values())[0].pos[2] + 1200))
-
-    for cell in net.cell_types.values():
-        ax = _plot_cell(cell, ax=ax, plt=plt, color=colors[i], show=True)
-        i+=1
-
-    return ax
-
-def _plot_cell(cell, ax, plt, color='b', show=True):
-    """Plot the cell morphology of a specific cell type
-
-    parameters
-    ----------
-    cell_type : instance of net.cell_type[]
-            The type of cell to be plotted. If None,
-            generic cell type 
-    ax : instance of Axes3D
-        Matplotlib 3D axis
-    show : bool
-        if True, show the plot
-    
-    """
-
-    from mpl_toolkits.mplot3d import Axes3D  # noqa
-
-    for sec_name, section in cell.sections.items():
-        linewidth = _linewidth_from_data_units(ax, section.diam)
-        end_pts = section.end_pts
-        xs, ys, zs = list(), list(), list()
-        for pt in end_pts:
-            dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
-            dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
-            dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
-            xs.append(pt[0] + dx)
-            ys.append(pt[1] + dz)
-            zs.append(pt[2] + dy)
-        ax.plot(xs, ys, zs, 'b-', color = color, linewidth=linewidth)
-    ax.view_init(0, -90)
-    ax.axis('off')
-
+        # Plotting the cell
+        for sec_name, section in cell.sections.items():
+            ax.set_xlim((total_radius+200))
+            ax.set_zlim((cell.pos[2] - 100, cell.pos[2] + 1200))
+            linewidth = _linewidth_from_data_units(ax, section.diam)
+            end_pts = section.end_pts
+            xs, ys, zs = list(), list(), list()
+            for pt in end_pts:
+                dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
+                dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
+                dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
+                xs.append(pt[0] + dx + ((radius + cell_radii[-1])*multiple)+100)
+                ys.append(pt[1] + dz)
+                zs.append(pt[2] + dy)
+            ax.plot(xs, ys, zs, color=colors[clr_index], linewidth=linewidth)
+        cell_radii.append(radius)
+        ax.view_init(0, -90)
+        ax.axis('on')
+        ax.grid('off')
+        ax.set_yticks([])
+        ax.set_xticks([])
+        print("iteration: ")
+        print(multiple)
+        multiple = multiple + 1
     plt.tight_layout()
     plt_show(show)
     return ax
