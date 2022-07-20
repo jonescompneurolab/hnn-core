@@ -424,8 +424,18 @@ def test_network():
     assert len(conn_idxs) == 0
     assert not pick_connection(net, src_gids='evprox1', loc='distal')
 
-    # Check condition where not connections match
+    # Check conditions where not connections match
     assert pick_connection(net, loc='distal', receptor='gabab') == list()
+    assert pick_connection(
+        net, src_gids='L2_pyramidal', receptor='gabab') == list()
+    assert pick_connection(
+        net, src_gids='L2_basket', receptor='ampa') == list()
+    assert pick_connection(
+        net, src_gids='L2_basket', target_gids='L2_basket',
+        loc='proximal', receptor='ampa') == list()
+    assert pick_connection(
+        net, src_gids='L2_pyramidal', target_gids='L2_basket',
+        loc='distal', receptor='gabab') == list()
 
     kwargs_bad = [
         ('src_gids', 0.0), ('src_gids', [0.0]),
