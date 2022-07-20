@@ -827,9 +827,8 @@ def plot_cell_morphology(cell, ax, show=True):
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D  # noqa
     cell_list = list()
-    clr_index=0
     colors = ['b', 'c', 'r', 'm']
-    multiple = 0
+    clr_index=0
 
     if ax is None:
         plt.figure()
@@ -838,20 +837,18 @@ def plot_cell_morphology(cell, ax, show=True):
     if type(cell) is dict:
         for ind_cell in cell:
             cell_list = list(cell.values())
-        print("is dict")
     else:
-        print("is not dict")
         cell_list[0]=cell
 
     # Cell is in XZ plane
     #ax.set_xlim((cell_list[0].pos[1] - 250, cell_list[0].pos[1] + 150))
     #ax.set_zlim((cell_list[0].pos[2] - 100, cell_list[0].pos[2] + 1200))
-    cell_radii = [0]
-    total_radius=0
+    cell_radii = list()
+    cell_radii.append(clr_index)
     for clr_index, cell in enumerate(cell_list):
-        radius = 0
 
         # Calculating the radius for cell offset
+        radius = 0
         for sec_name, section in cell.sections.items():
             end_pts = section.end_pts
             xs, ys, zs = list(), list(), list()
@@ -861,11 +858,11 @@ def plot_cell_morphology(cell, ax, show=True):
                 dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
                 if radius < pt[0]:
                     radius = pt[0]
-            total_radius+=radius
+        cell_radii.append(radius)
 
         # Plotting the cell
         for sec_name, section in cell.sections.items():
-            ax.set_xlim((total_radius+200))
+            ax.set_xlim((sum(cell_radii, 100)))
             ax.set_zlim((cell.pos[2] - 100, cell.pos[2] + 1200))
             linewidth = _linewidth_from_data_units(ax, section.diam)
             end_pts = section.end_pts
@@ -874,19 +871,13 @@ def plot_cell_morphology(cell, ax, show=True):
                 dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
                 dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
                 dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
-                xs.append(pt[0] + dx + ((radius + cell_radii[-1])*multiple)+100)
+                xs.append(pt[0] + dx + (radius + cell_radii[-1]+100))
                 ys.append(pt[1] + dz)
                 zs.append(pt[2] + dy)
             ax.plot(xs, ys, zs, color=colors[clr_index], linewidth=linewidth)
-        cell_radii.append(radius)
         ax.view_init(0, -90)
         ax.axis('on')
         ax.grid('off')
-        ax.set_yticks([])
-        ax.set_xticks([])
-        print("iteration: ")
-        print(multiple)
-        multiple = multiple + 1
     plt.tight_layout()
     plt_show(show)
     return ax
