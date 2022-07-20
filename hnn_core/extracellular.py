@@ -28,6 +28,36 @@ from neuron import h
 from .externals.mne import _validate_type, _check_option
 
 
+def calculate_csd2d(data, ch_axis=0, delta=1):
+    """estimates traditional current source density (csd) using
+    2nd spatial derivative method and interpolates border channels.
+    ref: Wójcik D.K. (2014) Current Source Density Analysis.
+    Parameters
+    ----------
+    data : channels x times array
+        LFP data
+    ch_axis : int
+        axis of electrode array, default is zero.
+    delta : int
+        spacing between channels, scales the CSD
+    Returns
+    -------
+    csd2d : channels x times array
+        the 2nd derivative current source density estimate (csd2d)
+    """
+    csd2d = -np.diff(np.diff(data, axis=ch_axis), axis=ch_axis) / delta ** 2
+
+    border_1 = np.take(csd2d, 0, axis=ch_axis) * 2 - np.take(csd2d, 1,
+                                                             axis=ch_axis)
+    border_2 = np.take(csd2d, -1, axis=ch_axis) * 2 - np.take(csd2d, -2,
+                                                              axis=ch_axis)
+
+    csd2d = np.concatenate([np.expand_dims(border_1, axis=ch_axis),
+                            csd2d, np.expand_dims(border_2, axis=ch_axis)],
+                           axis=ch_axis)
+    return csd2d
+
+
 def _transfer_resistance(section, electrode_pos, conductivity, method,
                          min_distance=0.5):
     """Transfer resistance between section and electrode position.
@@ -429,6 +459,38 @@ class ExtracellularArray:
                 voltage_scalebar=voltage_scalebar,
                 contact_labels=contact_labels,
                 show=show)
+        return fig
+
+    def plot_csd(self, trial_no=0, colorbar=True, ax=None, show=True):
+        """Generates CSD figure.
+        Parameters
+        ----------
+        trial_no : int | list of int | slice
+            Trial number(s) to plot
+        colorbar : bool
+            If the colorbar is presented.
+        ax : instance of matplotlib figure | None
+            The matplotlib axis.
+        show : bool
+            If True, show the plot
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+        from .viz import csd_generate
+        lfp = self.voltages[trial_no] * 1E-6
+
+        csd = calculate_csd2d(data=lfp,
+                              ch_axis=0,
+                              delta=1)
+
+        fig = csd_generate(csd,
+                           self.times,
+                           ax=ax,
+                           colorbar=colorbar,
+                           show=show)
+
         return fig
 
 
