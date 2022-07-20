@@ -263,6 +263,9 @@ def pick_connection(net, src_gids=None, target_gids=None,
         # Intersection across parameters
         if conn_set and inner_set:
             conn_set = conn_set.intersection(inner_set)
+            # If at any point there's no matching elements, return empty
+            if not conn_set:
+                return list()
         else:
             conn_set = conn_set.union(inner_set)
 
