@@ -86,10 +86,11 @@ class HNNGUI:
         plot_outputs_list.
     drive_widgets: list
         A list of network drive widgets added by add_drive_button.
-    drive_widgets: list
+    drive_boxes: list
         A list of network drive layouts.
-
-    TODO: add more attributes
+    connectivity_sliders: list
+        A list of boxes that control the weight and probability of connections
+        in the network.
     """
 
     def __init__(self, theme_color="#8A2BE2", log_window_height="100px",
@@ -190,13 +191,15 @@ class HNNGUI:
         # Connectivity list
         self.connectivity_sliders = list()
 
-        self._load_info = {"count": 0, "prev_param_data": b""}
         self._init_ui_components()
 
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows. It's
         not encouraged for users to modify or access attributes in this part.
         """
+        # Reloading status.
+        self._load_info = {"count": 0, "prev_param_data": b""}
+
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
@@ -237,6 +240,7 @@ class HNNGUI:
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
     def load_parameters(self, params_fname=None):
+        """Read parameters from file."""
         if not params_fname:
             # by default load default.json
             hnn_core_root = op.join(op.dirname(hnn_core.__file__))
@@ -245,7 +249,7 @@ class HNNGUI:
         return read_params(params_fname)
 
     def _link_callbacks(self):
-        # link callbacks
+        """Link callbacks to UI components."""
         def _handle_backend_change(backend_type):
             return handle_backend_change(backend_type.new,
                                          self._backend_config_out,
@@ -303,7 +307,8 @@ class HNNGUI:
         self.viz_layout_selection.observe(_handle_viz_layout_change, 'value')
 
     def run(self):
-        # compose widgets
+        """Compose widgets"""
+
         simulation_box = VBox([
             self.tstop, self.tstep, self.ntrials, self.backend_selection,
             self._backend_config_out
@@ -379,7 +384,10 @@ def create_expanded_button(description, button_style, height, disabled=False,
 
 
 def _get_connectivity_widgets(conn_data):
-    """Get sliders"""
+    """Create connectivity box widgets from specified weight and probability
+    data.
+    """
+
     style = {'description_width': '150px'}
     style = {}
     sliders = list()
@@ -687,21 +695,15 @@ def _get_evoked_widget(name,
     return drive, drive_box
 
 
-def add_drive_widget(drive_type,
-                     drive_boxes,
-                     drive_widgets,
-                     drives_out,
-                     tstop_widget,
-                     location,
-                     prespecified_drive_name=None,
+def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
+                     tstop_widget, location, prespecified_drive_name=None,
                      prespecified_drive_data=None,
                      prespecified_weights_ampa=None,
                      prespecified_weights_nmda=None,
-                     prespecified_delays=None,
-                     render=True,
-                     expand_last_drive=True,
-                     event_seed=14):
+                     prespecified_delays=None, render=True,
+                     expand_last_drive=True, event_seed=14):
     """Add a widget for a new drive."""
+
     layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
     drives_out.clear_output()
@@ -774,6 +776,7 @@ def _debug_update_plot_window(variables, _plot_out, plot_type, idx):
 
 
 def update_plot_window(variables, _plot_out, plot_type):
+    """Refresh plots with data from variables."""
     _plot_out.clear_output()
     if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
         return
@@ -1109,6 +1112,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
 
 
 def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
+    """Switch backends between MPI and Joblib."""
     backend_config.clear_output()
     with backend_config:
         if backend_type == "MPI":
@@ -1117,14 +1121,9 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
             display(n_jobs)
 
 
-def init_left_right_viz_layout(plot_outputs,
-                               plot_dropdowns,
-                               window_height,
-                               variables,
-                               plot_options,
-                               previous_outputs,
-                               border='1px solid gray',
-                               init=False):
+def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
+                               variables, plot_options, previous_outputs,
+                               border='1px solid gray', init=False):
     height_plot = window_height
     plot_outputs_L = Output(layout={'border': border, 'height': height_plot})
 
@@ -1190,14 +1189,9 @@ def init_left_right_viz_layout(plot_outputs,
     return grid
 
 
-def init_upper_down_viz_layout(plot_outputs,
-                               plot_dropdowns,
-                               window_height,
-                               variables,
-                               plot_options,
-                               previous_outputs,
-                               border='1px solid gray',
-                               init=False):
+def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
+                               variables, plot_options, previous_outputs,
+                               border='1px solid gray', init=False):
     height_plot = window_height
     default_plot_types = [plot_options[0], plot_options[1]]
     for idx, plot_type in enumerate(previous_outputs[:2]):
@@ -1267,13 +1261,8 @@ def init_upper_down_viz_layout(plot_outputs,
     return grid
 
 
-def initialize_viz_window(viz_window,
-                          variables,
-                          plot_outputs,
-                          plot_dropdowns,
-                          window_width,
-                          window_height,
-                          layout_option="L-R",
+def initialize_viz_window(viz_window, variables, plot_outputs, plot_dropdowns,
+                          window_width, window_height, layout_option="L-R",
                           init=False):
     plot_options = [
         'current dipole', 'input histogram', 'spikes', 'PSD', 'spectogram',
@@ -1310,6 +1299,9 @@ def initialize_viz_window(viz_window,
 
 
 def launch():
+    """Launch voila with hnn_widget.ipynb. You can pass voila commandline
+    parameters as usual.
+    """
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
     main([notebook_path, *sys.argv[1:]])
