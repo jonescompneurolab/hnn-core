@@ -1092,3 +1092,44 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
     plt_show(show)
     return ax.get_figure()
+
+
+
+def csd_generate(csd, times, ax=None, colorbar=True, show=True):
+    """Plots the csd.
+    Parameters
+    ----------
+    csd : csd array (channels x time)
+        CSD data
+    times : Numpy array
+        Sampling times (in ms).
+    ax : instance of matplotlib figure | None
+        The matplotlib axis.
+    colorbar : bool
+        If the colorbar is presented.
+    show : bool
+        If True, show the plot
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+    """
+    import matplotlib.pyplot as plt
+    if ax is None:
+        _, ax = plt.subplots(1, 1, constrained_layout=True)
+
+    y_ticks = np.linspace(0, csd.shape[0], csd.shape[0])
+    im = ax.pcolormesh(times, y_ticks, np.array(csd),
+                       cmap="jet_r", shading='auto')
+    ax.axis(ax.axis('tight'))
+    ax.set_title("CSD")
+
+    if colorbar:
+        color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
+        plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (A/m^{2})$')
+
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylabel('Electrode #')
+    plt_show(show)
+
+    return ax.get_figure()
