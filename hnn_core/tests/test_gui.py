@@ -72,10 +72,11 @@ def test_gui_change_connectivity():
     gui = HNNGUI()
     _ = gui.run()
 
-    for w_val in (0.2, 0.9):
-        for p_val in (0.1, 1.0):
-            for connectivity_slider in gui.connectivity_sliders:
-                for vbox in connectivity_slider:
+    for connectivity_slider in gui.connectivity_sliders:
+        for vbox in connectivity_slider:
+            for w_val in (0.2, 0.9):
+                for p_val in (0.1, 1.0):
+
                     # specify connection
                     conn_indices = pick_connection(
                         net=gui.variables['net'],
@@ -93,16 +94,18 @@ def test_gui_change_connectivity():
 
                     vbox.children[3].value = p_val
 
-            # re initialize network
-            _init_network_from_widgets(gui.params, gui.tstep,
-                                       gui.tstop, gui.variables,
-                                       gui.drive_widgets,
-                                       gui.connectivity_sliders,
-                                       add_drive=False)
+                    # re initialize network
+                    _init_network_from_widgets(gui.params, gui.tstep,
+                                               gui.tstop, gui.variables,
+                                               gui.drive_widgets,
+                                               gui.connectivity_sliders,
+                                               add_drive=False)
 
-            # test if the new value is reflected in the network
-            assert gui.variables['net'].connectivity[conn_idx][
-                'nc_dict']['A_weight'] == w_val
+                    # test if the new value is reflected in the network
+                    assert gui.variables['net'].connectivity[conn_idx][
+                        'nc_dict']['A_weight'] == w_val
+                    assert gui.variables['net'].connectivity[conn_idx][
+                        'probability'] == p_val
 
 
 def test_gui_add_drives():

@@ -827,15 +827,8 @@ def update_plot_window(variables, _plot_out, plot_type):
                 print("No network data")
 
 
-def load_drive_and_connectivity(variables, params, log_out, drives_out,
-                                drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop, load_info):
-    """Add drive and connectivity ipywidgets from params."""
-    load_info['count'] += 1
-    # init the network.
-    variables['net'] = jones_2009_model(params)
-
-    # Add connectivity
+def add_connectivity_tab(variables, connectivity_out, connectivity_sliders):
+    """Add all possible connectivity boxes to connectivity tab."""
     cell_types = [ct for ct in variables['net'].cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
@@ -873,10 +866,11 @@ def load_drive_and_connectivity(variables, params, log_out, drives_out,
                             "src_gids": src_gids,
                             "target_gids": target_gids,
                         }
-                connectivity_names.append(
-                    f"{src_gids}→{target_gids} ({location})")
-                connectivity_sliders.append(
-                    _get_connectivity_widgets(receptor_related_conn))
+                if len(receptor_related_conn) > 0:
+                    connectivity_names.append(
+                        f"{src_gids}→{target_gids} ({location})")
+                    connectivity_sliders.append(
+                        _get_connectivity_widgets(receptor_related_conn))
 
     connectivity_boxes = [VBox(slider) for slider in connectivity_sliders]
     cell_connectivity = Accordion(children=connectivity_boxes)
@@ -885,6 +879,19 @@ def load_drive_and_connectivity(variables, params, log_out, drives_out,
 
     with connectivity_out:
         display(cell_connectivity)
+
+
+def load_drive_and_connectivity(variables, params, log_out, drives_out,
+                                drive_widgets, drive_boxes, connectivity_out,
+                                connectivity_sliders, tstop, load_info):
+    """Add drive and connectivity ipywidgets from params."""
+    load_info['count'] += 1
+    # init the network.
+    variables['net'] = jones_2009_model(params)
+    # variables['net'] = jones_2009_model()
+
+    # Add connectivity
+    add_connectivity_tab(variables, connectivity_out, connectivity_sliders)
 
     # Add drives
     log_out.clear_output()
@@ -935,7 +942,8 @@ def on_upload_change(change, params, tstop, tstep, log_out, variables,
 
     if load_info['prev_param_data'] == param_data:
         with log_out:
-            print("Same param. No reloading")
+            print("Same param. No reloading. \
+To force reloading, hit \"clear uploaded parameters\" button")
         return
     else:
         load_info['prev_param_data'] = param_data
