@@ -851,6 +851,7 @@ def add_connectivity_tab(variables, connectivity_out, connectivity_sliders):
                                                    loc=location,
                                                    receptor=receptor)
                     if len(conn_indices) > 0:
+                        assert len(conn_indices) == 1
                         conn_idx = conn_indices[0]
                         current_w = variables['net'].connectivity[conn_idx][
                             'nc_dict']['A_weight']
@@ -943,7 +944,7 @@ def on_upload_change(change, params, tstop, tstep, log_out, variables,
     if load_info['prev_param_data'] == param_data:
         with log_out:
             print("Same param. No reloading. \
-To force reloading, hit \"clear uploaded parameters\" button")
+To force reloading, hit \"clear uploaded parameters\" button"                                                             )
         return
     else:
         load_info['prev_param_data'] = param_data
@@ -988,6 +989,7 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
                 receptor=vbox._belongsto['receptor'])
 
             if len(conn_indices) > 0:
+                assert len(conn_indices) == 1
                 conn_idx = conn_indices[0]
                 variables['net'].connectivity[conn_idx]['nc_dict'][
                     'A_weight'] = vbox.children[1].value
