@@ -27,7 +27,7 @@ def test_gui_load_params():
 def test_gui_upload_params():
     """Test if gui handles uploaded parameters correctly"""
     gui = HNNGUI()
-    _ = gui.run()
+    _ = gui.compose()
 
     params_name = 'default.json'
     hnn_core_root = op.join(op.dirname(hnn_core.__file__))
@@ -54,18 +54,18 @@ def test_gui_upload_params():
     gui.delete_drive_button.click()
     assert len(gui.drive_widgets) == 0
 
-    original_tstop = gui.tstop.value
-    gui.tstop.value = 1
+    original_tstop = gui.widget_tstop.value
+    gui.widget_tstop.value = 1
 
-    original_tstep = gui.tstep.value
-    gui.tstep.value = 1
+    original_tstep = gui.widget_dt.value
+    gui.widget_dt.value = 1
 
     # manually send uploaded content
     gui.load_button.set_trait('value', uploaded_value)
 
     # check if parameter is reloaded.
-    assert gui.tstop.value == original_tstop
-    assert gui.tstep.value == original_tstep
+    assert gui.widget_tstop.value == original_tstop
+    assert gui.widget_dt.value == original_tstep
     assert len(gui.drive_widgets) == original_drive_count
 
 
@@ -73,16 +73,16 @@ def test_gui_change_connectivity():
     """Test if GUI properly changes cell connectivity parameters.
     """
     gui = HNNGUI()
-    _ = gui.run()
+    _ = gui.compose()
 
-    for connectivity_slider in gui.connectivity_sliders:
+    for connectivity_slider in gui.connectivity_widgets:
         for vbox in connectivity_slider:
             for w_val in (0.2, 0.9):
                 for p_val in (0.1, 1.0):
 
                     # specify connection
                     conn_indices = pick_connection(
-                        net=gui.variables['net'],
+                        net=gui.simulation_data['net'],
                         src_gids=vbox._belongsto['src_gids'],
                         target_gids=vbox._belongsto['target_gids'],
                         loc=vbox._belongsto['location'],
@@ -98,31 +98,32 @@ def test_gui_change_connectivity():
                     vbox.children[3].value = p_val
 
                     # re initialize network
-                    _init_network_from_widgets(gui.params, gui.tstep,
-                                               gui.tstop, gui.variables,
+                    _init_network_from_widgets(gui.params, gui.widget_dt,
+                                               gui.widget_tstop,
+                                               gui.simulation_data,
                                                gui.drive_widgets,
-                                               gui.connectivity_sliders,
+                                               gui.connectivity_widgets,
                                                add_drive=False)
 
                     # test if the new value is reflected in the network
-                    assert gui.variables['net'].connectivity[conn_idx][
+                    assert gui.simulation_data['net'].connectivity[conn_idx][
                         'nc_dict']['A_weight'] == w_val
-                    assert gui.variables['net'].connectivity[conn_idx][
+                    assert gui.simulation_data['net'].connectivity[conn_idx][
                         'probability'] == p_val
 
 
 def test_gui_add_drives():
     """Test if gui add different type of drives."""
     gui = HNNGUI()
-    _ = gui.run()
+    _ = gui.compose()
 
     for val_drive_type in ("Poisson", "Evoked", "Rhythmic"):
         for val_location in ("distal", "proximal"):
             gui.delete_drive_button.click()
             assert len(gui.drive_widgets) == 0
 
-            gui.drive_type_selection.value = val_drive_type
-            gui.location_selection.value = val_location
+            gui.widget_drive_type_selection.value = val_drive_type
+            gui.widget_location_selection.value = val_location
             gui.add_drive_button.click()
 
             assert len(gui.drive_widgets) == 1
@@ -135,12 +136,13 @@ def test_gui_init_network():
     """Test if gui initializes network properly"""
     gui = HNNGUI()
     # now the default parameter has been loaded.
-    _init_network_from_widgets(gui.params, gui.tstep, gui.tstop, gui.variables,
-                               gui.drive_widgets, gui.connectivity_sliders)
+    _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
+                               gui.simulation_data, gui.drive_widgets,
+                               gui.connectivity_widgets)
 
     # copied from test_network.py
-    assert np.isclose(gui.variables['net']._inplane_distance, 1.)  # default
-    assert np.isclose(gui.variables['net']._layer_separation, 1307.4)
+    assert np.isclose(gui.simulation_data['net']._inplane_distance, 1.)
+    assert np.isclose(gui.simulation_data['net']._layer_separation, 1307.4)
 
 
 @requires_mpi4py
@@ -148,15 +150,15 @@ def test_gui_init_network():
 def test_gui_run_simulation_mpi():
     """Test if run button triggers simulation with MPIBackend."""
     gui = HNNGUI()
-    _ = gui.run()
+    _ = gui.compose()
     gui.params['N_pyr_x'] = 3
     gui.params['N_pyr_y'] = 3
 
-    gui.backend_selection.value = "MPI"
-    gui.tstop.value = 30  # speed up tests
+    gui.widget_backend_selection.value = "MPI"
+    gui.widget_tstop.value = 30  # speed up tests
     gui.run_button.click()
-    dpls = gui.variables['dpls']
-    assert isinstance(gui.variables["net"], Network)
+    dpls = gui.simulation_data['dpls']
+    assert isinstance(gui.simulation_data["net"], Network)
     assert isinstance(dpls, list)
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
 
@@ -164,26 +166,26 @@ def test_gui_run_simulation_mpi():
 def test_gui_run_simulation():
     """Test if run button triggers simulation."""
     gui = HNNGUI()
-    app_layout = gui.run()
+    app_layout = gui.compose()
     gui.params['N_pyr_x'] = 3
     gui.params['N_pyr_y'] = 3
 
     assert app_layout is not None
-    assert gui.backend_selection.value == "Joblib"
+    assert gui.widget_backend_selection.value == "Joblib"
     val_tstop = 20
     val_ntrials = 1
     for val_tstop in (10, 12):
         for val_ntrials in (1, 2):
             for val_tstep in (0.05, 0.08):
-                gui.tstop.value = val_tstop
-                gui.ntrials.value = val_ntrials
-                gui.tstep.value = val_tstep
+                gui.widget_tstop.value = val_tstop
+                gui.widget_ntrials.value = val_ntrials
+                gui.widget_dt.value = val_tstep
 
                 gui.run_button.click()
 
-                dpls = gui.variables['dpls']
+                dpls = gui.simulation_data['dpls']
 
-                assert isinstance(gui.variables["net"], Network)
+                assert isinstance(gui.simulation_data["net"], Network)
                 assert isinstance(dpls, list)
                 assert all([isinstance(dpl, Dipole) for dpl in dpls])
                 assert len(dpls) == val_ntrials

@@ -49,26 +49,26 @@ class HNNGUI:
         The styling configuration of GUI.
     params: dict
         The parameters to use for constructing the network.
-    variables: dict
+    simulation_data: dict
         Simulation related objects, such as net and dpls.
-    tstop: Widget
+    widget_tstop: Widget
         Simulation stop time widget.
-    tstep: Widget
+    widget_dt: Widget
         Simulation step size widget.
-    ntrials: Widget
+    widget_ntrials: Widget
         Widget that controls the number of trials in a single simulation.
-    backend_selection: Widget
+    widget_backend_selection: Widget
         Widget that selects the backend used in simulations.
-    viz_layout_selection: Widget
+    widget_viz_layout_selection: Widget
         Widget that selects the layout of visualization window.
-    mpi_cmd: Widget
+    widget_mpi_cmd: Widget
         Widget that specify the mpi command to use when the backend is
         MPIBackend.
-    n_jobs: Widget
+    widget_n_jobs: Widget
         Widget that specify the cores in multi-trial simulations.
-    drive_type_selection: Widget
+    widget_drive_type_selection: Widget
         Widget that is used to select the drive to be added to the network.
-    location_selection: Widget.
+    widget_location_selection: Widget.
         Widget that specifies the location of network drives. Could be proximal
         or distal.
     add_drive_button: Widget
@@ -112,47 +112,47 @@ class HNNGUI:
         # load default parameters
         self.params = self.load_parameters()
 
-        # In-memory storage of all simulation related variables
-        self.variables = dict(net=None, dpls=list())
+        # In-memory storage of all simulation related simulation_data
+        self.simulation_data = dict(net=None, dpls=list())
 
         # Simulation parameters
-        self.tstop = FloatText(value=170,
-                               description='tstop (ms):',
-                               disabled=False)
-        self.tstep = FloatText(value=0.025,
-                               description='tstep (ms):',
-                               disabled=False)
-        self.ntrials = IntText(value=1, description='Trials:', disabled=False)
+        self.widget_tstop = FloatText(value=170, description='tstop (ms):',
+                                      disabled=False)
+        self.widget_dt = FloatText(value=0.025, description='dt (ms):',
+                                   disabled=False)
+        self.widget_ntrials = IntText(value=1, description='Trials:',
+                                      disabled=False)
 
         # select backends
-        self.backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
-                                                   ('MPI', 'MPI')],
-                                          value='Joblib',
-                                          description='Backend:')
+        self.widget_backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
+                                                          ('MPI', 'MPI')],
+                                                 value='Joblib',
+                                                 description='Backend:')
 
         # visualization layout
-        self.viz_layout_selection = Dropdown(options=[('Horizontal', 'L-R'),
-                                                      ('Vertical', 'U-D')],
-                                             value='L-R',
-                                             description='Layout:')
+        self.widget_viz_layout_selection = Dropdown(options=[
+                                                    ('Horizontal', 'L-R'),
+                                                    ('Vertical', 'U-D')],
+                                                    value='L-R',
+                                                    description='Layout:')
 
-        self.mpi_cmd = Text(value='mpiexec',
-                            placeholder='Fill if applies',
-                            description='MPI cmd:',
-                            disabled=False)
+        self.widget_mpi_cmd = Text(value='mpiexec',
+                                   placeholder='Fill if applies',
+                                   description='MPI cmd:', disabled=False)
 
-        self.n_jobs = BoundedIntText(value=1, min=1,
-                                     max=multiprocessing.cpu_count(),
-                                     description='Cores:', disabled=False)
+        self.widget_n_jobs = BoundedIntText(value=1, min=1,
+                                            max=multiprocessing.cpu_count(),
+                                            description='Cores:',
+                                            disabled=False)
 
-        self.drive_type_selection = RadioButtons(
+        self.widget_drive_type_selection = RadioButtons(
             options=['Evoked', 'Poisson', 'Rhythmic'],
             value='Evoked',
             description='Drive:',
             disabled=False,
             layout=Layout(width=self.layout['drive_widget_width']))
 
-        self.location_selection = RadioButtons(
+        self.widget_location_selection = RadioButtons(
             options=['proximal', 'distal'], value='proximal',
             description='Location', disabled=False,
             layout=Layout(width=self.layout['drive_widget_width']))
@@ -189,7 +189,7 @@ class HNNGUI:
         self.drive_boxes = list()
 
         # Connectivity list
-        self.connectivity_sliders = list()
+        self.connectivity_widgets = list()
 
         self._init_ui_components()
 
@@ -230,7 +230,7 @@ class HNNGUI:
                     self.run_button, self.load_button, self.clear_button,
                     self.delete_drive_button
                 ]),
-                self.viz_layout_selection,
+                self.widget_viz_layout_selection,
             ]), self._log_out, self._simulation_status
         ])
         # title
@@ -253,13 +253,14 @@ class HNNGUI:
         def _handle_backend_change(backend_type):
             return handle_backend_change(backend_type.new,
                                          self._backend_config_out,
-                                         self.mpi_cmd, self.n_jobs)
+                                         self.widget_mpi_cmd,
+                                         self.widget_n_jobs)
 
         def _add_drive_button_clicked(b):
-            return add_drive_widget(self.drive_type_selection.value,
+            return add_drive_widget(self.widget_drive_type_selection.value,
                                     self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self.tstop,
-                                    self.location_selection.value)
+                                    self._drives_out, self.widget_tstop,
+                                    self.widget_location_selection.value)
 
         def _delete_drives_clicked(b):
             self._drives_out.clear_output()
@@ -272,23 +273,25 @@ class HNNGUI:
         def _on_upload_change(change):
             with self._log_out:
                 print("received new uploaded params file...")
-            return on_upload_change(change, self.params, self.tstop,
-                                    self.tstep, self._log_out, self.variables,
-                                    self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self._connectivity_out,
-                                    self.connectivity_sliders, self._load_info)
+            return on_upload_change(change, self.params, self.widget_tstop,
+                                    self.widget_dt, self._log_out,
+                                    self.simulation_data, self.drive_boxes,
+                                    self.drive_widgets, self._drives_out,
+                                    self._connectivity_out,
+                                    self.connectivity_widgets, self._load_info)
 
         def _run_button_clicked(b):
             return run_button_clicked(
-                self._log_out, self.drive_widgets, self.variables, self.tstep,
-                self.tstop, self.ntrials, self.backend_selection, self.mpi_cmd,
-                self.n_jobs, self.params, self.plot_outputs_list,
+                self._log_out, self.drive_widgets, self.simulation_data,
+                self.widget_dt, self.widget_tstop, self.widget_ntrials,
+                self.widget_backend_selection, self.widget_mpi_cmd,
+                self.widget_n_jobs, self.params, self.plot_outputs_list,
                 self.plot_dropdowns_list, self._simulation_status,
-                self.connectivity_sliders, b)
+                self.connectivity_widgets, b)
 
         def _handle_viz_layout_change(layout_option):
             return initialize_viz_window(
-                self._visualization_window, self.variables,
+                self._visualization_window, self.simulation_data,
                 self.plot_outputs_list, self.plot_dropdowns_list,
                 self.layout['visualization_window_width'],
                 self.layout['visualization_window_height'],
@@ -298,25 +301,26 @@ class HNNGUI:
             self._load_info["count"] = 0
             self._load_info["prev_param_data"] = 0
 
-        self.backend_selection.observe(_handle_backend_change, 'value')
+        self.widget_backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
         self.load_button.observe(_on_upload_change)
         self.run_button.on_click(_run_button_clicked)
         self.clear_button.on_click(_clear_params)
-        self.viz_layout_selection.observe(_handle_viz_layout_change, 'value')
+        self.widget_viz_layout_selection.observe(_handle_viz_layout_change,
+                                                 'value')
 
-    def run(self):
+    def compose(self):
         """Compose widgets"""
 
         simulation_box = VBox([
-            self.tstop, self.tstep, self.ntrials, self.backend_selection,
-            self._backend_config_out
+            self.widget_tstop, self.widget_dt, self.widget_ntrials,
+            self.widget_backend_selection, self._backend_config_out
         ])
 
         # accordians to group local-connectivity by cell type
         connectivity_boxes = [
-            VBox(slider) for slider in self.connectivity_sliders]
+            VBox(slider) for slider in self.connectivity_widgets]
         connectivity_names = [
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
             'Layer 5 Basket'
@@ -326,7 +330,7 @@ class HNNGUI:
             cell_connectivity.set_title(idx, connectivity_name)
 
         drive_selections = VBox([
-            self.drive_type_selection, self.location_selection,
+            self.widget_drive_type_selection, self.widget_location_selection,
             self.add_drive_button
         ])
         # from IPywidgets > 8.0
@@ -356,21 +360,23 @@ class HNNGUI:
         self._link_callbacks()
 
         # initialize visualization
-        initialize_viz_window(self._visualization_window,
-                              self.variables,
-                              self.plot_outputs_list,
-                              self.plot_dropdowns_list,
-                              self.layout['visualization_window_width'],
-                              self.layout['visualization_window_height'],
-                              layout_option=self.viz_layout_selection.value,
-                              init=True)
+        initialize_viz_window(
+            self._visualization_window,
+            self.simulation_data,
+            self.plot_outputs_list,
+            self.plot_dropdowns_list,
+            self.layout['visualization_window_width'],
+            self.layout['visualization_window_height'],
+            layout_option=self.widget_viz_layout_selection.value,
+            init=True)
 
         # initialize drive and connectivity ipywidgets
-        load_drive_and_connectivity(self.variables, self.params, self._log_out,
-                                    self._drives_out, self.drive_widgets,
-                                    self.drive_boxes, self._connectivity_out,
-                                    self.connectivity_sliders, self.tstop,
-                                    self._load_info)
+        load_drive_and_connectivity(self.simulation_data, self.params,
+                                    self._log_out, self._drives_out,
+                                    self.drive_widgets, self.drive_boxes,
+                                    self._connectivity_out,
+                                    self.connectivity_widgets,
+                                    self.widget_tstop, self._load_info)
 
         return hnn_gui
 
@@ -771,68 +777,69 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             display(accordion)
 
 
-def _debug_update_plot_window(variables, _plot_out, plot_type, idx):
-    update_plot_window(variables, _plot_out, plot_type)
+def _debug_update_plot_window(simulation_data, _plot_out, plot_type, idx):
+    update_plot_window(simulation_data, _plot_out, plot_type)
 
 
-def update_plot_window(variables, _plot_out, plot_type):
-    """Refresh plots with data from variables."""
+def update_plot_window(simulation_data, _plot_out, plot_type):
+    """Refresh plots with data from simulation_data."""
     _plot_out.clear_output()
     if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
         return
 
     with _plot_out:
         if plot_type['new'] == 'spikes':
-            if variables['net'].cell_response:
+            if simulation_data['net'].cell_response:
                 fig, ax = plt.subplots()
-                variables['net'].cell_response.plot_spikes_raster(ax=ax)
+                simulation_data['net'].cell_response.plot_spikes_raster(ax=ax)
             else:
                 print("No cell response data")
 
         elif plot_type['new'] == 'current dipole':
-            if len(variables['dpls']) > 0:
+            if len(simulation_data['dpls']) > 0:
                 fig, ax = plt.subplots()
-                plot_dipole(variables['dpls'], ax=ax, average=True)
+                plot_dipole(simulation_data['dpls'], ax=ax, average=True)
             else:
                 print("No dipole data")
 
         elif plot_type['new'] == 'input histogram':
             # BUG: got error here, need a better way to handle exception
-            if variables['net'].cell_response:
+            if simulation_data['net'].cell_response:
                 fig, ax = plt.subplots()
-                variables['net'].cell_response.plot_spikes_hist(ax=ax)
+                simulation_data['net'].cell_response.plot_spikes_hist(ax=ax)
             else:
                 print("No cell response data")
 
         elif plot_type['new'] == 'PSD':
-            if len(variables['dpls']) > 0:
+            if len(simulation_data['dpls']) > 0:
                 fig, ax = plt.subplots()
-                variables['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
+                simulation_data['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
             else:
                 print("No dipole data")
 
         elif plot_type['new'] == 'spectogram':
-            if len(variables['dpls']) > 0:
+            if len(simulation_data['dpls']) > 0:
                 freqs = np.arange(10., 100., 1.)
                 n_cycles = freqs / 8.
                 fig, ax = plt.subplots()
-                variables['dpls'][0].plot_tfr_morlet(freqs,
-                                                     n_cycles=n_cycles,
-                                                     ax=ax)
+                simulation_data['dpls'][0].plot_tfr_morlet(freqs,
+                                                           n_cycles=n_cycles,
+                                                           ax=ax)
             else:
                 print("No dipole data")
         elif plot_type['new'] == 'network':
-            if variables['net']:
+            if simulation_data['net']:
                 fig = plt.figure()
                 ax = fig.add_subplot(111, projection='3d')
-                variables['net'].plot_cells(ax=ax)
+                simulation_data['net'].plot_cells(ax=ax)
             else:
                 print("No network data")
 
 
-def add_connectivity_tab(variables, connectivity_out, connectivity_sliders):
+def add_connectivity_tab(simulation_data, connectivity_out,
+                         connectivity_sliders):
     """Add all possible connectivity boxes to connectivity tab."""
-    cell_types = [ct for ct in variables['net'].cell_types.keys()]
+    cell_types = [ct for ct in simulation_data['net'].cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
 
@@ -848,7 +855,7 @@ def add_connectivity_tab(variables, connectivity_out, connectivity_sliders):
                 # the connectivity list should be built on this level
                 receptor_related_conn = {}
                 for receptor in receptors:
-                    conn_indices = pick_connection(net=variables['net'],
+                    conn_indices = pick_connection(net=simulation_data['net'],
                                                    src_gids=src_gids,
                                                    target_gids=target_gids,
                                                    loc=location,
@@ -856,10 +863,10 @@ def add_connectivity_tab(variables, connectivity_out, connectivity_sliders):
                     if len(conn_indices) > 0:
                         assert len(conn_indices) == 1
                         conn_idx = conn_indices[0]
-                        current_w = variables['net'].connectivity[conn_idx][
-                            'nc_dict']['A_weight']
-                        current_p = variables['net'].connectivity[conn_idx][
-                            'probability']
+                        current_w = simulation_data['net'].connectivity[
+                            conn_idx]['nc_dict']['A_weight']
+                        current_p = simulation_data['net'].connectivity[
+                            conn_idx]['probability']
                         # valid connection
                         receptor_related_conn[receptor] = {
                             "weight": current_w,
@@ -885,23 +892,25 @@ def add_connectivity_tab(variables, connectivity_out, connectivity_sliders):
         display(cell_connectivity)
 
 
-def load_drive_and_connectivity(variables, params, log_out, drives_out,
+def load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_sliders, tstop, load_info):
     """Add drive and connectivity ipywidgets from params."""
     load_info['count'] += 1
     # init the network.
-    variables['net'] = jones_2009_model(params)
-    # variables['net'] = jones_2009_model()
+    simulation_data['net'] = jones_2009_model(params)
+    # simulation_data['net'] = jones_2009_model()
 
     # Add connectivity
-    add_connectivity_tab(variables, connectivity_out, connectivity_sliders)
+    add_connectivity_tab(simulation_data, connectivity_out,
+                         connectivity_sliders)
 
     # Add drives
     log_out.clear_output()
     with log_out:
         drive_specs = _extract_drive_specs_from_hnn_params(
-            variables['net']._params, list(variables['net'].cell_types.keys()))
+            simulation_data['net']._params,
+            list(simulation_data['net'].cell_types.keys()))
 
         # clear before adding drives
         drives_out.clear_output()
@@ -932,7 +941,7 @@ def load_drive_and_connectivity(variables, params, log_out, drives_out,
             )
 
 
-def on_upload_change(change, params, tstop, tstep, log_out, variables,
+def on_upload_change(change, params, tstop, dt, log_out, simulation_data,
                      drive_boxes, drive_widgets, drives_out, connectivity_out,
                      connectivity_sliders, load_info):
     if len(change['owner'].value) == 0:
@@ -962,22 +971,23 @@ To force reloading, hit \"clear uploaded parameters\" button")
         if 'tstop' in params_network.keys():
             tstop.value = params_network['tstop']
         if 'dt' in params_network.keys():
-            tstep.value = params_network['dt']
+            dt.value = params_network['dt']
 
         params.update(params_network)
     # init network, add drives & connectivity
-    load_drive_and_connectivity(variables, params, log_out, drives_out,
+    load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_sliders, tstop, load_info)
 
 
-def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
-                               connectivity_sliders, add_drive=True):
+def _init_network_from_widgets(params, dt, tstop, simulation_data,
+                               drive_widgets, connectivity_sliders,
+                               add_drive=True):
     """Construct network and add drives."""
     print("init network")
-    params['dt'] = tstep.value
+    params['dt'] = dt.value
     params['tstop'] = tstop.value
-    variables['net'] = jones_2009_model(
+    simulation_data['net'] = jones_2009_model(
         params,
         add_drives_from_params=False,
     )
@@ -985,7 +995,7 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
     for connectivity_slider in connectivity_sliders:
         for vbox in connectivity_slider:
             conn_indices = pick_connection(
-                net=variables['net'],
+                net=simulation_data['net'],
                 src_gids=vbox._belongsto['src_gids'],
                 target_gids=vbox._belongsto['target_gids'],
                 loc=vbox._belongsto['location'],
@@ -994,9 +1004,9 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
             if len(conn_indices) > 0:
                 assert len(conn_indices) == 1
                 conn_idx = conn_indices[0]
-                variables['net'].connectivity[conn_idx]['nc_dict'][
+                simulation_data['net'].connectivity[conn_idx]['nc_dict'][
                     'A_weight'] = vbox.children[1].value
-                variables['net'].connectivity[conn_idx][
+                simulation_data['net'].connectivity[conn_idx][
                     'probability'] = vbox.children[3].value
 
     if add_drive is False:
@@ -1028,7 +1038,7 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
                 k: v
                 for k, v in weights_nmda.items() if k in rate_constant
             }
-            variables['net'].add_poisson_drive(
+            simulation_data['net'].add_poisson_drive(
                 name=drive['name'],
                 tstart=drive['tstart'].value,
                 tstop=drive['tstop'].value,
@@ -1040,7 +1050,7 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
                 space_constant=100.0,
                 event_seed=drive['seedcore'].value)
         elif drive['type'] in ('Evoked', 'Gaussian'):
-            variables['net'].add_evoked_drive(
+            simulation_data['net'].add_evoked_drive(
                 name=drive['name'],
                 mu=drive['mu'].value,
                 sigma=drive['sigma'].value,
@@ -1052,7 +1062,7 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
                 space_constant=3.0,
                 event_seed=drive['seedcore'].value)
         elif drive['type'] in ('Rhythmic', 'Bursty'):
-            variables['net'].add_bursty_drive(
+            simulation_data['net'].add_bursty_drive(
                 name=drive['name'],
                 tstart=drive['tstart'].value,
                 tstart_std=drive['tstart_std'].value,
@@ -1066,37 +1076,37 @@ def _init_network_from_widgets(params, tstep, tstop, variables, drive_widgets,
                 event_seed=drive['seedcore'].value)
 
 
-def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
+def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
                        ntrials, backend_selection, mpi_cmd, n_jobs,
                        params, plot_outputs_list, plot_dropdowns_list,
                        simulation_status, connectivity_sliders, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
-        _init_network_from_widgets(params, tstep, tstop, variables,
+        _init_network_from_widgets(params, dt, tstop, simulation_data,
                                    drive_widgets, connectivity_sliders)
 
         print("start simulation")
         if backend_selection.value == "MPI":
-            variables['backend'] = MPIBackend(
+            simulation_data['backend'] = MPIBackend(
                 n_procs=multiprocessing.cpu_count() - 1, mpi_cmd=mpi_cmd.value)
         else:
-            variables['backend'] = JoblibBackend(n_jobs=n_jobs.value)
+            simulation_data['backend'] = JoblibBackend(n_jobs=n_jobs.value)
             print(f"Using Joblib with {n_jobs.value} core(s).")
-        with variables['backend']:
+        with simulation_data['backend']:
             simulation_status.value = """<div
             style='background:orange;padding-left:10px;color:white;'>
             Running...</div>"""
-            variables['dpls'] = simulate_dipole(variables['net'],
-                                                tstop=tstop.value,
-                                                dt=tstep.value,
-                                                n_trials=ntrials.value)
+            simulation_data['dpls'] = simulate_dipole(simulation_data['net'],
+                                                      tstop=tstop.value,
+                                                      dt=dt.value,
+                                                      n_trials=ntrials.value)
 
             window_len, scaling_factor = 30, 3000
             simulation_status.value = """<div
             style='background:green;padding-left:10px;color:white;'>
             Simulation finished</div>"""
-            for dpl in variables['dpls']:
+            for dpl in simulation_data['dpls']:
                 dpl.smooth(window_len).scale(scaling_factor)
 
     # Update all plotting panels
@@ -1104,7 +1114,7 @@ def run_button_clicked(log_out, drive_widgets, variables, tstep, tstop,
         with log_out:
             print(f"updating panel {idx}")
         update_plot_window(
-            variables, plot_outputs_list[idx], {
+            simulation_data, plot_outputs_list[idx], {
                 "type": "change",
                 "name": "value",
                 "new": plot_dropdowns_list[idx].value
@@ -1122,7 +1132,7 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
 
 
 def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
-                               variables, plot_options, previous_outputs,
+                               simulation_data, plot_options, previous_outputs,
                                border='1px solid gray', init=False):
     height_plot = window_height
     plot_outputs_L = Output(layout={'border': border, 'height': height_plot})
@@ -1139,7 +1149,7 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
     )
     plot_dropdown_L.observe(
         lambda plot_type: _debug_update_plot_window(
-            variables,
+            simulation_data,
             plot_outputs_L,
             plot_type,
             "Left",
@@ -1160,7 +1170,7 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
     )
     plot_dropdown_R.observe(
         lambda plot_type: _debug_update_plot_window(
-            variables,
+            simulation_data,
             plot_outputs_R,
             plot_type,
             "Right",
@@ -1172,12 +1182,12 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
     plot_dropdowns.append(plot_dropdown_R)
 
     if not init:
-        update_plot_window(variables, plot_outputs_L, {
+        update_plot_window(simulation_data, plot_outputs_L, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[0]
         })
-        update_plot_window(variables, plot_outputs_R, {
+        update_plot_window(simulation_data, plot_outputs_R, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[1]
@@ -1190,7 +1200,7 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
 
 
 def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
-                               variables, plot_options, previous_outputs,
+                               simulation_data, plot_options, previous_outputs,
                                border='1px solid gray', init=False):
     height_plot = window_height
     default_plot_types = [plot_options[0], plot_options[1]]
@@ -1210,7 +1220,7 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
     )
     plot_dropdown_U.observe(
         lambda plot_type: _debug_update_plot_window(
-            variables,
+            simulation_data,
             plot_outputs_U,
             plot_type,
             "Left",
@@ -1233,7 +1243,7 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
 
     plot_dropdown_D.observe(
         lambda plot_type: _debug_update_plot_window(
-            variables,
+            simulation_data,
             plot_outputs_D,
             plot_type,
             "Right",
@@ -1244,12 +1254,12 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
     plot_dropdowns.append(plot_dropdown_D)
 
     if not init:
-        update_plot_window(variables, plot_outputs_U, {
+        update_plot_window(simulation_data, plot_outputs_U, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[0]
         })
-        update_plot_window(variables, plot_outputs_D, {
+        update_plot_window(simulation_data, plot_outputs_D, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[1]
@@ -1261,9 +1271,9 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
     return grid
 
 
-def initialize_viz_window(viz_window, variables, plot_outputs, plot_dropdowns,
-                          window_width, window_height, layout_option="L-R",
-                          init=False):
+def initialize_viz_window(viz_window, simulation_data, plot_outputs,
+                          plot_dropdowns, window_width, window_height,
+                          layout_option="L-R", init=False):
     plot_options = [
         'current dipole', 'input histogram', 'spikes', 'PSD', 'spectogram',
         'network'
@@ -1280,7 +1290,7 @@ def initialize_viz_window(viz_window, variables, plot_outputs, plot_dropdowns,
             grid = init_left_right_viz_layout(plot_outputs,
                                               plot_dropdowns,
                                               window_height,
-                                              variables,
+                                              simulation_data,
                                               plot_options,
                                               previous_plot_outputs_values,
                                               init=init)
@@ -1290,7 +1300,7 @@ def initialize_viz_window(viz_window, variables, plot_outputs, plot_dropdowns,
             grid = init_upper_down_viz_layout(plot_outputs,
                                               plot_dropdowns,
                                               window_height,
-                                              variables,
+                                              simulation_data,
                                               plot_options,
                                               previous_plot_outputs_values,
                                               init=init)
