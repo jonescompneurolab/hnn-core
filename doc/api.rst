@@ -113,4 +113,4 @@ GUI (:py:mod:`hnn_core.gui`):
    :toctree: generated/
 
    HNNGUI
-   launch
+

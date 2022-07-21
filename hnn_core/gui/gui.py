@@ -43,6 +43,7 @@ class HNNGUI:
         The width of the left side bar (in pixel).
     drive_widget_width: str
         The width of network drive tab  (in pixel).
+
     Attributes
     ----------
     layout: dict
@@ -194,8 +195,10 @@ class HNNGUI:
         self._init_ui_components()
 
     def _init_ui_components(self):
-        """Initialize larger UI components and dynamical output windows. It's
-        not encouraged for users to modify or access attributes in this part.
+        """Initialize larger UI components and dynamical output windows.
+
+        It's not encouraged for users to modify or access attributes in this
+        part.
         """
         # Reloading status.
         self._load_info = {"count": 0, "prev_param_data": b""}
@@ -390,9 +393,7 @@ def create_expanded_button(description, button_style, height, disabled=False,
 
 
 def _get_connectivity_widgets(conn_data):
-    """Create connectivity box widgets from specified weight and probability
-    data.
-    """
+    """Create connectivity box widgets from specified weight and probability"""
 
     style = {'description_width': '150px'}
     style = {}
@@ -404,9 +405,7 @@ def _get_connectivity_widgets(conn_data):
                                  style=style)
 
         w_slider = FloatLogSlider(value=conn_data[receptor_name]['weight'],
-                                  min=-5,
-                                  max=1,
-                                  step=0.2,
+                                  min=-5, max=1, step=0.2,
                                   description=" ",
                                   disabled=False,
                                   continuous_update=False,
@@ -499,15 +498,9 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
     return widgets_list, widgets_dict
 
 
-def _get_rhythmic_widget(name,
-                         tstop_widget,
-                         layout,
-                         style,
-                         location,
-                         data=None,
-                         default_weights_ampa=None,
-                         default_weights_nmda=None,
-                         default_delays=None):
+def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
+                         data=None, default_weights_ampa=None,
+                         default_weights_nmda=None, default_delays=None):
     default_data = {
         'tstart': 0.,
         'tstart_std': 0.,
@@ -572,14 +565,8 @@ def _get_rhythmic_widget(name,
     return drive, drive_box
 
 
-def _get_poisson_widget(name,
-                        tstop_widget,
-                        layout,
-                        style,
-                        location,
-                        data=None,
-                        default_weights_ampa=None,
-                        default_weights_nmda=None,
+def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
+                        default_weights_ampa=None, default_weights_nmda=None,
                         default_delays=None):
     default_data = {
         'tstart': 0.0,
@@ -647,13 +634,8 @@ def _get_poisson_widget(name,
     return drive, drive_box
 
 
-def _get_evoked_widget(name,
-                       layout,
-                       style,
-                       location,
-                       data=None,
-                       default_weights_ampa=None,
-                       default_weights_nmda=None,
+def _get_evoked_widget(name, layout, style, location, data=None,
+                       default_weights_ampa=None, default_weights_nmda=None,
                        default_delays=None):
     default_data = {
         'mu': 0,
@@ -899,7 +881,6 @@ def load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
     load_info['count'] += 1
     # init the network.
     simulation_data['net'] = jones_2009_model(params)
-    # simulation_data['net'] = jones_2009_model()
 
     # Add connectivity
     add_connectivity_tab(simulation_data, connectivity_out,
@@ -1309,8 +1290,9 @@ def initialize_viz_window(viz_window, simulation_data, plot_outputs,
 
 
 def launch():
-    """Launch voila with hnn_widget.ipynb. You can pass voila commandline
-    parameters as usual.
+    """Launch voila with hnn_widget.ipynb.
+
+    You can pass voila commandline parameters as usual.
     """
     from voila.app import main
     notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
