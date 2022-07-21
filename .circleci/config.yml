@@ -49,6 +49,7 @@ jobs:
               command: |
                   source ~/miniconda/bin/activate testenv
                   pip install -U pip setuptools virtualenv
+                  pip install ipywidgets voila
                   python setup.py install
 
           - run:
