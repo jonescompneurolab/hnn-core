@@ -67,8 +67,8 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
-                       decim=None, color=None,
-                       voltage_offset=None, voltage_scalebar=None,
+                       decim=None, color='cividis',
+                       voltage_offset=50, voltage_scalebar=200,
                        contact_labels=None, show=True):
     """Plot extracellular electrode array voltage time series.
 
@@ -148,6 +148,8 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
     if ax is None:
         _, ax = plt.subplots(1, 1)
+
+    color = plt.get_cmap(color, len(contact_labels))
 
     n_offsets = data.shape[0]
     trace_offsets = np.zeros((n_offsets, 1))

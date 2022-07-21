@@ -354,8 +354,8 @@ class ExtracellularArray:
         return self
 
     def plot(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
-             ax=None, decim=None, color=None, voltage_offset=None,
-             voltage_scalebar=None, contact_labels=None, show=True):
+             ax=None, decim=None, color='cividis', voltage_offset=50,
+             voltage_scalebar=200, contact_labels=None, show=True):
         """Plot extracellular electrode array voltage time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
@@ -416,6 +416,10 @@ class ExtracellularArray:
             plot_data = plot_data[:, contact_no, ]
         elif contact_no is not None:
             raise ValueError(f'unknown contact number type, got {contact_no}')
+
+        if contact_labels is None:
+            positions = np.array(self.positions)
+            contact_labels = positions[:, 2]
 
         for trial_data in plot_data:
             fig = plot_extracellular(

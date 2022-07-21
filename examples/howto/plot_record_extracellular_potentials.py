@@ -86,24 +86,17 @@ fig, axs = plt.subplots(3, 1, sharex=True, figsize=(6, 8),
                         gridspec_kw={'height_ratios': [1, 3, 2]})
 
 # Then plot the aggregate dipole time series on its own axis
-dpl[trial_idx].copy().smooth(
-    window_len=window_len).plot(ax=axs[0], decim=decimate,
-                                show=False)
-
-voltage_offset = 50  # the spacing between individual traces
-voltage_scalebar = 200  # can be different from offset
-# we can assign each electrode a unique color using a linear colormap
-colors = plt.get_cmap('cividis', len(electrode_pos))
+dpl[trial_idx].smooth(window_len=window_len)
+dpl[trial_idx].plot(ax=axs[0], decim=decimate)
 
 # use the same smoothing window on the LFP traces to allow comparison to dipole
 net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
-    ax=axs[1], contact_labels=depths, color=colors, decim=decimate, show=False,
-    voltage_offset=voltage_offset, voltage_scalebar=voltage_scalebar)
+    ax=axs[1], decim=decimate)
 
 axs[1].grid(True, which='major', axis='x')
 axs[1].set_xlabel('')
 # Finally, add the spike raster to the bottom subplot
-net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
+net.cell_response.plot_spikes_raster(ax=axs[2])
 plt.tight_layout()
 plt.show()
 
