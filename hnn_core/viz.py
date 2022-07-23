@@ -89,9 +89,9 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
-    color : string | array of floats | ``matplotlib.colors.ListedColormap``
-        The color to use for plotting (optional). The usual Matplotlib standard
-        color strings may be used (e.g., 'b' for blue). A color can also be
+    color : str | array of floats | ``matplotlib.colors.ListedColormap``
+        The colormap to use for plotting. The usual Matplotlib standard
+        colormap strings may be used (e.g., 'jetblue'). A color can also be
         defined as an RGBA-quadruplet, or an array of RGBA-values (one for each
         electrode contact trace to plot). An instance of
         :class:`~matplotlib.colors.ListedColormap` may also be provided.
@@ -145,11 +145,11 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
             if color.N != n_contacts:
                 raise ValueError(f'ListedColormap has N={color.N}, but '
                                  f'there are {n_contacts} contacts')
+        elif isinstance(color, str):
+            color = plt.get_cmap(color, len(contact_labels))
 
     if ax is None:
         _, ax = plt.subplots(1, 1)
-
-    color = plt.get_cmap(color, len(contact_labels))
 
     n_offsets = data.shape[0]
     trace_offsets = np.zeros((n_offsets, 1))
