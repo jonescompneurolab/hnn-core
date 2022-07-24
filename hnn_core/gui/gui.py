@@ -101,19 +101,22 @@ class HNNGUI:
                  drive_widget_width="200px"):
         # set up styling.
         self.layout = {
-            "theme_color": theme_color,
-            "button": Layout(height='30px', width='auto'),
-            "log_out": {
-                    'border': '1px solid gray',
-                    'height': log_window_height,
-                    'overflow': 'auto'
-                },
-            "visualization_window": Layout(width=visualization_window_width,
-                                           height=visualization_window_height,
-                                           border='1px solid gray'),
-            "left_sidebar": Layout(width=left_sidebar_width),
-            "drive_widget": Layout(width=drive_widget_width),
-            "drive_textbox": Layout(width='270px', height='auto')
+            "theme_color":
+            theme_color,
+            "button":
+            Layout(height='30px', width='auto'),
+            "log_out": Layout(border='1px solid gray',
+                              height=log_window_height, overflow='auto'),
+            "visualization_window":
+            Layout(width=visualization_window_width,
+                   height=visualization_window_height,
+                   border='1px solid gray'),
+            "left_sidebar":
+            Layout(width=left_sidebar_width),
+            "drive_widget":
+            Layout(width=drive_widget_width),
+            "drive_textbox":
+            Layout(width='270px', height='auto')
         }
 
         # load default parameters
@@ -157,12 +160,12 @@ class HNNGUI:
             value='Evoked',
             description='Drive:',
             disabled=False,
-            layout=Layout(width=self.layout['drive_widget_width']))
+            layout=self.layout['drive_widget'])
 
         self.widget_location_selection = RadioButtons(
             options=['proximal', 'distal'], value='proximal',
             description='Location', disabled=False,
-            layout=Layout(width=self.layout['drive_widget_width']))
+            layout=self.layout['drive_widget'])
 
         self.add_drive_button = create_expanded_button(
             'Add drive', 'primary', layout=self.layout['button'],
@@ -180,7 +183,8 @@ class HNNGUI:
             button_style='success')
 
         self.clear_button = create_expanded_button(
-            'Clear uploaded parameters', 'danger', layout=self.layout['button'],
+            'Clear uploaded parameters', 'danger',
+            layout=self.layout['button'],
             button_color=self.layout['theme_color'])
 
         self.delete_drive_button = create_expanded_button(
@@ -212,7 +216,7 @@ class HNNGUI:
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
-        self._log_out = Output(self.layout['log_out'])
+        self._log_out = Output(layout=self.layout['log_out'])
         # visualization window
         self._visualization_window = Output(
             layout=self.layout['visualization_window'])
@@ -378,7 +382,8 @@ class HNNGUI:
                                     self.drive_widgets, self.drive_boxes,
                                     self._connectivity_out,
                                     self.connectivity_widgets,
-                                    self.widget_tstop, self._load_info)
+                                    self.widget_tstop, self._load_info,
+                                    self.layout)
 
         return hnn_gui
 
@@ -937,7 +942,7 @@ def on_upload_change(change, params, tstop, dt, log_out, simulation_data,
     if load_info['prev_param_data'] == param_data:
         with log_out:
             print("Same param. No reloading. \
-To force reloading, hit \"clear uploaded parameters\" button")
+To force reloading, hit \"clear uploaded parameters\" button"                                                             )
         return
     else:
         load_info['prev_param_data'] = param_data
@@ -1113,7 +1118,7 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
             display(n_jobs)
 
 
-def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
+def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
                                simulation_data, plot_options, previous_outputs,
                                layout, init=False):
     plot_outputs_L = Output(layout=layout)
@@ -1173,24 +1178,23 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
             "name": "value",
             "new": default_plot_types[1]
         })
-
-    grid = GridspecLayout(1, 2, height=window_height)
+    grid = GridspecLayout(1, 2, height=layout.height)
     grid[0, 0] = VBox([plot_dropdown_L, plot_outputs_L])
     grid[0, 1] = VBox([plot_dropdown_R, plot_outputs_R])
     return grid
 
 
-def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
-                               simulation_data, plot_options, previous_outputs,
-                               border='1px solid gray', init=False):
-    height_plot = window_height
+def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
+                               plot_options, previous_outputs,
+                               layout, init=False):
+
     default_plot_types = [plot_options[0], plot_options[1]]
     for idx, plot_type in enumerate(previous_outputs[:2]):
         default_plot_types[idx] = plot_type
 
     plot_outputs_U = Output(layout={
-        'border': border,
-        'height': f"{float(height_plot[:-2])/2}px"
+        'border': layout.border,
+        'height': f"{float(layout.height[:-2])/2}px"
     })
 
     plot_dropdown_U = Dropdown(
@@ -1213,7 +1217,10 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
     plot_dropdowns.append(plot_dropdown_U)
 
     # Down
-    plot_outputs_D = Output(layout={'border': border, 'height': height_plot})
+    plot_outputs_D = Output(layout={
+        'border': layout.border,
+        'height': layout.height
+    })
 
     plot_dropdown_D = Dropdown(
         options=plot_options,
@@ -1246,7 +1253,7 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
             "new": default_plot_types[1]
         })
 
-    grid = GridspecLayout(2, 1, height=window_height)
+    grid = GridspecLayout(2, 1, height=layout.height)
     grid[0, 0] = VBox([plot_dropdown_U, plot_outputs_U])
     grid[1, 0] = VBox([plot_dropdown_D, plot_outputs_D])
     return grid
@@ -1268,23 +1275,17 @@ def initialize_viz_window(viz_window, simulation_data, plot_outputs,
     with viz_window:
         # Left-Rright configuration
         if layout_option == "L-R":
-            grid = init_left_right_viz_layout(plot_outputs,
-                                              plot_dropdowns,
-                                              layout,
-                                              simulation_data,
-                                              plot_options,
+            grid = init_left_right_viz_layout(plot_outputs, plot_dropdowns,
+                                              simulation_data, plot_options,
                                               previous_plot_outputs_values,
-                                              init=init)
+                                              layout, init=init)
 
         # Upper-Down configuration
         elif layout_option == "U-D":
-            grid = init_upper_down_viz_layout(plot_outputs,
-                                              plot_dropdowns,
-                                              layout,
-                                              simulation_data,
-                                              plot_options,
+            grid = init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
+                                              simulation_data, plot_options,
                                               previous_plot_outputs_values,
-                                              init=init)
+                                              layout, init=init)
 
         display(grid)
 
