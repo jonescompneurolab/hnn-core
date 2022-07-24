@@ -102,13 +102,19 @@ class HNNGUI:
         # set up styling.
         self.layout = {
             "theme_color": theme_color,
-            "log_window_height": log_window_height,
-            "visualization_window_width": visualization_window_width,
-            "visualization_window_height": visualization_window_height,
-            "left_sidebar_width": left_sidebar_width,
-            "drive_widget_width": drive_widget_width,
+            "button": Layout(height='30px', width='auto'),
+            "log_out": {
+                    'border': '1px solid gray',
+                    'height': log_window_height,
+                    'overflow': 'auto'
+                },
+            "visualization_window": Layout(width=visualization_window_width,
+                                           height=visualization_window_height,
+                                           border='1px solid gray'),
+            "left_sidebar": Layout(width=left_sidebar_width),
+            "drive_widget": Layout(width=drive_widget_width),
+            "drive_textbox": Layout(width='270px', height='auto')
         }
-        self.layout['drive_widget_width'] = drive_widget_width
 
         # load default parameters
         self.params = self.load_parameters()
@@ -159,26 +165,26 @@ class HNNGUI:
             layout=Layout(width=self.layout['drive_widget_width']))
 
         self.add_drive_button = create_expanded_button(
-            'Add drive', 'primary', height='30px',
+            'Add drive', 'primary', layout=self.layout['button'],
             button_color=self.layout['theme_color'])
 
         # Run, delete drives and load button
         self.run_button = create_expanded_button(
-            'Run', 'success', height='30px',
+            'Run', 'success', layout=self.layout['button'],
             button_color=self.layout['theme_color'])
 
         self.load_button = FileUpload(
             accept='.json,.param', multiple=False,
             style={'button_color': self.layout['theme_color']},
-            description='Load network',
+            description='Load network', layout=self.layout['button'],
             button_style='success')
 
         self.clear_button = create_expanded_button(
-            'Clear uploaded parameters', 'danger', height='30px',
+            'Clear uploaded parameters', 'danger', layout=self.layout['button'],
             button_color=self.layout['theme_color'])
 
         self.delete_drive_button = create_expanded_button(
-            'Delete drives', 'success', height='30px',
+            'Delete drives', 'success', layout=self.layout['button'],
             button_color=self.layout['theme_color'])
 
         # Visualization figure list
@@ -206,17 +212,10 @@ class HNNGUI:
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
-        self._log_out = Output(
-            layout={
-                'border': '1px solid gray',
-                'height': self.layout['log_window_height'],
-                'overflow': 'auto'
-            })
+        self._log_out = Output(self.layout['log_out'])
         # visualization window
-        self._visualization_window = Output(layout={
-            'height': self.layout['visualization_window_height'],
-            'width': self.layout['visualization_window_width'],
-        })
+        self._visualization_window = Output(
+            layout=self.layout['visualization_window'])
         # detailed configuration of backends
         self._backend_config_out = Output()
 
@@ -263,7 +262,8 @@ class HNNGUI:
             return add_drive_widget(self.widget_drive_type_selection.value,
                                     self.drive_boxes, self.drive_widgets,
                                     self._drives_out, self.widget_tstop,
-                                    self.widget_location_selection.value)
+                                    self.widget_location_selection.value,
+                                    layout=self.layout['drive_textbox'])
 
         def _delete_drives_clicked(b):
             self._drives_out.clear_output()
@@ -281,7 +281,8 @@ class HNNGUI:
                                     self.simulation_data, self.drive_boxes,
                                     self.drive_widgets, self._drives_out,
                                     self._connectivity_out,
-                                    self.connectivity_widgets, self._load_info)
+                                    self.connectivity_widgets, self._load_info,
+                                    layout=self.layout['drive_textbox'])
 
         def _run_button_clicked(b):
             return run_button_clicked(
@@ -296,8 +297,7 @@ class HNNGUI:
             return initialize_viz_window(
                 self._visualization_window, self.simulation_data,
                 self.plot_outputs_list, self.plot_dropdowns_list,
-                self.layout['visualization_window_width'],
-                self.layout['visualization_window_height'],
+                self.layout['visualization_window'],
                 layout_option=layout_option.new)
 
         def _clear_params(b):
@@ -352,11 +352,11 @@ class HNNGUI:
             right_sidebar=self._visualization_window,
             footer=self._footer,
             pane_widths=[
-                self.layout['left_sidebar_width'], '0px',
-                self.layout['visualization_window_width']
+                self.layout['left_sidebar'].width, '0px',
+                self.layout['visualization_window'].width
             ],
             pane_heights=[
-                '50px', self.layout['visualization_window_height'], "1"
+                '50px', self.layout['visualization_window'].height, "1"
             ],
         )
 
@@ -368,8 +368,7 @@ class HNNGUI:
             self.simulation_data,
             self.plot_outputs_list,
             self.plot_dropdowns_list,
-            self.layout['visualization_window_width'],
-            self.layout['visualization_window_height'],
+            self.layout['visualization_window'],
             layout_option=self.widget_viz_layout_selection.value,
             init=True)
 
@@ -384,11 +383,10 @@ class HNNGUI:
         return hnn_gui
 
 
-def create_expanded_button(description, button_style, height, disabled=False,
+def create_expanded_button(description, button_style, layout, disabled=False,
                            button_color="#8A2BE2"):
     return Button(description=description, button_style=button_style,
-                  layout=Layout(height=height, width='auto'),
-                  style={'button_color': button_color},
+                  layout=layout, style={'button_color': button_color},
                   disabled=disabled)
 
 
@@ -684,7 +682,8 @@ def _get_evoked_widget(name, layout, style, location, data=None,
 
 
 def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
-                     tstop_widget, location, prespecified_drive_name=None,
+                     tstop_widget, location, layout,
+                     prespecified_drive_name=None,
                      prespecified_drive_data=None,
                      prespecified_weights_ampa=None,
                      prespecified_weights_nmda=None,
@@ -692,7 +691,6 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      expand_last_drive=True, event_seed=14):
     """Add a widget for a new drive."""
 
-    layout = Layout(width='270px', height='auto')
     style = {'description_width': '150px'}
     drives_out.clear_output()
     if not prespecified_drive_data:
@@ -876,7 +874,8 @@ def add_connectivity_tab(simulation_data, connectivity_out,
 
 def load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop, load_info):
+                                connectivity_sliders, tstop, load_info,
+                                layout):
     """Add drive and connectivity ipywidgets from params."""
     load_info['count'] += 1
     # init the network.
@@ -911,6 +910,7 @@ def load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
                 drives_out,
                 tstop,
                 specs['location'],
+                layout=layout,
                 prespecified_drive_name=drive_name,
                 prespecified_drive_data=specs['dynamics'],
                 prespecified_weights_ampa=specs['weights_ampa'],
@@ -924,7 +924,7 @@ def load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
 
 def on_upload_change(change, params, tstop, dt, log_out, simulation_data,
                      drive_boxes, drive_widgets, drives_out, connectivity_out,
-                     connectivity_sliders, load_info):
+                     connectivity_sliders, load_info, layout):
     if len(change['owner'].value) == 0:
         return
 
@@ -958,7 +958,8 @@ To force reloading, hit \"clear uploaded parameters\" button")
     # init network, add drives & connectivity
     load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop, load_info)
+                                connectivity_sliders, tstop, load_info,
+                                layout)
 
 
 def _init_network_from_widgets(params, dt, tstop, simulation_data,
@@ -1114,9 +1115,8 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
 
 def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
                                simulation_data, plot_options, previous_outputs,
-                               border='1px solid gray', init=False):
-    height_plot = window_height
-    plot_outputs_L = Output(layout={'border': border, 'height': height_plot})
+                               layout, init=False):
+    plot_outputs_L = Output(layout=layout)
 
     default_plot_types = [plot_options[0], plot_options[1]]
     for idx, plot_type in enumerate(previous_outputs[:2]):
@@ -1141,7 +1141,7 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns, window_height,
     plot_outputs.append(plot_outputs_L)
     plot_dropdowns.append(plot_dropdown_L)
 
-    plot_outputs_R = Output(layout={'border': border, 'height': height_plot})
+    plot_outputs_R = Output(layout=layout)
 
     plot_dropdown_R = Dropdown(
         options=plot_options,
@@ -1253,7 +1253,7 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, window_height,
 
 
 def initialize_viz_window(viz_window, simulation_data, plot_outputs,
-                          plot_dropdowns, window_width, window_height,
+                          plot_dropdowns, layout,
                           layout_option="L-R", init=False):
     plot_options = [
         'current dipole', 'input histogram', 'spikes', 'PSD', 'spectogram',
@@ -1270,7 +1270,7 @@ def initialize_viz_window(viz_window, simulation_data, plot_outputs,
         if layout_option == "L-R":
             grid = init_left_right_viz_layout(plot_outputs,
                                               plot_dropdowns,
-                                              window_height,
+                                              layout,
                                               simulation_data,
                                               plot_options,
                                               previous_plot_outputs_values,
@@ -1280,7 +1280,7 @@ def initialize_viz_window(viz_window, simulation_data, plot_outputs,
         elif layout_option == "U-D":
             grid = init_upper_down_viz_layout(plot_outputs,
                                               plot_dropdowns,
-                                              window_height,
+                                              layout,
                                               simulation_data,
                                               plot_options,
                                               previous_plot_outputs_values,
