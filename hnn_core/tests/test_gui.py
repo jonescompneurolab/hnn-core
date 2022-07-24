@@ -70,8 +70,7 @@ def test_gui_upload_params():
 
 
 def test_gui_change_connectivity():
-    """Test if GUI properly changes cell connectivity parameters.
-    """
+    """Test if GUI properly changes cell connectivity parameters."""
     gui = HNNGUI()
     _ = gui.compose()
 
