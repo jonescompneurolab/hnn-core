@@ -116,7 +116,20 @@ class HNNGUI:
             "drive_widget":
             Layout(width=drive_widget_width),
             "drive_textbox":
-            Layout(width='270px', height='auto')
+            Layout(width='270px', height='auto'),
+            "simulation_status_common": "background:gray;padding-left:10px",
+        }
+
+        self._simulation_status_contents = {
+            "not_running":
+            f"""<div style='{self.layout['simulation_status_common']};
+            color:white;'>Not running</div>""",
+            "running":
+            f"""<div style='{self.layout['simulation_status_common']};
+            color:white;'>Running...</div>""",
+            "finished":
+            f"""<div style='{self.layout['simulation_status_common']};
+            color:white;'>Simulation finished</div>""",
         }
 
         # load default parameters
@@ -225,9 +238,8 @@ class HNNGUI:
 
         # static parts
         # Running status
-        self._simulation_status = HTML(value="""<div
-            style='background:gray;padding-left:10px;color:white;'>
-            Not running</div>""")
+        self._simulation_status_bar = HTML(
+            value=self._simulation_status_contents['not_running'])
 
         # footer
         self._footer = VBox([
@@ -237,7 +249,7 @@ class HNNGUI:
                     self.delete_drive_button
                 ]),
                 self.widget_viz_layout_selection,
-            ]), self._log_out, self._simulation_status
+            ]), self._log_out, self._simulation_status_bar
         ])
         # title
         self._header = HTML(value=f"""<div
@@ -294,7 +306,8 @@ class HNNGUI:
                 self.widget_dt, self.widget_tstop, self.widget_ntrials,
                 self.widget_backend_selection, self.widget_mpi_cmd,
                 self.widget_n_jobs, self.params, self.plot_outputs_list,
-                self.plot_dropdowns_list, self._simulation_status,
+                self.plot_dropdowns_list, self._simulation_status_bar,
+                self._simulation_status_contents,
                 self.connectivity_widgets, b)
 
         def _handle_viz_layout_change(layout_option):
@@ -1068,7 +1081,8 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
 def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
                        ntrials, backend_selection, mpi_cmd, n_jobs,
                        params, plot_outputs_list, plot_dropdowns_list,
-                       simulation_status, connectivity_sliders, b):
+                       simulation_status_bar, simulation_status_contents,
+                       connectivity_sliders, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
@@ -1083,18 +1097,15 @@ def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
             simulation_data['backend'] = JoblibBackend(n_jobs=n_jobs.value)
             print(f"Using Joblib with {n_jobs.value} core(s).")
         with simulation_data['backend']:
-            simulation_status.value = """<div
-            style='background:orange;padding-left:10px;color:white;'>
-            Running...</div>"""
+            simulation_status_bar.value = simulation_status_contents['running']
             simulation_data['dpls'] = simulate_dipole(simulation_data['net'],
                                                       tstop=tstop.value,
                                                       dt=dt.value,
                                                       n_trials=ntrials.value)
 
             window_len, scaling_factor = 30, 3000
-            simulation_status.value = """<div
-            style='background:green;padding-left:10px;color:white;'>
-            Simulation finished</div>"""
+            simulation_status_bar.value = simulation_status_contents[
+                'finished']
             for dpl in simulation_data['dpls']:
                 dpl.smooth(window_len).scale(scaling_factor)
 
