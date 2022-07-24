@@ -941,8 +941,9 @@ def on_upload_change(change, params, tstop, dt, log_out, simulation_data,
 
     if load_info['prev_param_data'] == param_data:
         with log_out:
-            print("Same param. No reloading."
-To force reloading, hit \"clear uploaded parameters\" button"                                                             )
+            print(
+                "Same param. No reloading."
+                "To force reloading, hit \"clear uploaded parameters\" button")
         return
     else:
         load_info['prev_param_data'] = param_data
