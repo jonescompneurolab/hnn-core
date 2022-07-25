@@ -93,12 +93,12 @@ def _get_mpi_env():
 
 
 def spawn_job(command, obj, n_procs, info=None):
-    """Spawn child simulation jobs from an existing MPI communicator
+    """Spawn child simulation jobs from an existing MPI communicator.
 
     Parameters
     ----------
-    command : list of str | str
-        Command to spawn job from new MPI communicator.
+    command : list of str
+        Command and program arguments to spawn job from new MPI communicator.
     obj : object
         The object containing network and other simulation-specific information
         to broadcast to each child process via MPI.
@@ -129,9 +129,8 @@ def spawn_job(command, obj, n_procs, info=None):
     intercomm.bcast(obj, root=MPI.ROOT)
 
     # all child processes must complete without an error; if not, prevent
-    # the parent from deadlocking with a blocking recv call
-    # (note that the traceback cannot be accessed from here or passed to 
-    # the parent)
+    # the parent from deadlocking with a blocking recv call (note that the
+    # traceback cannot be accessed from here or passed to the parent)
     err_in_children = intercomm.allreduce(None, op=MPI.LAND)
     if err_in_children:
         raise RuntimeError('An error occured in a spawned MPI child process. '
@@ -152,7 +151,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
 
     Parameters
     ----------
-    command : list of str | str
+    command : list of str
         Command to run as subprocess (see subprocess.Popen documentation).
     obj : object
         The object to write to stdin after starting child process
@@ -660,11 +659,8 @@ class MPIBackend(object):
         self.expected_data_length = 0
         self.proc = None
         self.proc_queue = Queue()
-        self.mpi_comm_spawn = mpi_comm_spawn
-        self.mpi_comm_spawn_info = mpi_comm_spawn_info
-        self._intracomm = None
-        self._selfcomm = None
-        self._intercomm = None
+        self._mpi_comm_spawn = mpi_comm_spawn
+        self._mpi_comm_spawn_info = mpi_comm_spawn_info
 
         n_logical_cores = multiprocessing.cpu_count()
         if n_procs is None:
@@ -703,10 +699,8 @@ class MPIBackend(object):
             warn(f'{packages} not installed. Will run on single processor')
             self.n_procs = 1
 
-        if self.mpi_comm_spawn:
-            self._intracomm = MPI.COMM_WORLD
-            self._selfcomm = MPI.COMM_SELF
-            if self._intracomm.Get_rank() != 0:
+        if self._mpi_comm_spawn:
+            if MPI.COMM_WORLD.Get_rank() != 0:
                 raise RuntimeError('MPI is attempting to spawn multiple child '
                                    'jobs. Make sure only one parent MPI job '
                                    'is running when "mpi_comm_spawn" is True.')
@@ -752,7 +746,7 @@ class MPIBackend(object):
         _BACKEND = self._old_backend
 
         # always kill nrniv processes for good measure
-        if (not self.mpi_comm_spawn) and self.n_procs > 1:
+        if (not self._mpi_comm_spawn) and self.n_procs > 1:
             kill_proc_name('nrniv')
 
     def simulate(self, net, tstop, dt, n_trials, postproc=False):
@@ -789,12 +783,12 @@ class MPIBackend(object):
 
         sim_objs = [net, tstop, dt, n_trials]
 
-        if self.mpi_comm_spawn:
+        if self._mpi_comm_spawn:
             sim_data = spawn_job(
                 command=self.command,
                 obj=sim_objs,
                 n_procs=self.n_procs,
-                info=self.mpi_comm_spawn_info)
+                info=self._mpi_comm_spawn_info)
         else:
             env = _get_mpi_env()
             self.proc, sim_data = run_subprocess(
