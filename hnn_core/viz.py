@@ -1095,8 +1095,9 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
 
 
-def csd_generate(csd, times, ax=None, colorbar=True, show=True):
-    """Plots the csd.
+def plot_csd(csd, times, ax=None, colorbar=True, show=True):
+    """Generates the csd figure
+
     Parameters
     ----------
     csd : csd array (channels x time)
@@ -1126,7 +1127,7 @@ def csd_generate(csd, times, ax=None, colorbar=True, show=True):
 
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
-        plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (A/m^{2})$')
+        plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (uV/um^{2})$')
 
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Electrode #')
