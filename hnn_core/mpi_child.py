@@ -3,6 +3,7 @@ This script is called directly from MPIBackend.simulate()
 """
 
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
+#          Ryan Thorpe <ryvthorpe@gmail.com>
 
 import sys
 import pickle
@@ -72,7 +73,7 @@ class MPISimulation(object):
             MPI.Finalize()
 
     def _read_net(self):
-        """Read net broadcasted to all ranks on stdin"""
+        """Read net and associated objects broadcasted to all ranks on stdin"""
 
         # read Network from stdin
         if self.rank == 0:
@@ -148,11 +149,11 @@ if __name__ == '__main__':
 
     try:
         with MPISimulation() as mpi_sim:
-            # XXX: _read_net -> _read_obj, fix later
             net, tstop, dt, n_trials = mpi_sim._read_net()
             sim_data = mpi_sim.run(net, tstop, dt, n_trials)
             mpi_sim._write_data_stderr(sim_data)
             mpi_sim._wait_for_exit_signal()
+
     except Exception:
         # This can be useful to indicate the problem to the
         # caller (in parallel_backends.py)
