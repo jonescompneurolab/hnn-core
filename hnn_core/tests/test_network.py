@@ -461,10 +461,8 @@ def test_network():
     assert pick_connection(
         net, src_gids='L2_pyramidal', receptor='gabab') == list()
     assert pick_connection(
-        net, src_gids='L2_basket', receptor='ampa') == list()
-    assert pick_connection(
         net, src_gids='L2_basket', target_gids='L2_basket',
-        loc='proximal', receptor='ampa') == list()
+        loc='proximal', receptor='nmda') == list()
     assert pick_connection(
         net, src_gids='L2_pyramidal', target_gids='L2_basket',
         loc='distal', receptor='gabab') == list()
