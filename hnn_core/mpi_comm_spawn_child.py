@@ -5,6 +5,7 @@ This script is called directly from MPIBackend.simulate()
 # Authors: Blake Caldwell <blake_caldwell@brown.edu>
 #          Ryan Thorpe <ryvthorpe@gmail.com>
 
+from mpi4py import MPI
 from hnn_core.network_builder import _simulate_single_trial
 
 
@@ -23,16 +24,10 @@ class MPISimulation(object):
     rank : int
         The rank for each processor part of the MPI communicator
     """
-    def __init__(self, skip_mpi_import=False):
-        self.skip_mpi_import = skip_mpi_import
-        if skip_mpi_import:
-            self.rank = 0
-        else:
-            from mpi4py import MPI
-
-            self.intercomm = MPI.Comm.Get_parent()
-            self.comm = MPI.COMM_WORLD
-            self.rank = self.comm.Get_rank()
+    def __init__(self):
+        self.intercomm = MPI.Comm.Get_parent()
+        self.comm = MPI.COMM_WORLD
+        self.rank = self.comm.Get_rank()
 
     def __enter__(self):
         return self
@@ -66,6 +61,14 @@ if __name__ == '__main__':
 
     with MPISimulation() as mpi_sim:
         net, tstop, dt, n_trials = mpi_sim._read_net()
-        sim_data = mpi_sim.run(net, tstop, dt, n_trials)
-        if mpi_sim.rank == 0:
-            mpi_sim.intercomm.send(sim_data, dest=0)
+
+        try:
+            sim_data = mpi_sim.run(net, tstop, dt, n_trials)
+        except:
+            err_occured = True
+        else:
+            err_occured = False
+        finally:
+            mpi_sim.intercomm.allreduce(err_occured, op=MPI.LAND)
+            if mpi_sim.rank == 0:
+                mpi_sim.intercomm.send(sim_data, dest=0)

@@ -128,6 +128,16 @@ def spawn_job(command, obj, n_procs, info=None):
     # send Network + sim param objects to each child process
     intercomm.bcast(obj, root=MPI.ROOT)
 
+    # all child processes must complete without an error; if not, prevent
+    # the parent from deadlocking with a blocking recv call
+    # (note that the traceback cannot be accessed from here or passed to 
+    # the parent)
+    err_in_children = intercomm.allreduce(None, op=MPI.LAND)
+    if err_in_children:
+        raise RuntimeError('An error occured in a spawned MPI child process. '
+                           'Consider debugging with MPIBackend when '
+                           'mpi_comm_spawn=False.')
+
     # receive data
     child_data = intercomm.recv(source=MPI.ANY_SOURCE)
 
