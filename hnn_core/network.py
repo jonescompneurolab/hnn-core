@@ -493,7 +493,9 @@ class Network(object):
             Target location of synapses. Must be an element of
             `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
             group of sections, or an existing section such as 'soma' or
-            'apical_tuft' (defined in `Cell.sections` for all targeted cells)
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells).
+            The parameter `legacy_mode` of the `Network` must be set to `False`
+            to target specific sections.
         n_drive_cells : int | 'n_cells'
             The number of drive cells that each contribute an independently
             sampled synaptic spike to the network according to the Gaussian
@@ -599,7 +601,9 @@ class Network(object):
             Target location of synapses. Must be an element of
             `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
             group of sections, or an existing section such as 'soma' or
-            'apical_tuft' (defined in `Cell.sections` for all targeted cells)
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells).
+            The parameter `legacy_mode` of the `Network` must be set to `False`
+            to target specific sections.
         n_drive_cells : int | 'n_cells'
             The number of drive cells that each contribute an independently
             sampled synaptic spike to the network according to a Poisson
@@ -704,7 +708,9 @@ class Network(object):
             Target location of synapses. Must be an element of
             `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
             group of sections, or an existing section such as 'soma' or
-            'apical_tuft' (defined in `Cell.sections` for all targeted cells)
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells).
+            The parameter `legacy_mode` of the `Network` must be set to `False`
+            to target specific sections.
         burst_rate : float
             The mean rate at which cyclic bursts occur (unit: Hz)
         burst_std : float
@@ -801,7 +807,12 @@ class Network(object):
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
         location : str
-            Target location of synapses ('distal' or 'proximal')
+            Target location of synapses. Must be an element of
+            `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
+            group of sections, or an existing section such as 'soma' or
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells).
+            The parameter `legacy_mode` of the `Network` must be set to `False`
+            to target specific sections.
         space_constant : float
             Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
@@ -1095,10 +1106,12 @@ class Network(object):
             equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
         loc : str
-            Location of synapse on target cell. Must be an element of
+            Target location of synapses. Must be an element of
             `Cell.sect_loc` such as 'proximal' or 'distal', which defines a
             group of sections, or an existing section such as 'soma' or
-            'apical_tuft' (defined in `Cell.sections`)
+            'apical_tuft' (defined in `Cell.sections` for all targeted cells).
+            The parameter `legacy_mode` of the `Network` must be set to `False`
+            to target specific sections.
         receptor : str
             Synaptic receptor of connection. Must be one of:
             'ampa', 'nmda', 'gabaa', or 'gabab'.
