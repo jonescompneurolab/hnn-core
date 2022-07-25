@@ -28,33 +28,27 @@ from neuron import h
 from .externals.mne import _validate_type, _check_option
 
 
-def calculate_csd2d(data, ch_axis=0, delta=1):
-    """estimates traditional current source density (csd) using
-    2nd spatial derivative method and interpolates border channels.
-    ref: Wójcik D.K. (2014) Current Source Density Analysis.
+def calculate_csd2d(data, delta=1):
+    """current source density (csd) estimation
+
+    The three-point finite-difference approximation of the 
+    second spatial derivative for computing 1-dimensional CSD
     Parameters
     ----------
     data : channels x times array
         LFP data
-    ch_axis : int
-        axis of electrode array, default is zero.
     delta : int
-        spacing between channels, scales the CSD
+        distance between channels (in um), scales the CSD
     Returns
     -------
     csd2d : channels x times array
         the 2nd derivative current source density estimate (csd2d)
     """
-    csd2d = -np.diff(np.diff(data, axis=ch_axis), axis=ch_axis) / delta ** 2
+    csd2d = np.zeros([data.shape[0] - 2, data.shape[1]])
 
-    border_1 = np.take(csd2d, 0, axis=ch_axis) * 2 - np.take(csd2d, 1,
-                                                             axis=ch_axis)
-    border_2 = np.take(csd2d, -1, axis=ch_axis) * 2 - np.take(csd2d, -2,
-                                                              axis=ch_axis)
+    for channel, trace in enumerate(data[1:-1], start=1):
+        csd2d[channel - 1] = -(data[channel - 1] - 2 * trace + data[channel + 1]) / delta ** 2
 
-    csd2d = np.concatenate([np.expand_dims(border_1, axis=ch_axis),
-                            csd2d, np.expand_dims(border_2, axis=ch_axis)],
-                           axis=ch_axis)
     return csd2d
 
 
@@ -461,8 +455,9 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, trial_no=0, colorbar=True, ax=None, show=True):
-        """Generates CSD figure.
+    def csd(self, trial_no=0, colorbar=True, ax=None, show=True):
+        """Plots the CSD.
+
         Parameters
         ----------
         trial_no : int | list of int | slice
@@ -478,18 +473,16 @@ class ExtracellularArray:
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        from .viz import csd_generate
-        lfp = self.voltages[trial_no] * 1E-6
+        from .viz import plot_csd
+        lfp = self.voltages[trial_no]
+        delta = abs(self.positions[0][2] - self.positions[1][2])
 
         csd = calculate_csd2d(data=lfp,
-                              ch_axis=0,
-                              delta=1)
+                              delta=delta)
 
-        fig = csd_generate(csd,
-                           self.times,
-                           ax=ax,
-                           colorbar=colorbar,
-                           show=show)
+        fig = plot_csd(csd, self.times, ax=ax,
+                       colorbar=colorbar,
+                       show=show)
 
         return fig
 
