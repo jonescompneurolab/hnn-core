@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>04. Use MPI backend for parallelization &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
@@ -195,9 +195,9 @@ start the simulation across the number of processors (cores) specified by
 <img src="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" srcset="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run over 2 processes
 Running 1 trials...
 numprocs=2
+[976be0c488a8:01507] Read -1, expected 113508, errno = 1
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
-[76356c9cff81:01509] Read -1, expected 113508, errno = 1
 Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
 [Done]
 running trial 1 on 2 cores
@@ -232,20 +232,20 @@ Simulation time: 270.0 ms...
 Simulation time: 280.0 ms...
 Simulation time: 290.0 ms...
 Simulation time: 300.0 ms...
-[76356c9cff81:01509] Read -1, expected 49608, errno = 1
-[76356c9cff81:01509] Read -1, expected 49600, errno = 1
-[76356c9cff81:01508] Read -1, expected 49600, errno = 1
-[76356c9cff81:01508] Read -1, expected 49608, errno = 1
-[76356c9cff81:01509] Read -1, expected 49608, errno = 1
-[76356c9cff81:01508] Read -1, expected 49600, errno = 1
-[76356c9cff81:01509] Read -1, expected 49600, errno = 1
-[76356c9cff81:01508] Read -1, expected 49608, errno = 1
-[76356c9cff81:01508] Read -1, expected 5616, errno = 1
+[976be0c488a8:01507] Read -1, expected 49608, errno = 1
+[976be0c488a8:01506] Read -1, expected 49600, errno = 1
+[976be0c488a8:01507] Read -1, expected 49600, errno = 1
+[976be0c488a8:01506] Read -1, expected 49608, errno = 1
+[976be0c488a8:01507] Read -1, expected 49608, errno = 1
+[976be0c488a8:01506] Read -1, expected 49600, errno = 1
+[976be0c488a8:01506] Read -1, expected 49608, errno = 1
+[976be0c488a8:01507] Read -1, expected 49600, errno = 1
+[976be0c488a8:01506] Read -1, expected 5616, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  34.720 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  30.949 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
@@ -273,7 +273,7 @@ Simulation time: 300.0 ms...
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br/>
     </p>
   </div>
 </footer>
