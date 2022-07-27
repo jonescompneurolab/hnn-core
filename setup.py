@@ -111,6 +111,7 @@ if __name__ == "__main__":
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',
+              'gui/*.ipynb',
               'mod/*',
               'mod/x86_64/*',
               'mod/x86_64/.lib/*']},
