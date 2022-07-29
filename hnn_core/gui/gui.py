@@ -18,12 +18,13 @@ from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
 from hnn_core.viz import plot_dipole
-from IPython.display import display
+from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
                         FloatLogSlider, FloatSlider, FloatText, GridspecLayout,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
                         VBox, link)
+from ipywidgets.embed import embed_minimal_html
 
 
 class HNNGUI:
@@ -43,6 +44,10 @@ class HNNGUI:
         The width of the left side bar (in pixel).
     drive_widget_width: str
         The width of network drive tab  (in pixel).
+    header_height: str
+        The height of GUI titlebar  (in pixel).
+    button_height: str
+        The height of buttons  (in pixel).
 
     Attributes
     ----------
@@ -98,25 +103,31 @@ class HNNGUI:
                  visualization_window_width="1000px",
                  visualization_window_height="500px",
                  left_sidebar_width='380px',
-                 drive_widget_width="200px"):
+                 drive_widget_width="200px",
+                 header_height="50px",
+                 button_height="30px",
+                 ):
         # set up styling.
+
+        self._total_height = int(header_height[:-2]) + int(
+            visualization_window_height[:-2]) + int(button_height[:-2]) + int(
+                log_window_height[:-2]) + 20
+        self._total_width = int(left_sidebar_width[:-2]) + int(
+            visualization_window_width[:-2])
         self.layout = {
-            "theme_color":
-            theme_color,
-            "button":
-            Layout(height='30px', width='auto'),
+            "header_height": header_height,
+            "theme_color": theme_color,
+            "button": Layout(height=button_height, width='auto'),
             "log_out": Layout(border='1px solid gray',
-                              height=log_window_height, overflow='auto'),
-            "visualization_window":
-            Layout(width=visualization_window_width,
-                   height=visualization_window_height,
-                   border='1px solid gray'),
-            "left_sidebar":
-            Layout(width=left_sidebar_width),
-            "drive_widget":
-            Layout(width=drive_widget_width),
-            "drive_textbox":
-            Layout(width='270px', height='auto'),
+                              width=f"{self._total_width}px",
+                              height=log_window_height,
+                              overflow='auto'),
+            "visualization_window": Layout(width=visualization_window_width,
+                                           height=visualization_window_height,
+                                           border='1px solid gray'),
+            "left_sidebar": Layout(width=left_sidebar_width),
+            "drive_widget": Layout(width=drive_widget_width),
+            "drive_textbox": Layout(width='270px', height='auto'),
             "simulation_status_common": "background:gray;padding-left:10px",
         }
 
@@ -217,6 +228,8 @@ class HNNGUI:
 
         self._init_ui_components()
 
+        self._snapshots_count = 0
+
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows.
 
@@ -229,7 +242,7 @@ class HNNGUI:
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
-        self._log_out = Output(layout=self.layout['log_out'])
+        self._log_out = Output()
         # visualization window
         self._visualization_window = Output(
             layout=self.layout['visualization_window'])
@@ -249,7 +262,9 @@ class HNNGUI:
                     self.delete_drive_button
                 ]),
                 self.widget_viz_layout_selection,
-            ]), self._log_out, self._simulation_status_bar
+            ]),
+            HBox([self._log_out], layout=self.layout['log_out']),
+            self._simulation_status_bar
         ])
         # title
         self._header = HTML(value=f"""<div
@@ -330,8 +345,15 @@ class HNNGUI:
         self.widget_viz_layout_selection.observe(_handle_viz_layout_change,
                                                  'value')
 
-    def compose(self):
-        """Compose widgets"""
+    def compose(self, return_layout=True):
+        """Compose widgets.
+
+        Parameters
+        ----------
+        return_layout: bool
+            If the method returns the layout object which can be rendered by
+            IPython.display.display() method.
+        """
 
         simulation_box = VBox([
             self.widget_tstop, self.widget_dt, self.widget_ntrials,
@@ -364,8 +386,9 @@ class HNNGUI:
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
 
-        hnn_gui = AppLayout(
-            header=self._header, left_sidebar=left_tab,
+        self.app_layout = AppLayout(
+            header=self._header,
+            left_sidebar=left_tab,
             right_sidebar=self._visualization_window,
             footer=self._footer,
             pane_widths=[
@@ -373,7 +396,8 @@ class HNNGUI:
                 self.layout['visualization_window'].width
             ],
             pane_heights=[
-                '50px', self.layout['visualization_window'].height, "1"
+                self.layout['header_height'],
+                self.layout['visualization_window'].height, "1"
             ],
         )
 
@@ -398,7 +422,38 @@ class HNNGUI:
                                     self.widget_tstop, self._load_info,
                                     self.layout)
 
-        return hnn_gui
+        if not return_layout:
+            return
+        else:
+            return self.app_layout
+
+    def show(self):
+        display(self.app_layout)
+
+    def render_iframe(self, width=None, height=None, filename=None):
+        """Embed the widget to HTML and render it through iframe.
+        Parameters
+        ----------
+        width : Optional[int]
+            The width of iframe window use to show the snapshot.
+        height : Optional[int]
+            The height of iframe window use to show the snapshot.
+        filename : Optional[int]
+            The filename of snapshot.
+
+        Returns
+        -------
+        snapshot : An iframe snapshot object that can be rendered in notebooks.
+        """
+        self._snapshots_count += 1
+        if not filename:
+            filename = f"snapshot_{self._snapshots_count}.html"
+        embed_minimal_html(filename, views=[self.app_layout], title='')
+        if not width:
+            width = self._total_width + 10
+        if not height:
+            height = self._total_height + 10
+        return IFrame(filename, width=width, height=height)
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
@@ -1134,7 +1189,11 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
 def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
                                simulation_data, plot_options, previous_outputs,
                                layout, init=False):
-    plot_outputs_L = Output(layout=layout)
+    layout_LR = Layout(width=f"{int(layout.width[:-2])/2-10}px",
+                       height=layout.height,
+                       border=layout.border)
+
+    plot_outputs_L = Output(layout=layout_LR)
 
     default_plot_types = [plot_options[0], plot_options[1]]
     for idx, plot_type in enumerate(previous_outputs[:2]):
@@ -1159,7 +1218,7 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
     plot_outputs.append(plot_outputs_L)
     plot_dropdowns.append(plot_dropdown_L)
 
-    plot_outputs_R = Output(layout=layout)
+    plot_outputs_R = Output(layout=layout_LR)
 
     plot_dropdown_R = Dropdown(
         options=plot_options,
