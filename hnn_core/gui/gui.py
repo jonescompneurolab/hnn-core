@@ -439,7 +439,7 @@ class HNNGUI:
             The width of iframe window use to show the snapshot.
         height : Optional[int]
             The height of iframe window use to show the snapshot.
-        filename : Optional[int]
+        filename : str | None
             The filename of snapshot.
         render: bool
             Will return an IFrame object if False
