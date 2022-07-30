@@ -435,9 +435,9 @@ class HNNGUI:
 
         Parameters
         ----------
-        width : int
+        width : int | None
             The width of iframe window use to show the snapshot.
-        height : Optional[int]
+        height : int | None
             The height of iframe window use to show the snapshot.
         filename : str | None
             The filename of snapshot.
