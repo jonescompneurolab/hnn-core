@@ -2,7 +2,6 @@
 
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Huzi Cheng <hzcheng15@icloud.com>
-
 import codecs
 import logging
 import multiprocessing
@@ -228,7 +227,7 @@ class HNNGUI:
 
         self._init_ui_components()
 
-        self._snapshots_count = 0
+        self._screenshots_count = 0
 
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows.
@@ -430,7 +429,8 @@ class HNNGUI:
     def show(self):
         display(self.app_layout)
 
-    def render_iframe(self, width=None, height=None, filename=None):
+    def take_screenshot(self, width=None, height=None, filename=None,
+                        render=True):
         """Embed the widget to HTML and render it through iframe.
         Parameters
         ----------
@@ -440,20 +440,83 @@ class HNNGUI:
             The height of iframe window use to show the snapshot.
         filename : Optional[int]
             The filename of snapshot.
+        render: bool
+            Will return an IFrame object if False
 
         Returns
         -------
         snapshot : An iframe snapshot object that can be rendered in notebooks.
         """
-        self._snapshots_count += 1
+        self._screenshots_count += 1
         if not filename:
-            filename = f"snapshot_{self._snapshots_count}.html"
+            filename = f"snapshot_{self._screenshots_count}.html"
         embed_minimal_html(filename, views=[self.app_layout], title='')
         if not width:
-            width = self._total_width + 10
+            width = self._total_width + 20
         if not height:
-            height = self._total_height + 10
-        return IFrame(filename, width=width, height=height)
+            height = self._total_height + 20
+        screenshot = IFrame(filename, width=width, height=height)
+        if render:
+            display(screenshot)
+        else:
+            return screenshot
+
+    def run_notebook_cells(self):
+        """Run all but the last cells sequentially in a Jupyter notebook.
+        To properly use this function:
+            1. Put this into the penultimate cell.
+            2. init the HNNGUI in a single cell.
+            3. Hit 'run all' button to run the whole notebook and it will
+               selectively run twice.
+        """
+        js_string = """
+        function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        function getRunningStatus(idx){
+            const htmlContent = Jupyter.notebook.get_cell(idx).element[0];
+            return htmlContent.childNodes[0].childNodes[0].textContent;
+        }
+        function cellContainsInit(idx){
+            const textVal = Jupyter.notebook.get_cell(
+                idx).element[0].childNodes[0].textContent;
+            return textVal.includes('HNNGUI()') || textVal.includes('HNNGUI');
+        }
+        function cellContainsRunCells(idx){
+            const textVal = Jupyter.notebook.get_cell(
+                idx).element[0].childNodes[0].textContent;
+            return textVal.includes('run_notebook_cells()');
+        }
+        async function runNotebook() {
+            console.log("run notebook cell by cell");
+            const cellHtmlContents = Jupyter.notebook.element[0].children[0];
+            const nCells = cellHtmlContents.childElementCount;
+            console.log(`In total we have ${nCells} cells`);
+
+            for(let i=1; i<nCells-1; i++){
+                if(cellContainsRunCells(i)){
+                    break
+                }
+                else if(cellContainsInit(i)){
+                    console.log(`Skip init cell ${i}...`);
+                    continue
+                }
+
+                else{
+                    console.log(`About to execute cell ${i}..`);
+                    Jupyter.notebook.execute_cells([i]);
+                    while (getRunningStatus(i).includes("*")){
+                        console.log("Still running, wait for another 2 secs");
+                        await sleep(2000);
+                    }
+                    await sleep(1000);
+                }
+            }
+            console.log('Done');
+        }
+        runNotebook();
+        """
+        return js_string
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,

@@ -1,5 +1,6 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
 import os.path as op
+from pathlib import Path
 
 import hnn_core
 import matplotlib
@@ -195,3 +196,15 @@ def test_gui_run_simulation():
                     pytest.approx(dpl.times[1] - dpl.times[0]) == val_tstep
                     for dpl in dpls
                 ])
+
+
+def test_gui_take_screenshots():
+    """Test if the GUI correctly generate screenshots."""
+    gui = HNNGUI()
+    gui.compose(return_layout=False)
+    for i in range(3):
+        assert gui._screenshots_count == i
+        gui.take_screenshot()
+        screenshot = Path(f"snapshot_{gui._screenshots_count}.html")
+        assert screenshot.is_file()
+        screenshot.unlink()
