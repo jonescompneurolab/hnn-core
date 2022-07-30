@@ -432,6 +432,7 @@ class HNNGUI:
     def take_screenshot(self, width=None, height=None, filename=None,
                         render=True):
         """Embed the widget to HTML and render it through iframe.
+
         Parameters
         ----------
         width : Optional[int]
