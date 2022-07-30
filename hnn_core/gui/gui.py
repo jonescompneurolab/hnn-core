@@ -464,6 +464,7 @@ class HNNGUI:
 
     def run_notebook_cells(self):
         """Run all but the last cells sequentially in a Jupyter notebook.
+
         To properly use this function:
             1. Put this into the penultimate cell.
             2. init the HNNGUI in a single cell.
