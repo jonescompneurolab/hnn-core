@@ -3,10 +3,12 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Huzi Cheng <hzcheng15@icloud.com>
 import codecs
+import io
 import logging
 import multiprocessing
 import os.path as op
 import sys
+import urllib.parse
 
 import hnn_core
 import matplotlib.pyplot as plt
@@ -227,8 +229,6 @@ class HNNGUI:
 
         self._init_ui_components()
 
-        self._screenshots_count = 0
-
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows.
 
@@ -429,9 +429,8 @@ class HNNGUI:
     def show(self):
         display(self.app_layout)
 
-    def take_screenshot(self, width=None, height=None, filename=None,
-                        render=True):
-        """Embed the widget to HTML and render it through iframe.
+    def capture(self, width=None, height=None, render=True):
+        """Take a screenshot of the current GUI.
 
         Parameters
         ----------
@@ -439,8 +438,6 @@ class HNNGUI:
             The width of iframe window use to show the snapshot.
         height : int | None
             The height of iframe window use to show the snapshot.
-        filename : str | None
-            The filename of snapshot.
         render: bool
             Will return an IFrame object if False
 
@@ -448,15 +445,16 @@ class HNNGUI:
         -------
         snapshot : An iframe snapshot object that can be rendered in notebooks.
         """
-        self._screenshots_count += 1
-        if not filename:
-            filename = f"snapshot_{self._screenshots_count}.html"
-        embed_minimal_html(filename, views=[self.app_layout], title='')
+        file = io.StringIO()
+        embed_minimal_html(file, views=[self.app_layout], title='')
         if not width:
             width = self._total_width + 20
         if not height:
             height = self._total_height + 20
-        screenshot = IFrame(filename, width=width, height=height)
+
+        content = urllib.parse.quote(file.getvalue().encode('utf8'))
+        data_url = f"data:text/html,{content}"
+        screenshot = IFrame(data_url, width=width, height=height)
         if render:
             display(screenshot)
         else:
