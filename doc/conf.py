@@ -56,6 +56,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'numpydoc',
+    'nbsphinx',
     'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
@@ -109,6 +110,7 @@ html_theme_options = {
     'navbar_sidebarrel': False,
     'navbar_links': [
         ("Examples", "auto_examples/index"),
+        ("GUI", "gui/index"),
         ("API", "api"),
         ("Glossary", "glossary"),
         ("Whats new", "whats_new"),
@@ -235,3 +237,5 @@ sphinx_gallery_conf = {
                'dependencies': 'Dockerfile'
                }
 }
+
+nbsphinx_execute = 'always'
