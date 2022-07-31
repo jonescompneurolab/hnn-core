@@ -1,6 +1,5 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
 import os.path as op
-from pathlib import Path
 
 import hnn_core
 import matplotlib
@@ -11,6 +10,7 @@ from hnn_core.gui import HNNGUI
 from hnn_core.gui.gui import _init_network_from_widgets
 from hnn_core.network import pick_connection
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+from IPython.display import IFrame
 
 matplotlib.use('agg')
 
@@ -202,9 +202,8 @@ def test_gui_take_screenshots():
     """Test if the GUI correctly generate screenshots."""
     gui = HNNGUI()
     gui.compose(return_layout=False)
-    for i in range(3):
-        assert gui._screenshots_count == i
-        gui.capture()
-        screenshot = Path(f"snapshot_{gui._screenshots_count}.html")
-        assert screenshot.is_file()
-        screenshot.unlink()
+    screenshot = gui.capture(render=False)
+    assert type(screenshot) is IFrame
+    gui.app_layout.left_sidebar.selected_index = 2
+    screenshot1 = gui.capture(render=False)
+    assert screenshot._repr_html_() != screenshot1._repr_html_()
