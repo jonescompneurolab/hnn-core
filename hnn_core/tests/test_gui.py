@@ -204,7 +204,7 @@ def test_gui_take_screenshots():
     gui.compose(return_layout=False)
     for i in range(3):
         assert gui._screenshots_count == i
-        gui.take_screenshot()
+        gui.capture()
         screenshot = Path(f"snapshot_{gui._screenshots_count}.html")
         assert screenshot.is_file()
         screenshot.unlink()
