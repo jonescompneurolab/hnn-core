@@ -48,12 +48,12 @@ Building the documentation
 The documentation can be built using sphinx. For that, please additionally
 install the following::
 
-    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
+    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil nbsphinx
 
 If you are using a newer version of pip, you may be prompted to use the flag
 ``--use-feature=2020-resolver``. If this happens, please add it as recommended::
 
-    $ pip install --use-feature=2020-resolver matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
+    $ pip install --use-feature=2020-resolver matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil nbsphinx
 
 You can build the documentation locally using the command::
 
