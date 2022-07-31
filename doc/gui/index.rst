@@ -2,7 +2,7 @@
  GUI
 =====
 
-The bran-new light-weight web-based hnn GUI that works with hnn-core.
+The brand-new lightweight web-based hnn GUI that works with hnn-core.
 
 
 Launch GUI in a Jupyter notebook
