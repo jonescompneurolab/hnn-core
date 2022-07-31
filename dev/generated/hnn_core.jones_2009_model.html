@@ -145,7 +145,7 @@
 <h1>hnn_core.jones_2009_model<a class="headerlink" href="#hnn-core-jones-2009-model" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.jones_2009_model">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">jones_2009_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network_models.html#jones_2009_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.jones_2009_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">jones_2009_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network_models.html#jones_2009_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.jones_2009_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate the Jones et al. 2009 model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -157,6 +157,9 @@ Default: None</p>
 <dt><strong>add_drives_from_params</strong><span class="classifier">bool</span></dt><dd><p>If True, add drives as defined in the params-dict. NB this is mainly
 for backward-compatibility with HNN GUI, and will be deprecated in a
 future release. Default: False</p>
+</dd>
+<dt><strong>legacy_mode</strong><span class="classifier">bool</span></dt><dd><p>Set to True by default to enable matching HNN GUI output when drives
+are added suitably. Will be deprecated in a future release.</p>
 </dd>
 </dl>
 </dd>

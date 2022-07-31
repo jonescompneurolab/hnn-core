@@ -275,7 +275,12 @@ multiple trials.</p>
 <dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>End time of burst trains (defaults to None: tstop is set to the
 end of the simulation)</p>
 </dd>
-<dt><strong>location</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses (‘distal’ or ‘proximal’)</p>
+<dt><strong>location</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses. Must be an element of
+<em class="xref py py-obj">Cell.sect_loc</em> such as ‘proximal’ or ‘distal’, which defines a
+group of sections, or an existing section such as ‘soma’ or
+‘apical_tuft’ (defined in <em class="xref py py-obj">Cell.sections</em> for all targeted cells).
+The parameter <em class="xref py py-obj">legacy_mode</em> of the <a class="reference internal" href="#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a> must be set to <em class="xref py py-obj">False</em>
+to target specific sections.</p>
 </dd>
 <dt><strong>burst_rate</strong><span class="classifier">float</span></dt><dd><p>The mean rate at which cyclic bursts occur (unit: Hz)</p>
 </dd>
@@ -352,10 +357,12 @@ source - target connections are made in an all-to-all pattern.</p>
 equivalent to passing a list of gids for the relevant cell type.
 source - target connections are made in an all-to-all pattern.</p>
 </dd>
-<dt><strong>loc</strong><span class="classifier">str</span></dt><dd><p>Location of synapse on target cell. Must be
-‘proximal’, ‘distal’, or ‘soma’. Note that inhibitory synapses
-(receptor=’gabaa’ or ‘gabab’) of L2 pyramidal neurons are only
-valid loc=’soma’.</p>
+<dt><strong>loc</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses. Must be an element of
+<em class="xref py py-obj">Cell.sect_loc</em> such as ‘proximal’ or ‘distal’, which defines a
+group of sections, or an existing section such as ‘soma’ or
+‘apical_tuft’ (defined in <em class="xref py py-obj">Cell.sections</em> for all targeted cells).
+The parameter <em class="xref py py-obj">legacy_mode</em> of the <a class="reference internal" href="#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a> must be set to <em class="xref py py-obj">False</em>
+to target specific sections.</p>
 </dd>
 <dt><strong>receptor</strong><span class="classifier">str</span></dt><dd><p>Synaptic receptor of connection. Must be one of:
 ‘ampa’, ‘nmda’, ‘gabaa’, or ‘gabab’.</p>
@@ -431,7 +438,12 @@ The default value of 0.5 um corresponds to 1 um diameter dendrites.</p>
 </dd>
 <dt><strong>numspikes</strong><span class="classifier">int</span></dt><dd><p>Number of spikes at each target cell</p>
 </dd>
-<dt><strong>location</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses (‘distal’ or ‘proximal’)</p>
+<dt><strong>location</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses. Must be an element of
+<em class="xref py py-obj">Cell.sect_loc</em> such as ‘proximal’ or ‘distal’, which defines a
+group of sections, or an existing section such as ‘soma’ or
+‘apical_tuft’ (defined in <em class="xref py py-obj">Cell.sections</em> for all targeted cells).
+The parameter <em class="xref py py-obj">legacy_mode</em> of the <a class="reference internal" href="#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a> must be set to <em class="xref py py-obj">False</em>
+to target specific sections.</p>
 </dd>
 <dt><strong>n_drive_cells</strong><span class="classifier">int | ‘n_cells’</span></dt><dd><p>The number of drive cells that each contribute an independently
 sampled synaptic spike to the network according to the Gaussian
@@ -522,7 +534,12 @@ to each target cell type. Cell type-specific values may be
 provided as a dictionary, in which a key must be present for each
 cell type with non-zero AMPA or NMDA weights.</p>
 </dd>
-<dt><strong>location</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses (‘distal’ or ‘proximal’)</p>
+<dt><strong>location</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses. Must be an element of
+<em class="xref py py-obj">Cell.sect_loc</em> such as ‘proximal’ or ‘distal’, which defines a
+group of sections, or an existing section such as ‘soma’ or
+‘apical_tuft’ (defined in <em class="xref py py-obj">Cell.sections</em> for all targeted cells).
+The parameter <em class="xref py py-obj">legacy_mode</em> of the <a class="reference internal" href="#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Network</span></code></a> must be set to <em class="xref py py-obj">False</em>
+to target specific sections.</p>
 </dd>
 <dt><strong>n_drive_cells</strong><span class="classifier">int | ‘n_cells’</span></dt><dd><p>The number of drive cells that each contribute an independently
 sampled synaptic spike to the network according to a Poisson

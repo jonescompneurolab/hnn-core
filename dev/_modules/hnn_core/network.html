@@ -623,7 +623,12 @@
 <span class="sd">        numspikes : int</span>
 <span class="sd">            Number of spikes at each target cell</span>
 <span class="sd">        location : str</span>
-<span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
+<span class="sd">            Target location of synapses. Must be an element of</span>
+<span class="sd">            `Cell.sect_loc` such as &#39;proximal&#39; or &#39;distal&#39;, which defines a</span>
+<span class="sd">            group of sections, or an existing section such as &#39;soma&#39; or</span>
+<span class="sd">            &#39;apical_tuft&#39; (defined in `Cell.sections` for all targeted cells).</span>
+<span class="sd">            The parameter `legacy_mode` of the `Network` must be set to `False`</span>
+<span class="sd">            to target specific sections.</span>
 <span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
 <span class="sd">            The number of drive cells that each contribute an independently</span>
 <span class="sd">            sampled synaptic spike to the network according to the Gaussian</span>
@@ -726,7 +731,12 @@
 <span class="sd">            provided as a dictionary, in which a key must be present for each</span>
 <span class="sd">            cell type with non-zero AMPA or NMDA weights.</span>
 <span class="sd">        location : str</span>
-<span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
+<span class="sd">            Target location of synapses. Must be an element of</span>
+<span class="sd">            `Cell.sect_loc` such as &#39;proximal&#39; or &#39;distal&#39;, which defines a</span>
+<span class="sd">            group of sections, or an existing section such as &#39;soma&#39; or</span>
+<span class="sd">            &#39;apical_tuft&#39; (defined in `Cell.sections` for all targeted cells).</span>
+<span class="sd">            The parameter `legacy_mode` of the `Network` must be set to `False`</span>
+<span class="sd">            to target specific sections.</span>
 <span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
 <span class="sd">            The number of drive cells that each contribute an independently</span>
 <span class="sd">            sampled synaptic spike to the network according to a Poisson</span>
@@ -828,7 +838,12 @@
 <span class="sd">            End time of burst trains (defaults to None: tstop is set to the</span>
 <span class="sd">            end of the simulation)</span>
 <span class="sd">        location : str</span>
-<span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
+<span class="sd">            Target location of synapses. Must be an element of</span>
+<span class="sd">            `Cell.sect_loc` such as &#39;proximal&#39; or &#39;distal&#39;, which defines a</span>
+<span class="sd">            group of sections, or an existing section such as &#39;soma&#39; or</span>
+<span class="sd">            &#39;apical_tuft&#39; (defined in `Cell.sections` for all targeted cells).</span>
+<span class="sd">            The parameter `legacy_mode` of the `Network` must be set to `False`</span>
+<span class="sd">            to target specific sections.</span>
 <span class="sd">        burst_rate : float</span>
 <span class="sd">            The mean rate at which cyclic bursts occur (unit: Hz)</span>
 <span class="sd">        burst_std : float</span>
@@ -925,7 +940,12 @@
 <span class="sd">            Synaptic weights (in uS) of NMDA receptors on each targeted cell</span>
 <span class="sd">            type (dict keys). Cell types omitted from the dict are set to zero.</span>
 <span class="sd">        location : str</span>
-<span class="sd">            Target location of synapses (&#39;distal&#39; or &#39;proximal&#39;)</span>
+<span class="sd">            Target location of synapses. Must be an element of</span>
+<span class="sd">            `Cell.sect_loc` such as &#39;proximal&#39; or &#39;distal&#39;, which defines a</span>
+<span class="sd">            group of sections, or an existing section such as &#39;soma&#39; or</span>
+<span class="sd">            &#39;apical_tuft&#39; (defined in `Cell.sections` for all targeted cells).</span>
+<span class="sd">            The parameter `legacy_mode` of the `Network` must be set to `False`</span>
+<span class="sd">            to target specific sections.</span>
 <span class="sd">        space_constant : float</span>
 <span class="sd">            Describes lateral dispersion (from the column origin) of synaptic</span>
 <span class="sd">            weights and delays within the simulated column. The constant is</span>
@@ -935,7 +955,7 @@
 <span class="sd">            ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the</span>
 <span class="sd">            physical distance (in um) between the connected cells in the xy</span>
 <span class="sd">            plane.</span>
-<span class="sd">        synaptic_delays : dict</span>
+<span class="sd">        synaptic_delays : dict or float</span>
 <span class="sd">            Synaptic delay (in ms) at the column origin, dispersed laterally as</span>
 <span class="sd">            a function of the space_constant</span>
 <span class="sd">        n_drive_cells : int | &#39;n_cells&#39;</span>
@@ -963,9 +983,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Drive </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> already defined&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;proximal&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Allowed drive target locations are: &#39;distal&#39;, &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;and &#39;proximal&#39;, got </span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">_validate_type</span><span class="p">(</span>
             <span class="n">probability</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> <span class="s1">&#39;probability&#39;</span><span class="p">,</span> <span class="s1">&#39;float or dict&#39;</span><span class="p">)</span>
@@ -979,6 +996,20 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">target_populations</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Allowed drive target cell types are: &#39;</span><span class="p">,</span>
                              <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Ensure location exists for all target cells</span>
+        <span class="n">cell_sections</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">for</span>
+                         <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">target_populations</span><span class="p">]</span>
+        <span class="n">sect_locs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sect_loc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">for</span>
+                     <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">target_populations</span><span class="p">]</span>
+
+        <span class="n">valid_cell_sections</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="o">*</span><span class="n">cell_sections</span><span class="p">)</span>
+        <span class="n">valid_sect_locs</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="o">*</span><span class="n">sect_locs</span><span class="p">)</span>
+        <span class="n">valid_loc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">valid_cell_sections</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">valid_sect_locs</span><span class="p">)</span>
+
+        <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">valid_loc</span><span class="p">,</span>
+                      <span class="n">extra</span><span class="o">=</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; (the location &#39;</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">&#39; is not defined &quot;</span>
+                             <span class="s2">&quot;for one of the targeted cells)&quot;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
             <span class="c1"># allows tests must match HNN GUI output by preserving original</span>
@@ -1208,10 +1239,12 @@
 <span class="sd">            equivalent to passing a list of gids for the relevant cell type.</span>
 <span class="sd">            source - target connections are made in an all-to-all pattern.</span>
 <span class="sd">        loc : str</span>
-<span class="sd">            Location of synapse on target cell. Must be</span>
-<span class="sd">            &#39;proximal&#39;, &#39;distal&#39;, or &#39;soma&#39;. Note that inhibitory synapses</span>
-<span class="sd">            (receptor=&#39;gabaa&#39; or &#39;gabab&#39;) of L2 pyramidal neurons are only</span>
-<span class="sd">            valid loc=&#39;soma&#39;.</span>
+<span class="sd">            Target location of synapses. Must be an element of</span>
+<span class="sd">            `Cell.sect_loc` such as &#39;proximal&#39; or &#39;distal&#39;, which defines a</span>
+<span class="sd">            group of sections, or an existing section such as &#39;soma&#39; or</span>
+<span class="sd">            &#39;apical_tuft&#39; (defined in `Cell.sections` for all targeted cells).</span>
+<span class="sd">            The parameter `legacy_mode` of the `Network` must be set to `False`</span>
+<span class="sd">            to target specific sections.</span>
 <span class="sd">        receptor : str</span>
 <span class="sd">            Synaptic receptor of connection. Must be one of:</span>
 <span class="sd">            &#39;ampa&#39;, &#39;nmda&#39;, &#39;gabaa&#39;, or &#39;gabab&#39;.</span>
@@ -1307,12 +1340,33 @@
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;loc&#39;</span><span class="p">)</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">receptor</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;receptor&#39;</span><span class="p">)</span>
 
-        <span class="n">valid_loc</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;soma&#39;</span><span class="p">]</span>
-        <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;loc&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">valid_loc</span><span class="p">)</span>
+        <span class="n">target_sect_loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">target_type</span><span class="p">]</span><span class="o">.</span><span class="n">sect_loc</span>
+        <span class="n">target_sections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">target_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span>
+        <span class="n">valid_loc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="n">target_sect_loc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">target_sections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;loc&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">valid_loc</span><span class="p">,</span>
+                      <span class="n">extra</span><span class="o">=</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; (the loc &#39;</span><span class="si">{</span><span class="n">loc</span><span class="si">}</span><span class="s2">&#39; is not defined &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;for &#39;</span><span class="si">{</span><span class="n">target_type</span><span class="si">}</span><span class="s2">&#39; cells)&quot;</span><span class="p">))</span>
         <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc</span>
 
-        <span class="n">valid_receptor</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab&#39;</span><span class="p">]</span>
-        <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;receptor&#39;</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">valid_receptor</span><span class="p">)</span>
+        <span class="c1"># `loc` specifies a group of sections, all must contain the synapse</span>
+        <span class="c1"># specified by `receptor`</span>
+        <span class="k">if</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">target_sect_loc</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">target_sect_loc</span><span class="p">[</span><span class="n">loc</span><span class="p">]:</span>
+                <span class="n">valid_receptor</span> <span class="o">=</span> <span class="n">target_sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">syns</span>
+                <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;receptor&#39;</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">valid_receptor</span><span class="p">,</span>
+                              <span class="n">extra</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot; (the &#39;</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">&#39; receptor is not &quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;defined for the &#39;</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2">&#39; of&quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">target_type</span><span class="si">}</span><span class="s2">&#39; cells)&quot;</span><span class="p">)</span>
+        <span class="c1"># `loc` specifies an individual section</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">valid_receptor</span> <span class="o">=</span> <span class="n">target_sections</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span><span class="o">.</span><span class="n">syns</span>
+            <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;receptor&#39;</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span> <span class="n">valid_receptor</span><span class="p">,</span>
+                          <span class="n">extra</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;(the &#39;</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s2">&#39; receptor is not &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;defined for the &#39;</span><span class="si">{</span><span class="n">loc</span><span class="si">}</span><span class="s2">&#39; of&quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">target_type</span><span class="si">}</span><span class="s2">&#39; cells)&quot;</span><span class="p">)</span>
+
         <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">receptor</span>
 
         <span class="c1"># Create and validate nc_dict</span>
