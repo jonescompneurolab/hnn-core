@@ -35,6 +35,7 @@ jobs:
               name: Setup doc building stuff
               command: |
                   source ~/miniconda/bin/activate testenv
+                  sudo apt-get install pandoc
                   pip install sphinx numpydoc sphinx_bootstrap_theme pillow nbsphinx
                   pip install --user -U https://api.github.com/repos/sphinx-gallery/sphinx-gallery/zipball/master
 
