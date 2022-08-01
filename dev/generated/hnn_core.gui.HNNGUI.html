@@ -17,6 +17,8 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 
@@ -60,6 +62,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="../auto_examples/index.html">Examples</a></li>
+                <li><a href="../gui/index.html">GUI</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../glossary.html">Glossary</a></li>
                 <li><a href="../whats_new.html">Whats new</a></li>
@@ -142,7 +145,7 @@
 <h1>hnn_core.gui.HNNGUI<a class="headerlink" href="#hnn-core-gui-hnngui" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.gui.HNNGUI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.gui.</span></span><span class="sig-name descname"><span class="pre">HNNGUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theme_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#8A2BE2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_window_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'100px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualization_window_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1000px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualization_window_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'500px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_sidebar_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'380px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drive_widget_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'200px'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.gui.</span></span><span class="sig-name descname"><span class="pre">HNNGUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theme_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#8A2BE2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_window_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'100px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualization_window_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1000px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualization_window_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'500px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_sidebar_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'380px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drive_widget_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'200px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'50px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'30px'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI" title="Permalink to this definition">¶</a></dt>
 <dd><p>HNN GUI class</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -158,6 +161,10 @@
 <dt><strong>left_sidebar_width: str</strong></dt><dd><p>The width of the left side bar (in pixel).</p>
 </dd>
 <dt><strong>drive_widget_width: str</strong></dt><dd><p>The width of network drive tab  (in pixel).</p>
+</dd>
+<dt><strong>header_height: str</strong></dt><dd><p>The height of GUI titlebar  (in pixel).</p>
+</dd>
+<dt><strong>button_height: str</strong></dt><dd><p>The height of buttons  (in pixel).</p>
 </dd>
 </dl>
 </dd>
@@ -215,24 +222,84 @@ in the network.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.compose" title="hnn_core.gui.HNNGUI.compose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose</span></code></a>()</p></td>
-<td><p>Compose widgets</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.capture" title="hnn_core.gui.HNNGUI.capture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capture</span></code></a>([width, height, render])</p></td>
+<td><p>Take a screenshot of the current GUI.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_parameters" title="hnn_core.gui.HNNGUI.load_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_parameters</span></code></a>([params_fname])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.compose" title="hnn_core.gui.HNNGUI.compose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose</span></code></a>([return_layout])</p></td>
+<td><p>Compose widgets.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_parameters" title="hnn_core.gui.HNNGUI.load_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_parameters</span></code></a>([params_fname])</p></td>
 <td><p>Read parameters from file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.run_notebook_cells" title="hnn_core.gui.HNNGUI.run_notebook_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_notebook_cells</span></code></a>()</p></td>
+<td><p>Run all but the last cells sequentially in a Jupyter notebook.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>show</strong></p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.capture">
+<span class="sig-name descname"><span class="pre">capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.capture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.capture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a screenshot of the current GUI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>width</strong><span class="classifier">int | None</span></dt><dd><p>The width of iframe window use to show the snapshot.</p>
+</dd>
+<dt><strong>height</strong><span class="classifier">int | None</span></dt><dd><p>The height of iframe window use to show the snapshot.</p>
+</dd>
+<dt><strong>render: bool</strong></dt><dd><p>Will return an IFrame object if False</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>snapshot</strong><span class="classifier">An iframe snapshot object that can be rendered in notebooks.</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.compose">
-<span class="sig-name descname"><span class="pre">compose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.compose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.compose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compose widgets</p>
+<span class="sig-name descname"><span class="pre">compose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.compose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.compose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compose widgets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>return_layout: bool</strong></dt><dd><p>If the method returns the layout object which can be rendered by
+IPython.display.display() method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.load_parameters">
 <span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.load_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.load_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read parameters from file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.run_notebook_cells">
+<span class="sig-name descname"><span class="pre">run_notebook_cells</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.run_notebook_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.run_notebook_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all but the last cells sequentially in a Jupyter notebook.</p>
+<dl class="simple">
+<dt>To properly use this function:</dt><dd><ol class="arabic simple">
+<li><p>Put this into the penultimate cell.</p></li>
+<li><p>init the HNNGUI in a single cell.</p></li>
+<li><p>Hit ‘run all’ button to run the whole notebook and it will
+selectively run twice.</p></li>
+</ol>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

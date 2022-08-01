@@ -16,6 +16,8 @@
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 
@@ -59,6 +61,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="../../../auto_examples/index.html">Examples</a></li>
+                <li><a href="../../../gui/index.html">GUI</a></li>
                 <li><a href="../../../api.html">API</a></li>
                 <li><a href="../../../glossary.html">Glossary</a></li>
                 <li><a href="../../../whats_new.html">Whats new</a></li>
@@ -135,12 +138,13 @@
 
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Huzi Cheng &lt;hzcheng15@icloud.com&gt;</span>
-
 <span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
 
 <span class="kn">import</span> <span class="nn">hnn_core</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -151,12 +155,13 @@
 <span class="kn">from</span> <span class="nn">hnn_core.params</span> <span class="kn">import</span> <span class="p">(</span><span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">,</span> <span class="n">_read_json</span><span class="p">,</span>
                              <span class="n">_read_legacy_params</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">hnn_core.viz</span> <span class="kn">import</span> <span class="n">plot_dipole</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span>
                         <span class="n">FloatLogSlider</span><span class="p">,</span> <span class="n">FloatSlider</span><span class="p">,</span> <span class="n">FloatText</span><span class="p">,</span> <span class="n">GridspecLayout</span><span class="p">,</span>
                         <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span>
                         <span class="n">VBox</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ipywidgets.embed</span> <span class="kn">import</span> <span class="n">embed_minimal_html</span>
 
 
 <div class="viewcode-block" id="HNNGUI"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI">[docs]</a><span class="k">class</span> <span class="nc">HNNGUI</span><span class="p">:</span>
@@ -176,6 +181,10 @@
 <span class="sd">        The width of the left side bar (in pixel).</span>
 <span class="sd">    drive_widget_width: str</span>
 <span class="sd">        The width of network drive tab  (in pixel).</span>
+<span class="sd">    header_height: str</span>
+<span class="sd">        The height of GUI titlebar  (in pixel).</span>
+<span class="sd">    button_height: str</span>
+<span class="sd">        The height of buttons  (in pixel).</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -231,25 +240,31 @@
                  <span class="n">visualization_window_width</span><span class="o">=</span><span class="s2">&quot;1000px&quot;</span><span class="p">,</span>
                  <span class="n">visualization_window_height</span><span class="o">=</span><span class="s2">&quot;500px&quot;</span><span class="p">,</span>
                  <span class="n">left_sidebar_width</span><span class="o">=</span><span class="s1">&#39;380px&#39;</span><span class="p">,</span>
-                 <span class="n">drive_widget_width</span><span class="o">=</span><span class="s2">&quot;200px&quot;</span><span class="p">):</span>
+                 <span class="n">drive_widget_width</span><span class="o">=</span><span class="s2">&quot;200px&quot;</span><span class="p">,</span>
+                 <span class="n">header_height</span><span class="o">=</span><span class="s2">&quot;50px&quot;</span><span class="p">,</span>
+                 <span class="n">button_height</span><span class="o">=</span><span class="s2">&quot;30px&quot;</span><span class="p">,</span>
+                 <span class="p">):</span>
         <span class="c1"># set up styling.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">header_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">visualization_window_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">button_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="n">log_window_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">left_sidebar_width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">visualization_window_width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;theme_color&quot;</span><span class="p">:</span>
-            <span class="n">theme_color</span><span class="p">,</span>
-            <span class="s2">&quot;button&quot;</span><span class="p">:</span>
-            <span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s1">&#39;30px&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;header_height&quot;</span><span class="p">:</span> <span class="n">header_height</span><span class="p">,</span>
+            <span class="s2">&quot;theme_color&quot;</span><span class="p">:</span> <span class="n">theme_color</span><span class="p">,</span>
+            <span class="s2">&quot;button&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="n">button_height</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
             <span class="s2">&quot;log_out&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">border</span><span class="o">=</span><span class="s1">&#39;1px solid gray&#39;</span><span class="p">,</span>
-                              <span class="n">height</span><span class="o">=</span><span class="n">log_window_height</span><span class="p">,</span> <span class="n">overflow</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
-            <span class="s2">&quot;visualization_window&quot;</span><span class="p">:</span>
-            <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">visualization_window_width</span><span class="p">,</span>
-                   <span class="n">height</span><span class="o">=</span><span class="n">visualization_window_height</span><span class="p">,</span>
-                   <span class="n">border</span><span class="o">=</span><span class="s1">&#39;1px solid gray&#39;</span><span class="p">),</span>
-            <span class="s2">&quot;left_sidebar&quot;</span><span class="p">:</span>
-            <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">left_sidebar_width</span><span class="p">),</span>
-            <span class="s2">&quot;drive_widget&quot;</span><span class="p">:</span>
-            <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">drive_widget_width</span><span class="p">),</span>
-            <span class="s2">&quot;drive_textbox&quot;</span><span class="p">:</span>
-            <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;270px&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
+                              <span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                              <span class="n">height</span><span class="o">=</span><span class="n">log_window_height</span><span class="p">,</span>
+                              <span class="n">overflow</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;visualization_window&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">visualization_window_width</span><span class="p">,</span>
+                                           <span class="n">height</span><span class="o">=</span><span class="n">visualization_window_height</span><span class="p">,</span>
+                                           <span class="n">border</span><span class="o">=</span><span class="s1">&#39;1px solid gray&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;left_sidebar&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">left_sidebar_width</span><span class="p">),</span>
+            <span class="s2">&quot;drive_widget&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">drive_widget_width</span><span class="p">),</span>
+            <span class="s2">&quot;drive_textbox&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;270px&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
             <span class="s2">&quot;simulation_status_common&quot;</span><span class="p">:</span> <span class="s2">&quot;background:gray;padding-left:10px&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
@@ -362,7 +377,7 @@
         <span class="c1"># dynamic larger components</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to add new drives</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to tune connectivity.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;log_out&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
         <span class="c1"># visualization window</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_visualization_window</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span>
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">])</span>
@@ -382,7 +397,9 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span>
                 <span class="p">]),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_viz_layout_selection</span><span class="p">,</span>
-            <span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span>
+            <span class="p">]),</span>
+            <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;log_out&#39;</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span>
         <span class="p">])</span>
         <span class="c1"># title</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div</span>
@@ -463,8 +480,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_viz_layout_selection</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_handle_viz_layout_change</span><span class="p">,</span>
                                                  <span class="s1">&#39;value&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HNNGUI.compose"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.compose">[docs]</a>    <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Compose widgets&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="HNNGUI.compose"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.compose">[docs]</a>    <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compose widgets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        return_layout: bool</span>
+<span class="sd">            If the method returns the layout object which can be rendered by</span>
+<span class="sd">            IPython.display.display() method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">simulation_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span>
@@ -497,8 +521,9 @@
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">titles</span><span class="p">):</span>
             <span class="n">left_tab</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
 
-        <span class="n">hnn_gui</span> <span class="o">=</span> <span class="n">AppLayout</span><span class="p">(</span>
-            <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span> <span class="n">left_sidebar</span><span class="o">=</span><span class="n">left_tab</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span> <span class="o">=</span> <span class="n">AppLayout</span><span class="p">(</span>
+            <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span>
+            <span class="n">left_sidebar</span><span class="o">=</span><span class="n">left_tab</span><span class="p">,</span>
             <span class="n">right_sidebar</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_visualization_window</span><span class="p">,</span>
             <span class="n">footer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_footer</span><span class="p">,</span>
             <span class="n">pane_widths</span><span class="o">=</span><span class="p">[</span>
@@ -506,7 +531,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span>
             <span class="p">],</span>
             <span class="n">pane_heights</span><span class="o">=</span><span class="p">[</span>
-                <span class="s1">&#39;50px&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;header_height&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span>
             <span class="p">],</span>
         <span class="p">)</span>
 
@@ -531,7 +557,102 @@
                                     <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">hnn_gui</span></div></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_layout</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span></div>
+
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HNNGUI.capture"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.capture">[docs]</a>    <span class="k">def</span> <span class="nf">capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Take a screenshot of the current GUI.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        width : int | None</span>
+<span class="sd">            The width of iframe window use to show the snapshot.</span>
+<span class="sd">        height : int | None</span>
+<span class="sd">            The height of iframe window use to show the snapshot.</span>
+<span class="sd">        render: bool</span>
+<span class="sd">            Will return an IFrame object if False</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        snapshot : An iframe snapshot object that can be rendered in notebooks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="n">embed_minimal_html</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">views</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">width</span><span class="p">:</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_width</span> <span class="o">+</span> <span class="mi">20</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">height</span><span class="p">:</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_height</span> <span class="o">+</span> <span class="mi">20</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+        <span class="n">data_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data:text/html,</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">screenshot</span> <span class="o">=</span> <span class="n">IFrame</span><span class="p">(</span><span class="n">data_url</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">render</span><span class="p">:</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">screenshot</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">screenshot</span></div>
+
+<div class="viewcode-block" id="HNNGUI.run_notebook_cells"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.run_notebook_cells">[docs]</a>    <span class="k">def</span> <span class="nf">run_notebook_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run all but the last cells sequentially in a Jupyter notebook.</span>
+
+<span class="sd">        To properly use this function:</span>
+<span class="sd">            1. Put this into the penultimate cell.</span>
+<span class="sd">            2. init the HNNGUI in a single cell.</span>
+<span class="sd">            3. Hit &#39;run all&#39; button to run the whole notebook and it will</span>
+<span class="sd">               selectively run twice.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">js_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        function sleep(ms) {</span>
+<span class="s2">        return new Promise(resolve =&gt; setTimeout(resolve, ms));</span>
+<span class="s2">        }</span>
+<span class="s2">        function getRunningStatus(idx){</span>
+<span class="s2">            const htmlContent = Jupyter.notebook.get_cell(idx).element[0];</span>
+<span class="s2">            return htmlContent.childNodes[0].childNodes[0].textContent;</span>
+<span class="s2">        }</span>
+<span class="s2">        function cellContainsInit(idx){</span>
+<span class="s2">            const textVal = Jupyter.notebook.get_cell(</span>
+<span class="s2">                idx).element[0].childNodes[0].textContent;</span>
+<span class="s2">            return textVal.includes(&#39;HNNGUI()&#39;) || textVal.includes(&#39;HNNGUI&#39;);</span>
+<span class="s2">        }</span>
+<span class="s2">        function cellContainsRunCells(idx){</span>
+<span class="s2">            const textVal = Jupyter.notebook.get_cell(</span>
+<span class="s2">                idx).element[0].childNodes[0].textContent;</span>
+<span class="s2">            return textVal.includes(&#39;run_notebook_cells()&#39;);</span>
+<span class="s2">        }</span>
+<span class="s2">        async function runNotebook() {</span>
+<span class="s2">            console.log(&quot;run notebook cell by cell&quot;);</span>
+<span class="s2">            const cellHtmlContents = Jupyter.notebook.element[0].children[0];</span>
+<span class="s2">            const nCells = cellHtmlContents.childElementCount;</span>
+<span class="s2">            console.log(`In total we have $</span><span class="si">{nCells}</span><span class="s2"> cells`);</span>
+
+<span class="s2">            for(let i=1; i&lt;nCells-1; i++){</span>
+<span class="s2">                if(cellContainsRunCells(i)){</span>
+<span class="s2">                    break</span>
+<span class="s2">                }</span>
+<span class="s2">                else if(cellContainsInit(i)){</span>
+<span class="s2">                    console.log(`Skip init cell $</span><span class="si">{i}</span><span class="s2">...`);</span>
+<span class="s2">                    continue</span>
+<span class="s2">                }</span>
+
+<span class="s2">                else{</span>
+<span class="s2">                    console.log(`About to execute cell $</span><span class="si">{i}</span><span class="s2">..`);</span>
+<span class="s2">                    Jupyter.notebook.execute_cells([i]);</span>
+<span class="s2">                    while (getRunningStatus(i).includes(&quot;*&quot;)){</span>
+<span class="s2">                        console.log(&quot;Still running, wait for another 2 secs&quot;);</span>
+<span class="s2">                        await sleep(2000);</span>
+<span class="s2">                    }</span>
+<span class="s2">                    await sleep(1000);</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">            console.log(&#39;Done&#39;);</span>
+<span class="s2">        }</span>
+<span class="s2">        runNotebook();</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">js_string</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">create_expanded_button</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1267,7 +1388,11 @@
 <span class="k">def</span> <span class="nf">init_left_right_viz_layout</span><span class="p">(</span><span class="n">plot_outputs</span><span class="p">,</span> <span class="n">plot_dropdowns</span><span class="p">,</span>
                                <span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_options</span><span class="p">,</span> <span class="n">previous_outputs</span><span class="p">,</span>
                                <span class="n">layout</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">plot_outputs_L</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">)</span>
+    <span class="n">layout_LR</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                       <span class="n">height</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                       <span class="n">border</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">border</span><span class="p">)</span>
+
+    <span class="n">plot_outputs_L</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout_LR</span><span class="p">)</span>
 
     <span class="n">default_plot_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">plot_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">plot_options</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">previous_outputs</span><span class="p">[:</span><span class="mi">2</span><span class="p">]):</span>
@@ -1292,7 +1417,7 @@
     <span class="n">plot_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_outputs_L</span><span class="p">)</span>
     <span class="n">plot_dropdowns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_dropdown_L</span><span class="p">)</span>
 
-    <span class="n">plot_outputs_R</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">)</span>
+    <span class="n">plot_outputs_R</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout_LR</span><span class="p">)</span>
 
     <span class="n">plot_dropdown_R</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
         <span class="n">options</span><span class="o">=</span><span class="n">plot_options</span><span class="p">,</span>

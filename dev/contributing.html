@@ -17,6 +17,8 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 
@@ -60,6 +62,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="auto_examples/index.html">Examples</a></li>
+                <li><a href="gui/index.html">GUI</a></li>
                 <li><a href="api.html">API</a></li>
                 <li><a href="glossary.html">Glossary</a></li>
                 <li><a href="whats_new.html">Whats new</a></li>
@@ -186,12 +189,12 @@ dependencies as described in our <a class="reference internal" href="parallel.ht
 <h3>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">¶</a></h3>
 <p>The documentation can be built using sphinx. For that, please additionally
 install the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil nbsphinx
 </pre></div>
 </div>
 <p>If you are using a newer version of pip, you may be prompted to use the flag
 <code class="docutils literal notranslate"><span class="pre">--use-feature=2020-resolver</span></code>. If this happens, please add it as recommended:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --use-feature=2020-resolver matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --use-feature=2020-resolver matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil nbsphinx
 </pre></div>
 </div>
 <p>You can build the documentation locally using the command:</p>
