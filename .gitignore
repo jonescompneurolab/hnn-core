@@ -30,3 +30,5 @@ cover
 .vscode/
 
 __pycache__
+
+*.log
