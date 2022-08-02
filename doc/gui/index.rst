@@ -9,3 +9,8 @@ Launch GUI in a Jupyter notebook
 ================================
 
 See :doc:`basic_gui_usage`
+
+Event Related Potentials (ERPs)
+===============================
+
+See :doc:`tutorial_erp`
