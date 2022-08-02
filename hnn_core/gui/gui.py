@@ -28,6 +28,271 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
 from ipywidgets.embed import embed_minimal_html
 
 
+_plot_options = {
+    'Horizontal': 'L-R',
+    'Vertical': 'U-D',
+}
+
+
+def update_plot_window(simulation_data, _plot_out, plot_type):
+    """Refresh plots with data from simulation_data."""
+    _plot_out.clear_output()
+    if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
+        return
+
+    with _plot_out:
+        if plot_type['new'] == 'spikes':
+            if simulation_data['net'].cell_response:
+                fig, ax = plt.subplots()
+                simulation_data['net'].cell_response.plot_spikes_raster(ax=ax)
+            else:
+                print("No cell response data")
+
+        elif plot_type['new'] == 'current dipole':
+            if len(simulation_data['dpls']) > 0:
+                fig, ax = plt.subplots()
+                plot_dipole(simulation_data['dpls'], ax=ax, average=True)
+            else:
+                print("No dipole data")
+
+        elif plot_type['new'] == 'layer-specific dipole':
+            if len(simulation_data['dpls']) > 0:
+                layers = ["L2", "L5", "agg"]
+                fig, axes = plt.subplots(len(layers), 1, sharex=True)
+                plot_dipole(simulation_data['dpls'], ax=axes,
+                            layer=layers, average=True)
+            else:
+                print("No dipole data")
+
+        elif plot_type['new'] == 'input histogram':
+            # BUG: got error here, need a better way to handle exception
+            if simulation_data['net'].cell_response:
+                fig, ax = plt.subplots()
+                simulation_data['net'].cell_response.plot_spikes_hist(ax=ax)
+            else:
+                print("No cell response data")
+
+        elif plot_type['new'] == 'PSD':
+            if len(simulation_data['dpls']) > 0:
+                fig, ax = plt.subplots()
+                simulation_data['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
+            else:
+                print("No dipole data")
+
+        elif plot_type['new'] == 'spectogram':
+            if len(simulation_data['dpls']) > 0:
+                freqs = np.arange(10., 100., 1.)
+                n_cycles = freqs / 8.
+                fig, ax = plt.subplots()
+                simulation_data['dpls'][0].plot_tfr_morlet(freqs,
+                                                           n_cycles=n_cycles,
+                                                           ax=ax)
+            else:
+                print("No dipole data")
+        elif plot_type['new'] == 'network':
+            if simulation_data['net']:
+                fig = plt.figure()
+                ax = fig.add_subplot(111, projection='3d')
+                simulation_data['net'].plot_cells(ax=ax)
+            else:
+                print("No network data")
+
+
+def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
+                               simulation_data, plot_options, previous_outputs,
+                               layout, init=False):
+    layout_LR = Layout(width=f"{int(layout.width[:-2])/2-10}px",
+                       height=layout.height,
+                       border=layout.border)
+
+    plot_outputs_L = Output(layout=layout_LR)
+
+    default_plot_types = [plot_options[0], plot_options[1]]
+    for idx, plot_type in enumerate(previous_outputs[:2]):
+        default_plot_types[idx] = plot_type
+
+    plot_dropdown_L = Dropdown(
+        options=plot_options,
+        value=default_plot_types[0],
+        description='Plot:',
+        disabled=False,
+    )
+    plot_dropdown_L.observe(
+        lambda plot_type: _debug_update_plot_window(
+            simulation_data,
+            plot_outputs_L,
+            plot_type,
+            "Left",
+        ),
+        'value',
+    )
+
+    plot_outputs.append(plot_outputs_L)
+    plot_dropdowns.append(plot_dropdown_L)
+
+    plot_outputs_R = Output(layout=layout_LR)
+
+    plot_dropdown_R = Dropdown(
+        options=plot_options,
+        value=default_plot_types[1],
+        description='Plot:',
+        disabled=False,
+    )
+    plot_dropdown_R.observe(
+        lambda plot_type: _debug_update_plot_window(
+            simulation_data,
+            plot_outputs_R,
+            plot_type,
+            "Right",
+        ),
+        'value',
+    )
+
+    plot_outputs.append(plot_outputs_R)
+    plot_dropdowns.append(plot_dropdown_R)
+
+    if not init:
+        update_plot_window(simulation_data, plot_outputs_L, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[0]
+        })
+        update_plot_window(simulation_data, plot_outputs_R, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[1]
+        })
+    grid = GridspecLayout(1, 2, height=layout.height)
+    grid[0, 0] = VBox([plot_dropdown_L, plot_outputs_L])
+    grid[0, 1] = VBox([plot_dropdown_R, plot_outputs_R])
+    return grid
+
+
+def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
+                               plot_options, previous_outputs,
+                               layout, init=False):
+
+    default_plot_types = [plot_options[0], plot_options[1]]
+    for idx, plot_type in enumerate(previous_outputs[:2]):
+        default_plot_types[idx] = plot_type
+
+    plot_outputs_U = Output(layout={
+        'border': layout.border,
+        'height': f"{float(layout.height[:-2])/2}px"
+    })
+
+    plot_dropdown_U = Dropdown(
+        options=plot_options,
+        value=default_plot_types[0],
+        description='Plot:',
+        disabled=False,
+    )
+    plot_dropdown_U.observe(
+        lambda plot_type: _debug_update_plot_window(
+            simulation_data,
+            plot_outputs_U,
+            plot_type,
+            "Left",
+        ),
+        'value',
+    )
+
+    plot_outputs.append(plot_outputs_U)
+    plot_dropdowns.append(plot_dropdown_U)
+
+    # Down
+    plot_outputs_D = Output(layout={
+        'border': layout.border,
+        'height': layout.height
+    })
+
+    plot_dropdown_D = Dropdown(
+        options=plot_options,
+        value=default_plot_types[1],
+        description='Plot:',
+        disabled=False,
+    )
+
+    plot_dropdown_D.observe(
+        lambda plot_type: _debug_update_plot_window(
+            simulation_data,
+            plot_outputs_D,
+            plot_type,
+            "Right",
+        ),
+        'value',
+    )
+    plot_outputs.append(plot_outputs_D)
+    plot_dropdowns.append(plot_dropdown_D)
+
+    if not init:
+        update_plot_window(simulation_data, plot_outputs_U, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[0]
+        })
+        update_plot_window(simulation_data, plot_outputs_D, {
+            "type": "change",
+            "name": "value",
+            "new": default_plot_types[1]
+        })
+
+    grid = GridspecLayout(2, 1, height=layout.height)
+    grid[0, 0] = VBox([plot_dropdown_U, plot_outputs_U])
+    grid[1, 0] = VBox([plot_dropdown_D, plot_outputs_D])
+    return grid
+
+
+def change_plot_type(grid, layout, plot_idx, plot_type):
+    assert layout in _plot_options.values(), ValueError("Illegal layout type")
+    if layout == "L-R":
+        assert 0 <= plot_idx < 2
+        grid[layout].children[plot_idx].children[0].value = plot_type
+        pass
+    elif layout == "U-D":
+        assert 0 <= plot_idx < 2
+        grid[layout].children[plot_idx].children[0].value = plot_type
+    else:
+        pass
+
+
+def initialize_viz_window(viz_grid, viz_window, simulation_data, plot_outputs,
+                          plot_dropdowns, layout,
+                          layout_option="L-R", init=False):
+    plot_options = [
+        'current dipole',
+        'layer-specific dipole',
+        'input histogram',
+        'spikes',
+        'PSD',
+        'spectogram',
+        'network',
+    ]
+    viz_window.clear_output()
+    previous_plot_outputs_values = []
+    while len(plot_outputs) > 0:
+        plot_outputs.pop()
+        previous_plot_outputs_values.append(plot_dropdowns.pop().value)
+
+    with viz_window:
+        # Left-Rright configuration
+        if layout_option == "L-R":
+            grid = init_left_right_viz_layout(plot_outputs, plot_dropdowns,
+                                              simulation_data, plot_options,
+                                              previous_plot_outputs_values,
+                                              layout, init=init)
+
+        # Upper-Down configuration
+        elif layout_option == "U-D":
+            grid = init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
+                                              simulation_data, plot_options,
+                                              previous_plot_outputs_values,
+                                              layout, init=init)
+
+        viz_grid[layout_option] = grid
+        display(grid)
+
+
 class HNNGUI:
     """HNN GUI class
 
@@ -130,6 +395,7 @@ class HNNGUI:
             "drive_widget": Layout(width=drive_widget_width),
             "drive_textbox": Layout(width='270px', height='auto'),
             "simulation_status_common": "background:gray;padding-left:10px",
+            "simulation_status_running": "background:orange;padding-left:10px",
         }
 
         self._simulation_status_contents = {
@@ -137,7 +403,7 @@ class HNNGUI:
             f"""<div style='{self.layout['simulation_status_common']};
             color:white;'>Not running</div>""",
             "running":
-            f"""<div style='{self.layout['simulation_status_common']};
+            f"""<div style='{self.layout['simulation_status_running']};
             color:white;'>Running...</div>""",
             "finished":
             f"""<div style='{self.layout['simulation_status_common']};
@@ -165,11 +431,10 @@ class HNNGUI:
                                                  description='Backend:')
 
         # visualization layout
-        self.widget_viz_layout_selection = Dropdown(options=[
-                                                    ('Horizontal', 'L-R'),
-                                                    ('Vertical', 'U-D')],
-                                                    value='L-R',
-                                                    description='Layout:')
+        self.widget_viz_layout_selection = Dropdown(
+            options=[(k, _plot_options[k]) for k in _plot_options],
+            value=list(_plot_options.values())[0],
+            description='Layout:')
 
         self.widget_mpi_cmd = Text(value='mpiexec',
                                    placeholder='Fill if applies',
@@ -271,6 +536,12 @@ class HNNGUI:
             text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
+        # visualiation components
+        self._viz_grid = {
+            "L-R": None,
+            "U-D": None,
+        }
+
     def load_parameters(self, params_fname=None):
         """Read parameters from file."""
         if not params_fname:
@@ -326,6 +597,7 @@ class HNNGUI:
 
         def _handle_viz_layout_change(layout_option):
             return initialize_viz_window(
+                self._viz_grid,
                 self._visualization_window, self.simulation_data,
                 self.plot_outputs_list, self.plot_dropdowns_list,
                 self.layout['visualization_window'],
@@ -404,6 +676,7 @@ class HNNGUI:
 
         # initialize visualization
         initialize_viz_window(
+            self._viz_grid,
             self._visualization_window,
             self.simulation_data,
             self.plot_outputs_list,
@@ -477,10 +750,16 @@ class HNNGUI:
             const htmlContent = Jupyter.notebook.get_cell(idx).element[0];
             return htmlContent.childNodes[0].childNodes[0].textContent;
         }
-        function cellContainsInit(idx){
-            const textVal = Jupyter.notebook.get_cell(
-                idx).element[0].childNodes[0].textContent;
-            return textVal.includes('HNNGUI()') || textVal.includes('HNNGUI');
+        function cellContainsInitOrMarkdown(idx){
+            const cell = Jupyter.notebook.get_cell(idx);
+            if(cell.cell_type!=='code'){
+                return true;
+            }
+            else{
+                const textVal = cell.element[0].childNodes[0].textContent;
+                return textVal.includes('HNNGUI()') || textVal.includes(
+                    'HNNGUI');
+            }
         }
         function cellContainsRunCells(idx){
             const textVal = Jupyter.notebook.get_cell(
@@ -497,11 +776,10 @@ class HNNGUI:
                 if(cellContainsRunCells(i)){
                     break
                 }
-                else if(cellContainsInit(i)){
-                    console.log(`Skip init cell ${i}...`);
+                else if(cellContainsInitOrMarkdown(i)){
+                    console.log(`Skip init or markdown cell ${i}...`);
                     continue
                 }
-
                 else{
                     console.log(`About to execute cell ${i}..`);
                     Jupyter.notebook.execute_cells([i]);
@@ -517,6 +795,42 @@ class HNNGUI:
         runNotebook();
         """
         return js_string
+
+    # below are a series of methods that are used to manipulate the GUI
+    def _simulate_upload_file(self, file_url):
+        import urllib.request
+        params_name = file_url.split("/")[-1]
+        data = urllib.request.urlopen(file_url)
+        content = b""
+        for line in data:
+            content += line
+
+        uploaded_value = {
+            params_name: {
+                'metadata': {
+                    'name': params_name,
+                    'type': 'application/json',
+                    'size': len(content),
+                },
+                'content': content
+            }
+        }
+        self.load_button.set_trait('value', uploaded_value)
+
+    def _simulate_left_tab_click(self, tab_title):
+        tab_index = None
+        for idx in self.app_layout.left_sidebar._titles.keys():
+            if tab_title == self.app_layout.left_sidebar._titles[idx]:
+                tab_index = int(idx)
+                break
+        if tab_index is None:
+            raise ValueError("Incorrect tab title")
+        self.app_layout.left_sidebar.selected_index = tab_index
+
+    def _simulate_switch_plot_type(self, plot_idx, plot_type):
+        change_plot_type(self._viz_grid,
+                         self.widget_viz_layout_selection.value, plot_idx,
+                         plot_type)
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
@@ -892,61 +1206,6 @@ def _debug_update_plot_window(simulation_data, _plot_out, plot_type, idx):
     update_plot_window(simulation_data, _plot_out, plot_type)
 
 
-def update_plot_window(simulation_data, _plot_out, plot_type):
-    """Refresh plots with data from simulation_data."""
-    _plot_out.clear_output()
-    if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
-        return
-
-    with _plot_out:
-        if plot_type['new'] == 'spikes':
-            if simulation_data['net'].cell_response:
-                fig, ax = plt.subplots()
-                simulation_data['net'].cell_response.plot_spikes_raster(ax=ax)
-            else:
-                print("No cell response data")
-
-        elif plot_type['new'] == 'current dipole':
-            if len(simulation_data['dpls']) > 0:
-                fig, ax = plt.subplots()
-                plot_dipole(simulation_data['dpls'], ax=ax, average=True)
-            else:
-                print("No dipole data")
-
-        elif plot_type['new'] == 'input histogram':
-            # BUG: got error here, need a better way to handle exception
-            if simulation_data['net'].cell_response:
-                fig, ax = plt.subplots()
-                simulation_data['net'].cell_response.plot_spikes_hist(ax=ax)
-            else:
-                print("No cell response data")
-
-        elif plot_type['new'] == 'PSD':
-            if len(simulation_data['dpls']) > 0:
-                fig, ax = plt.subplots()
-                simulation_data['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
-            else:
-                print("No dipole data")
-
-        elif plot_type['new'] == 'spectogram':
-            if len(simulation_data['dpls']) > 0:
-                freqs = np.arange(10., 100., 1.)
-                n_cycles = freqs / 8.
-                fig, ax = plt.subplots()
-                simulation_data['dpls'][0].plot_tfr_morlet(freqs,
-                                                           n_cycles=n_cycles,
-                                                           ax=ax)
-            else:
-                print("No dipole data")
-        elif plot_type['new'] == 'network':
-            if simulation_data['net']:
-                fig = plt.figure()
-                ax = fig.add_subplot(111, projection='3d')
-                simulation_data['net'].plot_cells(ax=ax)
-            else:
-                print("No network data")
-
-
 def add_connectivity_tab(simulation_data, connectivity_out,
                          connectivity_sliders):
     """Add all possible connectivity boxes to connectivity tab."""
@@ -1242,182 +1501,6 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
             display(mpi_cmd)
         elif backend_type == "Joblib":
             display(n_jobs)
-
-
-def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
-                               simulation_data, plot_options, previous_outputs,
-                               layout, init=False):
-    layout_LR = Layout(width=f"{int(layout.width[:-2])/2-10}px",
-                       height=layout.height,
-                       border=layout.border)
-
-    plot_outputs_L = Output(layout=layout_LR)
-
-    default_plot_types = [plot_options[0], plot_options[1]]
-    for idx, plot_type in enumerate(previous_outputs[:2]):
-        default_plot_types[idx] = plot_type
-
-    plot_dropdown_L = Dropdown(
-        options=plot_options,
-        value=default_plot_types[0],
-        description='Plot:',
-        disabled=False,
-    )
-    plot_dropdown_L.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_L,
-            plot_type,
-            "Left",
-        ),
-        'value',
-    )
-
-    plot_outputs.append(plot_outputs_L)
-    plot_dropdowns.append(plot_dropdown_L)
-
-    plot_outputs_R = Output(layout=layout_LR)
-
-    plot_dropdown_R = Dropdown(
-        options=plot_options,
-        value=default_plot_types[1],
-        description='Plot:',
-        disabled=False,
-    )
-    plot_dropdown_R.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_R,
-            plot_type,
-            "Right",
-        ),
-        'value',
-    )
-
-    plot_outputs.append(plot_outputs_R)
-    plot_dropdowns.append(plot_dropdown_R)
-
-    if not init:
-        update_plot_window(simulation_data, plot_outputs_L, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[0]
-        })
-        update_plot_window(simulation_data, plot_outputs_R, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[1]
-        })
-    grid = GridspecLayout(1, 2, height=layout.height)
-    grid[0, 0] = VBox([plot_dropdown_L, plot_outputs_L])
-    grid[0, 1] = VBox([plot_dropdown_R, plot_outputs_R])
-    return grid
-
-
-def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
-                               plot_options, previous_outputs,
-                               layout, init=False):
-
-    default_plot_types = [plot_options[0], plot_options[1]]
-    for idx, plot_type in enumerate(previous_outputs[:2]):
-        default_plot_types[idx] = plot_type
-
-    plot_outputs_U = Output(layout={
-        'border': layout.border,
-        'height': f"{float(layout.height[:-2])/2}px"
-    })
-
-    plot_dropdown_U = Dropdown(
-        options=plot_options,
-        value=default_plot_types[0],
-        description='Plot:',
-        disabled=False,
-    )
-    plot_dropdown_U.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_U,
-            plot_type,
-            "Left",
-        ),
-        'value',
-    )
-
-    plot_outputs.append(plot_outputs_U)
-    plot_dropdowns.append(plot_dropdown_U)
-
-    # Down
-    plot_outputs_D = Output(layout={
-        'border': layout.border,
-        'height': layout.height
-    })
-
-    plot_dropdown_D = Dropdown(
-        options=plot_options,
-        value=default_plot_types[1],
-        description='Plot:',
-        disabled=False,
-    )
-
-    plot_dropdown_D.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_D,
-            plot_type,
-            "Right",
-        ),
-        'value',
-    )
-    plot_outputs.append(plot_outputs_D)
-    plot_dropdowns.append(plot_dropdown_D)
-
-    if not init:
-        update_plot_window(simulation_data, plot_outputs_U, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[0]
-        })
-        update_plot_window(simulation_data, plot_outputs_D, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[1]
-        })
-
-    grid = GridspecLayout(2, 1, height=layout.height)
-    grid[0, 0] = VBox([plot_dropdown_U, plot_outputs_U])
-    grid[1, 0] = VBox([plot_dropdown_D, plot_outputs_D])
-    return grid
-
-
-def initialize_viz_window(viz_window, simulation_data, plot_outputs,
-                          plot_dropdowns, layout,
-                          layout_option="L-R", init=False):
-    plot_options = [
-        'current dipole', 'input histogram', 'spikes', 'PSD', 'spectogram',
-        'network'
-    ]
-    viz_window.clear_output()
-    previous_plot_outputs_values = []
-    while len(plot_outputs) > 0:
-        plot_outputs.pop()
-        previous_plot_outputs_values.append(plot_dropdowns.pop().value)
-
-    with viz_window:
-        # Left-Rright configuration
-        if layout_option == "L-R":
-            grid = init_left_right_viz_layout(plot_outputs, plot_dropdowns,
-                                              simulation_data, plot_options,
-                                              previous_plot_outputs_values,
-                                              layout, init=init)
-
-        # Upper-Down configuration
-        elif layout_option == "U-D":
-            grid = init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
-                                              simulation_data, plot_options,
-                                              previous_plot_outputs_values,
-                                              layout, init=init)
-
-        display(grid)
 
 
 def launch():
