@@ -95,8 +95,6 @@ def test_gui_change_connectivity():
                     vbox.children[1].value = w_val
                     assert vbox.children[2].value == w_val
 
-                    vbox.children[3].value = p_val
-
                     # re initialize network
                     _init_network_from_widgets(gui.params, gui.widget_dt,
                                                gui.widget_tstop,
@@ -108,8 +106,6 @@ def test_gui_change_connectivity():
                     # test if the new value is reflected in the network
                     assert gui.simulation_data['net'].connectivity[conn_idx][
                         'nc_dict']['A_weight'] == w_val
-                    assert gui.simulation_data['net'].connectivity[conn_idx][
-                        'probability'] == p_val
 
 
 def test_gui_add_drives():
