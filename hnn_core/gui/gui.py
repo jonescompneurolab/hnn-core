@@ -22,7 +22,7 @@ from hnn_core.viz import plot_dipole
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatLogSlider, FloatSlider, FloatText, GridspecLayout,
+                        FloatLogSlider, FloatText, GridspecLayout,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
                         VBox, link)
 from ipywidgets.embed import embed_minimal_html
@@ -548,16 +548,11 @@ def _get_connectivity_widgets(conn_data):
                                   readout_format='.2e',
                                   style=style)
 
-        prob_slider_input = FloatSlider(
-            value=conn_data[receptor_name]['probability'], disabled=False,
-            min=0.0, max=1.0, step=0.01, continuous_update=False,
-            description="probability", style=style)
-
         link((w_slider, 'value'), (w_text_input, 'value'))
         conn_widget = VBox([
             HTML(value=f"""<p>
             Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
-            w_text_input, w_slider, prob_slider_input,
+            w_text_input, w_slider,
             HTML(value="<hr style='margin-bottom:5px'/>")
         ])
 
