@@ -12,7 +12,7 @@ from .externals.mne import _validate_type
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
-                     legacy_mode=True):
+                     legacy_mode=False):
     """Instantiate the Jones et al. 2009 model.
 
     Parameters
@@ -165,7 +165,7 @@ def jones_2009_model(params=None, add_drives_from_params=False,
 
 
 def law_2021_model(params=None, add_drives_from_params=False,
-                   legacy_mode=True):
+                   legacy_mode=False):
     """Instantiate the beta modulated ERP network model.
 
     Returns
@@ -244,7 +244,7 @@ def law_2021_model(params=None, add_drives_from_params=False,
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
 def calcium_model(params=None, add_drives_from_params=False,
-                  legacy_mode=True):
+                  legacy_mode=False):
     """Instantiate the Jones 2009 model with improved calcium dynamics.
 
     Returns
