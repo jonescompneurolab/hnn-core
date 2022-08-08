@@ -34,7 +34,7 @@ _plot_options = {
 }
 
 
-def update_plot_window(simulation_data, _plot_out, plot_type):
+def _update_plot_window(simulation_data, _plot_out, plot_type):
     """Refresh plots with data from simulation_data."""
     _plot_out.clear_output()
     if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
@@ -98,9 +98,9 @@ def update_plot_window(simulation_data, _plot_out, plot_type):
                 print("No network data")
 
 
-def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
-                               simulation_data, plot_options, previous_outputs,
-                               layout, init=False):
+def _init_left_right_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
+                                plot_options, previous_outputs, layout,
+                                init=False):
     layout_LR = Layout(width=f"{int(layout.width[:-2])/2-10}px",
                        height=layout.height,
                        border=layout.border)
@@ -152,12 +152,12 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
     plot_dropdowns.append(plot_dropdown_R)
 
     if not init:
-        update_plot_window(simulation_data, plot_outputs_L, {
+        _update_plot_window(simulation_data, plot_outputs_L, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[0]
         })
-        update_plot_window(simulation_data, plot_outputs_R, {
+        _update_plot_window(simulation_data, plot_outputs_R, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[1]
@@ -168,9 +168,9 @@ def init_left_right_viz_layout(plot_outputs, plot_dropdowns,
     return grid
 
 
-def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
-                               plot_options, previous_outputs,
-                               layout, init=False):
+def _init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
+                                plot_options, previous_outputs, layout,
+                                init=False):
 
     default_plot_types = [plot_options[0], plot_options[1]]
     for idx, plot_type in enumerate(previous_outputs[:2]):
@@ -226,12 +226,12 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
     plot_dropdowns.append(plot_dropdown_D)
 
     if not init:
-        update_plot_window(simulation_data, plot_outputs_U, {
+        _update_plot_window(simulation_data, plot_outputs_U, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[0]
         })
-        update_plot_window(simulation_data, plot_outputs_D, {
+        _update_plot_window(simulation_data, plot_outputs_D, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[1]
@@ -243,7 +243,7 @@ def init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
     return grid
 
 
-def change_plot_type(grid, layout, plot_idx, plot_type):
+def _change_plot_type(grid, layout, plot_idx, plot_type):
     assert layout in _plot_options.values(), ValueError("Illegal layout type")
     if layout == "L-R":
         assert 0 <= plot_idx < 2
@@ -256,9 +256,9 @@ def change_plot_type(grid, layout, plot_idx, plot_type):
         pass
 
 
-def initialize_viz_window(viz_grid, viz_window, simulation_data, plot_outputs,
-                          plot_dropdowns, layout,
-                          layout_option="L-R", init=False):
+def _initialize_viz_window(viz_grid, viz_window, simulation_data, plot_outputs,
+                           plot_dropdowns, layout, layout_option="L-R",
+                           init=False):
     plot_options = [
         'current dipole',
         'layer-specific dipole',
@@ -277,17 +277,17 @@ def initialize_viz_window(viz_grid, viz_window, simulation_data, plot_outputs,
     with viz_window:
         # Left-Rright configuration
         if layout_option == "L-R":
-            grid = init_left_right_viz_layout(plot_outputs, plot_dropdowns,
-                                              simulation_data, plot_options,
-                                              previous_plot_outputs_values,
-                                              layout, init=init)
+            grid = _init_left_right_viz_layout(plot_outputs, plot_dropdowns,
+                                               simulation_data, plot_options,
+                                               previous_plot_outputs_values,
+                                               layout, init=init)
 
         # Upper-Down configuration
         elif layout_option == "U-D":
-            grid = init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
-                                              simulation_data, plot_options,
-                                              previous_plot_outputs_values,
-                                              layout, init=init)
+            grid = _init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
+                                               simulation_data, plot_options,
+                                               previous_plot_outputs_values,
+                                               layout, init=init)
 
         viz_grid[layout_option] = grid
         display(grid)
@@ -596,7 +596,7 @@ class HNNGUI:
                 self.connectivity_widgets, b)
 
         def _handle_viz_layout_change(layout_option):
-            return initialize_viz_window(
+            return _initialize_viz_window(
                 self._viz_grid,
                 self._visualization_window, self.simulation_data,
                 self.plot_outputs_list, self.plot_dropdowns_list,
@@ -675,7 +675,7 @@ class HNNGUI:
         self._link_callbacks()
 
         # initialize visualization
-        initialize_viz_window(
+        _initialize_viz_window(
             self._viz_grid,
             self._visualization_window,
             self.simulation_data,
@@ -828,9 +828,9 @@ class HNNGUI:
         self.app_layout.left_sidebar.selected_index = tab_index
 
     def _simulate_switch_plot_type(self, plot_idx, plot_type):
-        change_plot_type(self._viz_grid,
-                         self.widget_viz_layout_selection.value, plot_idx,
-                         plot_type)
+        _change_plot_type(self._viz_grid,
+                          self.widget_viz_layout_selection.value, plot_idx,
+                          plot_type)
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
@@ -1208,7 +1208,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 
 
 def _debug_update_plot_window(simulation_data, _plot_out, plot_type, idx):
-    update_plot_window(simulation_data, _plot_out, plot_type)
+    _update_plot_window(simulation_data, _plot_out, plot_type)
 
 
 def add_connectivity_tab(simulation_data, connectivity_out,
@@ -1490,7 +1490,7 @@ def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
     for idx in range(len(plot_outputs_list)):
         with log_out:
             print(f"updating panel {idx}")
-        update_plot_window(
+        _update_plot_window(
             simulation_data, plot_outputs_list[idx], {
                 "type": "change",
                 "name": "value",
