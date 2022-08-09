@@ -1,7 +1,4 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
-import os.path as op
-
-import hnn_core
 import matplotlib
 import numpy as np
 import pytest
@@ -42,7 +39,7 @@ def test_gui_upload_params():
     original_tstep = gui.widget_dt.value
     gui.widget_dt.value = 1
     # simulate upload default.json
-    file_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"
+    file_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
     gui._simulate_upload_file(file_url)
 
     # check if parameter is reloaded.
