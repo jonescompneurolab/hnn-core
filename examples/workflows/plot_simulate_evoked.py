@@ -109,7 +109,7 @@ for dpl in dpls:
 import matplotlib.pyplot as plt
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
                          constrained_layout=True)
-plot_dipole(dpls, ax=axes[0], layer='agg')
+plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
 net.cell_response.plot_spikes_hist(ax=axes[1],
                                    spike_types=['evprox', 'evdist'])
 
@@ -118,7 +118,7 @@ net.cell_response.plot_spikes_hist(ax=axes[1],
 # different net waveform features, then instead of passing ``'agg'`` to
 # ``layer``, you can provide a list of layers to be visualized and optionally
 # a list of axes to ``ax`` to visualize the dipole moments separately.
-plot_dipole(dpls, average=False, layer=['L2', 'L5', 'agg'])
+plot_dipole(dpls, average=False, layer=['L2', 'L5', 'agg'], show=False)
 
 
 ###############################################################################
