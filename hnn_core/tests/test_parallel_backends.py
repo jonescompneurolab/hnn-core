@@ -29,7 +29,7 @@ def _terminate_mpibackend(event, backend):
     sleep(0.1)
 
     # run terminate until it is successful
-    while not event.isSet():
+    while not event.is_set():
         backend.terminate()
         sleep(0.01)
 
