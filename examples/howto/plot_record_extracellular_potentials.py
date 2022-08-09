@@ -87,16 +87,16 @@ fig, axs = plt.subplots(3, 1, sharex=True, figsize=(6, 8),
 
 # Then plot the aggregate dipole time series on its own axis
 dpl[trial_idx].smooth(window_len=window_len)
-dpl[trial_idx].plot(ax=axs[0], decim=decimate)
+dpl[trial_idx].plot(ax=axs[0], decim=decimate, show=False)
 
 # use the same smoothing window on the LFP traces to allow comparison to dipole
 net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
-    ax=axs[1], decim=decimate)
+    ax=axs[1], decim=decimate, show=False)
 
 axs[1].grid(True, which='major', axis='x')
 axs[1].set_xlabel('')
 # Finally, add the spike raster to the bottom subplot
-net.cell_response.plot_spikes_raster(ax=axs[2])
+net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
 plt.tight_layout()
 plt.show()
 
