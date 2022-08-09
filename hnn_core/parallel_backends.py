@@ -24,7 +24,7 @@ _BACKEND = None
 
 
 def _thread_handler(event, out, queue):
-    while not event.isSet():
+    while not event.is_set():
         line = out.readline()
         if line == '':
             break
