@@ -28,6 +28,7 @@ jobs:
           pip install numpy matplotlib scipy NEURON
           pip install ipywidgets voila
           pip install sphinx-gallery sphinx sphinx_bootstrap_theme numpydoc pillow nbsphinx
+          python setup.py install
       - name: Linkcheck
         shell: bash -el {0}
         run: |
