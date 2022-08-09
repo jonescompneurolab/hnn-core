@@ -9,6 +9,7 @@ import multiprocessing
 import os.path as op
 import sys
 import urllib.parse
+import urllib.request
 
 import hnn_core
 import matplotlib.pyplot as plt
@@ -26,7 +27,6 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
                         VBox, link)
 from ipywidgets.embed import embed_minimal_html
-
 
 _plot_options = {
     'Horizontal': 'L-R',
@@ -798,7 +798,6 @@ class HNNGUI:
 
     # below are a series of methods that are used to manipulate the GUI
     def _simulate_upload_file(self, file_url):
-        import urllib.request
         params_name = file_url.split("/")[-1]
         data = urllib.request.urlopen(file_url)
         content = b""
