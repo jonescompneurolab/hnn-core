@@ -30,25 +30,6 @@ def test_gui_upload_params():
     gui = HNNGUI()
     _ = gui.compose()
 
-    params_name = 'default.json'
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__))
-    params_fname = op.join(hnn_core_root, 'param', params_name)
-
-    content = b""
-    with open(params_fname, "rb") as f:
-        for line in f:
-            content += line
-    uploaded_value = {
-        params_name: {
-            'metadata': {
-                'name': params_name,
-                'type': 'application/json',
-                'size': len(content),
-            },
-            'content': content
-        }
-    }
-
     # change the default loaded parameters
     original_drive_count = len(gui.drive_widgets)
     assert original_drive_count > 0
@@ -60,9 +41,9 @@ def test_gui_upload_params():
 
     original_tstep = gui.widget_dt.value
     gui.widget_dt.value = 1
-
-    # manually send uploaded content
-    gui.load_button.set_trait('value', uploaded_value)
+    # simulate upload default.json
+    file_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"
+    gui._simulate_upload_file(file_url)
 
     # check if parameter is reloaded.
     assert gui.widget_tstop.value == original_tstop
