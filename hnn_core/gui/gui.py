@@ -99,8 +99,10 @@ def _update_plot_window(simulation_data, _plot_out, plot_type,
 
         elif plot_type['new'] == 'spectogram':
             if len(dpls_copied) > 0:
-                freqs = np.arange(10., analysis_config['max_spectral_frequency'],
-                                  1.,)
+                min_f = 10.0
+                max_f = analysis_config['max_spectral_frequency']
+                step_f = 1.0
+                freqs = np.arange(min_f, max_f, step_f)
                 n_cycles = freqs / 8.
                 fig, ax = plt.subplots()
                 dpls_copied[0].plot_tfr_morlet(
