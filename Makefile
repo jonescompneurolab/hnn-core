@@ -15,3 +15,16 @@ clean :
 
 check-manifest:
 	check-manifest
+
+test: flake
+	pytest .
+
+flake:
+	@if command -v flake8 > /dev/null; then \
+		echo "Running flake8"; \
+		flake8 hnn_core --count; \
+	else \
+		echo "flake8 not found, please install it!"; \
+		exit 1; \
+	fi;
+	@echo "flake8 passed"
