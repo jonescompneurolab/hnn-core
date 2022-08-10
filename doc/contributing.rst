@@ -14,6 +14,113 @@ If your contributions will make use of parallel backends for using more than
 one core, please see the additional installation steps in our
 :doc:`parallel backend guide <parallel>`.
 
+Overview of contribution process
+================================
+
+.. note:: Reminder: all contributors are expected to follow our
+          `code of conduct`_.
+
+Changes to hnn-core are typically made by `forking`_ the hnn-core
+repository, making changes to your fork (usually by `cloning`_ it to your
+personal computer, making the changes locally, and then `pushing`_ the local
+changes up to your fork on GitHub), and finally creating a `pull request`_ to incorporate
+your changes back into the shared "upstream" version of the codebase.
+
+In general you'll be working with three different copies of the hnn-core
+codebase: the official remote copy at https://github.com/hnn-core/hnn_core
+(usually called ``upstream``), your remote `fork`_ of the upstream repository
+(similar URL, but with your username in place of ``hnn-core``, and usually
+called ``origin``), and the local copy of the codebase on your computer. The
+typical contribution process is to:
+
+1. synchronize your local copy with ``upstream``
+
+2. make changes to your local copy
+
+3. `push`_ your changes to ``origin`` (your remote fork of the upstream)
+
+4. submit a `pull request`_ from your fork into ``upstream``
+
+The sections :ref:`basic-git` and :ref:`github-workflow` (below) describe this
+process in more detail.
+
+
+Setting up your local development environment
+=============================================
+
+Configuring git
+~~~~~~~~~~~~~~~
+
+Instructions for how to configure git can be found on 
+the [git book](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration).
+
+Making a pull request
+=====================
+
+1. Make a fork of the [hnn-core](https://github.com/jonescompneurolab/hnn-core) 
+repository to your own account on github. Look for the Fork button in the top right corner
+
+2. On the terminal of your local computer clone the fork
+
+    $ git clone https://github.com/<username>/hnn-core
+
+3. On the terminal of your local computer set up the remotes
+
+    $ cd hnn-core
+    $ git remote add upstream https://github.com/jonescompneurolab/hnn-core
+
+4. Check that the remotes have been correctly added
+
+    $ git remote -v
+
+You should see:
+
+    origin	https://github.com/<username>/hnn-core (fetch)
+    origin	https://github.com/<username>/hnn-core (push)
+    upstream	https://github.com/jonescompneurolab/hnn-core (fetch)
+    upstream	https://github.com/jonescompneurolab/hnn-core (push)
+
+5. To start a new feature branch, we will copy the existing ``master`` branch
+from the ``upstream`` remote and give it a specific name
+
+    $ git fetch upstream master:cool_feature
+    $ git checkout cool_feature
+
+6. Make your changes relevant to the pull request
+
+7. To make a commit, you first have to add the files you have
+changed to the staging area
+
+    $ git add -u
+
+ensure the have been added correctly
+
+    $ git status
+
+make a commit
+
+    $ git commit -m "your commit message"
+
+and finally check that the commit has been added
+
+    $ git log
+
+Note: see the [numpy contributing guide]
+(https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message)
+for tips on informative commit messages.
+
+8. Now push the feature branch to our fork
+
+    $ git push origin cool_feature
+
+9. Go to https://github.com/jonescompneurolab/hnn-core/compare/master...cool_feature
+to open the pull request. You should also see this link on the terminal when you make
+the push.
+
+10. After your pull request is reviewed, repeat steps 6-8 to update the pull request.
+
+11. Once the pull request is ready to be merged, add the prefix [MRG] to the title.
+
 Running tests
 =============
 
