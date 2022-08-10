@@ -30,7 +30,6 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
 from ipywidgets.embed import embed_minimal_html
 
 _spectrogram_color_maps = [
-    "jet",
     "viridis",
     "plasma",
     "inferno",
