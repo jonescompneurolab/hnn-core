@@ -121,6 +121,8 @@ the push.
 
 11. Once the pull request is ready to be merged, add the prefix [MRG] to the title.
 
+See the [git book](https://git-scm.com/book/en/v2) for a more general guide on using git. 
+
 Running tests
 =============
 
@@ -175,6 +177,46 @@ If you want to build the documentation locally without running all the examples,
 use the command::
 
     $ make html-noplot
+
+How to rebase
+=============
+Commits in hnn-core follow a linear history, therefore we use a "rebase" workflow
+instead of "merge" to resolve commits.
+See [this article](https://www.atlassian.com/git/tutorials/merging-vs-rebasing) for more details
+on the differences between these workflows.
+
+To rebase, we do the following:
+
+1. Checkout the feature branch
+
+    $ git checkout cool_feature
+
+2. Delete the ``master`` branch and fetch a new copy
+
+    $ git branch -D master
+    $ git fetch upstream master:master
+
+3. Start the rebase
+
+    $ git rebase master
+
+4. If there are conflicts, the easiest approach is to resolve them in an editor
+like VS code.
+See [this guide](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
+for more general information on resolve merge conflicts
+
+5. Once the conflicts have been resolved, add the resolved files to the staging area
+
+    $ git add -u
+    $ git rebase --continue
+
+In general it is best to rebase frequently if you are aware of pull requests being merged
+into the ``master`` base.
+
+If you face a lot of difficulting resolving merge conflicts,
+it may be easier to [squash](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
+before rebasing.
+
 
 Continuous Integration
 ======================
