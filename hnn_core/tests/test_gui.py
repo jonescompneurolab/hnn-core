@@ -56,34 +56,32 @@ def test_gui_change_connectivity():
     for connectivity_slider in gui.connectivity_widgets:
         for vbox in connectivity_slider:
             for w_val in (0.2, 0.9):
-                for p_val in (0.1, 1.0):
+                # specify connection
+                conn_indices = pick_connection(
+                    net=gui.simulation_data['net'],
+                    src_gids=vbox._belongsto['src_gids'],
+                    target_gids=vbox._belongsto['target_gids'],
+                    loc=vbox._belongsto['location'],
+                    receptor=vbox._belongsto['receptor'])
 
-                    # specify connection
-                    conn_indices = pick_connection(
-                        net=gui.simulation_data['net'],
-                        src_gids=vbox._belongsto['src_gids'],
-                        target_gids=vbox._belongsto['target_gids'],
-                        loc=vbox._belongsto['location'],
-                        receptor=vbox._belongsto['receptor'])
+                assert len(conn_indices) > 0
+                conn_idx = conn_indices[0]
 
-                    assert len(conn_indices) > 0
-                    conn_idx = conn_indices[0]
+                # test if the slider and the input field are synchronous
+                vbox.children[1].value = w_val
+                assert vbox.children[2].value == w_val
 
-                    # test if the slider and the input field are synchronous
-                    vbox.children[1].value = w_val
-                    assert vbox.children[2].value == w_val
+                # re initialize network
+                _init_network_from_widgets(gui.params, gui.widget_dt,
+                                           gui.widget_tstop,
+                                           gui.simulation_data,
+                                           gui.drive_widgets,
+                                           gui.connectivity_widgets,
+                                           add_drive=False)
 
-                    # re initialize network
-                    _init_network_from_widgets(gui.params, gui.widget_dt,
-                                               gui.widget_tstop,
-                                               gui.simulation_data,
-                                               gui.drive_widgets,
-                                               gui.connectivity_widgets,
-                                               add_drive=False)
-
-                    # test if the new value is reflected in the network
-                    assert gui.simulation_data['net'].connectivity[conn_idx][
-                        'nc_dict']['A_weight'] == w_val
+                # test if the new value is reflected in the network
+                assert gui.simulation_data['net'].connectivity[conn_idx][
+                    'nc_dict']['A_weight'] == w_val
 
 
 def test_gui_add_drives():
