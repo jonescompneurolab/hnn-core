@@ -1,0 +1,476 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e12a66a7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%load_ext autoreload\n",
+    "%autoreload 2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2b8ad740",
+   "metadata": {},
+   "source": [
+    "# Event Related Potentials (ERPs)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7369753b",
+   "metadata": {},
+   "source": [
+    "## Getting Started\n",
+    "\n",
+    "In order to understand the workflow and initial parameter sets provided with this tutorial, we must first briefly describe prior studies that led to the creation of the provided data and evoked response parameter set that you will work with. This tutorial is based on results from our 2007 study where we recorded and simulated tactile evoked responses source localized to the primary somatosensory cortex (SI) [1].\n",
+    "\n",
+    "In our 2007 study, we investigated the early evoked activity (0-175 ms) elicited by a brief tap to the D3 digit and source localized to an an equivalent current dipole in the contralateral hand area of the primary somatosensory cortex (SI) [1]. The strength of the tap was set at either suprathreshold (100% detection probability) or perceptual threshold (50% detection) levels (see Figure 1, left panel below). Note, to be precise, this data represents source localized event related field (ERF) activity because it was collected using MEG. We use the terminology ERP for simplicity, since the primary current dipoles generating evoked fields and potentials are the same.\n",
+    "\n",
+    "We found that we could reproduce evoked responses that accurately reflected the recorded waveform in our neocortical model from a layer specific sequence of exogenous excitatory synaptic drive to the local SI circuit, see Figure 1right panel below. This drive consisted of “feedforward” / proximal input at ~25 ms post-stimulus, followed by “feedback” / distal input at ~60 ms, followed by a subsequent “feedforward” / proximal input at ~125 ms (Gaussian distribution of input times on each simulated trial). This sequence of drive generated spiking activity and intracellular dendritic current flow in the pyramidal neuron dendrites to reproduce the current dipole signal. This sequence of drive can be interpreted as initial “feedforward” input from the lemniscal thalamus, followed by “feedback” input from higher order cortex or non-lemniscal thalamus, followed by a re-emergent leminsical thalamic drive. Intracranial recordings in non-human primates motivated and supported this assumption [2].\n",
+    "\n",
+    "In our model, the exogenous driving inputs were simulated as predefined trains of action potentials (pre-synaptic spikes) that activated excitatory synapses in the local cortical circuit in proximal and distal projection patterns (i.e. feedforward, and feedback, respectively, as shown schematically in Figure 1 right, and in the HNN GUI Model Schematics). The number, timing and strength (post-synaptic conductance) of the driving spikes were manually adjusted in the model until a close representation of the data was found (all other model parameters were tuned and fixed based on the morphology, physiology and connectivity within layered neocortical circuits [1]. Note, a scaling factor was applied to net dipole output to match to the magnitude of the recorded ERP data and used to predict the number of neurons contributing to the recorded ERP (purple circle, Figure 1, right panel). The dipole units were in nAm, with a one-to-one comparison between data and model output due to the biophysical detail in our model.\n",
+    "\n",
+    "\n",
+    "![](https://raw.githubusercontent.com/jonescompneurolab/hnn-tutorials/master/erp/images/image8.png)\n",
+    "<center>Adapted from Jones et al. 2007 [1]. Comparison of SI evoked response in experiment and neural model simulation. Left: MEG data showing tactile evoked response (ERP) source localized to the hand area of SI. Red: suprathreshold stimulation; Blue: Threshold stimulation (avg. n=100 trials). Right: Neural model simulation depicting proximal/distal inputs needed to replicate the ERP waveform (avg. n=25 trials)</center>\n",
+    "\n",
+    "In summary, to simulate the SI evoked response, a sequence of exogenous excitatory synaptic drive was simulated (by creating presynaptic spikes that activate layer specific synapses in the neocortical network) consisting of proximal drive at ~25 ms, followed by distal drive at ~60 ms, followed by a second proximal drive at ~122 ms. Given this background information, we can now walk you through the steps of simulating a similar ERP, using a subset of the data shown in Figure 1."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ac855c02",
+   "metadata": {},
+   "source": [
+    "## Launch GUI\n",
+    "\n",
+    "There're two ways you can use to launch the new GUI:\n",
+    "1. Standalone: execute `hnn-gui` in the terminal and access the GUI with your favorite browser.\n",
+    "2. Jupyter notebook:\n",
+    "    1. Create a jupyter notebook in a environment with `hnn-core[gui]` installed.\n",
+    "    2. Import `HNNGUI` and show it with its `compose` method.\n",
+    "\n",
+    "Here we adopt the second one for the demonstration purpose. In practice you may find the former more convenient."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2eba55b1-2ab7-4f07-a76c-34f5a184da4d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import time\n",
+    "from hnn_core.gui.gui import HNNGUI\n",
+    "from ipywidgets import Output\n",
+    "from IPython.display import Javascript\n",
+    "\n",
+    "# do not mix this with GUI operations\n",
+    "gui = HNNGUI()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "norwegian-angola",
+   "metadata": {
+    "require": [
+     "html2canvas"
+    ],
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "# In practice, set return_layout to false to show the dashboard\n",
+    "# gui.compose()\n",
+    "gui.compose(return_layout=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "612eb831",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b2f48fa3",
+   "metadata": {},
+   "source": [
+    "<!-- We ignored the load data part for now -->\n",
+    "\n",
+    "##   Load/view parameters to define network structure & to “activate” the network\n",
+    "\n",
+    "\n",
+    "An initial parameter set that will simulate an evoked response in close agreement with the SI data described in [Step 1 in this tutorial](https://jonescompneurolab.github.io/hnn-tutorials/erp/erp#toc_1) can be downloaded using the following hyperlink: [ERPYes100Trials.param](https://github.com/jonescompneurolab/hnn/blob/master/param/ERPYes100Trials.param).\n",
+    "\n",
+    "But before uploading files, we need to first clear existing drives:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8e36bd1b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui._simulate_left_tab_click(\"Drives\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "feb61ef3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b47be5a0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.delete_drive_button.click()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d7f90022",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.capture(width=1380, height=600)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "061faff2",
+   "metadata": {},
+   "source": [
+    "Once you have this param file downloaded and existing drive deleted, upload the file to the GUI through the `Load network` button."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9e078bf6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui._simulate_upload_file(\"https://raw.githubusercontent.com/jonescompneurolab/hnn/master/param/ERPYes100Trials.param\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0039c446",
+   "metadata": {},
+   "source": [
+    "After uploading, you'll notice that drives in `ERPYes100Trials.param` have been successfully added to the new GUI."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0cda6c80-b159-443f-a425-1da555784bc8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b162508a",
+   "metadata": {},
+   "source": [
+    "You can also view all cell connectivity paramters, i.e., weight and connectivity probability, in the `Cell connectivity` tab:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d39f7169",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui._simulate_left_tab_click(\"Cell connectivity\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "86b15f2c-fb02-46aa-a4ce-69030a8fcf32",
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0085aecd",
+   "metadata": {},
+   "source": [
+    "## Running the simulation and visualizing net current dipole\n",
+    "\n",
+    "Now that we have an initial parameter set, we can run a series of simulations (3 trials) that will produce the output shown below.\n",
+    "\n",
+    "To do so, first we need to set `Trials` to `2`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "307335c0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.widget_ntrials.value = 2\n",
+    "gui._simulate_left_tab_click(\"Simulation\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "cfcd2004",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ff875b7c",
+   "metadata": {},
+   "source": [
+    "Now let's click the \"Run\" button to launch the simulation."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7889c5ef-4e2c-439f-82a7-9b075440d799",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.run_button.click()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2fdad219",
+   "metadata": {},
+   "source": [
+    "After simulation, you can immediately find simulation results (dipoles) at the right side of the GUI. In the figures below, the thin gray traces are dipole signals from individual trials while the green trace is the average ERP. In the left panel, the aggregated dipole data is plotted while in the right panel layer-specific dipole data are also shwon so you can check the contribution per layer."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "87b85cc9-097b-45fa-b4e1-643bd08dd356",
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3f275d2c",
+   "metadata": {},
+   "source": [
+    "## Viewing network spiking activity\n",
+    "\n",
+    "By selecting \"spikes\" from dropdown menus, you can check the spiking activity produced in each population in response to the evoked inputs."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "626bc243",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui._simulate_switch_plot_type(0, \"spikes\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "cee6c06d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a9efed54",
+   "metadata": {},
+   "source": [
+    "## Viewing ERP Spectrograms\n",
+    "\n",
+    "By selecting \"spectogram\" from dropdown menus, you can check the spectrograms."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "18b11e90",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gui._simulate_switch_plot_type(0, \"spectogram\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "15f6d521",
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "gui.capture()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "29618378",
+   "metadata": {},
+   "source": [
+    "## Adjusting parameters\n",
+    "\n",
+    "Parameter adjustments will be key to developing and testing hypotheses on the circuit origin of your own ERP data. HNN is designed so that many of parameters in the model can be adjusted from the GUI. Here, we’ll walk through examples of how to adjust several “Evoked Input” parameters to investigate how they impact the evoked response."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "50fa5101",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# # change drive parameters is not very intuitive but that's all we can do for now.\n",
+    "# # example:\n",
+    "# idx = 1 \n",
+    "# gui.drive_boxes[idx].children # use this line to identify the correct drive box\n",
+    "# gui.drive_widgets[idx]['tstart'] = 500 # use this line to change value"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "062cedb3",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6c664d00",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b236a97d",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f3011020",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3ac2b0a5",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "696e649c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Javascript(gui.run_notebook_cells())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a08eebb4",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "finalized": {
+   "timestamp": 1659128328299,
+   "trusted": true
+  },
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.12"
+  },
+  "require": {
+   "paths": {
+    "html2canvas": "https://html2canvas.hertzen.com/dist/html2canvas"
+   },
+   "shim": {}
+  },
+  "vscode": {
+   "interpreter": {
+    "hash": "43b52e66020a3206304124443c3dbfb478b19fdebbaacdf952e81bd31b11f0ba"
+   }
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
