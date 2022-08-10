@@ -44,7 +44,8 @@ _plot_options = {
 }
 
 
-def _update_plot_window(simulation_data, _plot_out, plot_type, analysis_config):
+def _update_plot_window(simulation_data, _plot_out, plot_type,
+                        analysis_config):
     """Refresh plots with data from simulation_data."""
     # Make sure that visualization does not change the original data
     dpls_copied = copy.deepcopy(simulation_data['dpls'])
@@ -98,7 +99,8 @@ def _update_plot_window(simulation_data, _plot_out, plot_type, analysis_config):
 
         elif plot_type['new'] == 'spectogram':
             if len(dpls_copied) > 0:
-                freqs = np.arange(10., 100., 1.)
+                freqs = np.arange(10., analysis_config['max_spectral_frequency'],
+                                  1.,)
                 n_cycles = freqs / 8.
                 fig, ax = plt.subplots()
                 dpls_copied[0].plot_tfr_morlet(
