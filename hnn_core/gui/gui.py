@@ -3,6 +3,7 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Huzi Cheng <hzcheng15@icloud.com>
 import codecs
+import copy
 import io
 import logging
 import multiprocessing
@@ -28,79 +29,97 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         VBox, link)
 from ipywidgets.embed import embed_minimal_html
 
+_spectrogram_color_maps = [
+    "jet",
+    "viridis",
+    "plasma",
+    "inferno",
+    "magma",
+    "cividis",
+]
+
 _plot_options = {
     'Horizontal': 'L-R',
     'Vertical': 'U-D',
 }
 
 
-def _update_plot_window(simulation_data, _plot_out, plot_type):
+def _update_plot_window(simulation_data, _plot_out, plot_type, analysis_config):
     """Refresh plots with data from simulation_data."""
+    # Make sure that visualization does not change the original data
+    dpls_copied = copy.deepcopy(simulation_data['dpls'])
+    net_copied = copy.deepcopy(simulation_data['net'])
+    for dpl in dpls_copied:
+        dpl.smooth(analysis_config['dipole_smooth']).scale(
+            analysis_config['dipole_scaling'])
+
     _plot_out.clear_output()
     if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
         return
 
     with _plot_out:
         if plot_type['new'] == 'spikes':
-            if simulation_data['net'].cell_response:
+            if net_copied.cell_response:
                 fig, ax = plt.subplots()
-                simulation_data['net'].cell_response.plot_spikes_raster(ax=ax)
+                net_copied.cell_response.plot_spikes_raster(ax=ax)
             else:
                 print("No cell response data")
 
         elif plot_type['new'] == 'current dipole':
-            if len(simulation_data['dpls']) > 0:
+            if len(dpls_copied) > 0:
                 fig, ax = plt.subplots()
-                plot_dipole(simulation_data['dpls'], ax=ax, average=True)
+                plot_dipole(dpls_copied, ax=ax, average=True)
             else:
                 print("No dipole data")
 
         elif plot_type['new'] == 'layer-specific dipole':
-            if len(simulation_data['dpls']) > 0:
+            if len(dpls_copied) > 0:
                 layers = ["L2", "L5", "agg"]
                 fig, axes = plt.subplots(len(layers), 1, sharex=True)
-                plot_dipole(simulation_data['dpls'], ax=axes,
+                plot_dipole(dpls_copied, ax=axes,
                             layer=layers, average=True)
             else:
                 print("No dipole data")
 
         elif plot_type['new'] == 'input histogram':
             # BUG: got error here, need a better way to handle exception
-            if simulation_data['net'].cell_response:
+            if net_copied.cell_response:
                 fig, ax = plt.subplots()
-                simulation_data['net'].cell_response.plot_spikes_hist(ax=ax)
+                net_copied.cell_response.plot_spikes_hist(ax=ax)
             else:
                 print("No cell response data")
 
         elif plot_type['new'] == 'PSD':
-            if len(simulation_data['dpls']) > 0:
+            if len(dpls_copied) > 0:
                 fig, ax = plt.subplots()
-                simulation_data['dpls'][0].plot_psd(fmin=0, fmax=50, ax=ax)
+                dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax)
             else:
                 print("No dipole data")
 
         elif plot_type['new'] == 'spectogram':
-            if len(simulation_data['dpls']) > 0:
+            if len(dpls_copied) > 0:
                 freqs = np.arange(10., 100., 1.)
                 n_cycles = freqs / 8.
                 fig, ax = plt.subplots()
-                simulation_data['dpls'][0].plot_tfr_morlet(freqs,
-                                                           n_cycles=n_cycles,
-                                                           ax=ax)
+                dpls_copied[0].plot_tfr_morlet(
+                    freqs,
+                    n_cycles=n_cycles,
+                    colormap=analysis_config['spectrogram_cm'],
+                    ax=ax)
             else:
                 print("No dipole data")
         elif plot_type['new'] == 'network':
-            if simulation_data['net']:
+            if net_copied:
                 fig = plt.figure()
                 ax = fig.add_subplot(111, projection='3d')
-                simulation_data['net'].plot_cells(ax=ax)
+                net_copied.plot_cells(ax=ax)
             else:
                 print("No network data")
 
 
 def _init_left_right_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
-                                plot_options, previous_outputs, layout,
-                                init=False):
+                                plot_options, previous_outputs,
+                                analysis_config, layout, init=False):
     layout_LR = Layout(width=f"{int(layout.width[:-2])/2-10}px",
                        height=layout.height,
                        border=layout.border)
@@ -122,6 +141,7 @@ def _init_left_right_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
             simulation_data,
             plot_outputs_L,
             plot_type,
+            analysis_config,
             "Left",
         ),
         'value',
@@ -143,6 +163,7 @@ def _init_left_right_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
             simulation_data,
             plot_outputs_R,
             plot_type,
+            analysis_config,
             "Right",
         ),
         'value',
@@ -156,12 +177,12 @@ def _init_left_right_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
             "type": "change",
             "name": "value",
             "new": default_plot_types[0]
-        })
+        }, analysis_config)
         _update_plot_window(simulation_data, plot_outputs_R, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[1]
-        })
+        }, analysis_config)
     grid = GridspecLayout(1, 2, height=layout.height)
     grid[0, 0] = VBox([plot_dropdown_L, plot_outputs_L])
     grid[0, 1] = VBox([plot_dropdown_R, plot_outputs_R])
@@ -169,8 +190,8 @@ def _init_left_right_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
 
 
 def _init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
-                                plot_options, previous_outputs, layout,
-                                init=False):
+                                plot_options, previous_outputs,
+                                analysis_config, layout, init=False):
 
     default_plot_types = [plot_options[0], plot_options[1]]
     for idx, plot_type in enumerate(previous_outputs[:2]):
@@ -192,6 +213,7 @@ def _init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
             simulation_data,
             plot_outputs_U,
             plot_type,
+            analysis_config,
             "Left",
         ),
         'value',
@@ -218,6 +240,7 @@ def _init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
             simulation_data,
             plot_outputs_D,
             plot_type,
+            analysis_config,
             "Right",
         ),
         'value',
@@ -230,12 +253,12 @@ def _init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
             "type": "change",
             "name": "value",
             "new": default_plot_types[0]
-        })
+        }, analysis_config)
         _update_plot_window(simulation_data, plot_outputs_D, {
             "type": "change",
             "name": "value",
             "new": default_plot_types[1]
-        })
+        }, analysis_config)
 
     grid = GridspecLayout(2, 1, height=layout.height)
     grid[0, 0] = VBox([plot_dropdown_U, plot_outputs_U])
@@ -256,9 +279,14 @@ def _change_plot_type(grid, layout, plot_idx, plot_type):
         pass
 
 
-def _initialize_viz_window(viz_grid, viz_window, simulation_data, plot_outputs,
-                           plot_dropdowns, layout, layout_option="L-R",
-                           init=False):
+def _initialize_viz_window(simulation_data, analysis_config, init=False):
+    viz_grid = analysis_config['viz_grid']
+    viz_window = analysis_config['viz_window']
+    plot_outputs = analysis_config['plot_outputs']
+    plot_dropdowns = analysis_config['plot_dropdowns']
+    layout = analysis_config['style']
+    layout_option = analysis_config['layout']
+
     plot_options = [
         'current dipole',
         'layer-specific dipole',
@@ -273,6 +301,8 @@ def _initialize_viz_window(viz_grid, viz_window, simulation_data, plot_outputs,
     while len(plot_outputs) > 0:
         plot_outputs.pop()
         previous_plot_outputs_values.append(plot_dropdowns.pop().value)
+    # keep the same order of previous plots.
+    previous_plot_outputs_values.reverse()
 
     with viz_window:
         # Left-Rright configuration
@@ -280,14 +310,16 @@ def _initialize_viz_window(viz_grid, viz_window, simulation_data, plot_outputs,
             grid = _init_left_right_viz_layout(plot_outputs, plot_dropdowns,
                                                simulation_data, plot_options,
                                                previous_plot_outputs_values,
-                                               layout, init=init)
+                                               analysis_config, layout,
+                                               init=init)
 
         # Upper-Down configuration
         elif layout_option == "U-D":
             grid = _init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
                                                simulation_data, plot_options,
                                                previous_plot_outputs_values,
-                                               layout, init=init)
+                                               analysis_config, layout,
+                                               init=init)
 
         viz_grid[layout_option] = grid
         display(grid)
@@ -430,6 +462,24 @@ class HNNGUI:
                                                  value='Joblib',
                                                  description='Backend:')
 
+        analysis_style = {'description_width': '200px'}
+        self.widget_max_spectral_frequency = FloatText(
+            value=100.0, description='Max Spectral Frequency (Hz):',
+            disabled=False, style=analysis_style)
+        self.widget_dipole_scaling = FloatText(value=3000.0,
+                                               description='Dipole Scaling:',
+                                               disabled=False,
+                                               style=analysis_style)
+        self.widget_dipole_smooth = FloatText(
+            value=30.0,
+            description='Dipole Smooth Window (ms):',
+            disabled=False, style=analysis_style)
+
+        self.widget_spectrogram_cm = Dropdown(
+            description='Spectrogram Colormap:',
+            options=[(cm, cm) for cm in _spectrogram_color_maps],
+            value=_spectrogram_color_maps[0], style=analysis_style)
+
         # visualization layout
         self.widget_viz_layout_selection = Dropdown(
             options=[(k, _plot_options[k]) for k in _plot_options],
@@ -542,6 +592,23 @@ class HNNGUI:
             "U-D": None,
         }
 
+    @property
+    def analysis_config(self):
+        """Provides everything viz window needs except for the data."""
+        return {
+            "style": self.layout['visualization_window'],
+            "layout": self.widget_viz_layout_selection.value,
+            "max_spectral_frequency": self.widget_max_spectral_frequency.value,
+            "dipole_scaling": self.widget_dipole_scaling.value,
+            "dipole_smooth": self.widget_dipole_smooth.value,
+            "spectrogram_cm": self.widget_spectrogram_cm.value,
+            # widgets
+            "viz_grid": self._viz_grid,
+            "viz_window": self._visualization_window,
+            "plot_outputs": self.plot_outputs_list,
+            "plot_dropdowns": self.plot_dropdowns_list,
+        }
+
     def load_parameters(self, params_fname=None):
         """Read parameters from file."""
         if not params_fname:
@@ -590,18 +657,13 @@ class HNNGUI:
                 self._log_out, self.drive_widgets, self.simulation_data,
                 self.widget_dt, self.widget_tstop, self.widget_ntrials,
                 self.widget_backend_selection, self.widget_mpi_cmd,
-                self.widget_n_jobs, self.params, self.plot_outputs_list,
-                self.plot_dropdowns_list, self._simulation_status_bar,
+                self.widget_n_jobs, self.params, self._simulation_status_bar,
                 self._simulation_status_contents,
-                self.connectivity_widgets, b)
+                self.connectivity_widgets, self.analysis_config, b)
 
-        def _handle_viz_layout_change(layout_option):
-            return _initialize_viz_window(
-                self._viz_grid,
-                self._visualization_window, self.simulation_data,
-                self.plot_outputs_list, self.plot_dropdowns_list,
-                self.layout['visualization_window'],
-                layout_option=layout_option.new)
+        def _handle_viz_layout_change(_):
+            return _initialize_viz_window(self.simulation_data,
+                                          self.analysis_config)
 
         def _clear_params(b):
             self._load_info["count"] = 0
@@ -613,8 +675,17 @@ class HNNGUI:
         self.load_button.observe(_on_upload_change)
         self.run_button.on_click(_run_button_clicked)
         self.clear_button.on_click(_clear_params)
-        self.widget_viz_layout_selection.observe(_handle_viz_layout_change,
-                                                 'value')
+
+        # widgets whose changes should trigger viz changes.
+        _vis_related_widgets = [
+            self.widget_viz_layout_selection,
+            self.widget_max_spectral_frequency,
+            self.widget_dipole_scaling,
+            self.widget_dipole_smooth,
+            self.widget_spectrogram_cm,
+        ]
+        for _widget in _vis_related_widgets:
+            _widget.observe(_handle_viz_layout_change, 'value')
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -648,12 +719,21 @@ class HNNGUI:
         ])
         # from IPywidgets > 8.0
         drives_options = VBox([drive_selections, self._drives_out])
+
+        analysis_options = VBox([
+            self.widget_max_spectral_frequency,
+            self.widget_dipole_scaling,
+            self.widget_dipole_smooth,
+            self.widget_spectrogram_cm,
+        ])
+
         # Tabs for left pane
         left_tab = Tab()
         left_tab.children = [
-            simulation_box, self._connectivity_out, drives_options
+            simulation_box, self._connectivity_out, drives_options,
+            analysis_options,
         ]
-        titles = ['Simulation', 'Cell connectivity', 'Drives']
+        titles = ['Simulation', 'Cell connectivity', 'Drives', 'Analysis']
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
 
@@ -675,15 +755,8 @@ class HNNGUI:
         self._link_callbacks()
 
         # initialize visualization
-        _initialize_viz_window(
-            self._viz_grid,
-            self._visualization_window,
-            self.simulation_data,
-            self.plot_outputs_list,
-            self.plot_dropdowns_list,
-            self.layout['visualization_window'],
-            layout_option=self.widget_viz_layout_selection.value,
-            init=True)
+        _initialize_viz_window(self.simulation_data, self.analysis_config,
+                               init=True)
 
         # initialize drive and connectivity ipywidgets
         load_drive_and_connectivity(self.simulation_data, self.params,
@@ -1201,8 +1274,9 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             display(accordion)
 
 
-def _debug_update_plot_window(simulation_data, _plot_out, plot_type, idx):
-    _update_plot_window(simulation_data, _plot_out, plot_type)
+def _debug_update_plot_window(simulation_data, _plot_out, plot_type,
+                              analysis_config, idx):
+    _update_plot_window(simulation_data, _plot_out, plot_type, analysis_config)
 
 
 def add_connectivity_tab(simulation_data, connectivity_out,
@@ -1451,9 +1525,9 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
 
 def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
                        ntrials, backend_selection, mpi_cmd, n_jobs,
-                       params, plot_outputs_list, plot_dropdowns_list,
-                       simulation_status_bar, simulation_status_contents,
-                       connectivity_sliders, b):
+                       params, simulation_status_bar,
+                       simulation_status_contents, connectivity_sliders,
+                       analysis_config, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
@@ -1462,34 +1536,23 @@ def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
 
         print("start simulation")
         if backend_selection.value == "MPI":
-            simulation_data['backend'] = MPIBackend(
+            backend = MPIBackend(
                 n_procs=multiprocessing.cpu_count() - 1, mpi_cmd=mpi_cmd.value)
         else:
-            simulation_data['backend'] = JoblibBackend(n_jobs=n_jobs.value)
+            backend = JoblibBackend(n_jobs=n_jobs.value)
             print(f"Using Joblib with {n_jobs.value} core(s).")
-        with simulation_data['backend']:
+        with backend:
             simulation_status_bar.value = simulation_status_contents['running']
             simulation_data['dpls'] = simulate_dipole(simulation_data['net'],
                                                       tstop=tstop.value,
                                                       dt=dt.value,
                                                       n_trials=ntrials.value)
 
-            window_len, scaling_factor = 30, 3000
             simulation_status_bar.value = simulation_status_contents[
                 'finished']
-            for dpl in simulation_data['dpls']:
-                dpl.smooth(window_len).scale(scaling_factor)
 
     # Update all plotting panels
-    for idx in range(len(plot_outputs_list)):
-        with log_out:
-            print(f"updating panel {idx}")
-        _update_plot_window(
-            simulation_data, plot_outputs_list[idx], {
-                "type": "change",
-                "name": "value",
-                "new": plot_dropdowns_list[idx].value
-            })
+    _initialize_viz_window(simulation_data, analysis_config)
 
 
 def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
