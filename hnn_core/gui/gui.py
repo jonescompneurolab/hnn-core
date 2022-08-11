@@ -11,6 +11,7 @@ import os.path as op
 import sys
 import urllib.parse
 import urllib.request
+from collections import defaultdict
 
 import hnn_core
 import matplotlib.pyplot as plt
@@ -24,10 +25,16 @@ from hnn_core.viz import plot_dipole
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatLogSlider, FloatText, GridspecLayout,
-                        HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
-                        VBox, link)
+                        FloatLogSlider, FloatText, GridspecLayout, HBox,
+                        IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
+                        link)
 from ipywidgets.embed import embed_minimal_html
+
+# for debug
+from loguru import logger
+logger.remove()
+logger.add("logfile.log", level="DEBUG")
+
 
 _spectrogram_color_maps = [
     "viridis",
@@ -43,36 +50,49 @@ _plot_options = {
 }
 
 
-def _update_plot_window(simulation_data, _plot_out, plot_type,
-                        analysis_config):
-    """Refresh plots with data from simulation_data."""
+def _update_plot_window(simulation_data, analysis_config, plot_key):
+    """Refresh plots with data from simulation_data.
+
+    Parameters
+    ----------
+    simulation_data: dict
+        A dict of simulation data
+    analysis_config: dict
+        A dict of visualization configs
+    plot_key: str
+        A string used to identify the plot and data to update.
+    """
     # Make sure that visualization does not change the original data
-    dpls_copied = copy.deepcopy(simulation_data['dpls'])
-    net_copied = copy.deepcopy(simulation_data['net'])
+    _plot_out = analysis_config['plot_outputs'][plot_key]
+    plot_type = analysis_config['plot_dropdowns'][plot_key].value
+    sim_name = analysis_config['plot_sim_selections'][plot_key].value
+    logger.debug(
+        f"plot_key={plot_key}, plot_type={plot_type}, sim_name={sim_name}")
+
+    dpls_copied = copy.deepcopy(simulation_data[sim_name]['dpls'])
+    net_copied = copy.deepcopy(simulation_data[sim_name]['net'])
     for dpl in dpls_copied:
         dpl.smooth(analysis_config['dipole_smooth']).scale(
             analysis_config['dipole_scaling'])
 
     _plot_out.clear_output()
-    if not (plot_type['type'] == 'change' and plot_type['name'] == 'value'):
-        return
 
     with _plot_out:
-        if plot_type['new'] == 'spikes':
+        if plot_type == 'spikes':
             if net_copied.cell_response:
                 fig, ax = plt.subplots()
                 net_copied.cell_response.plot_spikes_raster(ax=ax)
             else:
                 print("No cell response data")
 
-        elif plot_type['new'] == 'current dipole':
+        elif plot_type == 'current dipole':
             if len(dpls_copied) > 0:
                 fig, ax = plt.subplots()
                 plot_dipole(dpls_copied, ax=ax, average=True)
             else:
                 print("No dipole data")
 
-        elif plot_type['new'] == 'layer-specific dipole':
+        elif plot_type == 'layer-specific dipole':
             if len(dpls_copied) > 0:
                 layers = ["L2", "L5", "agg"]
                 fig, axes = plt.subplots(len(layers), 1, sharex=True)
@@ -81,7 +101,7 @@ def _update_plot_window(simulation_data, _plot_out, plot_type,
             else:
                 print("No dipole data")
 
-        elif plot_type['new'] == 'input histogram':
+        elif plot_type == 'input histogram':
             # BUG: got error here, need a better way to handle exception
             if net_copied.cell_response:
                 fig, ax = plt.subplots()
@@ -89,14 +109,14 @@ def _update_plot_window(simulation_data, _plot_out, plot_type,
             else:
                 print("No cell response data")
 
-        elif plot_type['new'] == 'PSD':
+        elif plot_type == 'PSD':
             if len(dpls_copied) > 0:
                 fig, ax = plt.subplots()
                 dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax)
             else:
                 print("No dipole data")
 
-        elif plot_type['new'] == 'spectogram':
+        elif plot_type == 'spectogram':
             if len(dpls_copied) > 0:
                 min_f = 10.0
                 max_f = analysis_config['max_spectral_frequency']
@@ -111,7 +131,7 @@ def _update_plot_window(simulation_data, _plot_out, plot_type,
                     ax=ax)
             else:
                 print("No dipole data")
-        elif plot_type['new'] == 'network':
+        elif plot_type == 'network':
             if net_copied:
                 fig = plt.figure()
                 ax = fig.add_subplot(111, projection='3d')
@@ -120,152 +140,83 @@ def _update_plot_window(simulation_data, _plot_out, plot_type,
                 print("No network data")
 
 
-def _init_left_right_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
-                                plot_options, previous_outputs,
-                                analysis_config, layout, init=False):
-    layout_LR = Layout(width=f"{int(layout.width[:-2])/2-10}px",
-                       height=layout.height,
-                       border=layout.border)
-
-    plot_outputs_L = Output(layout=layout_LR)
-
-    default_plot_types = [plot_options[0], plot_options[1]]
-    for idx, plot_type in enumerate(previous_outputs[:2]):
-        default_plot_types[idx] = plot_type
-
-    plot_dropdown_L = Dropdown(
-        options=plot_options,
-        value=default_plot_types[0],
-        description='Plot:',
-        disabled=False,
-    )
-    plot_dropdown_L.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_L,
-            plot_type,
-            analysis_config,
-            "Left",
-        ),
-        'value',
-    )
-
-    plot_outputs.append(plot_outputs_L)
-    plot_dropdowns.append(plot_dropdown_L)
-
-    plot_outputs_R = Output(layout=layout_LR)
-
-    plot_dropdown_R = Dropdown(
-        options=plot_options,
-        value=default_plot_types[1],
-        description='Plot:',
-        disabled=False,
-    )
-    plot_dropdown_R.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_R,
-            plot_type,
-            analysis_config,
-            "Right",
-        ),
-        'value',
-    )
-
-    plot_outputs.append(plot_outputs_R)
-    plot_dropdowns.append(plot_dropdown_R)
-
-    if not init:
-        _update_plot_window(simulation_data, plot_outputs_L, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[0]
-        }, analysis_config)
-        _update_plot_window(simulation_data, plot_outputs_R, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[1]
-        }, analysis_config)
-    grid = GridspecLayout(1, 2, height=layout.height)
-    grid[0, 0] = VBox([plot_dropdown_L, plot_outputs_L])
-    grid[0, 1] = VBox([plot_dropdown_R, plot_outputs_R])
-    return grid
+def _gen_plot_callback(simulation_data, analysis_config, plot_key):
+    def callback(_):
+        _update_plot_window(simulation_data, analysis_config, plot_key)
+    return callback
 
 
-def _init_upper_down_viz_layout(plot_outputs, plot_dropdowns, simulation_data,
-                                plot_options, previous_outputs,
-                                analysis_config, layout, init=False):
+def _init_viz_layout(simulation_data, plot_options, previous_plot_types,
+                     analysis_config, style, layout_option, init=False):
+    plot_outputs = analysis_config['plot_outputs']
+    plot_dropdowns = analysis_config['plot_dropdowns']
+    plot_sim_selections = analysis_config['plot_sim_selections']
 
-    default_plot_types = [plot_options[0], plot_options[1]]
-    for idx, plot_type in enumerate(previous_outputs[:2]):
-        default_plot_types[idx] = plot_type
+    sim_names = list(simulation_data.keys())
+    assert analysis_config['current_sim_name'] in sim_names
 
-    plot_outputs_U = Output(layout={
-        'border': layout.border,
-        'height': f"{float(layout.height[:-2])/2}px"
-    })
+    if layout_option == "L-R":
+        # TODO fine tune the style so that there's no more overflow.
+        grid_style = Layout(width=f"{int(style.width[:-2])/2-10}px",
+                            # height=style.height,
+                            height=f"{int(style.height[:-2])-80}px",
+                            border=style.border)
+        grid = GridspecLayout(1, 2, height=style.height)
+        plot_keys = ["Left", "Right"]
 
-    plot_dropdown_U = Dropdown(
-        options=plot_options,
-        value=default_plot_types[0],
-        description='Plot:',
-        disabled=False,
-    )
-    plot_dropdown_U.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_U,
-            plot_type,
-            analysis_config,
-            "Left",
-        ),
-        'value',
-    )
+    elif layout_option == "U-D":
+        grid_style = Layout(width=f"{int(style.width[:-2])/2-10}px",
+                            height=f"{float(style.height[:-2])/2-10}px",
+                            border=style.border,)
+        grid = GridspecLayout(2, 1, height=style.height)
+        plot_keys = ["Up", "Down"]
 
-    plot_outputs.append(plot_outputs_U)
-    plot_dropdowns.append(plot_dropdown_U)
+    for idx, plot_key in enumerate(plot_keys):
+        plot_outputs[plot_key] = Output(layout=grid_style)
 
-    # Down
-    plot_outputs_D = Output(layout={
-        'border': layout.border,
-        'height': layout.height
-    })
+        plot_dropdowns[plot_key] = Dropdown(
+            options=plot_options,
+            value=previous_plot_types[plot_key]
+            if plot_key in previous_plot_types else plot_options[idx],
+            description='Plot:',
+            disabled=False,
+            layout=Layout()
+        )
+        plot_dropdowns[plot_key].observe(
+            _gen_plot_callback(simulation_data, analysis_config, plot_key),
+            'value',
+        )
+        logger.debug(f"bind to plot_key={plot_key}")
 
-    plot_dropdown_D = Dropdown(
-        options=plot_options,
-        value=default_plot_types[1],
-        description='Plot:',
-        disabled=False,
-    )
+        plot_sim_selections[plot_key] = Dropdown(
+            options=sim_names,
+            value=analysis_config['current_sim_name'],
+            description='Name:',
+            disabled=False,
+        )
+        plot_sim_selections[plot_key].observe(
+            _gen_plot_callback(simulation_data, analysis_config, plot_key),
+            'value',
+        )
 
-    plot_dropdown_D.observe(
-        lambda plot_type: _debug_update_plot_window(
-            simulation_data,
-            plot_outputs_D,
-            plot_type,
-            analysis_config,
-            "Right",
-        ),
-        'value',
-    )
-    plot_outputs.append(plot_outputs_D)
-    plot_dropdowns.append(plot_dropdown_D)
+        if layout_option == "L-R":
+            indices = (0, idx)
+            box_directed = VBox
+        elif layout_option == "U-D":
+            indices = (idx, 0)
+            box_directed = HBox
 
-    if not init:
-        _update_plot_window(simulation_data, plot_outputs_U, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[0]
-        }, analysis_config)
-        _update_plot_window(simulation_data, plot_outputs_D, {
-            "type": "change",
-            "name": "value",
-            "new": default_plot_types[1]
-        }, analysis_config)
+        grid[indices[0], indices[1]] = box_directed([
+            VBox([
+                plot_sim_selections[plot_keys[idx]],
+                plot_dropdowns[plot_keys[idx]]
+            ]),
+            plot_outputs[plot_keys[idx]],
+        ])
 
-    grid = GridspecLayout(2, 1, height=layout.height)
-    grid[0, 0] = VBox([plot_dropdown_U, plot_outputs_U])
-    grid[1, 0] = VBox([plot_dropdown_D, plot_outputs_D])
+        if not init:
+            _update_plot_window(simulation_data, analysis_config, plot_key)
+
     return grid
 
 
@@ -300,32 +251,24 @@ def _initialize_viz_window(simulation_data, analysis_config, init=False):
         'network',
     ]
     viz_window.clear_output()
-    previous_plot_outputs_values = []
-    while len(plot_outputs) > 0:
-        plot_outputs.pop()
-        previous_plot_outputs_values.append(plot_dropdowns.pop().value)
-    # keep the same order of previous plots.
-    previous_plot_outputs_values.reverse()
+    previous_plot_types = {}
+
+    plot_keys = copy.deepcopy(list(plot_outputs.keys()))
+    for plot_key in plot_keys:
+        previous_plot_types[plot_key] = plot_dropdowns[plot_key].value
+        del plot_outputs[plot_key]
+        del plot_dropdowns[plot_key]
 
     with viz_window:
-        # Left-Rright configuration
-        if layout_option == "L-R":
-            grid = _init_left_right_viz_layout(plot_outputs, plot_dropdowns,
-                                               simulation_data, plot_options,
-                                               previous_plot_outputs_values,
-                                               analysis_config, layout,
-                                               init=init)
-
-        # Upper-Down configuration
-        elif layout_option == "U-D":
-            grid = _init_upper_down_viz_layout(plot_outputs, plot_dropdowns,
-                                               simulation_data, plot_options,
-                                               previous_plot_outputs_values,
-                                               analysis_config, layout,
-                                               init=init)
-
-        viz_grid[layout_option] = grid
-        display(grid)
+        viz_grid[layout_option] = _init_viz_layout(
+            simulation_data,
+            plot_options,
+            previous_plot_types,
+            analysis_config,
+            layout,
+            layout_option,
+            init=init)
+        display(viz_grid[layout_option])
 
 
 class HNNGUI:
@@ -386,11 +329,11 @@ class HNNGUI:
         Clickable widget that receives uploaded parameter files.
     delete_drive_button: Widget
         Clickable widget that clear all existing network drives.
-    plot_outputs_list: list
+    plot_outputs_dict: list
         A list of visualization panel outputs.
-    plot_dropdowns_list: list
+    plot_dropdown_types_dict: list
         A list of dropdown menus that control the plot types in
-        plot_outputs_list.
+        plot_outputs_dict.
     drive_widgets: list
         A list of network drive widgets added by add_drive_button.
     drive_boxes: list
@@ -431,6 +374,7 @@ class HNNGUI:
             "drive_textbox": Layout(width='270px', height='auto'),
             "simulation_status_common": "background:gray;padding-left:10px",
             "simulation_status_running": "background:orange;padding-left:10px",
+            "simulation_status_failed": "background:red;padding-left:10px",
         }
 
         self._simulation_status_contents = {
@@ -443,13 +387,13 @@ class HNNGUI:
             "finished":
             f"""<div style='{self.layout['simulation_status_common']};
             color:white;'>Simulation finished</div>""",
+            "failed":
+            f"""<div style='{self.layout['simulation_status_failed']};
+            color:white;'>Simulation failed</div>""",
         }
 
         # load default parameters
         self.params = self.load_parameters()
-
-        # In-memory storage of all simulation related simulation_data
-        self.simulation_data = dict(net=None, dpls=list())
 
         # Simulation parameters
         self.widget_tstop = FloatText(value=170, description='tstop (ms):',
@@ -458,6 +402,10 @@ class HNNGUI:
                                    disabled=False)
         self.widget_ntrials = IntText(value=1, description='Trials:',
                                       disabled=False)
+        self.widget_simulation_name = Text(value='1',
+                                           placeholder='your simulation name',
+                                           description='Name:',
+                                           disabled=False)
 
         # select backends
         self.widget_backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
@@ -534,9 +482,10 @@ class HNNGUI:
             'Delete drives', 'success', layout=self.layout['button'],
             button_color=self.layout['theme_color'])
 
-        # Visualization figure list
-        self.plot_outputs_list = list()
-        self.plot_dropdowns_list = list()
+        # Visualization figure related dicts
+        self.plot_outputs_dict = dict()
+        self.plot_dropdown_types_dict = dict()
+        self.plot_sim_selections_dict = dict()
 
         # Add drive section
         self.drive_widgets = list()
@@ -544,6 +493,10 @@ class HNNGUI:
 
         # Connectivity list
         self.connectivity_widgets = list()
+
+        # In-memory storage of all simulation related simulation_data
+        self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
+        self.simulation_data[self.widget_simulation_name.value]
 
         self._init_ui_components()
 
@@ -608,8 +561,10 @@ class HNNGUI:
             # widgets
             "viz_grid": self._viz_grid,
             "viz_window": self._visualization_window,
-            "plot_outputs": self.plot_outputs_list,
-            "plot_dropdowns": self.plot_dropdowns_list,
+            "plot_outputs": self.plot_outputs_dict,
+            "plot_dropdowns": self.plot_dropdown_types_dict,
+            "plot_sim_selections": self.plot_sim_selections_dict,
+            "current_sim_name": self.widget_simulation_name.value,
         }
 
     def load_parameters(self, params_fname=None):
@@ -649,19 +604,18 @@ class HNNGUI:
                 print("received new uploaded params file...")
             return on_upload_change(change, self.params, self.widget_tstop,
                                     self.widget_dt, self._log_out,
-                                    self.simulation_data, self.drive_boxes,
-                                    self.drive_widgets, self._drives_out,
-                                    self._connectivity_out,
+                                    self.drive_boxes, self.drive_widgets,
+                                    self._drives_out, self._connectivity_out,
                                     self.connectivity_widgets, self._load_info,
-                                    layout=self.layout['drive_textbox'])
+                                    self.layout['drive_textbox'])
 
         def _run_button_clicked(b):
             return run_button_clicked(
-                self._log_out, self.drive_widgets, self.simulation_data,
-                self.widget_dt, self.widget_tstop, self.widget_ntrials,
-                self.widget_backend_selection, self.widget_mpi_cmd,
-                self.widget_n_jobs, self.params, self._simulation_status_bar,
-                self._simulation_status_contents,
+                self.widget_simulation_name, self._log_out, self.drive_widgets,
+                self.simulation_data, self.widget_dt, self.widget_tstop,
+                self.widget_ntrials, self.widget_backend_selection,
+                self.widget_mpi_cmd, self.widget_n_jobs, self.params,
+                self._simulation_status_bar, self._simulation_status_contents,
                 self.connectivity_widgets, self.analysis_config, b)
 
         def _handle_viz_layout_change(_):
@@ -701,8 +655,9 @@ class HNNGUI:
         """
 
         simulation_box = VBox([
-            self.widget_tstop, self.widget_dt, self.widget_ntrials,
-            self.widget_backend_selection, self._backend_config_out
+            self.widget_simulation_name, self.widget_tstop, self.widget_dt,
+            self.widget_ntrials, self.widget_backend_selection,
+            self._backend_config_out
         ])
 
         # accordians to group local-connectivity by cell type
@@ -756,16 +711,14 @@ class HNNGUI:
         )
 
         self._link_callbacks()
-
         # initialize visualization
         _initialize_viz_window(self.simulation_data, self.analysis_config,
                                init=True)
 
         # initialize drive and connectivity ipywidgets
-        load_drive_and_connectivity(self.simulation_data, self.params,
-                                    self._log_out, self._drives_out,
-                                    self.drive_widgets, self.drive_boxes,
-                                    self._connectivity_out,
+        load_drive_and_connectivity(self.params, self._log_out,
+                                    self._drives_out, self.drive_widgets,
+                                    self.drive_boxes, self._connectivity_out,
                                     self.connectivity_widgets,
                                     self.widget_tstop, self._load_info,
                                     self.layout)
@@ -1277,15 +1230,10 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             display(accordion)
 
 
-def _debug_update_plot_window(simulation_data, _plot_out, plot_type,
-                              analysis_config, idx):
-    _update_plot_window(simulation_data, _plot_out, plot_type, analysis_config)
-
-
-def add_connectivity_tab(simulation_data, connectivity_out,
+def add_connectivity_tab(net, connectivity_out,
                          connectivity_sliders):
     """Add all possible connectivity boxes to connectivity tab."""
-    cell_types = [ct for ct in simulation_data['net'].cell_types.keys()]
+    cell_types = [ct for ct in net.cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
 
@@ -1301,7 +1249,7 @@ def add_connectivity_tab(simulation_data, connectivity_out,
                 # the connectivity list should be built on this level
                 receptor_related_conn = {}
                 for receptor in receptors:
-                    conn_indices = pick_connection(net=simulation_data['net'],
+                    conn_indices = pick_connection(net=net,
                                                    src_gids=src_gids,
                                                    target_gids=target_gids,
                                                    loc=location,
@@ -1309,9 +1257,9 @@ def add_connectivity_tab(simulation_data, connectivity_out,
                     if len(conn_indices) > 0:
                         assert len(conn_indices) == 1
                         conn_idx = conn_indices[0]
-                        current_w = simulation_data['net'].connectivity[
+                        current_w = net.connectivity[
                             conn_idx]['nc_dict']['A_weight']
-                        current_p = simulation_data['net'].connectivity[
+                        current_p = net.connectivity[
                             conn_idx]['probability']
                         # valid connection
                         receptor_related_conn[receptor] = {
@@ -1338,25 +1286,24 @@ def add_connectivity_tab(simulation_data, connectivity_out,
         display(cell_connectivity)
 
 
-def load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
+def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_sliders, tstop, load_info,
                                 layout):
     """Add drive and connectivity ipywidgets from params."""
     load_info['count'] += 1
     # init the network.
-    simulation_data['net'] = jones_2009_model(params)
+    tmp_net = jones_2009_model(params)
 
     # Add connectivity
-    add_connectivity_tab(simulation_data, connectivity_out,
-                         connectivity_sliders)
+    add_connectivity_tab(tmp_net, connectivity_out, connectivity_sliders)
 
     # Add drives
     log_out.clear_output()
     with log_out:
         drive_specs = _extract_drive_specs_from_hnn_params(
-            simulation_data['net']._params,
-            list(simulation_data['net'].cell_types.keys()))
+            tmp_net._params,
+            list(tmp_net.cell_types.keys()))
 
         # clear before adding drives
         drives_out.clear_output()
@@ -1388,8 +1335,8 @@ def load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
             )
 
 
-def on_upload_change(change, params, tstop, dt, log_out, simulation_data,
-                     drive_boxes, drive_widgets, drives_out, connectivity_out,
+def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
+                     drive_widgets, drives_out, connectivity_out,
                      connectivity_sliders, load_info, layout):
     if len(change['owner'].value) == 0:
         return
@@ -1424,7 +1371,7 @@ def on_upload_change(change, params, tstop, dt, log_out, simulation_data,
 
         params.update(params_network)
     # init network, add drives & connectivity
-    load_drive_and_connectivity(simulation_data, params, log_out, drives_out,
+    load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_sliders, tstop, load_info,
                                 layout)
@@ -1526,16 +1473,24 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
                 event_seed=drive['seedcore'].value)
 
 
-def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
-                       ntrials, backend_selection, mpi_cmd, n_jobs,
-                       params, simulation_status_bar,
+def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
+                       simulation_data, dt, tstop, ntrials, backend_selection,
+                       mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_sliders,
                        analysis_config, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     with log_out:
-        _init_network_from_widgets(params, dt, tstop, simulation_data,
-                                   drive_widgets, connectivity_sliders)
+        _sim_name = widget_simulation_name.value
+        if simulation_data[_sim_name]['net'] is not None:
+            print("Simulation with the same name exists!")
+            simulation_status_bar.value = simulation_status_contents[
+                'failed']
+            return
+
+        _init_network_from_widgets(params, dt, tstop,
+                                   simulation_data[_sim_name], drive_widgets,
+                                   connectivity_sliders)
 
         print("start simulation")
         if backend_selection.value == "MPI":
@@ -1546,10 +1501,11 @@ def run_button_clicked(log_out, drive_widgets, simulation_data, dt, tstop,
             print(f"Using Joblib with {n_jobs.value} core(s).")
         with backend:
             simulation_status_bar.value = simulation_status_contents['running']
-            simulation_data['dpls'] = simulate_dipole(simulation_data['net'],
-                                                      tstop=tstop.value,
-                                                      dt=dt.value,
-                                                      n_trials=ntrials.value)
+            simulation_data[_sim_name]['dpls'] = simulate_dipole(
+                simulation_data[_sim_name]['net'],
+                tstop=tstop.value,
+                dt=dt.value,
+                n_trials=ntrials.value)
 
             simulation_status_bar.value = simulation_status_contents[
                 'finished']
