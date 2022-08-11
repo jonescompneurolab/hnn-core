@@ -167,7 +167,8 @@ def test_gui_run_simulations():
                 sim_name = gui.widget_simulation_name.value
                 dpls = gui.simulation_data[sim_name]['dpls']
 
-                assert isinstance(gui.simulation_data[sim_name]["net"], Network)
+                assert isinstance(gui.simulation_data[sim_name]["net"],
+                                  Network)
                 assert isinstance(dpls, list)
                 assert all([isinstance(dpl, Dipole) for dpl in dpls])
                 assert len(dpls) == val_ntrials

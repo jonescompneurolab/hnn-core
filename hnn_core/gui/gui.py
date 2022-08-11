@@ -1397,8 +1397,8 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
             if len(conn_indices) > 0:
                 assert len(conn_indices) == 1
                 conn_idx = conn_indices[0]
-                single_simulation_data['net'].connectivity[conn_idx]['nc_dict'][
-                    'A_weight'] = vbox.children[1].value
+                single_simulation_data['net'].connectivity[conn_idx][
+                    'nc_dict']['A_weight'] = vbox.children[1].value
                 single_simulation_data['net'].connectivity[conn_idx][
                     'probability'] = vbox.children[3].value
 
