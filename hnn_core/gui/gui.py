@@ -234,7 +234,7 @@ def _initialize_viz_window(simulation_data, analysis_config, init=False):
     viz_window = analysis_config['viz_window']
     plot_outputs = analysis_config['plot_outputs']
     plot_dropdowns = analysis_config['plot_dropdowns']
-    layout = analysis_config['style']
+    style = analysis_config['style']
     layout_option = analysis_config['layout']
 
     plot_options = [
@@ -261,7 +261,7 @@ def _initialize_viz_window(simulation_data, analysis_config, init=False):
             plot_options,
             previous_plot_types,
             analysis_config,
-            layout,
+            style,
             layout_option,
             init=init)
         display(viz_grid[layout_option])
