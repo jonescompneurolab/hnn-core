@@ -160,7 +160,7 @@
 
 
 <span class="k">def</span> <span class="nf">_thread_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">queue</span><span class="p">):</span>
-    <span class="k">while</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">isSet</span><span class="p">():</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="k">break</span>
