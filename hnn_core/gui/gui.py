@@ -496,7 +496,6 @@ class HNNGUI:
 
         # In-memory storage of all simulation related simulation_data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
-        self.simulation_data[self.widget_simulation_name.value]
 
         self._init_ui_components()
 
@@ -653,7 +652,6 @@ class HNNGUI:
             If the method returns the layout object which can be rendered by
             IPython.display.display() method.
         """
-
         simulation_box = VBox([
             self.widget_simulation_name, self.widget_tstop, self.widget_dt,
             self.widget_ntrials, self.widget_backend_selection,
@@ -711,6 +709,8 @@ class HNNGUI:
         )
 
         self._link_callbacks()
+        # init
+        self.simulation_data[self.widget_simulation_name.value]
         # initialize visualization
         _initialize_viz_window(self.simulation_data, self.analysis_config,
                                init=True)
@@ -1377,14 +1377,14 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
                                 layout)
 
 
-def _init_network_from_widgets(params, dt, tstop, simulation_data,
+def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                                drive_widgets, connectivity_sliders,
                                add_drive=True):
     """Construct network and add drives."""
     print("init network")
     params['dt'] = dt.value
     params['tstop'] = tstop.value
-    simulation_data['net'] = jones_2009_model(
+    single_simulation_data['net'] = jones_2009_model(
         params,
         add_drives_from_params=False,
     )
@@ -1392,7 +1392,7 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
     for connectivity_slider in connectivity_sliders:
         for vbox in connectivity_slider:
             conn_indices = pick_connection(
-                net=simulation_data['net'],
+                net=single_simulation_data['net'],
                 src_gids=vbox._belongsto['src_gids'],
                 target_gids=vbox._belongsto['target_gids'],
                 loc=vbox._belongsto['location'],
@@ -1401,9 +1401,9 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
             if len(conn_indices) > 0:
                 assert len(conn_indices) == 1
                 conn_idx = conn_indices[0]
-                simulation_data['net'].connectivity[conn_idx]['nc_dict'][
+                single_simulation_data['net'].connectivity[conn_idx]['nc_dict'][
                     'A_weight'] = vbox.children[1].value
-                simulation_data['net'].connectivity[conn_idx][
+                single_simulation_data['net'].connectivity[conn_idx][
                     'probability'] = vbox.children[3].value
 
     if add_drive is False:
@@ -1435,7 +1435,7 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
                 k: v
                 for k, v in weights_nmda.items() if k in rate_constant
             }
-            simulation_data['net'].add_poisson_drive(
+            single_simulation_data['net'].add_poisson_drive(
                 name=drive['name'],
                 tstart=drive['tstart'].value,
                 tstop=drive['tstop'].value,
@@ -1447,7 +1447,7 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
                 space_constant=100.0,
                 event_seed=drive['seedcore'].value)
         elif drive['type'] in ('Evoked', 'Gaussian'):
-            simulation_data['net'].add_evoked_drive(
+            single_simulation_data['net'].add_evoked_drive(
                 name=drive['name'],
                 mu=drive['mu'].value,
                 sigma=drive['sigma'].value,
@@ -1459,7 +1459,7 @@ def _init_network_from_widgets(params, dt, tstop, simulation_data,
                 space_constant=3.0,
                 event_seed=drive['seedcore'].value)
         elif drive['type'] in ('Rhythmic', 'Bursty'):
-            simulation_data['net'].add_bursty_drive(
+            single_simulation_data['net'].add_bursty_drive(
                 name=drive['name'],
                 tstart=drive['tstart'].value,
                 tstart_std=drive['tstart_std'].value,
@@ -1480,6 +1480,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        analysis_config, b):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
+
     with log_out:
         _sim_name = widget_simulation_name.value
         if simulation_data[_sim_name]['net'] is not None:
