@@ -1478,6 +1478,12 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
     log_out.clear_output()
 
     with log_out:
+        # clear empty trash simulations
+        for _name in tuple(simulation_data.keys()):
+            if simulation_data[_name]['net'] is None or len(
+                    simulation_data[_name]['dpls']) == 0:
+                del simulation_data[_name]
+
         _sim_name = widget_simulation_name.value
         if simulation_data[_sim_name]['net'] is not None:
             print("Simulation with the same name exists!")
