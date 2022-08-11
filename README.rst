@@ -1,23 +1,9 @@
 hnn-core
 ========
 
-|tests| |CircleCI| |Codecov| |PyPI|
+|tests| |CircleCI| |Codecov| |PyPI| |Gitter|
 
 |HNN-GUI|
-
-.. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
-   :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
-
-.. |CircleCI| image:: https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg
-   :target: https://circleci.com/gh/jonescompneurolab/hnn-core
-
-.. |Codecov| image:: https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg
-	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
-
-.. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
-	:target: https://pypi.org/project/hnn-core/
-
-.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
 
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
@@ -135,3 +121,20 @@ Read our `contributing guide`_.
 
 .. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
+
+.. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
+   :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
+
+.. |CircleCI| image:: https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg
+   :target: https://circleci.com/gh/jonescompneurolab/hnn-core
+
+.. |Codecov| image:: https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg
+	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
+
+.. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
+	:target: https://pypi.org/project/hnn-core/
+
+.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
+
+.. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
+   :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
