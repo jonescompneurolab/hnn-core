@@ -54,7 +54,7 @@ Configuring git
 Instructions for how to configure git can be found on 
 the [git book](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration).
 
-Making a pull request
+Making your first pull request
 =====================
 
 1. Make a fork of the [hnn-core](https://github.com/jonescompneurolab/hnn-core) 
