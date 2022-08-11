@@ -203,8 +203,8 @@
 
 
 <span class="k">def</span> <span class="nf">plot_extracellular</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">voltage_offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voltage_scalebar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span>
+                       <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
                        <span class="n">contact_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Plot extracellular electrode array voltage time series.</span>
 
@@ -225,9 +225,9 @@
 <span class="sd">        The SciPy function :func:`~scipy.signal.decimate` is used, which</span>
 <span class="sd">        recommends values &lt;13. To achieve higher decimation factors, a list of</span>
 <span class="sd">        ints can be provided. These are applied successively.</span>
-<span class="sd">    color : string | array of floats | ``matplotlib.colors.ListedColormap``</span>
-<span class="sd">        The color to use for plotting (optional). The usual Matplotlib standard</span>
-<span class="sd">        color strings may be used (e.g., &#39;b&#39; for blue). A color can also be</span>
+<span class="sd">    color : str | array of floats | ``matplotlib.colors.ListedColormap``</span>
+<span class="sd">        The colormap to use for plotting. The usual Matplotlib standard</span>
+<span class="sd">        colormap strings may be used (e.g., &#39;jetblue&#39;). A color can also be</span>
 <span class="sd">        defined as an RGBA-quadruplet, or an array of RGBA-values (one for each</span>
 <span class="sd">        electrode contact trace to plot). An instance of</span>
 <span class="sd">        :class:`~matplotlib.colors.ListedColormap` may also be provided.</span>
@@ -281,6 +281,8 @@
             <span class="k">if</span> <span class="n">color</span><span class="o">.</span><span class="n">N</span> <span class="o">!=</span> <span class="n">n_contacts</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ListedColormap has N=</span><span class="si">{</span><span class="n">color</span><span class="o">.</span><span class="n">N</span><span class="si">}</span><span class="s1">, but &#39;</span>
                                  <span class="sa">f</span><span class="s1">&#39;there are </span><span class="si">{</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1"> contacts&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>

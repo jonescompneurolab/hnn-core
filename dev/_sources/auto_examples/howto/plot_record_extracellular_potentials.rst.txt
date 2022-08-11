@@ -206,7 +206,7 @@ smoothing window, after which both data can be decimated by a factor of 20
 from 40 to 2 kHz sampling rates (note that decimation is applied in two
 steps). Decimation speeds up plotting significantly.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-110
+.. GENERATED FROM PYTHON SOURCE LINES 82-103
 
 .. code-block:: default
 
@@ -217,19 +217,12 @@ steps). Decimation speeds up plotting significantly.
                             gridspec_kw={'height_ratios': [1, 3, 2]})
 
     # Then plot the aggregate dipole time series on its own axis
-    dpl[trial_idx].copy().smooth(
-        window_len=window_len).plot(ax=axs[0], decim=decimate,
-                                    show=False)
-
-    voltage_offset = 50  # the spacing between individual traces
-    voltage_scalebar = 200  # can be different from offset
-    # we can assign each electrode a unique color using a linear colormap
-    colors = plt.get_cmap('cividis', len(electrode_pos))
+    dpl[trial_idx].smooth(window_len=window_len)
+    dpl[trial_idx].plot(ax=axs[0], decim=decimate, show=False)
 
     # use the same smoothing window on the LFP traces to allow comparison to dipole
     net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
-        ax=axs[1], contact_labels=depths, color=colors, decim=decimate, show=False,
-        voltage_offset=voltage_offset, voltage_scalebar=voltage_scalebar)
+        ax=axs[1], decim=decimate, show=False)
 
     axs[1].grid(True, which='major', axis='x')
     axs[1].set_xlabel('')
@@ -250,7 +243,7 @@ steps). Decimation speeds up plotting significantly.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-118
+.. GENERATED FROM PYTHON SOURCE LINES 104-111
 
 References
 ----------
@@ -263,7 +256,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  5.080 seconds)
+   **Total running time of the script:** ( 1 minutes  30.921 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:
