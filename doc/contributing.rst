@@ -14,37 +14,6 @@ If your contributions will make use of parallel backends for using more than
 one core, please see the additional installation steps in our
 :doc:`parallel backend guide <parallel>`.
 
-Overview of contribution process
-================================
-
-.. note:: Reminder: all contributors are expected to follow our
-          `code of conduct`_.
-
-Changes to hnn-core are typically made by `forking`_ the hnn-core
-repository, making changes to your fork (usually by `cloning`_ it to your
-personal computer, making the changes locally, and then `pushing`_ the local
-changes up to your fork on GitHub), and finally creating a `pull request`_ to incorporate
-your changes back into the shared "upstream" version of the codebase.
-
-In general you'll be working with three different copies of the hnn-core
-codebase: the official remote copy at https://github.com/hnn-core/hnn_core
-(usually called ``upstream``), your remote `fork`_ of the upstream repository
-(similar URL, but with your username in place of ``hnn-core``, and usually
-called ``origin``), and the local copy of the codebase on your computer. The
-typical contribution process is to:
-
-1. synchronize your local copy with ``upstream``
-
-2. make changes to your local copy
-
-3. `push`_ your changes to ``origin`` (your remote fork of the upstream)
-
-4. submit a `pull request`_ from your fork into ``upstream``
-
-The sections :ref:`basic-git` and :ref:`github-workflow` (below) describe this
-process in more detail.
-
-
 Setting up your local development environment
 =============================================
 
@@ -52,13 +21,25 @@ Configuring git
 ~~~~~~~~~~~~~~~
 
 Instructions for how to configure git can be found on 
-the [git book](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration).
+the git book `configuration <https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration>`_ page.
 
 Making your first pull request
-=====================
+==============================
+Changes to hnn-core are typically made by "forking" the hnn-core
+repository, making changes to your fork (usually by "cloning" it to your
+personal computer, making the changes locally, and then "pushing" the local
+changes up to your fork on GitHub), and finally creating a "pull request" to incorporate
+your changes back into the shared "upstream" version of the codebase.
 
-1. Make a fork of the [hnn-core](https://github.com/jonescompneurolab/hnn-core) 
-repository to your own account on github. Look for the Fork button in the top right corner
+In general you'll be working with three different copies of the hnn-core
+codebase: the official remote copy at https://github.com/hnn-core/hnn_core
+(usually called ``upstream``), your remote fork of the upstream repository
+(similar URL, but with your username in place of ``hnn-core``, and usually
+called ``origin``), and the local copy of the codebase on your computer. The
+typical contribution process is to
+
+1. Make a fork of the `hnn-core <https://github.com/jonescompneurolab/hnn-core>`_
+   repository to your own account on github. Look for the Fork button in the top right corner
 
 2. On the terminal of your local computer clone the fork
 
@@ -73,61 +54,55 @@ repository to your own account on github. Look for the Fork button in the top ri
 
     $ git remote -v
 
-You should see:
+   You should see:
 
-    origin	https://github.com/<username>/hnn-core (fetch)
-    origin	https://github.com/<username>/hnn-core (push)
-    upstream	https://github.com/jonescompneurolab/hnn-core (fetch)
-    upstream	https://github.com/jonescompneurolab/hnn-core (push)
+    | origin	https://github.com/<username>/hnn-core (fetch)
+    | origin	https://github.com/<username>/hnn-core (push)
+    | upstream	https://github.com/jonescompneurolab/hnn-core (fetch)
+    | upstream	https://github.com/jonescompneurolab/hnn-core (push)
 
-5. To start a new feature branch, we will copy the existing ``master`` branch
-from the ``upstream`` remote and give it a specific name
+5. To start a new feature branch, we will copy the existing ``master`` branch from the ``upstream`` remote and give it a specific name
 
-    $ git fetch upstream master:cool_feature
-    $ git checkout cool_feature
+    | $ git fetch upstream master:cool_feature
+    | $ git checkout cool_feature
 
 6. Make your changes relevant to the pull request
 
-7. To make a commit, you first have to add the files you have
-changed to the staging area
+7. To make a commit, you first have to add the files you have changed to the staging area
 
-    $ git add -u
+        $ git add -u
 
-ensure the have been added correctly
+   ensure they have been added correctly
 
-    $ git status
+        $ git status
 
-make a commit
+   make a commit
 
-    $ git commit -m "your commit message"
+        $ git commit -m "your commit message"
 
-and finally check that the commit has been added
+   and finally check that the commit has been added
 
-    $ git log
+        $ git log
 
-Note: see the [numpy contributing guide]
-(https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message)
-for tips on informative commit messages.
+   Note: see the `numpy contributing guide <https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message>`_
+   for tips on informative commit messages.
 
 8. Now push the feature branch to our fork
 
     $ git push origin cool_feature
 
-9. Go to https://github.com/jonescompneurolab/hnn-core/compare/master...cool_feature
-to open the pull request. You should also see this link on the terminal when you make
-the push.
+9. Go to https://github.com/jonescompneurolab/hnn-core/compare/master...cool_feature to open the pull request. You should also see this link on the terminal when you make the push.
 
 10. After your pull request is reviewed, repeat steps 6-8 to update the pull request.
 
 11. Once the pull request is ready to be merged, add the prefix [MRG] to the title.
 
-See the [git book](https://git-scm.com/book/en/v2) for a more general guide on using git. 
+See the `git book <https://git-scm.com/book/en/v2>`_ for a more general guide on using git. 
 
 Running tests
 =============
 
-To run the tests using ``pytest``, you need to have the git cloned ``hnn-core``
-repository with an editable pip install::
+To run the tests using ``pytest``, you need to have the git cloned ``hnn-core`` repository with an editable pip install::
 
     $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
     $ cd hnn-core
@@ -170,8 +145,8 @@ If you are using a newer version of pip, you may be prompted to use the flag
 
 You can build the documentation locally using the command::
 
-    $ cd doc/
-    $ make html
+$ cd doc/
+$ make html
 
 While MNE is not needed to install hnn-core, as a developer you will need to
 install it to run all the examples successfully. Please find the installation
@@ -186,7 +161,7 @@ How to rebase
 =============
 Commits in hnn-core follow a linear history, therefore we use a "rebase" workflow
 instead of "merge" to resolve commits.
-See [this article](https://www.atlassian.com/git/tutorials/merging-vs-rebasing) for more details
+See `this article <https://www.atlassian.com/git/tutorials/merging-vs-rebasing>`_ for more details
 on the differences between these workflows.
 
 To rebase, we do the following:
@@ -197,28 +172,28 @@ To rebase, we do the following:
 
 2. Delete the ``master`` branch and fetch a new copy
 
-    $ git branch -D master
-    $ git fetch upstream master:master
+    | $ git branch -D master
+    | $ git fetch upstream master:master
 
 3. Start the rebase
 
     $ git rebase master
 
 4. If there are conflicts, the easiest approach is to resolve them in an editor
-like VS code.
-See [this guide](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
-for more general information on resolve merge conflicts
+   like VS code.
+   See `this guide <https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging>`_
+   for more general information on resolve merge conflicts
 
 5. Once the conflicts have been resolved, add the resolved files to the staging area
 
-    $ git add -u
-    $ git rebase --continue
+    | $ git add -u
+    | $ git rebase --continue
 
 In general it is best to rebase frequently if you are aware of pull requests being merged
 into the ``master`` base.
 
 If you face a lot of difficulting resolving merge conflicts,
-it may be easier to [squash](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History)
+it may be easier to `squash <https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History>`_
 before rebasing.
 
 
