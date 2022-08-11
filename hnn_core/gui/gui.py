@@ -30,11 +30,6 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         link)
 from ipywidgets.embed import embed_minimal_html
 
-# for debug
-from loguru import logger
-logger.remove()
-logger.add("logfile.log", level="DEBUG")
-
 
 _spectrogram_color_maps = [
     "viridis",
@@ -66,8 +61,6 @@ def _update_plot_window(simulation_data, analysis_config, plot_key):
     _plot_out = analysis_config['plot_outputs'][plot_key]
     plot_type = analysis_config['plot_dropdowns'][plot_key].value
     sim_name = analysis_config['plot_sim_selections'][plot_key].value
-    logger.debug(
-        f"plot_key={plot_key}, plot_type={plot_type}, sim_name={sim_name}")
 
     dpls_copied = copy.deepcopy(simulation_data[sim_name]['dpls'])
     net_copied = copy.deepcopy(simulation_data[sim_name]['net'])
@@ -78,6 +71,10 @@ def _update_plot_window(simulation_data, analysis_config, plot_key):
     _plot_out.clear_output()
 
     with _plot_out:
+        if net_copied is None:
+            print("No network data")
+            return
+
         if plot_type == 'spikes':
             if net_copied.cell_response:
                 fig, ax = plt.subplots()
@@ -186,7 +183,6 @@ def _init_viz_layout(simulation_data, plot_options, previous_plot_types,
             _gen_plot_callback(simulation_data, analysis_config, plot_key),
             'value',
         )
-        logger.debug(f"bind to plot_key={plot_key}")
 
         plot_sim_selections[plot_key] = Dropdown(
             options=sim_names,
