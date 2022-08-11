@@ -147,6 +147,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 
 <span class="kn">import</span> <span class="nn">hnn_core</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -160,10 +161,11 @@
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span>
-                        <span class="n">FloatLogSlider</span><span class="p">,</span> <span class="n">FloatText</span><span class="p">,</span> <span class="n">GridspecLayout</span><span class="p">,</span>
-                        <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span>
-                        <span class="n">VBox</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+                        <span class="n">FloatLogSlider</span><span class="p">,</span> <span class="n">FloatText</span><span class="p">,</span> <span class="n">GridspecLayout</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span>
+                        <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
+                        <span class="n">link</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ipywidgets.embed</span> <span class="kn">import</span> <span class="n">embed_minimal_html</span>
+
 
 <span class="n">_spectrogram_color_maps</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
@@ -179,36 +181,51 @@
 <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">_plot_out</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">,</span>
-                        <span class="n">analysis_config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Refresh plots with data from simulation_data.&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Refresh plots with data from simulation_data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    simulation_data: dict</span>
+<span class="sd">        A dict of simulation data</span>
+<span class="sd">    analysis_config: dict</span>
+<span class="sd">        A dict of visualization configs</span>
+<span class="sd">    plot_key: str</span>
+<span class="sd">        A string used to identify the plot and data to update.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Make sure that visualization does not change the original data</span>
-    <span class="n">dpls_copied</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;dpls&#39;</span><span class="p">])</span>
-    <span class="n">net_copied</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">])</span>
+    <span class="n">_plot_out</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_outputs&#39;</span><span class="p">][</span><span class="n">plot_key</span><span class="p">]</span>
+    <span class="n">plot_type</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_dropdowns&#39;</span><span class="p">][</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_sim_selections&#39;</span><span class="p">][</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="n">dpls_copied</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s1">&#39;dpls&#39;</span><span class="p">])</span>
+    <span class="n">net_copied</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s1">&#39;net&#39;</span><span class="p">])</span>
     <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls_copied</span><span class="p">:</span>
         <span class="n">dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;dipole_smooth&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span>
             <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;dipole_scaling&#39;</span><span class="p">])</span>
 
     <span class="n">_plot_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;change&#39;</span> <span class="ow">and</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">):</span>
-        <span class="k">return</span>
 
     <span class="k">with</span> <span class="n">_plot_out</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;spikes&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">net_copied</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No network data&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;spikes&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">net_copied</span><span class="o">.</span><span class="n">cell_response</span><span class="p">:</span>
                 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
                 <span class="n">net_copied</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No cell response data&quot;</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;current dipole&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;current dipole&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
                 <span class="n">plot_dipole</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;layer-specific dipole&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;layer-specific dipole&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L2&quot;</span><span class="p">,</span> <span class="s2">&quot;L5&quot;</span><span class="p">,</span> <span class="s2">&quot;agg&quot;</span><span class="p">]</span>
                 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -217,7 +234,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;input histogram&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;input histogram&#39;</span><span class="p">:</span>
             <span class="c1"># BUG: got error here, need a better way to handle exception</span>
             <span class="k">if</span> <span class="n">net_copied</span><span class="o">.</span><span class="n">cell_response</span><span class="p">:</span>
                 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
@@ -225,14 +242,14 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No cell response data&quot;</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;PSD&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;PSD&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
                 <span class="n">dpls_copied</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_psd</span><span class="p">(</span><span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;spectogram&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;spectogram&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">min_f</span> <span class="o">=</span> <span class="mf">10.0</span>
                 <span class="n">max_f</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;max_spectral_frequency&#39;</span><span class="p">]</span>
@@ -247,7 +264,7 @@
                     <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">plot_type</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;network&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;network&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">net_copied</span><span class="p">:</span>
                 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
                 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
@@ -256,152 +273,82 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No network data&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_init_left_right_viz_layout</span><span class="p">(</span><span class="n">plot_outputs</span><span class="p">,</span> <span class="n">plot_dropdowns</span><span class="p">,</span> <span class="n">simulation_data</span><span class="p">,</span>
-                                <span class="n">plot_options</span><span class="p">,</span> <span class="n">previous_outputs</span><span class="p">,</span>
-                                <span class="n">analysis_config</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">layout_LR</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
-                       <span class="n">height</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-                       <span class="n">border</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">border</span><span class="p">)</span>
-
-    <span class="n">plot_outputs_L</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout_LR</span><span class="p">)</span>
-
-    <span class="n">default_plot_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">plot_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">plot_options</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">previous_outputs</span><span class="p">[:</span><span class="mi">2</span><span class="p">]):</span>
-        <span class="n">default_plot_types</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_type</span>
-
-    <span class="n">plot_dropdown_L</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-        <span class="n">options</span><span class="o">=</span><span class="n">plot_options</span><span class="p">,</span>
-        <span class="n">value</span><span class="o">=</span><span class="n">default_plot_types</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Plot:&#39;</span><span class="p">,</span>
-        <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">plot_dropdown_L</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">plot_type</span><span class="p">:</span> <span class="n">_debug_update_plot_window</span><span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">,</span>
-            <span class="n">plot_outputs_L</span><span class="p">,</span>
-            <span class="n">plot_type</span><span class="p">,</span>
-            <span class="n">analysis_config</span><span class="p">,</span>
-            <span class="s2">&quot;Left&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="s1">&#39;value&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">plot_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_outputs_L</span><span class="p">)</span>
-    <span class="n">plot_dropdowns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_dropdown_L</span><span class="p">)</span>
-
-    <span class="n">plot_outputs_R</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout_LR</span><span class="p">)</span>
-
-    <span class="n">plot_dropdown_R</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-        <span class="n">options</span><span class="o">=</span><span class="n">plot_options</span><span class="p">,</span>
-        <span class="n">value</span><span class="o">=</span><span class="n">default_plot_types</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Plot:&#39;</span><span class="p">,</span>
-        <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">plot_dropdown_R</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">plot_type</span><span class="p">:</span> <span class="n">_debug_update_plot_window</span><span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">,</span>
-            <span class="n">plot_outputs_R</span><span class="p">,</span>
-            <span class="n">plot_type</span><span class="p">,</span>
-            <span class="n">analysis_config</span><span class="p">,</span>
-            <span class="s2">&quot;Right&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="s1">&#39;value&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">plot_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_outputs_R</span><span class="p">)</span>
-    <span class="n">plot_dropdowns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_dropdown_R</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">init</span><span class="p">:</span>
-        <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_outputs_L</span><span class="p">,</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="n">default_plot_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">},</span> <span class="n">analysis_config</span><span class="p">)</span>
-        <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_outputs_R</span><span class="p">,</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="n">default_plot_types</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">},</span> <span class="n">analysis_config</span><span class="p">)</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">GridspecLayout</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-    <span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">plot_dropdown_L</span><span class="p">,</span> <span class="n">plot_outputs_L</span><span class="p">])</span>
-    <span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">plot_dropdown_R</span><span class="p">,</span> <span class="n">plot_outputs_R</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">grid</span>
+<span class="k">def</span> <span class="nf">_gen_plot_callback</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">callback</span>
 
 
-<span class="k">def</span> <span class="nf">_init_upper_down_viz_layout</span><span class="p">(</span><span class="n">plot_outputs</span><span class="p">,</span> <span class="n">plot_dropdowns</span><span class="p">,</span> <span class="n">simulation_data</span><span class="p">,</span>
-                                <span class="n">plot_options</span><span class="p">,</span> <span class="n">previous_outputs</span><span class="p">,</span>
-                                <span class="n">analysis_config</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_init_viz_layout</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_options</span><span class="p">,</span> <span class="n">previous_plot_types</span><span class="p">,</span>
+                     <span class="n">analysis_config</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">layout_option</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">plot_outputs</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_outputs&#39;</span><span class="p">]</span>
+    <span class="n">plot_dropdowns</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_dropdowns&#39;</span><span class="p">]</span>
+    <span class="n">plot_sim_selections</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_sim_selections&#39;</span><span class="p">]</span>
 
-    <span class="n">default_plot_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">plot_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">plot_options</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">previous_outputs</span><span class="p">[:</span><span class="mi">2</span><span class="p">]):</span>
-        <span class="n">default_plot_types</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_type</span>
+    <span class="n">sim_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;current_sim_name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">sim_names</span>
 
-    <span class="n">plot_outputs_U</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="p">{</span>
-        <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="n">layout</span><span class="o">.</span><span class="n">border</span><span class="p">,</span>
-        <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="si">}</span><span class="s2">px&quot;</span>
-    <span class="p">})</span>
+    <span class="k">if</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;L-R&quot;</span><span class="p">:</span>
+        <span class="c1"># TODO fine tune the style so that there&#39;s no more overflow.</span>
+        <span class="n">grid_style</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                            <span class="c1"># height=style.height,</span>
+                            <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">-</span><span class="mi">80</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                            <span class="n">border</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">border</span><span class="p">)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">GridspecLayout</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">plot_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">]</span>
 
-    <span class="n">plot_dropdown_U</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-        <span class="n">options</span><span class="o">=</span><span class="n">plot_options</span><span class="p">,</span>
-        <span class="n">value</span><span class="o">=</span><span class="n">default_plot_types</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Plot:&#39;</span><span class="p">,</span>
-        <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">plot_dropdown_U</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">plot_type</span><span class="p">:</span> <span class="n">_debug_update_plot_window</span><span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">,</span>
-            <span class="n">plot_outputs_U</span><span class="p">,</span>
-            <span class="n">plot_type</span><span class="p">,</span>
-            <span class="n">analysis_config</span><span class="p">,</span>
-            <span class="s2">&quot;Left&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="s1">&#39;value&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;U-D&quot;</span><span class="p">:</span>
+        <span class="n">grid_style</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                            <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                            <span class="n">border</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">border</span><span class="p">,)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">GridspecLayout</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">plot_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Up&quot;</span><span class="p">,</span> <span class="s2">&quot;Down&quot;</span><span class="p">]</span>
 
-    <span class="n">plot_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_outputs_U</span><span class="p">)</span>
-    <span class="n">plot_dropdowns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_dropdown_U</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">plot_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plot_keys</span><span class="p">):</span>
+        <span class="n">plot_outputs</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">grid_style</span><span class="p">)</span>
 
-    <span class="c1"># Down</span>
-    <span class="n">plot_outputs_D</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="p">{</span>
-        <span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="n">layout</span><span class="o">.</span><span class="n">border</span><span class="p">,</span>
-        <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">layout</span><span class="o">.</span><span class="n">height</span>
-    <span class="p">})</span>
+        <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">plot_options</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">previous_plot_types</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">plot_key</span> <span class="ow">in</span> <span class="n">previous_plot_types</span> <span class="k">else</span> <span class="n">plot_options</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Plot:&#39;</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
+            <span class="n">_gen_plot_callback</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">),</span>
+            <span class="s1">&#39;value&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="n">plot_dropdown_D</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-        <span class="n">options</span><span class="o">=</span><span class="n">plot_options</span><span class="p">,</span>
-        <span class="n">value</span><span class="o">=</span><span class="n">default_plot_types</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Plot:&#39;</span><span class="p">,</span>
-        <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
+        <span class="n">plot_sim_selections</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">sim_names</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;current_sim_name&#39;</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Name:&#39;</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plot_sim_selections</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
+            <span class="n">_gen_plot_callback</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">),</span>
+            <span class="s1">&#39;value&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="n">plot_dropdown_D</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">plot_type</span><span class="p">:</span> <span class="n">_debug_update_plot_window</span><span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">,</span>
-            <span class="n">plot_outputs_D</span><span class="p">,</span>
-            <span class="n">plot_type</span><span class="p">,</span>
-            <span class="n">analysis_config</span><span class="p">,</span>
-            <span class="s2">&quot;Right&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="s1">&#39;value&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">plot_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_outputs_D</span><span class="p">)</span>
-    <span class="n">plot_dropdowns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_dropdown_D</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;L-R&quot;</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="n">box_directed</span> <span class="o">=</span> <span class="n">VBox</span>
+        <span class="k">elif</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;U-D&quot;</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">box_directed</span> <span class="o">=</span> <span class="n">HBox</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">init</span><span class="p">:</span>
-        <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_outputs_U</span><span class="p">,</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="n">default_plot_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">},</span> <span class="n">analysis_config</span><span class="p">)</span>
-        <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_outputs_D</span><span class="p">,</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="n">default_plot_types</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">},</span> <span class="n">analysis_config</span><span class="p">)</span>
+        <span class="n">grid</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">box_directed</span><span class="p">([</span>
+            <span class="n">VBox</span><span class="p">([</span>
+                <span class="n">plot_sim_selections</span><span class="p">[</span><span class="n">plot_keys</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
+                <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_keys</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
+            <span class="p">]),</span>
+            <span class="n">plot_outputs</span><span class="p">[</span><span class="n">plot_keys</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
+        <span class="p">])</span>
 
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">GridspecLayout</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-    <span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">plot_dropdown_U</span><span class="p">,</span> <span class="n">plot_outputs_U</span><span class="p">])</span>
-    <span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">plot_dropdown_D</span><span class="p">,</span> <span class="n">plot_outputs_D</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">init</span><span class="p">:</span>
+            <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">grid</span>
 
 
@@ -423,7 +370,7 @@
     <span class="n">viz_window</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;viz_window&#39;</span><span class="p">]</span>
     <span class="n">plot_outputs</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_outputs&#39;</span><span class="p">]</span>
     <span class="n">plot_dropdowns</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_dropdowns&#39;</span><span class="p">]</span>
-    <span class="n">layout</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">]</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">]</span>
     <span class="n">layout_option</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;layout&#39;</span><span class="p">]</span>
 
     <span class="n">plot_options</span> <span class="o">=</span> <span class="p">[</span>
@@ -436,32 +383,24 @@
         <span class="s1">&#39;network&#39;</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">viz_window</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
-    <span class="n">previous_plot_outputs_values</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">plot_outputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">plot_outputs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-        <span class="n">previous_plot_outputs_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_dropdowns</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-    <span class="c1"># keep the same order of previous plots.</span>
-    <span class="n">previous_plot_outputs_values</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+    <span class="n">previous_plot_types</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">plot_keys</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">plot_outputs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">for</span> <span class="n">plot_key</span> <span class="ow">in</span> <span class="n">plot_keys</span><span class="p">:</span>
+        <span class="n">previous_plot_types</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">del</span> <span class="n">plot_outputs</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span>
 
     <span class="k">with</span> <span class="n">viz_window</span><span class="p">:</span>
-        <span class="c1"># Left-Rright configuration</span>
-        <span class="k">if</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;L-R&quot;</span><span class="p">:</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="n">_init_left_right_viz_layout</span><span class="p">(</span><span class="n">plot_outputs</span><span class="p">,</span> <span class="n">plot_dropdowns</span><span class="p">,</span>
-                                               <span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_options</span><span class="p">,</span>
-                                               <span class="n">previous_plot_outputs_values</span><span class="p">,</span>
-                                               <span class="n">analysis_config</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span>
-                                               <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">)</span>
-
-        <span class="c1"># Upper-Down configuration</span>
-        <span class="k">elif</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;U-D&quot;</span><span class="p">:</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="n">_init_upper_down_viz_layout</span><span class="p">(</span><span class="n">plot_outputs</span><span class="p">,</span> <span class="n">plot_dropdowns</span><span class="p">,</span>
-                                               <span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_options</span><span class="p">,</span>
-                                               <span class="n">previous_plot_outputs_values</span><span class="p">,</span>
-                                               <span class="n">analysis_config</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span>
-                                               <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">)</span>
-
-        <span class="n">viz_grid</span><span class="p">[</span><span class="n">layout_option</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid</span>
-        <span class="n">display</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+        <span class="n">viz_grid</span><span class="p">[</span><span class="n">layout_option</span><span class="p">]</span> <span class="o">=</span> <span class="n">_init_viz_layout</span><span class="p">(</span>
+            <span class="n">simulation_data</span><span class="p">,</span>
+            <span class="n">plot_options</span><span class="p">,</span>
+            <span class="n">previous_plot_types</span><span class="p">,</span>
+            <span class="n">analysis_config</span><span class="p">,</span>
+            <span class="n">style</span><span class="p">,</span>
+            <span class="n">layout_option</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">viz_grid</span><span class="p">[</span><span class="n">layout_option</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="HNNGUI"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI">[docs]</a><span class="k">class</span> <span class="nc">HNNGUI</span><span class="p">:</span>
@@ -522,11 +461,11 @@
 <span class="sd">        Clickable widget that receives uploaded parameter files.</span>
 <span class="sd">    delete_drive_button: Widget</span>
 <span class="sd">        Clickable widget that clear all existing network drives.</span>
-<span class="sd">    plot_outputs_list: list</span>
+<span class="sd">    plot_outputs_dict: list</span>
 <span class="sd">        A list of visualization panel outputs.</span>
-<span class="sd">    plot_dropdowns_list: list</span>
+<span class="sd">    plot_dropdown_types_dict: list</span>
 <span class="sd">        A list of dropdown menus that control the plot types in</span>
-<span class="sd">        plot_outputs_list.</span>
+<span class="sd">        plot_outputs_dict.</span>
 <span class="sd">    drive_widgets: list</span>
 <span class="sd">        A list of network drive widgets added by add_drive_button.</span>
 <span class="sd">    drive_boxes: list</span>
@@ -567,6 +506,7 @@
             <span class="s2">&quot;drive_textbox&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;270px&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
             <span class="s2">&quot;simulation_status_common&quot;</span><span class="p">:</span> <span class="s2">&quot;background:gray;padding-left:10px&quot;</span><span class="p">,</span>
             <span class="s2">&quot;simulation_status_running&quot;</span><span class="p">:</span> <span class="s2">&quot;background:orange;padding-left:10px&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;simulation_status_failed&quot;</span><span class="p">:</span> <span class="s2">&quot;background:red;padding-left:10px&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span> <span class="o">=</span> <span class="p">{</span>
@@ -579,13 +519,13 @@
             <span class="s2">&quot;finished&quot;</span><span class="p">:</span>
             <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div style=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;simulation_status_common&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">            color:white;&#39;&gt;Simulation finished&lt;/div&gt;&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;failed&quot;</span><span class="p">:</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div style=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;simulation_status_failed&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">            color:white;&#39;&gt;Simulation failed&lt;/div&gt;&quot;&quot;&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="c1"># load default parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">()</span>
-
-        <span class="c1"># In-memory storage of all simulation related simulation_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">())</span>
 
         <span class="c1"># Simulation parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;tstop (ms):&#39;</span><span class="p">,</span>
@@ -594,6 +534,10 @@
                                    <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span> <span class="o">=</span> <span class="n">IntText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Trials:&#39;</span><span class="p">,</span>
                                       <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                                           <span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;your simulation name&#39;</span><span class="p">,</span>
+                                           <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Name:&#39;</span><span class="p">,</span>
+                                           <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># select backends</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;Joblib&#39;</span><span class="p">,</span> <span class="s1">&#39;Joblib&#39;</span><span class="p">),</span>
@@ -670,9 +614,10 @@
             <span class="s1">&#39;Delete drives&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;button&#39;</span><span class="p">],</span>
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
 
-        <span class="c1"># Visualization figure list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">plot_outputs_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">plot_dropdowns_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># Visualization figure related dicts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_outputs_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_dropdown_types_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_sim_selections_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="c1"># Add drive section</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -680,6 +625,9 @@
 
         <span class="c1"># Connectivity list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="c1"># In-memory storage of all simulation related simulation_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">()))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_ui_components</span><span class="p">()</span>
 
@@ -744,8 +692,10 @@
             <span class="c1"># widgets</span>
             <span class="s2">&quot;viz_grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_grid</span><span class="p">,</span>
             <span class="s2">&quot;viz_window&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visualization_window</span><span class="p">,</span>
-            <span class="s2">&quot;plot_outputs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_outputs_list</span><span class="p">,</span>
-            <span class="s2">&quot;plot_dropdowns&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_dropdowns_list</span><span class="p">,</span>
+            <span class="s2">&quot;plot_outputs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_outputs_dict</span><span class="p">,</span>
+            <span class="s2">&quot;plot_dropdowns&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_dropdown_types_dict</span><span class="p">,</span>
+            <span class="s2">&quot;plot_sim_selections&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_sim_selections_dict</span><span class="p">,</span>
+            <span class="s2">&quot;current_sim_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="p">}</span>
 
 <div class="viewcode-block" id="HNNGUI.load_parameters"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.load_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -785,19 +735,18 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;received new uploaded params file...&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">on_upload_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span><span class="p">,</span>
-                                    <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">])</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">])</span>
 
         <span class="k">def</span> <span class="nf">_run_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">run_button_clicked</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_handle_viz_layout_change</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
@@ -835,10 +784,10 @@
 <span class="sd">            If the method returns the layout object which can be rendered by</span>
 <span class="sd">            IPython.display.display() method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">simulation_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span>
         <span class="p">])</span>
 
         <span class="c1"># accordians to group local-connectivity by cell type</span>
@@ -892,16 +841,16 @@
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_link_callbacks</span><span class="p">()</span>
-
+        <span class="c1"># init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="c1"># initialize visualization</span>
         <span class="n">_initialize_viz_window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span><span class="p">,</span>
                                <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># initialize drive and connectivity ipywidgets</span>
-        <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
+        <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
@@ -1413,15 +1362,10 @@
             <span class="n">display</span><span class="p">(</span><span class="n">accordion</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_debug_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">_plot_out</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">,</span>
-                              <span class="n">analysis_config</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-    <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">_plot_out</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">add_connectivity_tab</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">add_connectivity_tab</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
                          <span class="n">connectivity_sliders</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add all possible connectivity boxes to connectivity tab.&quot;&quot;&quot;</span>
-    <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">ct</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">ct</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
     <span class="n">receptors</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab&#39;</span><span class="p">)</span>
     <span class="n">locations</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;soma&#39;</span><span class="p">)</span>
 
@@ -1437,7 +1381,7 @@
                 <span class="c1"># the connectivity list should be built on this level</span>
                 <span class="n">receptor_related_conn</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="n">receptors</span><span class="p">:</span>
-                    <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span>
+                    <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="n">net</span><span class="p">,</span>
                                                    <span class="n">src_gids</span><span class="o">=</span><span class="n">src_gids</span><span class="p">,</span>
                                                    <span class="n">target_gids</span><span class="o">=</span><span class="n">target_gids</span><span class="p">,</span>
                                                    <span class="n">loc</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
@@ -1445,9 +1389,9 @@
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conn_indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">conn_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
                         <span class="n">conn_idx</span> <span class="o">=</span> <span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                        <span class="n">current_w</span> <span class="o">=</span> <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
+                        <span class="n">current_w</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
                             <span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;A_weight&#39;</span><span class="p">]</span>
-                        <span class="n">current_p</span> <span class="o">=</span> <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
+                        <span class="n">current_p</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
                             <span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;probability&#39;</span><span class="p">]</span>
                         <span class="c1"># valid connection</span>
                         <span class="n">receptor_related_conn</span><span class="p">[</span><span class="n">receptor</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -1474,25 +1418,24 @@
         <span class="n">display</span><span class="p">(</span><span class="n">cell_connectivity</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">load_drive_and_connectivity</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">load_drive_and_connectivity</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
                                 <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
                                 <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">load_info</span><span class="p">,</span>
                                 <span class="n">layout</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add drive and connectivity ipywidgets from params.&quot;&quot;&quot;</span>
     <span class="n">load_info</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="c1"># init the network.</span>
-    <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">tmp_net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
     <span class="c1"># Add connectivity</span>
-    <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                         <span class="n">connectivity_sliders</span><span class="p">)</span>
+    <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">tmp_net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">)</span>
 
     <span class="c1"># Add drives</span>
     <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="n">drive_specs</span> <span class="o">=</span> <span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_params</span><span class="p">,</span>
-            <span class="nb">list</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="n">tmp_net</span><span class="o">.</span><span class="n">_params</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">tmp_net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
         <span class="c1"># clear before adding drives</span>
         <span class="n">drives_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
@@ -1524,8 +1467,8 @@
             <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">on_upload_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">simulation_data</span><span class="p">,</span>
-                     <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">on_upload_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
+                     <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
                      <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">load_info</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span>
@@ -1560,20 +1503,20 @@
 
         <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params_network</span><span class="p">)</span>
     <span class="c1"># init network, add drives &amp; connectivity</span>
-    <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
+    <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
                                 <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
                                 <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">load_info</span><span class="p">,</span>
                                 <span class="n">layout</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">simulation_data</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">single_simulation_data</span><span class="p">,</span>
                                <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">,</span>
                                <span class="n">add_drive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Construct network and add drives.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init network&quot;</span><span class="p">)</span>
     <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">value</span>
     <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tstop</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span>
+    <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span>
         <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1581,7 +1524,7 @@
     <span class="k">for</span> <span class="n">connectivity_slider</span> <span class="ow">in</span> <span class="n">connectivity_sliders</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">vbox</span> <span class="ow">in</span> <span class="n">connectivity_slider</span><span class="p">:</span>
             <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span>
-                <span class="n">net</span><span class="o">=</span><span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span>
+                <span class="n">net</span><span class="o">=</span><span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span>
                 <span class="n">src_gids</span><span class="o">=</span><span class="n">vbox</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;src_gids&#39;</span><span class="p">],</span>
                 <span class="n">target_gids</span><span class="o">=</span><span class="n">vbox</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;target_gids&#39;</span><span class="p">],</span>
                 <span class="n">loc</span><span class="o">=</span><span class="n">vbox</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
@@ -1590,9 +1533,9 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conn_indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">conn_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
                 <span class="n">conn_idx</span> <span class="o">=</span> <span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span>
-                    <span class="s1">&#39;A_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-                <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span>
+                <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span>
+                    <span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;A_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span>
                     <span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
     <span class="k">if</span> <span class="n">add_drive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -1624,7 +1567,7 @@
                 <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">weights_nmda</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rate_constant</span>
             <span class="p">}</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_poisson_drive</span><span class="p">(</span>
+            <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_poisson_drive</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
                 <span class="n">tstart</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">tstop</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -1636,7 +1579,7 @@
                 <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
                 <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">):</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+            <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
                 <span class="n">mu</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">sigma</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -1648,7 +1591,7 @@
                 <span class="n">space_constant</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
                 <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Bursty&#39;</span><span class="p">):</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_bursty_drive</span><span class="p">(</span>
+            <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_bursty_drive</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
                 <span class="n">tstart</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">tstart_std</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart_std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -1662,16 +1605,31 @@
                 <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">simulation_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
-                       <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span>
-                       <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
+                       <span class="n">simulation_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
+                       <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
                        <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">,</span>
                        <span class="n">analysis_config</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
     <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-        <span class="n">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">simulation_data</span><span class="p">,</span>
-                                   <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">)</span>
+        <span class="c1"># clear empty trash simulations</span>
+        <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">][</span><span class="s1">&#39;net&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">][</span><span class="s1">&#39;dpls&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_name</span><span class="p">]</span>
+
+        <span class="n">_sim_name</span> <span class="o">=</span> <span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s1">&#39;net&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulation with the same name exists!&quot;</span><span class="p">)</span>
+            <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span>
+                <span class="s1">&#39;failed&#39;</span><span class="p">]</span>
+            <span class="k">return</span>
+
+        <span class="n">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
+                                   <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">],</span> <span class="n">drive_widgets</span><span class="p">,</span>
+                                   <span class="n">connectivity_sliders</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start simulation&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
@@ -1682,10 +1640,11 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using Joblib with </span><span class="si">{</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> core(s).&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">backend</span><span class="p">:</span>
             <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span><span class="s1">&#39;running&#39;</span><span class="p">]</span>
-            <span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;dpls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span>
-                                                      <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                                                      <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                                                      <span class="n">n_trials</span><span class="o">=</span><span class="n">ntrials</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s1">&#39;dpls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span>
+                <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">][</span><span class="s1">&#39;net&#39;</span><span class="p">],</span>
+                <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">n_trials</span><span class="o">=</span><span class="n">ntrials</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
             <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span>
                 <span class="s1">&#39;finished&#39;</span><span class="p">]</span>
