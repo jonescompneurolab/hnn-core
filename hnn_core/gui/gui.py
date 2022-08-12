@@ -3,269 +3,46 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Huzi Cheng <hzcheng15@icloud.com>
 import codecs
-import copy
 import io
 import logging
 import multiprocessing
-import os.path as op
 import sys
 import urllib.parse
 import urllib.request
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 
-import hnn_core
-import matplotlib.pyplot as plt
-import numpy as np
-from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
-                      simulate_dipole)
-from hnn_core.network import pick_connection
-from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params)
-from hnn_core.viz import plot_dipole
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatLogSlider, FloatText, GridspecLayout, HBox,
-                        IntText, Layout, Output, RadioButtons, Tab, Text, VBox,
-                        link)
+                        FloatLogSlider, FloatText, HBox, IntText, Layout,
+                        Output, RadioButtons, Tab, Text, VBox, link)
 from ipywidgets.embed import embed_minimal_html
 
-
-_spectrogram_color_maps = [
-    "viridis",
-    "plasma",
-    "inferno",
-    "magma",
-    "cividis",
-]
-
-_plot_options = {
-    'Horizontal': 'L-R',
-    'Vertical': 'U-D',
-}
+import hnn_core
+from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
+                      simulate_dipole)
+from hnn_core.gui._logging import logger
+from hnn_core.gui._viz_manager import _VizManager
+from hnn_core.network import pick_connection
+from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
+                             _read_legacy_params)
 
 
-def _update_plot_window(simulation_data, analysis_config, plot_key):
-    """Refresh plots with data from simulation_data.
+class _OutputWidgetHandler(logging.Handler):
+    def __init__(self, output_widget, *args, **kwargs):
+        super(_OutputWidgetHandler, self).__init__(*args, **kwargs)
+        self.out = output_widget
 
-    Parameters
-    ----------
-    simulation_data: dict
-        A dict of simulation data
-    analysis_config: dict
-        A dict of visualization configs
-    plot_key: str
-        A string used to identify the plot and data to update.
-    """
-    # Make sure that visualization does not change the original data
-    _plot_out = analysis_config['plot_outputs'][plot_key]
-    plot_type = analysis_config['plot_dropdowns'][plot_key].value
-    sim_name = analysis_config['plot_sim_selections'][plot_key].value
-
-    dpls_copied = copy.deepcopy(simulation_data[sim_name]['dpls'])
-    net_copied = copy.deepcopy(simulation_data[sim_name]['net'])
-    for dpl in dpls_copied:
-        dpl.smooth(analysis_config['dipole_smooth']).scale(
-            analysis_config['dipole_scaling'])
-
-    _plot_out.clear_output()
-
-    with _plot_out:
-        if net_copied is None:
-            print("No network data")
-            return
-
-        if plot_type == 'spikes':
-            if net_copied.cell_response:
-                fig, ax = plt.subplots()
-                net_copied.cell_response.plot_spikes_raster(ax=ax)
-            else:
-                print("No cell response data")
-
-        elif plot_type == 'current dipole':
-            if len(dpls_copied) > 0:
-                fig, ax = plt.subplots()
-                plot_dipole(dpls_copied, ax=ax, average=True)
-            else:
-                print("No dipole data")
-
-        elif plot_type == 'layer-specific dipole':
-            if len(dpls_copied) > 0:
-                layers = ["L2", "L5", "agg"]
-                fig, axes = plt.subplots(len(layers), 1, sharex=True)
-                plot_dipole(dpls_copied, ax=axes,
-                            layer=layers, average=True)
-            else:
-                print("No dipole data")
-
-        elif plot_type == 'input histogram':
-            # BUG: got error here, need a better way to handle exception
-            if net_copied.cell_response:
-                fig, ax = plt.subplots()
-                net_copied.cell_response.plot_spikes_hist(ax=ax)
-            else:
-                print("No cell response data")
-
-        elif plot_type == 'PSD':
-            if len(dpls_copied) > 0:
-                fig, ax = plt.subplots()
-                dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax)
-            else:
-                print("No dipole data")
-
-        elif plot_type == 'spectogram':
-            if len(dpls_copied) > 0:
-                min_f = 10.0
-                max_f = analysis_config['max_spectral_frequency']
-                step_f = 1.0
-                freqs = np.arange(min_f, max_f, step_f)
-                n_cycles = freqs / 8.
-                fig, ax = plt.subplots()
-                dpls_copied[0].plot_tfr_morlet(
-                    freqs,
-                    n_cycles=n_cycles,
-                    colormap=analysis_config['spectrogram_cm'],
-                    ax=ax)
-            else:
-                print("No dipole data")
-        elif plot_type == 'network':
-            if net_copied:
-                fig = plt.figure()
-                ax = fig.add_subplot(111, projection='3d')
-                net_copied.plot_cells(ax=ax)
-            else:
-                print("No network data")
-
-
-def _gen_plot_callback(simulation_data, analysis_config, plot_key):
-    def callback(_):
-        _update_plot_window(simulation_data, analysis_config, plot_key)
-    return callback
-
-
-def _init_viz_layout(simulation_data, plot_options, previous_plot_types,
-                     analysis_config, style, layout_option, init=False):
-    plot_outputs = analysis_config['plot_outputs']
-    plot_dropdowns = analysis_config['plot_dropdowns']
-    plot_sim_selections = analysis_config['plot_sim_selections']
-
-    sim_names = list(simulation_data.keys())
-    assert analysis_config['current_sim_name'] in sim_names
-
-    if layout_option == "L-R":
-        # TODO fine tune the style so that there's no more overflow.
-        grid_style = Layout(width=f"{int(style.width[:-2])/2-10}px",
-                            # height=style.height,
-                            height=f"{int(style.height[:-2])-80}px",
-                            border=style.border)
-        grid = GridspecLayout(1, 2, height=style.height)
-        plot_keys = ["Left", "Right"]
-
-    elif layout_option == "U-D":
-        grid_style = Layout(width=f"{int(style.width[:-2])/2-10}px",
-                            height=f"{float(style.height[:-2])/2-10}px",
-                            border=style.border,)
-        grid = GridspecLayout(2, 1, height=style.height)
-        plot_keys = ["Up", "Down"]
-
-    for idx, plot_key in enumerate(plot_keys):
-        plot_outputs[plot_key] = Output(layout=grid_style)
-
-        plot_dropdowns[plot_key] = Dropdown(
-            options=plot_options,
-            value=previous_plot_types[plot_key]
-            if plot_key in previous_plot_types else plot_options[idx],
-            description='Plot:',
-            disabled=False,
-            layout=Layout()
-        )
-        plot_dropdowns[plot_key].observe(
-            _gen_plot_callback(simulation_data, analysis_config, plot_key),
-            'value',
-        )
-
-        plot_sim_selections[plot_key] = Dropdown(
-            options=sim_names,
-            value=analysis_config['current_sim_name'],
-            description='Name:',
-            disabled=False,
-        )
-        plot_sim_selections[plot_key].observe(
-            _gen_plot_callback(simulation_data, analysis_config, plot_key),
-            'value',
-        )
-
-        if layout_option == "L-R":
-            indices = (0, idx)
-            box_directed = VBox
-        elif layout_option == "U-D":
-            indices = (idx, 0)
-            box_directed = HBox
-
-        grid[indices[0], indices[1]] = box_directed([
-            VBox([
-                plot_sim_selections[plot_keys[idx]],
-                plot_dropdowns[plot_keys[idx]]
-            ]),
-            plot_outputs[plot_keys[idx]],
-        ])
-
-        if not init:
-            _update_plot_window(simulation_data, analysis_config, plot_key)
-
-    return grid
-
-
-def _change_plot_type(grid, layout, plot_idx, plot_type):
-    assert layout in _plot_options.values(), ValueError("Illegal layout type")
-    if layout == "L-R":
-        assert 0 <= plot_idx < 2
-        grid[layout].children[plot_idx].children[0].value = plot_type
-        pass
-    elif layout == "U-D":
-        assert 0 <= plot_idx < 2
-        grid[layout].children[plot_idx].children[0].value = plot_type
-    else:
-        pass
-
-
-def _initialize_viz_window(simulation_data, analysis_config, init=False):
-    viz_grid = analysis_config['viz_grid']
-    viz_window = analysis_config['viz_window']
-    plot_outputs = analysis_config['plot_outputs']
-    plot_dropdowns = analysis_config['plot_dropdowns']
-    style = analysis_config['style']
-    layout_option = analysis_config['layout']
-
-    plot_options = [
-        'current dipole',
-        'layer-specific dipole',
-        'input histogram',
-        'spikes',
-        'PSD',
-        'spectogram',
-        'network',
-    ]
-    viz_window.clear_output()
-    previous_plot_types = {}
-
-    plot_keys = copy.deepcopy(list(plot_outputs.keys()))
-    for plot_key in plot_keys:
-        previous_plot_types[plot_key] = plot_dropdowns[plot_key].value
-        del plot_outputs[plot_key]
-        del plot_dropdowns[plot_key]
-
-    with viz_window:
-        viz_grid[layout_option] = _init_viz_layout(
-            simulation_data,
-            plot_options,
-            previous_plot_types,
-            analysis_config,
-            style,
-            layout_option,
-            init=init)
-        display(viz_grid[layout_option])
+    def emit(self, record):
+        formatted_record = self.format(record)
+        new_output = {
+            'name': 'stdout',
+            'output_type': 'stream',
+            'text': formatted_record + '\n'
+        }
+        self.out.outputs = (new_output, ) + self.out.outputs
 
 
 class HNNGUI:
@@ -275,19 +52,19 @@ class HNNGUI:
     ----------
     theme_color : str
         The theme color of the whole dashboard.
-    log_window_height: str
+    log_window_height : str
         The height of the log output window (in pixel).
-    visualization_window_width: str
+    visualization_window_width : str
         The width of the visualization window (in pixel).
-    visualization_window_height: str
+    visualization_window_height : str
         The height of the visualization window (in pixel).
-    left_sidebar_width: str
+    left_sidebar_width : str
         The width of the left side bar (in pixel).
-    drive_widget_width: str
+    drive_widget_width : str
         The width of network drive tab  (in pixel).
-    header_height: str
+    header_height : str
         The height of GUI titlebar  (in pixel).
-    button_height: str
+    button_height : str
         The height of buttons  (in pixel).
 
     Attributes
@@ -340,38 +117,63 @@ class HNNGUI:
         in the network.
     """
 
-    def __init__(self, theme_color="#8A2BE2", log_window_height="100px",
-                 visualization_window_width="1000px",
-                 visualization_window_height="500px",
-                 left_sidebar_width='380px',
-                 drive_widget_width="200px",
-                 header_height="50px",
-                 button_height="30px",
+    def __init__(self, theme_color="#8A2BE2",
+                 total_height=800,
+                 total_width=1300,
+                 header_height=50,
+                 button_height=30,
+                 operation_box_height=60,
+                 drive_widget_width=200,
+                 left_sidebar_width=500,
+                 log_window_height=150,
+                 status_height=30,
                  ):
         # set up styling.
+        self.total_height = total_height
+        self.total_width = total_width
 
-        self._total_height = int(header_height[:-2]) + int(
-            visualization_window_height[:-2]) + int(button_height[:-2]) + int(
-                log_window_height[:-2]) + 20
-        self._total_width = int(left_sidebar_width[:-2]) + int(
-            visualization_window_width[:-2])
+        viz_win_width = self.total_width - left_sidebar_width
+        main_content_height = self.total_height - status_height
+
+        config_box_height = main_content_height - (log_window_height +
+                                                   operation_box_height)
         self.layout = {
-            "header_height": header_height,
+            "header_height": f"{header_height}px",
             "theme_color": theme_color,
-            "button": Layout(height=button_height, width='auto'),
+            "btn": Layout(height=f"{button_height}px", width='auto'),
+            "del_fig_btn": Layout(height=f"{button_height}px", width='auto'),
             "log_out": Layout(border='1px solid gray',
-                              width=f"{self._total_width}px",
-                              height=log_window_height,
+                              height=f"{log_window_height-10}px",
                               overflow='auto'),
-            "visualization_window": Layout(width=visualization_window_width,
-                                           height=visualization_window_height,
-                                           border='1px solid gray'),
-            "left_sidebar": Layout(width=left_sidebar_width),
-            "drive_widget": Layout(width=drive_widget_width),
+            "viz_config": Layout(width='99%'),
+            "visualization_window": Layout(
+                width=f"{viz_win_width-10}px",
+                height=f"{main_content_height-10}px",
+                border='1px solid gray',
+                overflow='scroll'),
+            "visualization_output": Layout(
+                width=f"{viz_win_width-50}px",
+                height=f"{main_content_height-100}px",
+                border='1px solid gray',
+                overflow='scroll'),
+            "left_sidebar": Layout(width=f"{left_sidebar_width}px",
+                                   height=f"{main_content_height}px"),
+            "left_tab": Layout(width=f"{left_sidebar_width}px",
+                               height=f"{config_box_height}px"),
+            "operation_box": Layout(width=f"{left_sidebar_width}px",
+                                    height=f"{operation_box_height}px",
+                                    flex_wrap="wrap",
+                                    ),
+            "config_box": Layout(width=f"{left_sidebar_width}px",
+                                 height=f"{config_box_height-100}px"),
+            "drive_widget": Layout(width=f"{drive_widget_width}px"),
             "drive_textbox": Layout(width='270px', height='auto'),
+            # simulation status related
+            "simulation_status_height": f"{status_height}px",
             "simulation_status_common": "background:gray;padding-left:10px",
             "simulation_status_running": "background:orange;padding-left:10px",
             "simulation_status_failed": "background:red;padding-left:10px",
+            "simulation_status_finished": "background:green;padding-left:10px",
         }
 
         self._simulation_status_contents = {
@@ -382,7 +184,7 @@ class HNNGUI:
             f"""<div style='{self.layout['simulation_status_running']};
             color:white;'>Running...</div>""",
             "finished":
-            f"""<div style='{self.layout['simulation_status_common']};
+            f"""<div style='{self.layout['simulation_status_finished']};
             color:white;'>Simulation finished</div>""",
             "failed":
             f"""<div style='{self.layout['simulation_status_failed']};
@@ -391,6 +193,9 @@ class HNNGUI:
 
         # load default parameters
         self.params = self.load_parameters()
+
+        # In-memory storage of all simulation and visualization related data
+        self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
         # Simulation parameters
         self.widget_tstop = FloatText(value=170, description='tstop (ms):',
@@ -403,81 +208,51 @@ class HNNGUI:
                                            placeholder='your simulation name',
                                            description='Name:',
                                            disabled=False)
-
-        # select backends
         self.widget_backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
                                                           ('MPI', 'MPI')],
                                                  value='Joblib',
                                                  description='Backend:')
-
-        analysis_style = {'description_width': '200px'}
-        self.widget_max_spectral_frequency = FloatText(
-            value=100.0, description='Max Spectral Frequency (Hz):',
-            disabled=False, style=analysis_style)
-        self.widget_dipole_scaling = FloatText(value=3000.0,
-                                               description='Dipole Scaling:',
-                                               disabled=False,
-                                               style=analysis_style)
-        self.widget_dipole_smooth = FloatText(
-            value=30.0,
-            description='Dipole Smooth Window (ms):',
-            disabled=False, style=analysis_style)
-
-        self.widget_spectrogram_cm = Dropdown(
-            description='Spectrogram Colormap:',
-            options=[(cm, cm) for cm in _spectrogram_color_maps],
-            value=_spectrogram_color_maps[0], style=analysis_style)
-
-        # visualization layout
-        self.widget_viz_layout_selection = Dropdown(
-            options=[(k, _plot_options[k]) for k in _plot_options],
-            value=list(_plot_options.values())[0],
-            description='Layout:')
-
         self.widget_mpi_cmd = Text(value='mpiexec',
                                    placeholder='Fill if applies',
                                    description='MPI cmd:', disabled=False)
-
         self.widget_n_jobs = BoundedIntText(value=1, min=1,
                                             max=multiprocessing.cpu_count(),
                                             description='Cores:',
                                             disabled=False)
 
+        # Drive selection
         self.widget_drive_type_selection = RadioButtons(
             options=['Evoked', 'Poisson', 'Rhythmic'],
             value='Evoked',
             description='Drive:',
             disabled=False,
             layout=self.layout['drive_widget'])
-
         self.widget_location_selection = RadioButtons(
             options=['proximal', 'distal'], value='proximal',
             description='Location', disabled=False,
             layout=self.layout['drive_widget'])
-
         self.add_drive_button = create_expanded_button(
-            'Add drive', 'primary', layout=self.layout['button'],
+            'Add drive', 'primary', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
 
-        # Run, delete drives and load button
+        # Dashboard level buttons
         self.run_button = create_expanded_button(
-            'Run', 'success', layout=self.layout['button'],
+            'Run', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
-
         self.load_button = FileUpload(
             accept='.json,.param', multiple=False,
             style={'button_color': self.layout['theme_color']},
-            description='Load network', layout=self.layout['button'],
+            description='Load network', layout=self.layout['btn'],
             button_style='success')
-
         self.clear_button = create_expanded_button(
             'Clear uploaded parameters', 'danger',
-            layout=self.layout['button'],
+            layout=self.layout['btn'],
+            button_color=self.layout['theme_color'])
+        self.delete_drive_button = create_expanded_button(
+            'Delete drives', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
 
-        self.delete_drive_button = create_expanded_button(
-            'Delete drives', 'success', layout=self.layout['button'],
-            button_color=self.layout['theme_color'])
+        # Plotting window
 
         # Visualization figure related dicts
         self.plot_outputs_dict = dict()
@@ -491,10 +266,15 @@ class HNNGUI:
         # Connectivity list
         self.connectivity_widgets = list()
 
-        # In-memory storage of all simulation related simulation_data
-        self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
-
         self._init_ui_components()
+        self.add_logging_window_logger()
+
+    def add_logging_window_logger(self):
+        handler = _OutputWidgetHandler(self._log_out)
+        handler.setFormatter(
+            logging.Formatter('%(asctime)s  - [%(levelname)s] %(message)s'))
+        logger.addHandler(handler)
+        logger.setLevel(logging.DEBUG)
 
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows.
@@ -509,9 +289,13 @@ class HNNGUI:
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
         self._log_out = Output()
+
+        self.viz_manager = _VizManager(self.data, self.layout)
+
         # visualization window
         self._visualization_window = Output(
-            layout=self.layout['visualization_window'])
+            layout=self.layout['visualization_output'])
+
         # detailed configuration of backends
         self._backend_config_out = Output()
 
@@ -520,42 +304,24 @@ class HNNGUI:
         self._simulation_status_bar = HTML(
             value=self._simulation_status_contents['not_running'])
 
-        # footer
-        self._footer = VBox([
-            HBox([
-                HBox([
-                    self.run_button, self.load_button, self.clear_button,
-                    self.delete_drive_button
-                ]),
-                self.widget_viz_layout_selection,
-            ]),
-            HBox([self._log_out], layout=self.layout['log_out']),
-            self._simulation_status_bar
-        ])
+        self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
+        self._operation_buttons = HBox([self.run_button,
+                                        self.load_button,
+                                        self.clear_button,
+                                        self.delete_drive_button],
+                                       layout=self.layout['operation_box'])
         # title
         self._header = HTML(value=f"""<div
             style='background:{self.layout['theme_color']};
             text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
-        # visualiation components
-        self._viz_grid = {
-            "L-R": None,
-            "U-D": None,
-        }
-
     @property
     def analysis_config(self):
         """Provides everything viz window needs except for the data."""
         return {
-            "style": self.layout['visualization_window'],
-            "layout": self.widget_viz_layout_selection.value,
-            "max_spectral_frequency": self.widget_max_spectral_frequency.value,
-            "dipole_scaling": self.widget_dipole_scaling.value,
-            "dipole_smooth": self.widget_dipole_smooth.value,
-            "spectrogram_cm": self.widget_spectrogram_cm.value,
+            "viz_style": self.layout['visualization_output'],
             # widgets
-            "viz_grid": self._viz_grid,
             "viz_window": self._visualization_window,
             "plot_outputs": self.plot_outputs_dict,
             "plot_dropdowns": self.plot_dropdown_types_dict,
@@ -563,13 +329,18 @@ class HNNGUI:
             "current_sim_name": self.widget_simulation_name.value,
         }
 
-    def load_parameters(self, params_fname=None):
+    @property
+    def data(self):
+        """Provides all GUI relate data."""
+        return {"simulation_data": self.simulation_data}
+
+    @staticmethod
+    def load_parameters(params_fname=None):
         """Read parameters from file."""
         if not params_fname:
             # by default load default.json
-            hnn_core_root = op.join(op.dirname(hnn_core.__file__))
-            params_fname = op.join(hnn_core_root, 'param', 'default.json')
-
+            hnn_core_root = Path(hnn_core.__file__).parent
+            params_fname = hnn_core_root / 'param/default.json'
         return read_params(params_fname)
 
     def _link_callbacks(self):
@@ -608,15 +379,11 @@ class HNNGUI:
         def _run_button_clicked(b):
             return run_button_clicked(
                 self.widget_simulation_name, self._log_out, self.drive_widgets,
-                self.simulation_data, self.widget_dt, self.widget_tstop,
+                self.data, self.widget_dt, self.widget_tstop,
                 self.widget_ntrials, self.widget_backend_selection,
                 self.widget_mpi_cmd, self.widget_n_jobs, self.params,
                 self._simulation_status_bar, self._simulation_status_contents,
-                self.connectivity_widgets, self.analysis_config, b)
-
-        def _handle_viz_layout_change(_):
-            return _initialize_viz_window(self.simulation_data,
-                                          self.analysis_config)
+                self.connectivity_widgets, self.viz_manager)
 
         def _clear_params(b):
             self._load_info["count"] = 0
@@ -629,17 +396,6 @@ class HNNGUI:
         self.run_button.on_click(_run_button_clicked)
         self.clear_button.on_click(_clear_params)
 
-        # widgets whose changes should trigger viz changes.
-        _vis_related_widgets = [
-            self.widget_viz_layout_selection,
-            self.widget_max_spectral_frequency,
-            self.widget_dipole_scaling,
-            self.widget_dipole_smooth,
-            self.widget_spectrogram_cm,
-        ]
-        for _widget in _vis_related_widgets:
-            _widget.observe(_handle_viz_layout_change, 'value')
-
     def compose(self, return_layout=True):
         """Compose widgets.
 
@@ -650,10 +406,12 @@ class HNNGUI:
             IPython.display.display() method.
         """
         simulation_box = VBox([
-            self.widget_simulation_name, self.widget_tstop, self.widget_dt,
-            self.widget_ntrials, self.widget_backend_selection,
-            self._backend_config_out
-        ])
+            VBox([
+                self.widget_simulation_name, self.widget_tstop, self.widget_dt,
+                self.widget_ntrials, self.widget_backend_selection,
+                self._backend_config_out
+            ]),
+        ], layout=self.layout['config_box'])
 
         # accordians to group local-connectivity by cell type
         connectivity_boxes = [
@@ -671,42 +429,39 @@ class HNNGUI:
         # from IPywidgets > 8.0
         drives_options = VBox([drive_selections, self._drives_out])
 
-        analysis_options = VBox([
-            self.widget_max_spectral_frequency,
-            self.widget_dipole_scaling,
-            self.widget_dipole_smooth,
-            self.widget_spectrogram_cm,
-        ])
+        config_panel, figs_output = self.viz_manager.compose()
 
         # Tabs for left pane
         titles = ('Simulation', 'Cell connectivity', 'Drives', 'Analysis')
         left_tab = Tab(titles=titles)
         left_tab.children = [
             simulation_box, self._connectivity_out, drives_options,
-            analysis_options,
+            config_panel,
         ]
 
         self.app_layout = AppLayout(
             header=self._header,
-            left_sidebar=left_tab,
-            right_sidebar=self._visualization_window,
-            footer=self._footer,
+            left_sidebar=VBox([
+                VBox([left_tab], layout=self.layout['left_tab']),
+                self._operation_buttons,
+                self._log_window,
+            ], layout=self.layout['left_sidebar']),
+            right_sidebar=figs_output,
+            footer=self._simulation_status_bar,
             pane_widths=[
                 self.layout['left_sidebar'].width, '0px',
                 self.layout['visualization_window'].width
             ],
             pane_heights=[
                 self.layout['header_height'],
-                self.layout['visualization_window'].height, "1"
+                self.layout['visualization_window'].height,
+                self.layout['simulation_status_height']
             ],
         )
 
         self._link_callbacks()
-        # init
-        self.simulation_data[self.widget_simulation_name.value]
-        # initialize visualization
-        _initialize_viz_window(self.simulation_data, self.analysis_config,
-                               init=True)
+
+        # self.simulation_data[self.widget_simulation_name.value]
 
         # initialize drive and connectivity ipywidgets
         load_drive_and_connectivity(self.params, self._log_out,
@@ -743,9 +498,9 @@ class HNNGUI:
         file = io.StringIO()
         embed_minimal_html(file, views=[self.app_layout], title='')
         if not width:
-            width = self._total_width + 20
+            width = self.total_width + 20
         if not height:
-            height = self._total_height + 20
+            height = self.total_height + 20
 
         content = urllib.parse.quote(file.getvalue().encode('utf8'))
         data_url = f"data:text/html,{content}"
@@ -838,18 +593,14 @@ class HNNGUI:
 
     def _simulate_left_tab_click(self, tab_title):
         tab_index = None
-        for idx, tab_title in enumerate(self.app_layout.left_sidebar.titles):
-            if tab_title == self.app_layout.left_sidebar.titles[idx]:
+        left_tab = self.app_layout.left_sidebar.children[0].children[0]
+        for idx in left_tab._titles.keys():
+            if tab_title == left_tab._titles[idx]:
                 tab_index = int(idx)
                 break
         if tab_index is None:
             raise ValueError("Incorrect tab title")
-        self.app_layout.left_sidebar.selected_index = tab_index
-
-    def _simulate_switch_plot_type(self, plot_idx, plot_type):
-        _change_plot_type(self._viz_grid,
-                          self.widget_viz_layout_selection.value, plot_idx,
-                          plot_type)
+        left_tab.selected_index = tab_index
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
@@ -1346,7 +1097,7 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
     else:
         load_info['prev_param_data'] = param_data
 
-    ext = op.splitext(params_fname)[1]
+    ext = Path(params_fname).suffix
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
     params_network = read_func[ext](param_data)
 
@@ -1463,13 +1214,13 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
-                       simulation_data, dt, tstop, ntrials, backend_selection,
+                       all_data, dt, tstop, ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_sliders,
-                       analysis_config, b):
+                       viz_manager):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
-
+    simulation_data = all_data["simulation_data"]
     with log_out:
         # clear empty trash simulations
         for _name in tuple(simulation_data.keys()):
@@ -1506,8 +1257,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
             simulation_status_bar.value = simulation_status_contents[
                 'finished']
 
-    # Update all plotting panels
-    _initialize_viz_window(simulation_data, analysis_config)
+    viz_manager.add_figure()
 
 
 def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
@@ -1526,5 +1276,5 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
-    notebook_path = op.join(op.dirname(__file__), 'hnn_widget.ipynb')
-    main([notebook_path, *sys.argv[1:]])
+    notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
+    main([str(notebook_path.resolve()), *sys.argv[1:]])

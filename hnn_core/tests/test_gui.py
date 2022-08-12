@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
+from hnn_core.gui._viz_manager import _idx2figname
 from hnn_core.gui.gui import _init_network_from_widgets
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
@@ -207,11 +208,84 @@ def test_gui_run_simulations():
 
 
 def test_gui_take_screenshots():
-    """Test if the GUI correctly generate screenshots."""
+    """Test if the GUI correctly generates screenshots."""
     gui = HNNGUI()
     gui.compose(return_layout=False)
     screenshot = gui.capture(render=False)
     assert type(screenshot) is IFrame
-    gui.app_layout.left_sidebar.selected_index = 2
+    gui._simulate_left_tab_click("Drives")
     screenshot1 = gui.capture(render=False)
     assert screenshot._repr_html_() != screenshot1._repr_html_()
+
+
+def test_gui_add_figure():
+    """Test if the GUI adds/deletes figs properly."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    fig_tabs = gui.viz_manager.figs_tabs
+    axes_config_tabs = gui.viz_manager.axes_config_tabs
+    assert len(fig_tabs.children) == 0
+    assert len(axes_config_tabs.children) == 0
+
+    # after each run we should have a default fig
+    gui.run_button.click()
+    assert len(fig_tabs.children) == 1
+    assert len(axes_config_tabs.children) == 1
+
+    assert gui.viz_manager.fig_idx['idx'] == 2
+
+    for idx in range(3):
+        n_fig = idx + 2
+        gui.viz_manager.make_fig_button.click()
+        assert len(fig_tabs.children) == n_fig
+        assert len(axes_config_tabs.children) == n_fig
+
+    # we should have 4 figs here
+    # delete the 2nd and test if the total number and fig names match or not.
+    tmp_fig_idx = 2
+    tab_index = tmp_fig_idx - 1
+    assert gui.viz_manager.fig_idx['idx'] == 5
+    # test delete figures
+    axes_config_tabs.children[tab_index].children[0].click()
+    assert gui.viz_manager.fig_idx['idx'] == 5
+
+    assert len(fig_tabs.children) == 3
+    assert len(axes_config_tabs.children) == 3
+    remaining_titles1 = [
+        fig_tabs.get_title(idx) for idx in range(len(fig_tabs.children))
+    ]
+    remaining_titles2 = [
+        axes_config_tabs.get_title(idx)
+        for idx in range(len(axes_config_tabs.children))
+    ]
+    correct_remaining_titles = [_idx2figname(idx) for idx in (1, 3, 4)]
+    assert remaining_titles1 == remaining_titles2 == correct_remaining_titles
+
+
+def test_gui_edit_figure():
+    """Test if the GUI adds/deletes figs properly."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    # sim_name = gui.widget_simulation_name.value
+    fig_tabs = gui.viz_manager.figs_tabs
+    axes_config_tabs = gui.viz_manager.axes_config_tabs
+
+    # after each run we should have a default fig
+    sim_names = ["t1", "t2", "t3"]
+    for sim_idx, sim_name in enumerate(sim_names):
+        gui.widget_simulation_name.value = sim_name
+        gui.run_button.click()
+        print(len(fig_tabs.children), sim_idx)
+        n_figs = sim_idx + 1
+        assert len(fig_tabs.children) == n_figs
+        assert len(axes_config_tabs.children) == n_figs
+
+        axes_config = axes_config_tabs.children[-1].children[1]
+        simulation_selection = axes_config.children[0].children[0]
+        assert simulation_selection.options == tuple(sim_names[: n_figs])
