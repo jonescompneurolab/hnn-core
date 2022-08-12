@@ -371,6 +371,7 @@ class NetworkBuilder(object):
         # round robin assignment of cell gids
         for gid in range(self._rank, self.net._n_cells, n_hosts):
             self._gid_list.append(gid)
+        print(f'# of GIDs on this host: {len(self._gid_list)}')
 
         for drive in self.net.external_drives.values():
             if drive['cell_specific']:
