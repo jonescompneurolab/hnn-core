@@ -175,6 +175,7 @@ class TestParallelBackends():
         net = jones_2009_model(params, add_drives_from_params=True)
 
         oversubscribed = round(cpu_count() * 1.5)
+        oversubscribed = 12
         with MPIBackend(n_procs=oversubscribed) as backend:
             assert backend.n_procs == oversubscribed
             simulate_dipole(net, tstop=40)
