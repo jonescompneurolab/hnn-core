@@ -123,13 +123,13 @@ def average_dipoles(dpls):
 
     Parameters
     ----------
-    dpls: list of Dipole objects
+    dpls : list of Dipole objects
         Contains list of dipole objects, each with a `data` member containing
         'L2', 'L5' and 'agg' components
 
     Returns
     -------
-    dpl: instance of Dipole
+    dpl : instance of Dipole
         A new dipole object with each component of `dpl.data` representing the
         average over the same components in the input list
     """
@@ -167,15 +167,15 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """ Calculates RMSE between data in dpl and exp_dpl
     Parameters
     ----------
-    dpl: instance of Dipole
+    dpl : instance of Dipole
         A dipole object with simulated data
-    exp_dpl: instance of Dipole
+    exp_dpl : instance of Dipole
         A dipole object with experimental data
-    tstart | None: float
+    tstart : None | float
         Time at beginning of range over which to calculate RMSE
-    tstop | None: float
+    tstop : None | float
         Time at end of range over which to calculate RMSE
-    weights | None: array
+    weights : None | array
         An array of weights to be applied to each point in
         simulated dpl. Must have length >= dpl.data
         If None, weights will be replaced with 1's for typical RMSE
@@ -183,7 +183,7 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
     Returns
     -------
-    err: float
+    err : float
         Weighted RMSE between data in dpl and exp_dpl
     """
     from scipy import signal

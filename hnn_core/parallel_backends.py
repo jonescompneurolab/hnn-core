@@ -37,7 +37,7 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
     To be called after simulate(). Returns list of Dipoles, one for each trial,
     and saves spiking info in net (instance of Network).
     """
-    dpls = []
+    dpls = list()
 
     # Create array of equally sampled time points for simulating currents
     cell_type_names = list(net.cell_types.keys())
@@ -688,12 +688,12 @@ class MPIBackend(object):
             The integration time step of h.CVode (ms)
         n_trials : int
             Number of trials to simulate.
-        postproc: bool
+        postproc : bool
             If False, no postprocessing applied to the dipole
 
         Returns
         -------
-        dpl: list of Dipole
+        dpl : list of Dipole
             The Dipole results from each simulation trial
         """
 
@@ -703,8 +703,6 @@ class MPIBackend(object):
                                                     dt=dt,
                                                     n_trials=n_trials,
                                                     postproc=postproc)
-
-        print("Running %d trials..." % (n_trials))
 
         if self.n_procs > net._n_cells:
             raise ValueError(f'More MPI processes were assigned than there '
