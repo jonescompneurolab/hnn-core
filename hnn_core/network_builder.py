@@ -38,7 +38,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     (non-blocking)
     """
 
-    neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
+    neuron_net = NetworkBuilder(net, tstop=tstop, dt=dt, trial_idx=trial_idx)
 
     global _PC, _CVODE
 
@@ -263,8 +263,10 @@ class NetworkBuilder(object):
     `self.net._params` and the network is ready for another simulation.
     """
 
-    def __init__(self, net, trial_idx=0):
+    def __init__(self, net, tstop, dt, trial_idx=0):
         self.net = net
+        self.tstop = tstop
+        self.dt = dt
         self.trial_idx = trial_idx
 
         # When computing the network dynamics in parallel, the nodes of the
@@ -321,8 +323,8 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        self._nrn_dipoles['L5_pyramidal'] = h.Vector()
-        self._nrn_dipoles['L2_pyramidal'] = h.Vector()
+        self._nrn_dipoles['L5_pyramidal'] = h.Vector(self.tstop / self.dt + 1)
+        self._nrn_dipoles['L2_pyramidal'] = h.Vector(self.tstop / self.dt + 1)
 
         self._gid_assign()
 
@@ -371,7 +373,6 @@ class NetworkBuilder(object):
         # round robin assignment of cell gids
         for gid in range(self._rank, self.net._n_cells, n_hosts):
             self._gid_list.append(gid)
-        print(f'# of GIDs on this host: {len(self._gid_list)}')
 
         for drive in self.net.external_drives.values():
             if drive['cell_specific']:
@@ -543,16 +544,18 @@ class NetworkBuilder(object):
                 if nrn_dpl.size() > 0:
                     nrn_dpl.add(cell.dipole)
                 else:
-                    nrn_dpl.append(cell.dipole)
+                    pass
+                    #nrn_dpl.append(cell.dipole)
 
             self._vsoma[cell.gid] = cell.rec_v
             self._isoma[cell.gid] = cell.rec_i
-
+        print('***checkpoint 1***')
         _PC.allreduce(self._nrn_dipoles['L5_pyramidal'], 1)
         _PC.allreduce(self._nrn_dipoles['L2_pyramidal'], 1)
+        print('***checkpoint 2***')
         for nrn_arr in self._nrn_rec_arrays.values():
             _PC.allreduce(nrn_arr._nrn_voltages, 1)
-
+        print('***checkpoint 3***')
         # aggregate the currents and voltages independently on each proc
         vsoma_list = _PC.py_gather(self._vsoma, 0)
         isoma_list = _PC.py_gather(self._isoma, 0)
