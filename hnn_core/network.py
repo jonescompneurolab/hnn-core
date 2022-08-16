@@ -377,7 +377,7 @@ class Network(object):
 
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
-        self._n_cells = 0  # currently only used for tests
+        self._n_cells = 0  # used in tests and MPIBackend checks
         self.pos_dict = dict()
         self.cell_types = dict()
 
