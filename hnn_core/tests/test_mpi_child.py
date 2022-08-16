@@ -127,7 +127,7 @@ def test_child_run():
             sim_data = mpi_sim.run(net_reduced, tstop=tstop, dt=0.025,
                                    n_trials=n_trials)
             stdout = buf.getvalue()
-        assert "Simulation time:" in stdout
+        assert "Trial 1: 0.03 ms..." in stdout
 
         with io.StringIO() as buf_err, redirect_stderr(buf_err):
             mpi_sim._write_data_stderr(sim_data)
