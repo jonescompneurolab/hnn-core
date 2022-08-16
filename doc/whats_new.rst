@@ -54,6 +54,11 @@ Bug
 - Fix bug where :func:`~hnn_core.network.pick_connection` did not return an
   empty list when searching non existing connections, by `Nick Tolley`_ in :gh:`515`
 
+- Fix bug in :meth:`~hnn_core.NetworkBuilder.aggregate_data` where continuous 
+  data types (e.g., current dipole) were not guaranteed to have congruent array 
+  sizes across cells distributed over different MPI threads, by `Ryan Thorpe`_ 
+  in :gh:`545`.
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
