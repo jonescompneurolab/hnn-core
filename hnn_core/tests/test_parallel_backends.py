@@ -7,6 +7,7 @@ from threading import Thread, Event
 from time import sleep
 from urllib.request import urlretrieve
 
+import numpy as np
 from numpy import loadtxt
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 
@@ -174,9 +175,27 @@ class TestParallelBackends():
                        'N_trials': 2})
         net = jones_2009_model(params, add_drives_from_params=True)
 
-        oversubscribed = round(cpu_count() * 1.5)
-        with MPIBackend(n_procs=oversubscribed) as backend:
-            assert backend.n_procs == oversubscribed
+        # try running with more procs than cells in the network (will probably
+        # oversubscribe)
+        too_many_procs = net._n_cells + 1
+        with pytest.raises(ValueError, match='More MPI processes were '
+                           'assigned than there are cells'):
+            with MPIBackend(n_procs=too_many_procs) as backend:
+                simulate_dipole(net, tstop=40)
+
+        # force oversubscription + hyperthreading, but make sure there are
+        # always enough cells in the network
+        oversubscribed_procs = cpu_count() + 1
+        n_grid_1d = np.ceil(np.sqrt(oversubscribed_procs))
+        params.update({'N_pyr_x': n_grid_1d,
+                       'N_pyr_y': n_grid_1d,
+                       't_evprox_1': 5,
+                       't_evdist_1': 10,
+                       't_evprox_2': 20,
+                       'N_trials': 2})
+        net = jones_2009_model(params, add_drives_from_params=True)
+        with MPIBackend(n_procs=oversubscribed_procs) as backend:
+            assert backend.n_procs == oversubscribed_procs
             simulate_dipole(net, tstop=40)
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
