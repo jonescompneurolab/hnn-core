@@ -705,7 +705,13 @@ class MPIBackend(object):
                                                     postproc=postproc)
 
         print("Running %d trials..." % (n_trials))
-        dpls = []
+
+        if self.n_procs > net._n_cells:
+            raise ValueError(f'More MPI processes were assigned than there '
+                             f'are cells in the network. Please decrease '
+                             f'the number of parallel processes (got n_procs='
+                             f'{self.n_procs}) over which you will '
+                             f'distribute the {net._n_cells} network neurons.')
 
         env = _get_mpi_env()
 
