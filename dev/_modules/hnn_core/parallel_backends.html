@@ -841,7 +841,13 @@
                                                     <span class="n">postproc</span><span class="o">=</span><span class="n">postproc</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running </span><span class="si">%d</span><span class="s2"> trials...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
-        <span class="n">dpls</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">net</span><span class="o">.</span><span class="n">_n_cells</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;More MPI processes were assigned than there &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;are cells in the network. Please decrease &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;the number of parallel processes (got n_procs=&#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span><span class="si">}</span><span class="s1">) over which you will &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;distribute the </span><span class="si">{</span><span class="n">net</span><span class="o">.</span><span class="n">_n_cells</span><span class="si">}</span><span class="s1"> network neurons.&#39;</span><span class="p">)</span>
 
         <span class="n">env</span> <span class="o">=</span> <span class="n">_get_mpi_env</span><span class="p">()</span>
 

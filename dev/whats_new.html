@@ -207,6 +207,10 @@ is a list of dipoles, by <a class="reference external" href="https://github.com/
 reflect the shape of the cell being simulated, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/481">#481</a></p></li>
 <li><p>Fix bug where <code class="xref py py-func docutils literal notranslate"><span class="pre">pick_connection()</span></code> did not return an
 empty list when searching non existing connections, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/515">#515</a></p></li>
+<li><p>Fix bug in <code class="xref py py-class docutils literal notranslate"><span class="pre">MPIBackend</span></code> that caused an MPI runtime error
+(<code class="docutils literal notranslate"><span class="pre">RuntimeError:</span> <span class="pre">MPI</span> <span class="pre">simulation</span> <span class="pre">failed.</span> <span class="pre">Return</span> <span class="pre">code:</span> <span class="pre">143</span></code>), when running a
+simulation with an oversubscribed MPI session on a reduced network, by
+<a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/545">#545</a>.</p></li>
 </ul>
 </section>
 <section id="api">
