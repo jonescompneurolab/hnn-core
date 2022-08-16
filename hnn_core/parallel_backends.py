@@ -499,7 +499,6 @@ class JoblibBackend(object):
     """
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
-        print("joblib will run over %d jobs" % (self.n_jobs))
 
     def _parallel_func(self, func):
         if self.n_jobs != 1:
@@ -552,6 +551,9 @@ class JoblibBackend(object):
         dpl: list of Dipole
             The Dipole results from each simulation trial
         """
+
+        print(f"Joblib will run {n_trials} in parallel by "
+              f"distributing trials over {self.n_jobs} jobs.")
         parallel, myfunc = self._parallel_func(_simulate_single_trial)
         sim_data = parallel(myfunc(net, tstop, dt, trial_idx) for
                             trial_idx in range(n_trials))
@@ -631,12 +633,6 @@ class MPIBackend(object):
 
         self.mpi_cmd = mpi_cmd
 
-        if self.n_procs == 1:
-            print("Backend will use 1 core. Running simulation without MPI")
-            return
-        else:
-            print("MPI will run over %d processes" % (self.n_procs))
-
         if hyperthreading:
             self.mpi_cmd += ' --use-hwthread-cpus'
 
@@ -699,17 +695,21 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
+            print("MPIBackend is set to use 1 core: tranferring the "
+                  "simulation to JoblibBackend....")
             return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
                                                     dt=dt,
                                                     n_trials=n_trials,
                                                     postproc=postproc)
-
-        if self.n_procs > net._n_cells:
+        elif self.n_procs > net._n_cells:
             raise ValueError(f'More MPI processes were assigned than there '
                              f'are cells in the network. Please decrease '
                              f'the number of parallel processes (got n_procs='
                              f'{self.n_procs}) over which you will '
                              f'distribute the {net._n_cells} network neurons.')
+
+        print(f"MPI will run {n_trials} sequentially by "
+              f"distributing network neurons over {self.n_procs} processes.")
 
         env = _get_mpi_env()
 

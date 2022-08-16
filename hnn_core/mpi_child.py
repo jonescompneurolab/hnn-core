@@ -125,7 +125,7 @@ class MPISimulation(object):
 
         from hnn_core.network_builder import _simulate_single_trial
 
-        sim_data = []
+        sim_data = list()
         for trial_idx in range(n_trials):
             single_sim_data = _simulate_single_trial(net, tstop, dt, trial_idx)
 
