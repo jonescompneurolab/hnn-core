@@ -58,11 +58,9 @@ def test_gid_assignment():
     all_gids.sort()
 
     n_hosts = 3
-    tstop = 20.
-    dt = 0.025
     all_gids_instantiated = list()
     for rank in range(n_hosts):
-        net_builder = NetworkBuilder(net, tstop=tstop, dt=dt)
+        net_builder = NetworkBuilder(net)
         net_builder._gid_list = list()
         net_builder._gid_assign(rank=rank, n_hosts=n_hosts)
         all_gids_instantiated.extend(net_builder._gid_list)
@@ -176,7 +174,7 @@ class TestParallelBackends():
                        'N_trials': 2})
         net = jones_2009_model(params, add_drives_from_params=True)
 
-        oversubscribed = round(cpu_count() * 1.5)
+        oversubscribed = round(cpu_count() * 3.0)
         with MPIBackend(n_procs=oversubscribed) as backend:
             assert backend.n_procs == oversubscribed
             simulate_dipole(net, tstop=40)
