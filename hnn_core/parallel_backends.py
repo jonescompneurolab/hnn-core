@@ -701,7 +701,8 @@ class MPIBackend(object):
                                                     dt=dt,
                                                     n_trials=n_trials,
                                                     postproc=postproc)
-        elif self.n_procs > net._n_cells:
+
+        if self.n_procs > net._n_cells:
             raise ValueError(f'More MPI processes were assigned than there '
                              f'are cells in the network. Please decrease '
                              f'the number of parallel processes (got n_procs='
