@@ -38,7 +38,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     (non-blocking)
     """
 
-    neuron_net = NetworkBuilder(net, tstop=tstop, dt=dt, trial_idx=trial_idx)
+    neuron_net = NetworkBuilder(net, trial_idx=trial_idx)
+    print(f'num gids on this rank: {len(neuron_net._gid_list)}')
 
     global _PC, _CVODE
 
@@ -86,7 +87,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     _PC.barrier()
 
     # these calls aggregate data across procs/nodes
-    neuron_net.aggregate_data()
+    neuron_net.aggregate_data(n_samples=times.size())
 
     # now convert data from Neuron into Python
     vsoma_py = dict()
@@ -263,10 +264,8 @@ class NetworkBuilder(object):
     `self.net._params` and the network is ready for another simulation.
     """
 
-    def __init__(self, net, tstop, dt, trial_idx=0):
+    def __init__(self, net, trial_idx=0):
         self.net = net
-        self.tstop = tstop
-        self.dt = dt
         self.trial_idx = trial_idx
 
         # When computing the network dynamics in parallel, the nodes of the
@@ -323,8 +322,8 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        self._nrn_dipoles['L5_pyramidal'] = h.Vector(self.tstop / self.dt + 1)
-        self._nrn_dipoles['L2_pyramidal'] = h.Vector(self.tstop / self.dt + 1)
+        self._nrn_dipoles['L5_pyramidal'] = h.Vector()
+        self._nrn_dipoles['L2_pyramidal'] = h.Vector()
 
         self._gid_assign()
 
@@ -532,30 +531,46 @@ class NetworkBuilder(object):
             if _PC.gid_exists(gid):
                 _PC.spike_record(gid, self._spike_times, self._spike_gids)
 
-    def aggregate_data(self):
-        """Aggregate somatic currents, voltages, and dipoles."""
-        for cell in self._cells:
-            if cell.name in ('L5Pyr', 'L2Pyr'):
-                nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
+    def aggregate_data(self, n_samples):
+        """Aggregate somatic currents, voltages, and dipoles.
 
-                # dipoles are initialized as empty h.Vector() containers
-                # the first cell is "appended", setting the
-                # length of the vector, after which cell data are added (sum)
-                if nrn_dpl.size() > 0:
-                    nrn_dpl.add(cell.dipole)
-                else:
-                    pass
-                    #nrn_dpl.append(cell.dipole)
+        Parameters
+        ----------
+        n_samples : int
+            Number of samples contained in continuous data types (e.g.,
+            current dipole and somatic voltage).
+
+        Notes
+        -----
+        Specifying ``n_samples`` ensures that certain NEURON data objects
+        (e.g., h.Vector()) are congruent in shape and can thus be reduced
+        across all MPI ranks.
+        """
+        for nrn_dpl in self._nrn_dipoles.values():
+            # ensure that the shape of this rank's nrn_dpl h.Vector() object is
+            # initialized consistently across all ranks regardless of whether
+            # this rank contains cells contributing to the dipole calculation
+            if nrn_dpl.size() != n_samples:
+                nrn_dpl.append(h.Vector(n_samples, 0))
+
+        for cell in self._cells:
+            if hasattr(cell, 'dipole'):
+                print(f'cell {cell.name} has a dipole!!!')
+                if cell.dipole.size() != n_samples:
+                    raise ValueError(f"n_samples does not match the size "
+                                     f"of at least one cell's dipole vector. "
+                                     f"Got n_samples={n_samples}, {cell.name}."
+                                     f"dipole.size()={cell.dipole.size()}.")
+                nrn_dpl.add(cell.dipole)
 
             self._vsoma[cell.gid] = cell.rec_v
             self._isoma[cell.gid] = cell.rec_i
-        print('***checkpoint 1***')
+
         _PC.allreduce(self._nrn_dipoles['L5_pyramidal'], 1)
         _PC.allreduce(self._nrn_dipoles['L2_pyramidal'], 1)
-        print('***checkpoint 2***')
         for nrn_arr in self._nrn_rec_arrays.values():
             _PC.allreduce(nrn_arr._nrn_voltages, 1)
-        print('***checkpoint 3***')
+
         # aggregate the currents and voltages independently on each proc
         vsoma_list = _PC.py_gather(self._vsoma, 0)
         isoma_list = _PC.py_gather(self._isoma, 0)
