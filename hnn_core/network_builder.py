@@ -45,14 +45,10 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     h.load_file("stdrun.hoc")
 
     rank = _get_rank()
-    nhosts = _get_nhosts()
 
     # Now let's simulate the dipole
 
     _PC.barrier()  # sync for output to screen
-    if rank == 0:
-        print("running trial %d on %d cores" %
-              (trial_idx + 1, nhosts))
 
     # Set tstop before instantiating any classes
     h.tstop = tstop
@@ -69,7 +65,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     h.finitialize()
 
     def simulation_time():
-        print('Simulation time: {0} ms...'.format(round(h.t, 2)))
+        print(f'Trial {trial_idx + 1}: {round(h.t, 2)} ms...')
 
     if rank == 0:
         for tt in range(0, int(h.tstop), 10):
