@@ -54,10 +54,10 @@ Bug
 - Fix bug where :func:`~hnn_core.network.pick_connection` did not return an
   empty list when searching non existing connections, by `Nick Tolley`_ in :gh:`515`
 
-- Fix bug in :meth:`~hnn_core.NetworkBuilder.aggregate_data` where continuous 
-  data types (e.g., current dipole) were not guaranteed to have congruent array 
-  sizes across cells distributed over different MPI threads, by `Ryan Thorpe`_ 
-  in :gh:`545`.
+- Fix bug in :class:`~hnn_core.MPIBackend` that caused an MPI runtime error
+  (``RuntimeError: MPI simulation failed. Return code: 143``), when running a
+  simulation with an oversubscribed MPI session on a reduced network, by 
+  `Ryan Thorpe`_ in :gh:`545`.
 
 API
 ~~~
