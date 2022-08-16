@@ -552,7 +552,7 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
 
-        print(f"Joblib will run {n_trials} in parallel by "
+        print(f"Joblib will run {n_trials} trial(s) in parallel by "
               f"distributing trials over {self.n_jobs} jobs.")
         parallel, myfunc = self._parallel_func(_simulate_single_trial)
         sim_data = parallel(myfunc(net, tstop, dt, trial_idx) for
@@ -708,7 +708,7 @@ class MPIBackend(object):
                              f'{self.n_procs}) over which you will '
                              f'distribute the {net._n_cells} network neurons.')
 
-        print(f"MPI will run {n_trials} sequentially by "
+        print(f"MPI will run {n_trials} trial(s) sequentially by "
               f"distributing network neurons over {self.n_procs} processes.")
 
         env = _get_mpi_env()
