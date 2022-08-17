@@ -259,13 +259,13 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dpls: list of Dipole objects</span>
+<span class="sd">    dpls : list of Dipole objects</span>
 <span class="sd">        Contains list of dipole objects, each with a `data` member containing</span>
 <span class="sd">        &#39;L2&#39;, &#39;L5&#39; and &#39;agg&#39; components</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    dpl: instance of Dipole</span>
+<span class="sd">    dpl : instance of Dipole</span>
 <span class="sd">        A new dipole object with each component of `dpl.data` representing the</span>
 <span class="sd">        average over the same components in the input list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -303,15 +303,15 @@
     <span class="sd">&quot;&quot;&quot; Calculates RMSE between data in dpl and exp_dpl</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dpl: instance of Dipole</span>
+<span class="sd">    dpl : instance of Dipole</span>
 <span class="sd">        A dipole object with simulated data</span>
-<span class="sd">    exp_dpl: instance of Dipole</span>
+<span class="sd">    exp_dpl : instance of Dipole</span>
 <span class="sd">        A dipole object with experimental data</span>
-<span class="sd">    tstart | None: float</span>
+<span class="sd">    tstart : None | float</span>
 <span class="sd">        Time at beginning of range over which to calculate RMSE</span>
-<span class="sd">    tstop | None: float</span>
+<span class="sd">    tstop : None | float</span>
 <span class="sd">        Time at end of range over which to calculate RMSE</span>
-<span class="sd">    weights | None: array</span>
+<span class="sd">    weights : None | array</span>
 <span class="sd">        An array of weights to be applied to each point in</span>
 <span class="sd">        simulated dpl. Must have length &gt;= dpl.data</span>
 <span class="sd">        If None, weights will be replaced with 1&#39;s for typical RMSE</span>
@@ -319,7 +319,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    err: float</span>
+<span class="sd">    err : float</span>
 <span class="sd">        Weighted RMSE between data in dpl and exp_dpl</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>

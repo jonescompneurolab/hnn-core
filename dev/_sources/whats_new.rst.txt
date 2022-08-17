@@ -15,7 +15,7 @@ Changelog
 - Add option to select drives using argument 'which_drives' in
   :func:`~hnn_core.optimization.optimize_evoked`, by `Mohamed A. Sherif`_ in :gh:`478`.
 
-- Changed ``conn_seed`` default to ``None`` (from ``3``) in :func:`~hnn_core.network.add_connection`, 
+- Changed ``conn_seed`` default to ``None`` (from ``3``) in :func:`~hnn_core.network.add_connection`,
   by `Mattan Pelah`_ in :gh:`492`.
 
 - Add interface to modify attributes of sections in
@@ -23,6 +23,9 @@ Changelog
 
  - Add ability to target specific sections when adding drives or connections,
    by `Nick Tolley`_ in :gh:`419`
+
+- Runtime output messages now specify the trial with which each simulation time
+  checkpoint belongs too, by `Ryan Thorpe`_ in :gh:`546`.
 
 Bug
 ~~~
@@ -56,14 +59,14 @@ Bug
 
 - Fix bug in :class:`~hnn_core.MPIBackend` that caused an MPI runtime error
   (``RuntimeError: MPI simulation failed. Return code: 143``), when running a
-  simulation with an oversubscribed MPI session on a reduced network, by 
+  simulation with an oversubscribed MPI session on a reduced network, by
   `Ryan Thorpe`_ in :gh:`545`.
 
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
   template model by passing a :class:`~hnn_core.Network` instance directly into
-  :func:`~hnn_core.optimization.optimize_evoked`. Simulations run during 
+  :func:`~hnn_core.optimization.optimize_evoked`. Simulations run during
   optimization can now consist of multiple trials over which the simulated
   dipole is averaged, by `Ryan Thorpe`_ in :gh:`446`.
 
@@ -77,7 +80,7 @@ API
 
 Notable Changes
 ---------------
-- Local field potentials can now be recorded during simulations 
+- Local field potentials can now be recorded during simulations
   :ref:`[Example] <sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py>`
 
 - Ability to optimize parameters to reproduce event related potentials from real data
@@ -143,7 +146,7 @@ Changelog
 
 - Add method for setting in-plane cell distances and layer separation in the network :func:`~hnn_core.Network.set_cell_positions`, by `Christopher Bailey`_ in `#370 <https://github.com/jonescompneurolab/hnn-core/pull/370>`_
 
-- External drives API now accepts probability argument for targetting subsets of cells, 
+- External drives API now accepts probability argument for targetting subsets of cells,
   by `Nick Tolley`_ in :gh:`416`
 
 Bug
@@ -336,5 +339,5 @@ People who contributed to this release (in alphabetical order):
 .. _Nick Tolley: https://github.com/ntolley
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane
-.. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese 
+.. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
