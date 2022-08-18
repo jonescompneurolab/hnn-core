@@ -39,16 +39,16 @@ This backend will use MPI (Message Passing Interface) on the system to split neu
 
 **MacOS Environment**::
 
-    $ export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
+    $ export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX}/lib
 
 Alternatively, run the commands below will avoid needing to run the export command every time a new shell is opened::
 
     $ cd ${CONDA_PREFIX}
     $ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
-    $ echo "export OLD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH" >> etc/conda/activate.d/env_vars.sh
-    $ echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${CONDA_PREFIX}/lib" >> etc/conda/activate.d/env_vars.sh
-    $ echo "export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
-    $ echo "unset OLD_LD_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
+    $ echo "export OLD_DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH" >> etc/conda/activate.d/env_vars.sh
+    $ echo "export DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH:\${CONDA_PREFIX}/lib" >> etc/conda/activate.d/env_vars.sh
+    $ echo "export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
+    $ echo "unset OLD_DYLD_FALLBACK_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
 
 **Test MPI**::
 
