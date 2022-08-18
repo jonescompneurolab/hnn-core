@@ -53,8 +53,8 @@ Alternatively, run the commands below will avoid needing to run the export comma
 **Test MPI**::
 
     $ mpiexec -np 2 nrniv -mpi -python -c 'from neuron import h; from mpi4py import MPI; \
-                                           print("Hello from proc %d" % MPI.COMM_WORLD.Get_rank()); \
-                                               h.quit()'
+                                           print(f"Hello from proc {MPI.COMM_WORLD.Get_rank()}"); \
+                                           h.quit()'
     numprocs=2
     NEURON -- VERSION 7.7.2 7.7 (2b7985ba) 2019-06-20
     Duke, Yale, and the BlueBrain Project -- Copyright 1984-2018
