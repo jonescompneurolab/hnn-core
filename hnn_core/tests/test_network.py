@@ -499,8 +499,6 @@ def test_network():
 
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
-    net.clear_connectivity()
-    assert len(net.connectivity) == 50
     net.clear_drives()
     assert len(net.connectivity) == 0
 
