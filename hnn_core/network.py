@@ -1263,7 +1263,7 @@ class Network(object):
                 connectivity.append(conn)
         self.connectivity = connectivity
 
-    def clear_drives(self, drive_name='all'):
+    def clear_drives(self, drive_names='all'):
         """Remove all drives defined in Network.connectivity.
 
         Parameters

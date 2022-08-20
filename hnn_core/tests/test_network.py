@@ -499,7 +499,10 @@ def test_network():
 
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
-    net.clear_drives()
+    net.clear_drives(['evprox1'])
+    assert 'evprox1' not in net.external_drives
+    with pytest.raises(ValueError, match="drive_names must be an instance of"):
+        net.clear_drives('blah')
     assert len(net.connectivity) == 0
 
     with pytest.warns(UserWarning, match='No connections'):

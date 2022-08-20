@@ -365,6 +365,24 @@ def _run_optimization(maxiter, param_ranges, optrun):
     return result
 
 
+def compare_evoked_drives(net1, net2):
+    """Compare the optimized parameters."""
+    evoked_drive_names = [key for key in net1.external_drives.keys()
+                          if net1.external_drives[key]['type'] == 'evoked']
+    for key in net1.external_drives.keys():
+        if key not in net2.external_drives.keys():
+            raise ValueError('Cannot')
+    drive_dynamics1, drive_syn_weights1 = _get_drive_params(net1,
+        evoked_drive_names)[-2:]
+    drive_dynamics2, drive_syn_weights2 = _get_drive_params(net2,
+        evoked_drive_names)[-2:]
+    params = dict()
+    for key in drive_syn_weights1:
+        params[key].append([drive_syn_weights1[key], drive_syn_weights2[key]])
+    params['mu'].append([drive_dynamics1['mu'], drive_dynamics2['mu']])
+    params['sigma'].append([drive_dynamics1['sigma'], drive_dynamics2['sigma']])
+
+
 def _get_drive_params(net, drive_names):
     """Get evoked drive parameters from a Network instance."""
 
