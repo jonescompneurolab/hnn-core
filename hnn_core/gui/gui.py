@@ -1331,7 +1331,6 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
         return
 
     params_fname = change['new']['name']
-    file_uploaded = change['new']
     param_data = change['new']['content']
     param_data = codecs.decode(param_data, encoding="utf-8")
 
