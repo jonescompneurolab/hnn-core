@@ -41,53 +41,53 @@ typical contribution process is to
 1. Make a fork of the `hnn-core <https://github.com/jonescompneurolab/hnn-core>`_
    repository to your own account on github. Look for the Fork button in the top right corner
 
-2. On the terminal of your local computer clone the fork
+2. On the terminal of your local computer clone the fork::
 
     $ git clone https://github.com/<username>/hnn-core
 
-3. On the terminal of your local computer set up the remotes
+3. On the terminal of your local computer set up the remotes::
 
     $ cd hnn-core
     $ git remote add upstream https://github.com/jonescompneurolab/hnn-core
 
-4. Check that the remotes have been correctly added
+4. Check that the remotes have been correctly added::
 
     $ git remote -v
 
-   You should see:
+   You should see::
 
     | origin	https://github.com/<username>/hnn-core (fetch)
     | origin	https://github.com/<username>/hnn-core (push)
     | upstream	https://github.com/jonescompneurolab/hnn-core (fetch)
     | upstream	https://github.com/jonescompneurolab/hnn-core (push)
 
-5. To start a new feature branch, we will copy the existing ``master`` branch from the ``upstream`` remote and give it a specific name
+5. To start a new feature branch, we will copy the existing ``master`` branch from the ``upstream`` remote and give it a specific name::
 
     | $ git fetch upstream master:cool_feature
     | $ git checkout cool_feature
 
 6. Make your changes relevant to the pull request
 
-7. To make a commit, you first have to add the files you have changed to the staging area
+7. To make a commit, you first have to add the files you have changed to the staging area::
 
         $ git add -u
 
-   ensure they have been added correctly
+   ensure they have been added correctly::
 
         $ git status
 
-   make a commit
+   make a commit::
 
         $ git commit -m "your commit message"
 
-   and finally check that the commit has been added
+   and finally check that the commit has been added::
 
         $ git log
 
    Note: see the `numpy contributing guide <https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message>`_
    for tips on informative commit messages.
 
-8. Now push the feature branch to our fork
+8. Now push the feature branch to our fork::
 
     $ git push origin cool_feature
 
@@ -117,7 +117,7 @@ If you update a mod file, you will have to rebuild them using the command::
 
     $ python setup.py build_mod
 
-To run the tests simply type into your terminal
+To run the tests simply type into your terminal::
 
     $ make test
 
@@ -166,16 +166,16 @@ on the differences between these workflows.
 
 To rebase, we do the following:
 
-1. Checkout the feature branch
+1. Checkout the feature branch::
 
     $ git checkout cool_feature
 
-2. Delete the ``master`` branch and fetch a new copy
+2. Delete the ``master`` branch and fetch a new copy::
 
     | $ git branch -D master
     | $ git fetch upstream master:master
 
-3. Start the rebase
+3. Start the rebase::
 
     $ git rebase master
 
@@ -184,7 +184,7 @@ To rebase, we do the following:
    See `this guide <https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging>`_
    for more general information on resolve merge conflicts
 
-5. Once the conflicts have been resolved, add the resolved files to the staging area
+5. Once the conflicts have been resolved, add the resolved files to the staging area::
 
     | $ git add -u
     | $ git rebase --continue
