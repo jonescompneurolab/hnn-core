@@ -657,13 +657,11 @@ class HNNGUI:
         # accordians to group local-connectivity by cell type
         connectivity_boxes = [
             VBox(slider) for slider in self.connectivity_widgets]
-        connectivity_names = [
+        connectivity_names = (
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
-            'Layer 5 Basket'
-        ]
-        cell_connectivity = Accordion(children=connectivity_boxes)
-        for idx, connectivity_name in enumerate(connectivity_names):
-            cell_connectivity.set_title(idx, connectivity_name)
+            'Layer 5 Basket')
+        cell_connectivity = Accordion(children=connectivity_boxes,
+                                      titles=connectivity_names)
 
         drive_selections = VBox([
             self.widget_drive_type_selection, self.widget_location_selection,
@@ -680,14 +678,12 @@ class HNNGUI:
         ])
 
         # Tabs for left pane
-        left_tab = Tab()
+        titles = ('Simulation', 'Cell connectivity', 'Drives', 'Analysis')
+        left_tab = Tab(titles=titles)
         left_tab.children = [
             simulation_box, self._connectivity_out, drives_options,
             analysis_options,
         ]
-        titles = ['Simulation', 'Cell connectivity', 'Drives', 'Analysis']
-        for idx, title in enumerate(titles):
-            left_tab.set_title(idx, title)
 
         self.app_layout = AppLayout(
             header=self._header,
@@ -1215,14 +1211,15 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             drive_widgets.append(drive)
 
         if render:
+            titles = [f"{drive['name']} ({drive['location']})" for
+                      drive in drive_widgets]
+
             accordion = Accordion(
                 children=drive_boxes,
                 selected_index=len(drive_boxes) -
                 1 if expand_last_drive else None,
-            )
-            for idx, drive in enumerate(drive_widgets):
-                accordion.set_title(idx,
-                                    f"{drive['name']} ({drive['location']})")
+                titles=tuple(titles))
+
             display(accordion)
 
 
@@ -1238,7 +1235,7 @@ def add_connectivity_tab(net, connectivity_out,
     while len(connectivity_sliders) > 0:
         connectivity_sliders.pop()
 
-    connectivity_names = []
+    connectivity_names = list()
     for src_gids in cell_types:
         for target_gids in cell_types:
             for location in locations:
@@ -1274,9 +1271,8 @@ def add_connectivity_tab(net, connectivity_out,
                         _get_connectivity_widgets(receptor_related_conn))
 
     connectivity_boxes = [VBox(slider) for slider in connectivity_sliders]
-    cell_connectivity = Accordion(children=connectivity_boxes)
-    for idx, connectivity_name in enumerate(connectivity_names):
-        cell_connectivity.set_title(idx, connectivity_name)
+    cell_connectivity = Accordion(children=connectivity_boxes,
+                                  titles=tuple(connectivity_names))
 
     with connectivity_out:
         display(cell_connectivity)
