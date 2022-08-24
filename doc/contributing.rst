@@ -56,15 +56,15 @@ typical contribution process is to
 
    You should see::
 
-    | origin	https://github.com/<username>/hnn-core (fetch)
-    | origin	https://github.com/<username>/hnn-core (push)
-    | upstream	https://github.com/jonescompneurolab/hnn-core (fetch)
-    | upstream	https://github.com/jonescompneurolab/hnn-core (push)
+    origin	https://github.com/<username>/hnn-core (fetch)
+    origin	https://github.com/<username>/hnn-core (push)
+    upstream	https://github.com/jonescompneurolab/hnn-core (fetch)
+    upstream	https://github.com/jonescompneurolab/hnn-core (push)
 
 5. To start a new feature branch, we will copy the existing ``master`` branch from the ``upstream`` remote and give it a specific name::
 
-    | $ git fetch upstream master:cool_feature
-    | $ git checkout cool_feature
+    $ git fetch upstream master:cool_feature
+    $ git checkout cool_feature
 
 6. Make your changes relevant to the pull request
 
@@ -172,8 +172,8 @@ To rebase, we do the following:
 
 2. Delete the ``master`` branch and fetch a new copy::
 
-    | $ git branch -D master
-    | $ git fetch upstream master:master
+    $ git branch -D master
+    $ git fetch upstream master:master
 
 3. Start the rebase::
 
@@ -186,8 +186,8 @@ To rebase, we do the following:
 
 5. Once the conflicts have been resolved, add the resolved files to the staging area::
 
-    | $ git add -u
-    | $ git rebase --continue
+    $ git add -u
+    $ git rebase --continue
 
 In general it is best to rebase frequently if you are aware of pull requests being merged
 into the ``master`` base.
