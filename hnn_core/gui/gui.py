@@ -660,7 +660,7 @@ class HNNGUI:
         connectivity_names = (
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
             'Layer 5 Basket')
-        cell_connectivity = Accordion(children=connectivity_boxes,
+        cell_connectivity = Accordion(children=connectivity_boxes, # noqa
                                       titles=connectivity_names)
 
         drive_selections = VBox([
