@@ -826,15 +826,12 @@ class HNNGUI:
             content += line
 
         uploaded_value = {
-            params_name: {
-                'metadata': {
-                    'name': params_name,
-                    'type': 'application/json',
-                    'size': len(content),
-                },
-                'content': content
-            }
+            'name': params_name,
+            'type': 'application/json',
+            'size': len(content),
+            'content': content
         }
+
         self.load_button.set_trait('value', uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
@@ -1333,10 +1330,9 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
     if len(change['owner'].value) == 0:
         return
 
-    # params_fname = change['owner'].metadata[0]['name']
-    params_fname = list(change['owner'].value.keys())[0]
-    file_uploaded = change['owner'].value
-    param_data = list(file_uploaded.values())[0]['content']
+    params_fname = change['new']['name']
+    file_uploaded = change['new']
+    param_data = change['new']['content']
     param_data = codecs.decode(param_data, encoding="utf-8")
 
     if load_info['prev_param_data'] == param_data:
