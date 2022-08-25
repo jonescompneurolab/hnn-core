@@ -838,8 +838,8 @@ class HNNGUI:
 
     def _simulate_left_tab_click(self, tab_title):
         tab_index = None
-        for idx in self.app_layout.left_sidebar._titles.keys():
-            if tab_title == self.app_layout.left_sidebar._titles[idx]:
+        for idx, tab_title in enumerate(self.app_layout.left_sidebar.titles):
+            if tab_title == self.app_layout.left_sidebar.titles[idx]:
                 tab_index = int(idx)
                 break
         if tab_index is None:
