@@ -419,7 +419,7 @@ def test_network():
     kwargs_good = [
         ('src_gids', 0),
         ('src_gids', 'L2_pyramidal'),
-        ('src_gids', ['L2_pyramidal'])
+        ('src_gids', 'L2_pyramidal'),
         ('src_gids', range(2)),
         ('src_gids', None),
         ('target_gids', 35),
@@ -456,7 +456,7 @@ def test_network():
     indices = pick_connection(net, target_gids=['L2_basket', 'L5_basket'])
     for conn_idx in indices:
         assert np.all(np.in1d(
-            net.connectivity[conn_idx]['src_gids'], gid_list))
+            net.connectivity[conn_idx]['target_gids'], gid_list))
 
     # Check that a given gid isn't present in any connection profile that
     # pick_connection can't identify
