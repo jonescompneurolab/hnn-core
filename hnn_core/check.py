@@ -6,7 +6,7 @@ from .params import _long_name
 from .externals.mne import _validate_type, _check_option
 
 
-def _check_gids(gids, gid_ranges, valid_cells, arg_name):
+def _check_gids(gids, gid_ranges, valid_cells, arg_name, same_type=True):
     """Format different gid specifications into list of gids"""
     _validate_type(gids, (int, list, range, str, None), arg_name,
                    'int list, range, str, or None')
@@ -20,6 +20,9 @@ def _check_gids(gids, gid_ranges, valid_cells, arg_name):
         _check_option(arg_name, gids, valid_cells)
         gids = gid_ranges[_long_name(gids)]
 
+    if all(isinstance(gid, str) for gid in gids):
+        gids = [gid for cell_type in gids for gid in gid_ranges[cell_type]]
+
     cell_type = _gid_to_type(gids[0], gid_ranges)
     for gid in gids:
         _validate_type(gid, int, arg_name)
@@ -27,7 +30,7 @@ def _check_gids(gids, gid_ranges, valid_cells, arg_name):
         if gid_type is None:
             raise AssertionError(
                 f'{arg_name} {gid} not in net.gid_ranges')
-        if gid_type != cell_type:
+        if same_type and gid_type != cell_type:
             raise AssertionError(f'All {arg_name} must be of the same type')
 
     return gids

@@ -209,9 +209,9 @@ def pick_connection(net, src_gids=None, target_gids=None,
     valid_srcs = list(net.gid_ranges.keys())  # includes drives as srcs
     valid_targets = list(net.cell_types.keys())
     src_gids = _check_gids(src_gids, net.gid_ranges,
-                           valid_srcs, 'src_gids')
+                           valid_srcs, 'src_gids', same_type=False)
     target_gids = _check_gids(target_gids, net.gid_ranges,
-                              valid_targets, 'target_gids')
+                              valid_targets, 'target_gids', same_type=False)
 
     _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
     _validate_type(receptor, (str, list, None), 'receptor',
