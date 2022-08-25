@@ -62,6 +62,9 @@ Bug
   simulation with an oversubscribed MPI session on a reduced network, by
   `Ryan Thorpe`_ in :gh:`545`.
 
+- Fix bug where :func:`~hnn_core.network.pick_connection` failed when searching
+  for connections with a list of cell types, by `Nick Tolley`_ in :gh:`559`
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
