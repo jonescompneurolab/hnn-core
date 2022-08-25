@@ -419,6 +419,7 @@ def test_network():
     kwargs_good = [
         ('src_gids', 0),
         ('src_gids', 'L2_pyramidal'),
+        ('src_gids', ['L2_pyramidal'])
         ('src_gids', range(2)),
         ('src_gids', None),
         ('target_gids', 35),
@@ -443,6 +444,20 @@ def test_network():
             else:
                 assert np.any(np.in1d([item], net.connectivity[conn_idx][arg]))
 
+    # Test searching a list of src or target types
+    cell_type_list = ['L2_basket', 'L5_basket']
+    gid_list = np.array(list(net.gid_ranges['L2_basket']) + list(
+        net.gid_ranges['L5_basket']))
+    indices = pick_connection(net, src_gids=cell_type_list)
+    for conn_idx in indices:
+        assert np.all(np.in1d(
+            net.connectivity[conn_idx]['src_gids'], gid_list))
+
+    indices = pick_connection(net, target_gids=['L2_basket', 'L5_basket'])
+    for conn_idx in indices:
+        assert np.all(np.in1d(
+            net.connectivity[conn_idx]['src_gids'], gid_list))
+
     # Check that a given gid isn't present in any connection profile that
     # pick_connection can't identify
     conn_idxs = pick_connection(net, src_gids=0)
@@ -456,7 +471,7 @@ def test_network():
     assert len(conn_idxs) == 0
     assert not pick_connection(net, src_gids='evprox1', loc='distal')
 
-    # Check conditions where not connections match
+    # Check conditions where no connections match
     assert pick_connection(net, loc='distal', receptor='gabab') == list()
     assert pick_connection(
         net, src_gids='L2_pyramidal', receptor='gabab') == list()
