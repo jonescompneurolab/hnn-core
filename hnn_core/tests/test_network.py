@@ -419,7 +419,6 @@ def test_network():
     kwargs_good = [
         ('src_gids', 0),
         ('src_gids', 'L2_pyramidal'),
-        ('src_gids', 'L2_pyramidal'),
         ('src_gids', range(2)),
         ('src_gids', None),
         ('target_gids', 35),
