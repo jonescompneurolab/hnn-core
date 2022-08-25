@@ -89,6 +89,7 @@ install Neuron using the traditional package installer available here
 `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
 
 manually install ``hnn-core`` by cloning the latest stable release from github::
+
    $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
    $ cd hnn-core
    $ git fetch --tags
@@ -96,6 +97,7 @@ manually install ``hnn-core`` by cloning the latest stable release from github::
    $ git checkout $latestTag
 
 and finally pip install the local copy, as well as build the Neuron .mod files::
+   
    $ pip install -e .
    $ python setup.py build_mod
 
