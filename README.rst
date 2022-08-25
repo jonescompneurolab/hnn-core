@@ -76,17 +76,28 @@ than one CPU core, refer to our `parallel backend guide`_.
 
 **Note for Windows users**
 
-The pip installer for Neuron does not yet work for Windows. In this case, it is better to
-install ``hnn_core`` without the dependencies::
+The pip installer for Neuron does not yet work for Windows. In this case we recommend
+installing WSL on your local machine, and install ``hnn-core`` using the same steps as
+above. 
 
-   $ pip install hnn_core --no-deps
-
-and then install the dependencies separately::
+Otherewise, to use ``hnn-core`` natively on windows, it is necessary to first install the
+dependencies separately::
 
    $ pip install scipy numpy matplotlib
 
-and install Neuron using the traditional package installer available here
+install Neuron using the traditional package installer available here
 `https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
+
+manually install ``hnn-core`` by cloning the latest stable release from github::
+   $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
+   $ cd hnn-core
+   $ git fetch --tags
+   $ latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+   $ git checkout $latestTag
+
+and finally pip install the local copy, as well as build the Neuron .mod files::
+   $ pip install -e .
+   $ python setup.py build_mod
 
 Documentation and examples
 ==========================
