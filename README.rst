@@ -77,8 +77,8 @@ than one CPU core, refer to our `parallel backend guide`_.
 **Note for Windows users**
 
 The pip installer for Neuron does not yet work for Windows. In this case we recommend
-installing WSL on your local machine, and install ``hnn-core`` using the same steps as
-above. 
+installing `WSL <https://docs.microsoft.com/en-us/windows/wsl/install>`_ on your
+local machine, and install ``hnn-core`` using the same steps as above.
 
 Otherewise, to use ``hnn-core`` natively on windows, it is necessary to first install the
 dependencies separately::

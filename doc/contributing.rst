@@ -32,7 +32,7 @@ changes up to your fork on GitHub), and finally creating a "pull request" to inc
 your changes back into the shared "upstream" version of the codebase.
 
 In general you'll be working with three different copies of the hnn-core
-codebase: the official remote copy at https://github.com/hnn-core/hnn_core
+codebase: the official remote copy at https://github.com/jonescompneurolab/hnn-core
 (usually called ``upstream``), your remote fork of the upstream repository
 (similar URL, but with your username in place of ``hnn-core``, and usually
 called ``origin``), and the local copy of the codebase on your computer. The
@@ -61,7 +61,8 @@ typical contribution process is to
     upstream	https://github.com/jonescompneurolab/hnn-core (fetch)
     upstream	https://github.com/jonescompneurolab/hnn-core (push)
 
-5. To start a new feature branch, we will copy the existing ``master`` branch from the ``upstream`` remote and give it a specific name::
+5. To start a new feature branch, we will copy the existing ``master`` branch from
+   the ``upstream`` remote and give it a specific name::
 
     $ git fetch upstream master:cool_feature
     $ git checkout cool_feature
@@ -91,11 +92,12 @@ typical contribution process is to
 
     $ git push origin cool_feature
 
-9. Go to https://github.com/jonescompneurolab/hnn-core/compare/master...cool_feature to open the pull request. You should also see this link on the terminal when you make the push.
+9. Go to https://github.com/jonescompneurolab/hnn-core/compare to open the pull request by selecting your feature branch.
+   You should also see this link on the terminal when you make the push. 
 
-10. After your pull request is reviewed, repeat steps 6-8 to update the pull request.
+11. After your pull request is reviewed, repeat steps 6-8 to update the pull request.
 
-11. Once the pull request is ready to be merged, add the prefix [MRG] to the title.
+12. Once the pull request is ready to be merged, add the prefix [MRG] to the title.
 
 See the `git book <https://git-scm.com/book/en/v2>`_ for a more general guide on using git. 
 
