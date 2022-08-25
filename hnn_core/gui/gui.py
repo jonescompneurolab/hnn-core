@@ -12,6 +12,7 @@ import sys
 import urllib.parse
 import urllib.request
 from collections import defaultdict
+from datetime import datetime
 
 import hnn_core
 import matplotlib.pyplot as plt
@@ -825,12 +826,13 @@ class HNNGUI:
         for line in data:
             content += line
 
-        uploaded_value = {
+        uploaded_value = [{
             'name': params_name,
             'type': 'application/json',
             'size': len(content),
-            'content': content
-        }
+            'content': content,
+            'last_modified': datetime.utcnow()
+        }]
 
         self.load_button.set_trait('value', uploaded_value)
 
@@ -1330,8 +1332,8 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
     if len(change['owner'].value) == 0:
         return
 
-    params_fname = change['new']['name']
-    param_data = change['new']['content']
+    params_fname = change['new'][0]['name']
+    param_data = change['new'][0]['content']
     param_data = codecs.decode(param_data, encoding="utf-8")
 
     if load_info['prev_param_data'] == param_data:
