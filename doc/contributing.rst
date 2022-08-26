@@ -88,7 +88,7 @@ typical contribution process is to
    Note: see the `numpy contributing guide <https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message>`_
    for tips on informative commit messages.
 
-8. Now push the feature branch to our fork::
+8. Now push the feature branch to your fork::
 
     $ git push origin cool_feature
 
