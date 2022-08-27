@@ -37,7 +37,6 @@ def test_gui_upload_params():
 
     original_tstop = gui.widget_tstop.value
     gui.widget_tstop.value = 1
-
     original_tstep = gui.widget_dt.value
     gui.widget_dt.value = 1
     # simulate upload default.json

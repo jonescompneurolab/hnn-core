@@ -106,7 +106,7 @@ if __name__ == "__main__":
               'scipy'
           ],
           extras_require={
-              'gui': ['ipywidgets >=8.0.0', 'voila']
+              'gui': ['ipywidgets <=7.7.1', 'voila']
           },
           packages=find_packages(),
           package_data={'hnn_core': [

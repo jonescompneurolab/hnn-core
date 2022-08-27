@@ -10,7 +10,6 @@ import sys
 import urllib.parse
 import urllib.request
 from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
 
 from IPython.display import IFrame, display
@@ -392,7 +391,7 @@ class HNNGUI:
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
-        self.load_button.observe(_on_upload_change)
+        self.load_button.observe(_on_upload_change, names='value')
         self.run_button.on_click(_run_button_clicked)
         self.clear_button.on_click(_clear_params)
 
@@ -419,8 +418,9 @@ class HNNGUI:
         connectivity_names = (
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
             'Layer 5 Basket')
-        cell_connectivity = Accordion(children=connectivity_boxes, # noqa
-                                      titles=connectivity_names)
+        cell_connectivity = Accordion(children=connectivity_boxes)
+        for idx, connectivity_name in enumerate(connectivity_names):
+            cell_connectivity.set_title(idx, connectivity_name)
 
         drive_selections = VBox([
             self.widget_drive_type_selection, self.widget_location_selection,
@@ -438,7 +438,8 @@ class HNNGUI:
             config_panel,
         ]
         titles = ('Simulation', 'Cell connectivity', 'Drives', 'Visualization')
-        left_tab.titles = titles
+        for idx, title in enumerate(titles):
+            left_tab.set_title(idx, title)
 
         self.app_layout = AppLayout(
             header=self._header,
@@ -582,21 +583,23 @@ class HNNGUI:
         for line in data:
             content += line
 
-        uploaded_value = [{
-            'name': params_name,
-            'type': 'application/json',
-            'size': len(content),
-            'content': content,
-            'last_modified': datetime.utcnow()
-        }]
-
+        uploaded_value = {
+            params_name: {
+                'metadata': {
+                    'name': params_name,
+                    'type': 'application/json',
+                    'size': len(content),
+                },
+                'content': content
+            }
+        }
         self.load_button.set_trait('value', uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
         tab_index = None
         left_tab = self.app_layout.left_sidebar.children[0].children[0]
-        for idx, _tab_title in enumerate(left_tab.titles):
-            if tab_title == _tab_title:
+        for idx in left_tab._titles.keys():
+            if tab_title == left_tab._titles[idx]:
                 tab_index = int(idx)
                 break
         if tab_index is None:
@@ -962,14 +965,15 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             drive_widgets.append(drive)
 
         if render:
-            titles = [f"{drive['name']} ({drive['location']})" for
-                      drive in drive_widgets]
-
             accordion = Accordion(
                 children=drive_boxes,
                 selected_index=len(drive_boxes) -
                 1 if expand_last_drive else None,
-                titles=tuple(titles))
+            )
+
+            for idx, drive in enumerate(drive_widgets):
+                accordion.set_title(idx,
+                                    f"{drive['name']} ({drive['location']})")
 
             display(accordion)
 
@@ -1084,8 +1088,15 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
     if len(change['owner'].value) == 0:
         return
 
-    params_fname = change['new'][0]['name']
-    param_data = change['new'][0]['content']
+    # for compability
+    if type(change['new']) is list:
+        key = 0
+    else:
+        key = list(change['new'].keys())[0]
+
+    params_fname = change['new'][key]['metadata']['name']
+    param_data = change['new'][key]['content']
+
     param_data = codecs.decode(param_data, encoding="utf-8")
 
     if load_info['prev_param_data'] == param_data:
