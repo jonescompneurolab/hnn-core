@@ -269,10 +269,10 @@ class Cell:
         The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
-    rec_v : h.Vector()
+    rec_vsec : dict
         Recording of somatic voltage. Must be enabled
         by running simulate_dipole(net, record_vsoma=True)
-    rec_i : dict
+    rec_isec : dict
         Contains recording of somatic currents indexed
         by synapse type. (keys are soma_gabaa, soma_gabab etc.)
         Must be enabled by running simulate_dipole(net, record_isoma=True)
@@ -311,9 +311,7 @@ class Cell:
         self._nrn_sections = dict()
         self._nrn_synapses = dict()
         self.dipole_pp = list()
-        self.rec_v = h.Vector()
-        self.rec_i = dict()
-        self.rec_vsec = dict()
+        self.rec_vsec = dict
         self.rec_isec = dict()
         # insert iclamp
         self.list_IClamp = list()

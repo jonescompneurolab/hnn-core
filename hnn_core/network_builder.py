@@ -569,9 +569,6 @@ class NetworkBuilder(object):
                 nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
-            self._vsoma[cell.gid] = cell.rec_v
-            self._isoma[cell.gid] = cell.rec_i
-
             self._vsec[cell.gid] = cell.rec_vsec
             self._isec[cell.gid] = cell.rec_isec
 

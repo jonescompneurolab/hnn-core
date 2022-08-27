@@ -162,20 +162,6 @@ def test_cell_response_backends(run_hnn_core_fixture):
                                       record_vsec=True, record_isec=True)
     n_times = len(joblib_net.cell_response.times)
 
-    assert len(joblib_net.cell_response.vsoma) == n_trials
-    assert len(joblib_net.cell_response.isoma) == n_trials
-    assert len(joblib_net.cell_response.vsoma[trial_idx][gid]) == n_times
-    assert len(joblib_net.cell_response.isoma[
-               trial_idx][gid]['soma_gabaa']) == n_times
-
-    assert len(mpi_net.cell_response.vsoma) == n_trials
-    assert len(mpi_net.cell_response.isoma) == n_trials
-    assert len(mpi_net.cell_response.vsoma[trial_idx][gid]) == n_times
-    assert len(mpi_net.cell_response.isoma[
-               trial_idx][gid]['soma_gabaa']) == n_times
-    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
-    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
-
     assert len(joblib_net.cell_response.vsec) == n_trials
     assert len(joblib_net.cell_response.isec) == n_trials
     assert len(joblib_net.cell_response.vsec[
