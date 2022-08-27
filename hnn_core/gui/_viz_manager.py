@@ -25,7 +25,7 @@ class _TabWithNoneIndex(Tab):
             self.selected_index = None
 
         # if there are tabs, but none is selected, select the first one
-        elif self.selected_index == None:
+        elif self.selected_index is None:
             self.selected_index = None
 
         # if there are tabs and a selection, but the selection is no longer
@@ -365,11 +365,11 @@ def _add_figure(b, widgets, data, scale=0.95):
     with fig_outputs:
         dpi = _dpi
         figsize = (scale * ((int(viz_output_layout.width[:-2]) - 10) / dpi),
-                scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
+                   scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
         mosaic = fig_templates[template_name]['mosaic']
         kwargs = eval(f"dict({fig_templates[template_name]['kwargs']})")
         fig, axd = plt.subplot_mosaic(mosaic, figsize=figsize, dpi=dpi,
-                                    **kwargs)
+                                      **kwargs)
         fig.tight_layout()
         fig.canvas.header_visible = False
         fig.canvas.footer_visible = False
