@@ -432,12 +432,13 @@ class HNNGUI:
         config_panel, figs_output = self.viz_manager.compose()
 
         # Tabs for left pane
-        titles = ('Simulation', 'Cell connectivity', 'Drives', 'Analysis')
-        left_tab = Tab(titles=titles)
+        left_tab = Tab()
         left_tab.children = [
             simulation_box, self._connectivity_out, drives_options,
             config_panel,
         ]
+        titles = ('Simulation', 'Cell connectivity', 'Drives', 'Visualization')
+        left_tab.titles = titles
 
         self.app_layout = AppLayout(
             header=self._header,
@@ -594,8 +595,8 @@ class HNNGUI:
     def _simulate_left_tab_click(self, tab_title):
         tab_index = None
         left_tab = self.app_layout.left_sidebar.children[0].children[0]
-        for idx in left_tab._titles.keys():
-            if tab_title == left_tab._titles[idx]:
+        for idx, _tab_title in enumerate(left_tab.titles):
+            if tab_title == _tab_title:
                 tab_index = int(idx)
                 break
         if tab_index is None:
