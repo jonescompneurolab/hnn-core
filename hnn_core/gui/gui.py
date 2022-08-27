@@ -401,7 +401,7 @@ class HNNGUI:
 
         Parameters
         ----------
-        return_layout: bool
+        return_layout : bool
             If the method returns the layout object which can be rendered by
             IPython.display.display() method.
         """
@@ -489,7 +489,7 @@ class HNNGUI:
             The width of iframe window use to show the snapshot.
         height : int | None
             The height of iframe window use to show the snapshot.
-        render: bool
+        render : bool
             Will return an IFrame object if False
 
         Returns
