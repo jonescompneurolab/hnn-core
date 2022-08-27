@@ -243,10 +243,6 @@ class HNNGUI:
             style={'button_color': self.layout['theme_color']},
             description='Load network', layout=self.layout['btn'],
             button_style='success')
-        self.clear_button = create_expanded_button(
-            'Clear uploaded parameters', 'danger',
-            layout=self.layout['btn'],
-            button_color=self.layout['theme_color'])
         self.delete_drive_button = create_expanded_button(
             'Delete drives', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
@@ -281,9 +277,6 @@ class HNNGUI:
         It's not encouraged for users to modify or access attributes in this
         part.
         """
-        # Reloading status.
-        self._load_info = {"count": 0, "prev_param_data": b""}
-
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
@@ -306,7 +299,6 @@ class HNNGUI:
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
         self._operation_buttons = HBox([self.run_button,
                                         self.load_button,
-                                        self.clear_button,
                                         self.delete_drive_button],
                                        layout=self.layout['operation_box'])
         # title
@@ -366,13 +358,11 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_change(change):
-            with self._log_out:
-                print("received new uploaded params file...")
             return on_upload_change(change, self.params, self.widget_tstop,
                                     self.widget_dt, self._log_out,
                                     self.drive_boxes, self.drive_widgets,
                                     self._drives_out, self._connectivity_out,
-                                    self.connectivity_widgets, self._load_info,
+                                    self.connectivity_widgets,
                                     self.layout['drive_textbox'])
 
         def _run_button_clicked(b):
@@ -384,16 +374,11 @@ class HNNGUI:
                 self._simulation_status_bar, self._simulation_status_contents,
                 self.connectivity_widgets, self.viz_manager)
 
-        def _clear_params(b):
-            self._load_info["count"] = 0
-            self._load_info["prev_param_data"] = 0
-
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
         self.load_button.observe(_on_upload_change, names='value')
         self.run_button.on_click(_run_button_clicked)
-        self.clear_button.on_click(_clear_params)
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -470,8 +455,7 @@ class HNNGUI:
                                     self._drives_out, self.drive_widgets,
                                     self.drive_boxes, self._connectivity_out,
                                     self.connectivity_widgets,
-                                    self.widget_tstop, self._load_info,
-                                    self.layout)
+                                    self.widget_tstop, self.layout)
 
         if not return_layout:
             return
@@ -1035,10 +1019,8 @@ def add_connectivity_tab(net, connectivity_out,
 
 def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop, load_info,
-                                layout):
+                                connectivity_sliders, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
-    load_info['count'] += 1
     # init the network.
     tmp_net = jones_2009_model(params)
 
@@ -1084,10 +1066,10 @@ def load_drive_and_connectivity(params, log_out, drives_out,
 
 def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
                      drive_widgets, drives_out, connectivity_out,
-                     connectivity_sliders, load_info, layout):
+                     connectivity_sliders, layout):
     if len(change['owner'].value) == 0:
         return
-
+    logger.debug("received new uploaded params file...")
     # for compability
     if type(change['new']) is list:
         key = 0
@@ -1098,16 +1080,6 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
     param_data = change['new'][key]['content']
 
     param_data = codecs.decode(param_data, encoding="utf-8")
-
-    if load_info['prev_param_data'] == param_data:
-        with log_out:
-            print(
-                "Same param. No reloading."
-                "To force reloading, hit \"clear uploaded parameters\" button",
-            )
-        return
-    else:
-        load_info['prev_param_data'] = param_data
 
     ext = Path(params_fname).suffix
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
@@ -1123,10 +1095,10 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
 
         params.update(params_network)
     # init network, add drives & connectivity
-    load_drive_and_connectivity(params, log_out, drives_out,
-                                drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop, load_info,
-                                layout)
+    load_drive_and_connectivity(params, log_out, drives_out, drive_widgets,
+                                drive_boxes, connectivity_out,
+                                connectivity_sliders, tstop, layout)
+    change['owner'].set_trait('value', {})
 
 
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
