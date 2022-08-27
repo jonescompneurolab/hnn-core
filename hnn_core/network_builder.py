@@ -4,6 +4,8 @@
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
+import os
+import os.path as op
 from copy import deepcopy
 
 import numpy as np
@@ -141,27 +143,24 @@ def _is_loaded_mechanisms():
 
 
 def load_custom_mechanisms():
-    import platform
-    import os.path as op
 
     if _is_loaded_mechanisms():
         return
 
-    if platform.system() == 'Windows':
-        mech_fname = op.join(op.dirname(__file__), 'mod', 'nrnmech.dll')
-    else:
-        if platform.system() == 'Darwin' and 'arm64' in platform.platform():
-            cpu_arch = 'arm64'
-        else:  # x86 Mac or Linux
-            cpu_arch = 'x86_64'
+    # recursively find the .so / .dll library
+    mech_fname = list()
+    mod_dir = op.join(op.dirname(__file__), 'mod')
+    for root, dirnames, filenames in os.walk(mod_dir):
+        for filename in filenames:
+            if filename.endswith(('.so', '.dll')):
+                mech_fname.append(os.path.join(root, filename))
+                break
 
-        mech_fname = op.join(op.dirname(__file__), 'mod', cpu_arch,
-                             '.libs', 'libnrnmech.so')
-    if not op.exists(mech_fname):
-        raise FileNotFoundError(f'The file {mech_fname} could not be found')
+    if len(mech_fname) == 0:
+        raise FileNotFoundError(f'No .so or .dll file found in {mod_dir}')
 
-    h.nrn_load_dll(mech_fname)
-    print('Loading custom mechanism files from %s' % mech_fname)
+    h.nrn_load_dll(mech_fname[0])
+    print('Loading custom mechanism files from %s' % mech_fname[0])
     if not _is_loaded_mechanisms():
         raise ValueError('The custom mechanisms could not be loaded')
 
