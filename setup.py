@@ -52,12 +52,11 @@ class BuildMod(Command):
         print("=> Building mod files ...")
 
         if platform.system() == 'Windows':
-            mod_path = op.join(op.dirname(__file__), 'mod')
             shell = True
         else:
-            mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
             shell = False
 
+        mod_path = op.join(op.dirname(__file__), 'hnn_core', 'mod')
         process = subprocess.Popen(['nrnivmodl'], cwd=mod_path,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, shell=shell)
@@ -111,10 +110,7 @@ if __name__ == "__main__":
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',
-              'gui/*.ipynb',
-              'mod/*',
-              'mod/x86_64/*',
-              'mod/x86_64/.lib/*']},
+              'gui/*.ipynb']},
           cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod},
           entry_points={'console_scripts': ['hnn-gui=hnn_core.gui.gui:launch']}
           )
