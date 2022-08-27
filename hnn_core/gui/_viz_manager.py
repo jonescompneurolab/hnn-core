@@ -100,15 +100,15 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
 
     Parameters
     ----------
-    fig: Figure
+    fig : Figure
         A matplotlib.figure.Figure object.
-    ax: Axes
+    ax : Axes
         matplotlib.axes.Axes
-    single_simulation: dict
+    single_simulation : dict
         A single simulation
-    plot_type: str
+    plot_type : str
         Type of subplots
-    plot_config: dict
+    plot_config : dict
         A dict specifies the preprocessing and style of plots.
     """
     # Make sure that visualization does not change the original data
