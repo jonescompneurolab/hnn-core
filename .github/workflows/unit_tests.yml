@@ -36,7 +36,7 @@ jobs:
           pip install flake8 pytest pytest-cov
           pip install mne psutil joblib
           pip install NEURON
-          pip install ipywidgets voila
+          pip install 'ipywidgets<=7.7.1' voila
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             pip install mpi4py
           else

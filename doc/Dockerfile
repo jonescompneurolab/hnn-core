@@ -44,7 +44,7 @@ RUN pip install numpy && \
     pip install scipy && \
     pip install matplotlib && \
     pip install pyqt5 && \
-	pip install ipywidgets && \
+	pip install 'ipywidgets<=7.7.1' && \
     pip install pillow && \
     pip install https://api.github.com/repos/mne-tools/mne-python/zipball/master
     

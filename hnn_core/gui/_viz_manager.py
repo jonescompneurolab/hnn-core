@@ -16,22 +16,6 @@ from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
 
-class _TabWithNoneIndex(Tab):
-    def _reset_selected_index(self):
-        """Disable the default tab behavior that reset selected_index to 0."""
-        # if there are no tabs, then none should be selected
-        num_children = len(self.children)
-        if num_children == 0:
-            self.selected_index = None
-
-        # if there are tabs, but none is selected, select the first one
-        elif self.selected_index is None:
-            self.selected_index = None
-
-        # if there are tabs and a selection, but the selection is no longer
-        # valid, select the last tab.
-        elif num_children < self.selected_index:
-            self.selected_index = num_children - 1
 
 
 _dpi = 96
@@ -337,11 +321,10 @@ def _add_axes_controls(widgets, data, fig, axd):
     close_fig_button.on_click(
         partial(_close_figure, widgets=widgets, data=data, fig_idx=fig_idx))
 
-    _prev_titles = copy.deepcopy(widgets['axes_config_tabs'].titles)
+    n_tabs = len(widgets['axes_config_tabs'].children)
     widgets['axes_config_tabs'].children = widgets[
         'axes_config_tabs'].children + (VBox([close_fig_button, controls]), )
-    widgets['axes_config_tabs'].titles = _prev_titles + (
-        _idx2figname(fig_idx), )
+    widgets['axes_config_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
 
 def _add_figure(b, widgets, data, scale=0.95):
@@ -350,17 +333,15 @@ def _add_figure(b, widgets, data, scale=0.95):
     viz_output_layout = data['visualization_output']
     fig_outputs = Output()
     n_tabs = len(widgets['figs_tabs'].children)
+
     if n_tabs == 0:
         widgets['figs_output'].clear_output()
         with widgets['figs_output']:
             display(widgets['figs_tabs'])
 
-    _prev_titles = copy.deepcopy(widgets['figs_tabs'].titles)
-    widgets['figs_tabs'].selected_index = None
     widgets['figs_tabs'].children = widgets['figs_tabs'].children + (
         fig_outputs, )
-
-    widgets['figs_tabs'].titles = _prev_titles + (_idx2figname(fig_idx), )
+    widgets['figs_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
     with fig_outputs:
         dpi = _dpi
@@ -373,13 +354,14 @@ def _add_figure(b, widgets, data, scale=0.95):
         fig.tight_layout()
         fig.canvas.header_visible = False
         fig.canvas.footer_visible = False
+
         plt.show()
 
     _add_axes_controls(widgets, data, fig=fig, axd=axd)
 
     data['figs'][fig_idx] = fig
-    data['fig_idx']['idx'] += 1
     widgets['figs_tabs'].selected_index = n_tabs
+    data['fig_idx']['idx'] += 1
 
 
 class _VizManager:
@@ -401,8 +383,8 @@ class _VizManager:
             layout=self.viz_layout['visualization_window'])
 
         # widgets
-        self.axes_config_tabs = _TabWithNoneIndex()
-        self.figs_tabs = _TabWithNoneIndex()
+        self.axes_config_tabs = Tab()
+        self.figs_tabs = Tab()
         self.axes_config_tabs.selected_index = None
         self.figs_tabs.selected_index = None
         link(
