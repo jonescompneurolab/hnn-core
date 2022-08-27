@@ -16,8 +16,6 @@ from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
 
-
-
 _dpi = 96
 _fig_placeholder = 'Run simulation to add figures here.'
 
@@ -373,6 +371,13 @@ class _VizManager:
         A dict containing all simulation data
     viz_layout : dict
         A dict about visualization layout specs
+
+    Attributes
+    ----------
+    widgets : dict
+        A dict of widget references
+    data : dict
+        A dict of external simulation data object
     """
     def __init__(self, gui_data, viz_layout):
         plt.close("all")

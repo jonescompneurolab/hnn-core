@@ -68,50 +68,50 @@ class HNNGUI:
 
     Attributes
     ----------
-    layout: dict
+    layout : dict
         The styling configuration of GUI.
-    params: dict
+    params : dict
         The parameters to use for constructing the network.
-    simulation_data: dict
+    simulation_data : dict
         Simulation related objects, such as net and dpls.
-    widget_tstop: Widget
+    widget_tstop : Widget
         Simulation stop time widget.
-    widget_dt: Widget
+    widget_dt : Widget
         Simulation step size widget.
-    widget_ntrials: Widget
+    widget_ntrials : Widget
         Widget that controls the number of trials in a single simulation.
-    widget_backend_selection: Widget
+    widget_backend_selection : Widget
         Widget that selects the backend used in simulations.
-    widget_viz_layout_selection: Widget
+    widget_viz_layout_selection : Widget
         Widget that selects the layout of visualization window.
-    widget_mpi_cmd: Widget
+    widget_mpi_cmd : Widget
         Widget that specify the mpi command to use when the backend is
         MPIBackend.
-    widget_n_jobs: Widget
+    widget_n_jobs : Widget
         Widget that specify the cores in multi-trial simulations.
-    widget_drive_type_selection: Widget
+    widget_drive_type_selection : Widget
         Widget that is used to select the drive to be added to the network.
-    widget_location_selection: Widget.
+    widget_location_selection : Widget.
         Widget that specifies the location of network drives. Could be proximal
         or distal.
-    add_drive_button: Widget
+    add_drive_button : Widget
         Clickable widget that is used to add a drive to the network.
-    run_button: Widget
+    run_button : Widget
         Clickable widget that triggers simulation.
-    load_button: Widget
+    load_button : Widget
         Clickable widget that receives uploaded parameter files.
-    delete_drive_button: Widget
+    delete_drive_button : Widget
         Clickable widget that clear all existing network drives.
-    plot_outputs_dict: list
+    plot_outputs_dict : list
         A list of visualization panel outputs.
-    plot_dropdown_types_dict: list
+    plot_dropdown_types_dict : list
         A list of dropdown menus that control the plot types in
         plot_outputs_dict.
-    drive_widgets: list
+    drive_widgets : list
         A list of network drive widgets added by add_drive_button.
-    drive_boxes: list
+    drive_boxes : list
         A list of network drive layouts.
-    connectivity_sliders: list
+    connectivity_sliders : list
         A list of boxes that control the weight and probability of connections
         in the network.
     """
