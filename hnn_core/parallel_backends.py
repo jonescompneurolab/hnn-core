@@ -51,8 +51,6 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         net.cell_response._spike_times.append(sim_data[idx]['spike_times'])
         net.cell_response._spike_gids.append(sim_data[idx]['spike_gids'])
         net.cell_response.update_types(net.gid_ranges)
-        net.cell_response._vsoma.append(sim_data[idx]['vsoma'])
-        net.cell_response._isoma.append(sim_data[idx]['isoma'])
         net.cell_response._vsec.append(sim_data[idx]['vsec'])
         net.cell_response._isec.append(sim_data[idx]['isec'])
 
