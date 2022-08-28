@@ -178,6 +178,7 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
 
 
 def _static_re_render(widgets, fig, fig_idx):
+    logger.debug('_static_re_render is called')
     figs_tabs = widgets['figs_tabs']
     titles = [
         figs_tabs.get_title(idx) for idx in range(len(figs_tabs.children))
@@ -186,7 +187,6 @@ def _static_re_render(widgets, fig, fig_idx):
     fig_output = widgets['figs_tabs'].children[fig_tab_idx]
     fig_output.clear_output()
     with fig_output:
-        plt.ioff()
         display(fig)
 
 
@@ -207,8 +207,12 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
     ax.set_facecolor('w')
     _update_ax(fig, ax, single_simulation, plot_type, plot_config)
 
+    logger.debug('update ax')
     if data['use_ipympl'] is False:
         _static_re_render(widgets, fig, fig_idx)
+    else:
+        fig.canvas.draw()
+        fig.canvas.flush_events()
 
 
 def _clear_axis(b, widgets, data, fig_idx, fig, ax):
@@ -217,6 +221,9 @@ def _clear_axis(b, widgets, data, fig_idx, fig, ax):
 
     if data['use_ipympl'] is False:
         _static_re_render(widgets, fig, fig_idx)
+    else:
+        fig.canvas.draw()
+        fig.canvas.flush_events()
 
 
 def _get_ax_control(widgets, data, fig_idx, fig, ax):
@@ -384,8 +391,11 @@ def _add_figure(b, widgets, data, scale=0.95):
         fig.tight_layout()
         fig.canvas.header_visible = False
         fig.canvas.footer_visible = False
-
-        display(fig)
+        
+        if data['use_ipympl'] is False:
+            display(fig)
+        else:
+            display(fig.canvas)
 
     _add_axes_controls(widgets, data, fig=fig, axd=axd)
 
