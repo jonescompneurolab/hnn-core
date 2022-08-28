@@ -391,7 +391,7 @@ def _add_figure(b, widgets, data, scale=0.95):
         fig.tight_layout()
         fig.canvas.header_visible = False
         fig.canvas.footer_visible = False
-        
+
         if data['use_ipympl'] is False:
             display(fig)
         else:
