@@ -590,6 +590,15 @@ class HNNGUI:
             raise ValueError("Incorrect tab title")
         left_tab.selected_index = tab_index
 
+    def _simulate_make_figure(self,):
+        self._simulate_left_tab_click("Visualization")
+        self.viz_manager.make_fig_button.click()
+
+    def _simulate_viz_action(self, action_name, *args, **kwargs):
+        self._simulate_left_tab_click("Visualization")
+        action = getattr(self.viz_manager, f"_simulate_{action_name}")
+        action(*args, **kwargs)
+
 
 def create_expanded_button(description, button_style, layout, disabled=False,
                            button_color="#8A2BE2"):
