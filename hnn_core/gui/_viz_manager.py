@@ -460,3 +460,67 @@ class _VizManager:
     def add_figure(self, b=None):
         logger.debug("add figure")
         _add_figure(b, self.widgets, self.data, scale=0.97)
+
+    def _simulate_add_fig(self):
+        self.make_fig_button.click()
+
+    def _simulate_switch_fig_template(self, template_name):
+        assert template_name in fig_templates.keys(), "No such template"
+        self.templates_dropdown.value = template_name
+
+    def _simulate_delete_figure(self, fig_name):
+        tab = self.axes_config_tabs
+        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        assert fig_name in titles
+        tab_idx = titles.index(fig_name)
+
+        self.axes_config_tabs.selected_index = tab_idx
+        close_button = self.axes_config_tabs.children[tab_idx].children[0]
+        close_button.click()
+
+    def _simulate_edit_figure(self, fig_name, ax_name, simulation_name,
+                              plot_type, config, operation):
+        assert simulation_name in self.data['simulations'].keys()
+        assert plot_type in _plot_types
+        assert operation in ("plot", "clear")
+
+        tab = self.axes_config_tabs
+        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        assert fig_name in titles, "No such figure"
+        tab_idx = titles.index(fig_name)
+        self.axes_config_tabs.selected_index = tab_idx
+
+        ax_control_tabs = self.axes_config_tabs.children[tab_idx].children[1]
+        ax_titles = [
+            ax_control_tabs.get_title(idx)
+            for idx in range(len(ax_control_tabs.children))
+        ]
+        assert ax_name in ax_titles, "No such axis"
+        ax_idx = ax_titles.index(ax_name)
+        ax_control_tabs.selected_index = ax_idx
+
+        # ax config
+        simulation_ctrl = ax_control_tabs.children[ax_idx].children[0]
+        # return simulation_ctrl
+        simulation_ctrl.value = simulation_name
+
+        plot_type_ctrl = ax_control_tabs.children[ax_idx].children[1]
+        plot_type_ctrl.value = plot_type
+
+        config_name_idx = {
+            "dipole_smooth": 2,
+            "dipole_scaling": 3,
+            "max_spectral_frequency": 4,
+            "spectrogram_colormap_selection": 5,
+        }
+        for conf_key, conf_val in config.items():
+            assert conf_key in config_name_idx.keys()
+            idx = config_name_idx[conf_key]
+            conf_widget = ax_control_tabs.children[ax_idx].children[idx]
+            conf_widget.value = conf_val
+
+        buttons = ax_control_tabs.children[ax_idx].children[-1]
+        if operation == "plot":
+            buttons.children[0].click()
+        elif operation == "clear":
+            buttons.children[1].click()
