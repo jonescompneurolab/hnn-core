@@ -6,6 +6,7 @@ import copy
 import io
 from functools import partial
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
@@ -176,9 +177,23 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
             ax.imshow(img_arr)
 
 
+def _static_re_render(widgets, fig, fig_idx):
+    figs_tabs = widgets['figs_tabs']
+    titles = [
+        figs_tabs.get_title(idx) for idx in range(len(figs_tabs.children))
+    ]
+    fig_tab_idx = titles.index(_idx2figname(fig_idx))
+    fig_output = widgets['figs_tabs'].children[fig_tab_idx]
+    fig_output.clear_output()
+    with fig_output:
+        plt.ioff()
+        display(fig)
+
+
 def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
                   spectrogram_colormap_selection, dipole_smooth,
-                  max_spectral_frequency, dipole_scaling, data, fig, ax):
+                  max_spectral_frequency, dipole_scaling, widgets, data,
+                  fig_idx, fig, ax):
     single_simulation = data['simulations'][widgets_simulation.value]
 
     plot_config = {
@@ -192,10 +207,16 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
     ax.set_facecolor('w')
     _update_ax(fig, ax, single_simulation, plot_type, plot_config)
 
+    if data['use_ipympl'] is False:
+        _static_re_render(widgets, fig, fig_idx)
 
-def _clear_axis(b, ax):
+
+def _clear_axis(b, widgets, data, fig_idx, fig, ax):
     ax.clear()
     ax.set_facecolor('w')
+
+    if data['use_ipympl'] is False:
+        _static_re_render(widgets, fig, fig_idx)
 
 
 def _get_ax_control(widgets, data, fig_idx, fig, ax):
@@ -242,7 +263,15 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style)
 
     clear_button = Button(description='Clear axis')
-    clear_button.on_click(partial(_clear_axis, ax=ax))
+    clear_button.on_click(
+        partial(
+            _clear_axis,
+            widgets=widgets,
+            data=data,
+            fig_idx=fig_idx,
+            fig=fig,
+            ax=ax,
+        ))
 
     plot_button = Button(description='Plot')
     plot_button.on_click(
@@ -254,7 +283,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             dipole_smooth=dipole_smooth,
             max_spectral_frequency=max_spectral_frequency,
             dipole_scaling=dipole_scaling,
+            widgets=widgets,
             data=data,
+            fig_idx=fig_idx,
             fig=fig,
             ax=ax,
         ))
@@ -347,13 +378,14 @@ def _add_figure(b, widgets, data, scale=0.95):
                    scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
         mosaic = fig_templates[template_name]['mosaic']
         kwargs = eval(f"dict({fig_templates[template_name]['kwargs']})")
+        plt.ioff()
         fig, axd = plt.subplot_mosaic(mosaic, figsize=figsize, dpi=dpi,
                                       **kwargs)
         fig.tight_layout()
         fig.canvas.header_visible = False
         fig.canvas.footer_visible = False
 
-        plt.show()
+        display(fig)
 
     _add_axes_controls(widgets, data, fig=fig, axd=axd)
 
@@ -382,6 +414,7 @@ class _VizManager:
     def __init__(self, gui_data, viz_layout):
         plt.close("all")
         self.viz_layout = viz_layout
+        self.use_ipympl = 'ipympl' in matplotlib.get_backend()
 
         self.axes_config_output = Output()
         self.figs_output = Output(
@@ -428,6 +461,7 @@ class _VizManager:
     @property
     def data(self):
         return {
+            "use_ipympl": self.use_ipympl,
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
             "visualization_output": self.viz_layout['visualization_output'],
