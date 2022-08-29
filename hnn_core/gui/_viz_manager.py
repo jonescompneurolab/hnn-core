@@ -177,7 +177,7 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
             ax.imshow(img_arr)
 
 
-def _static_re_render(widgets, fig, fig_idx):
+def _static_rerender(widgets, fig, fig_idx):
     logger.debug('_static_re_render is called')
     figs_tabs = widgets['figs_tabs']
     titles = [
@@ -187,7 +187,14 @@ def _static_re_render(widgets, fig, fig_idx):
     fig_output = widgets['figs_tabs'].children[fig_tab_idx]
     fig_output.clear_output()
     with fig_output:
+        fig.tight_layout()
         display(fig)
+
+
+def _dynamic_rerender(fig):
+    fig.canvas.draw()
+    fig.canvas.flush_events()
+    fig.tight_layout()
 
 
 def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
@@ -209,11 +216,9 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
     logger.debug('update ax')
     if data['use_ipympl'] is False:
-        _static_re_render(widgets, fig, fig_idx)
+        _static_rerender(widgets, fig, fig_idx)
     else:
-        fig.canvas.draw()
-        fig.canvas.flush_events()
-        fig.tight_layout()
+        _dynamic_rerender(fig)
 
 
 def _clear_axis(b, widgets, data, fig_idx, fig, ax):
@@ -221,11 +226,9 @@ def _clear_axis(b, widgets, data, fig_idx, fig, ax):
     ax.set_facecolor('w')
 
     if data['use_ipympl'] is False:
-        _static_re_render(widgets, fig, fig_idx)
+        _static_rerender(widgets, fig, fig_idx)
     else:
-        fig.canvas.draw()
-        fig.canvas.flush_events()
-        fig.tight_layout()
+        _dynamic_rerender(fig)
 
 
 def _get_ax_control(widgets, data, fig_idx, fig, ax):
