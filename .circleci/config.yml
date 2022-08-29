@@ -50,8 +50,7 @@ jobs:
               command: |
                   source ~/miniconda/bin/activate testenv
                   pip install -U pip setuptools virtualenv
-                  pip install 'ipywidgets<=7.7.1' voila 'ipympl<0.9'
-                  python setup.py install
+                  pip install '.[gui]'
 
           - run:
               name: Build the documentation
