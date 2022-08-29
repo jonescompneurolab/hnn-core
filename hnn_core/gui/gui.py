@@ -269,7 +269,6 @@ class HNNGUI:
         handler.setFormatter(
             logging.Formatter('%(asctime)s  - [%(levelname)s] %(message)s'))
         logger.addHandler(handler)
-        logger.setLevel(logging.DEBUG)
 
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows.
