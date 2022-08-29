@@ -27,9 +27,8 @@ jobs:
           sudo apt-get install pandoc
           python -m pip install --upgrade pip
           pip install numpy matplotlib scipy NEURON
-          pip install 'ipywidgets<=7.7.1' voila 'ipympl<0.9'
           pip install sphinx-gallery sphinx sphinx_bootstrap_theme numpydoc pillow nbsphinx
-          python setup.py install
+          pip install '.[gui]'
       - name: Linkcheck
         shell: bash -el {0}
         run: |
