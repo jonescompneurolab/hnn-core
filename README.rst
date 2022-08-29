@@ -78,7 +78,7 @@ than one CPU core, refer to our `parallel backend guide`_.
 
 We do not currently support hnn_core installation natively on Windows. Instead we reccomend
 installing `WSL <https://docs.microsoft.com/en-us/windows/wsl/install>`_ on your
-local machine, and install ``hnn-core`` using the same steps as above.
+local machine, and install ``hnn-core`` and Anaconda using the same steps as above.
 
 Documentation and examples
 ==========================
