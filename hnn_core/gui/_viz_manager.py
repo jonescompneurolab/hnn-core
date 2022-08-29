@@ -213,6 +213,7 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
     else:
         fig.canvas.draw()
         fig.canvas.flush_events()
+        fig.tight_layout()
 
 
 def _clear_axis(b, widgets, data, fig_idx, fig, ax):
@@ -224,6 +225,7 @@ def _clear_axis(b, widgets, data, fig_idx, fig, ax):
     else:
         fig.canvas.draw()
         fig.canvas.flush_events()
+        fig.tight_layout()
 
 
 def _get_ax_control(widgets, data, fig_idx, fig, ax):
