@@ -465,7 +465,7 @@ class HNNGUI:
     def show(self):
         display(self.app_layout)
 
-    def capture(self, width=None, height=None, render=True):
+    def capture(self, width=None, height=None, extra_margin=100, render=True):
         """Take a screenshot of the current GUI.
 
         Parameters
@@ -474,6 +474,8 @@ class HNNGUI:
             The width of iframe window use to show the snapshot.
         height : int | None
             The height of iframe window use to show the snapshot.
+        extra_margin: int
+            Extra margin in pixel for the GUI.
         render : bool
             Will return an IFrame object if False
 
@@ -484,9 +486,9 @@ class HNNGUI:
         file = io.StringIO()
         embed_minimal_html(file, views=[self.app_layout], title='')
         if not width:
-            width = self.total_width + 20
+            width = self.total_width + extra_margin
         if not height:
-            height = self.total_height + 20
+            height = self.total_height + extra_margin
 
         content = urllib.parse.quote(file.getvalue().encode('utf8'))
         data_url = f"data:text/html,{content}"
@@ -1019,8 +1021,9 @@ def add_connectivity_tab(net, connectivity_out,
                         _get_connectivity_widgets(receptor_related_conn))
 
     connectivity_boxes = [VBox(slider) for slider in connectivity_sliders]
-    cell_connectivity = Accordion(children=connectivity_boxes,
-                                  titles=tuple(connectivity_names))
+    cell_connectivity = Accordion(children=connectivity_boxes)
+    for idx, connectivity_name in enumerate(connectivity_names):
+        cell_connectivity.set_title(idx, connectivity_name)
 
     with connectivity_out:
         display(cell_connectivity)
