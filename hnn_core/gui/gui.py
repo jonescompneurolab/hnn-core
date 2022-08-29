@@ -284,10 +284,6 @@ class HNNGUI:
 
         self.viz_manager = _VizManager(self.data, self.layout)
 
-        # visualization window
-        self._visualization_window = Output(
-            layout=self.layout['visualization_output'])
-
         # detailed configuration of backends
         self._backend_config_out = Output()
 
@@ -313,7 +309,6 @@ class HNNGUI:
         return {
             "viz_style": self.layout['visualization_output'],
             # widgets
-            "viz_window": self._visualization_window,
             "plot_outputs": self.plot_outputs_dict,
             "plot_dropdowns": self.plot_dropdown_types_dict,
             "plot_sim_selections": self.plot_sim_selections_dict,
