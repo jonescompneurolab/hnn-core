@@ -592,6 +592,18 @@ class HNNGUI:
         self.viz_manager.make_fig_button.click()
 
     def _simulate_viz_action(self, action_name, *args, **kwargs):
+        """A shortcut to call simulated actions in _VizManager.
+
+        Parameters
+        ----------
+        action_name : str
+            The action to take. For example, to call `_simulate_add_fig` in
+            _VizManager, you can run `_simulate_viz_action("viz_action")`
+        args : list
+            Optional positional parameters passed to the called method.
+        kwargs: dict
+            Optional keyword parameters passed to the called method.
+        """
         self._simulate_left_tab_click("Visualization")
         action = getattr(self.viz_manager, f"_simulate_{action_name}")
         action(*args, **kwargs)
