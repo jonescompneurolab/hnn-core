@@ -428,8 +428,7 @@ class _VizManager:
         self.use_ipympl = 'ipympl' in matplotlib.get_backend()
 
         self.axes_config_output = Output()
-        self.figs_output = Output(
-            layout=self.viz_layout['visualization_window'])
+        self.figs_output = Output()
 
         # widgets
         self.axes_config_tabs = Tab()
@@ -485,6 +484,9 @@ class _VizManager:
         with self.figs_output:
             display(Label(_fig_placeholder))
 
+        fig_output_container = VBox(
+            [self.figs_output], layout=self.viz_layout['visualization_window'])
+
         config_panel = VBox([
             Box(
                 [
@@ -500,7 +502,7 @@ class _VizManager:
             Label("Figure config:"),
             self.axes_config_output,
         ])
-        return config_panel, self.figs_output
+        return config_panel, fig_output_container
 
     def add_figure(self, b=None):
         _add_figure(b, self.widgets, self.data, scale=0.97)
