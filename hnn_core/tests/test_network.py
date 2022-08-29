@@ -445,17 +445,21 @@ def test_network():
 
     # Test searching a list of src or target types
     cell_type_list = ['L2_basket', 'L5_basket']
-    gid_list = np.array(list(net.gid_ranges['L2_basket']) + list(
+    true_gid_set = set(list(net.gid_ranges['L2_basket']) + list(
         net.gid_ranges['L5_basket']))
     indices = pick_connection(net, src_gids=cell_type_list)
+    pick_gid_list = list()
     for conn_idx in indices:
-        assert np.all(np.in1d(
-            net.connectivity[conn_idx]['src_gids'], gid_list))
+        pick_gid_list.extend(
+            net.connectivity[conn_idx]['src_gids'])
+    assert true_gid_set == set(pick_gid_list)
 
     indices = pick_connection(net, target_gids=['L2_basket', 'L5_basket'])
+    pick_gid_list = list()
     for conn_idx in indices:
-        assert np.all(np.in1d(
-            net.connectivity[conn_idx]['target_gids'], gid_list))
+        pick_gid_list.extend(
+            net.connectivity[conn_idx]['target_gids'])
+    assert true_gid_set == set(pick_gid_list)
 
     # Check that a given gid isn't present in any connection profile that
     # pick_connection can't identify
