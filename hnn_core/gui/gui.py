@@ -23,7 +23,7 @@ import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
                       simulate_dipole)
 from hnn_core.gui._logging import logger
-from hnn_core.gui._viz_manager import _VizManager
+from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
@@ -1249,6 +1249,11 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                 'finished']
 
     viz_manager.add_figure()
+    fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
+    ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
+    for ax_name, plot_type in ax_plots:
+        viz_manager._simulate_edit_figure(fig_name, ax_name, _sim_name,
+                                          plot_type, {}, "plot")
 
 
 def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
