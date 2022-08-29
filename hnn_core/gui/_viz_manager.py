@@ -388,12 +388,13 @@ def _add_figure(b, widgets, data, scale=0.95):
         plt.ioff()
         fig, axd = plt.subplot_mosaic(mosaic, figsize=figsize, dpi=dpi,
                                       **kwargs)
+        plt.ion()
         fig.tight_layout()
         fig.canvas.header_visible = False
         fig.canvas.footer_visible = False
 
         if data['use_ipympl'] is False:
-            display(fig)
+            plt.show()
         else:
             display(fig.canvas)
 
@@ -502,7 +503,6 @@ class _VizManager:
         return config_panel, self.figs_output
 
     def add_figure(self, b=None):
-        logger.debug("add figure")
         _add_figure(b, self.widgets, self.data, scale=0.97)
 
     def _simulate_add_fig(self):
