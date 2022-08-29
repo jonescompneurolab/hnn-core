@@ -106,7 +106,7 @@ Running tests
 
 To run the tests using ``pytest``, you need to have the git cloned ``hnn-core`` repository with an editable pip install::
 
-    $ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
+    $ git clone https://github.com/jonescompneurolab/hnn-core
     $ cd hnn-core
     $ pip install -e .
     $ python setup.py build_mod
