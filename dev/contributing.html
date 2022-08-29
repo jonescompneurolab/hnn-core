@@ -91,11 +91,17 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">Contributions</a><ul>
+<li><a class="reference internal" href="#setting-up-your-local-development-environment">Setting up your local development environment</a><ul>
+<li><a class="reference internal" href="#configuring-git">Configuring git</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#making-your-first-pull-request">Making your first pull request</a></li>
 <li><a class="reference internal" href="#running-tests">Running tests</a></li>
 <li><a class="reference internal" href="#updating-documentation">Updating documentation</a><ul>
 <li><a class="reference internal" href="#building-the-documentation">Building the documentation</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#how-to-rebase">How to rebase</a></li>
 <li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
 </ul>
 </li>
@@ -160,11 +166,98 @@ installation as shown below.</p>
 <p>If your contributions will make use of parallel backends for using more than
 one core, please see the additional installation steps in our
 <a class="reference internal" href="parallel.html"><span class="doc">parallel backend guide</span></a>.</p>
+<section id="setting-up-your-local-development-environment">
+<h2>Setting up your local development environment<a class="headerlink" href="#setting-up-your-local-development-environment" title="Permalink to this heading">¶</a></h2>
+<section id="configuring-git">
+<h3>Configuring git<a class="headerlink" href="#configuring-git" title="Permalink to this heading">¶</a></h3>
+<p>Instructions for how to configure git can be found on
+the git book <a class="reference external" href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration">configuration</a> page.</p>
+</section>
+</section>
+<section id="making-your-first-pull-request">
+<h2>Making your first pull request<a class="headerlink" href="#making-your-first-pull-request" title="Permalink to this heading">¶</a></h2>
+<p>Changes to hnn-core are typically made by “forking” the hnn-core
+repository, making changes to your fork (usually by “cloning” it to your
+personal computer, making the changes locally, and then “pushing” the local
+changes up to your fork on GitHub), and finally creating a “pull request” to incorporate
+your changes back into the shared “upstream” version of the codebase.</p>
+<p>In general you’ll be working with three different copies of the hnn-core
+codebase: the official remote copy at <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a>
+(usually called <code class="docutils literal notranslate"><span class="pre">upstream</span></code>), your remote fork of the upstream repository
+(similar URL, but with your username in place of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, and usually
+called <code class="docutils literal notranslate"><span class="pre">origin</span></code>), and the local copy of the codebase on your computer. The
+typical contribution process is to</p>
+<ol class="arabic">
+<li><p>Make a fork of the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">hnn-core</a>
+repository to your own account on github. Look for the Fork button in the top right corner</p></li>
+<li><p>On the terminal of your local computer clone the fork:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/&lt;username&gt;/hnn-core
+</pre></div>
+</div>
+</li>
+<li><p>On the terminal of your local computer set up the remotes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd hnn-core
+$ git remote add upstream https://github.com/jonescompneurolab/hnn-core
+</pre></div>
+</div>
+</li>
+<li><p>Check that the remotes have been correctly added:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git remote -v
+</pre></div>
+</div>
+<p>You should see:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>To start a new feature branch, we will copy the existing <code class="docutils literal notranslate"><span class="pre">master</span></code> branch from
+the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote and give it a specific name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git fetch upstream master:cool_feature
+$ git checkout cool_feature
+</pre></div>
+</div>
+</li>
+<li><p>Make your changes relevant to the pull request</p></li>
+<li><p>To make a commit, you first have to add the files you have changed to the staging area:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add -u
+</pre></div>
+</div>
+<p>ensure they have been added correctly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git status
+</pre></div>
+</div>
+<p>make a commit:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -m &quot;your commit message&quot;
+</pre></div>
+</div>
+<p>and finally check that the commit has been added:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log
+</pre></div>
+</div>
+<p>Note: see the <a class="reference external" href="https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message">numpy contributing guide</a>
+for tips on informative commit messages.</p>
+</li>
+<li><p>Now push the feature branch to your fork:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin cool_feature
+</pre></div>
+</div>
+</li>
+<li><p>Go to <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/compare">https://github.com/jonescompneurolab/hnn-core/compare</a> to open the pull request by selecting your feature branch.
+You should also see this link on the terminal when you make the push.</p></li>
+</ol>
+<ol class="arabic simple" start="11">
+<li><p>After your pull request is reviewed, repeat steps 6-8 to update the pull request.</p></li>
+<li><p>Once the pull request is ready to be merged, add the prefix [MRG] to the title.</p></li>
+</ol>
+<p>See the <a class="reference external" href="https://git-scm.com/book/en/v2">git book</a> for a more general guide on using git.</p>
+</section>
 <section id="running-tests">
 <h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this heading">¶</a></h2>
-<p>To run the tests using <code class="docutils literal notranslate"><span class="pre">pytest</span></code>, you need to have the git cloned <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
-repository with an editable pip install:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/jonescompneurolab/hnn-core --depth 1
+<p>To run the tests using <code class="docutils literal notranslate"><span class="pre">pytest</span></code>, you need to have the git cloned <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> repository with an editable pip install:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/jonescompneurolab/hnn-core
 $ cd hnn-core
 $ pip install -e .
 $ python setup.py build_mod
@@ -176,6 +269,10 @@ $ python setup.py build_mod
 </div>
 <p>If you update a mod file, you will have to rebuild them using the command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py build_mod
+</pre></div>
+</div>
+<p>To run the tests simply type into your terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make test
 </pre></div>
 </div>
 <p>MPI tests are skipped if the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> module is not installed. This allows
@@ -211,6 +308,47 @@ use the command:</p>
 </pre></div>
 </div>
 </section>
+</section>
+<section id="how-to-rebase">
+<h2>How to rebase<a class="headerlink" href="#how-to-rebase" title="Permalink to this heading">¶</a></h2>
+<p>Commits in hnn-core follow a linear history, therefore we use a “rebase” workflow
+instead of “merge” to resolve commits.
+See <a class="reference external" href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">this article</a> for more details
+on the differences between these workflows.</p>
+<p>To rebase, we do the following:</p>
+<ol class="arabic">
+<li><p>Checkout the feature branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout cool_feature
+</pre></div>
+</div>
+</li>
+<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and fetch a new copy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git branch -D master
+$ git fetch upstream master:master
+</pre></div>
+</div>
+</li>
+<li><p>Start the rebase:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git rebase master
+</pre></div>
+</div>
+</li>
+<li><p>If there are conflicts, the easiest approach is to resolve them in an editor
+like VS code.
+See <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">this guide</a>
+for more general information on resolve merge conflicts</p></li>
+<li><p>Once the conflicts have been resolved, add the resolved files to the staging area:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add -u
+$ git rebase --continue
+</pre></div>
+</div>
+</li>
+</ol>
+<p>In general it is best to rebase frequently if you are aware of pull requests being merged
+into the <code class="docutils literal notranslate"><span class="pre">master</span></code> base.</p>
+<p>If you face a lot of difficulting resolving merge conflicts,
+it may be easier to <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History">squash</a>
+before rebasing.</p>
 </section>
 <section id="continuous-integration">
 <h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this heading">¶</a></h2>
