@@ -22,8 +22,8 @@ _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
     'current dipole',
-    'layer 2 dipole',
-    'layer 5 dipole',
+    'layer2 dipole',
+    'layer5 dipole',
     'aggregate dipole',
     'input histogram',
     'spikes',
@@ -132,30 +132,35 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
                 colormap=plot_config['spectrogram_cm'],
                 ax=ax, show=False)
 
-    elif 'dipole@' in plot_type:
+    elif 'dipole' in plot_type:
         if len(dpls_copied) > 0:
-            plot_dipole(dpls_copied,
-                        ax=ax,
-                        layer=plot_type.split("@")[1],
-                        average=True,
-                        show=False)
-
-    elif plot_type == 'current dipole':
-        if len(dpls_copied) > 0:
-            plot_dipole(dpls_copied, ax=ax, average=True, show=False)
-
-    elif plot_type == 'layer-specific dipole':
-        if len(dpls_copied) > 0:
-            ax.remove()
-            layers = ["L2", "L5", "agg"]
-            gridspec = ax.get_subplotspec()
-            gs01 = gridspec.subgridspec(3, 1)
-            ax_l2 = fig.add_subplot(gs01[0])
-            ax_l5 = fig.add_subplot(gs01[1])
-            ax_lagg = fig.add_subplot(gs01[2])
-            axes = [ax_l2, ax_l5, ax_lagg]
-            plot_dipole(dpls_copied, ax=axes,
-                        layer=layers, average=True)
+            if plot_type == 'current dipole':
+                plot_dipole(dpls_copied, ax=ax, average=True, show=False)
+            elif plot_type == 'layer-specific dipole':
+                try:
+                    ax.remove()
+                    layers = ["agg", "L2", "L5"]
+                    gridspec = ax.get_subplotspec()
+                    gs01 = gridspec.subgridspec(3, 1)
+                    ax_l2 = fig.add_subplot(gs01[0])
+                    ax_l5 = fig.add_subplot(gs01[1])
+                    ax_lagg = fig.add_subplot(gs01[2])
+                    axes = [ax_l2, ax_l5, ax_lagg]
+                    plot_dipole(dpls_copied, ax=axes,
+                                layer=layers, average=True)
+                except Exception as e:
+                    logger.exception(e)
+            else:
+                layer_namemap = {
+                    "layer2": "L2",
+                    "layer5": "L5",
+                    "aggregate": "agg",
+                }
+                plot_dipole(dpls_copied,
+                            ax=ax,
+                            layer=layer_namemap[plot_type.split(" ")[0]],
+                            average=True,
+                            show=False)
         else:
             print("No dipole data")
 
