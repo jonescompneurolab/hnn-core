@@ -22,9 +22,9 @@ _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
     'current dipole',
-    'dipole@L2',
-    'dipole@L5',
-    'dipole@agg',
+    'layer 2 dipole',
+    'layer 5 dipole',
+    'aggregate dipole',
     'input histogram',
     'spikes',
     'PSD',
