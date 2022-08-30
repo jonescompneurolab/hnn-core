@@ -30,7 +30,6 @@ _plot_types = [
     'PSD',
     'spectogram',
     'network',
-    'layer-specific dipole',
 ]
 
 _spectrogram_color_maps = [
@@ -136,20 +135,6 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
         if len(dpls_copied) > 0:
             if plot_type == 'current dipole':
                 plot_dipole(dpls_copied, ax=ax, average=True, show=False)
-            elif plot_type == 'layer-specific dipole':
-                try:
-                    ax.remove()
-                    layers = ["agg", "L2", "L5"]
-                    gridspec = ax.get_subplotspec()
-                    gs01 = gridspec.subgridspec(3, 1)
-                    ax_l2 = fig.add_subplot(gs01[0])
-                    ax_l5 = fig.add_subplot(gs01[1])
-                    ax_lagg = fig.add_subplot(gs01[2])
-                    axes = [ax_l2, ax_l5, ax_lagg]
-                    plot_dipole(dpls_copied, ax=axes,
-                                layer=layers, average=True)
-                except Exception as e:
-                    logger.exception(e)
             else:
                 layer_namemap = {
                     "layer2": "L2",
