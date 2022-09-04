@@ -472,7 +472,7 @@ class _VizManager:
             "visualization_output": self.viz_layout['visualization_output'],
             "figs": self.figs
         }
-    
+
     def reset_fig_config_tabs(self):
         simulation_names = tuple(self.data['simulations'].keys())
         for tab in self.axes_config_tabs.children:
