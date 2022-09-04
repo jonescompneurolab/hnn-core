@@ -472,6 +472,14 @@ class _VizManager:
             "visualization_output": self.viz_layout['visualization_output'],
             "figs": self.figs
         }
+    
+    def reset_fig_config_tabs(self):
+        simulation_names = tuple(self.data['simulations'].keys())
+        for tab in self.axes_config_tabs.children:
+            controls = tab.children[1]
+            for ax_control in controls.children:
+                simulation_selection = ax_control.children[0]
+                simulation_selection.options = simulation_names
 
     def compose(self):
         with self.axes_config_output:

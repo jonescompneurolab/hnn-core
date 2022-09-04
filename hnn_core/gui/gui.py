@@ -1259,6 +1259,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
             simulation_status_bar.value = simulation_status_contents[
                 'finished']
 
+    viz_manager.reset_fig_config_tabs()
     viz_manager.add_figure()
     fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
     ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
