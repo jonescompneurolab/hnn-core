@@ -465,6 +465,7 @@ class _VizManager:
 
     @property
     def data(self):
+        """Provides easy access to visualization-related data."""
         return {
             "use_ipympl": self.use_ipympl,
             "simulations": self.gui_data["simulation_data"],
@@ -474,6 +475,7 @@ class _VizManager:
         }
 
     def reset_fig_config_tabs(self):
+        """Reset the figure config tabs with most recent simulation data."""
         simulation_names = tuple(self.data['simulations'].keys())
         for tab in self.axes_config_tabs.children:
             controls = tab.children[1]
@@ -482,6 +484,7 @@ class _VizManager:
                 simulation_selection.options = simulation_names
 
     def compose(self):
+        """Compose widgets."""
         with self.axes_config_output:
             display(self.axes_config_tabs)
         with self.figs_output:
@@ -508,6 +511,7 @@ class _VizManager:
         return config_panel, fig_output_container
 
     def add_figure(self, b=None):
+        """Add a figure and corresponding config tabs to the dashboard."""
         _add_figure(b, self.widgets, self.data, scale=0.97)
 
     def _simulate_add_fig(self):

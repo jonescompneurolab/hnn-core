@@ -316,7 +316,7 @@ class HNNGUI:
 
     @property
     def data(self):
-        """Provides all GUI relate data."""
+        """Provides easy access to simulation-related data."""
         return {"simulation_data": self.simulation_data}
 
     @staticmethod
