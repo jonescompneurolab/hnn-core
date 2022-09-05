@@ -126,6 +126,7 @@ class HNNGUI:
                  left_sidebar_width=500,
                  log_window_height=150,
                  status_height=30,
+                 dpi=96,
                  ):
         # set up styling.
         self.total_height = total_height
@@ -137,6 +138,7 @@ class HNNGUI:
         config_box_height = main_content_height - (log_window_height +
                                                    operation_box_height)
         self.layout = {
+            "dpi": dpi,
             "header_height": f"{header_height}px",
             "theme_color": theme_color,
             "btn": Layout(height=f"{button_height}px", width='auto'),
