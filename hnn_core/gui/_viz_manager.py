@@ -17,7 +17,6 @@ from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
 
-_dpi = 96
 _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
@@ -357,7 +356,7 @@ def _add_axes_controls(widgets, data, fig, axd):
     widgets['axes_config_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
 
-def _add_figure(b, widgets, data, scale=0.95):
+def _add_figure(widgets, data, scale=0.95, dpi=96):
     template_name = widgets['templates_dropdown'].value
     fig_idx = data['fig_idx']['idx']
     viz_output_layout = data['visualization_output']
@@ -374,7 +373,6 @@ def _add_figure(b, widgets, data, scale=0.95):
     widgets['figs_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
     with fig_outputs:
-        dpi = _dpi
         figsize = (scale * ((int(viz_output_layout.width[:-2]) - 10) / dpi),
                    scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
         mosaic = fig_templates[template_name]['mosaic']
@@ -509,9 +507,21 @@ class _VizManager:
         ])
         return config_panel, fig_output_container
 
-    def add_figure(self, b=None):
-        """Add a figure and corresponding config tabs to the dashboard."""
-        _add_figure(b, self.widgets, self.data, scale=0.97)
+    def add_figure(self, scale=0.97, dpi=96):
+        """Add a figure and corresponding config tabs to the dashboard.
+
+        Parameters
+        ----------
+            scale : float
+                A number fo scale the whole figure to avoid layout overflow.
+                Usually set from 0.95 to 1.0.
+            dpi : int
+                Dots Per Inch (dpi). We use this parameter to determine the
+                actual looking size of matplotlib figures. By default it's 96
+                but for different screens you may want to specify this to get
+                the best visualization results.
+        """
+        _add_figure(self.widgets, self.data, scale=scale, dpi=dpi)
 
     def _simulate_add_fig(self):
         self.make_fig_button.click()
