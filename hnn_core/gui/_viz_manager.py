@@ -150,7 +150,6 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
             print("No dipole data")
 
     elif plot_type == 'network':
-        # raise NotImplementedError("No 3D plot for single ax now")
         if net_copied:
             _fig = plt.figure()
             _ax = _fig.add_subplot(111, projection='3d')
