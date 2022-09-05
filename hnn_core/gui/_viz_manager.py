@@ -531,7 +531,27 @@ class _VizManager:
         close_button.click()
 
     def _simulate_edit_figure(self, fig_name, ax_name, simulation_name,
-                              plot_type, config, operation):
+                              plot_type, preprocessing_config, operation):
+        """Manipulate a certain figure.
+
+        Parameters
+        ----------
+            fig_name : str
+                The figure name shown in the GUI, e.g., 'Figure 1'.
+            ax_name : str
+                Axis name shwon in the left side of GUI, like, 'ax0'.
+            simulation_name : str
+                The name of simulation you want to visualize
+            plot_type : str
+                Type of visualization.
+            preprocessing_config : dict
+                A dict of visualization preprocessing parameters. Allowed keys:
+                `dipole_smooth`, `dipole_scaling`, `max_spectral_frequency`,
+                `spectrogram_colormap_selection`. config could be empty: `{}`.
+            operation : str
+                `"plot"` if you want to plot and `"clear"` if you want to
+                remove previously plotted visualizations.
+        """
         assert simulation_name in self.data['simulations'].keys()
         assert plot_type in _plot_types
         assert operation in ("plot", "clear")
@@ -565,7 +585,7 @@ class _VizManager:
             "max_spectral_frequency": 4,
             "spectrogram_colormap_selection": 5,
         }
-        for conf_key, conf_val in config.items():
+        for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()
             idx = config_name_idx[conf_key]
             conf_widget = ax_control_tabs.children[ax_idx].children[idx]
