@@ -51,20 +51,26 @@ class HNNGUI:
     ----------
     theme_color : str
         The theme color of the whole dashboard.
-    log_window_height : str
-        The height of the log output window (in pixel).
-    visualization_window_width : str
-        The width of the visualization window (in pixel).
-    visualization_window_height : str
-        The height of the visualization window (in pixel).
-    left_sidebar_width : str
-        The width of the left side bar (in pixel).
-    drive_widget_width : str
-        The width of network drive tab  (in pixel).
-    header_height : str
-        The height of GUI titlebar  (in pixel).
-    button_height : str
-        The height of buttons  (in pixel).
+    total_height : int
+        The height of the GUI (in pixel, same for all following parameters).
+    total_width : int
+        The width of the GUI.
+    header_height : int
+        The height of the header.
+    button_height : int
+        The height of buttons.
+    operation_box_height : int
+        The operation_box_height of operations box.
+    drive_widget_width : int
+        The width of GUI drive box.
+    left_sidebar_width : int
+        The width of left sidebad.
+    log_window_height : int
+        The height of logging window.
+    status_height : int
+        The height of status bar.
+    dpi : int
+        The screen dpi.
 
     Attributes
     ----------
