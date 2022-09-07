@@ -109,7 +109,6 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
             net_copied.cell_response.plot_spikes_raster(ax=ax, show=False)
 
     elif plot_type == 'input histogram':
-        # BUG: got error here, need a better way to handle exception
         if net_copied.cell_response:
             net_copied.cell_response.plot_spikes_hist(ax=ax, show=False)
 
