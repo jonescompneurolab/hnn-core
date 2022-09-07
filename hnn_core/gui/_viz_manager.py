@@ -90,7 +90,7 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
     plot_type : str
         Type of subplots
     plot_config : dict
-        A dict specifies the preprocessing and style of plots.
+        A dict that specifies the preprocessing and style of plots.
     """
     # Make sure that visualization does not change the original data
     dpls_copied = copy.deepcopy(single_simulation['dpls'])
