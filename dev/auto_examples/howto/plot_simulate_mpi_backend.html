@@ -18,7 +18,7 @@
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 
@@ -197,10 +197,10 @@ start the simulation across the number of processors (cores) specified by
 </div>
 <img src="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" srcset="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run 1 trial(s) sequentially by distributing network neurons over 2 processes.
 numprocs=2
-[c475a081d484:01622] Read -1, expected 113508, errno = 1
-Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+[c48bb14afaf5:01640] Read -1, expected 113508, errno = 1
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
-Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/mod/x86_64/.libs/libnrnmech.so
 [Done]
 Trial 1: 0.03 ms...
 Trial 1: 10.0 ms...
@@ -233,20 +233,20 @@ Trial 1: 270.0 ms...
 Trial 1: 280.0 ms...
 Trial 1: 290.0 ms...
 Trial 1: 300.0 ms...
-[c475a081d484:01622] Read -1, expected 49608, errno = 1
-[c475a081d484:01621] Read -1, expected 49600, errno = 1
-[c475a081d484:01622] Read -1, expected 49600, errno = 1
-[c475a081d484:01621] Read -1, expected 49608, errno = 1
-[c475a081d484:01622] Read -1, expected 49608, errno = 1
-[c475a081d484:01621] Read -1, expected 49600, errno = 1
-[c475a081d484:01622] Read -1, expected 49600, errno = 1
-[c475a081d484:01621] Read -1, expected 49608, errno = 1
-[c475a081d484:01621] Read -1, expected 5616, errno = 1
+[c48bb14afaf5:01640] Read -1, expected 49608, errno = 1
+[c48bb14afaf5:01639] Read -1, expected 49600, errno = 1
+[c48bb14afaf5:01639] Read -1, expected 49608, errno = 1
+[c48bb14afaf5:01640] Read -1, expected 49600, errno = 1
+[c48bb14afaf5:01639] Read -1, expected 49600, errno = 1
+[c48bb14afaf5:01640] Read -1, expected 49608, errno = 1
+[c48bb14afaf5:01639] Read -1, expected 49608, errno = 1
+[c48bb14afaf5:01640] Read -1, expected 49600, errno = 1
+[c48bb14afaf5:01639] Read -1, expected 5616, errno = 1
 
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  35.477 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  40.401 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>

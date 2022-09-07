@@ -17,7 +17,7 @@
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 
@@ -139,269 +139,45 @@
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Huzi Cheng &lt;hzcheng15@icloud.com&gt;</span>
 <span class="kn">import</span> <span class="nn">codecs</span>
-<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="p">(</span><span class="n">JoblibBackend</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">jones_2009_model</span><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span>
-                      <span class="n">simulate_dipole</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hnn_core.network</span> <span class="kn">import</span> <span class="n">pick_connection</span>
-<span class="kn">from</span> <span class="nn">hnn_core.params</span> <span class="kn">import</span> <span class="p">(</span><span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">,</span> <span class="n">_read_json</span><span class="p">,</span>
-                             <span class="n">_read_legacy_params</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hnn_core.viz</span> <span class="kn">import</span> <span class="n">plot_dipole</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span>
-                        <span class="n">FloatLogSlider</span><span class="p">,</span> <span class="n">FloatText</span><span class="p">,</span> <span class="n">GridspecLayout</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span>
-                        <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
-                        <span class="n">link</span><span class="p">)</span>
+                        <span class="n">FloatLogSlider</span><span class="p">,</span> <span class="n">FloatText</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span>
+                        <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ipywidgets.embed</span> <span class="kn">import</span> <span class="n">embed_minimal_html</span>
 
-
-<span class="n">_spectrogram_color_maps</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;plasma&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;inferno&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;magma&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;cividis&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="n">_plot_options</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;Horizontal&#39;</span><span class="p">:</span> <span class="s1">&#39;L-R&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Vertical&#39;</span><span class="p">:</span> <span class="s1">&#39;U-D&#39;</span><span class="p">,</span>
-<span class="p">}</span>
+<span class="kn">import</span> <span class="nn">hnn_core</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="p">(</span><span class="n">JoblibBackend</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">jones_2009_model</span><span class="p">,</span> <span class="n">read_params</span><span class="p">,</span>
+                      <span class="n">simulate_dipole</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">hnn_core.gui._logging</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">hnn_core.gui._viz_manager</span> <span class="kn">import</span> <span class="n">_VizManager</span><span class="p">,</span> <span class="n">_idx2figname</span>
+<span class="kn">from</span> <span class="nn">hnn_core.network</span> <span class="kn">import</span> <span class="n">pick_connection</span>
+<span class="kn">from</span> <span class="nn">hnn_core.params</span> <span class="kn">import</span> <span class="p">(</span><span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">,</span> <span class="n">_read_json</span><span class="p">,</span>
+                             <span class="n">_read_legacy_params</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Refresh plots with data from simulation_data.</span>
+<span class="k">class</span> <span class="nc">_OutputWidgetHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_OutputWidgetHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">output_widget</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    simulation_data: dict</span>
-<span class="sd">        A dict of simulation data</span>
-<span class="sd">    analysis_config: dict</span>
-<span class="sd">        A dict of visualization configs</span>
-<span class="sd">    plot_key: str</span>
-<span class="sd">        A string used to identify the plot and data to update.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Make sure that visualization does not change the original data</span>
-    <span class="n">_plot_out</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_outputs&#39;</span><span class="p">][</span><span class="n">plot_key</span><span class="p">]</span>
-    <span class="n">plot_type</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_dropdowns&#39;</span><span class="p">][</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_sim_selections&#39;</span><span class="p">][</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-
-    <span class="n">dpls_copied</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s1">&#39;dpls&#39;</span><span class="p">])</span>
-    <span class="n">net_copied</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">[</span><span class="n">sim_name</span><span class="p">][</span><span class="s1">&#39;net&#39;</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">dpl</span> <span class="ow">in</span> <span class="n">dpls_copied</span><span class="p">:</span>
-        <span class="n">dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;dipole_smooth&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span>
-            <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;dipole_scaling&#39;</span><span class="p">])</span>
-
-    <span class="n">_plot_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
-
-    <span class="k">with</span> <span class="n">_plot_out</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">net_copied</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No network data&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
-
-        <span class="k">if</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;spikes&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">net_copied</span><span class="o">.</span><span class="n">cell_response</span><span class="p">:</span>
-                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-                <span class="n">net_copied</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No cell response data&quot;</span><span class="p">)</span>
-
-        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;current dipole&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-                <span class="n">plot_dipole</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
-
-        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;layer-specific dipole&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L2&quot;</span><span class="p">,</span> <span class="s2">&quot;L5&quot;</span><span class="p">,</span> <span class="s2">&quot;agg&quot;</span><span class="p">]</span>
-                <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">plot_dipole</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span>
-                            <span class="n">layer</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
-
-        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;input histogram&#39;</span><span class="p">:</span>
-            <span class="c1"># BUG: got error here, need a better way to handle exception</span>
-            <span class="k">if</span> <span class="n">net_copied</span><span class="o">.</span><span class="n">cell_response</span><span class="p">:</span>
-                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-                <span class="n">net_copied</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_hist</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No cell response data&quot;</span><span class="p">)</span>
-
-        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;PSD&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-                <span class="n">dpls_copied</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_psd</span><span class="p">(</span><span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
-
-        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;spectogram&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpls_copied</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">min_f</span> <span class="o">=</span> <span class="mf">10.0</span>
-                <span class="n">max_f</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;max_spectral_frequency&#39;</span><span class="p">]</span>
-                <span class="n">step_f</span> <span class="o">=</span> <span class="mf">1.0</span>
-                <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">min_f</span><span class="p">,</span> <span class="n">max_f</span><span class="p">,</span> <span class="n">step_f</span><span class="p">)</span>
-                <span class="n">n_cycles</span> <span class="o">=</span> <span class="n">freqs</span> <span class="o">/</span> <span class="mf">8.</span>
-                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-                <span class="n">dpls_copied</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_tfr_morlet</span><span class="p">(</span>
-                    <span class="n">freqs</span><span class="p">,</span>
-                    <span class="n">n_cycles</span><span class="o">=</span><span class="n">n_cycles</span><span class="p">,</span>
-                    <span class="n">colormap</span><span class="o">=</span><span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;spectrogram_cm&#39;</span><span class="p">],</span>
-                    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dipole data&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;network&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">net_copied</span><span class="p">:</span>
-                <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-                <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
-                <span class="n">net_copied</span><span class="o">.</span><span class="n">plot_cells</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No network data&quot;</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_gen_plot_callback</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
-        <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">callback</span>
-
-
-<span class="k">def</span> <span class="nf">_init_viz_layout</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">plot_options</span><span class="p">,</span> <span class="n">previous_plot_types</span><span class="p">,</span>
-                     <span class="n">analysis_config</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">layout_option</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">plot_outputs</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_outputs&#39;</span><span class="p">]</span>
-    <span class="n">plot_dropdowns</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_dropdowns&#39;</span><span class="p">]</span>
-    <span class="n">plot_sim_selections</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_sim_selections&#39;</span><span class="p">]</span>
-
-    <span class="n">sim_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="k">assert</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;current_sim_name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">sim_names</span>
-
-    <span class="k">if</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;L-R&quot;</span><span class="p">:</span>
-        <span class="c1"># TODO fine tune the style so that there&#39;s no more overflow.</span>
-        <span class="n">grid_style</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
-                            <span class="c1"># height=style.height,</span>
-                            <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">-</span><span class="mi">80</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
-                            <span class="n">border</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">border</span><span class="p">)</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">GridspecLayout</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-        <span class="n">plot_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">]</span>
-
-    <span class="k">elif</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;U-D&quot;</span><span class="p">:</span>
-        <span class="n">grid_style</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
-                            <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
-                            <span class="n">border</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">border</span><span class="p">,)</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">GridspecLayout</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-        <span class="n">plot_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Up&quot;</span><span class="p">,</span> <span class="s2">&quot;Down&quot;</span><span class="p">]</span>
-
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">plot_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plot_keys</span><span class="p">):</span>
-        <span class="n">plot_outputs</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">grid_style</span><span class="p">)</span>
-
-        <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">plot_options</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">previous_plot_types</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">plot_key</span> <span class="ow">in</span> <span class="n">previous_plot_types</span> <span class="k">else</span> <span class="n">plot_options</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Plot:&#39;</span><span class="p">,</span>
-            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-            <span class="n">_gen_plot_callback</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">),</span>
-            <span class="s1">&#39;value&#39;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">plot_sim_selections</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">sim_names</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;current_sim_name&#39;</span><span class="p">],</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Name:&#39;</span><span class="p">,</span>
-            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">plot_sim_selections</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-            <span class="n">_gen_plot_callback</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">),</span>
-            <span class="s1">&#39;value&#39;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;L-R&quot;</span><span class="p">:</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
-            <span class="n">box_directed</span> <span class="o">=</span> <span class="n">VBox</span>
-        <span class="k">elif</span> <span class="n">layout_option</span> <span class="o">==</span> <span class="s2">&quot;U-D&quot;</span><span class="p">:</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="n">box_directed</span> <span class="o">=</span> <span class="n">HBox</span>
-
-        <span class="n">grid</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">box_directed</span><span class="p">([</span>
-            <span class="n">VBox</span><span class="p">([</span>
-                <span class="n">plot_sim_selections</span><span class="p">[</span><span class="n">plot_keys</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
-                <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_keys</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
-            <span class="p">]),</span>
-            <span class="n">plot_outputs</span><span class="p">[</span><span class="n">plot_keys</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
-        <span class="p">])</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">init</span><span class="p">:</span>
-            <span class="n">_update_plot_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">plot_key</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">grid</span>
-
-
-<span class="k">def</span> <span class="nf">_change_plot_type</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">plot_idx</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">_plot_options</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Illegal layout type&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">layout</span> <span class="o">==</span> <span class="s2">&quot;L-R&quot;</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">plot_idx</span> <span class="o">&lt;</span> <span class="mi">2</span>
-        <span class="n">grid</span><span class="p">[</span><span class="n">layout</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">plot_type</span>
-        <span class="k">pass</span>
-    <span class="k">elif</span> <span class="n">layout</span> <span class="o">==</span> <span class="s2">&quot;U-D&quot;</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">plot_idx</span> <span class="o">&lt;</span> <span class="mi">2</span>
-        <span class="n">grid</span><span class="p">[</span><span class="n">layout</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">plot_type</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">pass</span>
-
-
-<span class="k">def</span> <span class="nf">_initialize_viz_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">viz_grid</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;viz_grid&#39;</span><span class="p">]</span>
-    <span class="n">viz_window</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;viz_window&#39;</span><span class="p">]</span>
-    <span class="n">plot_outputs</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_outputs&#39;</span><span class="p">]</span>
-    <span class="n">plot_dropdowns</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;plot_dropdowns&#39;</span><span class="p">]</span>
-    <span class="n">style</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">]</span>
-    <span class="n">layout_option</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="p">[</span><span class="s1">&#39;layout&#39;</span><span class="p">]</span>
-
-    <span class="n">plot_options</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;current dipole&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;layer-specific dipole&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;input histogram&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;spikes&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;PSD&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;spectogram&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;network&#39;</span><span class="p">,</span>
-    <span class="p">]</span>
-    <span class="n">viz_window</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
-    <span class="n">previous_plot_types</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="n">plot_keys</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">plot_outputs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-    <span class="k">for</span> <span class="n">plot_key</span> <span class="ow">in</span> <span class="n">plot_keys</span><span class="p">:</span>
-        <span class="n">previous_plot_types</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">del</span> <span class="n">plot_outputs</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span>
-        <span class="k">del</span> <span class="n">plot_dropdowns</span><span class="p">[</span><span class="n">plot_key</span><span class="p">]</span>
-
-    <span class="k">with</span> <span class="n">viz_window</span><span class="p">:</span>
-        <span class="n">viz_grid</span><span class="p">[</span><span class="n">layout_option</span><span class="p">]</span> <span class="o">=</span> <span class="n">_init_viz_layout</span><span class="p">(</span>
-            <span class="n">simulation_data</span><span class="p">,</span>
-            <span class="n">plot_options</span><span class="p">,</span>
-            <span class="n">previous_plot_types</span><span class="p">,</span>
-            <span class="n">analysis_config</span><span class="p">,</span>
-            <span class="n">style</span><span class="p">,</span>
-            <span class="n">layout_option</span><span class="p">,</span>
-            <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">display</span><span class="p">(</span><span class="n">viz_grid</span><span class="p">[</span><span class="n">layout_option</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="n">formatted_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">new_output</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;stdout&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;output_type&#39;</span><span class="p">:</span> <span class="s1">&#39;stream&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">formatted_record</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_output</span><span class="p">,</span> <span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span>
 
 
 <div class="viewcode-block" id="HNNGUI"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI">[docs]</a><span class="k">class</span> <span class="nc">HNNGUI</span><span class="p">:</span>
@@ -411,103 +187,136 @@
 <span class="sd">    ----------</span>
 <span class="sd">    theme_color : str</span>
 <span class="sd">        The theme color of the whole dashboard.</span>
-<span class="sd">    log_window_height: str</span>
-<span class="sd">        The height of the log output window (in pixel).</span>
-<span class="sd">    visualization_window_width: str</span>
-<span class="sd">        The width of the visualization window (in pixel).</span>
-<span class="sd">    visualization_window_height: str</span>
-<span class="sd">        The height of the visualization window (in pixel).</span>
-<span class="sd">    left_sidebar_width: str</span>
-<span class="sd">        The width of the left side bar (in pixel).</span>
-<span class="sd">    drive_widget_width: str</span>
-<span class="sd">        The width of network drive tab  (in pixel).</span>
-<span class="sd">    header_height: str</span>
-<span class="sd">        The height of GUI titlebar  (in pixel).</span>
-<span class="sd">    button_height: str</span>
-<span class="sd">        The height of buttons  (in pixel).</span>
+<span class="sd">    total_height : int</span>
+<span class="sd">        The height of the GUI (in pixel, same for all following parameters).</span>
+<span class="sd">    total_width : int</span>
+<span class="sd">        The width of the GUI.</span>
+<span class="sd">    header_height : int</span>
+<span class="sd">        The height of the header.</span>
+<span class="sd">    button_height : int</span>
+<span class="sd">        The height of buttons.</span>
+<span class="sd">    operation_box_height : int</span>
+<span class="sd">        The operation_box_height of operations box.</span>
+<span class="sd">    drive_widget_width : int</span>
+<span class="sd">        The width of GUI drive box.</span>
+<span class="sd">    left_sidebar_width : int</span>
+<span class="sd">        The width of left sidebad.</span>
+<span class="sd">    log_window_height : int</span>
+<span class="sd">        The height of logging window.</span>
+<span class="sd">    status_height : int</span>
+<span class="sd">        The height of status bar.</span>
+<span class="sd">    dpi : int</span>
+<span class="sd">        The screen dpi.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    layout: dict</span>
+<span class="sd">    layout : dict</span>
 <span class="sd">        The styling configuration of GUI.</span>
-<span class="sd">    params: dict</span>
+<span class="sd">    params : dict</span>
 <span class="sd">        The parameters to use for constructing the network.</span>
-<span class="sd">    simulation_data: dict</span>
+<span class="sd">    simulation_data : dict</span>
 <span class="sd">        Simulation related objects, such as net and dpls.</span>
-<span class="sd">    widget_tstop: Widget</span>
+<span class="sd">    widget_tstop : Widget</span>
 <span class="sd">        Simulation stop time widget.</span>
-<span class="sd">    widget_dt: Widget</span>
+<span class="sd">    widget_dt : Widget</span>
 <span class="sd">        Simulation step size widget.</span>
-<span class="sd">    widget_ntrials: Widget</span>
+<span class="sd">    widget_ntrials : Widget</span>
 <span class="sd">        Widget that controls the number of trials in a single simulation.</span>
-<span class="sd">    widget_backend_selection: Widget</span>
+<span class="sd">    widget_backend_selection : Widget</span>
 <span class="sd">        Widget that selects the backend used in simulations.</span>
-<span class="sd">    widget_viz_layout_selection: Widget</span>
+<span class="sd">    widget_viz_layout_selection : Widget</span>
 <span class="sd">        Widget that selects the layout of visualization window.</span>
-<span class="sd">    widget_mpi_cmd: Widget</span>
+<span class="sd">    widget_mpi_cmd : Widget</span>
 <span class="sd">        Widget that specify the mpi command to use when the backend is</span>
 <span class="sd">        MPIBackend.</span>
-<span class="sd">    widget_n_jobs: Widget</span>
+<span class="sd">    widget_n_jobs : Widget</span>
 <span class="sd">        Widget that specify the cores in multi-trial simulations.</span>
-<span class="sd">    widget_drive_type_selection: Widget</span>
+<span class="sd">    widget_drive_type_selection : Widget</span>
 <span class="sd">        Widget that is used to select the drive to be added to the network.</span>
-<span class="sd">    widget_location_selection: Widget.</span>
+<span class="sd">    widget_location_selection : Widget.</span>
 <span class="sd">        Widget that specifies the location of network drives. Could be proximal</span>
 <span class="sd">        or distal.</span>
-<span class="sd">    add_drive_button: Widget</span>
+<span class="sd">    add_drive_button : Widget</span>
 <span class="sd">        Clickable widget that is used to add a drive to the network.</span>
-<span class="sd">    run_button: Widget</span>
+<span class="sd">    run_button : Widget</span>
 <span class="sd">        Clickable widget that triggers simulation.</span>
-<span class="sd">    load_button: Widget</span>
+<span class="sd">    load_button : Widget</span>
 <span class="sd">        Clickable widget that receives uploaded parameter files.</span>
-<span class="sd">    delete_drive_button: Widget</span>
+<span class="sd">    delete_drive_button : Widget</span>
 <span class="sd">        Clickable widget that clear all existing network drives.</span>
-<span class="sd">    plot_outputs_dict: list</span>
+<span class="sd">    plot_outputs_dict : list</span>
 <span class="sd">        A list of visualization panel outputs.</span>
-<span class="sd">    plot_dropdown_types_dict: list</span>
+<span class="sd">    plot_dropdown_types_dict : list</span>
 <span class="sd">        A list of dropdown menus that control the plot types in</span>
 <span class="sd">        plot_outputs_dict.</span>
-<span class="sd">    drive_widgets: list</span>
+<span class="sd">    drive_widgets : list</span>
 <span class="sd">        A list of network drive widgets added by add_drive_button.</span>
-<span class="sd">    drive_boxes: list</span>
+<span class="sd">    drive_boxes : list</span>
 <span class="sd">        A list of network drive layouts.</span>
-<span class="sd">    connectivity_sliders: list</span>
+<span class="sd">    connectivity_sliders : list</span>
 <span class="sd">        A list of boxes that control the weight and probability of connections</span>
 <span class="sd">        in the network.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theme_color</span><span class="o">=</span><span class="s2">&quot;#8A2BE2&quot;</span><span class="p">,</span> <span class="n">log_window_height</span><span class="o">=</span><span class="s2">&quot;100px&quot;</span><span class="p">,</span>
-                 <span class="n">visualization_window_width</span><span class="o">=</span><span class="s2">&quot;1000px&quot;</span><span class="p">,</span>
-                 <span class="n">visualization_window_height</span><span class="o">=</span><span class="s2">&quot;500px&quot;</span><span class="p">,</span>
-                 <span class="n">left_sidebar_width</span><span class="o">=</span><span class="s1">&#39;380px&#39;</span><span class="p">,</span>
-                 <span class="n">drive_widget_width</span><span class="o">=</span><span class="s2">&quot;200px&quot;</span><span class="p">,</span>
-                 <span class="n">header_height</span><span class="o">=</span><span class="s2">&quot;50px&quot;</span><span class="p">,</span>
-                 <span class="n">button_height</span><span class="o">=</span><span class="s2">&quot;30px&quot;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theme_color</span><span class="o">=</span><span class="s2">&quot;#8A2BE2&quot;</span><span class="p">,</span>
+                 <span class="n">total_height</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+                 <span class="n">total_width</span><span class="o">=</span><span class="mi">1300</span><span class="p">,</span>
+                 <span class="n">header_height</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">button_height</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                 <span class="n">operation_box_height</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                 <span class="n">drive_widget_width</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                 <span class="n">left_sidebar_width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                 <span class="n">log_window_height</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+                 <span class="n">status_height</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                 <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
                  <span class="p">):</span>
         <span class="c1"># set up styling.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_height</span> <span class="o">=</span> <span class="n">total_height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_width</span> <span class="o">=</span> <span class="n">total_width</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_total_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">header_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="n">visualization_window_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">button_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
-                <span class="n">log_window_height</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="mi">20</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_total_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">left_sidebar_width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="n">visualization_window_width</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">viz_win_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_width</span> <span class="o">-</span> <span class="n">left_sidebar_width</span>
+        <span class="n">main_content_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_height</span> <span class="o">-</span> <span class="n">status_height</span>
+
+        <span class="n">config_box_height</span> <span class="o">=</span> <span class="n">main_content_height</span> <span class="o">-</span> <span class="p">(</span><span class="n">log_window_height</span> <span class="o">+</span>
+                                                   <span class="n">operation_box_height</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;header_height&quot;</span><span class="p">:</span> <span class="n">header_height</span><span class="p">,</span>
+            <span class="s2">&quot;dpi&quot;</span><span class="p">:</span> <span class="n">dpi</span><span class="p">,</span>
+            <span class="s2">&quot;header_height&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">header_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
             <span class="s2">&quot;theme_color&quot;</span><span class="p">:</span> <span class="n">theme_color</span><span class="p">,</span>
-            <span class="s2">&quot;button&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="n">button_height</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;btn&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">button_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;del_fig_btn&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">button_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
             <span class="s2">&quot;log_out&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">border</span><span class="o">=</span><span class="s1">&#39;1px solid gray&#39;</span><span class="p">,</span>
-                              <span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
-                              <span class="n">height</span><span class="o">=</span><span class="n">log_window_height</span><span class="p">,</span>
+                              <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">log_window_height</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
                               <span class="n">overflow</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
-            <span class="s2">&quot;visualization_window&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">visualization_window_width</span><span class="p">,</span>
-                                           <span class="n">height</span><span class="o">=</span><span class="n">visualization_window_height</span><span class="p">,</span>
-                                           <span class="n">border</span><span class="o">=</span><span class="s1">&#39;1px solid gray&#39;</span><span class="p">),</span>
-            <span class="s2">&quot;left_sidebar&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">left_sidebar_width</span><span class="p">),</span>
-            <span class="s2">&quot;drive_widget&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">drive_widget_width</span><span class="p">),</span>
+            <span class="s2">&quot;viz_config&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;99%&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;visualization_window&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span>
+                <span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">viz_win_width</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">main_content_height</span><span class="o">-</span><span class="mi">10</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                <span class="n">border</span><span class="o">=</span><span class="s1">&#39;1px solid gray&#39;</span><span class="p">,</span>
+                <span class="n">overflow</span><span class="o">=</span><span class="s1">&#39;scroll&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;visualization_output&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span>
+                <span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">viz_win_width</span><span class="o">-</span><span class="mi">50</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">main_content_height</span><span class="o">-</span><span class="mi">100</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                <span class="n">border</span><span class="o">=</span><span class="s1">&#39;1px solid gray&#39;</span><span class="p">,</span>
+                <span class="n">overflow</span><span class="o">=</span><span class="s1">&#39;scroll&#39;</span><span class="p">),</span>
+            <span class="s2">&quot;left_sidebar&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left_sidebar_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                                   <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">main_content_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;left_tab&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left_sidebar_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                               <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config_box_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;operation_box&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left_sidebar_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                                    <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation_box_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                                    <span class="n">flex_wrap</span><span class="o">=</span><span class="s2">&quot;wrap&quot;</span><span class="p">,</span>
+                                    <span class="p">),</span>
+            <span class="s2">&quot;config_box&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left_sidebar_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+                                 <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config_box_height</span><span class="o">-</span><span class="mi">100</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;drive_widget&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drive_widget_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">),</span>
             <span class="s2">&quot;drive_textbox&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;270px&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
+            <span class="c1"># simulation status related</span>
+            <span class="s2">&quot;simulation_status_height&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
             <span class="s2">&quot;simulation_status_common&quot;</span><span class="p">:</span> <span class="s2">&quot;background:gray;padding-left:10px&quot;</span><span class="p">,</span>
             <span class="s2">&quot;simulation_status_running&quot;</span><span class="p">:</span> <span class="s2">&quot;background:orange;padding-left:10px&quot;</span><span class="p">,</span>
             <span class="s2">&quot;simulation_status_failed&quot;</span><span class="p">:</span> <span class="s2">&quot;background:red;padding-left:10px&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;simulation_status_finished&quot;</span><span class="p">:</span> <span class="s2">&quot;background:green;padding-left:10px&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span> <span class="o">=</span> <span class="p">{</span>
@@ -518,7 +327,7 @@
             <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div style=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;simulation_status_running&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">            color:white;&#39;&gt;Running...&lt;/div&gt;&quot;&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;finished&quot;</span><span class="p">:</span>
-            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div style=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;simulation_status_common&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div style=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;simulation_status_finished&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">            color:white;&#39;&gt;Simulation finished&lt;/div&gt;&quot;&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;failed&quot;</span><span class="p">:</span>
             <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div style=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;simulation_status_failed&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span>
@@ -527,6 +336,9 @@
 
         <span class="c1"># load default parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">()</span>
+
+        <span class="c1"># In-memory storage of all simulation and visualization related data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">()))</span>
 
         <span class="c1"># Simulation parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;tstop (ms):&#39;</span><span class="p">,</span>
@@ -539,81 +351,47 @@
                                            <span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;your simulation name&#39;</span><span class="p">,</span>
                                            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Name:&#39;</span><span class="p">,</span>
                                            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="c1"># select backends</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;Joblib&#39;</span><span class="p">,</span> <span class="s1">&#39;Joblib&#39;</span><span class="p">),</span>
                                                           <span class="p">(</span><span class="s1">&#39;MPI&#39;</span><span class="p">,</span> <span class="s1">&#39;MPI&#39;</span><span class="p">)],</span>
                                                  <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Joblib&#39;</span><span class="p">,</span>
                                                  <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Backend:&#39;</span><span class="p">)</span>
-
-        <span class="n">analysis_style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;200px&#39;</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_spectral_frequency</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span>
-            <span class="n">value</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Max Spectral Frequency (Hz):&#39;</span><span class="p">,</span>
-            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_scaling</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">3000.0</span><span class="p">,</span>
-                                               <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dipole Scaling:&#39;</span><span class="p">,</span>
-                                               <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                               <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_smooth</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span>
-            <span class="n">value</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dipole Smooth Window (ms):&#39;</span><span class="p">,</span>
-            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_spectrogram_cm</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Spectrogram Colormap:&#39;</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="p">[(</span><span class="n">cm</span><span class="p">,</span> <span class="n">cm</span><span class="p">)</span> <span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="n">_spectrogram_color_maps</span><span class="p">],</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">_spectrogram_color_maps</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">)</span>
-
-        <span class="c1"># visualization layout</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_viz_layout_selection</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
-            <span class="n">options</span><span class="o">=</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">_plot_options</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_plot_options</span><span class="p">],</span>
-            <span class="n">value</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_plot_options</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Layout:&#39;</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">,</span>
                                    <span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;Fill if applies&#39;</span><span class="p">,</span>
                                    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;MPI cmd:&#39;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span> <span class="o">=</span> <span class="n">BoundedIntText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                             <span class="nb">max</span><span class="o">=</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(),</span>
                                             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Cores:&#39;</span><span class="p">,</span>
                                             <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
+        <span class="c1"># Drive selection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
             <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="s1">&#39;Rhythmic&#39;</span><span class="p">],</span>
             <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Drive:&#39;</span><span class="p">,</span>
             <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_widget&#39;</span><span class="p">])</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
             <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;distal&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_widget&#39;</span><span class="p">])</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s1">&#39;Add drive&#39;</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;button&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Add drive&#39;</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
 
-        <span class="c1"># Run, delete drives and load button</span>
+        <span class="c1"># Dashboard level buttons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s1">&#39;Run&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;button&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Run&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">load_button</span> <span class="o">=</span> <span class="n">FileUpload</span><span class="p">(</span>
             <span class="n">accept</span><span class="o">=</span><span class="s1">&#39;.json,.param&#39;</span><span class="p">,</span> <span class="n">multiple</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;button_color&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">]},</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Load network&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;button&#39;</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Load network&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
             <span class="n">button_style</span><span class="o">=</span><span class="s1">&#39;success&#39;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">clear_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s1">&#39;Clear uploaded parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;danger&#39;</span><span class="p">,</span>
-            <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;button&#39;</span><span class="p">],</span>
-            <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s1">&#39;Delete drives&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;button&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Delete drives&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Plotting window</span>
 
         <span class="c1"># Visualization figure related dicts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plot_outputs_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -627,10 +405,14 @@
         <span class="c1"># Connectivity list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-        <span class="c1"># In-memory storage of all simulation related simulation_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">()))</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_ui_components</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_logging_window_logger</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">add_logging_window_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">_OutputWidgetHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1">  - [</span><span class="si">%(levelname)s</span><span class="s1">] </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_init_ui_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize larger UI components and dynamical output windows.</span>
@@ -638,16 +420,13 @@
 <span class="sd">        It&#39;s not encouraged for users to modify or access attributes in this</span>
 <span class="sd">        part.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Reloading status.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;prev_param_data&quot;</span><span class="p">:</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">}</span>
-
         <span class="c1"># dynamic larger components</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to add new drives</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to tune connectivity.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
-        <span class="c1"># visualization window</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_visualization_window</span> <span class="o">=</span> <span class="n">Output</span><span class="p">(</span>
-            <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span> <span class="o">=</span> <span class="n">_VizManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+
         <span class="c1"># detailed configuration of backends</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
 
@@ -656,56 +435,41 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">[</span><span class="s1">&#39;not_running&#39;</span><span class="p">])</span>
 
-        <span class="c1"># footer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_footer</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
-            <span class="n">HBox</span><span class="p">([</span>
-                <span class="n">HBox</span><span class="p">([</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">run_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_button</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span>
-                <span class="p">]),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_viz_layout_selection</span><span class="p">,</span>
-            <span class="p">]),</span>
-            <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;log_out&#39;</span><span class="p">]),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span>
-        <span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_window</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;log_out&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_operation_buttons</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">run_button</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">load_button</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span><span class="p">],</span>
+                                       <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;operation_box&#39;</span><span class="p">])</span>
         <span class="c1"># title</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div</span>
 <span class="s2">            style=&#39;background:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">            text-align:center;color:white;&#39;&gt;</span>
 <span class="s2">            HUMAN NEOCORTICAL NEUROSOLVER&lt;/div&gt;&quot;&quot;&quot;</span><span class="p">)</span>
 
-        <span class="c1"># visualiation components</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_viz_grid</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;L-R&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;U-D&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="p">}</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">analysis_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Provides everything viz window needs except for the data.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">],</span>
-            <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_viz_layout_selection</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="s2">&quot;max_spectral_frequency&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_spectral_frequency</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="s2">&quot;dipole_scaling&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_scaling</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="s2">&quot;dipole_smooth&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_smooth</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="s2">&quot;spectrogram_cm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_spectrogram_cm</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;viz_style&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_output&#39;</span><span class="p">],</span>
             <span class="c1"># widgets</span>
-            <span class="s2">&quot;viz_grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz_grid</span><span class="p">,</span>
-            <span class="s2">&quot;viz_window&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visualization_window</span><span class="p">,</span>
             <span class="s2">&quot;plot_outputs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_outputs_dict</span><span class="p">,</span>
             <span class="s2">&quot;plot_dropdowns&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_dropdown_types_dict</span><span class="p">,</span>
             <span class="s2">&quot;plot_sim_selections&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_sim_selections_dict</span><span class="p">,</span>
             <span class="s2">&quot;current_sim_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="p">}</span>
 
-<div class="viewcode-block" id="HNNGUI.load_parameters"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.load_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Provides easy access to simulation-related data.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">}</span>
+
+<div class="viewcode-block" id="HNNGUI.load_parameters"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.load_parameters">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="n">params_fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read parameters from file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">params_fname</span><span class="p">:</span>
             <span class="c1"># by default load default.json</span>
-            <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
-            <span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hnn_core_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.json&#39;</span><span class="p">)</span>
-
+            <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+            <span class="n">params_fname</span> <span class="o">=</span> <span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s1">&#39;param/default.json&#39;</span>
         <span class="k">return</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_link_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -732,64 +496,44 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">_on_upload_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;received new uploaded params file...&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">on_upload_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">])</span>
 
         <span class="k">def</span> <span class="nf">_run_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">run_button_clicked</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">_handle_viz_layout_change</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">_initialize_viz_window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span>
-                                          <span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span><span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">_clear_params</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span><span class="p">[</span><span class="s2">&quot;prev_param_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_handle_backend_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_add_drive_button_clicked</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_delete_drives_clicked</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">load_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_on_upload_change</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_on_upload_change</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_run_button_clicked</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">clear_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_clear_params</span><span class="p">)</span>
-
-        <span class="c1"># widgets whose changes should trigger viz changes.</span>
-        <span class="n">_vis_related_widgets</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_viz_layout_selection</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_spectral_frequency</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_scaling</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_smooth</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_spectrogram_cm</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="k">for</span> <span class="n">_widget</span> <span class="ow">in</span> <span class="n">_vis_related_widgets</span><span class="p">:</span>
-            <span class="n">_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_handle_viz_layout_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HNNGUI.compose"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.compose">[docs]</a>    <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compose widgets.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        return_layout: bool</span>
+<span class="sd">        return_layout : bool</span>
 <span class="sd">            If the method returns the layout object which can be rendered by</span>
 <span class="sd">            IPython.display.display() method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">simulation_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span>
-        <span class="p">])</span>
+            <span class="n">VBox</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span>
+            <span class="p">]),</span>
+        <span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;config_box&#39;</span><span class="p">])</span>
 
         <span class="c1"># accordians to group local-connectivity by cell type</span>
         <span class="n">connectivity_boxes</span> <span class="o">=</span> <span class="p">[</span>
@@ -797,8 +541,9 @@
         <span class="n">connectivity_names</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s1">&#39;Layer 2/3 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;Layer 5 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;Layer 2 Basket&#39;</span><span class="p">,</span>
             <span class="s1">&#39;Layer 5 Basket&#39;</span><span class="p">)</span>
-        <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">,</span> <span class="c1"># noqa</span>
-                                      <span class="n">titles</span><span class="o">=</span><span class="n">connectivity_names</span><span class="p">)</span>
+        <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">connectivity_names</span><span class="p">):</span>
+            <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span><span class="p">)</span>
 
         <span class="n">drive_selections</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="p">,</span>
@@ -807,50 +552,48 @@
         <span class="c1"># from IPywidgets &gt; 8.0</span>
         <span class="n">drives_options</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span><span class="n">drive_selections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">])</span>
 
-        <span class="n">analysis_options</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_spectral_frequency</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_scaling</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_dipole_smooth</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">widget_spectrogram_cm</span><span class="p">,</span>
-        <span class="p">])</span>
+        <span class="n">config_panel</span><span class="p">,</span> <span class="n">figs_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">compose</span><span class="p">()</span>
 
         <span class="c1"># Tabs for left pane</span>
-        <span class="n">titles</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Simulation&#39;</span><span class="p">,</span> <span class="s1">&#39;Cell connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;Drives&#39;</span><span class="p">,</span> <span class="s1">&#39;Analysis&#39;</span><span class="p">)</span>
-        <span class="n">left_tab</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">(</span><span class="n">titles</span><span class="o">=</span><span class="n">titles</span><span class="p">)</span>
+        <span class="n">left_tab</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">()</span>
         <span class="n">left_tab</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">simulation_box</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span> <span class="n">drives_options</span><span class="p">,</span>
-            <span class="n">analysis_options</span><span class="p">,</span>
+            <span class="n">config_panel</span><span class="p">,</span>
         <span class="p">]</span>
+        <span class="n">titles</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Simulation&#39;</span><span class="p">,</span> <span class="s1">&#39;Cell connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;Drives&#39;</span><span class="p">,</span> <span class="s1">&#39;Visualization&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">titles</span><span class="p">):</span>
+            <span class="n">left_tab</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span> <span class="o">=</span> <span class="n">AppLayout</span><span class="p">(</span>
             <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span>
-            <span class="n">left_sidebar</span><span class="o">=</span><span class="n">left_tab</span><span class="p">,</span>
-            <span class="n">right_sidebar</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_visualization_window</span><span class="p">,</span>
-            <span class="n">footer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_footer</span><span class="p">,</span>
+            <span class="n">left_sidebar</span><span class="o">=</span><span class="n">VBox</span><span class="p">([</span>
+                <span class="n">VBox</span><span class="p">([</span><span class="n">left_tab</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;left_tab&#39;</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_operation_buttons</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_window</span><span class="p">,</span>
+            <span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;left_sidebar&#39;</span><span class="p">]),</span>
+            <span class="n">right_sidebar</span><span class="o">=</span><span class="n">figs_output</span><span class="p">,</span>
+            <span class="n">footer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span>
             <span class="n">pane_widths</span><span class="o">=</span><span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;left_sidebar&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="s1">&#39;0px&#39;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span>
             <span class="p">],</span>
             <span class="n">pane_heights</span><span class="o">=</span><span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;header_height&#39;</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_window&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;simulation_status_height&#39;</span><span class="p">]</span>
             <span class="p">],</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_link_callbacks</span><span class="p">()</span>
-        <span class="c1"># init</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="c1"># initialize visualization</span>
-        <span class="n">_initialize_viz_window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span><span class="p">,</span>
-                               <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># self.simulation_data[self.widget_simulation_name.value]</span>
 
         <span class="c1"># initialize drive and connectivity ipywidgets</span>
         <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_info</span><span class="p">,</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">return_layout</span><span class="p">:</span>
             <span class="k">return</span>
@@ -860,7 +603,7 @@
     <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HNNGUI.capture"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.capture">[docs]</a>    <span class="k">def</span> <span class="nf">capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="HNNGUI.capture"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.capture">[docs]</a>    <span class="k">def</span> <span class="nf">capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_margin</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Take a screenshot of the current GUI.</span>
 
 <span class="sd">        Parameters</span>
@@ -869,7 +612,9 @@
 <span class="sd">            The width of iframe window use to show the snapshot.</span>
 <span class="sd">        height : int | None</span>
 <span class="sd">            The height of iframe window use to show the snapshot.</span>
-<span class="sd">        render: bool</span>
+<span class="sd">        extra_margin: int</span>
+<span class="sd">            Extra margin in pixel for the GUI.</span>
+<span class="sd">        render : bool</span>
 <span class="sd">            Will return an IFrame object if False</span>
 
 <span class="sd">        Returns</span>
@@ -879,9 +624,9 @@
         <span class="n">file</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
         <span class="n">embed_minimal_html</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">views</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">width</span><span class="p">:</span>
-            <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_width</span> <span class="o">+</span> <span class="mi">20</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_width</span> <span class="o">+</span> <span class="n">extra_margin</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">height</span><span class="p">:</span>
-            <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_height</span> <span class="o">+</span> <span class="mi">20</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_height</span> <span class="o">+</span> <span class="n">extra_margin</span>
 
         <span class="n">content</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
         <span class="n">data_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data:text/html,</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -962,30 +707,49 @@
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="n">content</span> <span class="o">+=</span> <span class="n">line</span>
 
-        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">params_name</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span>
-            <span class="s1">&#39;last_modified&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
-        <span class="p">}]</span>
-
+        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">params_name</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">params_name</span><span class="p">,</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_simulate_left_tab_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_title</span><span class="p">):</span>
         <span class="n">tab_index</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tab_title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="o">.</span><span class="n">left_sidebar</span><span class="o">.</span><span class="n">titles</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">tab_title</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="o">.</span><span class="n">left_sidebar</span><span class="o">.</span><span class="n">titles</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+        <span class="n">left_tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="o">.</span><span class="n">left_sidebar</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">left_tab</span><span class="o">.</span><span class="n">_titles</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">tab_title</span> <span class="o">==</span> <span class="n">left_tab</span><span class="o">.</span><span class="n">_titles</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
                 <span class="n">tab_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
                 <span class="k">break</span>
         <span class="k">if</span> <span class="n">tab_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect tab title&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="o">.</span><span class="n">left_sidebar</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="n">tab_index</span>
+        <span class="n">left_tab</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="n">tab_index</span>
 
-    <span class="k">def</span> <span class="nf">_simulate_switch_plot_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_idx</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">):</span>
-        <span class="n">_change_plot_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_viz_grid</span><span class="p">,</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">widget_viz_layout_selection</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">plot_idx</span><span class="p">,</span>
-                          <span class="n">plot_type</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">_simulate_make_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_left_tab_click</span><span class="p">(</span><span class="s2">&quot;Visualization&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">make_fig_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_simulate_viz_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A shortcut to call simulated actions in _VizManager.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        action_name : str</span>
+<span class="sd">            The action to take. For example, to call `_simulate_add_fig` in</span>
+<span class="sd">            _VizManager, you can run `_simulate_viz_action(&quot;viz_action&quot;)`</span>
+<span class="sd">        args : list</span>
+<span class="sd">            Optional positional parameters passed to the called method.</span>
+<span class="sd">        kwargs: dict</span>
+<span class="sd">            Optional keyword parameters passed to the called method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_left_tab_click</span><span class="p">(</span><span class="s2">&quot;Visualization&quot;</span><span class="p">)</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_simulate_</span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">action</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">create_expanded_button</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1302,7 +1066,6 @@
             <span class="n">name</span> <span class="o">=</span> <span class="n">drive_type</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">drive_boxes</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">prespecified_drive_name</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;add drive type to widget: </span><span class="si">{</span><span class="n">drive_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">drive_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Bursty&#39;</span><span class="p">):</span>
             <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span> <span class="o">=</span> <span class="n">_get_rhythmic_widget</span><span class="p">(</span>
                 <span class="n">name</span><span class="p">,</span>
@@ -1346,14 +1109,15 @@
             <span class="n">drive_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drive</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span>
-            <span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span>
-                      <span class="n">drive</span> <span class="ow">in</span> <span class="n">drive_widgets</span><span class="p">]</span>
-
             <span class="n">accordion</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span>
                 <span class="n">children</span><span class="o">=</span><span class="n">drive_boxes</span><span class="p">,</span>
                 <span class="n">selected_index</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">drive_boxes</span><span class="p">)</span> <span class="o">-</span>
                 <span class="mi">1</span> <span class="k">if</span> <span class="n">expand_last_drive</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">titles</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">titles</span><span class="p">))</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">drive_widgets</span><span class="p">):</span>
+                <span class="n">accordion</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span>
+                                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
             <span class="n">display</span><span class="p">(</span><span class="n">accordion</span><span class="p">)</span>
 
@@ -1406,8 +1170,9 @@
                         <span class="n">_get_connectivity_widgets</span><span class="p">(</span><span class="n">receptor_related_conn</span><span class="p">))</span>
 
     <span class="n">connectivity_boxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">VBox</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span> <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="n">connectivity_sliders</span><span class="p">]</span>
-    <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">,</span>
-                                  <span class="n">titles</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">connectivity_names</span><span class="p">))</span>
+    <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">connectivity_names</span><span class="p">):</span>
+        <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">connectivity_out</span><span class="p">:</span>
         <span class="n">display</span><span class="p">(</span><span class="n">cell_connectivity</span><span class="p">)</span>
@@ -1415,10 +1180,8 @@
 
 <span class="k">def</span> <span class="nf">load_drive_and_connectivity</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
                                 <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                                <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">load_info</span><span class="p">,</span>
-                                <span class="n">layout</span><span class="p">):</span>
+                                <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add drive and connectivity ipywidgets from params.&quot;&quot;&quot;</span>
-    <span class="n">load_info</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="c1"># init the network.</span>
     <span class="n">tmp_net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
@@ -1464,25 +1227,17 @@
 
 <span class="k">def</span> <span class="nf">on_upload_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
                      <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                     <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">load_info</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+                     <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">params_fname</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-    <span class="n">param_data</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+    <span class="n">params_fname</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="n">param_data</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+
     <span class="n">param_data</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">param_data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">load_info</span><span class="p">[</span><span class="s1">&#39;prev_param_data&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">param_data</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;Same param. No reloading.&quot;</span>
-                <span class="s2">&quot;To force reloading, hit </span><span class="se">\&quot;</span><span class="s2">clear uploaded parameters</span><span class="se">\&quot;</span><span class="s2"> button&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">return</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">load_info</span><span class="p">[</span><span class="s1">&#39;prev_param_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_data</span>
-
-    <span class="n">ext</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
     <span class="n">read_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;.json&#39;</span><span class="p">:</span> <span class="n">_read_json</span><span class="p">,</span> <span class="s1">&#39;.param&#39;</span><span class="p">:</span> <span class="n">_read_legacy_params</span><span class="p">}</span>
     <span class="n">params_network</span> <span class="o">=</span> <span class="n">read_func</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">param_data</span><span class="p">)</span>
 
@@ -1496,10 +1251,10 @@
 
         <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params_network</span><span class="p">)</span>
     <span class="c1"># init network, add drives &amp; connectivity</span>
-    <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
-                                <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                                <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">load_info</span><span class="p">,</span>
-                                <span class="n">layout</span><span class="p">)</span>
+    <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
+                                <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
+                                <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+    <span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="p">{})</span>
 
 
 <span class="k">def</span> <span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">single_simulation_data</span><span class="p">,</span>
@@ -1535,7 +1290,6 @@
         <span class="k">return</span>
     <span class="c1"># add drives to network</span>
     <span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">drive_widgets</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;add drive type to network: </span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">weights_ampa</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
@@ -1599,13 +1353,13 @@
 
 
 <span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
-                       <span class="n">simulation_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
+                       <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
                        <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
                        <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">,</span>
-                       <span class="n">analysis_config</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+                       <span class="n">viz_manager</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
     <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
-
+    <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="c1"># clear empty trash simulations</span>
         <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">simulation_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
@@ -1642,8 +1396,13 @@
             <span class="n">simulation_status_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">simulation_status_contents</span><span class="p">[</span>
                 <span class="s1">&#39;finished&#39;</span><span class="p">]</span>
 
-    <span class="c1"># Update all plotting panels</span>
-    <span class="n">_initialize_viz_window</span><span class="p">(</span><span class="n">simulation_data</span><span class="p">,</span> <span class="n">analysis_config</span><span class="p">)</span>
+    <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
+    <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
+    <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;fig_idx&#39;</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax_plots</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;ax0&quot;</span><span class="p">,</span> <span class="s2">&quot;input histogram&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;ax1&quot;</span><span class="p">,</span> <span class="s2">&quot;current dipole&quot;</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="n">ax_plots</span><span class="p">:</span>
+        <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span><span class="n">fig_name</span><span class="p">,</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">_sim_name</span><span class="p">,</span>
+                                          <span class="n">plot_type</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;plot&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">handle_backend_change</span><span class="p">(</span><span class="n">backend_type</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
@@ -1662,8 +1421,8 @@
 <span class="sd">    You can pass voila commandline parameters as usual.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">voila.app</span> <span class="kn">import</span> <span class="n">main</span>
-    <span class="n">notebook_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;hnn_widget.ipynb&#39;</span><span class="p">)</span>
-    <span class="n">main</span><span class="p">([</span><span class="n">notebook_path</span><span class="p">,</span> <span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+    <span class="n">notebook_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;hnn_widget.ipynb&#39;</span>
+    <span class="n">main</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">notebook_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
 </pre></div>
 
     </div>

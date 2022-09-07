@@ -18,7 +18,7 @@
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 
@@ -266,9 +266,9 @@ operate in-place, i.e., the objects are modified.</p>
                                    <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;evprox&#39;</span><span class="p">,</span> <span class="s1">&#39;evdist&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_simulate_evoked_003.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_003.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:362: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
+<img src="../../_images/sphx_glr_plot_simulate_evoked_003.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_003.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/viz.py:362: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
   np.array(cell_response._spike_times)[trial_idx])
-/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/viz.py:364: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
+/home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/viz.py:364: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify &#39;dtype=object&#39; when creating the ndarray.
   np.array(cell_response._spike_types)[trial_idx])
 
 &lt;Figure size 600x600 with 2 Axes&gt;
@@ -329,7 +329,7 @@ object, this time we make a copy of it before smoothing and scaling.</p>
 <li><img src="../../_images/sphx_glr_plot_simulate_evoked_006.png" srcset="../../_images/sphx_glr_plot_simulate_evoked_006.png" alt="plot simulate evoked" class = "sphx-glr-multi-img"/></li>
 </ul>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
-Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core-0.3.dev0-py3.7.egg/hnn_core/mod/x86_64/.libs/libnrnmech.so
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/mod/x86_64/.libs/libnrnmech.so
 Building the NEURON model
 [Done]
 Trial 1: 0.03 ms...
@@ -372,7 +372,7 @@ a combined magnetoencephalography and biophysically based computational
 modeling study.” Journal of Neuroscience 27.40 (2007): 10751-10764.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  54.100 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  56.292 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_evoked.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>
