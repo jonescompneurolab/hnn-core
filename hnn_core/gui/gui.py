@@ -930,7 +930,6 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             name = drive_type + str(len(drive_boxes))
         else:
             name = prespecified_drive_name
-        logging.debug(f"add drive type to widget: {drive_type}")
         if drive_type in ('Rhythmic', 'Bursty'):
             drive, drive_box = _get_rhythmic_widget(
                 name,
@@ -1095,12 +1094,7 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
                      connectivity_sliders, layout):
     if len(change['owner'].value) == 0:
         return
-    logger.debug("received new uploaded params file...")
-    # for compability
-    if type(change['new']) is list:
-        key = 0
-    else:
-        key = list(change['new'].keys())[0]
+    key = list(change['new'].keys())[0]
 
     params_fname = change['new'][key]['metadata']['name']
     param_data = change['new'][key]['content']
@@ -1160,7 +1154,6 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         return
     # add drives to network
     for drive in drive_widgets:
-        logging.debug(f"add drive type to network: {drive['type']}")
         weights_ampa = {
             k: v.value
             for k, v in drive['weights_ampa'].items()
