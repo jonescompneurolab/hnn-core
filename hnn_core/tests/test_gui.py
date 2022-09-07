@@ -271,7 +271,6 @@ def test_gui_edit_figure():
     gui.params['N_pyr_x'] = 3
     gui.params['N_pyr_y'] = 3
 
-    # sim_name = gui.widget_simulation_name.value
     fig_tabs = gui.viz_manager.figs_tabs
     axes_config_tabs = gui.viz_manager.axes_config_tabs
 
