@@ -133,7 +133,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
         if len(dpls_copied) > 0:
             color = next(ax._get_lines.prop_cycler)['color']
             if plot_type == 'current dipole':
-                plot_dipole(dpls_copied, ax=ax, sim_name=sim_name, color=color,
+                plot_dipole(dpls_copied, ax=ax, label=f"{sim_name}: average",
+                            color=color,
                             average=True, show=False)
             else:
                 layer_namemap = {
@@ -141,7 +142,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                     "layer5": "L5",
                     "aggregate": "agg",
                 }
-                plot_dipole(dpls_copied, ax=ax, sim_name=sim_name, color=color,
+                plot_dipole(dpls_copied, ax=ax, label=f"{sim_name}: average",
+                            color=color,
                             layer=layer_namemap[plot_type.split(" ")[0]],
                             average=True, show=False)
         else:

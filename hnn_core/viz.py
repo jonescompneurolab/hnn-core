@@ -225,7 +225,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color='k', sim_name=None, average=False, show=True):
+                color='k', label="average", average=False, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -248,8 +248,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         ints can be provided. These are applied successively.
     color : tuple of float | str
         RGBA value to use for plotting. By default, 'k' (black)
-    sim_name : str | None
-        Prefix of dipole labels. Used when overlaying multiple simulations.
+    label : str
+        Dipole label. Enabled when average=True
     average : bool
         If True, render the average across all dpls.
     show : bool
@@ -295,10 +295,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
                 if idx == len(dpl) - 1 and average:
-                    if sim_name is not None:
-                        label = f"{sim_name}: average"
-                    else:
-                        label = "average"
                     # the average dpl
                     ax.plot(times, data, color=color, label=label, lw=1.5)
                 else:
