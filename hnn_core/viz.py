@@ -687,7 +687,7 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
 
 
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-             ax=None, show=True):
+             color=None, label=None, ax=None, show=True):
     """Plot power spectral density (PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` from SciPy with ``window='hamming'``.
@@ -710,6 +710,10 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         End time of data to include (in ms). If None, use entire simulation.
     layer : str, default 'agg'
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+    color : str or tuple or None
+        The line color of PSD
+    label : str or None
+        Line label for PSD
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     show : bool
@@ -746,7 +750,10 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
         trial_power.append(Pxx)
 
-    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0))
+    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0), color=color,
+            label=label)
+    if label:
+        ax.legend()
     if fmax is not None:
         ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
