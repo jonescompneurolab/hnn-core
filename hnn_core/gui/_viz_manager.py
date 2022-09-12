@@ -16,19 +16,24 @@ from ipywidgets import (Box, Button, Dropdown, FloatText, HBox, Label, Layout,
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
-
 _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
     'current dipole',
     'layer2 dipole',
     'layer5 dipole',
-    'aggregate dipole',
     'input histogram',
     'spikes',
     'PSD',
     'spectogram',
     'network',
+]
+
+no_overlay_plot_types = [
+    'network',
+    'spectogram',
+    'spikes',
+    'input histogram',
 ]
 
 _spectrogram_color_maps = [
@@ -39,21 +44,17 @@ _spectrogram_color_maps = [
     "cividis",
 ]
 
-
 fig_templates = {
     "2row x 1col (1:3)": {
-        "kwargs":
-        "gridspec_kw={\"height_ratios\":[1,3]}",
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
         "mosaic": "00\n11",
     },
     "2row x 1col (1:1)": {
-        "kwargs":
-        "gridspec_kw={\"height_ratios\":[1,1]}",
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
         "mosaic": "00\n11",
     },
     "1row x 2col (1:1)": {
-        "kwargs":
-        "gridspec_kw={\"height_ratios\":[1,1]}",
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
         "mosaic": "01\n01",
     },
     "single figure": {
@@ -61,8 +62,7 @@ fig_templates = {
         "mosaic": "00\n00",
     },
     "2row x 2col (1:1)": {
-        "kwargs":
-        "gridspec_kw={\"height_ratios\":[1,1]}",
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
         "mosaic": "01\n23",
     },
 }
@@ -114,7 +114,9 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'PSD':
         if len(dpls_copied) > 0:
-            dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax, show=False)
+            color = next(ax._get_lines.prop_cycler)['color']
+            dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax, color=color,
+                                    label=sim_name, show=False)
 
     elif plot_type == 'spectogram':
         if len(dpls_copied) > 0:
@@ -127,43 +129,49 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 freqs,
                 n_cycles=n_cycles,
                 colormap=plot_config['spectrogram_cm'],
-                ax=ax, show=False)
+                ax=ax,
+                show=False)
 
     elif 'dipole' in plot_type:
         if len(dpls_copied) > 0:
             color = next(ax._get_lines.prop_cycler)['color']
             if plot_type == 'current dipole':
-                plot_dipole(dpls_copied, ax=ax, label=f"{sim_name}: average",
+                plot_dipole(dpls_copied,
+                            ax=ax,
+                            label=f"{sim_name}: average",
                             color=color,
-                            average=True, show=False)
+                            average=True,
+                            show=False)
             else:
                 layer_namemap = {
                     "layer2": "L2",
                     "layer5": "L5",
-                    "aggregate": "agg",
                 }
-                plot_dipole(dpls_copied, ax=ax, label=f"{sim_name}: average",
+                plot_dipole(dpls_copied,
+                            ax=ax,
+                            label=f"{sim_name}: average",
                             color=color,
                             layer=layer_namemap[plot_type.split(" ")[0]],
-                            average=True, show=False)
+                            average=True,
+                            show=False)
         else:
             print("No dipole data")
 
     elif plot_type == 'network':
         if net_copied:
-            _fig = plt.figure()
-            _ax = _fig.add_subplot(111, projection='3d')
-            net_copied.plot_cells(ax=_ax)
-
-            io_buf = io.BytesIO()
-            _fig.savefig(io_buf, format='raw')
-            io_buf.seek(0)
-            img_arr = np.reshape(np.frombuffer(io_buf.getvalue(),
-                                               dtype=np.uint8),
-                                 newshape=(int(_fig.bbox.bounds[3]),
-                                           int(_fig.bbox.bounds[2]), -1))
-            io_buf.close()
-            ax.imshow(img_arr)
+            with plt.ioff():
+                _fig = plt.figure()
+                _ax = _fig.add_subplot(111, projection='3d')
+                net_copied.plot_cells(ax=_ax, show=False)
+                io_buf = io.BytesIO()
+                _fig.savefig(io_buf, format='raw')
+                io_buf.seek(0)
+                img_arr = np.reshape(np.frombuffer(io_buf.getvalue(),
+                                     dtype=np.uint8),
+                                     newshape=(int(_fig.bbox.bounds[3]),
+                                     int(_fig.bbox.bounds[2]), -1))
+                io_buf.close()
+                _ = ax.imshow(img_arr)
 
 
 def _static_rerender(widgets, fig, fig_idx):
@@ -192,6 +200,10 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
                   fig_idx, fig, ax, existing_plots):
     sim_name = widgets_simulation.value
     plot_type = widgets_plot_type.value
+    # disable add plots for types that do not support overlay
+    if plot_type in no_overlay_plot_types:
+        b.disabled = True
+
     # freeze plot type
     widgets_plot_type.disabled = True
 
@@ -218,10 +230,11 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
 
 def _clear_axis(b, widgets, data, fig_idx, fig, ax, widgets_plot_type,
-                existing_plots):
+                existing_plots, add_plot_button):
     ax.clear()
     ax.set_facecolor('w')
     widgets_plot_type.disabled = False
+    add_plot_button.disabled = False
     existing_plots.children = ()
     if data['use_ipympl'] is False:
         _static_rerender(widgets, fig, fig_idx)
@@ -234,47 +247,58 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     layout = Layout(width="98%")
     simulation_names = tuple(data['simulations'].keys())
     if len(simulation_names) == 0:
-        simulation_names = ["None", ]
+        simulation_names = [
+            "None",
+        ]
 
     simulation_selection = Dropdown(
         options=simulation_names,
-        value=simulation_names[-1], description='Simulation:',
-        disabled=False, layout=layout,
+        value=simulation_names[-1],
+        description='Simulation:',
+        disabled=False,
+        layout=layout,
         style=analysis_style,
     )
 
     plot_type_selection = Dropdown(
         options=_plot_types,
-        value=_plot_types[0], description='Type:',
-        disabled=False, layout=layout,
+        value=_plot_types[0],
+        description='Type:',
+        disabled=False,
+        layout=layout,
         style=analysis_style,
     )
 
     spectrogram_colormap_selection = Dropdown(
         description='Spectrogram Colormap:',
         options=[(cm, cm) for cm in _spectrogram_color_maps],
-        value=_spectrogram_color_maps[0], layout=layout,
+        value=_spectrogram_color_maps[0],
+        layout=layout,
         style=analysis_style,
     )
     dipole_smooth = FloatText(value=30,
                               description='Dipole Smooth Window (ms):',
-                              disabled=False, layout=layout,
+                              disabled=False,
+                              layout=layout,
                               style=analysis_style)
-    dipole_scaling = FloatText(
-        value=3000,
-        description='Dipole Scaling:',
-        disabled=False, layout=layout,
-        style=analysis_style)
+    dipole_scaling = FloatText(value=3000,
+                               description='Dipole Scaling:',
+                               disabled=False,
+                               layout=layout,
+                               style=analysis_style)
 
     max_spectral_frequency = FloatText(
         value=100,
         description='Max Spectral Frequency (Hz):',
-        disabled=False, layout=layout,
+        disabled=False,
+        layout=layout,
         style=analysis_style)
 
     existing_plots = VBox([])
 
+    plot_button = Button(description='Add plot')
     clear_button = Button(description='Clear axis')
+
     clear_button.on_click(
         partial(
             _clear_axis,
@@ -285,9 +309,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             ax=ax,
             widgets_plot_type=plot_type_selection,
             existing_plots=existing_plots,
+            add_plot_button=plot_button,
         ))
 
-    plot_button = Button(description='Add plot')
     plot_button.on_click(
         partial(
             _plot_on_axes,
@@ -310,10 +334,8 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         dipole_scaling, max_spectral_frequency, spectrogram_colormap_selection,
         HBox(
             [plot_button, clear_button],
-            layout=Layout(justify_content='space-between', ),
-        ),
-        existing_plots
-    ], layout=Layout(width="98%"))
+            layout=Layout(justify_content='space-between'),
+        ), existing_plots], layout=Layout(width="98%"))
 
     return vbox
 
@@ -361,7 +383,8 @@ def _add_axes_controls(widgets, data, fig, axd):
         controls.set_title(i, f'ax{i}')
 
     close_fig_button = Button(description=f'Close {_idx2figname(fig_idx)}',
-                              button_style='danger', icon='close',
+                              button_style='danger',
+                              icon='close',
                               layout=Layout(width="98%"))
     close_fig_button.on_click(
         partial(_close_figure, widgets=widgets, data=data, fig_idx=fig_idx))
@@ -394,7 +417,9 @@ def _add_figure(b, widgets, data, scale=0.95, dpi=96):
         mosaic = fig_templates[template_name]['mosaic']
         kwargs = eval(f"dict({fig_templates[template_name]['kwargs']})")
         plt.ioff()
-        fig, axd = plt.subplot_mosaic(mosaic, figsize=figsize, dpi=dpi,
+        fig, axd = plt.subplot_mosaic(mosaic,
+                                      figsize=figsize,
+                                      dpi=dpi,
                                       **kwargs)
         plt.ion()
         fig.tight_layout()
@@ -430,6 +455,7 @@ class _VizManager:
     data : dict
         A dict of external simulation data object
     """
+
     def __init__(self, gui_data, viz_layout):
         plt.close("all")
         self.viz_layout = viz_layout
@@ -526,7 +552,10 @@ class _VizManager:
     def add_figure(self, b=None):
         """Add a figure and corresponding config tabs to the dashboard.
         """
-        _add_figure(None, self.widgets, self.data, scale=0.97,
+        _add_figure(None,
+                    self.widgets,
+                    self.data,
+                    scale=0.97,
                     dpi=self.viz_layout['dpi'])
 
     def _simulate_add_fig(self):

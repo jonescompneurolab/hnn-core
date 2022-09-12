@@ -421,7 +421,7 @@ class Dipole(object):
                            decim=decim, color=color, show=show)
 
     def plot_psd(self, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-                 ax=None, show=True):
+                 color=None, label=None, ax=None, show=True):
         """Plot power spectral density (PSD) of dipole time course
 
         Applies `~scipy.signal.periodogram` from SciPy with
@@ -448,6 +448,10 @@ class Dipole(object):
             simulation.
         layer : str, default 'agg'
             The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+        color : str or tuple or None
+            The line color of PSD
+        label : str or None
+            Line label for PSD
         ax : instance of matplotlib figure | None
             The matplotlib axis.
         show : bool
@@ -459,7 +463,8 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         return plot_psd(self, fmin=fmin, fmax=fmax, tmin=tmin, tmax=tmax,
-                        layer=layer, ax=ax, show=show)
+                        layer=layer, color=color, label=label, ax=ax,
+                        show=show)
 
     def plot_tfr_morlet(self, freqs, n_cycles=7., tmin=None, tmax=None,
                         layer='agg', decim=None, padding='zeros', ax=None,
