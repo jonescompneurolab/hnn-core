@@ -6,7 +6,20 @@
 
 import numpy as np
 from itertools import cycle
+
+import matplotlib.colors as mc
+import colorsys
+
 from .externals.mne import _validate_type
+
+
+def _lighten_color(color, amount=0.5):
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
 def _get_plot_data_trange(times, data, tmin, tmax):
@@ -212,7 +225,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color='k', average=False, show=True):
+                color='k', sim_name=None, average=False, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -233,8 +246,10 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
-    color : tuple of float
+    color : tuple of float | str
         RGBA value to use for plotting. By default, 'k' (black)
+    sim_name : str | None
+        Prefix of dipole labels. Used when overlaying multiple simulations.
     average : bool
         If True, render the average across all dpls.
     show : bool
@@ -279,13 +294,17 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                                                     tmin, tmax)
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
-
                 if idx == len(dpl) - 1 and average:
+                    if sim_name is not None:
+                        label = f"{sim_name}: average"
+                    else:
+                        label = "average"
                     # the average dpl
-                    ax.plot(times, data, color='g', label="average", lw=1.5)
+                    ax.plot(times, data, color=color, label=label, lw=1.5)
                 else:
                     alpha = 0.5 if average else 1.
-                    ax.plot(times, data, color=color, alpha=alpha, lw=1.)
+                    ax.plot(times, data, color=_lighten_color(color, 0.5),
+                            alpha=alpha, lw=1.)
 
         if average:
             ax.legend()

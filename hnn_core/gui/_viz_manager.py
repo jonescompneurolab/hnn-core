@@ -76,7 +76,7 @@ def _figname2idx(fname):
     return int(fname.split(" ")[-1])
 
 
-def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
+def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
     """Refresh plots with simulation_data.
 
     Parameters
@@ -131,19 +131,19 @@ def _update_ax(fig, ax, single_simulation, plot_type, plot_config):
 
     elif 'dipole' in plot_type:
         if len(dpls_copied) > 0:
+            color = next(ax._get_lines.prop_cycler)['color']
             if plot_type == 'current dipole':
-                plot_dipole(dpls_copied, ax=ax, average=True, show=False)
+                plot_dipole(dpls_copied, ax=ax, sim_name=sim_name, color=color,
+                            average=True, show=False)
             else:
                 layer_namemap = {
                     "layer2": "L2",
                     "layer5": "L5",
                     "aggregate": "agg",
                 }
-                plot_dipole(dpls_copied,
-                            ax=ax,
+                plot_dipole(dpls_copied, ax=ax, sim_name=sim_name, color=color,
                             layer=layer_namemap[plot_type.split(" ")[0]],
-                            average=True,
-                            show=False)
+                            average=True, show=False)
         else:
             print("No dipole data")
 
@@ -187,8 +187,13 @@ def _dynamic_rerender(fig):
 def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
                   spectrogram_colormap_selection, dipole_smooth,
                   max_spectral_frequency, dipole_scaling, widgets, data,
-                  fig_idx, fig, ax):
-    single_simulation = data['simulations'][widgets_simulation.value]
+                  fig_idx, fig, ax, existing_plots):
+    sim_name = widgets_simulation.value
+    plot_type = widgets_plot_type.value
+    # freeze plot type
+    widgets_plot_type.disabled = True
+
+    single_simulation = data['simulations'][sim_name]
 
     plot_config = {
         "max_spectral_frequency": max_spectral_frequency.value,
@@ -196,22 +201,26 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
         "dipole_smooth": dipole_smooth.value,
         "spectrogram_cm": spectrogram_colormap_selection.value
     }
-    plot_type = widgets_plot_type.value
-    ax.clear()
-    ax.set_facecolor('w')
-    _update_ax(fig, ax, single_simulation, plot_type, plot_config)
+
+    # ax.clear()
+    # ax.set_facecolor('w')
+    _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config)
 
     logger.debug('update ax')
+    existing_plots.children = (*existing_plots.children,
+                               Label(f"{sim_name}: {plot_type}"))
     if data['use_ipympl'] is False:
         _static_rerender(widgets, fig, fig_idx)
     else:
         _dynamic_rerender(fig)
 
 
-def _clear_axis(b, widgets, data, fig_idx, fig, ax):
+def _clear_axis(b, widgets, data, fig_idx, fig, ax, widgets_plot_type,
+                existing_plots):
     ax.clear()
     ax.set_facecolor('w')
-
+    widgets_plot_type.disabled = False
+    existing_plots.children = ()
     if data['use_ipympl'] is False:
         _static_rerender(widgets, fig, fig_idx)
     else:
@@ -261,6 +270,8 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         disabled=False, layout=layout,
         style=analysis_style)
 
+    existing_plots = VBox([])
+
     clear_button = Button(description='Clear axis')
     clear_button.on_click(
         partial(
@@ -270,9 +281,11 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             fig_idx=fig_idx,
             fig=fig,
             ax=ax,
+            widgets_plot_type=plot_type_selection,
+            existing_plots=existing_plots,
         ))
 
-    plot_button = Button(description='Plot')
+    plot_button = Button(description='Add plot')
     plot_button.on_click(
         partial(
             _plot_on_axes,
@@ -287,6 +300,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             fig_idx=fig_idx,
             fig=fig,
             ax=ax,
+            existing_plots=existing_plots,
         ))
 
     vbox = VBox([
@@ -295,7 +309,8 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         HBox(
             [plot_button, clear_button],
             layout=Layout(justify_content='space-between', ),
-        )
+        ),
+        existing_plots
     ], layout=Layout(width="98%"))
 
     return vbox
@@ -590,7 +605,7 @@ class _VizManager:
             conf_widget = ax_control_tabs.children[ax_idx].children[idx]
             conf_widget.value = conf_val
 
-        buttons = ax_control_tabs.children[ax_idx].children[-1]
+        buttons = ax_control_tabs.children[ax_idx].children[-2]
         if operation == "plot":
             buttons.children[0].click()
         elif operation == "clear":
