@@ -231,6 +231,7 @@ def _clear_axis(b, widgets, data, fig_idx, fig, ax, widgets_plot_type,
                 existing_plots, add_plot_button):
     ax.clear()
     ax.set_facecolor('w')
+    ax.set_aspect('auto')
     widgets_plot_type.disabled = False
     add_plot_button.disabled = False
     existing_plots.children = ()
