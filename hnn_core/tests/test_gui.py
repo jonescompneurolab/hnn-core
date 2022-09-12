@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
-from hnn_core.gui._viz_manager import _idx2figname
+from hnn_core.gui._viz_manager import _idx2figname, _no_overlay_plot_types
 from hnn_core.gui.gui import _init_network_from_widgets
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
@@ -287,3 +287,33 @@ def test_gui_edit_figure():
         axes_config = axes_config_tabs.children[-1].children[1]
         simulation_selection = axes_config.children[0].children[0]
         assert simulation_selection.options == tuple(sim_names[: n_figs])
+
+
+def test_gui_figure_overlay():
+    """Test if the GUI adds/deletes figs properly."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    axes_config_tabs = gui.viz_manager.axes_config_tabs
+
+    gui.run_button.click()
+    for tab in axes_config_tabs.children:
+        for controls in tab.children[1].children:
+            add_plot_button = controls.children[-2].children[0]
+            clear_ax_button = controls.children[-2].children[1]
+            plot_type_selection = controls.children[1]
+
+            assert plot_type_selection.disabled is True
+            clear_ax_button.click()
+            # after clearing the axis, we should be able to select plot type.
+            assert plot_type_selection.disabled is False
+
+            # disable overlay for certain plot types
+            for plot_type in _no_overlay_plot_types:
+                plot_type_selection.value = plot_type
+                add_plot_button.click()
+                assert add_plot_button.disabled is True
+                clear_ax_button.click()
+                assert add_plot_button.disabled is False

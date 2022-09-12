@@ -29,7 +29,7 @@ _plot_types = [
     'network',
 ]
 
-no_overlay_plot_types = [
+_no_overlay_plot_types = [
     'network',
     'spectogram',
     'spikes',
@@ -201,7 +201,7 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
     sim_name = widgets_simulation.value
     plot_type = widgets_plot_type.value
     # disable add plots for types that do not support overlay
-    if plot_type in no_overlay_plot_types:
+    if plot_type in _no_overlay_plot_types:
         b.disabled = True
 
     # freeze plot type
