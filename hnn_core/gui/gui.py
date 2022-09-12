@@ -211,8 +211,8 @@ class HNNGUI:
                                    disabled=False)
         self.widget_ntrials = IntText(value=1, description='Trials:',
                                       disabled=False)
-        self.widget_simulation_name = Text(value='1',
-                                           placeholder='your simulation name',
+        self.widget_simulation_name = Text(value='default',
+                                           placeholder='ID of your simulation',
                                            description='Name:',
                                            disabled=False)
         self.widget_backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
