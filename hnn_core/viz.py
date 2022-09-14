@@ -7,13 +7,14 @@
 import numpy as np
 from itertools import cycle
 
-import matplotlib.colors as mc
+import matplotlib
 import colorsys
 
 from .externals.mne import _validate_type
 
 
 def _lighten_color(color, amount=0.5):
+    mc = matplotlib.colors
     try:
         c = mc.cnames[color]
     except:
