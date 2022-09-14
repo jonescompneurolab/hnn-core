@@ -102,7 +102,7 @@ if __name__ == "__main__":
           install_requires=[
               'numpy >=1.14',
               'NEURON >=7.7',
-              'matplotlib',
+              'matplotlib>=3.5.3',
               'scipy'
           ],
           extras_require={
