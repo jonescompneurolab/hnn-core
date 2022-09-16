@@ -6,8 +6,6 @@
 
 import numpy as np
 from itertools import cycle
-
-
 import colorsys
 
 from .externals.mne import _validate_type
