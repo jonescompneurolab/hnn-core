@@ -448,9 +448,9 @@ class Dipole(object):
             simulation.
         layer : str, default 'agg'
             The layer to plot. Can be one of 'agg', 'L2', and 'L5'
-        color : str or tuple or None
+        color : str | tuple | None
             The line color of PSD
-        label : str or None
+        label : str | None
             Line label for PSD
         ax : instance of matplotlib figure | None
             The matplotlib axis.
