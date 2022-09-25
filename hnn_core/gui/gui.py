@@ -173,7 +173,7 @@ class HNNGUI:
                                     ),
             "config_box": Layout(width=f"{left_sidebar_width}px",
                                  height=f"{config_box_height-100}px"),
-            "drive_widget": Layout(width=f"{drive_widget_width}px"),
+            "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width='270px', height='auto'),
             # simulation status related
             "simulation_status_height": f"{status_height}px",
@@ -252,6 +252,11 @@ class HNNGUI:
             style={'button_color': self.layout['theme_color']},
             description='Load connectivity', layout=self.layout['btn'],
             button_style='success')
+        self.load_drives_button = FileUpload(
+            accept='.json,.param', multiple=False,
+            style={'button_color': self.layout['theme_color']},
+            description='Load drives', layout=self.layout['btn'],
+            button_style='success')
 
         self.delete_drive_button = create_expanded_button(
             'Delete drives', 'success', layout=self.layout['btn'],
@@ -303,8 +308,7 @@ class HNNGUI:
             value=self._simulation_status_contents['not_running'])
 
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
-        self._operation_buttons = HBox([self.run_button,
-                                        self.delete_drive_button],
+        self._operation_buttons = HBox([self.run_button],
                                        layout=self.layout['operation_box'])
         # title
         self._header = HTML(value=f"""<div
@@ -370,6 +374,15 @@ class HNNGUI:
                                     self.layout['drive_textbox'],
                                     "connectivity")
 
+        def _on_upload_drives(change):
+            return on_upload_change(change, self.params, self.widget_tstop,
+                                    self.widget_dt, self._log_out,
+                                    self.drive_boxes, self.drive_widgets,
+                                    self._drives_out, self._connectivity_out,
+                                    self.connectivity_widgets,
+                                    self.layout['drive_textbox'],
+                                    "drives")
+
         def _run_button_clicked(b):
             return run_button_clicked(
                 self.widget_simulation_name, self._log_out, self.drive_widgets,
@@ -384,6 +397,7 @@ class HNNGUI:
         self.delete_drive_button.on_click(_delete_drives_clicked)
         self.load_connectivity_button.observe(_on_upload_connectivity,
                                               names='value')
+        self.load_drives_button.observe(_on_upload_drives, names='value')
         self.run_button.on_click(_run_button_clicked)
 
     def compose(self, return_layout=True):
@@ -419,11 +433,16 @@ class HNNGUI:
             cell_connectivity.set_title(idx, connectivity_name)
 
         drive_selections = VBox([
-            self.widget_drive_type_selection, self.widget_location_selection,
-            self.add_drive_button
+            self.add_drive_button, self.widget_drive_type_selection,
+            self.widget_location_selection])
+
+        drives_options = VBox([
+            HBox([
+                drive_selections,
+                VBox([self.load_drives_button, self.delete_drive_button],
+                     layout=Layout(flex="1"))
+            ]), self._drives_out
         ])
-        # from IPywidgets > 8.0
-        drives_options = VBox([drive_selections, self._drives_out])
 
         config_panel, figs_output = self.viz_manager.compose()
 
@@ -1134,7 +1153,7 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
     # init network, add drives & connectivity
     if load_type == 'connectivity':
         add_connectivity_tab(params, connectivity_out, connectivity_sliders)
-    elif load_type == 'drive':
+    elif load_type == 'drives':
         add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
     else:
