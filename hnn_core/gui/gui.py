@@ -246,11 +246,13 @@ class HNNGUI:
         self.run_button = create_expanded_button(
             'Run', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
-        self.load_button = FileUpload(
+
+        self.load_connectivity_button = FileUpload(
             accept='.json,.param', multiple=False,
             style={'button_color': self.layout['theme_color']},
-            description='Load network', layout=self.layout['btn'],
+            description='Load connectivity', layout=self.layout['btn'],
             button_style='success')
+
         self.delete_drive_button = create_expanded_button(
             'Delete drives', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
@@ -287,6 +289,7 @@ class HNNGUI:
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
+
         self._log_out = Output()
 
         self.viz_manager = _VizManager(self.data, self.layout)
@@ -301,7 +304,6 @@ class HNNGUI:
 
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
         self._operation_buttons = HBox([self.run_button,
-                                        self.load_button,
                                         self.delete_drive_button],
                                        layout=self.layout['operation_box'])
         # title
@@ -359,13 +361,14 @@ class HNNGUI:
                 self.drive_widgets.pop()
                 self.drive_boxes.pop()
 
-        def _on_upload_change(change):
+        def _on_upload_connectivity(change):
             return on_upload_change(change, self.params, self.widget_tstop,
                                     self.widget_dt, self._log_out,
                                     self.drive_boxes, self.drive_widgets,
                                     self._drives_out, self._connectivity_out,
                                     self.connectivity_widgets,
-                                    self.layout['drive_textbox'])
+                                    self.layout['drive_textbox'],
+                                    "connectivity")
 
         def _run_button_clicked(b):
             return run_button_clicked(
@@ -379,7 +382,8 @@ class HNNGUI:
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
-        self.load_button.observe(_on_upload_change, names='value')
+        self.load_connectivity_button.observe(_on_upload_connectivity,
+                                              names='value')
         self.run_button.on_click(_run_button_clicked)
 
     def compose(self, return_layout=True):
@@ -398,6 +402,11 @@ class HNNGUI:
                 self._backend_config_out
             ]),
         ], layout=self.layout['config_box'])
+
+        connectivity_box = VBox([
+            HBox([self.load_connectivity_button, ]),
+            self._connectivity_out,
+        ])
 
         # accordians to group local-connectivity by cell type
         connectivity_boxes = [
@@ -421,7 +430,7 @@ class HNNGUI:
         # Tabs for left pane
         left_tab = Tab()
         left_tab.children = [
-            simulation_box, self._connectivity_out, drives_options,
+            simulation_box, connectivity_box, drives_options,
             config_panel,
         ]
         titles = ('Simulation', 'Cell connectivity', 'Drives', 'Visualization')
@@ -581,7 +590,7 @@ class HNNGUI:
                 'content': content
             }
         }
-        self.load_button.set_trait('value', uploaded_value)
+        self.load_connectivity_button.set_trait('value', uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
         tab_index = None
@@ -986,9 +995,10 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             display(accordion)
 
 
-def add_connectivity_tab(net, connectivity_out,
+def add_connectivity_tab(params, connectivity_out,
                          connectivity_sliders):
     """Add all possible connectivity boxes to connectivity tab."""
+    net = jones_2009_model(params)
     cell_types = [ct for ct in net.cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
@@ -1041,59 +1051,66 @@ def add_connectivity_tab(net, connectivity_out,
     with connectivity_out:
         display(cell_connectivity)
 
+    return net
+
+
+def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+                  layout):
+    net = jones_2009_model(params)
+    drive_specs = _extract_drive_specs_from_hnn_params(
+        net._params,
+        list(net.cell_types.keys()))
+
+    # clear before adding drives
+    drives_out.clear_output()
+    while len(drive_widgets) > 0:
+        drive_widgets.pop()
+        drive_boxes.pop()
+
+    drive_names = sorted(drive_specs.keys())
+    for idx, drive_name in enumerate(drive_names):  # order matters
+        specs = drive_specs[drive_name]
+        should_render = idx == (len(drive_names) - 1)
+
+        add_drive_widget(
+            specs['type'].capitalize(),
+            drive_boxes,
+            drive_widgets,
+            drives_out,
+            tstop,
+            specs['location'],
+            layout=layout,
+            prespecified_drive_name=drive_name,
+            prespecified_drive_data=specs['dynamics'],
+            prespecified_weights_ampa=specs['weights_ampa'],
+            prespecified_weights_nmda=specs['weights_nmda'],
+            prespecified_delays=specs['synaptic_delays'],
+            render=should_render,
+            expand_last_drive=False,
+            event_seed=specs['event_seed'],
+        )
+
 
 def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_sliders, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
-    # init the network.
-    tmp_net = jones_2009_model(params)
-
-    # Add connectivity
-    add_connectivity_tab(tmp_net, connectivity_out, connectivity_sliders)
-
-    # Add drives
     log_out.clear_output()
     with log_out:
-        drive_specs = _extract_drive_specs_from_hnn_params(
-            tmp_net._params,
-            list(tmp_net.cell_types.keys()))
-
-        # clear before adding drives
-        drives_out.clear_output()
-        while len(drive_widgets) > 0:
-            drive_widgets.pop()
-            drive_boxes.pop()
-
-        drive_names = sorted(drive_specs.keys())
-        for idx, drive_name in enumerate(drive_names):  # order matters
-            specs = drive_specs[drive_name]
-            should_render = idx == (len(drive_names) - 1)
-
-            add_drive_widget(
-                specs['type'].capitalize(),
-                drive_boxes,
-                drive_widgets,
-                drives_out,
-                tstop,
-                specs['location'],
-                layout=layout,
-                prespecified_drive_name=drive_name,
-                prespecified_drive_data=specs['dynamics'],
-                prespecified_weights_ampa=specs['weights_ampa'],
-                prespecified_weights_nmda=specs['weights_nmda'],
-                prespecified_delays=specs['synaptic_delays'],
-                render=should_render,
-                expand_last_drive=False,
-                event_seed=specs['event_seed'],
-            )
+        # Add connectivity
+        add_connectivity_tab(params, connectivity_out, connectivity_sliders)
+        # Add drives
+        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+                      layout)
 
 
 def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
                      drive_widgets, drives_out, connectivity_out,
-                     connectivity_sliders, layout):
+                     connectivity_sliders, layout, load_type):
     if len(change['owner'].value) == 0:
+        logger.info("Empty change")
         return
+    logger.info("Loading connectivity...")
     key = list(change['new'].keys())[0]
 
     params_fname = change['new'][key]['metadata']['name']
@@ -1115,9 +1132,15 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
 
         params.update(params_network)
     # init network, add drives & connectivity
-    load_drive_and_connectivity(params, log_out, drives_out, drive_widgets,
-                                drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop, layout)
+    if load_type == 'connectivity':
+        add_connectivity_tab(params, connectivity_out, connectivity_sliders)
+    elif load_type == 'drive':
+        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+                      layout)
+    else:
+        raise ValueError
+
+    change['owner'].set_trait('_counter', 0)
     change['owner'].set_trait('value', {})
 
 
