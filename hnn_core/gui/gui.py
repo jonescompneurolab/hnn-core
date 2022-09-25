@@ -592,24 +592,13 @@ class HNNGUI:
         return js_string
 
     # below are a series of methods that are used to manipulate the GUI
-    def _simulate_upload_file(self, file_url):
-        params_name = file_url.split("/")[-1]
-        data = urllib.request.urlopen(file_url)
-        content = b""
-        for line in data:
-            content += line
-
-        uploaded_value = {
-            params_name: {
-                'metadata': {
-                    'name': params_name,
-                    'type': 'application/json',
-                    'size': len(content),
-                },
-                'content': content
-            }
-        }
+    def _simulate_upload_connectivity(self, file_url):
+        uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_connectivity_button.set_trait('value', uploaded_value)
+
+    def _simulate_upload_drives(self, file_url):
+        uploaded_value = _prepare_upload_file_from_url(file_url)
+        self.load_drives_button.set_trait('value', uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
         tab_index = None
@@ -642,6 +631,25 @@ class HNNGUI:
         self._simulate_left_tab_click("Visualization")
         action = getattr(self.viz_manager, f"_simulate_{action_name}")
         action(*args, **kwargs)
+
+
+def _prepare_upload_file_from_url(file_url):
+    params_name = file_url.split("/")[-1]
+    data = urllib.request.urlopen(file_url)
+    content = b""
+    for line in data:
+        content += line
+
+    return {
+        params_name: {
+            'metadata': {
+                'name': params_name,
+                'type': 'application/json',
+                'size': len(content),
+            },
+            'content': content
+        }
+    }
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,

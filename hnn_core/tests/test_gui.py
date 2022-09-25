@@ -41,7 +41,8 @@ def test_gui_upload_params():
     gui.widget_dt.value = 1
     # simulate upload default.json
     file_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
-    gui._simulate_upload_file(file_url)
+    gui._simulate_upload_connectivity(file_url)
+    gui._simulate_upload_drives(file_url)
 
     # check if parameter is reloaded.
     assert gui.widget_tstop.value == original_tstop
