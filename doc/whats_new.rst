@@ -279,6 +279,8 @@ Changelog
 
 - Add Savitzky-Golay filtering method :meth:`~hnn_core.dipole.Dipole.savgol_filter` to ``Dipole``; copied from ``mne-python`` :meth:`~mne.Evoked.savgol_filter`, by `Christopher Bailey`_ in `#264 <https://github.com/jonescompneurolab/hnn-core/pull/264>`_
 
+- Add warning if network drives are not loaded, by `Orsolya Beatrix Kolozsvari`_ in `#516 <https://github.com/jonescompneurolab/hnn-core/pull/516>`_
+
 Bug
 ~~~
 
@@ -325,6 +327,7 @@ People who contributed to this release (in alphabetical order):
 - `Carmen Kohl`_
 - `Mainak Jas`_
 - `Nick Tolley`_
+- `Orsolya Beatrix Kolozsvari`_
 - `Ryan Thorpe`_
 - `Samika Kanekar`_
 - `Stephanie R. Jones`_
@@ -340,6 +343,7 @@ People who contributed to this release (in alphabetical order):
 .. _Mattan Pelah: https://github.com/mjpelah
 .. _Mohamed A. Sherif: https://github.com/mohdsherif/
 .. _Nick Tolley: https://github.com/ntolley
+.. _Orsolya Beatrix Kolozsvari: http://github.com/orbekolo/
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane
 .. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
