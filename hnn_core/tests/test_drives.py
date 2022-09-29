@@ -428,6 +428,10 @@ def test_add_drives():
             synaptic_delays={'L2_pyramidal': 1.},
             probability={'L2_pyramidal': 2.0})
 
+    with pytest.warns(UserWarning, match='No external drives loaded'):
+            net.clear_drives()
+            simulate_dipole(net, tstop=10)
+
 
 def test_drive_random_state():
     """Tests to check same random state always gives same spike times."""
