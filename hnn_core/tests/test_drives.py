@@ -429,8 +429,8 @@ def test_add_drives():
             probability={'L2_pyramidal': 2.0})
 
     with pytest.warns(UserWarning, match='No external drives loaded'):
-            net.clear_drives()
-            simulate_dipole(net, tstop=10)
+        net.clear_drives()
+        simulate_dipole(net, tstop=10)
 
 
 def test_drive_random_state():
