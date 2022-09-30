@@ -27,7 +27,7 @@ Changelog
 - Runtime output messages now specify the trial with which each simulation time
   checkpoint belongs too, by `Ryan Thorpe`_ in :gh:`546`.
 
-- Add warning if network drives are not loaded, by `Orsolya Beatrix Kolozsvari`_ in :gh:`#516`
+- Add warning if network drives are not loaded, by `Orsolya Beatrix Kolozsvari`_ in :gh:`516`
 
 Bug
 ~~~
