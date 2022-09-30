@@ -21,11 +21,13 @@ Changelog
 - Add interface to modify attributes of sections in
   :func:`~hnn_core.Cell.modify_section`, by `Nick Tolley`_ in :gh:`481`
 
- - Add ability to target specific sections when adding drives or connections,
-   by `Nick Tolley`_ in :gh:`419`
+- Add ability to target specific sections when adding drives or connections,
+  by `Nick Tolley`_ in :gh:`419`
 
 - Runtime output messages now specify the trial with which each simulation time
   checkpoint belongs too, by `Ryan Thorpe`_ in :gh:`546`.
+
+- Add warning if network drives are not loaded, by `Orsolya Beatrix Kolozsvari`_ in :gh:`#516`
 
 Bug
 ~~~
@@ -279,8 +281,6 @@ Changelog
 
 - Add Savitzky-Golay filtering method :meth:`~hnn_core.dipole.Dipole.savgol_filter` to ``Dipole``; copied from ``mne-python`` :meth:`~mne.Evoked.savgol_filter`, by `Christopher Bailey`_ in `#264 <https://github.com/jonescompneurolab/hnn-core/pull/264>`_
 
-- Add warning if network drives are not loaded, by `Orsolya Beatrix Kolozsvari`_ in `#516 <https://github.com/jonescompneurolab/hnn-core/pull/516>`_
-
 Bug
 ~~~
 
@@ -327,7 +327,6 @@ People who contributed to this release (in alphabetical order):
 - `Carmen Kohl`_
 - `Mainak Jas`_
 - `Nick Tolley`_
-- `Orsolya Beatrix Kolozsvari`_
 - `Ryan Thorpe`_
 - `Samika Kanekar`_
 - `Stephanie R. Jones`_
