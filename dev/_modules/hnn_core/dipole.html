@@ -16,6 +16,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -196,6 +197,9 @@
                       <span class="s1">&#39;net = jones_2009_model() or net = law_2021_model() to &#39;</span>
                       <span class="s1">&#39;create a predefined network from published models.&#39;</span><span class="p">,</span>
                       <span class="ne">UserWarning</span><span class="p">)</span>
+    <span class="c1"># ADD DRIVE WARNINGS HERE</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No external drives loaded&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]:</span>
@@ -751,7 +755,7 @@
     </p>
     <p>
         &copy; Copyright 2021, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.2.3.<br/>
     </p>
   </div>
 </footer>

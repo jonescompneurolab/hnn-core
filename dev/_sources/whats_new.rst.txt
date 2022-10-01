@@ -21,11 +21,13 @@ Changelog
 - Add interface to modify attributes of sections in
   :func:`~hnn_core.Cell.modify_section`, by `Nick Tolley`_ in :gh:`481`
 
- - Add ability to target specific sections when adding drives or connections,
-   by `Nick Tolley`_ in :gh:`419`
+- Add ability to target specific sections when adding drives or connections,
+  by `Nick Tolley`_ in :gh:`419`
 
 - Runtime output messages now specify the trial with which each simulation time
   checkpoint belongs too, by `Ryan Thorpe`_ in :gh:`546`.
+
+- Add warning if network drives are not loaded, by `Orsolya Beatrix Kolozsvari`_ in :gh:`516`
 
 Bug
 ~~~
@@ -340,6 +342,7 @@ People who contributed to this release (in alphabetical order):
 .. _Mattan Pelah: https://github.com/mjpelah
 .. _Mohamed A. Sherif: https://github.com/mohdsherif/
 .. _Nick Tolley: https://github.com/ntolley
+.. _Orsolya Beatrix Kolozsvari: http://github.com/orbekolo/
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane
 .. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
