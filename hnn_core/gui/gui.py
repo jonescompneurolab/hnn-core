@@ -148,6 +148,7 @@ class HNNGUI:
             "header_height": f"{header_height}px",
             "theme_color": theme_color,
             "btn": Layout(height=f"{button_height}px", width='auto'),
+            "btn_full_w": Layout(height=f"{button_height}px", width='100%'),
             "del_fig_btn": Layout(height=f"{button_height}px", width='auto'),
             "log_out": Layout(border='1px solid gray',
                               height=f"{log_window_height-10}px",
@@ -250,7 +251,7 @@ class HNNGUI:
         self.load_connectivity_button = FileUpload(
             accept='.json,.param', multiple=False,
             style={'button_color': self.layout['theme_color']},
-            description='Load connectivity', layout=self.layout['btn'],
+            description='Load connectivity', layout=self.layout['btn_full_w'],
             button_style='success')
         self.load_drives_button = FileUpload(
             accept='.json,.param', multiple=False,
@@ -434,13 +435,14 @@ class HNNGUI:
 
         drive_selections = VBox([
             self.add_drive_button, self.widget_drive_type_selection,
-            self.widget_location_selection])
+            self.widget_location_selection],
+            layout=Layout(flex="1"))
 
         drives_options = VBox([
             HBox([
-                drive_selections,
                 VBox([self.load_drives_button, self.delete_drive_button],
-                     layout=Layout(flex="1"))
+                     layout=Layout(flex="1")),
+                drive_selections,
             ]), self._drives_out
         ])
 
