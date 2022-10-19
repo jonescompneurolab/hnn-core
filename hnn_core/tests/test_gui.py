@@ -40,14 +40,34 @@ def test_gui_upload_params():
     original_tstep = gui.widget_dt.value
     gui.widget_dt.value = 1
     # simulate upload default.json
-    file_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
-    gui._simulate_upload_connectivity(file_url)
-    gui._simulate_upload_drives(file_url)
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
+    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json" # noqa
+    gui._simulate_upload_connectivity(file1_url)
+    gui._simulate_upload_drives(file1_url)
 
     # check if parameter is reloaded.
     assert gui.widget_tstop.value == original_tstop
     assert gui.widget_dt.value == original_tstep
     assert len(gui.drive_widgets) == original_drive_count
+
+    # check parameters with different files.
+    # file1: connectivity file2: drives
+    gui._simulate_upload_connectivity(file1_url)
+    assert gui.widget_tstop.value == 170.
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
+    gui._simulate_upload_drives(file2_url)
+    assert gui.widget_tstop.value == 250.
+    # uploading new drives does not influence the existing connectivity.
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
+
+    # file2: connectivity file1: drives
+    gui._simulate_upload_connectivity(file2_url)
+    # now connectivity is refreshed.
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    assert gui.drive_widgets[-1]['tstop'].value == 250.
+    gui._simulate_upload_drives(file1_url)
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    assert gui.drive_widgets[-1]['tstop'].value == 0.
 
 
 def test_gui_change_connectivity():
@@ -213,7 +233,7 @@ def test_gui_take_screenshots():
     gui.compose(return_layout=False)
     screenshot = gui.capture(render=False)
     assert type(screenshot) is IFrame
-    gui._simulate_left_tab_click("Drives")
+    gui._simulate_left_tab_click("External drives")
     screenshot1 = gui.capture(render=False)
     assert screenshot._repr_html_() != screenshot1._repr_html_()
 
