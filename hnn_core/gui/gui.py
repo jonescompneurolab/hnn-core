@@ -1088,7 +1088,7 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
     net = jones_2009_model(params)
     drive_specs = _extract_drive_specs_from_hnn_params(
-        net._params,
+        params,
         list(net.cell_types.keys()))
 
     # clear before adding drives
