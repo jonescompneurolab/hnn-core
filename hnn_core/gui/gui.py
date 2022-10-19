@@ -129,7 +129,7 @@ class HNNGUI:
                  button_height=30,
                  operation_box_height=60,
                  drive_widget_width=200,
-                 left_sidebar_width=500,
+                 left_sidebar_width=576,
                  log_window_height=150,
                  status_height=30,
                  dpi=96,
@@ -251,12 +251,12 @@ class HNNGUI:
         self.load_connectivity_button = FileUpload(
             accept='.json,.param', multiple=False,
             style={'button_color': self.layout['theme_color']},
-            description='Load connectivity', layout=self.layout['btn_full_w'],
-            button_style='success')
+            description='Load local network connectivity',
+            layout=self.layout['btn_full_w'], button_style='success')
         self.load_drives_button = FileUpload(
             accept='.json,.param', multiple=False,
             style={'button_color': self.layout['theme_color']},
-            description='Load drives', layout=self.layout['btn'],
+            description='Load external drives', layout=self.layout['btn'],
             button_style='success')
 
         self.delete_drive_button = create_expanded_button(
@@ -454,7 +454,8 @@ class HNNGUI:
             simulation_box, connectivity_box, drives_options,
             config_panel,
         ]
-        titles = ('Simulation', 'Cell connectivity', 'Drives', 'Visualization')
+        titles = ('Simulation', 'Network connectivity', 'External drives',
+                  'Visualization')
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
 
