@@ -126,7 +126,7 @@ Read our `contributing guide`_.
 .. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
 	:target: https://pypi.org/project/hnn-core/
 
-.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/189708150-fe1bf176-aa1d-4136-9629-4197bf002b4b.png
+.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/197026635-39b6564a-f529-4caf-870e-af9ca4d2fb75.png
 
 .. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
    :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
