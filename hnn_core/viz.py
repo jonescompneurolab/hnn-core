@@ -1110,6 +1110,7 @@ def plot_csd(csd, times, ax=None, colorbar=True, show=True):
         If the colorbar is presented.
     show : bool
         If True, show the plot
+    
     Returns
     -------
     fig : instance of matplotlib Figure
