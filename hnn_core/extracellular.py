@@ -28,28 +28,37 @@ from neuron import h
 from .externals.mne import _validate_type, _check_option
 
 
-def calculate_csd2d(data, delta=1):
+def calculate_csd2d(LFP_data, ch_axis=0, delta=1):
     """current source density (csd) estimation
 
-    The three-point finite-difference approximation of the 
+    The three-point finite-difference approximation of the
     second spatial derivative for computing 1-dimensional CSD
+    with border electrode interpolation
+    csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] + LFP[electrode + 1]) / spacing ** 2
+
     Parameters
     ----------
-    data : channels x times array
+    LFP_data : channels x times array
         LFP data
+    ch_axis : int
+        axis of electrode array, default is zero.
     delta : int
-        distance between channels (in um), scales the CSD
+        spacing between channels, scales the CSD
     Returns
     -------
     csd2d : channels x times array
         the 2nd derivative current source density estimate (csd2d)
     """
-    csd2d = np.zeros([data.shape[0] - 2, data.shape[1]])
-
-    for channel, trace in enumerate(data[1:-1], start=1):
-        csd2d[channel - 1] = -(data[channel - 1] - 2 * trace + data[channel + 1]) / delta ** 2
-
+    csd2d = -np.diff(np.diff(LFP_data, axis=ch_axis), axis=ch_axis) / delta ** 2
+    bottom_border = np.take(csd2d, -1, axis=ch_axis) * 2 - np.take(csd2d, -2,
+                                                              axis=ch_axis)
+    top_border = np.take(csd2d, 0, axis=ch_axis) * 2 - np.take(csd2d, 1,
+                                                             axis=ch_axis)
+    csd2d = np.concatenate([np.expand_dims(top_border, axis=ch_axis),
+                            csd2d, np.expand_dims(bottom_border, axis=ch_axis)],
+                           axis=ch_axis)
     return csd2d
+
 
 
 def _transfer_resistance(section, electrode_pos, conductivity, method,
@@ -455,12 +464,12 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def csd(self, trial_no=0, colorbar=True, ax=None, show=True):
+    def csd(self, trial_idx=0, colorbar=True, ax=None, show=True):
         """Plots the CSD.
 
         Parameters
         ----------
-        trial_no : int | list of int | slice
+        trial_idx : int | list of int | slice
             Trial number(s) to plot
         colorbar : bool
             If the colorbar is presented.
@@ -468,6 +477,7 @@ class ExtracellularArray:
             The matplotlib axis.
         show : bool
             If True, show the plot
+        
         Returns
         -------
         fig : instance of matplotlib Figure
