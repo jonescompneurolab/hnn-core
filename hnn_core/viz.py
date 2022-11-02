@@ -1092,3 +1092,61 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
     plt_show(show)
     return ax.get_figure()
+
+
+def plot_csd(csd,
+             times,
+             method,
+             filtered,
+             show_cb=True,
+             cmap="bwr",
+             ax=None,
+             show=True):
+    """Plot CSD.
+
+    TODO: add other plotting parameters, e.g., colormaps.
+    Parameters
+    ----------
+    csd : Instance of icsd.*CSD object
+        CSD data
+    times : np.array
+        An array of times (in ms) for the recorded data.
+    method : str
+        The method used to calculate CSD from LFP
+    filtered : bool
+        If the CSD data is filtered
+    ax : instance of matplotlib figure | None
+        The matplotlib axis.
+    show_cb : bool
+        If the colorbar is presented.
+    show : bool
+        If True, show the plot
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+    """
+    import matplotlib.pyplot as plt
+    if ax is None:
+        _, ax = plt.subplots(1, 1)
+
+    yticks = np.linspace(0, csd.shape[0], csd.shape[0])
+    im = ax.pcolormesh(times,
+                       yticks,
+                       np.array(csd),
+                       cmap=cmap,
+                       vmin=-abs(csd).max(),
+                       vmax=abs(csd).max(),
+                       shading="nearest")
+    ax.invert_yaxis()
+    ax.axis(ax.axis('tight'))
+    filter_info = ', filtered' if filtered else ''
+    ax.set_title(f"{method}-iCSD{filter_info}")
+    if show_cb:
+        cb = plt.colorbar(im, ax=ax)
+        cb.set_label('CSD (%s)' % csd.dimensionality.string)
+    ax.set_ylabel('Ch #')  # This part needs to be changed.
+    ax.set_xlabel('Time (ms)')
+    plt_show(show)
+    return ax.get_figure()

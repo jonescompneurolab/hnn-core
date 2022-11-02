@@ -20,10 +20,12 @@ Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65.
 #          Sam Neymotin <samnemo@gmail.com>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
+from typing import Literal
 import numpy as np
 from copy import deepcopy
 from numpy.linalg import norm
 from neuron import h
+import quantities as pq
 
 from .externals.mne import _validate_type, _check_option
 
@@ -429,6 +431,67 @@ class ExtracellularArray:
                 voltage_scalebar=voltage_scalebar,
                 contact_labels=contact_labels,
                 show=show)
+        return fig
+
+    def csd_plot(self,
+                 trial_no=0,
+                 method="spline",
+                 f_type="gaussian",
+                 filtered=True,
+                 show_cb=False,
+                 cmap="jet_r",
+                 ax=None,
+                 show=True,
+                 **kwargs):
+        """Plot the current source density of extracellular electrode array.
+        """
+        import icsd
+        from .viz import plot_csd
+        pos_err_info = "The X & Y coordinates should be the same."
+        _xs = [i[0] for i in self.positions]
+        _ys = [i[1] for i in self.positions]
+        assert len(set(_xs)) == len(set(_ys)) == 1, pos_err_info
+        plot_data = self.voltages[trial_no]
+
+        lfp_data = plot_data * pq.V * 1E-6
+        z_data = np.array([p[2] for p in self.positions]) * 1e-6 * pq.m
+        # the z_data should be monotonously increasing.
+        # default parameters used by iCSD methods below
+        sigma = self.conductivity * pq.S / pq.m
+        diam = 500E-6 * pq.m  # [m]
+
+        if method == "standard":
+            csd_obj = icsd.StandardCSD(lfp=lfp_data,
+                                       coord_electrode=z_data,
+                                       sigma=sigma,
+                                       f_type=f_type,
+                                       f_order=(3, 1))
+        elif method == "spline":
+            csd_obj = icsd.SplineiCSD(lfp=lfp_data,
+                                      coord_electrode=z_data,
+                                      diam=diam,
+                                      sigma=sigma,
+                                      sigma_top=sigma,
+                                      num_steps=201,
+                                      f_type=f_type,
+                                      f_order=(3, 1),
+                                      **kwargs)
+        else:
+            raise NotImplementedError(
+                "Currently only standard and spline CSD are supported")
+
+        csd = csd_obj.get_csd()
+        if filtered:
+            csd = csd_obj.filter_csd(csd)
+
+        fig = plot_csd(csd,
+                       self.times,
+                       method,
+                       filtered,
+                       ax=ax,
+                       show_cb=show_cb,
+                       cmap=cmap,
+                       show=show)
         return fig
 
 
