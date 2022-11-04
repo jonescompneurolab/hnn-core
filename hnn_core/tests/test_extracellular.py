@@ -9,7 +9,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
-from hnn_core.extracellular import ExtracellularArray
+from hnn_core.extracellular import ExtracellularArray, _calculate_csd2d
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
 
@@ -178,8 +178,8 @@ def test_extracellular_backends(run_hnn_core_fixture):
     # make sure sampling rate is fixed (raises RuntimeError if not)
     _ = joblib_net.rec_arrays['arr1'].sfreq
     # check plotting works
-    joblib_net.rec_arrays['arr1'].plot(show=False)
-
+    joblib_net.rec_arrays['arr1'].plot_lfp(show=False)
+    joblib_net.rec_arrays['arr1'].plot_csd(show=False)
 
 def test_rec_array_calculation():
     """Test LFP calculation."""
@@ -203,6 +203,12 @@ def test_rec_array_calculation():
     assert len(net.rec_arrays['arr1'].voltages[0]) == 2  # n_contacts
     assert (len(net.rec_arrays['arr1'].voltages[0][0]) ==
             len(net.rec_arrays['arr1'].times))
+
+    # test dimensionality of LFP and CSD matrices
+    lfp_data = net.rec_arrays['arr1'].voltages[0]
+    csd_data = _calculate_csd2d(lfp_data)
+    assert lfp_data.shape == csd_data.shape
+
     # ensure copy drops data (but retains electrode position information etc.)
     net_copy = net.copy()
     assert isinstance(net_copy.rec_arrays['arr1'], ExtracellularArray)

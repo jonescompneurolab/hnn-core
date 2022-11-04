@@ -6,19 +6,7 @@
 
 import numpy as np
 from itertools import cycle
-import colorsys
-
 from .externals.mne import _validate_type
-
-
-def _lighten_color(color, amount=0.5):
-    import matplotlib.colors as mc
-    try:
-        c = mc.cnames[color]
-    except:
-        c = color
-    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
-    return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
 def _get_plot_data_trange(times, data, tmin, tmax):
@@ -78,9 +66,9 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
-                       decim=None, color='cividis',
-                       voltage_offset=50, voltage_scalebar=200,
+def plot_extracellular_lfp(times, data, tmin=None, tmax=None, ax=None,
+                       decim=None, color=None,
+                       voltage_offset=None, voltage_scalebar=None,
                        contact_labels=None, show=True):
     """Plot extracellular electrode array voltage time series.
 
@@ -101,9 +89,9 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
-    color : str | array of floats | ``matplotlib.colors.ListedColormap``
-        The colormap to use for plotting. The usual Matplotlib standard
-        colormap strings may be used (e.g., 'jetblue'). A color can also be
+    color : string | array of floats | ``matplotlib.colors.ListedColormap``
+        The color to use for plotting (optional). The usual Matplotlib standard
+        color strings may be used (e.g., 'b' for blue). A color can also be
         defined as an RGBA-quadruplet, or an array of RGBA-values (one for each
         electrode contact trace to plot). An instance of
         :class:`~matplotlib.colors.ListedColormap` may also be provided.
@@ -157,8 +145,6 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
             if color.N != n_contacts:
                 raise ValueError(f'ListedColormap has N={color.N}, but '
                                  f'there are {n_contacts} contacts')
-        elif isinstance(color, str):
-            color = plt.get_cmap(color, len(contact_labels))
 
     if ax is None:
         _, ax = plt.subplots(1, 1)
@@ -224,7 +210,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color='k', label="average", average=False, show=True):
+                color='k', average=False, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -245,10 +231,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
-    color : tuple of float | str
+    color : tuple of float
         RGBA value to use for plotting. By default, 'k' (black)
-    label : str
-        Dipole label. Enabled when average=True
     average : bool
         If True, render the average across all dpls.
     show : bool
@@ -293,13 +277,13 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                                                     tmin, tmax)
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
+
                 if idx == len(dpl) - 1 and average:
                     # the average dpl
-                    ax.plot(times, data, color=color, label=label, lw=1.5)
+                    ax.plot(times, data, color='g', label="average", lw=1.5)
                 else:
                     alpha = 0.5 if average else 1.
-                    ax.plot(times, data, color=_lighten_color(color, 0.5),
-                            alpha=alpha, lw=1.)
+                    ax.plot(times, data, color=color, alpha=alpha, lw=1.)
 
         if average:
             ax.legend()
@@ -686,7 +670,7 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
 
 
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-             color=None, label=None, ax=None, show=True):
+             ax=None, show=True):
     """Plot power spectral density (PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` from SciPy with ``window='hamming'``.
@@ -709,10 +693,6 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         End time of data to include (in ms). If None, use entire simulation.
     layer : str, default 'agg'
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
-    color : str or tuple or None
-        The line color of PSD
-    label : str or None
-        Line label for PSD
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     show : bool
@@ -749,10 +729,7 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
         trial_power.append(Pxx)
 
-    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0), color=color,
-            label=label)
-    if label:
-        ax.legend()
+    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0))
     if fmax is not None:
         ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
@@ -1095,9 +1072,9 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
 
 
-def plot_csd(csd, times, ax=None, colorbar=True, show=True):
-    """Generates the csd figure
-
+def plot_extracellular_csd(csd, times, ax=None, colorbar=True,
+                           contact_labels=None, show=True):
+    """Generates figure for current source density (csd) estimation
     Parameters
     ----------
     csd : csd array (channels x time)
@@ -1108,9 +1085,12 @@ def plot_csd(csd, times, ax=None, colorbar=True, show=True):
         The matplotlib axis.
     colorbar : bool
         If the colorbar is presented.
+    contact_labels : list (optional)
+        Labels associated with the contacts to plot. Passed as-is to
+        :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
         If True, show the plot
-    
+
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -1120,8 +1100,7 @@ def plot_csd(csd, times, ax=None, colorbar=True, show=True):
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    y_ticks = np.linspace(0, csd.shape[0], csd.shape[0])
-    im = ax.pcolormesh(times, y_ticks, np.array(csd),
+    im = ax.pcolormesh(times, contact_labels, np.array(csd),
                        cmap="jet_r", shading='auto')
     ax.axis(ax.axis('tight'))
     ax.set_title("CSD")
