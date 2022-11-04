@@ -28,17 +28,16 @@ from neuron import h
 from .externals.mne import _validate_type, _check_option
 
 
-def calculate_csd2d(LFP_data, ch_axis=0, delta=1):
+def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
     """current source density (csd) estimation
-
     The three-point finite-difference approximation of the
     second spatial derivative for computing 1-dimensional CSD
     with border electrode interpolation
-    csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] + LFP[electrode + 1]) / spacing ** 2
-
+    csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +
+                       LFP[electrode + 1]) / spacing ** 2
     Parameters
     ----------
-    LFP_data : channels x times array
+    lfp_data : channels x times array
         LFP data
     ch_axis : int
         axis of electrode array, default is zero.
@@ -49,16 +48,16 @@ def calculate_csd2d(LFP_data, ch_axis=0, delta=1):
     csd2d : channels x times array
         the 2nd derivative current source density estimate (csd2d)
     """
-    csd2d = -np.diff(np.diff(LFP_data, axis=ch_axis), axis=ch_axis) / delta ** 2
-    bottom_border = np.take(csd2d, -1, axis=ch_axis) * 2 - np.take(csd2d, -2,
-                                                              axis=ch_axis)
-    top_border = np.take(csd2d, 0, axis=ch_axis) * 2 - np.take(csd2d, 1,
-                                                             axis=ch_axis)
+    csd2d = -np.diff(np.diff(lfp_data, axis=ch_axis),
+                     axis=ch_axis) / delta ** 2
+    bottom_border = np.take(csd2d, -1, axis=ch_axis) * \
+        2 - np.take(csd2d, -2, axis=ch_axis)
+    top_border = np.take(csd2d, 0, axis=ch_axis) * \
+        2 - np.take(csd2d, 1, axis=ch_axis)
     csd2d = np.concatenate([np.expand_dims(top_border, axis=ch_axis),
-                            csd2d, np.expand_dims(bottom_border, axis=ch_axis)],
-                           axis=ch_axis)
+                            csd2d, np.expand_dims(bottom_border,
+                                                  axis=ch_axis)], axis=ch_axis)
     return csd2d
-
 
 
 def _transfer_resistance(section, electrode_pos, conductivity, method,
@@ -386,9 +385,9 @@ class ExtracellularArray:
 
         return self
 
-    def plot(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
-             ax=None, decim=None, color='cividis', voltage_offset=50,
-             voltage_scalebar=200, contact_labels=None, show=True):
+    def plot_lfp(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
+                 ax=None, decim=None, color=None, voltage_offset=None,
+                 voltage_scalebar=None, contact_labels=None, show=True):
         """Plot extracellular electrode array voltage time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
@@ -436,7 +435,7 @@ class ExtracellularArray:
         fig : instance of plt.fig
             The matplotlib figure handle into which time series were plotted.
         """
-        from .viz import plot_extracellular
+        from .viz import plot_extracellular_lfp
 
         if trial_no is None:
             plot_data = self.voltages
@@ -450,12 +449,8 @@ class ExtracellularArray:
         elif contact_no is not None:
             raise ValueError(f'unknown contact number type, got {contact_no}')
 
-        if contact_labels is None:
-            positions = np.array(self.positions)
-            contact_labels = positions[:, 2]
-
         for trial_data in plot_data:
-            fig = plot_extracellular(
+            fig = plot_extracellular_lfp(
                 self.times, trial_data, tmin=tmin, tmax=tmax, ax=ax,
                 decim=decim, color=color,
                 voltage_offset=voltage_offset,
@@ -464,35 +459,38 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def csd(self, trial_idx=0, colorbar=True, ax=None, show=True):
-        """Plots the CSD.
+    def plot_csd(self, colorbar=True, ax=None,
+                 contact_labels=None, show=True):
+        """Plots the current source density (csd) estimation
 
         Parameters
         ----------
-        trial_idx : int | list of int | slice
-            Trial number(s) to plot
         colorbar : bool
             If the colorbar is presented.
         ax : instance of matplotlib figure | None
             The matplotlib axis.
+        contact_labels : list (optional)
+            Labels associated with the contacts to plot. Passed as-is to
+            :func:`~matplotlib.axes.Axes.set_yticklabels`.
         show : bool
             If True, show the plot
-        
+
         Returns
         -------
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        from .viz import plot_csd
-        lfp = self.voltages[trial_no]
+        from .viz import plot_extracellular_csd
+        lfp = self.voltages[0]
         delta = abs(self.positions[0][2] - self.positions[1][2])
 
-        csd = calculate_csd2d(data=lfp,
+        csd = _calculate_csd2d(lfp_data=lfp,
                               delta=delta)
 
-        fig = plot_csd(csd, self.times, ax=ax,
-                       colorbar=colorbar,
-                       show=show)
+        fig = plot_extracellular_csd(csd, self.times, ax=ax,
+                                     colorbar=colorbar,
+                                     contact_labels=contact_labels,
+                                     show=show)
 
         return fig
 
