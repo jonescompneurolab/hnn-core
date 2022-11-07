@@ -90,7 +90,7 @@ dpl[trial_idx].smooth(window_len=window_len)
 dpl[trial_idx].plot(ax=axs[0], decim=decimate, show=False)
 
 # use the same smoothing window on the LFP traces to allow comparison to dipole
-net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
+net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_lfp(
     ax=axs[1], decim=decimate, show=False)
 
 axs[1].grid(True, which='major', axis='x')
