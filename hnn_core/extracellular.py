@@ -48,12 +48,9 @@ def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
     csd2d : channels x times array
         the 2nd derivative current source density estimate (csd2d)
     """
-    csd2d = -np.diff(np.diff(lfp_data, axis=0),
-                     axis=0) / delta ** 2
-    bottom_border = csd2d[-1, :] * \
-        2 - csd2d[-2, :]
-    top_border = csd2d[0, :] * \
-        2 - csd2d[1, :]
+    csd2d = -np.diff(np.diff(lfp_data, axis=0), axis=0) / delta ** 2
+    bottom_border = csd2d[-1, :] * 2 - csd2d[-2, :]
+    top_border = csd2d[0, :] * 2 - csd2d[1, :]
     csd2d = np.concatenate([np.expand_dims(top_border, axis=ch_axis),
                             csd2d, np.expand_dims(bottom_border,
                                                   axis=ch_axis)], axis=ch_axis)

@@ -198,7 +198,8 @@ def test_rec_array_calculation():
 
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)
-    electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000), (1.5, 1.5, 5000), (1.5, 1.5, 7000)]
+    electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000), (1.5, 1.5, 5000),
+                     (1.5, 1.5, 7000)]
     net.add_electrode_array('arr1', electrode_pos)
     _ = simulate_dipole(net, tstop=5, n_trials=1)
 
