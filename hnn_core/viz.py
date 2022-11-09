@@ -6,7 +6,19 @@
 
 import numpy as np
 from itertools import cycle
+import colorsys
+
 from .externals.mne import _validate_type
+
+
+def _lighten_color(color, amount=0.5):
+    import matplotlib.colors as mc
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
 def _get_plot_data_trange(times, data, tmin, tmax):
