@@ -79,9 +79,9 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_extracellular_lfp(times, data, tmin=None, tmax=None, ax=None,
-                       decim=None, color='cividis',
-                       voltage_offset=50, voltage_scalebar=200,
-                       contact_labels=None, show=True):
+                           decim=None, color='cividis',
+                           voltage_offset=50, voltage_scalebar=200,
+                           contact_labels=None, show=True):
     """Plot extracellular electrode array voltage time series.
 
     Parameters
