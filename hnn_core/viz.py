@@ -1094,10 +1094,10 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     return ax.get_figure()
 
 
-
-def plot_extracellular_csd(csd, times, ax=None, colorbar=True,
-                           contact_labels=None, show=True):
+def plot_extracellular_csd(csd, times, contact_labels, ax=None,
+                           colorbar=True, show=True):
     """Generates figure for current source density (csd) estimation
+
     Parameters
     ----------
     csd : csd array (channels x time)

@@ -48,12 +48,12 @@ def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
     csd2d : channels x times array
         the 2nd derivative current source density estimate (csd2d)
     """
-    csd2d = -np.diff(np.diff(lfp_data, axis=ch_axis),
-                     axis=ch_axis) / delta ** 2
-    bottom_border = np.take(csd2d, -1, axis=ch_axis) * \
-        2 - np.take(csd2d, -2, axis=ch_axis)
-    top_border = np.take(csd2d, 0, axis=ch_axis) * \
-        2 - np.take(csd2d, 1, axis=ch_axis)
+    csd2d = -np.diff(np.diff(lfp_data, axis=0),
+                     axis=0) / delta ** 2
+    bottom_border = csd2d[-1, :] * \
+        2 - csd2d[-2, :]
+    top_border = csd2d[0, :] * \
+        2 - csd2d[1, :]
     csd2d = np.concatenate([np.expand_dims(top_border, axis=ch_axis),
                             csd2d, np.expand_dims(bottom_border,
                                                   axis=ch_axis)], axis=ch_axis)
@@ -463,8 +463,7 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, colorbar=True, ax=None,
-                 contact_labels=None, show=True):
+    def plot_csd(self, contact_labels, colorbar=True, ax=None, show=True):
         """Plots the current source density (csd) estimation
 
         Parameters
@@ -489,12 +488,10 @@ class ExtracellularArray:
         delta = abs(self.positions[0][2] - self.positions[1][2])
 
         csd = _calculate_csd2d(lfp_data=lfp,
-                              delta=delta)
+                               delta=delta)
 
-        fig = plot_extracellular_csd(csd, self.times, ax=ax,
-                                     colorbar=colorbar,
-                                     contact_labels=contact_labels,
-                                     show=show)
+        fig = plot_extracellular_csd(csd, self.times, contact_labels, ax=ax,
+                                     colorbar=colorbar, show=show)
 
         return fig
 
