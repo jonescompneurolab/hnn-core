@@ -30,11 +30,13 @@ from .externals.mne import _validate_type, _check_option
 
 def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
     """current source density (csd) estimation
+    
     The three-point finite-difference approximation of the
     second spatial derivative for computing 1-dimensional CSD
     with border electrode interpolation
     csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +
                        LFP[electrode + 1]) / spacing ** 2
+    
     Parameters
     ----------
     lfp_data : channels x times array
@@ -43,6 +45,7 @@ def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
         axis of electrode array, default is zero.
     delta : int
         spacing between channels, scales the CSD
+    
     Returns
     -------
     csd2d : channels x times array

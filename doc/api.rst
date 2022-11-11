@@ -80,7 +80,8 @@ Visualization (:py:mod:`hnn_core.viz`):
    plot_tfr_morlet
    plot_cell_connectivity
    plot_connectivity_matrix
-   plot_csd
+   plot_extracellular_lfp
+   plot_extracellular_csd
 
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):
 ---------------------------------------------------------
