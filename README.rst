@@ -111,6 +111,11 @@ Interested in Contributing?
 
 Read our `contributing guide`_.
 
+Roadmap
+=======
+
+Read our `roadmap`_.
+
 .. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
 

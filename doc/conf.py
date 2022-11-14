@@ -114,8 +114,7 @@ html_theme_options = {
         ("API", "api"),
         ("Glossary", "glossary"),
         ("Whats new", "whats_new"),
-        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True),
-        ("Roadmap", "roadmap")
+        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
     ],
     'bootswatch_theme': "yeti"
 }

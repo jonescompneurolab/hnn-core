@@ -1,16 +1,37 @@
-=====
- GUI
-=====
+===
+GUI
+===
 
 The brand-new lightweight web-based hnn GUI that works with hnn-core.
 
+.. raw:: html
 
-Launch GUI in a Jupyter notebook
-================================
+    <div class="sphx-glr-thumbcontainer"
+         tooltip="Launch GUI in a Jupyter notebook">
 
-See :doc:`basic_gui_usage`
+.. only:: html
 
-Event Related Potentials (ERPs)
-===============================
+ .. figure:: https://user-images.githubusercontent.com/11160442/197026635-39b6564a-f529-4caf-870e-af9ca4d2fb75.png
+     :alt: 01. Basic GUI usage
 
-See :doc:`tutorial_erp`
+     :doc:`basic_gui_usage`
+
+.. raw:: html
+
+    </div>
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer"
+         tooltip="GUI ERP example">
+
+.. only:: html
+
+ .. figure:: https://hnn.brown.edu/wp-content/uploads/2019/06/ERP_.png
+     :alt: 02. Simulate Event Related Potentials (ERPs)
+
+     :doc:`tutorial_erp`
+
+.. raw:: html
+
+    </div>
