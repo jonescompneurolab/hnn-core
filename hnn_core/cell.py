@@ -311,7 +311,7 @@ class Cell:
         self._nrn_sections = dict()
         self._nrn_synapses = dict()
         self.dipole_pp = list()
-        self.rec_vsec = dict
+        self.rec_vsec = dict()
         self.rec_isec = dict()
         # insert iclamp
         self.list_IClamp = list()
@@ -553,7 +553,7 @@ class Cell:
 
         # Logic checks if just recording soma, sections, or both
         if record_vsoma and not record_vsec:
-            self.rec_vsec = dict(['soma'])
+            self.rec_vsec = dict.fromkeys(['soma'])
         elif record_vsec:
             self.rec_vsec = dict.fromkeys(section_names)
 
@@ -564,7 +564,7 @@ class Cell:
                     self._nrn_sections[sec_name](0.5)._ref_v)
 
         if record_isoma and not record_isec:
-            self.rec_isec = dict(['soma'])
+            self.rec_isec = dict.fromkeys(['soma'])
         elif record_isec:
             self.rec_isec = dict.fromkeys(section_names)
 
