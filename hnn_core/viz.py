@@ -78,10 +78,9 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def plot_extracellular_lfp(times, data, tmin=None, tmax=None, ax=None,
-                           decim=None, color='cividis',
-                           voltage_offset=50, voltage_scalebar=200,
-                           contact_labels=None, show=True):
+def plot_extracellular_lfp(times, data, contact_labels, tmin=None, tmax=None,
+                           ax=None, decim=None, color='cividis',
+                           voltage_offset=50, voltage_scalebar=200, show=True):
     """Plot extracellular electrode array voltage time series.
 
     Parameters
@@ -113,7 +112,7 @@ def plot_extracellular_lfp(times, data, tmin=None, tmax=None, ax=None,
     voltage_scalebar : float | None (optional)
         Height, in units of uV, of a scale bar to plot in the top-left corner
         of the plot.
-    contact_labels : list (optional)
+    contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
@@ -187,9 +186,7 @@ def plot_extracellular_lfp(times, data, tmin=None, tmax=None, ax=None,
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
         ylabel = 'Individual contact traces'
-        if contact_labels is None:
-            ax.set_yticks([])
-        elif len(contact_labels) != n_offsets:
+        if len(contact_labels) != n_offsets:
             raise ValueError(f'contact_labels is length {len(contact_labels)},'
                              f' but {n_offsets} contacts to be plotted')
         else:
@@ -1108,7 +1105,7 @@ def plot_extracellular_csd(csd, times, contact_labels, ax=None,
         The matplotlib axis.
     colorbar : bool
         If the colorbar is presented.
-    contact_labels : list (optional)
+    contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool

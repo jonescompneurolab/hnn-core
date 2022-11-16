@@ -30,13 +30,13 @@ from .externals.mne import _validate_type, _check_option
 
 def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
     """current source density (csd) estimation
-    
+
     The three-point finite-difference approximation of the
     second spatial derivative for computing 1-dimensional CSD
     with border electrode interpolation
     csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +
                        LFP[electrode + 1]) / spacing ** 2
-    
+
     Parameters
     ----------
     lfp_data : channels x times array
@@ -45,7 +45,7 @@ def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
         axis of electrode array, default is zero.
     delta : int
         spacing between channels, scales the CSD
-    
+
     Returns
     -------
     csd2d : channels x times array
@@ -120,7 +120,7 @@ def _transfer_resistance(section, electrode_pos, conductivity, method,
         # distance from segment midpoints to electrode
         dis = norm(np.tile(electrode_pos, (section.nseg, 1)) - seg_ctr,
                    axis=1)
-
+        foo = 3/0
         # To avoid very large values when electrode is placed close to a
         # segment junction, enforce minimal radial distance
         dis = np.maximum(dis, min_distance)
@@ -387,7 +387,7 @@ class ExtracellularArray:
 
     def plot_lfp(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
                  ax=None, decim=None, color='cividis', voltage_offset=50,
-                 voltage_scalebar=200, contact_labels=None, show=True):
+                 voltage_scalebar=200, show=True):
         """Plot extracellular electrode array voltage time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
@@ -424,9 +424,6 @@ class ExtracellularArray:
         voltage_scalebar : float | None (optional)
             Height, in units of uV, of a scale bar to plot in the top-left
             corner of the plot.
-        contact_labels : list (optional)
-            Labels associated with the contacts to plot. Passed as-is to
-            :meth:`~matplotlib.axes.Axes.set_yticklabels`.
         show : bool
             If True, show the figure
 
@@ -449,9 +446,8 @@ class ExtracellularArray:
         elif contact_no is not None:
             raise ValueError(f'unknown contact number type, got {contact_no}')
 
-        if contact_labels is None:
-            positions = np.array(self.positions)
-            contact_labels = positions[:, 2]
+        positions = np.array(self.positions)
+        contact_labels = positions[:, 2]
 
         for trial_data in plot_data:
             fig = plot_extracellular_lfp(
@@ -463,7 +459,7 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, contact_labels, colorbar=True, ax=None, show=True):
+    def plot_csd(self, colorbar=True, ax=None, show=True):
         """Plots the current source density (csd) estimation
 
         Parameters
@@ -472,9 +468,6 @@ class ExtracellularArray:
             If the colorbar is presented.
         ax : instance of matplotlib figure | None
             The matplotlib axis.
-        contact_labels : list (optional)
-            Labels associated with the contacts to plot. Passed as-is to
-            :func:`~matplotlib.axes.Axes.set_yticklabels`.
         show : bool
             If True, show the plot
 
@@ -490,7 +483,11 @@ class ExtracellularArray:
         csd = _calculate_csd2d(lfp_data=lfp,
                                delta=delta)
 
-        fig = plot_extracellular_csd(csd, self.times, contact_labels, ax=ax,
+        positions = np.array(self.positions)
+        contact_labels = positions[:, 2]
+
+        fig = plot_extracellular_csd(csd, self.times,
+                                     contact_labels=contact_labels, ax=ax,
                                      colorbar=colorbar, show=show)
 
         return fig
