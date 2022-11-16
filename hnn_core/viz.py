@@ -78,10 +78,10 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def plot_extracellular_lfp(times, data, contact_labels, tmin=None, tmax=None,
+def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
                            ax=None, decim=None, color='cividis',
                            voltage_offset=50, voltage_scalebar=200, show=True):
-    """Plot extracellular electrode array voltage time series.
+    """Plot laminar extracellular electrode array voltage time series.
 
     Parameters
     ----------
@@ -1091,14 +1091,14 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     return ax.get_figure()
 
 
-def plot_extracellular_csd(csd, times, contact_labels, ax=None,
+def plot_laminar_csd(csd, times, contact_labels, ax=None,
                            colorbar=True, show=True):
-    """Generates figure for current source density (csd) estimation
+    """Plot laminar current source density (CSD) estimation from LFP array.
 
     Parameters
     ----------
     csd : csd array (channels x time)
-        CSD data
+        CSD data.
     times : Numpy array
         Sampling times (in ms).
     ax : instance of matplotlib figure | None
@@ -1109,7 +1109,7 @@ def plot_extracellular_csd(csd, times, contact_labels, ax=None,
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
-        If True, show the plot
+        If True, show the plot.
 
     Returns
     -------

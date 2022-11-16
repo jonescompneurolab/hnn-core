@@ -147,7 +147,7 @@ def test_transfer_resistance():
 @requires_psutil
 def test_extracellular_backends(run_hnn_core_fixture):
     """Test extracellular outputs across backends."""
-
+    # calculation of CSD requires >=4 electrode contacts
     electrode_array = {'arr1': [(2, 2, 400), (2, 2, 600), (2, 2, 800),
                                 (2, 2, 1000)]}
     _, joblib_net = run_hnn_core_fixture(

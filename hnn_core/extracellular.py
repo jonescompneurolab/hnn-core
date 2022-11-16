@@ -29,7 +29,7 @@ from .externals.mne import _validate_type, _check_option
 
 
 def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
-    """current source density (csd) estimation
+    """Current source density (CSD) estimation
 
     The three-point finite-difference approximation of the
     second spatial derivative for computing 1-dimensional CSD
@@ -40,11 +40,11 @@ def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
     Parameters
     ----------
     lfp_data : channels x times array
-        LFP data
+        LFP data.
     ch_axis : int
-        axis of electrode array, default is zero.
+        Axis of electrode array, default is zero.
     delta : int
-        spacing between channels, scales the CSD
+        Spacing between channels, scales the CSD.
 
     Returns
     -------
@@ -432,7 +432,7 @@ class ExtracellularArray:
         fig : instance of plt.fig
             The matplotlib figure handle into which time series were plotted.
         """
-        from .viz import plot_extracellular_lfp
+        from .viz import plot_laminar_lfp
 
         if trial_no is None:
             plot_data = self.voltages
@@ -450,7 +450,7 @@ class ExtracellularArray:
         contact_labels = positions[:, 2]
 
         for trial_data in plot_data:
-            fig = plot_extracellular_lfp(
+            fig = plot_laminar_lfp(
                 self.times, trial_data, tmin=tmin, tmax=tmax, ax=ax,
                 decim=decim, color=color,
                 voltage_offset=voltage_offset,
@@ -476,7 +476,7 @@ class ExtracellularArray:
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        from .viz import plot_extracellular_csd
+        from .viz import plot_laminar_csd
         lfp = self.voltages[0]
         delta = abs(self.positions[0][2] - self.positions[1][2])
 
@@ -486,9 +486,9 @@ class ExtracellularArray:
         positions = np.array(self.positions)
         contact_labels = positions[:, 2]
 
-        fig = plot_extracellular_csd(csd, self.times,
-                                     contact_labels=contact_labels, ax=ax,
-                                     colorbar=colorbar, show=show)
+        fig = plot_laminar_csd(csd, self.times,
+                               contact_labels=contact_labels, ax=ax,
+                               colorbar=colorbar, show=show)
 
         return fig
 

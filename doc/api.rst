@@ -55,12 +55,12 @@ Dipole (:py:mod:`hnn_core.dipole`):
 
 ExtracellularArray (:py:mod:`hnn_core.extracellular`):
 ------------------------------------------------------
-   
+
 .. currentmodule:: hnn_core.extracellular
-   
+
 .. autosummary::
    :toctree: generated/
- 
+
    ExtracellularArray
 
 Visualization (:py:mod:`hnn_core.viz`):
@@ -80,8 +80,8 @@ Visualization (:py:mod:`hnn_core.viz`):
    plot_tfr_morlet
    plot_cell_connectivity
    plot_connectivity_matrix
-   plot_extracellular_lfp
-   plot_extracellular_csd
+   plot_laminar_lfp
+   plot_laminar_csd
 
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):
 ---------------------------------------------------------
@@ -115,4 +115,3 @@ GUI (:py:mod:`hnn_core.gui`):
    :toctree: generated/
 
    HNNGUI
-
