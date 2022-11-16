@@ -148,9 +148,8 @@ def test_transfer_resistance():
 def test_extracellular_backends(run_hnn_core_fixture):
     """Test extracellular outputs across backends."""
 
-    electrode_array = {'arr1': [(2, 2, 100), (6, 6, 200),
-                                (4, 4, 300), (4, 4, 400),
-                                (4, 4, 500), (4, 4, 600)]}
+    electrode_array = {'arr1': [(2, 2, depth) for depth in
+                                range(100, 700, 100)]}
     _, joblib_net = run_hnn_core_fixture(
         backend='joblib', n_jobs=1, reduced=True, record_isoma=True,
         record_vsoma=True, electrode_array=electrode_array)
@@ -181,8 +180,7 @@ def test_extracellular_backends(run_hnn_core_fixture):
     _ = joblib_net.rec_arrays['arr1'].sfreq
     # check plotting works
     joblib_net.rec_arrays['arr1'].plot_lfp(show=False)
-    electrode_depths = [100, 200, 300, 400, 500, 600]
-    joblib_net.rec_arrays['arr1'].plot_csd(electrode_depths, show=False)
+    joblib_net.rec_arrays['arr1'].plot_csd(show=False)
 
 
 def test_rec_array_calculation():
@@ -197,16 +195,15 @@ def test_rec_array_calculation():
     net = jones_2009_model(params, add_drives_from_params=True)
 
     # one electrode inside, one above the active elements of the network,
-    # and two more to allow calculation of CSD (2nd spatial derivative)
-    electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000), (1.5, 1.5, 5000),
-                     (1.5, 1.5, 7000)]
+    # and one more to allow calculation of CSD (2nd spatial derivative)
+    electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000), (1.5, 1.5, 5000)]
     net.add_electrode_array('arr1', electrode_pos)
     _ = simulate_dipole(net, tstop=5, n_trials=1)
 
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
             len(net.rec_arrays['arr1'].voltages) == 1)  # n_trials
-    assert len(net.rec_arrays['arr1'].voltages[0]) == 4  # n_contacts
+    assert len(net.rec_arrays['arr1'].voltages[0]) == 3  # n_contacts
     assert (len(net.rec_arrays['arr1'].voltages[0][0]) ==
             len(net.rec_arrays['arr1'].times))
 
