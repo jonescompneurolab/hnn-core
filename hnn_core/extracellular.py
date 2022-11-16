@@ -120,7 +120,7 @@ def _transfer_resistance(section, electrode_pos, conductivity, method,
         # distance from segment midpoints to electrode
         dis = norm(np.tile(electrode_pos, (section.nseg, 1)) - seg_ctr,
                    axis=1)
-        foo = 3/0
+
         # To avoid very large values when electrode is placed close to a
         # segment junction, enforce minimal radial distance
         dis = np.maximum(dis, min_distance)
@@ -240,7 +240,7 @@ class ExtracellularArray:
                  min_distance=0.5, times=None, voltages=None):
 
         _validate_type(positions, (tuple, list), 'positions')
-        if len(positions) == 3:  # a single coordinate given
+        if len(positions) == 3 and not isinstance(positions[0], tuple):  # a single coordinate given
             positions = [positions]
         for pos in positions:
             _validate_type(pos, (tuple, list), 'positions')
