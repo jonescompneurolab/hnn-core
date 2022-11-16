@@ -240,7 +240,7 @@ class ExtracellularArray:
                  min_distance=0.5, times=None, voltages=None):
 
         _validate_type(positions, (tuple, list), 'positions')
-        if len(positions) == 3 and not isinstance(positions[0], tuple):  # a single coordinate given
+        if np.array(positions).shape == (3,):  # a single coordinate given
             positions = [positions]
         for pos in positions:
             _validate_type(pos, (tuple, list), 'positions')
