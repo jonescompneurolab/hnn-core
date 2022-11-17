@@ -52,7 +52,7 @@ jobs:
       - name: Test with pytest
         shell: bash -el {0}
         run: |
-          python -m py.test .  --cov=hnn_core hnn_core/tests/ --cov-report=xml
+          python -m pytest .  --cov=hnn_core hnn_core/tests/ --cov-report=xml
       - name: Upload code coverage
         shell: bash -el {0}
         run: |
