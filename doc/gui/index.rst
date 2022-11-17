@@ -8,7 +8,7 @@ The brand-new lightweight web-based hnn GUI that works with hnn-core.
 
     <div class="sphx-glr-thumbnails">
         <div class="sphx-glr-thumbcontainer"
-            tooltip="Launch GUI in a Jupyter notebook">
+            tooltip="Basic GUI usage">
 
 .. only:: html
 
@@ -21,7 +21,7 @@ The brand-new lightweight web-based hnn GUI that works with hnn-core.
 
       <div class="sphx-glr-thumbnail-title">01. Basic GUI usage</div>
     </div>
-    <div class="sphx-glr-thumbcontainer" tooltip="GUI ERP example">
+    <div class="sphx-glr-thumbcontainer" tooltip="Basic GUI usage">
 
 .. only:: html
 
