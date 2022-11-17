@@ -79,13 +79,13 @@ def plt_show(show=True, fig=None, **kwargs):
 
 
 def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
-                           ax=None, decim=None, color='cividis',
-                           voltage_offset=50, voltage_scalebar=200, show=True):
+                     ax=None, decim=None, color='cividis',
+                     voltage_offset=50, voltage_scalebar=200, show=True):
     """Plot laminar extracellular electrode array voltage time series.
 
     Parameters
     ----------
-    times : list | Numpy array
+    times : array-like, shape (n_times,)
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
@@ -1091,16 +1091,16 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     return ax.get_figure()
 
 
-def plot_laminar_csd(csd, times, contact_labels, ax=None,
-                           colorbar=True, show=True):
+def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
+                     show=True):
     """Plot laminar current source density (CSD) estimation from LFP array.
 
     Parameters
     ----------
-    csd : csd array (channels x time)
-        CSD data.
-    times : Numpy array
+    times : Numpy array, shape (n_times,)
         Sampling times (in ms).
+    data : array-like, shape (n_channels, n_times)
+        CSD data, channels x time.
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     colorbar : bool
@@ -1120,9 +1120,8 @@ def plot_laminar_csd(csd, times, contact_labels, ax=None,
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    im = ax.pcolormesh(times, contact_labels, np.array(csd),
+    im = ax.pcolormesh(times, contact_labels, np.array(data),
                        cmap="jet_r", shading='auto')
-    ax.axis(ax.axis('tight'))
     ax.set_title("CSD")
 
     if colorbar:
@@ -1130,7 +1129,8 @@ def plot_laminar_csd(csd, times, contact_labels, ax=None,
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (uV/um^{2})$')
 
     ax.set_xlabel('Time (ms)')
-    ax.set_ylabel('Electrode #')
+    ax.set_ylabel('Electrode depth')
+    plt.tight_layout()
     plt_show(show)
 
     return ax.get_figure()
