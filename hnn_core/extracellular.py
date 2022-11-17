@@ -469,7 +469,7 @@ class ExtracellularArray:
         ax : instance of matplotlib figure | None
             The matplotlib axis.
         show : bool
-            If True, show the plot
+            If True, show the plot.
 
         Returns
         -------
@@ -480,13 +480,13 @@ class ExtracellularArray:
         lfp = self.voltages[0]
         delta = abs(self.positions[0][2] - self.positions[1][2])
 
-        csd = _calculate_csd2d(lfp_data=lfp,
-                               delta=delta)
+        csd_data = _calculate_csd2d(lfp_data=lfp,
+                                    delta=delta)
 
         positions = np.array(self.positions)
         contact_labels = positions[:, 2]
 
-        fig = plot_laminar_csd(csd, self.times,
+        fig = plot_laminar_csd(self.times, csd_data,
                                contact_labels=contact_labels, ax=ax,
                                colorbar=colorbar, show=show)
 
