@@ -9,7 +9,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
-from hnn_core.extracellular import (ExtracellularArray, _calculate_csd2d,
+from hnn_core.extracellular import (ExtracellularArray, calculate_csd2d,
                                     _get_laminar_z_coords)
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
@@ -225,7 +225,7 @@ def test_rec_array_calculation():
 
     # test dimensionality of LFP and CSD matrices
     lfp_data = net.rec_arrays['arr1'].voltages[0]
-    csd_data = _calculate_csd2d(lfp_data)
+    csd_data = calculate_csd2d(lfp_data)
     assert lfp_data.shape == csd_data.shape
 
     # ensure copy drops data (but retains electrode position information etc.)

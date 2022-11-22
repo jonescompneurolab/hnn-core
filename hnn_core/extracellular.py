@@ -28,35 +28,34 @@ from neuron import h
 from .externals.mne import _validate_type, _check_option
 
 
-def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
+def calculate_csd2d(lfp_data, delta=1):
     """Current source density (CSD) estimation
 
+    Parameters
+    ----------
+    lfp_data : array, shape (n_channels, n_times)
+        LFP data.
+    delta : int
+        Spacing between channels (um), scales the CSD.
+
+    Returns
+    -------
+    csd2d : array, shape (n_channels, n_times)
+        The 2nd derivative current source density estimate (csd2d)
+
+    Notes
+    -----
     The three-point finite-difference approximation of the
     second spatial derivative for computing 1-dimensional CSD
     with border electrode interpolation
     csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +
                        LFP[electrode + 1]) / spacing ** 2
-
-    Parameters
-    ----------
-    lfp_data : channels x times array
-        LFP data.
-    ch_axis : int
-        Axis of electrode array, default is zero.
-    delta : int
-        Spacing between channels, scales the CSD.
-
-    Returns
-    -------
-    csd2d : channels x times array
-        the 2nd derivative current source density estimate (csd2d)
     """
-    csd2d = -np.diff(np.diff(lfp_data, axis=0), axis=0) / delta ** 2
+    csd2d = -np.diff(lfp_data, n=2, axis=0) / delta ** 2
     bottom_border = csd2d[-1, :] * 2 - csd2d[-2, :]
     top_border = csd2d[0, :] * 2 - csd2d[1, :]
-    csd2d = np.concatenate([np.expand_dims(top_border, axis=ch_axis),
-                            csd2d, np.expand_dims(bottom_border,
-                                                  axis=ch_axis)], axis=ch_axis)
+    csd2d = np.concatenate((top_border[None, ...], csd2d,
+                            bottom_border[None, ...]), axis=0)
     return csd2d
 
 
@@ -516,8 +515,8 @@ class ExtracellularArray:
         lfp = self.voltages[0]
         contact_labels, delta = _get_laminar_z_coords(self.positions)
 
-        csd_data = _calculate_csd2d(lfp_data=lfp,
-                                    delta=delta)
+        csd_data = calculate_csd2d(lfp_data=lfp,
+                                   delta=delta)
 
         fig = plot_laminar_csd(self.times, csd_data,
                                contact_labels=contact_labels, ax=ax,
