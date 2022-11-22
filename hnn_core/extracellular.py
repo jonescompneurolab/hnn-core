@@ -75,6 +75,12 @@ def _get_laminar_z_coords(electrode_positions):
     z_delta : float
         Magnitude of change in the z-direction.
     """
+    n_contacts = np.array(electrode_positions).shape[0]
+    if n_contacts < 2:
+        raise ValueError(
+            'Electrode array positions must contain more than 1 contact to be '
+            'compatible with laminar profiling in a neocortical column. Got '
+            f'{n_contacts} electrode contact positions.')
     displacements = np.diff(electrode_positions, axis=0)
     z_delta = np.abs(displacements[0, 2])
     magnitudes = np.linalg.norm(displacements, axis=1)
@@ -84,7 +90,7 @@ def _get_laminar_z_coords(electrode_positions):
             np.allclose(cross_prods, 0)):  # colinear
         raise ValueError(
             'Electrode contacts are incompatible with laminar profiling '
-            'within the context of a neocortical column. Make sure the '
+            'in a neocortical column. Make sure the '
             'electrode postions are equispaced, colinear, and projecting '
             'along the z-axis.')
     else:
