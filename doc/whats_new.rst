@@ -78,6 +78,13 @@ API
 - `~hnn_core.viz.plot_dipole` now supports separate visualizations of different
   layers, by `Huzi Cheng`_ in :gh:`479`.
 
+- Current source density (CSD) can now be calculated with
+  :func:`~hnn_core.extracellular.calculate_csd2d` and plotted with
+  :meth:`~hnn_core.extracellular.ExtracellularArray.plot_csd`. The method for
+  plotting local field potential (LFP) is now found at
+  :meth:`~hnn_core.extracellular.ExtracellularArray.plot_lfp`, by
+  `Steven Brandt`_ and `Ryan Thorpe`_ in :gh:`517`.
+
 .. _0.2:
 
 0.2
@@ -347,3 +354,4 @@ People who contributed to this release (in alphabetical order):
 .. _Samika Kanekar: https://github.com/samikane
 .. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
+.. _Steven Brandt: https://github.com/spbrandt
