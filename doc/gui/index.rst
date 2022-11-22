@@ -21,7 +21,7 @@ The brand-new lightweight web-based hnn GUI that works with hnn-core.
 
       <div class="sphx-glr-thumbnail-title">01. Basic GUI usage</div>
     </div>
-    <div class="sphx-glr-thumbcontainer" tooltip="Basic GUI usage">
+    <div class="sphx-glr-thumbcontainer" tooltip="Simulate ERP using GUI">
 
 .. only:: html
 
