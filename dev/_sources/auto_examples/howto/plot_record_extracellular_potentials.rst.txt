@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py>`
         to download the full example code or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
@@ -255,7 +255,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  54.803 seconds)
+   **Total running time of the script:** ( 1 minutes  3.156 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:
