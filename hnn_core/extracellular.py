@@ -425,7 +425,7 @@ class ExtracellularArray:
     def plot_lfp(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
                  ax=None, decim=None, color='cividis', voltage_offset=50,
                  voltage_scalebar=200, show=True):
-        """Plot extracellular electrode array voltage time series.
+        """Plot laminar local field potential time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
         with or without (default) and offset.
@@ -496,7 +496,7 @@ class ExtracellularArray:
         return fig
 
     def plot_csd(self, colorbar=True, ax=None, show=True):
-        """Plots the current source density (csd) estimation
+        """Plot laminar current source density (CSD) estimation
 
         Parameters
         ----------
