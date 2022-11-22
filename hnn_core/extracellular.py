@@ -60,6 +60,37 @@ def _calculate_csd2d(lfp_data, ch_axis=0, delta=1):
     return csd2d
 
 
+def _get_laminar_z_coords(electrode_positions):
+    """Get equispaced, colinear electrode coordinates along z-axis.
+
+    Parameters
+    ----------
+    electrode_positions : list of tuple
+        The (x, y, z) coordinates (in um) of the extracellular electrodes.
+
+    Returns
+    -------
+    z_coordinates : array, shape (n_contacts,)
+        Z-coordinates of the electrode contacts.
+    z_delta : float
+        Magnitude of change in the z-direction.
+    """
+    displacements = np.diff(electrode_positions, axis=0)
+    z_delta = np.abs(displacements[0, 2])
+    magnitudes = np.linalg.norm(displacements, axis=1)
+    cross_prods = np.cross(displacements[:-1], displacements[1:])
+    if not (np.allclose(magnitudes, magnitudes[0]) and  # equally spaced
+            z_delta > 0 and  # changes in z-direction
+            np.allclose(cross_prods, 0)):  # colinear
+        raise ValueError(
+            'Electrode contacts are incompatible with laminar profiling '
+            'within the context of a neocortical column. Make sure the '
+            'electrode postions are equispaced, colinear, and projecting '
+            'along the z-axis.')
+    else:
+        return np.array(electrode_positions)[:, 2], z_delta
+
+
 def _transfer_resistance(section, electrode_pos, conductivity, method,
                          min_distance=0.5):
     """Transfer resistance between section and electrode position.
@@ -446,8 +477,7 @@ class ExtracellularArray:
         elif contact_no is not None:
             raise ValueError(f'unknown contact number type, got {contact_no}')
 
-        positions = np.array(self.positions)
-        contact_labels = positions[:, 2]
+        contact_labels, _ = _get_laminar_z_coords(self.positions)
 
         for trial_data in plot_data:
             fig = plot_laminar_lfp(
@@ -478,13 +508,10 @@ class ExtracellularArray:
         """
         from .viz import plot_laminar_csd
         lfp = self.voltages[0]
-        delta = abs(self.positions[0][2] - self.positions[1][2])
+        contact_labels, delta = _get_laminar_z_coords(self.positions)
 
         csd_data = _calculate_csd2d(lfp_data=lfp,
                                     delta=delta)
-
-        positions = np.array(self.positions)
-        contact_labels = positions[:, 2]
 
         fig = plot_laminar_csd(self.times, csd_data,
                                contact_labels=contact_labels, ax=ax,
