@@ -82,21 +82,25 @@ dpl = simulate_dipole(net, tstop=170)
 trial_idx = 0
 window_len = 10  # ms
 decimate = [5, 4]  # from 40k to 8k to 2k
-fig, axs = plt.subplots(3, 1, sharex=True, figsize=(6, 8),
-                        gridspec_kw={'height_ratios': [1, 3, 2]})
+fig, axs = plt.subplots(4, 1, sharex=True, figsize=(6, 8),
+                        gridspec_kw={'height_ratios': [1, 3, 3, 3]})
 
 # Then plot the aggregate dipole time series on its own axis
 dpl[trial_idx].smooth(window_len=window_len)
 dpl[trial_idx].plot(ax=axs[0], decim=decimate, show=False)
 
 # use the same smoothing window on the LFP traces to allow comparison to dipole
-net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
+net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_lfp(
     ax=axs[1], decim=decimate, show=False)
 
 axs[1].grid(True, which='major', axis='x')
 axs[1].set_xlabel('')
-# Finally, add the spike raster to the bottom subplot
+# Add spike raster to subplot
 net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
+
+# Finally, add the CSD to the bottom subplot
+net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(
+    ax=axs[3], show=False)
 plt.tight_layout()
 plt.show()
 

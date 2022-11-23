@@ -94,7 +94,8 @@
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray</span></code></a><ul>
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.__repr__"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.__repr__()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.copy()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.plot()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_csd"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.plot_csd()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_lfp"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.plot_lfp()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.sfreq"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.sfreq</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.smooth"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.smooth()</span></code></a></li>
 </ul>
@@ -215,10 +216,13 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return a copy of the ExtracellularArray instance</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot" title="hnn_core.extracellular.ExtracellularArray.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(*[, trial_no, contact_no, tmin, tmax, ...])</p></td>
-<td><p>Plot extracellular electrode array voltage time series.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_csd" title="hnn_core.extracellular.ExtracellularArray.plot_csd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_csd</span></code></a>([colorbar, ax, show])</p></td>
+<td><p>Plot laminar current source density (CSD) estimation</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.smooth" title="hnn_core.extracellular.ExtracellularArray.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(window_len)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_lfp" title="hnn_core.extracellular.ExtracellularArray.plot_lfp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_lfp</span></code></a>(*[, trial_no, contact_no, tmin, ...])</p></td>
+<td><p>Plot laminar local field potential time series.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.smooth" title="hnn_core.extracellular.ExtracellularArray.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(window_len)</p></td>
 <td><p>Smooth extracellular waveforms using Hamming-windowed convolution</p></td>
 </tr>
 </tbody>
@@ -244,9 +248,33 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_no</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_no</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cividis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_scalebar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot extracellular electrode array voltage time series.</p>
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.plot_csd">
+<span class="sig-name descname"><span class="pre">plot_csd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.plot_csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.plot_csd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot laminar current source density (CSD) estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>colorbar</strong><span class="classifier">bool</span></dt><dd><p>If the colorbar is presented.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the plot.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">instance of matplotlib Figure</span></dt><dd><p>The matplotlib figure handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.plot_lfp">
+<span class="sig-name descname"><span class="pre">plot_lfp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_no</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_no</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cividis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_scalebar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.plot_lfp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.plot_lfp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot laminar local field potential time series.</p>
 <p>One plot is created for each trial. Multiple trials can be overlaid
 with or without (default) and offset.</p>
 <dl class="field-list simple">
@@ -281,9 +309,6 @@ laminar arrays.</p>
 <dt><strong>voltage_scalebar</strong><span class="classifier">float | None (optional)</span></dt><dd><p>Height, in units of uV, of a scale bar to plot in the top-left
 corner of the plot.</p>
 </dd>
-<dt><strong>contact_labels</strong><span class="classifier">list (optional)</span></dt><dd><p>Labels associated with the contacts to plot. Passed as-is to
-<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_yticklabels.html#matplotlib.axes.Axes.set_yticklabels" title="(in Matplotlib v3.6.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_yticklabels()</span></code></a>.</p>
-</dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure</p>
 </dd>
 </dl>
@@ -313,7 +338,7 @@ If you prefer a filtered copy, consider using the
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.24.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
+<dt><strong>window_len</strong><span class="classifier">float</span></dt><dd><p>The length (in ms) of a <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.hamming.html#numpy.hamming" title="(in NumPy v1.25.dev0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hamming</span></code></a> window to convolve the
 data with.</p>
 </dd>
 </dl>

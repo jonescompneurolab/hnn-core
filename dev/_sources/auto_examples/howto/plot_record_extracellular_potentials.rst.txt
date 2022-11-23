@@ -205,28 +205,32 @@ smoothing window, after which both data can be decimated by a factor of 20
 from 40 to 2 kHz sampling rates (note that decimation is applied in two
 steps). Decimation speeds up plotting significantly.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-103
+.. GENERATED FROM PYTHON SOURCE LINES 82-107
 
 .. code-block:: default
 
     trial_idx = 0
     window_len = 10  # ms
     decimate = [5, 4]  # from 40k to 8k to 2k
-    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(6, 8),
-                            gridspec_kw={'height_ratios': [1, 3, 2]})
+    fig, axs = plt.subplots(4, 1, sharex=True, figsize=(6, 8),
+                            gridspec_kw={'height_ratios': [1, 3, 3, 3]})
 
     # Then plot the aggregate dipole time series on its own axis
     dpl[trial_idx].smooth(window_len=window_len)
     dpl[trial_idx].plot(ax=axs[0], decim=decimate, show=False)
 
     # use the same smoothing window on the LFP traces to allow comparison to dipole
-    net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot(
+    net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_lfp(
         ax=axs[1], decim=decimate, show=False)
 
     axs[1].grid(True, which='major', axis='x')
     axs[1].set_xlabel('')
-    # Finally, add the spike raster to the bottom subplot
+    # Add spike raster to subplot
     net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
+
+    # Finally, add the CSD to the bottom subplot
+    net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(
+        ax=axs[3], show=False)
     plt.tight_layout()
     plt.show()
 
@@ -234,7 +238,7 @@ steps). Decimation speeds up plotting significantly.
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2 + L5), CSD
    :srcset: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
    :class: sphx-glr-single-img
 
@@ -242,7 +246,7 @@ steps). Decimation speeds up plotting significantly.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-111
+.. GENERATED FROM PYTHON SOURCE LINES 108-115
 
 References
 ----------
@@ -255,7 +259,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  3.156 seconds)
+   **Total running time of the script:** ( 1 minutes  21.056 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:

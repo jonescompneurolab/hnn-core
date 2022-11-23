@@ -164,6 +164,74 @@
 <span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
 
 
+<span class="k">def</span> <span class="nf">calculate_csd2d</span><span class="p">(</span><span class="n">lfp_data</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Current source density (CSD) estimation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lfp_data : array, shape (n_channels, n_times)</span>
+<span class="sd">        LFP data.</span>
+<span class="sd">    delta : int</span>
+<span class="sd">        Spacing between channels (um), scales the CSD.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    csd2d : array, shape (n_channels, n_times)</span>
+<span class="sd">        The 2nd derivative current source density estimate (csd2d)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The three-point finite-difference approximation of the</span>
+<span class="sd">    second spatial derivative for computing 1-dimensional CSD</span>
+<span class="sd">    with border electrode interpolation</span>
+<span class="sd">    csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +</span>
+<span class="sd">                       LFP[electrode + 1]) / spacing ** 2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">csd2d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">lfp_data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">bottom_border</span> <span class="o">=</span> <span class="n">csd2d</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">csd2d</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">top_border</span> <span class="o">=</span> <span class="n">csd2d</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">csd2d</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">csd2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">top_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">csd2d</span><span class="p">,</span>
+                            <span class="n">bottom_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">csd2d</span>
+
+
+<span class="k">def</span> <span class="nf">_get_laminar_z_coords</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get equispaced, colinear electrode coordinates along z-axis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    electrode_positions : list of tuple</span>
+<span class="sd">        The (x, y, z) coordinates (in um) of the extracellular electrodes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    z_coordinates : array, shape (n_contacts,)</span>
+<span class="sd">        Z-coordinates of the electrode contacts.</span>
+<span class="sd">    z_delta : float</span>
+<span class="sd">        Magnitude of change in the z-direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_contacts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_contacts</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Electrode array positions must contain more than 1 contact to be &#39;</span>
+            <span class="s1">&#39;compatible with laminar profiling in a neocortical column. Got &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1"> electrode contact positions.&#39;</span><span class="p">)</span>
+    <span class="n">displacements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">z_delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">displacements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacements</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cross_prods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">displacements</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">displacements</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">,</span> <span class="n">magnitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span>  <span class="c1"># equally spaced</span>
+            <span class="n">z_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>  <span class="c1"># changes in z-direction</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">cross_prods</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>  <span class="c1"># colinear</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Electrode contacts are incompatible with laminar profiling &#39;</span>
+            <span class="s1">&#39;in a neocortical column. Make sure the &#39;</span>
+            <span class="s1">&#39;electrode postions are equispaced, colinear, and projecting &#39;</span>
+            <span class="s1">&#39;along the z-axis.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">)[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">z_delta</span>
+
+
 <span class="k">def</span> <span class="nf">_transfer_resistance</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">electrode_pos</span><span class="p">,</span> <span class="n">conductivity</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
                          <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Transfer resistance between section and electrode position.</span>
@@ -344,7 +412,7 @@
                  <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voltages</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;positions&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># a single coordinate given</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>  <span class="c1"># a single coordinate given</span>
             <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">positions</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
             <span class="n">_validate_type</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;positions&#39;</span><span class="p">)</span>
@@ -489,10 +557,10 @@
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="ExtracellularArray.plot"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">trial_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contact_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span> <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-             <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">contact_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot extracellular electrode array voltage time series.</span>
+<div class="viewcode-block" id="ExtracellularArray.plot_lfp"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_lfp">[docs]</a>    <span class="k">def</span> <span class="nf">plot_lfp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">trial_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contact_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span> <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot laminar local field potential time series.</span>
 
 <span class="sd">        One plot is created for each trial. Multiple trials can be overlaid</span>
 <span class="sd">        with or without (default) and offset.</span>
@@ -528,9 +596,6 @@
 <span class="sd">        voltage_scalebar : float | None (optional)</span>
 <span class="sd">            Height, in units of uV, of a scale bar to plot in the top-left</span>
 <span class="sd">            corner of the plot.</span>
-<span class="sd">        contact_labels : list (optional)</span>
-<span class="sd">            Labels associated with the contacts to plot. Passed as-is to</span>
-<span class="sd">            :meth:`~matplotlib.axes.Axes.set_yticklabels`.</span>
 <span class="sd">        show : bool</span>
 <span class="sd">            If True, show the figure</span>
 
@@ -539,7 +604,7 @@
 <span class="sd">        fig : instance of plt.fig</span>
 <span class="sd">            The matplotlib figure handle into which time series were plotted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_extracellular</span>
+        <span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_laminar_lfp</span>
 
         <span class="k">if</span> <span class="n">trial_no</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">plot_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span>
@@ -553,18 +618,46 @@
         <span class="k">elif</span> <span class="n">contact_no</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unknown contact number type, got </span><span class="si">{</span><span class="n">contact_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">contact_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-            <span class="n">contact_labels</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">contact_labels</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_laminar_z_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">trial_data</span> <span class="ow">in</span> <span class="n">plot_data</span><span class="p">:</span>
-            <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_extracellular</span><span class="p">(</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_lfp</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">trial_data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
                 <span class="n">decim</span><span class="o">=</span><span class="n">decim</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
                 <span class="n">voltage_offset</span><span class="o">=</span><span class="n">voltage_offset</span><span class="p">,</span>
                 <span class="n">voltage_scalebar</span><span class="o">=</span><span class="n">voltage_scalebar</span><span class="p">,</span>
                 <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span>
                 <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="ExtracellularArray.plot_csd"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_csd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot laminar current source density (CSD) estimation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        colorbar : bool</span>
+<span class="sd">            If the colorbar is presented.</span>
+<span class="sd">        ax : instance of matplotlib figure | None</span>
+<span class="sd">            The matplotlib axis.</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the plot.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of matplotlib Figure</span>
+<span class="sd">            The matplotlib figure handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_laminar_csd</span>
+        <span class="n">lfp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">contact_labels</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">_get_laminar_z_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+
+        <span class="n">csd_data</span> <span class="o">=</span> <span class="n">calculate_csd2d</span><span class="p">(</span><span class="n">lfp_data</span><span class="o">=</span><span class="n">lfp</span><span class="p">,</span>
+                                   <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_csd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">csd_data</span><span class="p">,</span>
+                               <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                               <span class="n">colorbar</span><span class="o">=</span><span class="n">colorbar</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">fig</span></div></div>
 
 

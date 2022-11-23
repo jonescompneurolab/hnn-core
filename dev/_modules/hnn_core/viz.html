@@ -214,15 +214,14 @@
         <span class="p">(</span><span class="n">fig</span> <span class="ow">or</span> <span class="n">plt</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">plot_extracellular</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span>
-                       <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-                       <span class="n">contact_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot extracellular electrode array voltage time series.</span>
+<div class="viewcode-block" id="plot_laminar_lfp"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_laminar_lfp.html#hnn_core.viz.plot_laminar_lfp">[docs]</a><span class="k">def</span> <span class="nf">plot_laminar_lfp</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span>
+                     <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot laminar extracellular electrode array voltage time series.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    times : list | Numpy array</span>
+<span class="sd">    times : array-like, shape (n_times,)</span>
 <span class="sd">        Sampling times (in ms).</span>
 <span class="sd">    data : Two-dimensional Numpy array</span>
 <span class="sd">        The extracellular voltages as an (n_contacts, n_times) array.</span>
@@ -249,7 +248,7 @@
 <span class="sd">    voltage_scalebar : float | None (optional)</span>
 <span class="sd">        Height, in units of uV, of a scale bar to plot in the top-left corner</span>
 <span class="sd">        of the plot.</span>
-<span class="sd">    contact_labels : list (optional)</span>
+<span class="sd">    contact_labels : list</span>
 <span class="sd">        Labels associated with the contacts to plot. Passed as-is to</span>
 <span class="sd">        :func:`~matplotlib.axes.Axes.set_yticklabels`.</span>
 <span class="sd">    show : bool</span>
@@ -323,9 +322,7 @@
     <span class="k">if</span> <span class="n">voltage_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">voltage_offset</span><span class="p">,</span> <span class="n">n_offsets</span> <span class="o">*</span> <span class="n">voltage_offset</span><span class="p">)</span>
         <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Individual contact traces&#39;</span>
-        <span class="k">if</span> <span class="n">contact_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_offsets</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_offsets</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;contact_labels is length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">)</span><span class="si">}</span><span class="s1">,&#39;</span>
                              <span class="sa">f</span><span class="s1">&#39; but </span><span class="si">{</span><span class="n">n_offsets</span><span class="si">}</span><span class="s1"> contacts to be plotted&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -356,7 +353,7 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
 
     <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="plot_dipole"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole">[docs]</a><span class="k">def</span> <span class="nf">plot_dipole</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1227,6 +1224,51 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="n">_onclick</span><span class="p">)</span>
 
     <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_laminar_csd"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_laminar_csd.html#hnn_core.viz.plot_laminar_csd">[docs]</a><span class="k">def</span> <span class="nf">plot_laminar_csd</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot laminar current source density (CSD) estimation from LFP array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    times : Numpy array, shape (n_times,)</span>
+<span class="sd">        Sampling times (in ms).</span>
+<span class="sd">    data : array-like, shape (n_channels, n_times)</span>
+<span class="sd">        CSD data, channels x time.</span>
+<span class="sd">    ax : instance of matplotlib figure | None</span>
+<span class="sd">        The matplotlib axis.</span>
+<span class="sd">    colorbar : bool</span>
+<span class="sd">        If the colorbar is presented.</span>
+<span class="sd">    contact_labels : list</span>
+<span class="sd">        Labels associated with the contacts to plot. Passed as-is to</span>
+<span class="sd">        :func:`~matplotlib.axes.Axes.set_yticklabels`.</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the plot.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : instance of matplotlib Figure</span>
+<span class="sd">        The matplotlib figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+                       <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet_r&quot;</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;CSD&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
+        <span class="n">color_axis</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">inset_axes</span><span class="p">([</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">color_axis</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$CSD (uV/um^</span><span class="si">{2}</span><span class="s1">)$&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Electrode depth&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 </pre></div>
 
