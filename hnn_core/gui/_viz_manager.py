@@ -25,13 +25,13 @@ _plot_types = [
     'input histogram',
     'spikes',
     'PSD',
-    'spectogram',
+    'spectrogram',
     'network',
 ]
 
 _no_overlay_plot_types = [
     'network',
-    'spectogram',
+    'spectrogram',
     'spikes',
     'input histogram',
 ]
@@ -118,7 +118,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax, color=color,
                                     label=sim_name, show=False)
 
-    elif plot_type == 'spectogram':
+    elif plot_type == 'spectrogram':
         if len(dpls_copied) > 0:
             min_f = 10.0
             max_f = plot_config['max_spectral_frequency']
