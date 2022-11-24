@@ -218,7 +218,7 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
     _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config)
 
-    logger.info(f'update ax (id={id(ax)})')
+    logger.debug(f'update ax (id={id(ax)})')
     existing_plots.children = (*existing_plots.children,
                                Label(f"{sim_name}: {plot_type}"))
     if data['use_ipympl'] is False:
