@@ -625,7 +625,7 @@ class HNNGUI:
         ----------
         action_name : str
             The action to take. For example, to call `_simulate_add_fig` in
-            _VizManager, you can run `_simulate_viz_action("viz_action")`
+            _VizManager, you can run `_simulate_viz_action("add_fig")`
         args : list
             Optional positional parameters passed to the called method.
         kwargs: dict
