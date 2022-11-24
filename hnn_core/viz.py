@@ -691,10 +691,11 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         cbar = fig.colorbar(im, cax=cax, format=xfmt, shrink=0.8, pad=0)
         cbar.ax.yaxis.set_ticks_position('left')
         cbar.ax.yaxis.offsetText.set_fontsize(cbar_fontsize)
-        
+
         cbar.ax.set_ylabel(
             r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(scale_applied),
-            rotation=-90, va="bottom", fontsize=cbar_fontsize, color=cbar_color)
+            rotation=-90, va="bottom", fontsize=cbar_fontsize,
+            color=cbar_color)
         cbar.ax.tick_params(direction='in', labelsize=cbar_fontsize,
                             labelcolor=cbar_color, colors=cbar_color)
         plt.setp(cbar.ax.spines.values(), color=cbar_color)
