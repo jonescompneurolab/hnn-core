@@ -577,7 +577,8 @@ def plot_cells(net, ax=None, show=True):
 
 def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
                     layer='agg', decim=None, padding='zeros', ax=None,
-                    colormap='inferno', colorbar=True, show=True):
+                    colormap='inferno', colorbar=True, colorbar_loc=None,
+                    show=True):
     """Plot Morlet time-frequency representation of dipole time course
 
     Parameters
@@ -610,6 +611,8 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         The name of a matplotlib colormap, e.g., 'viridis'. Default: 'inferno'
     colorbar : bool
         If True (default), adjust figure to include colorbar.
+    colorbar_loc: str or None
+        The location of colorbar. Set to right side if None.
     show : bool
         If True, show the figure
 
@@ -676,30 +679,38 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         fig = ax.get_figure()
         xfmt = ScalarFormatter()
         xfmt.set_powerlimits((-2, 2))
+        # default colorbar
+        if colorbar_loc is None:
+            cbar = fig.colorbar(im, ax=ax, format=xfmt, shrink=0.8, pad=0)
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.ax.set_ylabel(r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(
+                scale_applied), rotation=-90, va="bottom")
+        # put colorbar inside the heatmap.
+        elif colorbar_loc == 'inner':
+            cbar_color = "white"
+            cbar_fontsize = 6
 
-        ax_pos = ax.get_position()
-        ax_width = ax_pos.x1 - ax_pos.x0
-        ax_height = ax_pos.y1 - ax_pos.y0
-        cbar_L = ax_pos.x0 + 0.9 * ax_width
-        cbar_B = ax_pos.y0 + 0.8 * ax_height
-        cbar_W = ax_width * 0.04
-        cbar_H = ax_height * 0.15
+            ax_pos = ax.get_position()
+            ax_width = ax_pos.x1 - ax_pos.x0
+            ax_height = ax_pos.y1 - ax_pos.y0
+            cbar_L = ax_pos.x0 + 0.9 * ax_width
+            cbar_B = ax_pos.y0 + 0.8 * ax_height
+            cbar_W = ax_width * 0.04
+            cbar_H = ax_height * 0.15
 
-        cbar_color = "white"
-        cbar_fontsize = 6
-        cax = fig.add_axes([cbar_L, cbar_B, cbar_W, cbar_H])
-        cbar = fig.colorbar(im, cax=cax, format=xfmt, shrink=0.8, pad=0)
-        cbar.ax.yaxis.set_ticks_position('left')
-        cbar.ax.yaxis.offsetText.set_fontsize(cbar_fontsize)
+            cax = fig.add_axes([cbar_L, cbar_B, cbar_W, cbar_H])
+            cbar = fig.colorbar(im, cax=cax, format=xfmt, shrink=0.8, pad=0)
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.ax.yaxis.offsetText.set_fontsize(cbar_fontsize)
 
-        cbar.ax.set_ylabel(
-            r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(scale_applied),
-            rotation=-90, va="bottom", fontsize=cbar_fontsize,
-            color=cbar_color)
-        cbar.ax.tick_params(direction='in', labelsize=cbar_fontsize,
-                            labelcolor=cbar_color, colors=cbar_color)
-        plt.setp(cbar.ax.spines.values(), color=cbar_color)
-        setattr(fig, f'_cbar-ax-{id(ax)}', cbar)
+            cbar.ax.set_ylabel(
+                r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(scale_applied),
+                rotation=-90, va="bottom", fontsize=cbar_fontsize,
+                color=cbar_color)
+            cbar.ax.tick_params(direction='in', labelsize=cbar_fontsize,
+                                labelcolor=cbar_color, colors=cbar_color)
+            plt.setp(cbar.ax.spines.values(), color=cbar_color)
+            setattr(fig, f'_cbar-ax-{id(ax)}', cbar)
 
     plt_show(show)
     return ax.get_figure()
