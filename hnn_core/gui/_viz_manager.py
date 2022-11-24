@@ -129,7 +129,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 freqs,
                 n_cycles=n_cycles,
                 colormap=plot_config['spectrogram_cm'],
-                ax=ax,
+                ax=ax, colorbar_loc='inner',
                 show=False)
 
     elif 'dipole' in plot_type:
