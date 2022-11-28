@@ -68,6 +68,26 @@ fig_templates = {
 }
 
 
+def _align_fig_xaxis(fig):
+    # align x axis for all plots whose x axis are time.
+    ax_align_x = []
+    for ax in fig.get_axes():
+        if hasattr(ax, 'align_x'):
+            if getattr(ax, 'align_x'):
+                logger.info(f"ax {ax} should be aligned")
+                ax_align_x.append(ax)
+
+    if len(ax_align_x) > 1:
+        logger.info(f"align x axis! {ax_align_x}")
+        ax_align_x[0].get_shared_x_axes().join(*ax_align_x)
+
+
+def _disable_align_fig_xaxis(fig):
+    for ax in fig.get_axes():
+        for aax in fig.get_axes():
+            ax.get_shared_x_axes().remove(aax)
+
+
 def _idx2figname(idx):
     return f"Figure {idx}"
 
@@ -106,20 +126,24 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     if plot_type == 'spikes':
         if net_copied.cell_response:
+            setattr(ax, 'align_x', True)
             net_copied.cell_response.plot_spikes_raster(ax=ax, show=False)
 
     elif plot_type == 'input histogram':
         if net_copied.cell_response:
+            setattr(ax, 'align_x', True)
             net_copied.cell_response.plot_spikes_hist(ax=ax, show=False)
 
     elif plot_type == 'PSD':
         if len(dpls_copied) > 0:
+            setattr(ax, 'align_x', False)
             color = next(ax._get_lines.prop_cycler)['color']
             dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax, color=color,
                                     label=sim_name, show=False)
 
     elif plot_type == 'spectrogram':
         if len(dpls_copied) > 0:
+            setattr(ax, 'align_x', True)
             min_f = 10.0
             max_f = plot_config['max_spectral_frequency']
             step_f = 1.0
@@ -134,6 +158,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif 'dipole' in plot_type:
         if len(dpls_copied) > 0:
+            setattr(ax, 'align_x', True)
             color = next(ax._get_lines.prop_cycler)['color']
             if plot_type == 'current dipole':
                 plot_dipole(dpls_copied,
@@ -159,6 +184,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'network':
         if net_copied:
+            setattr(ax, 'align_x', False)
             with plt.ioff():
                 _fig = plt.figure()
                 _ax = _fig.add_subplot(111, projection='3d')
@@ -183,12 +209,15 @@ def _static_rerender(widgets, fig, fig_idx):
     fig_tab_idx = titles.index(_idx2figname(fig_idx))
     fig_output = widgets['figs_tabs'].children[fig_tab_idx]
     fig_output.clear_output()
+    _align_fig_xaxis(fig)
     with fig_output:
         fig.tight_layout()
         display(fig)
 
 
 def _dynamic_rerender(fig):
+    _align_fig_xaxis(fig)
+
     fig.canvas.draw()
     fig.canvas.flush_events()
     fig.tight_layout()
@@ -229,7 +258,10 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
 def _clear_axis(b, widgets, data, fig_idx, fig, ax, widgets_plot_type,
                 existing_plots, add_plot_button):
+    # clear all potential linked axes before any modifications.
+    _disable_align_fig_xaxis(fig)
     ax.clear()
+    delattr(ax, 'align_x')
 
     # remove attached colorbar if exists
     if hasattr(fig, f'_cbar-ax-{id(ax)}'):
