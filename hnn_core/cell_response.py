@@ -322,7 +322,8 @@ class CellResponse(object):
 
         return spike_rates
 
-    def plot_spikes_raster(self, trial_idx=None, ax=None, show=True):
+    def plot_spikes_raster(self, trial_idx=None, ax=None, start_from_t0=True,
+                           show=True):
         """Plot the aggregate spiking activity according to cell type.
 
         Parameters
@@ -331,6 +332,8 @@ class CellResponse(object):
             Index of trials to be plotted. If None, all trials plotted.
         ax : instance of matplotlib axis | None
             An axis object from matplotlib. If None, a new figure is created.
+        start_from_t0 : bool
+            If True, hard set xlim left to 0.
         show : bool
             If True, show the figure.
 
@@ -340,7 +343,8 @@ class CellResponse(object):
             The matplotlib figure object.
         """
         return plot_spikes_raster(
-            cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
+            cell_response=self, trial_idx=trial_idx, ax=ax,
+            start_from_t0=start_from_t0, show=show)
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
                          show=True):

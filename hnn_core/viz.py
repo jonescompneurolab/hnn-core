@@ -445,7 +445,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
+def plot_spikes_raster(cell_response, trial_idx=None, ax=None,
+                       start_from_t0=True, show=True):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -456,6 +457,8 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         Index of trials to be plotted. If None, all trials plotted
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None, a new figure is created.
+    start_from_t0 : bool
+        If True, hard set xlim left to 0.
     show : bool
         If True, show the figure.
 
@@ -515,7 +518,8 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
-    ax.set_xlim(left=0)
+    if start_from_t0 is True:
+        ax.set_xlim(left=0)
 
     plt_show(show)
     return ax.get_figure()

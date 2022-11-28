@@ -74,11 +74,9 @@ def _align_fig_xaxis(fig):
     for ax in fig.get_axes():
         if hasattr(ax, 'align_x'):
             if getattr(ax, 'align_x'):
-                logger.info(f"ax {ax} should be aligned")
                 ax_align_x.append(ax)
 
     if len(ax_align_x) > 1:
-        logger.info(f"align x axis! {ax_align_x}")
         ax_align_x[0].get_shared_x_axes().join(*ax_align_x)
 
 
@@ -127,7 +125,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
     if plot_type == 'spikes':
         if net_copied.cell_response:
             setattr(ax, 'align_x', True)
-            net_copied.cell_response.plot_spikes_raster(ax=ax, show=False)
+            net_copied.cell_response.plot_spikes_raster(
+                ax=ax, start_from_t0=False, show=False)
 
     elif plot_type == 'input histogram':
         if net_copied.cell_response:
@@ -247,7 +246,6 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
     _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config)
 
-    logger.debug(f'update ax (id={id(ax)})')
     existing_plots.children = (*existing_plots.children,
                                Label(f"{sim_name}: {plot_type}"))
     if data['use_ipympl'] is False:
