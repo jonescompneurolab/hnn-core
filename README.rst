@@ -81,9 +81,16 @@ than one CPU core, refer to our `parallel backend guide`_.
 
 **Note for Windows users**
 
-We do not currently support hnn_core installation natively on Windows. Instead we reccomend
-installing `WSL <https://docs.microsoft.com/en-us/windows/wsl/install>`_ on your
-local machine, and install ``hnn-core`` and Anaconda using the same steps as above.
+Install Neuron using the `precompiled installers`_ **before** installing
+``hnn-core``. Make sure that:
+
+   $ python -c 'import nrn;'
+
+does not throw any errors before running:
+
+   $ pip install hnn_core[gui]
+
+If you encounter errors, please get help from Neuron forum.
 
 Documentation and examples
 ==========================
@@ -123,6 +130,7 @@ Read our `roadmap`_.
 
 .. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
+.. _precompiled installers: https://www.neuron.yale.edu/neuron/download
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
