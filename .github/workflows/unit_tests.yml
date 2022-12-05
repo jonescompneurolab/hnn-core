@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-os]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.7, 3.8]
 
     steps:
@@ -32,9 +32,9 @@ jobs:
       - name: Install Neuron on Windows separately
         shell: bash
         run: |
-          if [ "${{ matrix.os }}" == "windows-os" ]; then
-            wget https://github.com/neuronsimulator/nrn/releases/download/8.2.0/nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe
-            .\nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe /S /D=C:\nrn_test
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            curl.exe --url https://github.com/neuronsimulator/nrn/releases/download/8.2.0/nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe --output nrn-setup.exe
+            nrn-setup.exe /S /D=C:\nrn_test
           fi;
       - name: Install dependencies
         shell: bash -el {0}
