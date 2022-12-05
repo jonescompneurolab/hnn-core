@@ -30,10 +30,12 @@ jobs:
             sudo apt-get install libopenmpi-dev openmpi-bin
           fi;
       - name: Install Neuron on Windows separately
-        shell: cmd
+        shell: bash
         run: |
-          Copy-Item -Source https://github.com/neuronsimulator/nrn/releases/download/8.2.0/nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe -Destination .
-          start /b /wait .\nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe /S /D=C:\nrn_test
+          if [ "${{ matrix.os }}" == "windows-os" ]; then
+            wget https://github.com/neuronsimulator/nrn/releases/download/8.2.0/nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe
+            .\nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe /S /D=C:\nrn_test
+          fi;
       - name: Install dependencies
         shell: bash -el {0}
         run: |
