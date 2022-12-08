@@ -182,7 +182,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
     times = np.array(joblib_net.cell_response.times)
     spike_times = np.array(joblib_net.cell_response.spike_times[trial_idx])
     spike_gids = np.array(joblib_net.cell_response.spike_gids[trial_idx])
-    vsoma = np.array(joblib_net.cell_response.vsoma[trial_idx][gid])
+    vsoma = np.array(joblib_net.cell_response.vsec['soma'][trial_idx][gid])
 
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],
