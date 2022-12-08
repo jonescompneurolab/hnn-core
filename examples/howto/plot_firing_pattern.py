@@ -83,18 +83,19 @@ gid_ranges = net.gid_ranges
 print(net.gid_ranges)
 
 ###############################################################################
-# Simulated voltage in the soma is stored in :class:`~hnn_core.CellResponse`
-# as a dictionary. The CellResponse object stores data produced by individual
-# cells including spikes, somatic voltages and currents.
+# Simulated voltage in the soma and other cell sections are stored in
+# :class:`~hnn_core.CellResponse` as a dictionary. The CellResponse object
+# stores data produced by individual cells including spikes,
+# voltages and currents.
 trial_idx = 0
-vsoma = net.cell_response.vsoma[trial_idx]
-print(vsoma.keys())
+vsec = net.cell_response.vsec[trial_idx]
+print(vsec.keys())
 
 ###############################################################################
 # We can plot the firing pattern of individual cells by indexing with the gid
 gid = 170
 plt.figure(figsize=(4, 4), constrained_layout=True)
-plt.plot(net.cell_response.times, vsoma[gid])
+plt.plot(net.cell_response.times, vsec[gid]['soma'])
 plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
 plt.xlabel('Time (ms)')
 plt.ylabel('Voltage (mV)')
@@ -133,9 +134,9 @@ fig, axes = plt.subplots(3, 1, figsize=(5, 7), sharex=True)
 
 for idx in range(10):  # only 10 cells per cell-type
     gid = gid_ranges['L2_pyramidal'][idx]
-    axes[0].plot(net.cell_response.times, vsoma[gid], color='g')
+    axes[0].plot(net.cell_response.times, vsec[gid]['soma'], color='g')
     gid = gid_ranges['L5_pyramidal'][idx]
-    axes[0].plot(net.cell_response.times, vsoma[gid], color='r')
+    axes[0].plot(net.cell_response.times, vsec[gid]['soma'], color='r')
 net.cell_response.plot_spikes_raster(ax=axes[1])
 net.cell_response.plot_spikes_hist(ax=axes[2],
                                    spike_types=['L5_pyramidal',
