@@ -495,23 +495,23 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     ypos = 0
+    events = []
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
-            cell_type_ypos.append(np.repeat(ypos, len(gid_time)))
+            cell_type_ypos.append(ypos)
             ypos = ypos - 1
 
         if cell_type_times:
-            cell_type_times = np.concatenate(cell_type_times)
-            cell_type_ypos = np.concatenate(cell_type_ypos)
+            events.append(
+                ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
+                             color=cell_type_colors[cell_type],
+                             label=cell_type, linelengths=3))
 
-            ax.scatter(cell_type_times, cell_type_ypos, label=cell_type,
-                       color=cell_type_colors[cell_type])
-
-    ax.legend(loc=1)
+    ax.legend(handles=[e[0] for e in events], loc=1)
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
