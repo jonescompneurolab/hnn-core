@@ -7,6 +7,9 @@ jobs:
           - image: circleci/python:3.8.1-buster
       steps:
           - checkout
+          - restore_cache:
+              keys:
+                - html_built
 
           - run:
               name: Install miniconda
@@ -61,6 +64,11 @@ jobs:
           - persist_to_workspace:
               root: doc/_build
               paths: html
+
+          - save_cache:
+              key: html_built
+              paths:
+                - doc/_build/html/
 
           - store_artifacts:
               path: doc/_build/html/
