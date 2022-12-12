@@ -54,7 +54,7 @@ jobs:
 
           - restore_cache:
               keys:
-                - doc_built
+                - examples_built-{{ .Environment.CACHE_VERSION }}
 
           - run:
               name: Build the documentation
@@ -67,7 +67,7 @@ jobs:
               paths: html
 
           - save_cache:
-              key: doc_built
+              key: examples_built-{{ .Environment.CACHE_VERSION }}
               paths:
                 - doc/auto_examples
                 - doc/_build
