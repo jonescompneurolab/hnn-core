@@ -492,23 +492,23 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     ypos = 0
+    events = []
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
-            cell_type_ypos.append(np.repeat(ypos, len(gid_time)))
+            cell_type_ypos.append(ypos)
             ypos = ypos - 1
 
         if cell_type_times:
-            cell_type_times = np.concatenate(cell_type_times)
-            cell_type_ypos = np.concatenate(cell_type_ypos)
+            events.append(
+                ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
+                             color=cell_type_colors[cell_type],
+                             label=cell_type, linelengths=5))
 
-            ax.scatter(cell_type_times, cell_type_ypos, label=cell_type,
-                       color=cell_type_colors[cell_type])
-
-    ax.legend(loc=1)
+    ax.legend(handles=[e[0] for e in events], loc=1)
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
@@ -574,7 +574,8 @@ def plot_cells(net, ax=None, show=True):
 
 def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
                     layer='agg', decim=None, padding='zeros', ax=None,
-                    colormap='inferno', colorbar=True, show=True):
+                    colormap='inferno', colorbar=True, colorbar_inside=False,
+                    show=True):
     """Plot Morlet time-frequency representation of dipole time course
 
     Parameters
@@ -607,6 +608,8 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         The name of a matplotlib colormap, e.g., 'viridis'. Default: 'inferno'
     colorbar : bool
         If True (default), adjust figure to include colorbar.
+    colorbar_inside: bool, default False
+        Put the color inside the heatmap if True.
     show : bool
         If True, show the figure
 
@@ -673,10 +676,38 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         fig = ax.get_figure()
         xfmt = ScalarFormatter()
         xfmt.set_powerlimits((-2, 2))
-        cbar = fig.colorbar(im, ax=ax, format=xfmt, shrink=0.8, pad=0)
-        cbar.ax.yaxis.set_ticks_position('left')
-        cbar.ax.set_ylabel(r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(
-            scale_applied), rotation=-90, va="bottom")
+        # default colorbar
+        if colorbar_inside is False:
+            cbar = fig.colorbar(im, ax=ax, format=xfmt, shrink=0.8, pad=0)
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.ax.set_ylabel(r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(
+                scale_applied), rotation=-90, va="bottom")
+        # put colorbar inside the heatmap.
+        else:
+            cbar_color = "white"
+            cbar_fontsize = 6
+
+            ax_pos = ax.get_position()
+            ax_width = ax_pos.x1 - ax_pos.x0
+            ax_height = ax_pos.y1 - ax_pos.y0
+            cbar_L = ax_pos.x0 + 0.9 * ax_width
+            cbar_B = ax_pos.y0 + 0.8 * ax_height
+            cbar_W = ax_width * 0.04
+            cbar_H = ax_height * 0.15
+
+            cax = fig.add_axes([cbar_L, cbar_B, cbar_W, cbar_H])
+            cbar = fig.colorbar(im, cax=cax, format=xfmt, shrink=0.8, pad=0)
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.ax.yaxis.offsetText.set_fontsize(cbar_fontsize)
+
+            cbar.ax.set_ylabel(
+                r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(scale_applied),
+                rotation=-90, va="bottom", fontsize=cbar_fontsize,
+                color=cbar_color)
+            cbar.ax.tick_params(direction='in', labelsize=cbar_fontsize,
+                                labelcolor=cbar_color, colors=cbar_color)
+            plt.setp(cbar.ax.spines.values(), color=cbar_color)
+            setattr(fig, f'_cbar-ax-{id(ax)}', cbar)
 
     plt_show(show)
     return ax.get_figure()

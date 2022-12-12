@@ -471,7 +471,8 @@ class Dipole(object):
 
     def plot_tfr_morlet(self, freqs, n_cycles=7., tmin=None, tmax=None,
                         layer='agg', decim=None, padding='zeros', ax=None,
-                        colormap='inferno', colorbar=True, show=True):
+                        colormap='inferno', colorbar=True,
+                        colorbar_inside=False, show=True):
         """Plot Morlet time-frequency representation of dipole time course
 
         NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be
@@ -509,6 +510,8 @@ class Dipole(object):
             'inferno'
         colorbar : bool
             If True (default), adjust figure to include colorbar.
+        colorbar_inside: bool, default False
+            Put the color inside the heatmap if True.
         show : bool
             If True, show the figure
 
@@ -520,7 +523,8 @@ class Dipole(object):
         return plot_tfr_morlet(
             self, freqs, n_cycles=n_cycles, tmin=tmin, tmax=tmax,
             layer=layer, decim=decim, padding=padding, ax=ax,
-            colormap=colormap, colorbar=colorbar, show=show)
+            colormap=colormap, colorbar=colorbar,
+            colorbar_inside=colorbar_inside, show=show)
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.

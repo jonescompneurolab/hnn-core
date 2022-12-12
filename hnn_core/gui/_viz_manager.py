@@ -25,13 +25,13 @@ _plot_types = [
     'input histogram',
     'spikes',
     'PSD',
-    'spectogram',
+    'spectrogram',
     'network',
 ]
 
 _no_overlay_plot_types = [
     'network',
-    'spectogram',
+    'spectrogram',
     'spikes',
     'input histogram',
 ]
@@ -118,7 +118,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax, color=color,
                                     label=sim_name, show=False)
 
-    elif plot_type == 'spectogram':
+    elif plot_type == 'spectrogram':
         if len(dpls_copied) > 0:
             min_f = 10.0
             max_f = plot_config['max_spectral_frequency']
@@ -129,7 +129,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 freqs,
                 n_cycles=n_cycles,
                 colormap=plot_config['spectrogram_cm'],
-                ax=ax,
+                ax=ax, colorbar_inside=True,
                 show=False)
 
     elif 'dipole' in plot_type:
@@ -172,6 +172,12 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                                      int(_fig.bbox.bounds[2]), -1))
                 io_buf.close()
                 _ = ax.imshow(img_arr)
+
+    # set up alignment
+    if plot_type not in ['network', 'PSD']:
+        margin_x = 0
+        max_x = max([dpl.times[-1] for dpl in dpls_copied])
+        ax.set_xlim(left=-margin_x, right=max_x + margin_x)
 
 
 def _static_rerender(widgets, fig, fig_idx):
@@ -218,7 +224,6 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
     _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config)
 
-    logger.debug('update ax')
     existing_plots.children = (*existing_plots.children,
                                Label(f"{sim_name}: {plot_type}"))
     if data['use_ipympl'] is False:
@@ -230,6 +235,12 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 def _clear_axis(b, widgets, data, fig_idx, fig, ax, widgets_plot_type,
                 existing_plots, add_plot_button):
     ax.clear()
+
+    # remove attached colorbar if exists
+    if hasattr(fig, f'_cbar-ax-{id(ax)}'):
+        getattr(fig, f'_cbar-ax-{id(ax)}').ax.remove()
+        delattr(fig, f'_cbar-ax-{id(ax)}')
+
     ax.set_facecolor('w')
     ax.set_aspect('auto')
     widgets_plot_type.disabled = False

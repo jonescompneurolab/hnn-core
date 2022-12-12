@@ -307,7 +307,7 @@ def test_gui_edit_figure():
 
         axes_config = axes_config_tabs.children[-1].children[1]
         simulation_selection = axes_config.children[0].children[0]
-        assert simulation_selection.options == tuple(sim_names[: n_figs])
+        assert simulation_selection.options == tuple(sim_names[:n_figs])
 
 
 def test_gui_figure_overlay():
@@ -338,3 +338,29 @@ def test_gui_figure_overlay():
                 assert add_plot_button.disabled is True
                 clear_ax_button.click()
                 assert add_plot_button.disabled is False
+
+
+def test_gui_adaptive_spectrogram():
+    gui = HNNGUI()
+    gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    gui.run_button.click()
+    figid = 1
+    figname = f'Figure {figid}'
+    axname = 'ax1'
+    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                             'spectrogram', {}, 'clear')
+    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                             'spectrogram', {}, 'plot')
+    # make sure the colorbar is correctly added
+    assert any(['_cbar-ax-' in attr
+                for attr in dir(gui.viz_manager.figs[figid])]) is True
+    assert len(gui.viz_manager.figs[1].axes) == 3
+    # make sure the colorbar is safely removed
+    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                             'spectrogram', {}, 'clear')
+    assert any(['_cbar-ax-' in attr
+                for attr in dir(gui.viz_manager.figs[figid])]) is False
+    assert len(gui.viz_manager.figs[1].axes) == 2
