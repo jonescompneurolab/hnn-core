@@ -71,6 +71,7 @@ jobs:
               paths:
                 - doc/_build
                 - doc/generated
+                - doc/auto_examples
 
           - store_artifacts:
               path: doc/_build/html/
