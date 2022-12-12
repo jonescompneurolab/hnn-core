@@ -509,7 +509,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
             events.append(
                 ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
                              color=cell_type_colors[cell_type],
-                             label=cell_type, linelengths=3))
+                             label=cell_type, linelengths=5))
 
     ax.legend(handles=[e[0] for e in events], loc=1)
     ax.set_facecolor('k')
