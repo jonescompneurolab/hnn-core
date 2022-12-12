@@ -70,6 +70,7 @@ jobs:
               key: doc_built
               paths:
                 - doc/_build
+                - doc/generated
 
           - store_artifacts:
               path: doc/_build/html/
