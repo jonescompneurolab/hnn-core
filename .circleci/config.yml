@@ -7,9 +7,6 @@ jobs:
           - image: circleci/python:3.8.1-buster
       steps:
           - checkout
-          - restore_cache:
-              keys:
-                - html_built
 
           - run:
               name: Install miniconda
@@ -54,6 +51,10 @@ jobs:
                   source ~/miniconda/bin/activate testenv
                   pip install -U pip setuptools virtualenv
                   pip install '.[gui]'
+
+          - restore_cache:
+              keys:
+                - html_built
 
           - run:
               name: Build the documentation
