@@ -54,7 +54,7 @@ jobs:
 
           - restore_cache:
               keys:
-                - html_built
+                - doc_built
 
           - run:
               name: Build the documentation
@@ -67,9 +67,9 @@ jobs:
               paths: html
 
           - save_cache:
-              key: html_built
+              key: doc_built
               paths:
-                - doc/_build/html/
+                - doc/_build
 
           - store_artifacts:
               path: doc/_build/html/
