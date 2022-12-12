@@ -69,9 +69,8 @@ jobs:
           - save_cache:
               key: doc_built
               paths:
-                - doc/_build
-                - doc/generated
                 - doc/auto_examples
+                - doc/_build
 
           - store_artifacts:
               path: doc/_build/html/
