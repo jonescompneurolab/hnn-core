@@ -347,7 +347,7 @@
    "source": [
     "## Viewing ERP Spectrograms\n",
     "\n",
-    "<!-- By selecting \"spectogram\" from dropdown menus, you can check the spectrograms. -->\n",
+    "<!-- By selecting \"spectrogram\" from dropdown menus, you can check the spectrograms. -->\n",
     "Next, you can click the 'Make figure' button to create another figure and show thespectrogram there."
    ]
   },
@@ -365,7 +365,7 @@
     "    \"Figure 2\",\n",
     "    \"ax0\",\n",
     "    \"default\",\n",
-    "    \"spectogram\",\n",
+    "    \"spectrogram\",\n",
     "    {},\n",
     "    \"plot\"\n",
     ")"
