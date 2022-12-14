@@ -270,12 +270,14 @@ class Cell:
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
     rec_vsec : dict
-        Recording of somatic voltage. Must be enabled
-        by running simulate_dipole(net, record_vsoma=True)
+        Recording of section specific voltage. Must be enabled
+        by running simulate_dipole(net, record_vsec=True) or
+        simulate_dipole(net, record_vsoma=True)
     rec_isec : dict
-        Contains recording of somatic currents indexed
-        by synapse type. (keys are soma_gabaa, soma_gabab etc.)
-        Must be enabled by running simulate_dipole(net, record_isoma=True)
+        Contains recording of section specific currents indexed
+        by synapse type (keys can be soma_gabaa, soma_gabab etc.).
+        Must be enabled by running simulate_dipole(net, record_isec=True)
+        or simulate_dipole(net, record_isoma=True)
     tonic_biases : list of h.IClamp
         The current clamps inserted at each section of the cell
         for tonic biasing inputs.
