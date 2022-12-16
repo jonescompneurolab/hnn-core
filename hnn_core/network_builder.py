@@ -326,13 +326,9 @@ class NetworkBuilder(object):
 
         self._gid_assign()
 
-        record_vsoma = self.net._params['record_vsoma']
-        record_isoma = self.net._params['record_isoma']
         record_vsec = self.net._params['record_vsec']
         record_isec = self.net._params['record_isec']
         self._create_cells_and_drives(threshold=self.net._params['threshold'],
-                                      record_vsoma=record_vsoma,
-                                      record_isoma=record_isoma,
                                       record_vsec=record_vsec,
                                       record_isec=record_isec)
 
@@ -403,8 +399,7 @@ class NetworkBuilder(object):
         # extremely important to get the gids in the right order
         self._gid_list.sort()
 
-    def _create_cells_and_drives(self, threshold, record_vsoma=False,
-                                 record_isoma=False, record_vsec=False,
+    def _create_cells_and_drives(self, threshold, record_vsec=False,
                                  record_isec=False):
         """Parallel create cells AND external drives
 
@@ -440,8 +435,7 @@ class NetworkBuilder(object):
                         src_type in self.net.external_biases['tonic']):
                     cell.create_tonic_bias(**self.net.external_biases
                                            ['tonic'][src_type])
-                cell.record(record_vsoma, record_isoma,
-                            record_vsec, record_isec)
+                cell.record(record_vsec, record_isec)
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)

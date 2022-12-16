@@ -535,43 +535,39 @@ class Cell:
         stim.amp = amplitude
         self.tonic_biases.append(stim)
 
-    def record(self, record_vsoma=False, record_isoma=False,
-               record_vsec=False, record_isec=False):
+    def record(self, record_vsec=False, record_isec=False):
         """ Record current and voltage from all sections
 
         Parameters
         ----------
-        record_vsoma : bool
-            Option to record somatic voltages from cells. Default: False.
-        record_isoma : bool
-            Option to record somatic currents from cells. Default: False.
-        record_vsec : bool
-            Option to record voltages from all sections. Default: False.
-        record_isec : bool
-            Option to record currents from all sections. Default: False.
+        record_vsec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        record_isec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
         """
 
         section_names = list(self.sections.keys())
 
         # Logic checks if just recording soma, sections, or both
-        if record_vsoma and not record_vsec:
+        if record_vsec == 'soma':
             self.rec_vsec = dict.fromkeys(['soma'])
-        elif record_vsec:
+        elif record_vsec == 'all':
             self.rec_vsec = dict.fromkeys(section_names)
 
-        if record_vsoma or record_vsec:
+        if record_vsec:
             for sec_name in self.rec_vsec:
                 self.rec_vsec[sec_name] = h.Vector()
                 self.rec_vsec[sec_name].record(
                     self._nrn_sections[sec_name](0.5)._ref_v)
 
-        if record_isoma and not record_isec:
+        if record_isec == 'soma':
             self.rec_isec = dict.fromkeys(['soma'])
-        elif record_isec:
+        elif record_isec == 'all':
             self.rec_isec = dict.fromkeys(section_names)
 
-        if record_isoma or record_isec:
-            self.rec_isec = dict.fromkeys(section_names)
+        if record_isec:
             for sec_name in self.rec_isec:
                 list_syn = [key for key in self._nrn_synapses.keys()
                             if key.startswith(f'{sec_name}_')]

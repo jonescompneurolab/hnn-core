@@ -72,7 +72,7 @@ net.add_evoked_drive(
     weights_ampa=weights_ampa_p2, location='proximal',
     synaptic_delays=synaptic_delays_prox, event_seed=814)
 
-dpls = simulate_dipole(net, tstop=170., record_vsoma=True)
+dpls = simulate_dipole(net, tstop=170., record_vsec='soma')
 
 ###############################################################################
 # Here, we explain more details about the data structures and how they can
