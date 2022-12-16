@@ -89,8 +89,8 @@ API
   `Steven Brandt`_ and `Ryan Thorpe`_ in :gh:`517`.
 
 - Recorded voltages/currents from the soma, as well all sections, are enabled by
-  setting either `record_vsoma` and `record_isoma`, or `record_vsec` and `record_isec`
-  to `True` in :func:`~hnn_core.simulate_dipole`. Recordings are now accessed through
+  setting either `record_vsec` or `record_isec` to `'all'` or `'soma'` 
+  in :func:`~hnn_core.simulate_dipole`. Recordings are now accessed through
   :class:`~hnn_core.CellResponse.vsec` and :class:`~hnn_core.CellResponse.isec`,
   by `Nick Tolley`_ in :gh:`502`.
 

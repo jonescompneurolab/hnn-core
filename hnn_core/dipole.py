@@ -6,13 +6,13 @@
 import warnings
 import numpy as np
 from copy import deepcopy
+from .externals.mne import _check_option
 
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
-def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
-                    record_isoma=False, postproc=False, record_vsec=False,
-                    record_isec=False):
+def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
+                    record_isec=False, postproc=False):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -27,10 +27,12 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     n_trials : int | None
         The number of trials to simulate. If None, the 'N_trials' value
         of the ``params`` used to create ``net`` is used (must be >0)
-    record_vsoma : bool
-        Option to record somatic voltages from cells. Default: False.
-    record_isoma : bool
-        Option to record somatic currents from cells. Default: False.
+    record_vsec : 'all' | 'soma' | False
+        Option to record voltages from all sections ('all'), or just
+        the soma ('soma'). Default: False.
+    record_isec : 'all' | 'soma' | False
+        Option to record voltages from all sections ('all'), or just
+        the soma ('soma'). Default: False.
     postproc : bool
         If True, smoothing (``dipole_smooth_win``) and scaling
         (``dipole_scalefctr``) values are read from the parameter file, and
@@ -39,10 +41,6 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
         extracellular recordings etc. The preferred way is to use the
         :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
-    record_vsec : bool
-        Option to record voltages from all sections. Default: False.
-    record_isec : bool
-        Option to record currents from all sections. Default: False.
 
     Returns
     -------
@@ -86,29 +84,13 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     net._instantiate_drives(n_trials=n_trials, tstop=tstop)
     net._reset_rec_arrays()
 
-    if isinstance(record_vsoma, bool):
-        net._params['record_vsoma'] = record_vsoma
-    else:
-        raise TypeError("record_vsoma must be bool, got %s"
-                        % type(record_vsoma).__name__)
+    _check_option('record_vsec', record_vsec, ['all', 'soma', False])
 
-    if isinstance(record_isoma, bool):
-        net._params['record_isoma'] = record_isoma
-    else:
-        raise TypeError("record_isoma must be bool, got %s"
-                        % type(record_isoma).__name__)
+    net._params['record_vsec'] = record_vsec
 
-    if isinstance(record_vsec, bool):
-        net._params['record_vsec'] = record_vsec
-    else:
-        raise TypeError("record_vsec must be bool, got %s"
-                        % type(record_vsec).__name__)
+    _check_option('record_isec', record_isec, ['all', 'soma', False])
 
-    if isinstance(record_isec, bool):
-        net._params['record_isec'] = record_isec
-    else:
-        raise TypeError("record_isec must be bool, got %s"
-                        % type(record_isec).__name__)
+    net._params['record_isec'] = record_isec
 
     if postproc:
         warnings.warn('The postproc-argument is deprecated and will be removed'
