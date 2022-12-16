@@ -88,15 +88,15 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     vsec_py = dict()
     for gid, vsec_dict in neuron_net._vsec.items():
         vsec_py[gid] = dict()
-        for sec_name, rec_v in vsec_dict.items():
-            vsec_py[gid][sec_name] = rec_v.to_python()
+        for sec_name, vsec in vsec_dict.items():
+            vsec_py[gid][sec_name] = vsec.to_python()
 
     isec_py = dict()
     for gid, isec_dict in neuron_net._isec.items():
         isec_py[gid] = dict()
-        for sec_name, rec_i in isec_dict.items():
+        for sec_name, isec in isec_dict.items():
             isec_py[gid][sec_name] = {
-                key: rec_i.to_python() for key, rec_i in rec_i.items()}
+                key: isec.to_python() for key, isec in isec.items()}
 
     dpl_data = np.c_[
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
@@ -563,8 +563,8 @@ class NetworkBuilder(object):
                 nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
-            self._vsec[cell.gid] = cell.rec_vsec
-            self._isec[cell.gid] = cell.rec_isec
+            self._vsec[cell.gid] = cell.vsec
+            self._isec[cell.gid] = cell.isec
 
         # reduce across threads
         for nrn_dpl in self._nrn_dipoles.values():
