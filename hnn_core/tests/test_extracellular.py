@@ -166,11 +166,11 @@ def test_extracellular_backends(run_hnn_core_fixture):
     electrode_array = {'arr1': [(2, 2, 400), (2, 2, 600), (2, 2, 800),
                                 (2, 2, 1000)]}
     _, joblib_net = run_hnn_core_fixture(
-        backend='joblib', n_jobs=1, reduced=True, record_isoma=True,
-        record_vsoma=True, electrode_array=electrode_array)
+        backend='joblib', n_jobs=1, reduced=True, record_isec='soma',
+        record_vsec='soma', electrode_array=electrode_array)
     _, mpi_net = run_hnn_core_fixture(
-        backend='mpi', n_procs=2, reduced=True, record_isoma=True,
-        record_vsoma=True, electrode_array=electrode_array)
+        backend='mpi', n_procs=2, reduced=True, record_isec='soma',
+        record_vsec='soma', electrode_array=electrode_array)
 
     assert (len(electrode_array['arr1']) ==
             len(joblib_net.rec_arrays['arr1'].positions) ==
