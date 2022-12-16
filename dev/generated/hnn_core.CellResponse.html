@@ -197,11 +197,11 @@ The inner list contains the type of spike (e.g., evprox1
 or L2_pyramidal) that occured at the corresonding time stamp.
 Each gid corresponds to a type via Network::gid_ranges.</p>
 </dd>
-<dt><strong>vsoma</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
-Dictionary indexed by gids containing somatic voltages.</p>
+<dt><strong>vsec</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
+Dictionary indexed by gids containing voltages for cell sections.</p>
 </dd>
-<dt><strong>isoma</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
-Dictionary indexed by gids containing somatic currents.</p>
+<dt><strong>isec</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
+Dictionary indexed by gids containing currents for cell sections.</p>
 </dd>
 <dt><strong>times</strong><span class="classifier">array-like, shape (n_times,)</span></dt><dd><p>Array of time points for samples in continuous data.
 This includes vsoma and isoma.</p>

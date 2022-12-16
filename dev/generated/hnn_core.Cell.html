@@ -99,7 +99,7 @@
 <li><a class="reference internal" href="#hnn_core.Cell.modify_section"><code class="docutils literal notranslate"><span class="pre">Cell.modify_section()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src"><code class="docutils literal notranslate"><span class="pre">Cell.parconnect_from_src()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.plot_morphology"><code class="docutils literal notranslate"><span class="pre">Cell.plot_morphology()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Cell.record_soma"><code class="docutils literal notranslate"><span class="pre">Cell.record_soma()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.Cell.record"><code class="docutils literal notranslate"><span class="pre">Cell.record()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon"><code class="docutils literal notranslate"><span class="pre">Cell.setup_source_netcon()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.syn_create"><code class="docutils literal notranslate"><span class="pre">Cell.syn_create()</span></code></a></li>
 </ul>
@@ -216,12 +216,14 @@ of the section and the mechanisms inserted.</p>
 </dd>
 <dt><strong>dipole_pp</strong><span class="classifier">list of h.Dipole()</span></dt><dd><p>The Dipole objects (see dipole.mod).</p>
 </dd>
-<dt><strong>rec_v</strong><span class="classifier">h.Vector()</span></dt><dd><p>Recording of somatic voltage. Must be enabled
-by running simulate_dipole(net, record_vsoma=True)</p>
+<dt><strong>vsec</strong><span class="classifier">dict</span></dt><dd><p>Recording of section specific voltage. Must be enabled
+by running simulate_dipole(net, record_vsec=True) or
+simulate_dipole(net, record_vsoma=True)</p>
 </dd>
-<dt><strong>rec_i</strong><span class="classifier">dict</span></dt><dd><p>Contains recording of somatic currents indexed
-by synapse type. (keys are soma_gabaa, soma_gabab etc.)
-Must be enabled by running simulate_dipole(net, record_isoma=True)</p>
+<dt><strong>isec</strong><span class="classifier">dict</span></dt><dd><p>Contains recording of section specific currents indexed
+by synapse type (keys can be soma_gabaa, soma_gabab etc.).
+Must be enabled by running simulate_dipole(net, record_isec=True)
+or simulate_dipole(net, record_isoma=True)</p>
 </dd>
 <dt><strong>tonic_biases</strong><span class="classifier">list of h.IClamp</span></dt><dd><p>The current clamps inserted at each section of the cell
 for tonic biasing inputs.</p>
@@ -255,8 +257,8 @@ names of section locations that are proximal or distal.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, cell_types, show])</p></td>
 <td><p>Plot the cell morphology.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record_soma" title="hnn_core.Cell.record_soma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_soma</span></code></a>([record_vsoma, record_isoma])</p></td>
-<td><p>Record current and voltage at soma.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record" title="hnn_core.Cell.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>([record_vsec, record_isec])</p></td>
+<td><p>Record current and voltage from all sections</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
 <td><p>Created for _PC.cell and specifies SOURCES of spikes.</p></td>
@@ -392,15 +394,17 @@ square grid.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.Cell.record_soma">
-<span class="sig-name descname"><span class="pre">record_soma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isoma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.record_soma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.record_soma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record current and voltage at soma.</p>
+<dt class="sig sig-object py" id="hnn_core.Cell.record">
+<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record current and voltage from all sections</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>record_vsoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic voltages from cells</p>
+<dt><strong>record_vsec</strong><span class="classifier">‘all’ | ‘soma’ | False</span></dt><dd><p>Option to record voltages from all sections (‘all’), or just
+the soma (‘soma’). Default: False.</p>
 </dd>
-<dt><strong>record_isoma</strong><span class="classifier">bool</span></dt><dd><p>Option to record somatic currents from cells</p>
+<dt><strong>record_isec</strong><span class="classifier">‘all’ | ‘soma’ | False</span></dt><dd><p>Option to record voltages from all sections (‘all’), or just
+the soma (‘soma’). Default: False.</p>
 </dd>
 </dl>
 </dd>

@@ -160,7 +160,7 @@ differ from first.
         weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=synaptic_delays_prox, event_seed=814)
 
-    dpls = simulate_dipole(net, tstop=170., record_vsoma=True)
+    dpls = simulate_dipole(net, tstop=170., record_vsec='soma')
 
 
 
@@ -221,19 +221,20 @@ object as a dictionary
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-89
+.. GENERATED FROM PYTHON SOURCE LINES 86-90
 
-Simulated voltage in the soma is stored in :class:`~hnn_core.CellResponse`
-as a dictionary. The CellResponse object stores data produced by individual
-cells including spikes, somatic voltages and currents.
+Simulated voltage in the soma and other cell sections are stored in
+:class:`~hnn_core.CellResponse` as a dictionary. The CellResponse object
+stores data produced by individual cells including spikes,
+voltages and currents.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-93
+.. GENERATED FROM PYTHON SOURCE LINES 90-94
 
 .. code-block:: default
 
     trial_idx = 0
-    vsoma = net.cell_response.vsoma[trial_idx]
-    print(vsoma.keys())
+    vsec = net.cell_response.vsec[trial_idx]
+    print(vsec.keys())
 
 
 
@@ -248,17 +249,17 @@ cells including spikes, somatic voltages and currents.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-95
+.. GENERATED FROM PYTHON SOURCE LINES 95-96
 
 We can plot the firing pattern of individual cells by indexing with the gid
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-103
+.. GENERATED FROM PYTHON SOURCE LINES 96-104
 
 .. code-block:: default
 
     gid = 170
     plt.figure(figsize=(4, 4), constrained_layout=True)
-    plt.plot(net.cell_response.times, vsoma[gid])
+    plt.plot(net.cell_response.times, vsec[gid]['soma'])
     plt.title('%s (gid=%d)' % (net.gid_to_type(gid), gid))
     plt.xlabel('Time (ms)')
     plt.ylabel('Voltage (mV)')
@@ -276,14 +277,14 @@ We can plot the firing pattern of individual cells by indexing with the gid
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-108
+.. GENERATED FROM PYTHON SOURCE LINES 105-109
 
 Also, we can plot the spikes in the network and write them to text files.
 Note that we can use formatting syntax to specify the filename pattern
 with which each trial will be written ('spk_1.txt', 'spk_2.txt, ...). To
 read spikes back in, we can use wildcard expressions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-114
+.. GENERATED FROM PYTHON SOURCE LINES 109-115
 
 .. code-block:: default
 
@@ -318,18 +319,18 @@ read spikes back in, we can use wildcard expressions.
 
  .. code-block:: none
 
-    Writing file /tmp/tmpxxctign2/spk_0.txt
+    Writing file /tmp/tmpbzky5nq2/spk_0.txt
 
     <Figure size 640x480 with 1 Axes>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-117
+.. GENERATED FROM PYTHON SOURCE LINES 116-118
 
 We can additionally calculate the mean spike rates for each cell class by
 specifying a time window with ``tstart`` and ``tstop``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-128
+.. GENERATED FROM PYTHON SOURCE LINES 118-129
 
 .. code-block:: default
 
@@ -360,12 +361,12 @@ specifying a time window with ``tstart`` and ``tstop``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-131
+.. GENERATED FROM PYTHON SOURCE LINES 130-132
 
 Finally, we can plot the soma voltage along with the spiking activity with
 raster plots and histograms for the pyramidal cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-143
+.. GENERATED FROM PYTHON SOURCE LINES 132-144
 
 .. code-block:: default
 
@@ -374,9 +375,9 @@ raster plots and histograms for the pyramidal cells.
 
     for idx in range(10):  # only 10 cells per cell-type
         gid = gid_ranges['L2_pyramidal'][idx]
-        axes[0].plot(net.cell_response.times, vsoma[gid], color='g')
+        axes[0].plot(net.cell_response.times, vsec[gid]['soma'], color='g')
         gid = gid_ranges['L5_pyramidal'][idx]
-        axes[0].plot(net.cell_response.times, vsoma[gid], color='r')
+        axes[0].plot(net.cell_response.times, vsec[gid]['soma'], color='r')
     net.cell_response.plot_spikes_raster(ax=axes[1])
     net.cell_response.plot_spikes_hist(ax=axes[2],
                                        spike_types=['L5_pyramidal',
@@ -402,7 +403,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  15.508 seconds)
+   **Total running time of the script:** ( 0 minutes  56.015 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:

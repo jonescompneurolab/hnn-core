@@ -142,12 +142,13 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_check_option</span>
 
 <span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_dipole</span><span class="p">,</span> <span class="n">plot_psd</span><span class="p">,</span> <span class="n">plot_tfr_morlet</span>
 
 
-<div class="viewcode-block" id="simulate_dipole"><a class="viewcode-back" href="../../generated/hnn_core.simulate_dipole.html#hnn_core.dipole.simulate_dipole">[docs]</a><span class="k">def</span> <span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsoma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">record_isoma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="simulate_dipole"><a class="viewcode-back" href="../../generated/hnn_core.simulate_dipole.html#hnn_core.dipole.simulate_dipole">[docs]</a><span class="k">def</span> <span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simulate a dipole given the experiment parameters.</span>
 
 <span class="sd">    Parameters</span>
@@ -162,10 +163,12 @@
 <span class="sd">    n_trials : int | None</span>
 <span class="sd">        The number of trials to simulate. If None, the &#39;N_trials&#39; value</span>
 <span class="sd">        of the ``params`` used to create ``net`` is used (must be &gt;0)</span>
-<span class="sd">    record_vsoma : bool</span>
-<span class="sd">        Option to record somatic voltages from cells</span>
-<span class="sd">    record_isoma : bool</span>
-<span class="sd">        Option to record somatic currents from cells</span>
+<span class="sd">    record_vsec : &#39;all&#39; | &#39;soma&#39; | False</span>
+<span class="sd">        Option to record voltages from all sections (&#39;all&#39;), or just</span>
+<span class="sd">        the soma (&#39;soma&#39;). Default: False.</span>
+<span class="sd">    record_isec : &#39;all&#39; | &#39;soma&#39; | False</span>
+<span class="sd">        Option to record voltages from all sections (&#39;all&#39;), or just</span>
+<span class="sd">        the soma (&#39;soma&#39;). Default: False.</span>
 <span class="sd">    postproc : bool</span>
 <span class="sd">        If True, smoothing (``dipole_smooth_win``) and scaling</span>
 <span class="sd">        (``dipole_scalefctr``) values are read from the parameter file, and</span>
@@ -217,17 +220,13 @@
     <span class="n">net</span><span class="o">.</span><span class="n">_instantiate_drives</span><span class="p">(</span><span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
     <span class="n">net</span><span class="o">.</span><span class="n">_reset_rec_arrays</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_vsoma</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;record_vsoma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_vsoma</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;record_vsoma must be bool, got </span><span class="si">%s</span><span class="s2">&quot;</span>
-                        <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">record_vsoma</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;record_vsec&#39;</span><span class="p">,</span> <span class="n">record_vsec</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;soma&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_isoma</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;record_isoma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_isoma</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;record_isoma must be bool, got </span><span class="si">%s</span><span class="s2">&quot;</span>
-                        <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">record_isoma</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;record_vsec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_vsec</span>
+
+    <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;record_isec&#39;</span><span class="p">,</span> <span class="n">record_isec</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;soma&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+    <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;record_isec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_isec</span>
 
     <span class="k">if</span> <span class="n">postproc</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The postproc-argument is deprecated and will be removed&#39;</span>

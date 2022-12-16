@@ -184,12 +184,12 @@
 <span class="sd">        The inner list contains the type of spike (e.g., evprox1</span>
 <span class="sd">        or L2_pyramidal) that occured at the corresonding time stamp.</span>
 <span class="sd">        Each gid corresponds to a type via Network::gid_ranges.</span>
-<span class="sd">    vsoma : list (n_trials,) of dict, shape</span>
+<span class="sd">    vsec : list (n_trials,) of dict, shape</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
-<span class="sd">        Dictionary indexed by gids containing somatic voltages.</span>
-<span class="sd">    isoma : list (n_trials,) of dict, shape</span>
+<span class="sd">        Dictionary indexed by gids containing voltages for cell sections.</span>
+<span class="sd">    isec : list (n_trials,) of dict, shape</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
-<span class="sd">        Dictionary indexed by gids containing somatic currents.</span>
+<span class="sd">        Dictionary indexed by gids containing currents for cell sections.</span>
 <span class="sd">    times : array-like, shape (n_times,)</span>
 <span class="sd">        Array of time points for samples in continuous data.</span>
 <span class="sd">        This includes vsoma and isoma.</span>
@@ -245,8 +245,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="o">=</span> <span class="n">spike_gids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">=</span> <span class="n">spike_types</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vsec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">times</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;times&#39; is an np.ndarray of simulation times&quot;</span><span class="p">)</span>
@@ -351,12 +351,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">vsoma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span>
+    <span class="k">def</span> <span class="nf">vsec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">isoma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span>
+    <span class="k">def</span> <span class="nf">isec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isec</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

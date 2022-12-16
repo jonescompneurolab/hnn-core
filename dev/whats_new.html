@@ -182,6 +182,8 @@ by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</
 <li><p>Runtime output messages now specify the trial with which each simulation time
 checkpoint belongs too, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/546">#546</a>.</p></li>
 <li><p>Add warning if network drives are not loaded, by <a class="reference external" href="http://github.com/orbekolo/">Orsolya Beatrix Kolozsvari</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/516">#516</a></p></li>
+<li><p>Add ability to record voltages and synaptic currents from all sections in <a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellResponse</span></code></a>,
+by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/502">#502</a>.</p></li>
 </ul>
 </section>
 <section id="bug">
@@ -230,6 +232,11 @@ layers, by <a class="reference external" href="https://github.com/chenghuzi">Huz
 plotting local field potential (LFP) is now found at
 <a class="reference internal" href="generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_lfp" title="hnn_core.extracellular.ExtracellularArray.plot_lfp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">plot_lfp()</span></code></a>, by
 <a class="reference external" href="https://github.com/spbrandt">Steven Brandt</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/517">#517</a>.</p></li>
+<li><p>Recorded voltages/currents from the soma, as well all sections, are enabled by
+setting either <em class="xref py py-obj">record_vsec</em> or <em class="xref py py-obj">record_isec</em> to <em class="xref py py-obj">‘all’</em> or <em class="xref py py-obj">‘soma’</em>
+in <a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>. Recordings are now accessed through
+<code class="xref py py-class docutils literal notranslate"><span class="pre">vsec</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">isec</span></code>,
+by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/502">#502</a>.</p></li>
 </ul>
 </section>
 </section>
