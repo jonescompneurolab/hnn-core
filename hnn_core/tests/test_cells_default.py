@@ -37,7 +37,7 @@ def test_cells_default():
     h.celsius = 37
 
     l5p.record(record_vsec='soma')
-    vsoma = l5p.rec_vsec['soma'].record(l5p._nrn_sections['soma'](0.5)._ref_v)
+    vsoma = l5p.vsec['soma'].record(l5p._nrn_sections['soma'](0.5)._ref_v)
     times = h.Vector().record(h._ref_t)
 
     stim = h.IClamp(l5p._nrn_sections['soma'](0.5))
