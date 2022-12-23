@@ -54,7 +54,7 @@ jobs:
 
           - restore_cache:
               keys:
-                - built-{{ checksum ".circleci/cache_version" }}
+                - built-{{ checksum ".cache_version" }}
 
           - run:
               name: Build the documentation
@@ -67,7 +67,7 @@ jobs:
               paths: html
 
           - save_cache:
-              key: built-{{ checksum ".circleci/cache_version" }}
+              key: built-{{ checksum ".cache_version" }}
               paths:
                 - doc/auto_examples
                 - doc/_build
