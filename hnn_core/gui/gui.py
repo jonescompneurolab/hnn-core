@@ -316,6 +316,8 @@ class HNNGUI:
             style='background:{self.layout['theme_color']};
             text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
+        
+        self._connectivity_tab = {}
 
     @property
     def analysis_config(self):
@@ -370,7 +372,8 @@ class HNNGUI:
             return on_upload_change(change, self.params, self.widget_tstop,
                                     self.widget_dt, self._log_out,
                                     self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self._connectivity_out,
+                                    self._drives_out, self._connectivity_tab,
+                                    self._connectivity_out,
                                     self.connectivity_widgets,
                                     self.layout['drive_textbox'],
                                     "connectivity")
@@ -379,7 +382,8 @@ class HNNGUI:
             return on_upload_change(change, self.params, self.widget_tstop,
                                     self.widget_dt, self._log_out,
                                     self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self._connectivity_out,
+                                    self._drives_out, self._connectivity_tab,
+                                    self._connectivity_out,
                                     self.connectivity_widgets,
                                     self.layout['drive_textbox'],
                                     "drives")
@@ -484,11 +488,10 @@ class HNNGUI:
         # self.simulation_data[self.widget_simulation_name.value]
 
         # initialize drive and connectivity ipywidgets
-        load_drive_and_connectivity(self.params, self._log_out,
-                                    self._drives_out, self.drive_widgets,
-                                    self.drive_boxes, self._connectivity_out,
-                                    self.connectivity_widgets,
-                                    self.widget_tstop, self.layout)
+        self._connectivity_tab['content'] = load_drive_and_connectivity(
+            self.params, self._log_out, self._drives_out, self.drive_widgets,
+            self.drive_boxes, self._connectivity_out,
+            self.connectivity_widgets, self.widget_tstop, self.layout)
 
         if not return_layout:
             return
@@ -1081,7 +1084,7 @@ def add_connectivity_tab(params, connectivity_out,
     with connectivity_out:
         display(cell_connectivity)
 
-    return net
+    return net, cell_connectivity
 
 
 def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
@@ -1128,15 +1131,19 @@ def load_drive_and_connectivity(params, log_out, drives_out,
     log_out.clear_output()
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_sliders)
+        _, connectivity_tab = add_connectivity_tab(params, connectivity_out,
+                                                   connectivity_sliders)
         # Add drives
         add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
 
+    return connectivity_tab
+
 
 def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
-                     drive_widgets, drives_out, connectivity_out,
-                     connectivity_sliders, layout, load_type):
+                     drive_widgets, drives_out, connectivity_tab,
+                     connectivity_out, connectivity_sliders, layout,
+                     load_type):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
@@ -1163,7 +1170,9 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
         params.update(params_network)
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out, connectivity_sliders)
+        _, _connectivity_tab = add_connectivity_tab(params, connectivity_out,
+                                                    connectivity_sliders)
+        connectivity_tab['content'] = _connectivity_tab
     elif load_type == 'drives':
         add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
