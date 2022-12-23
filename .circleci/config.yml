@@ -54,7 +54,7 @@ jobs:
 
           - restore_cache:
               keys:
-                - examples_built-{{ .Environment.CACHE_VERSION }}
+                - built-{{ checksum ".circleci/cache_version" }}
 
           - run:
               name: Build the documentation
@@ -67,7 +67,7 @@ jobs:
               paths: html
 
           - save_cache:
-              key: examples_built-{{ .Environment.CACHE_VERSION }}
+              key: built-{{ checksum ".circleci/cache_version" }}
               paths:
                 - doc/auto_examples
                 - doc/_build
