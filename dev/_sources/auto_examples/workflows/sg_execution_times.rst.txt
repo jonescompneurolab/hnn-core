@@ -6,16 +6,16 @@
 
 Computation times
 =================
-**20:18.864** total execution time for **auto_examples_workflows** files:
+**13:05.917** total execution time for **auto_examples_workflows** files:
 
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py` (``plot_simulate_beta.py``)     | 06:53.715 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py` (``plot_simulate_beta.py``)     | 04:42.868 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py` (``plot_simulate_gamma.py``)   | 05:20.522 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py` (``plot_simulate_gamma.py``)   | 03:10.911 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)   | 03:56.833 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)   | 02:25.080 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py` (``plot_simulate_evoked.py``) | 02:35.680 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py` (``plot_simulate_evoked.py``) | 01:34.108 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py` (``plot_simulate_somato.py``) | 01:32.114 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py` (``plot_simulate_somato.py``) | 01:12.950 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------+-----------+--------+
