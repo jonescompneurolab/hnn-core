@@ -52,6 +52,10 @@ jobs:
                   pip install -U pip setuptools virtualenv
                   pip install '.[gui]'
 
+          - restore_cache:
+              keys:
+                - built-{{ checksum ".circleci/build_cache" }}
+
           - run:
               name: Build the documentation
               command: |
@@ -61,6 +65,12 @@ jobs:
           - persist_to_workspace:
               root: doc/_build
               paths: html
+
+          - save_cache:
+              key: built-{{ checksum ".circleci/build_cache" }}
+              paths:
+                - doc/auto_examples
+                - doc/_build
 
           - store_artifacts:
               path: doc/_build/html/
