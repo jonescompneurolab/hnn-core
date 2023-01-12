@@ -149,7 +149,7 @@
 
 <div class="viewcode-block" id="simulate_dipole"><a class="viewcode-back" href="../../generated/hnn_core.simulate_dipole.html#hnn_core.dipole.simulate_dipole">[docs]</a><span class="k">def</span> <span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Simulate a dipole given the experiment parameters.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulate a dipole given the experiment parameters.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -239,7 +239,7 @@
 
 
 <div class="viewcode-block" id="read_dipole"><a class="viewcode-back" href="../../generated/hnn_core.read_dipole.html#hnn_core.dipole.read_dipole">[docs]</a><span class="k">def</span> <span class="nf">read_dipole</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Read dipole values from a file and create a Dipole instance.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a file and create a Dipole instance.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -257,7 +257,7 @@
 
 
 <div class="viewcode-block" id="average_dipoles"><a class="viewcode-back" href="../../generated/hnn_core.dipole.average_dipoles.html#hnn_core.dipole.average_dipoles">[docs]</a><span class="k">def</span> <span class="nf">average_dipoles</span><span class="p">(</span><span class="n">dpls</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute dipole averages over a list of Dipole objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute dipole averages over a list of Dipole objects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -302,7 +302,7 @@
 
 
 <span class="k">def</span> <span class="nf">_rmse</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">exp_dpl</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Calculates RMSE between data in dpl and exp_dpl</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculates RMSE between data in dpl and exp_dpl</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dpl : instance of Dipole</span>
@@ -369,7 +369,7 @@
 
 
 <div class="viewcode-block" id="Dipole"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole">[docs]</a><span class="k">class</span> <span class="nc">Dipole</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Dipole class.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dipole class.</span>
 
 <span class="sd">    An instance of the ``Dipole``-class contains the simulated dipole moment</span>
 <span class="sd">    timecourses for L2 and L5 pyramidal cells, as well as their aggregate</span>
@@ -419,7 +419,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># for visualisation</span>
 
 <div class="viewcode-block" id="Dipole.copy"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a copy of the Dipole instance</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of the Dipole instance</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -429,7 +429,7 @@
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">,</span> <span class="n">fctr</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Apply scaling and smoothing from param-files (DEPRECATE)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply scaling and smoothing from param-files (DEPRECATE)</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -444,7 +444,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">window_len</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_convert_fAm_to_nAm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The NEURON simulator output is in fAm, convert to nAm</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The NEURON simulator output is in fAm, convert to nAm</span>
 
 <span class="sd">        NB! Must be run `after` :meth:`Dipole.baseline_renormalization`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -452,7 +452,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">1e-6</span>
 
 <div class="viewcode-block" id="Dipole.scale"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Scale (multiply) the dipole moment by a fixed factor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scale (multiply) the dipole moment by a fixed factor</span>
 
 <span class="sd">        The attribute ``Dipole.scale_applied`` is updated to reflect factors</span>
 <span class="sd">        applied and displayed in plots.</span>
@@ -468,7 +468,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="Dipole.smooth"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.smooth">[docs]</a>    <span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Hamming-windowed convolution</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Hamming-windowed convolution</span>
 
 <span class="sd">        Note that this method operates in-place, i.e., it will alter the data.</span>
 <span class="sd">        If you prefer a filtered copy, consider using the</span>
@@ -494,7 +494,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="Dipole.savgol_filter"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter">[docs]</a>    <span class="k">def</span> <span class="nf">savgol_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h_freq</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Savitzky-Golay filtering</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Savitzky-Golay filtering</span>
 
 <span class="sd">        Note that this method operates in-place, i.e., it will alter the data.</span>
 <span class="sd">        If you prefer a filtered copy, consider using the</span>
@@ -531,7 +531,7 @@
 
 <div class="viewcode-block" id="Dipole.plot"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Simple layer-specific plot function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simple layer-specific plot function.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -560,7 +560,7 @@
 
 <div class="viewcode-block" id="Dipole.plot_psd"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot_psd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span>
                  <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot power spectral density (PSD) of dipole time course</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot power spectral density (PSD) of dipole time course</span>
 
 <span class="sd">        Applies `~scipy.signal.periodogram` from SciPy with</span>
 <span class="sd">        ``window=&#39;hamming&#39;``.</span>
@@ -608,7 +608,7 @@
                         <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">colorbar_inside</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot Morlet time-frequency representation of dipole time course</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot Morlet time-frequency representation of dipole time course</span>
 
 <span class="sd">        NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be</span>
 <span class="sd">        installed.</span>
@@ -662,7 +662,7 @@
             <span class="n">colorbar_inside</span><span class="o">=</span><span class="n">colorbar_inside</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_baseline_renormalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Only baseline renormalize if the units are fAm.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Only baseline renormalize if the units are fAm.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -714,7 +714,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Dipole.write"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Write dipole values to a file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dipole values to a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

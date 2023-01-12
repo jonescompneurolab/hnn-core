@@ -153,7 +153,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_range</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get range of values to sweep over.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get range of values to sweep over.&quot;&quot;&quot;</span>
     <span class="n">range_min</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">val</span> <span class="o">-</span> <span class="n">val</span> <span class="o">*</span> <span class="n">multiplier</span> <span class="o">/</span> <span class="mf">100.</span><span class="p">)</span>
     <span class="n">range_max</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">val</span> <span class="o">*</span> <span class="n">multiplier</span> <span class="o">/</span> <span class="mf">100.</span>
     <span class="n">ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;initial&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">,</span> <span class="s1">&#39;minval&#39;</span><span class="p">:</span> <span class="n">range_min</span><span class="p">,</span> <span class="s1">&#39;maxval&#39;</span><span class="p">:</span> <span class="n">range_max</span><span class="p">}</span>
@@ -163,7 +163,7 @@
 <span class="k">def</span> <span class="nf">_split_by_evinput</span><span class="p">(</span><span class="n">drive_names</span><span class="p">,</span> <span class="n">drive_dynamics</span><span class="p">,</span> <span class="n">drive_syn_weights</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                       <span class="n">sigma_range_multiplier</span><span class="p">,</span> <span class="n">timing_range_multiplier</span><span class="p">,</span>
                       <span class="n">synweight_range_multiplier</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Sorts parameter ranges by evoked inputs into a dictionary</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Sorts parameter ranges by evoked inputs into a dictionary</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -246,7 +246,7 @@
 
 
 <span class="k">def</span> <span class="nf">_generate_weights</span><span class="p">(</span><span class="n">evinput_params</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">decay_multiplier</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Calculation of weight function for wRMSE calcuation</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculation of weight function for wRMSE calcuation</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -300,7 +300,7 @@
 
 
 <span class="k">def</span> <span class="nf">_create_last_chunk</span><span class="p">(</span><span class="n">input_chunks</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This creates a chunk that combines parameters for</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; This creates a chunk that combines parameters for</span>
 <span class="sd">    all chunks in input_chunks (final step)</span>
 
 <span class="sd">    Parameters</span>
@@ -330,7 +330,7 @@
 
 
 <span class="k">def</span> <span class="nf">_consolidate_chunks</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Consolidates inputs into optimization &quot;chunks&quot; defined by</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Consolidates inputs into optimization &quot;chunks&quot; defined by</span>
 <span class="sd">    opt_start and opt_end</span>
 
 <span class="sd">    Parameters</span>
@@ -375,7 +375,7 @@
 
 <span class="k">def</span> <span class="nf">_optrun</span><span class="p">(</span><span class="n">drive_params_updated</span><span class="p">,</span> <span class="n">drive_params_static</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
             <span class="n">n_trials</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">opt_dpls</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">smooth_window_len</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This is the function to run a simulation</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the function to run a simulation</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -502,7 +502,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_drive_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">drive_names</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get evoked drive parameters from a Network instance.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get evoked drive parameters from a Network instance.&quot;&quot;&quot;</span>
 
     <span class="n">drive_dynamics</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">drive_syn_weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -565,7 +565,7 @@
                     <span class="n">synweight_range_multiplier</span><span class="o">=</span><span class="mf">500.0</span><span class="p">,</span> <span class="n">decay_multiplier</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span>
                     <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">smooth_window_len</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span>
                     <span class="n">which_drives</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Optimize drives to generate evoked response.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimize drives to generate evoked response.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

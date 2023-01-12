@@ -154,7 +154,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_cos_theta</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get cos(theta) to compute dipole along the apical dendrite.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get cos(theta) to compute dipole along the apical dendrite.&quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name_apical</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span>
          <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name_apical</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="n">cos_thetas</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -165,7 +165,7 @@
 
 
 <span class="k">def</span> <span class="nf">_calculate_gaussian</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return height of gaussian at x_val.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return height of gaussian at x_val.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -193,7 +193,7 @@
 
 <span class="k">def</span> <span class="nf">_get_gaussian_connection</span><span class="p">(</span><span class="n">src_pos</span><span class="p">,</span> <span class="n">target_pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span>
                              <span class="n">inplane_distance</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Calculate distance dependent connection properties.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate distance dependent connection properties.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -232,7 +232,7 @@
 
 
 <span class="k">class</span> <span class="nc">_ArtificialCell</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;The ArtificialCell class for initializing a NEURON feed source.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The ArtificialCell class for initializing a NEURON feed source.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -291,7 +291,7 @@
 
 
 <span class="k">class</span> <span class="nc">Section</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Section class.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Section class.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -363,7 +363,7 @@
 
 
 <div class="viewcode-block" id="Cell"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell">[docs]</a><span class="k">class</span> <span class="nc">Cell</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Create a cell object.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a cell object.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -506,7 +506,7 @@
                         <span class="nb">setattr</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_create_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">synapses</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create synapses.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create synapses.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">syns</span><span class="p">:</span>
                 <span class="n">syn_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">receptor</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -515,7 +515,7 @@
                     <span class="n">seg</span><span class="p">,</span> <span class="o">**</span><span class="n">synapses</span><span class="p">[</span><span class="n">receptor</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_create_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">topology</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create soma and set geometry.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create soma and set geometry.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -570,7 +570,7 @@
         <span class="n">h</span><span class="o">.</span><span class="n">define_shape</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Cell.build"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Build cell in Neuron and insert dipole if applicable.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build cell in Neuron and insert dipole if applicable.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -590,7 +590,7 @@
                              <span class="sa">f</span><span class="s1">&#39;Got </span><span class="si">{</span><span class="n">sec_name_apical</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Cell.copy"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return copy of instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return copy of instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="c1"># two things need to happen here for h:</span>
@@ -599,7 +599,7 @@
     <span class="c1">#    section at position 1</span>
     <span class="c1"># In Cell() and not Pyr() for future possibilities</span>
     <span class="k">def</span> <span class="nf">_insert_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Insert dipole into each section of this cell.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert dipole into each section of this cell.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -652,7 +652,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dipole</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dpl_ref</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cell.create_tonic_bias"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias">[docs]</a>    <span class="k">def</span> <span class="nf">create_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create tonic bias at the soma.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create tonic bias at the soma.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -672,7 +672,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tonic_biases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stim</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Cell.record"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Record current and voltage from all sections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Record current and voltage from all sections</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -716,7 +716,7 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_synapses</span><span class="p">[</span><span class="n">syn_name</span><span class="p">]</span><span class="o">.</span><span class="n">_ref_i</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Cell.syn_create"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.syn_create">[docs]</a>    <span class="k">def</span> <span class="nf">syn_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secloc</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tau1</span><span class="p">,</span> <span class="n">tau2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create an h.Exp2Syn synapse.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an h.Exp2Syn synapse.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -744,7 +744,7 @@
         <span class="k">return</span> <span class="n">syn</span></div>
 
 <div class="viewcode-block" id="Cell.setup_source_netcon"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.setup_source_netcon">[docs]</a>    <span class="k">def</span> <span class="nf">setup_source_netcon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Created for _PC.cell and specifies SOURCES of spikes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Created for _PC.cell and specifies SOURCES of spikes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -758,7 +758,7 @@
 
 <div class="viewcode-block" id="Cell.parconnect_from_src"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.parconnect_from_src">[docs]</a>    <span class="k">def</span> <span class="nf">parconnect_from_src</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_presyn</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">postsyn</span><span class="p">,</span>
                             <span class="n">inplane_distance</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parallel receptor-centric connect FROM presyn TO this cell,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parallel receptor-centric connect FROM presyn TO this cell,</span>
 <span class="sd">           based on GID.</span>
 
 <span class="sd">        Parameters</span>
@@ -792,7 +792,7 @@
         <span class="k">return</span> <span class="n">nc</span></div>
 
 <div class="viewcode-block" id="Cell.plot_morphology"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.plot_morphology">[docs]</a>    <span class="k">def</span> <span class="nf">plot_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -809,7 +809,7 @@
         <span class="k">return</span> <span class="n">plot_cell_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_update_end_pts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&quot;Create cell and copy coordinates to Section.end_pts&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;&quot;Create cell and copy coordinates to Section.end_pts&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_sections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
         <span class="n">section_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
@@ -826,7 +826,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Cell.modify_section"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.modify_section">[docs]</a>    <span class="k">def</span> <span class="nf">modify_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Ra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Change attributes of section specified by `sec_name`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Change attributes of section specified by `sec_name`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
