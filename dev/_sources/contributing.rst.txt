@@ -205,3 +205,12 @@ Continuous Integration
 The repository is tested via continuous integration with GitHub Actions and
 Circle. The automated tests run on GitHub Actions while the documentation is
 built on Circle.
+
+To speed up the documentation-building process on CircleCI, we enabled versioned 
+`caching <https://circleci.com/docs/caching/>`_ to reduce the building time from
+about 30 minutes to ~5 minutes.
+Usually, you don't need to worry about it. But in case a complete rebuild is necessary 
+for a new version of the doc, you can modify the content in ``.circleci/build_cache``, as 
+CircleCI uses the MD5 of that file as the key for previously cached content.
+For consistency, we recommend you to monotonically increase the version number
+in that file, e.g., from "v2"-> "v3".
