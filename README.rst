@@ -65,6 +65,10 @@ and it should not give any error messages.
 To install the GUI dependencies along with ``hnn-core``, a simple tweak to the above command is needed::
 
    $ pip install hnn_core[gui]
+   
+Note if you are zsh in macOS the command is::
+
+   $ pip install hnn_core'[gui]'
 
 To start the GUI, please do::
 
