@@ -2,6 +2,7 @@ from functools import partial
 import os.path as op
 
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
@@ -24,8 +25,6 @@ def _fake_click(fig, ax, point, button=1):
 
 def test_network_visualization():
     """Test network visualisations."""
-    import matplotlib.pyplot as plt
-
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
@@ -82,8 +81,6 @@ def test_network_visualization():
 
 def test_dipole_visualization():
     """Test dipole visualisations."""
-    import matplotlib.pyplot as plt
-
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)

@@ -1,5 +1,6 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from hnn_core import Dipole, Network, Params
@@ -16,8 +17,6 @@ matplotlib.use('agg')
 
 def test_gui_load_params():
     """Test if gui loads default parameters properly"""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
 
     assert isinstance(gui.params, Params)
@@ -29,8 +28,6 @@ def test_gui_load_params():
 
 def test_gui_upload_params():
     """Test if gui handles uploaded parameters correctly"""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
 
@@ -77,8 +74,6 @@ def test_gui_upload_params():
 
 def test_gui_change_connectivity():
     """Test if GUI properly changes cell connectivity parameters."""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
 
@@ -119,8 +114,6 @@ def test_gui_change_connectivity():
 
 def test_gui_add_drives():
     """Test if gui add different type of drives."""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
 
@@ -142,8 +135,6 @@ def test_gui_add_drives():
 
 def test_gui_init_network():
     """Test if gui initializes network properly"""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
     # now the default parameter has been loaded.
@@ -163,8 +154,6 @@ def test_gui_init_network():
 @requires_psutil
 def test_gui_run_simulation_mpi():
     """Test if run button triggers simulation with MPIBackend."""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -182,8 +171,6 @@ def test_gui_run_simulation_mpi():
 
 
 def test_gui_run_simulations():
-    import matplotlib.pyplot as plt
-
     """Test if run button triggers multiple simulations correctly."""
     gui = HNNGUI()
     app_layout = gui.compose()
@@ -249,8 +236,6 @@ def test_gui_run_simulations():
 
 def test_gui_take_screenshots():
     """Test if the GUI correctly generates screenshots."""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     gui.compose(return_layout=False)
     screenshot = gui.capture(render=False)
@@ -263,8 +248,6 @@ def test_gui_take_screenshots():
 
 def test_gui_add_figure():
     """Test if the GUI adds/deletes figs properly."""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -313,8 +296,6 @@ def test_gui_add_figure():
 
 def test_gui_edit_figure():
     """Test if the GUI adds/deletes figs properly."""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -341,8 +322,6 @@ def test_gui_edit_figure():
 
 def test_gui_figure_overlay():
     """Test if the GUI adds/deletes figs properly."""
-    import matplotlib.pyplot as plt
-
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -373,7 +352,6 @@ def test_gui_figure_overlay():
 
 
 def test_gui_adaptive_spectrogram():
-    import matplotlib.pyplot as plt
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3

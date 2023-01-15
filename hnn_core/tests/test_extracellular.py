@@ -13,6 +13,8 @@ from hnn_core.extracellular import (ExtracellularArray, calculate_csd2d,
                                     _get_laminar_z_coords)
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
+import matplotlib.pyplot as plt
+
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -161,8 +163,6 @@ def test_transfer_resistance():
 @requires_mpi4py
 @requires_psutil
 def test_extracellular_backends(run_hnn_core_fixture):
-    import matplotlib.pyplot as plt
-
     """Test extracellular outputs across backends."""
     # calculation of CSD requires >=4 electrode contacts
     electrode_array = {'arr1': [(2, 2, 400), (2, 2, 600), (2, 2, 800),
@@ -199,7 +199,7 @@ def test_extracellular_backends(run_hnn_core_fixture):
     joblib_net.rec_arrays['arr1'].plot_lfp(show=False)
     joblib_net.rec_arrays['arr1'].plot_csd(show=False)
 
-    plt.close()
+    plt.close('all')
 
 
 def test_rec_array_calculation():

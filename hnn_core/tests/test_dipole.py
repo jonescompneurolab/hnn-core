@@ -2,6 +2,7 @@ import os.path as op
 from urllib.request import urlretrieve
 
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
@@ -18,8 +19,6 @@ matplotlib.use('agg')
 
 def test_dipole(tmpdir, run_hnn_core_fixture):
     """Test dipole object."""
-    import matplotlib.pyplot as plt
-
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     dpl_out_fname = tmpdir.join('dpl1.txt')
@@ -115,8 +114,6 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
 
 def test_dipole_simulation():
     """Test data produced from simulate_dipole() call."""
-    import matplotlib.pyplot as plt
-
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)

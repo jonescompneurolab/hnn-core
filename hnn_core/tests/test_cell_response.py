@@ -2,6 +2,7 @@
 
 from glob import glob
 
+import matplotlib.pyplot as plt
 import pytest
 import numpy as np
 
@@ -10,8 +11,6 @@ from hnn_core import CellResponse, read_spikes
 
 def test_cell_response(tmpdir):
     """Test CellResponse object."""
-    import matplotlib.pyplot as plt
-
     # Round-trip test
     spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
     spike_gids = [[1, 3], [5, 7]]
