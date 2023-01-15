@@ -72,6 +72,7 @@ def test_gui_upload_params():
     assert gui.drive_widgets[-1]['tstop'].value == 0.
     plt.close('all')
 
+
 def test_gui_change_connectivity():
     """Test if GUI properly changes cell connectivity parameters."""
     gui = HNNGUI()
