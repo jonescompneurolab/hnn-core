@@ -161,6 +161,8 @@ def test_transfer_resistance():
 @requires_mpi4py
 @requires_psutil
 def test_extracellular_backends(run_hnn_core_fixture):
+    import matplotlib.pyplot as plt
+
     """Test extracellular outputs across backends."""
     # calculation of CSD requires >=4 electrode contacts
     electrode_array = {'arr1': [(2, 2, 400), (2, 2, 600), (2, 2, 800),
@@ -196,6 +198,8 @@ def test_extracellular_backends(run_hnn_core_fixture):
     # check plotting works
     joblib_net.rec_arrays['arr1'].plot_lfp(show=False)
     joblib_net.rec_arrays['arr1'].plot_csd(show=False)
+
+    plt.close()
 
 
 def test_rec_array_calculation():

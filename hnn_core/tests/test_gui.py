@@ -16,16 +16,21 @@ matplotlib.use('agg')
 
 def test_gui_load_params():
     """Test if gui loads default parameters properly"""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
 
     assert isinstance(gui.params, Params)
 
     print(gui.params)
     print(gui.params['L2Pyr*'])
+    plt.close('all')
 
 
 def test_gui_upload_params():
     """Test if gui handles uploaded parameters correctly"""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
 
@@ -68,10 +73,12 @@ def test_gui_upload_params():
     gui._simulate_upload_drives(file1_url)
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
     assert gui.drive_widgets[-1]['tstop'].value == 0.
-
+    plt.close('all')
 
 def test_gui_change_connectivity():
     """Test if GUI properly changes cell connectivity parameters."""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
 
@@ -107,10 +114,13 @@ def test_gui_change_connectivity():
                 # test if the new value is reflected in the network
                 assert _single_simulation['net'].connectivity[conn_idx][
                     'nc_dict']['A_weight'] == w_val
+    plt.close('all')
 
 
 def test_gui_add_drives():
     """Test if gui add different type of drives."""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
 
@@ -127,10 +137,13 @@ def test_gui_add_drives():
             assert gui.drive_widgets[0]['type'] == val_drive_type
             assert gui.drive_widgets[0]['location'] == val_location
             assert val_drive_type in gui.drive_widgets[0]['name']
+    plt.close('all')
 
 
 def test_gui_init_network():
     """Test if gui initializes network properly"""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
     # now the default parameter has been loaded.
@@ -139,6 +152,7 @@ def test_gui_init_network():
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
                                gui.connectivity_widgets)
+    plt.close('all')
 
     # copied from test_network.py
     assert np.isclose(_single_simulation['net']._inplane_distance, 1.)
@@ -149,6 +163,8 @@ def test_gui_init_network():
 @requires_psutil
 def test_gui_run_simulation_mpi():
     """Test if run button triggers simulation with MPIBackend."""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -162,9 +178,12 @@ def test_gui_run_simulation_mpi():
     assert isinstance(gui.simulation_data[default_name]["net"], Network)
     assert isinstance(dpls, list)
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
+    plt.close('all')
 
 
 def test_gui_run_simulations():
+    import matplotlib.pyplot as plt
+
     """Test if run button triggers multiple simulations correctly."""
     gui = HNNGUI()
     app_layout = gui.compose()
@@ -225,10 +244,13 @@ def test_gui_run_simulations():
     assert len(gui.simulation_data) == 1
     assert gui._simulation_status_bar.value == \
         gui._simulation_status_contents['failed']
+    plt.close('all')
 
 
 def test_gui_take_screenshots():
     """Test if the GUI correctly generates screenshots."""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     gui.compose(return_layout=False)
     screenshot = gui.capture(render=False)
@@ -236,10 +258,13 @@ def test_gui_take_screenshots():
     gui._simulate_left_tab_click("External drives")
     screenshot1 = gui.capture(render=False)
     assert screenshot._repr_html_() != screenshot1._repr_html_()
+    plt.close('all')
 
 
 def test_gui_add_figure():
     """Test if the GUI adds/deletes figs properly."""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -283,10 +308,13 @@ def test_gui_add_figure():
     ]
     correct_remaining_titles = [_idx2figname(idx) for idx in (1, 3, 4)]
     assert remaining_titles1 == remaining_titles2 == correct_remaining_titles
+    plt.close('all')
 
 
 def test_gui_edit_figure():
     """Test if the GUI adds/deletes figs properly."""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -308,10 +336,13 @@ def test_gui_edit_figure():
         axes_config = axes_config_tabs.children[-1].children[1]
         simulation_selection = axes_config.children[0].children[0]
         assert simulation_selection.options == tuple(sim_names[:n_figs])
+    plt.close('all')
 
 
 def test_gui_figure_overlay():
     """Test if the GUI adds/deletes figs properly."""
+    import matplotlib.pyplot as plt
+
     gui = HNNGUI()
     _ = gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -338,9 +369,11 @@ def test_gui_figure_overlay():
                 assert add_plot_button.disabled is True
                 clear_ax_button.click()
                 assert add_plot_button.disabled is False
+    plt.close('all')
 
 
 def test_gui_adaptive_spectrogram():
+    import matplotlib.pyplot as plt
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -364,3 +397,4 @@ def test_gui_adaptive_spectrogram():
     assert any(['_cbar-ax-' in attr
                 for attr in dir(gui.viz_manager.figs[figid])]) is False
     assert len(gui.viz_manager.figs[1].axes) == 2
+    plt.close('all')

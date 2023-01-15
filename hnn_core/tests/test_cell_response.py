@@ -10,6 +10,7 @@ from hnn_core import CellResponse, read_spikes
 
 def test_cell_response(tmpdir):
     """Test CellResponse object."""
+    import matplotlib.pyplot as plt
 
     # Round-trip test
     spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
@@ -162,3 +163,4 @@ def test_cell_response(tmpdir):
                       'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
         cell_response = read_spikes(tmpdir.join('spk_*.txt'),
                                     gid_ranges=gid_ranges)
+    plt.close('all')

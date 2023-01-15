@@ -24,6 +24,8 @@ def _fake_click(fig, ax, point, button=1):
 
 def test_network_visualization():
     """Test network visualisations."""
+    import matplotlib.pyplot as plt
+
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
@@ -59,6 +61,8 @@ def test_network_visualization():
     with pytest.raises(ValueError, match='src_gid -1 not a valid cell ID'):
         plot_cell_connectivity(net, conn_idx, src_gid=-1)
 
+    plt.close('all')
+
     # test interactive clicking updates the position of src_cell in plot
     del net.connectivity[-1]
     conn_idx = 15
@@ -73,6 +77,7 @@ def test_network_visualization():
     _fake_click(fig, ax_src, [pos[0], pos[1]])
     pos_in_plot = ax_target.collections[2].get_offsets().data[0]
     assert_allclose(pos[:2], pos_in_plot)
+    plt.close('all')
 
 
 def test_dipole_visualization():
@@ -112,6 +117,7 @@ def test_dipole_visualization():
 
     # test plotting multiple dipoles with average
     fig = plot_dipole(dpls, average=True, show=False)
+    plt.close('all')
 
     # test plotting dipoles with multiple layers
     fig, ax = plt.subplots()
@@ -124,6 +130,8 @@ def test_dipole_visualization():
                       show=False,
                       ax=[axes[0], axes[1], axes[2]],
                       layer=['L2', 'L5', 'agg'])
+
+    plt.close('all')
 
     with pytest.raises(AssertionError,
                        match="ax and layer should have the same size"):
@@ -156,3 +164,5 @@ def test_dipole_visualization():
         net.cell_response.plot_spikes_hist(trial_idx='blah')
     net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
     net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
+
+    plt.close('all')

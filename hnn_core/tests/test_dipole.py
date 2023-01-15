@@ -18,6 +18,8 @@ matplotlib.use('agg')
 
 def test_dipole(tmpdir, run_hnn_core_fixture):
     """Test dipole object."""
+    import matplotlib.pyplot as plt
+
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     dpl_out_fname = tmpdir.join('dpl1.txt')
@@ -108,9 +110,13 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
                            net._params['dipole_scalefctr'])
     assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
 
+    plt.close('all')
+
 
 def test_dipole_simulation():
     """Test data produced from simulate_dipole() call."""
+    import matplotlib.pyplot as plt
+
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
@@ -144,6 +150,7 @@ def test_dipole_simulation():
 
         # Smoke test for raster plot with no spikes
         net.cell_response.plot_spikes_raster()
+    plt.close('all')
 
 
 @requires_mpi4py
