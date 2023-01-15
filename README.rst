@@ -24,8 +24,8 @@ Optional dependencies
 GUI
 ~~~
 
-* ipywidgets
-* voila
+* ipywidgets (<=7.7.1)
+* voila (<=0.3.6)
 
 Parallel processing
 ~~~~~~~~~~~~~~~~~~~
