@@ -117,7 +117,7 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
         If True, show the figure
-    
+
     Returns
     -------
     fig : instance of plt.fig
@@ -340,6 +340,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         List of valid string inputs will plot each spike type individually.
 
         | Ex: ``['poisson', 'evdist']``
+
         Dictionary of valid lists will plot list elements as a group.
 
         | Ex: ``{'Evoked': ['evdist', 'evprox'], 'Tonic': ['poisson']}``
@@ -1016,6 +1017,7 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
 def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
                            colorbar=True, colormap='viridis', show=True):
     """Plot synaptic weight of connections.
+
     This is an interactive plot with source cells shown in the left
     subplot and connectivity from a source cell to all the target cells
     in the right subplot. Click on the cells in the left subplot to
@@ -1044,7 +1046,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     -------
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
-    
+
     Notes
     -----
     Target cells will be determined by the connections in
@@ -1166,7 +1168,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
         If True, show the plot.
-    
+
     Returns
     -------
     fig : instance of matplotlib Figure
