@@ -13,6 +13,8 @@ from hnn_core.extracellular import (ExtracellularArray, calculate_csd2d,
                                     _get_laminar_z_coords)
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 
+import matplotlib.pyplot as plt
+
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -196,6 +198,8 @@ def test_extracellular_backends(run_hnn_core_fixture):
     # check plotting works
     joblib_net.rec_arrays['arr1'].plot_lfp(show=False)
     joblib_net.rec_arrays['arr1'].plot_csd(show=False)
+
+    plt.close('all')
 
 
 def test_rec_array_calculation():
