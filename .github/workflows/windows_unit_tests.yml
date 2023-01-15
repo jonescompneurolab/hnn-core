@@ -6,11 +6,6 @@ on:
   pull_request:
     branches: ['**']
 
-env:
-  PATH: C:\nrn_test\bin;%PATH%
-  PYTHONPATH: C:\nrn_test\lib\python
-  NEURONHOME: C:\nrn_test
-
 jobs:
   build:
 
@@ -31,10 +26,16 @@ jobs:
         run: |
           curl.exe -L  --output nrn-setup.exe --url https://github.com/neuronsimulator/nrn/releases/download/8.2.0/nrn-8.2.0.w64-mingw-py-37-38-39-310-setup.exe
           start /b /wait .\nrn-setup.exe /S /D=C:\nrn_test
+          set PATH=C:\nrn_test\bin;%PATH%
+          set PYTHONPATH=C:\nrn_test\lib\python;%PYTHONPATH%
+          set NEURONHOME=C:\nrn_test
           python -c "import neuron"
       - name: Install dependencies and HNN
         shell: cmd
         run: |
+          set PATH=C:\nrn_test\bin;%PATH%
+          set PYTHONPATH=C:\nrn_test\lib\python;%PYTHONPATH%
+          set NEURONHOME=C:\nrn_test
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
           pip install mne psutil joblib
@@ -42,4 +43,7 @@ jobs:
       - name: Test with pytest
         shell: cmd
         run: |
+          set PATH=C:\nrn_test\bin;%PATH%
+          set PYTHONPATH=C:\nrn_test\lib\python;%PYTHONPATH%
+          set NEURONHOME=C:\nrn_test
           python -m pytest .  --cov=hnn_core hnn_core/tests/ --cov-report=xml
