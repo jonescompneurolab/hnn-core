@@ -60,7 +60,9 @@ def _decimate_plot_data(decim, data, times, sfreq=None):
 
 def plt_show(show=True, fig=None, **kwargs):
     """Show a figure while suppressing warnings.
+
     NB copied from :func:`mne.viz.utils.plt_show`.
+
     Parameters
     ----------
     show : bool
@@ -80,6 +82,7 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
                      ax=None, decim=None, color='cividis',
                      voltage_offset=50, voltage_scalebar=200, show=True):
     """Plot laminar extracellular electrode array voltage time series.
+
     Parameters
     ----------
     times : array-like, shape (n_times,)
@@ -114,6 +117,7 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
         If True, show the figure
+    
     Returns
     -------
     fig : instance of plt.fig
@@ -219,6 +223,7 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                 color='k', label="average", average=False, show=True):
     """Simple layer-specific plot function.
+
     Parameters
     ----------
     dpl : instance of Dipole | list of Dipole instances
@@ -245,6 +250,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         If True, render the average across all dpls.
     show : bool
         If True, show the figure
+
     Returns
     -------
     fig : instance of plt.fig
@@ -316,6 +322,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
                      show=True):
     """Plot the histogram of spiking activity across trials.
+
     Parameters
     ----------
     cell_response : instance of CellResponse
@@ -327,17 +334,24 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         a new figure is created.
     spike_types: string | list | dictionary | None
         String input of a valid spike type is plotted individually.
+
         | Ex: ``'poisson'``, ``'evdist'``, ``'evprox'``, ...
+
         List of valid string inputs will plot each spike type individually.
+
         | Ex: ``['poisson', 'evdist']``
         Dictionary of valid lists will plot list elements as a group.
+
         | Ex: ``{'Evoked': ['evdist', 'evprox'], 'Tonic': ['poisson']}``
+
         If None, all input spike types are plotted individually if any
         are present. Otherwise spikes from all cells are plotted.
         Valid strings also include leading characters of spike types
+
         | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
     show : bool
         If True, show the figure.
+
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -429,6 +443,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
 
 def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     """Plot the aggregate spiking activity according to cell type.
+
     Parameters
     ----------
     cell_response : instance of CellResponse
@@ -439,6 +454,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
         If True, show the figure.
+
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -503,6 +519,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
 
 def plot_cells(net, ax=None, show=True):
     """Plot the cells using Network.pos_dict.
+
     Parameters
     ----------
     net : instance of Network
@@ -512,6 +529,7 @@ def plot_cells(net, ax=None, show=True):
         a new figure is created.
     show : bool
         If True, show the figure.
+
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -558,6 +576,7 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
                     colormap='inferno', colorbar=True, colorbar_inside=False,
                     show=True):
     """Plot Morlet time-frequency representation of dipole time course
+
     Parameters
     ----------
     dpl : instance of Dipole | list of Dipole instances
@@ -592,6 +611,7 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         Put the color inside the heatmap if True.
     show : bool
         If True, show the figure
+
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -695,11 +715,13 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
              color=None, label=None, ax=None, show=True):
     """Plot power spectral density (PSD) of dipole time course
+
     Applies `~scipy.signal.periodogram` from SciPy with ``window='hamming'``.
     Note that no spectral averaging is applied across time, as most
     ``hnn_core`` simulations are short-duration. However, passing a list of
     `Dipole` instances will plot their average (Hamming-windowed) power, which
     resembles the `Welch`-method applied over time.
+
     Parameters
     ----------
     dpl : instance of Dipole | list of Dipole instances
@@ -722,6 +744,7 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         The matplotlib axis.
     show : bool
         If True, show the figure
+
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -785,6 +808,7 @@ def _linewidth_from_data_units(ax, linewidth):
 
 def plot_cell_morphology(cell, ax, show=True):
     """Plot the cell morphology.
+
     Parameters
     ----------
     cell : instance of Cell
@@ -793,6 +817,7 @@ def plot_cell_morphology(cell, ax, show=True):
         Matplotlib 3D axis
     show : bool
         If True, show the plot
+
     Returns
     -------
     axes : list of instance of Axes3D
@@ -861,6 +886,7 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
                              colorbar=True, colormap='Greys',
                              show=True):
     """Plot connectivity matrix with color bar for synaptic weights
+
     Parameters
     ----------
     net : Instance of Network object
@@ -879,6 +905,7 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
         If True (default), adjust figure to include colorbar.
     show : bool
         If True, show the plot
+
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -993,6 +1020,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     subplot and connectivity from a source cell to all the target cells
     in the right subplot. Click on the cells in the left subplot to
     explore how the connectivity pattern changes for different source cells.
+
     Parameters
     ----------
     net : Instance of Network object
@@ -1011,10 +1039,12 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
         If True (default), adjust figure to include colorbar.
     show : bool
         If True, show the plot
+
     Returns
     -------
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
+    
     Notes
     -----
     Target cells will be determined by the connections in
@@ -1120,6 +1150,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
                      show=True):
     """Plot laminar current source density (CSD) estimation from LFP array.
+
     Parameters
     ----------
     times : Numpy array, shape (n_times,)
@@ -1135,6 +1166,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
         If True, show the plot.
+    
     Returns
     -------
     fig : instance of matplotlib Figure
