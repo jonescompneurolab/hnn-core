@@ -84,13 +84,14 @@ than one CPU core, refer to our `parallel backend guide`_.
 Install Neuron using the `precompiled installers`_ **before** installing
 ``hnn-core``. Make sure that:
 
-   $ python -c 'import nrn;'
+   $ python -c 'import neuron;'
 
-does not throw any errors before running:
+does not throw any errors before running the install command.
+If you encounter errors, please get help from `NEURON forum`_.
+Finally, do:
 
    $ pip install hnn_core[gui]
 
-If you encounter errors, please get help from Neuron forum.
 
 Documentation and examples
 ==========================
@@ -131,6 +132,7 @@ Read our `roadmap`_.
 .. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
 .. _precompiled installers: https://www.neuron.yale.edu/neuron/download
+.. _NEURON forum: https://www.neuron.yale.edu/phpbb/
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
