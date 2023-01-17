@@ -34,8 +34,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
-          pip install mne psutil joblib
-          pip install NEURON
+          pip install psutil joblib
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             pip install mpi4py
           else
