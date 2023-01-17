@@ -1,4 +1,4 @@
-name: Unit tests
+name: Unit test
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: ['**']
 
-envs:
+env:
     PYTHONPATH: C:\nrn_test\lib\python
     NEURONHOME: C:\nrn_test
 
@@ -30,7 +30,7 @@ jobs:
         run: |
           powershell -command "gh release download --repo https://github.com/neuronsimulator/nrn --pattern '*.exe' --output nrn-setup.exe"
           start /b /wait .\nrn-setup.exe /S /D=C:\nrn_test
-          "C:\nrn_test\bin" >> $env:GITHUB_PATH
+          powershell -command "'C:\nrn_test\bin' >> $env:GITHUB_PATH"
           python -c "import neuron"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
