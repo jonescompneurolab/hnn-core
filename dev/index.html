@@ -230,9 +230,17 @@ because the pip installer works better with virtual environments such as the one
 <p>For further instructions on installation and usage of parallel backends for using more
 than one CPU core, refer to our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/parallel.html">parallel backend guide</a>.</p>
 <p><strong>Note for Windows users</strong></p>
-<p>We do not currently support hnn_core installation natively on Windows. Instead we reccomend
-installing <a class="reference external" href="https://docs.microsoft.com/en-us/windows/wsl/install">WSL</a> on your
-local machine, and install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> and Anaconda using the same steps as above.</p>
+<p>Install Neuron using the <a class="reference external" href="https://www.neuron.yale.edu/neuron/download">precompiled installers</a> <strong>before</strong> installing
+<code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>. Make sure that:</p>
+<blockquote>
+<div><p>$ python -c ‘import neuron;’</p>
+</div></blockquote>
+<p>does not throw any errors before running the install command.
+If you encounter errors, please get help from <a class="reference external" href="https://www.neuron.yale.edu/phpbb/">NEURON forum</a>.
+Finally, do:</p>
+<blockquote>
+<div><p>$ pip install hnn_core[gui]</p>
+</div></blockquote>
 </section>
 <section id="documentation-and-examples">
 <h1>Documentation and examples<a class="headerlink" href="#documentation-and-examples" title="Permalink to this heading">¶</a></h1>
