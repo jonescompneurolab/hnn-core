@@ -25,11 +25,10 @@ jobs:
         with:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
-      - name: Install MPI
-        shell: cmd
-        run: |
-          conda install -c conda-forge mpi4py msmpi
-          python -c "from mpi4py import MPI"
+      - name: Setup MPI
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: msmpi
       - name: Install Neuron on Windows separately
         shell: cmd
         run: |
@@ -44,7 +43,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
-          pip install psutil joblib
+          pip install psutil joblib mpi4py
           pip install --verbose .[gui]
       - name: Test with pytest
         shell: cmd
