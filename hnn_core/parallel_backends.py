@@ -4,6 +4,9 @@
 #          Mainak Jas <mainakjas@gmail.com>
 
 import os
+import platform
+import os.path as op
+
 import sys
 import re
 import multiprocessing
@@ -631,27 +634,24 @@ class MPIBackend(object):
             warn(f'{packages} not installed. Will run on single processor')
             self.n_procs = 1
 
-        self.mpi_cmd = mpi_cmd
-
-        if hyperthreading:
-            self.mpi_cmd += ' --use-hwthread-cpus'
-
-        if oversubscribe:
-            self.mpi_cmd += ' --oversubscribe'
-
-        self.mpi_cmd += ' -np ' + str(self.n_procs)
-
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
-            sys.executable + ' ' + \
-            os.path.join(os.path.dirname(sys.modules[__name__].__file__),
-                         'mpi_child.py')
-
         # Split the command into shell arguments for passing to Popen
-        if 'win' in sys.platform:
-            use_posix = True
+        use_posix = True if platform.system() == 'Windows' else False
+        self.mpi_cmd = shlex.split(mpi_cmd, posix=use_posix)
+
+        if platform.system() == 'Windows':
+            self.mpi_cmd.extend(['/np', f'{self.n_procs}'])
         else:
-            use_posix = False
-        self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
+            if hyperthreading:
+                self.mpi_cmd.append('--use-hwthread-cpus')
+            if oversubscribe:
+                self.mpi_cmd.append('--oversubscribe')
+
+            self.mpi_cmd.extend(['-np', f'{self.n_procs}'])
+
+        mpi_child_fname =  op.join(op.dirname(__file__), 'mpi_child.py')
+        self.mpi_cmd.extend(['nrniv', '-python', '-mpi', '-nobanner',
+                             sys.executable, fr'{mpi_child_fname}'])
+
 
     def __enter__(self):
         global _BACKEND
