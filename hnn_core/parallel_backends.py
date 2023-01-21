@@ -113,6 +113,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     child_data : object
         The data returned by the child process.
     """
+    for cm in command:
+        print(cm)
     proc_data_bytes = b''
     # each loop while waiting will involve two Queue.get() timeouts, each
     # 0.01s. This caclulation will error on the side of a longer timeout
@@ -639,7 +641,7 @@ class MPIBackend(object):
         self.mpi_cmd = shlex.split(mpi_cmd, posix=use_posix)
 
         if platform.system() == 'Windows':
-            self.mpi_cmd.extend(['/np', f'{self.n_procs}'])
+            self.mpi_cmd.extend([r'/np', f'{self.n_procs}'])
         else:
             if hyperthreading:
                 self.mpi_cmd.append('--use-hwthread-cpus')
@@ -650,7 +652,7 @@ class MPIBackend(object):
 
         mpi_child_fname =  op.join(op.dirname(__file__), 'mpi_child.py')
         self.mpi_cmd.extend(['nrniv', '-python', '-mpi', '-nobanner',
-                             sys.executable, fr'{mpi_child_fname}'])
+                             sys.executable, rf'{mpi_child_fname}'])
 
 
     def __enter__(self):
