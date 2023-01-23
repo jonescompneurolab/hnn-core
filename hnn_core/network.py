@@ -1253,23 +1253,31 @@ class Network(object):
 
         self.connectivity.append(deepcopy(conn))
 
-    def clear_connectivity(self):
-        """Remove all connections defined in Network.connectivity
-        """
+    def _clear_connectivity(self, src_types=None):
+        """Remove connections with src_type in Network.connectivity."""
+        if src_types is None:
+            src_types = self.external_drives.keys()
         connectivity = list()
         for conn in self.connectivity:
-            if conn['src_type'] in self.external_drives.keys():
+            if conn['src_type'] in src_types:
                 connectivity.append(conn)
         self.connectivity = connectivity
 
-    def clear_drives(self):
-        """Remove all drives defined in Network.connectivity"""
+    def clear_drives(self, drive_names='all'):
+        """Remove all drives defined in Network.connectivity.
+
+        Parameters
+        ----------
+        drive_names : list | 'all'
+            The drive_names to remove
+        """
+        if drive_names == 'all':
+            drive_names = list(self.external_drives.keys())
+        _validate_type(drive_names, (list,))
         connectivity = list()
-        for conn in self.connectivity:
-            if conn['src_type'] not in self.external_drives.keys():
-                connectivity.append(conn)
-        self.external_drives = dict()
-        self.connectivity = connectivity
+        for drive_name in drive_names:
+            del self.external_drives[drive_name]
+        self._clear_connectivity(src_type=drive_names)
 
     def add_electrode_array(self, name, electrode_pos, *, conductivity=0.3,
                             method='psa', min_distance=0.5):
