@@ -80,7 +80,8 @@ axes[0].set_xlim((1, 399))
 
 plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False)
 axes[1].set_xscale('log')
-plt.tight_layout()
+
+hjhj
 ###############################################################################
 # The next step is to add a simultaneous 10 Hz :term:`distal` drive with a
 # lower within-burst spread of spike times (``burst_std``) compared with the
