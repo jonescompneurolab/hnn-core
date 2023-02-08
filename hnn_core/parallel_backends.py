@@ -650,10 +650,9 @@ class MPIBackend(object):
 
             self.mpi_cmd.extend(['-np', f'{self.n_procs}'])
 
-        mpi_child_fname =  op.join(op.dirname(__file__), 'mpi_child.py')
+        mpi_child_fname = op.join(op.dirname(__file__), 'mpi_child.py')
         self.mpi_cmd.extend(['nrniv', '-python', '-mpi', '-nobanner',
                              sys.executable, rf'{mpi_child_fname}'])
-
 
     def __enter__(self):
         global _BACKEND
