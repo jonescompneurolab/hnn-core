@@ -141,7 +141,7 @@ def test_network():
                    'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
                    't0_input_prox': 50})
 
-    net = jones_2009_model(deepcopy(params), add_drives_from_params=False)
+    net = jones_2009_model(deepcopy(params))
 
     # add all drives explicitly and ensure that the expected number of drive
     # cells get instantiated for each case
@@ -591,7 +591,7 @@ def test_network():
 def test_add_cell_type():
     """Test adding a new cell type."""
     params = read_params(params_fname)
-    net = jones_2009_model(params, add_drives_from_params=False)
+    net = jones_2009_model(params)
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
@@ -627,7 +627,7 @@ def test_tonic_biases():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    net = Network(params, add_drives_from_params=False)
+    net = Network(params)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
                            t0=0.0, tstop=4.0)
