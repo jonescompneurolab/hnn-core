@@ -628,6 +628,10 @@ def test_tonic_biases():
     params = read_params(params_fname)
 
     net = Network(params)
+    net.add_connection(source_cell='L2_pyramidal',
+                       target_cell='L2_basket',
+                       loc='soma', receptor='ampa', weight=1e-3,
+                       delay=1.0, lamtha=3.0)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
                            t0=0.0, tstop=4.0)
