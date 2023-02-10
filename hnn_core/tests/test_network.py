@@ -672,7 +672,7 @@ def test_tonic_biases():
     params = read_params(params_fname)
 
     net = Network(params)
-    # add arbitrary local network connection to avoid simulation warning
+    # add arbitrary local network connectivity to avoid simulation warning
     net.add_connection(src_gids='L2_pyramidal',
                        target_gids='L2_basket',
                        loc='soma', receptor='ampa', weight=1e-3,
