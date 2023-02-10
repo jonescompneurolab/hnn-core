@@ -376,7 +376,7 @@ def test_network_drives():
 def test_network_connectivity():
     """Test manipulation of local network connectivity."""
     params = read_params(params_fname)
-    net = Network(params, legacy_mode=True)
+    net = Network(params, legacy_mode=False)
 
     # add some basic local network connectivity
     # layer2 Pyr -> layer2 Pyr
@@ -547,17 +547,20 @@ def test_network_connectivity():
                 assert np.any(np.in1d([item], net.connectivity[conn_idx][arg]))
 
     # Test searching a list of src or target types
-    cell_type_list = ['L2_basket', 'L5_basket']
+    src_cell_type_list = ['L2_basket', 'L5_basket']
     true_gid_set = set(list(net.gid_ranges['L2_basket']) + list(
         net.gid_ranges['L5_basket']))
-    indices = pick_connection(net, src_gids=cell_type_list)
+    indices = pick_connection(net, src_gids=src_cell_type_list)
     pick_gid_list = list()
     for conn_idx in indices:
         pick_gid_list.extend(
             net.connectivity[conn_idx]['src_gids'])
     assert true_gid_set == set(pick_gid_list)
 
-    indices = pick_connection(net, target_gids=['L2_basket', 'L5_basket'])
+    target_cell_type_list = ['L2_pyramidal', 'L5_pyramidal']
+    true_gid_set = set(list(net.gid_ranges['L2_pyramidal']) + list(
+        net.gid_ranges['L5_pyramidal']))
+    indices = pick_connection(net, target_gids=target_cell_type_list)
     pick_gid_list = list()
     for conn_idx in indices:
         pick_gid_list.extend(
@@ -621,7 +624,7 @@ def test_network_connectivity():
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
-    assert len(net.connectivity) == 8  # 2 drives x 4 target cell types
+    assert len(net.connectivity) == 4  # 2 drives x 4 target cell types
     net.clear_drives()
     assert len(net.connectivity) == 0
 
