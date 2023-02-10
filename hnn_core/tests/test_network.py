@@ -128,8 +128,8 @@ def test_network_cell_positions():
                     net.pos_dict['origin'][idx])
 
 
-def test_network():
-    """Test network object."""
+def test_network_drives():
+    """Test manipulation of drives in the network object."""
     with pytest.raises(TypeError, match='params must be an instance of dict'):
         Network('hello')
     params = read_params(params_fname)
@@ -147,6 +147,7 @@ def test_network():
     # cells get instantiated for each case
     n_drive_cells_list = list()
 
+    '''
     weights_ampa_d1 = {'L2_basket': 0.006562,
                        'L2_pyramidal': 7e-6,
                        'L5_pyramidal': 0.142300}
@@ -169,7 +170,12 @@ def test_network():
         weights_ampa=weights_ampa_d1,
         weights_nmda=weights_nmda_d1,
         synaptic_delays=synaptic_delays_d1,
-        seedcore=4)
+        event_seed=4)
+    '''
+
+    add_erp_drives_to_jones_model(net)
+    n_drive_cells = 'n_cells'
+    n_drive_cells_list.append(n_drive_cells)
 
     weights_ampa_d2 = {'L2_basket': 0.006562,
                        'L2_pyramidal': 7e-6,
@@ -200,7 +206,7 @@ def test_network():
         weights_ampa=weights_ampa_d2,
         weights_nmda=weights_nmda_d2,
         synaptic_delays=synaptic_delays_d2,
-        seedcore=4)
+        event_seed=4)
 
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
@@ -366,26 +372,33 @@ def test_network():
     nc = network_builder.ncs['evdist1_L2Basket_nmda'][0]
     assert nc.threshold == params['threshold']
 
-    # Test inputs for connectivity API
-    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
-    # instantiate drive events for NetworkBuilder
+
+def test_network_connectivity():
+    """Test manipulation of local network connectivity."""
+    params = read_params(params_fname)
+    net = jones_2009_model(params, add_drives_from_params=True)
+
+    # instantiate drive events and artificial cells for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
+    network_builder = NetworkBuilder(net)
+
+    # get initial number of connections targeting a single section
     n_conn_prox = len(network_builder.ncs['L2Pyr_L2Pyr_ampa'])
+    n_conn_trunk = len(network_builder.ncs['L2Pyr_L2Pyr_nmda'])
+
+    # add connections targeting single section and rebuild
     kwargs_default = dict(src_gids=[35, 36], target_gids=[35, 36],
                           loc='proximal', receptor='ampa',
                           weight=5e-4, delay=1.0, lamtha=1e9,
                           probability=1.0)
     net.add_connection(**kwargs_default)  # smoke test
-
-    # Test adding connection targeting single section
     kwargs_trunk = kwargs_default.copy()
     kwargs_trunk['loc'] = 'apical_trunk'
     kwargs_trunk['receptor'] = 'nmda'
-    n_conn_trunk = len(network_builder.ncs['L2Pyr_L2Pyr_nmda'])
     net.add_connection(**kwargs_trunk)
-
     network_builder = NetworkBuilder(net)
+
     # Check proximal targeted connection count increased by right number
     # (2*2 connections between cells, 3 sections in proximal target)
     assert len(network_builder.ncs['L2Pyr_L2Pyr_ampa']) == n_conn_prox + 4 * 3
@@ -628,8 +641,9 @@ def test_tonic_biases():
     params = read_params(params_fname)
 
     net = Network(params)
-    net.add_connection(source_cell='L2_pyramidal',
-                       target_cell='L2_basket',
+    # add arbitrary local network connection to avoid simulation warning
+    net.add_connection(src_gids='L2_pyramidal',
+                       target_gids='L2_basket',
                        loc='soma', receptor='ampa', weight=1e-3,
                        delay=1.0, lamtha=3.0)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
