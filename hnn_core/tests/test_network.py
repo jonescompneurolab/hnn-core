@@ -376,11 +376,39 @@ def test_network_drives():
 def test_network_connectivity():
     """Test manipulation of local network connectivity."""
     params = read_params(params_fname)
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = Network(params, legacy_mode=True)
+
+    # add some basic local network connectivity
+    # layer2 Pyr -> layer2 Pyr
+    # layer5 Pyr -> layer5 Pyr
+    for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
+        for receptor in ['nmda', 'ampa']:
+            net.add_connection(
+                target_cell, target_cell, loc='proximal', receptor=receptor,
+                weight=5e-4, delay=net.delay, lamtha=3.0, allow_autapses=False)
+    # layer2 Basket -> layer2 Pyr
+    # layer5 Basket -> layer5 Pyr
+    for receptor in ['gabaa', 'gabab']:
+        net.add_connection(
+            src_gids='L2_basket', target_gids='L2_pyramidal', loc='soma',
+            receptor=receptor, weight=5e-4, delay=net.delay, lamtha=50.0)
+        net.add_connection(
+            src_gids='L5_basket', target_gids='L2_pyramidal', loc='soma',
+            receptor=receptor, weight=5e-4, delay=net.delay, lamtha=70.0)
+
+    # add arbitrary drives that contribute artificial cells to network
+    net.add_evoked_drive(name='evdist1', mu=5.0, sigma=1.0,
+                         numspikes=1, location='distal',
+                         weights_ampa={'L2_basket': 0.1,
+                                       'L2_pyramidal': 0.1})
+    net.add_evoked_drive(name='evprox1', mu=5.0, sigma=1.0,
+                         numspikes=1, location='proximal',
+                         weights_ampa={'L2_basket': 0.1,
+                                       'L2_pyramidal': 0.1})
 
     # instantiate drive events and artificial cells for NetworkBuilder
-    net._instantiate_drives(tstop=params['tstop'],
-                            n_trials=params['N_trials'])
+    net._instantiate_drives(tstop=10.0,
+                            n_trials=1)
     network_builder = NetworkBuilder(net)
 
     # get initial number of connections targeting a single section
@@ -593,7 +621,7 @@ def test_network_connectivity():
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
-    assert len(net.connectivity) == 50
+    assert len(net.connectivity) == 8  # 2 drives x 4 target cell types
     net.clear_drives()
     assert len(net.connectivity) == 0
 
