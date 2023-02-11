@@ -1,6 +1,5 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from copy import deepcopy
 from hnn_core.dipole import simulate_dipole
 import os.path as op
 import numpy as np
