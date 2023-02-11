@@ -68,7 +68,7 @@ def test_external_drive_times():
     events_per_cycle = 3
     cycle_events_isi = 7
     events_jitter_std = 5.
-    prng, prng2 = _get_prng(seed=0, gid=5, sync_evinput=False)
+    prng, prng2 = _get_prng(seed=0, gid=5)
     event_times = _create_bursty_input(
         t0=t0, t0_stdev=t0_stdev, tstop=tstop,
         f_input=f_input, events_jitter_std=events_jitter_std,
