@@ -197,7 +197,7 @@ def _add_drives_from_params(net):
         drive['event_seed'] += net.gid_ranges[drive_name][0]
 
 
-def _get_prng(seed, gid, sync_evinput=False):
+def _get_prng(seed, gid):
     """Random generator for this instance.
 
     Parameters
@@ -212,24 +212,12 @@ def _get_prng(seed, gid, sync_evinput=False):
     Returns
     -------
     prng : instance of RandomState
-        The seed for events assuming a given start time.
+        The seed for events assuming a given start time; dependent on gid.
     prng2 : instance of RandomState
         The seed for generating randomized start times.
         Used in _create_bursty_input
     """
-    # XXX: some param files use seed < 0 but numpy
-    # does not allow this.
-    if seed >= 0:
-        # only used for randomisation of t0 of bursty drives
-        prng2 = np.random.RandomState(seed)
-    else:
-        prng2 = None
-
-    if not sync_evinput:
-        seed = seed + gid
-
-    prng = np.random.RandomState(seed)
-    return prng, prng2
+    return np.random.RandomState(seed + gid), np.random.RandomState(seed)
 
 
 def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
