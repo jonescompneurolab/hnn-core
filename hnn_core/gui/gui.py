@@ -1082,7 +1082,7 @@ def add_drive_accordian(drives_out, drive_boxes, drive_widgets,
                         expand_last_drive=False):
     drives_out.clear_output()
     with drives_out:
-        logger.info(f"create drive Accordion")
+        logger.info("create drive Accordion")
         accordion = Accordion(
             children=drive_boxes,
             selected_index=len(drive_boxes) -

@@ -97,8 +97,11 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
     net_copied = copy.deepcopy(single_simulation['net'])
 
     for dpl in dpls_copied:
-        dpl.smooth(plot_config['dipole_smooth']).scale(
-            plot_config['dipole_scaling'])
+        if plot_config['dipole_smooth'] > 0:
+            dpl.smooth(plot_config['dipole_smooth']).scale(
+                plot_config['dipole_scaling'])
+        else:
+            dpl.scale(plot_config['dipole_scaling'])
 
     if net_copied is None:
         print("No network data")
@@ -124,7 +127,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             max_f = plot_config['max_spectral_frequency']
             step_f = 1.0
             freqs = np.arange(min_f, max_f, step_f)
-            n_cycles = freqs / 8.
+            n_cycles = 7 # freqs / 8.
             dpls_copied[0].plot_tfr_morlet(
                 freqs,
                 n_cycles=n_cycles,
