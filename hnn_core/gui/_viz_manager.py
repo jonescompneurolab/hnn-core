@@ -131,7 +131,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             max_f = plot_config['max_spectral_frequency']
             step_f = 1.0
             freqs = np.arange(min_f, max_f, step_f)
-            n_cycles = 7  # freqs / 8.
+            n_cycles = freqs / 8.
             dpls_copied[0].plot_tfr_morlet(
                 freqs,
                 n_cycles=n_cycles,
