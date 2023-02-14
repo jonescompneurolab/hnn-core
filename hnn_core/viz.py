@@ -370,9 +370,9 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     # Extract desired trials
     if len(cell_response._spike_times[0]) > 0:
         spike_times = np.concatenate(
-            np.array(cell_response._spike_times)[trial_idx])
+            np.array(cell_response._spike_times, dtype=object)[trial_idx])
         spike_types_data = np.concatenate(
-            np.array(cell_response._spike_types)[trial_idx])
+            np.array(cell_response._spike_types, dtype=object)[trial_idx])
     else:
         spike_times = np.array([])
         spike_types_data = np.array([])
@@ -474,11 +474,11 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     # Extract desired trials
     if len(cell_response._spike_times[0]) > 0:
         spike_times = np.concatenate(
-            np.array(cell_response._spike_times)[trial_idx])
+            np.array(cell_response._spike_times, dtype=object)[trial_idx])
         spike_types = np.concatenate(
-            np.array(cell_response._spike_types)[trial_idx])
+            np.array(cell_response._spike_types, dtype=object)[trial_idx])
         spike_gids = np.concatenate(
-            np.array(cell_response._spike_gids)[trial_idx])
+            np.array(cell_response._spike_gids, dtype=object)[trial_idx])
     else:
         spike_times = np.array([])
         spike_types = np.array([])
