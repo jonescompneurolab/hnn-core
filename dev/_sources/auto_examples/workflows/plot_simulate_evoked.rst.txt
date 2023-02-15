@@ -270,10 +270,6 @@ Plot the amplitudes of the simulated aggregate dipole moments over time
 
  .. code-block:: none
 
-    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/viz.py:373: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
-      np.array(cell_response._spike_times)[trial_idx])
-    /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/viz.py:375: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
-      np.array(cell_response._spike_types)[trial_idx])
 
     <Figure size 600x600 with 2 Axes>
 
@@ -413,7 +409,7 @@ object, this time we make a copy of it before smoothing and scaling.
  .. code-block:: none
 
     Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/mod/x86_64/.libs/libnrnmech.so
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/mod/x86_64/libnrnmech.so
     Building the NEURON model
     [Done]
     Trial 1: 0.03 ms...
@@ -457,7 +453,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  5.344 seconds)
+   **Total running time of the script:** ( 2 minutes  0.090 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

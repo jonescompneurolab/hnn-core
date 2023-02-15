@@ -233,9 +233,9 @@ tasks.
    :hidden:
    :includehidden:
 
+
    /auto_examples/workflows/index.rst
    /auto_examples/howto/index.rst
-
 
 .. only:: html
 
