@@ -336,9 +336,14 @@ def test_network_drives():
     # Check that all external drives are initialized with the expected amount
     # of artificial cells assuming legacy_mode=False (i.e., dependent on
     # drive targets).
-    prox_targets = net._n_cells
-    dist_targets = net._N_pyr_x * net._N_pyr_x * 2 + 35  # 35 L2/3 basket cells
-    n_evoked_sources = dist_targets + (2 * prox_targets)  # 1 dist, 2 prox
+    prox_targets = (len(net.gid_ranges['L2_basket']) +
+                    len(net.gid_ranges['L2_pyramidal']) +
+                    len(net.gid_ranges['L5_basket']) +
+                    len(net.gid_ranges['L5_pyramidal']))
+    dist_targets = (len(net.gid_ranges['L2_basket']) +
+                    len(net.gid_ranges['L2_pyramidal']) +
+                    len(net.gid_ranges['L5_pyramidal']))
+    n_evoked_sources = dist_targets + (2 * prox_targets)
     n_pois_sources = dist_targets
     n_bursty_sources = net.external_drives['bursty1']['n_drive_cells']
     # test that expected number of external driving events are created
@@ -636,7 +641,7 @@ def test_network_connectivity():
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
-    assert len(net.connectivity) == 4  # 2 drives x 4 target cell types
+    assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
     net.clear_drives()
     assert len(net.connectivity) == 0
 
