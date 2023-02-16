@@ -98,10 +98,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     for dpl in dpls_copied:
         if plot_config['dipole_smooth'] > 0:
-            dpl.smooth(plot_config['dipole_smooth']).scale(
-                plot_config['dipole_scaling'])
-        else:
-            dpl.scale(plot_config['dipole_scaling'])
+            dpl.smooth(plot_config['dipole_smooth'])
+        dpl.scale(plot_config['dipole_scaling'])
 
     if net_copied is None:
         print("No network data")
