@@ -202,7 +202,9 @@ intersphinx_timeout = 5
 
 linkcheck_ignore = [
    'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
-   'https://neuron.yale.edu/neuron'
+   'https://neuron.yale.edu/neuron',
+   'https://doi.org/10.1152/jn.00535.2009',
+   'https://doi.org/10.1152/jn.00122.2010',
 ]
 
 # Resolve binder filepath_prefix. From the docs:
