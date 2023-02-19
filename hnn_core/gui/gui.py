@@ -15,7 +15,7 @@ from pathlib import Path
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatLogSlider, FloatText, HBox, IntText, Layout,
+                        FloatSlider, FloatText, HBox, IntText, Layout,
                         Output, RadioButtons, Tab, Text, VBox, link)
 from ipywidgets.embed import embed_minimal_html
 
@@ -674,7 +674,7 @@ def _get_connectivity_widgets(conn_data):
                                  description="weight",
                                  style=style)
 
-        w_slider = FloatLogSlider(value=conn_data[receptor_name]['weight'],
+        w_slider = FloatSlider(value=conn_data[receptor_name]['weight'],
                                   min=-5, max=1, step=0.2,
                                   description=" ",
                                   disabled=False,
