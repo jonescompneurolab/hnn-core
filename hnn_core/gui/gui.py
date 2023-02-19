@@ -675,14 +675,14 @@ def _get_connectivity_widgets(conn_data):
                                  style=style)
 
         w_slider = FloatSlider(value=conn_data[receptor_name]['weight'],
-                                  min=-5, max=1, step=0.2,
-                                  description=" ",
-                                  disabled=False,
-                                  continuous_update=False,
-                                  orientation='horizontal',
-                                  readout=False,
-                                  readout_format='.2e',
-                                  style=style)
+                               min=-1, max=1, step=0.01,
+                               description=" ",
+                               disabled=False,
+                               continuous_update=False,
+                               orientation='horizontal',
+                               readout=False,
+                               readout_format='.2e',
+                               style=style)
 
         link((w_slider, 'value'), (w_text_input, 'value'))
         conn_widget = VBox([
