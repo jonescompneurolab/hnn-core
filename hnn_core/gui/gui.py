@@ -1244,7 +1244,12 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         if drive['type'] == 'Poisson':
             rate_constant = {
                 k: v.value
-                for k, v in drive['rate_constant'].items() if v.value >= 0
+                for k, v in drive['rate_constant'].items() if v.value > 0
+            }
+            # filter to match the key
+            synaptic_delays = {
+                k: synaptic_delays[k]
+                for k in rate_constant.keys()
             }
             weights_ampa = {
                 k: v
