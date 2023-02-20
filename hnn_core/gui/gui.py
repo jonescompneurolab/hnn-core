@@ -15,7 +15,7 @@ from pathlib import Path
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatLogSlider, FloatText, HBox, IntText, Layout,
+                        FloatSlider, FloatText, HBox, IntText, Layout,
                         Output, RadioButtons, Tab, Text, VBox, link)
 from ipywidgets.embed import embed_minimal_html
 
@@ -684,7 +684,7 @@ def _get_connectivity_widgets(conn_data):
                                  description="weight",
                                  style=style)
 
-        w_slider = FloatLogSlider(value=conn_data[receptor_name]['weight'],
+        w_slider = FloatSlider(value=conn_data[receptor_name]['weight'],
                                   min=-5, max=1, step=0.2,
                                   description=" ",
                                   disabled=False,
@@ -764,9 +764,9 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
         'weights_nmda': weights_nmda,
         'delays': delays
     }
-    widgets_list = ([HTML(value="<b>AMPA weights</b>")] +
+    widgets_list = ([HTML(value="<b>AMPA weights (µS)</b>")] +
                     list(weights_ampa.values()) +
-                    [HTML(value="<b>NMDA weights</b>")] +
+                    [HTML(value="<b>NMDA weights (µS)</b>")] +
                     list(weights_nmda.values()) +
                     [HTML(value="<b>Synaptic delays</b>")] +
                     list(delays.values()))
@@ -892,7 +892,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         },
     )
     widgets_dict.update({'rate_constant': rate_constant})
-    widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
+    widgets_list.extend([HTML(value="<b>Rate constants (Hz)</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
     drive_box = VBox([tstart, tstop, seedcore] + widgets_list)
@@ -1238,11 +1238,13 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         }
         synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
         print(
-            f"drive type is {drive['type']}, location={drive['location']}")
+            f"drive type is {drive['type']}, location={drive['location']} "
+            f"synaptic_delays={synaptic_delays}"
+            )
         if drive['type'] == 'Poisson':
             rate_constant = {
                 k: v.value
-                for k, v in drive['rate_constant'].items() if v.value > 0
+                for k, v in drive['rate_constant'].items() if v.value >= 0
             }
             weights_ampa = {
                 k: v
