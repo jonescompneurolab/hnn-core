@@ -1189,7 +1189,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 single_simulation_data['net'].connectivity[conn_idx][
                     'nc_dict']['A_weight'] = vbox.children[1].value
                 single_simulation_data['net'].connectivity[conn_idx][
-                    'probability'] = vbox.children[3].value
+                    'probability'] = vbox.children[2].value
 
     if add_drive is False:
         return
