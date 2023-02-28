@@ -732,7 +732,7 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
             description=f'{cell_type}:', min=0, max=1e6, step=0.01, **kwargs)
         delays[f'{cell_type}'] = BoundedFloatText(
             value=default_data['delays'][cell_type],
-            description=f'{cell_type}:', min=0, max=1e6, step=0.01, **kwargs)
+            description=f'{cell_type}:', min=0, max=1e6, step=0.1, **kwargs)
 
     widgets_dict = {
         'weights_ampa': weights_ampa,
