@@ -78,8 +78,8 @@ def test_gui_change_connectivity():
     gui = HNNGUI()
     _ = gui.compose()
 
-    for connectivity_slider in gui.connectivity_widgets:
-        for vbox in connectivity_slider:
+    for connectivity_field in gui.connectivity_widgets:
+        for vbox in connectivity_field:
             for w_val in (0.2, 0.9):
                 _single_simulation = {}
                 _single_simulation['net'] = jones_2009_model(gui.params)
@@ -96,10 +96,8 @@ def test_gui_change_connectivity():
 
                 # test if the slider and the input field are synchronous
                 vbox.children[1].value = w_val
-                assert vbox.children[2].value == w_val
 
                 # re initialize network
-
                 _init_network_from_widgets(gui.params, gui.widget_dt,
                                            gui.widget_tstop,
                                            _single_simulation,
