@@ -671,8 +671,7 @@ def _get_connectivity_widgets(conn_data):
     for receptor_name in conn_data.keys():
         w_text_input = FloatText(value=conn_data[receptor_name]['weight'],
                                  disabled=False, continuous_update=False,
-                                 description="weight",
-                                 style=style)
+                                 step=0.01, description="weight", style=style)
 
         conn_widget = VBox([
             HTML(value=f"""<p>
