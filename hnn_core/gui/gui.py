@@ -16,7 +16,7 @@ from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
                         FloatText, HBox, IntText, Layout, Output, RadioButtons,
-                        Tab, Text, VBox, link)
+                        Tab, Text, VBox)
 from ipywidgets.embed import embed_minimal_html
 
 import hnn_core
