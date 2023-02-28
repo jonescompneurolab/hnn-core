@@ -14,9 +14,8 @@ from pathlib import Path
 
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
-                        BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatText, HBox, IntText, Layout, Output, RadioButtons,
-                        Tab, Text, VBox)
+                        BoundedIntText, Button, Dropdown, FileUpload, VBox,
+                        HBox, IntText, Layout, Output, RadioButtons, Tab, Text)
 from ipywidgets.embed import embed_minimal_html
 
 import hnn_core
@@ -206,10 +205,11 @@ class HNNGUI:
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
         # Simulation parameters
-        self.widget_tstop = FloatText(value=170, description='tstop (ms):',
-                                      disabled=False)
-        self.widget_dt = FloatText(value=0.025, description='dt (ms):',
-                                   disabled=False)
+        self.widget_tstop = BoundedFloatText(
+            value=170, description='tstop (ms):', min=0, max=1e6,
+            disabled=False)
+        self.widget_dt = BoundedFloatText(
+            value=0.025, description='dt (ms):', min=0, max=10, disabled=False)
         self.widget_ntrials = IntText(value=1, description='Trials:',
                                       disabled=False)
         self.widget_simulation_name = Text(value='default',
@@ -669,9 +669,10 @@ def _get_connectivity_widgets(conn_data):
     style = {}
     sliders = list()
     for receptor_name in conn_data.keys():
-        w_text_input = FloatText(value=conn_data[receptor_name]['weight'],
-                                 disabled=False, continuous_update=False,
-                                 step=0.01, description="weight", style=style)
+        w_text_input = BoundedFloatText(
+            value=conn_data[receptor_name]['weight'], disabled=False,
+            continuous_update=False, min=0, max=1e6, step=0.01,
+            description="weight", style=style)
 
         conn_widget = VBox([
             HTML(value=f"""<p>
@@ -723,18 +724,15 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
 
     weights_ampa, weights_nmda, delays = dict(), dict(), dict()
     for cell_type in cell_types:
-        weights_ampa[f'{cell_type}'] = FloatText(
+        weights_ampa[f'{cell_type}'] = BoundedFloatText(
             value=default_data['weights_ampa'][cell_type],
-            description=f'{cell_type}:',
-            **kwargs)
-        weights_nmda[f'{cell_type}'] = FloatText(
+            description=f'{cell_type}:', min=0, max=1e6, step=0.01, **kwargs)
+        weights_nmda[f'{cell_type}'] = BoundedFloatText(
             value=default_data['weights_nmda'][cell_type],
-            description=f'{cell_type}:',
-            **kwargs)
-        delays[f'{cell_type}'] = FloatText(
+            description=f'{cell_type}:', min=0, max=1e6, step=0.01, **kwargs)
+        delays[f'{cell_type}'] = BoundedFloatText(
             value=default_data['delays'][cell_type],
-            description=f'{cell_type}:',
-            **kwargs)
+            description=f'{cell_type}:', min=0, max=1e6, step=0.01, **kwargs)
 
     widgets_dict = {
         'weights_ampa': weights_ampa,
@@ -765,27 +763,27 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     if isinstance(data, dict):
         default_data.update(data)
     kwargs = dict(layout=layout, style=style)
-    tstart = FloatText(value=default_data['tstart'],
-                       description='Start time (ms)',
-                       **kwargs)
-    tstart_std = FloatText(value=default_data['tstart_std'],
-                           description='Start time dev (ms)',
-                           **kwargs)
+    tstart = BoundedFloatText(
+        value=default_data['tstart'], description='Start time (ms)',
+        min=0, max=1e6, **kwargs)
+    tstart_std = BoundedFloatText(
+        value=default_data['tstart_std'], description='Start time dev (ms)',
+        min=0, max=1e6, **kwargs)
     tstop = BoundedFloatText(
         value=default_data['tstop'],
         description='Stop time (ms)',
         max=tstop_widget.value,
         **kwargs,
     )
-    burst_rate = FloatText(value=default_data['burst_rate'],
-                           description='Burst rate (Hz)',
-                           **kwargs)
-    burst_std = FloatText(value=default_data['burst_std'],
-                          description='Burst std dev (Hz)',
-                          **kwargs)
-    repeats = FloatText(value=default_data['repeats'],
-                        description='Repeats',
-                        **kwargs)
+    burst_rate = BoundedFloatText(
+        value=default_data['burst_rate'], description='Burst rate (Hz)',
+        min=0, max=1e6, **kwargs)
+    burst_std = BoundedFloatText(
+        value=default_data['burst_std'], description='Burst std dev (Hz)',
+        min=0, max=1e6, **kwargs)
+    repeats = BoundedFloatText(
+        value=default_data['repeats'], description='Repeats', min=0, max=1e6,
+        **kwargs)
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        **kwargs)
@@ -833,10 +831,9 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
     }
     if isinstance(data, dict):
         default_data.update(data)
-    tstart = FloatText(value=default_data['tstart'],
-                       description='Start time (ms)',
-                       layout=layout,
-                       style=style)
+    tstart = BoundedFloatText(
+        value=default_data['tstart'], description='Start time (ms)',
+        min=0, max=1e6, layout=layout, style=style)
     tstop = BoundedFloatText(
         value=default_data['tstop'],
         max=tstop_widget.value,
@@ -852,11 +849,10 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
     rate_constant = dict()
     for cell_type in cell_types:
-        rate_constant[f'{cell_type}'] = FloatText(
+        rate_constant[f'{cell_type}'] = BoundedFloatText(
             value=default_data['rate_constant'][cell_type],
-            description=f'{cell_type}:',
-            layout=layout,
-            style=style)
+            description=f'{cell_type}:', min=0, max=1e6, step=0.01,
+            layout=layout, style=style)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
         layout,
@@ -898,12 +894,12 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     if isinstance(data, dict):
         default_data.update(data)
     kwargs = dict(layout=layout, style=style)
-    mu = FloatText(value=default_data['mu'],
-                   description='Mean time:',
-                   **kwargs)
-    sigma = FloatText(value=default_data['sigma'],
-                      description='Std dev time:',
-                      **kwargs)
+    mu = BoundedFloatText(
+        value=default_data['mu'], description='Mean time:', min=0, max=1e6,
+        **kwargs)
+    sigma = BoundedFloatText(
+        value=default_data['sigma'], description='Std dev time:', min=0,
+        max=1e6, **kwargs)
     numspikes = IntText(value=default_data['numspikes'],
                         description='No. Spikes:',
                         **kwargs)
