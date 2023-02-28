@@ -117,7 +117,7 @@ class HNNGUI:
         A list of network drive widgets added by add_drive_button.
     drive_boxes : list
         A list of network drive layouts.
-    connectivity_sliders : list
+    connectivity_textfields : list
         A list of boxes that control the weight and probability of connections
         in the network.
     """
@@ -1013,7 +1013,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 
 
 def add_connectivity_tab(params, connectivity_out,
-                         connectivity_sliders):
+                         connectivity_textfields):
     """Add all possible connectivity boxes to connectivity tab."""
     net = jones_2009_model(params)
     cell_types = [ct for ct in net.cell_types.keys()]
@@ -1022,8 +1022,8 @@ def add_connectivity_tab(params, connectivity_out,
 
     # clear existing connectivity
     connectivity_out.clear_output()
-    while len(connectivity_sliders) > 0:
-        connectivity_sliders.pop()
+    while len(connectivity_textfields) > 0:
+        connectivity_textfields.pop()
 
     connectivity_names = list()
     for src_gids in cell_types:
@@ -1057,10 +1057,10 @@ def add_connectivity_tab(params, connectivity_out,
                 if len(receptor_related_conn) > 0:
                     connectivity_names.append(
                         f"{src_gids}→{target_gids} ({location})")
-                    connectivity_sliders.append(
+                    connectivity_textfields.append(
                         _get_connectivity_widgets(receptor_related_conn))
 
-    connectivity_boxes = [VBox(slider) for slider in connectivity_sliders]
+    connectivity_boxes = [VBox(slider) for slider in connectivity_textfields]
     cell_connectivity = Accordion(children=connectivity_boxes)
     for idx, connectivity_name in enumerate(connectivity_names):
         cell_connectivity.set_title(idx, connectivity_name)
@@ -1110,12 +1110,12 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
 
 def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_sliders, tstop, layout):
+                                connectivity_textfields, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
     log_out.clear_output()
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_sliders)
+        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
         # Add drives
         add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
@@ -1123,7 +1123,7 @@ def load_drive_and_connectivity(params, log_out, drives_out,
 
 def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
                      drive_widgets, drives_out, connectivity_out,
-                     connectivity_sliders, layout, load_type):
+                     connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
@@ -1150,7 +1150,7 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
         params.update(params_network)
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out, connectivity_sliders)
+        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
         add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
@@ -1162,7 +1162,7 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
 
 
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
-                               drive_widgets, connectivity_sliders,
+                               drive_widgets, connectivity_textfields,
                                add_drive=True):
     """Construct network and add drives."""
     print("init network")
@@ -1173,7 +1173,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         add_drives_from_params=False,
     )
     # adjust connectivity according to the connectivity_tab
-    for connectivity_slider in connectivity_sliders:
+    for connectivity_slider in connectivity_textfields:
         for vbox in connectivity_slider:
             conn_indices = pick_connection(
                 net=single_simulation_data['net'],
@@ -1259,7 +1259,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        all_data, dt, tstop, ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
-                       simulation_status_contents, connectivity_sliders,
+                       simulation_status_contents, connectivity_textfields,
                        viz_manager):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
@@ -1280,7 +1280,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 
         _init_network_from_widgets(params, dt, tstop,
                                    simulation_data[_sim_name], drive_widgets,
-                                   connectivity_sliders)
+                                   connectivity_textfields)
 
         print("start simulation")
         if backend_selection.value == "MPI":
