@@ -15,8 +15,8 @@ from pathlib import Path
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatSlider, FloatText, HBox, IntText, Layout,
-                        Output, RadioButtons, Tab, Text, VBox, link)
+                        FloatText, HBox, IntText, Layout, Output, RadioButtons,
+                        Tab, Text, VBox, link)
 from ipywidgets.embed import embed_minimal_html
 
 import hnn_core
@@ -674,22 +674,10 @@ def _get_connectivity_widgets(conn_data):
                                  description="weight",
                                  style=style)
 
-        w_slider = FloatSlider(value=conn_data[receptor_name]['weight'],
-                               min=-1, max=1, step=0.01,
-                               description=" ",
-                               disabled=False,
-                               continuous_update=False,
-                               orientation='horizontal',
-                               readout=False,
-                               readout_format='.2e',
-                               style=style)
-
-        link((w_slider, 'value'), (w_text_input, 'value'))
         conn_widget = VBox([
             HTML(value=f"""<p>
             Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
-            w_text_input, w_slider,
-            HTML(value="<hr style='margin-bottom:5px'/>")
+            w_text_input, HTML(value="<hr style='margin-bottom:5px'/>")
         ])
 
         conn_widget._belongsto = {
