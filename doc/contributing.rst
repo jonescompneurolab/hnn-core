@@ -1,7 +1,8 @@
 Contributions
 -------------
 
-Please read the contribution guide until the end before beginning contributions.
+Please read the contribution guide **until the end** before beginning
+contributions.
 
 Contributions are welcome in the form of pull requests.
 
@@ -151,11 +152,10 @@ Updating documentation
 When you update the documentation, it is recommended to build it locally to
 check whether the documentation renders correctly in HTML.
 
-Certain documentation files require frequent updates. These are::
+Certain documentation files require frequent updates. These are:
 
-    * ``doc/api.rst`` if you added a new function.
-    * ``doc/whats_new.rst`` to document the fix or change so you can be
-      credited on the next release.
+* ``doc/api.rst`` if you added a new function.
+* ``doc/whats_new.rst`` to document the fix or change so you can be credited on the next release.
 
 Please update these documents at the end to avoid rebase conflicts with other
 pull requests.
@@ -225,7 +225,6 @@ into the ``master`` base.
 If you face a lot of difficulting resolving merge conflicts,
 it may be easier to `squash <https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History>`_
 before rebasing.
-
 
 Continuous Integration
 ======================
