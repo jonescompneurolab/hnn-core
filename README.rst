@@ -11,7 +11,7 @@ It is early Work in Progress. Contributors are very welcome.
 
 Dependencies
 ------------
-hnn-core requires Python (>=3.0) and the following packages:
+hnn-core requires Python (>=3.7) and the following packages:
 
 * numpy
 * scipy
