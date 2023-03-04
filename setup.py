@@ -107,6 +107,7 @@ if __name__ == "__main__":
           extras_require={
               'gui': ['ipywidgets <=7.7.1', 'ipympl<0.9', 'voila<=0.3.6']
           },
+          python_requires='>=3.7',
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',
