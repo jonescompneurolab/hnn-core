@@ -152,12 +152,12 @@ Updating documentation
 When you update the documentation, it is recommended to build it locally to
 check whether the documentation renders correctly in HTML.
 
-Certain documentation files require frequent updates. These are:
+Certain documentation files require explicit updates by the contributor of a given change (i.e., you). These are:
 
 * ``doc/api.rst`` if you added a new function.
 * ``doc/whats_new.rst`` to document the fix or change so you can be credited on the next release.
 
-Please update these documents at the end to avoid rebase conflicts with other
+Please update these documents once your pull request is ready to merge to avoid rebase conflicts with other
 pull requests.
 
 Building the documentation
