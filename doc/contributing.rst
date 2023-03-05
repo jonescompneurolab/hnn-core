@@ -167,7 +167,7 @@ Building the documentation
 The documentation can be built using sphinx. For that, please additionally
 install the following::
 
-    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow joblib psutil nbsphinx
+    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme sphinx-copybutton pillow joblib psutil nbsphinx
 
 You can build the documentation locally using the command::
 
