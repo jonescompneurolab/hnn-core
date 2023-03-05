@@ -27,7 +27,7 @@ jobs:
           sudo apt-get install pandoc
           python -m pip install --upgrade pip
           pip install numpy matplotlib scipy NEURON
-          pip install sphinx-gallery sphinx sphinx_bootstrap_theme numpydoc pillow nbsphinx
+          pip install sphinx-gallery sphinx sphinx_bootstrap_theme sphinx-copybutton numpydoc pillow nbsphinx
           pip install '.[gui]'
       - name: Linkcheck
         shell: bash -el {0}
