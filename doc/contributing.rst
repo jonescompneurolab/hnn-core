@@ -142,9 +142,10 @@ To run the tests simply type into your terminal::
 
     $ make test
 
-MPI tests are skipped if the ``mpi4py`` module is not installed. This allows
-testing features not related to parallelization without installing the extra
-dependencies as described in our :doc:`parallel backend guide <parallel>`.
+MPI tests are skipped if the ``mpi4py`` module is not installed. We highly
+encourage contributors to follow the :doc:`parallel backend guide <parallel>`
+to install ``mpi4py`` so that they can run the entire test suite locally
+on their computer.
 
 Updating documentation
 ======================
