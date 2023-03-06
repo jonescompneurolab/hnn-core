@@ -206,10 +206,11 @@ class HNNGUI:
 
         # Simulation parameters
         self.widget_tstop = BoundedFloatText(
-            value=170, description='tstop (ms):', min=0, max=1e6,
+            value=170, description='tstop (ms):', min=0, max=1e6, step=1,
             disabled=False)
         self.widget_dt = BoundedFloatText(
-            value=0.025, description='dt (ms):', min=0, max=10, disabled=False)
+            value=0.025, description='dt (ms):', min=0, max=10, step=0.01,
+            disabled=False)
         self.widget_ntrials = IntText(value=1, description='Trials:',
                                       disabled=False)
         self.widget_simulation_name = Text(value='default',
