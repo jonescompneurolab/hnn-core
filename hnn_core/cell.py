@@ -241,14 +241,15 @@ class Cell:
         Keys are name of synaptic mechanism. Each synaptic mechanism
         has keys for parameters of the mechanism, e.g., 'e', 'tau1',
         'tau2'.
-    topology : list of list
+    topology : list of list | None
         The topology of cell sections. Each element is a list of
         4 items in the format
         [parent_sec, parent_loc, child_sec, child_loc] where
         parent_sec and parent_loc are float between 0 and 1
         specifying the location in the section to connect and
         parent_sec and child_sec are names of the connecting
-        sections.
+        sections. If None, no topology is specified. This may
+        be necessary for single-compartment cells.
     sect_loc : dict of list
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.

@@ -543,10 +543,71 @@ def plot_cells(net, ax=None, show=True):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
-    colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
-              'L5_basket': 'r', 'L2_basket': 'm'}
-    markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
-               'L5_basket': 'x', 'L2_basket': 'x'}
+    #colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
+              #'L5_basket': 'r', 'L2_basket': 'm'}
+
+   #markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
+            #   'L5_basket': 'x', 'L2_basket': 'x'}
+            
+    all_colors = ['b', 'c', 'r', 'm', 'tab:orange', 'g', 'y', 'k', 'w', 'tab:brown']
+    all_markers= ['^', '^', 'x', 'x', 'o', 'v', 's', 'p', 'h', '<']
+    cell_names = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
+    for cell_name in net.cell_types:
+        if cell_name not in cell_names:
+            cell_names.append(cell_name)
+#     import hnn_core
+# from hnn_core import  jones_2009_model, simulate_dipole
+# import matplotlib as plt
+
+# net = jones_2009_model(add_drives_from_params= True)
+# params = hnn_core.read_params('/home/mohamed/Desktop/PhD Thesis/auditory_evoked_simulation/HNN-AEF-main/HNN_Parameters/L_Contra.param')
+
+# def martinotti(n_cells):
+#     from hnn_core.cell import Section, Cell
+
+#     cell_name = 'martinotti'
+#     pos = [(5, 5, 5)] * n_cells
+#     # pos = net.pos_dict['L5_basket'].copy()
+
+#     end_pts = [[0, 0, 0], [0, 0, 39.]]
+#     soma = Section(L=39., diam=20., cm=0.85,
+#         Ra=200., end_pts=end_pts)
+#     soma.syns = ['gabaa', 'nmda']
+    
+#     synapses = {
+#         'gabaa': {
+#             'e': -80,
+#             'tau1': 0.5,
+#             'tau2': 5.
+#         },
+#         'nmda': {
+#             'e': 0,
+#             'tau1': 1.,
+#             'tau2': 20.
+#         }
+#     }
+#     sect_loc = ['proximal']
+
+#     return Cell(cell_name, pos,
+#             sections=soma,
+#             synapses=synapses,
+#             topology=None,
+#             sect_loc=sect_loc,
+#             gid=0)
+
+# net.plot_cells()
+# net._add_cell_type('L5_martinotti', pos='L5_basket' ,cell_template = None)
+
+# simulate_dipole(net, tstop = 100, record_vsec= 'all')
+
+# net.add_connection(src_gids='L5_martinotti', target_gids='L5_pyramidal', loc='apical_tuft', receptor='gabaa', weight= 0.025 , delay=1.0 ,lamtha=70.0 , allow_autapses= False, probability=1)
+
+    
+    colors= dict()
+    markers= dict()
+    for idx, cell_name in enumerate(cell_names):
+        colors[cell_name] = all_colors[idx]
+        markers[cell_name] = all_markers[idx]
 
     for cell_type in net.cell_types:
         x = [pos[0] for pos in net.pos_dict[cell_type]]

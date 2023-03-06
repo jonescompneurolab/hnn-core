@@ -1074,7 +1074,17 @@ class Network(object):
         }
 
     def _add_cell_type(self, cell_name, pos, cell_template=None):
-        """Add cell type by updating pos_dict and gid_ranges."""
+        """Add cell type by updating pos_dict and gid_ranges.
+    
+        Parameters
+        ----------
+        cell_name : str
+            The name of the cell population.
+        pos : list of tuple (x, y, z)
+            The position of the cells to be added to net.pos_dict.
+        cell_template : None | instance of Cell
+            An instance of            
+        """
         ll = self._n_gids
         self._n_gids += len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
