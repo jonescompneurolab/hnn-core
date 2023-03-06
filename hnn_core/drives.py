@@ -25,7 +25,7 @@ def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
         weights_nmda = dict()
 
     weights_by_type = {cell_type: dict() for cell_type in
-                       (set(weights_ampa.keys()) | set(weights_ampa.keys()))}
+                       (set(weights_ampa.keys()) | set(weights_nmda.keys()))}
     for cell_type in weights_ampa:
         weights_by_type[cell_type].update({'ampa': weights_ampa[cell_type]})
     for cell_type in weights_nmda:
