@@ -43,6 +43,13 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     the net is created using the set_cell_positions-method. An all-to-all
     connectivity pattern is applied between cells. Inhibitory basket cells are
     present at a 1:3-ratio.
+
+    References
+    ----------
+    .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
+        a combined magnetoencephalography and biophysically based
+        computational modeling study."
+        Journal of Neuroscience 27.40 (2007): 10751-10764.
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     if params is None:
@@ -169,7 +176,7 @@ def law_2021_model(params=None, add_drives_from_params=False,
                    legacy_mode=True):
     """Instantiate the expansion of Jones 2009 model to study beta
     modulated ERPs as described in
-    Law et al. Cereb. Cortex 2021 [2]_
+    Law et al. Cereb. Cortex 2021 [1]_
 
     Returns
     -------
@@ -192,6 +199,12 @@ def law_2021_model(params=None, add_drives_from_params=False,
     4) Removal of L5 pyramidal somatic and basal dendrite calcium channels
     5) Replace L2_basket -> L5_pyramidal GABAa connection with GABAb
     6) Addition of L5_basket -> L5_pyramidal distal connection
+
+    References
+    ----------
+    .. [1] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
+       Relationship between Transient Beta Events and Human Tactile
+       Perception." Cerebral Cortex, 32, 668–688 (2022).
     """
 
     net = jones_2009_model(params=params,
@@ -250,7 +263,7 @@ def calcium_model(params=None, add_drives_from_params=False,
                   legacy_mode=True):
     """Instantiate the Jones 2009 model with improved calcium dynamics in
     L5 pyramidal neurons. For more details on changes to calcium dynamics
-    see Kohl et al. Brain Topragr 2022 [3]_
+    see Kohl et al. Brain Topragr 2022 [1]_
 
     Returns
     -------
@@ -269,6 +282,12 @@ def calcium_model(params=None, add_drives_from_params=False,
     Specifically, this model introduces a distance dependent maximum
     conductance (gbar) on calcium channels such that the gbar linearly
     decreases along the dendrites in the direction of the soma.
+
+    References
+    ----------
+    .. [1] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory
+       Evoked Responses Revealed By Human Neocortical Neurosolver."
+       Brain Topography, 35, 19–35 (2022).
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -335,15 +354,6 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=synaptic_delays_prox, event_seed=814)
 
-# References
-# ----------
-# .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
-#        a combined magnetoencephalography and biophysically based
-#        computational modeling study."
-#        Journal of Neuroscience 27.40 (2007): 10751-10764.
-# .. [2] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
-#        Relationship between Transient Beta Events and Human Tactile
-#        Perception." Cerebral Cortex, 32, 668–688 (2022).
-# .. [3] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory
-#        Evoked Responses Revealed By Human Neocortical Neurosolver."
-#        Brain Topography, 35, 19–35 (2022).
+
+
+
