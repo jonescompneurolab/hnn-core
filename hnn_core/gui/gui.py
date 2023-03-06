@@ -781,9 +781,9 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     burst_std = BoundedFloatText(
         value=default_data['burst_std'], description='Burst std dev (Hz)',
         min=0, max=1e6, **kwargs)
-    repeats = BoundedFloatText(
-        value=default_data['repeats'], description='Repeats', min=0, max=1e6,
-        **kwargs)
+    repeats = BoundedIntText(
+        value=default_data['repeats'], description='Repeats', min=0,
+        max=int(1e6), **kwargs)
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        **kwargs)
