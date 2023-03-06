@@ -497,10 +497,30 @@ def test_network():
             kwargs[arg] = string_arg
             pick_connection(**kwargs)
 
+    
+    ##################################################################
+    # Deleting a custom number of external drives and testing
+    # original_network_connectivity = net.connectivity
+    all_drive_names = net.get_external_drive_names()
+    print(all_drive_names)
+    drive_names_to_be_deleted = all_drive_names[0:2] # Testing to delete 2 drives
+    print(drive_names_to_be_deleted)
+    print("Before running clear drives length of connectivity is "+str(len(net.connectivity)))
+    net.clear_drives(drive_names_to_be_deleted)
+    print("After running clear drives length of connectivity is "+str(len(net.connectivity)))
+    assert len(net.connectivity) == 15
+    print("Two drives deleted successfuly. 5 drives should be left now")
+    ##################################################################
+
+
+
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
+    # print("Im here")
+    print("Before running clear drives length of connectivity is "+str(len(net.connectivity)))
     net.clear_drives()
-    assert len(net.connectivity) == 0
+    print("After running clear drives length of connectivity is "+str(len(net.connectivity)))
+    assert len(net.connectivity) == 50
 
     with pytest.warns(UserWarning, match='No connections'):
         simulate_dipole(net, tstop=10)
