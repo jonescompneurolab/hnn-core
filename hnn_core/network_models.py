@@ -13,7 +13,8 @@ from .externals.mne import _validate_type
 
 def jones_2009_model(params=None, add_drives_from_params=False,
                      legacy_mode=True):
-    """Instantiate the Jones et al. 2009 model.
+    """Instantiate the network model described in
+    Jones et al. J. Neuroscience 2007 [1]_
 
     Parameters
     ----------
@@ -166,7 +167,9 @@ def jones_2009_model(params=None, add_drives_from_params=False,
 
 def law_2021_model(params=None, add_drives_from_params=False,
                    legacy_mode=True):
-    """Instantiate the beta modulated ERP network model.
+    """Instantiate the expansion of Jones 2009 model to study beta
+    modulated ERPs as described in
+    Law et al. Cereb. Cortex 2021 [2]_
 
     Returns
     -------
@@ -245,7 +248,9 @@ def law_2021_model(params=None, add_drives_from_params=False,
 # (only relevant for Jones 2009 model)
 def calcium_model(params=None, add_drives_from_params=False,
                   legacy_mode=True):
-    """Instantiate the Jones 2009 model with improved calcium dynamics.
+    """Instantiate the Jones 2009 model with improved calcium dynamics in
+    L5 pyramidal neurons. For more details on changes to calcium dynamics
+    see Kohl et al. Brain Topragr 2022 [3]_
 
     Returns
     -------
@@ -329,3 +334,15 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         'evprox2', mu=137.12 + tstart, sigma=8.33, numspikes=1,
         weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=synaptic_delays_prox, event_seed=814)
+
+# References
+# ----------
+# .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
+#        a combined magnetoencephalography and biophysically based computational
+#        modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
+# .. [2] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
+#        Relationship between Transient Beta Events and Human Tactile Perception."
+#        Cerebral Cortex, 32, 668–688 (2022).
+# .. [3] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory Evoked
+#        Responses Revealed By Human Neocortical Neurosolver."
+#        Brain Topography, 35, 19–35 (2022).
