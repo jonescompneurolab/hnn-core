@@ -352,16 +352,9 @@ def test_network_drives():
     assert network_builder._drive_cells[n_bursty_sources].gid ==\
         net._n_cells + n_bursty_sources
 
-    # Assert that netcons are created properly
+    # check that Network drive connectivity tranfers to NetworkBuilder
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
     n_basket = len(net.gid_ranges['L2_basket'])
-
-    # Check basket-basket connection where allow_autapses=False
-    assert 'L2Pyr_L2Pyr_nmda' in network_builder.ncs
-    n_connections = 3 * (n_pyr ** 2 - n_pyr)  # 3 synapses / cell
-    assert len(network_builder.ncs['L2Pyr_L2Pyr_nmda']) == n_connections
-    nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
-    assert nc.threshold == params['threshold']
 
     # Check bursty drives which use cell_specific=False
     assert 'bursty1_L2Pyr_ampa' in network_builder.ncs
@@ -369,13 +362,6 @@ def test_network_drives():
     n_connections = n_bursty1_sources * 3 * n_pyr  # 3 synapses / cell
     assert len(network_builder.ncs['bursty1_L2Pyr_ampa']) == n_connections
     nc = network_builder.ncs['bursty1_L2Pyr_ampa'][0]
-    assert nc.threshold == params['threshold']
-
-    # Check basket-basket connection where allow_autapses=True
-    assert 'L2Basket_L2Basket_gabaa' in network_builder.ncs
-    n_connections = n_basket ** 2  # 1 synapse / cell
-    assert len(network_builder.ncs['L2Basket_L2Basket_gabaa']) == n_connections
-    nc = network_builder.ncs['L2Basket_L2Basket_gabaa'][0]
     assert nc.threshold == params['threshold']
 
     # Check evoked drives which use cell_specific=True
@@ -551,6 +537,10 @@ def test_network_connectivity():
         net.add_connection(
             src_gids='L5_basket', target_gids='L2_pyramidal', loc='soma',
             receptor=receptor, weight=5e-4, delay=net.delay, lamtha=70.0)
+    # layer2 Basket -> layer2 Basket (autapses allowed)
+    net.add_connection(
+        src_gids='L2_basket', target_gids='L2_basket', loc='soma',
+        receptor='gabaa', weight=5e-4, delay=net.delay, lamtha=20.0)
 
     # add arbitrary drives that contribute artificial cells to network
     net.add_evoked_drive(name='evdist1', mu=5.0, sigma=1.0,
@@ -566,6 +556,24 @@ def test_network_connectivity():
     net._instantiate_drives(tstop=10.0,
                             n_trials=1)
     network_builder = NetworkBuilder(net)
+
+    # start by checking that Network connectivity tranfers to NetworkBuilder
+    n_pyr = len(net.gid_ranges['L2_pyramidal'])
+    n_basket = len(net.gid_ranges['L2_basket'])
+
+    # Check basket-basket connection where allow_autapses=False
+    assert 'L2Pyr_L2Pyr_nmda' in network_builder.ncs
+    n_connections = 3 * (n_pyr ** 2 - n_pyr)  # 3 synapses / cell
+    assert len(network_builder.ncs['L2Pyr_L2Pyr_nmda']) == n_connections
+    nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
+    assert nc.threshold == params['threshold']
+
+    # Check basket-basket connection where allow_autapses=True
+    assert 'L2Basket_L2Basket_gabaa' in network_builder.ncs
+    n_connections = n_basket ** 2  # 1 synapse / cell
+    assert len(network_builder.ncs['L2Basket_L2Basket_gabaa']) == n_connections
+    nc = network_builder.ncs['L2Basket_L2Basket_gabaa'][0]
+    assert nc.threshold == params['threshold']
 
     # get initial number of connections targeting a single section
     n_conn_prox = len(network_builder.ncs['L2Pyr_L2Pyr_ampa'])
