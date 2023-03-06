@@ -241,6 +241,14 @@ def test_add_drives():
             assert num_connections == \
                 np.around(len(net.gid_ranges[cell_type]) *
                           probability[cell_type]).astype(int)
+
+    # Test adding just the NMDA weights (no AMPA)
+    net.add_evoked_drive(
+        'evoked_nmda', mu=1.0, sigma=1.0, numspikes=1,
+        weights_nmda=weights_nmda,
+        location='distal', synaptic_delays=syn_delays, cell_specific=True,
+        probability=probability)
+
     # Round trip test to ensure drives API produces a functioning Network
     simulate_dipole(net, tstop=1)
 
