@@ -210,6 +210,7 @@ linkcheck_ignore = [
    'https://neuron.yale.edu/neuron',
    'https://doi.org/10.1152/jn.00535.2009',
    'https://doi.org/10.1152/jn.00122.2010',
+   'https://groups.google.com/g/hnnsolver'
 ]
 
 # Resolve binder filepath_prefix. From the docs:
