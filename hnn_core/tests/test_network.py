@@ -406,7 +406,7 @@ def test_network_drives_legacy():
         assert len(net.gid_ranges[dn]) == n_drive_cells
 
     # Check drive dict structure for each external drive
-    for drive_idx, drive in enumerate(net.external_drives.values()):
+    for drive in net.external_drives.values():
         # Check that connectivity sources correspond to gid_ranges
         conn_idxs = pick_connection(net, src_gids=drive['name'])
         this_src_gids = set([gid for conn_idx in conn_idxs
