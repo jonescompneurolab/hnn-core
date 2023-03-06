@@ -276,11 +276,14 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     if type(dpl) == list:
         for single_dpl in dpl:
             if not isinstance(single_dpl, Dipole):
-                raise ValueError('Argument 1 should be of type dipole or list of dipoles, '
-                                f'but {single_dpl} is a {type(single_dpl)}')
-    elif not isinstance(dpl, Dipole):
-        raise ValueError('Argument 1 should be of type dipole or list of dipoles, '
-                            f'but {dpl} is a {type(dpl)}')
+                raise ValueError('Argument 1 should be of type '
+                                 'dipole or list of dipoles, '
+                                 f'but {single_dpl} is a {type(single_dpl)}')
+    else:
+        if not isinstance(dpl, Dipole):
+            raise ValueError('Argument 1 should be of '
+                             'type dipole or list of dipoles, '
+                             f'but {dpl} is a {type(dpl)}')
 
     scale_applied = dpl[0].scale_applied
 
