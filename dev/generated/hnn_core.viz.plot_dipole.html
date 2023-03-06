@@ -8,6 +8,7 @@
     <title>hnn_core.viz.plot_dipole &#8212; hnn-core  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
@@ -18,6 +19,8 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -165,7 +168,7 @@
 ‘agg’, ‘L2’, and ‘L5’</p>
 </dd>
 <dt><strong>decim</strong><span class="classifier">int or list of int or None (default)</span></dt><dd><p>Optional (integer) factor by which to decimate the raw dipole traces.
-The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.11.0.dev0+1625.a2e9157)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used, which
+The SciPy function <a class="reference external" href="https://scipy.github.io/devdocs/reference/generated/scipy.signal.decimate.html#scipy.signal.decimate" title="(in SciPy v1.11.0.dev0+1658.ae73552)"><code class="xref py py-func docutils literal notranslate"><span class="pre">decimate()</span></code></a> is used, which
 recommends values &lt;13. To achieve higher decimation factors, a list of
 ints can be provided. These are applied successively.</p>
 </dd>

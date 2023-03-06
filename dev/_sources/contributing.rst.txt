@@ -1,6 +1,9 @@
 Contributions
 -------------
 
+Please read the contribution guide **until the end** before beginning
+contributions.
+
 Contributions are welcome in the form of pull requests.
 
 Once the implementation of a piece of functionality is considered to be bug
@@ -101,36 +104,62 @@ typical contribution process is to
 
 See the `git book <https://git-scm.com/book/en/v2>`_ for a more general guide on using git. 
 
-Running tests
-=============
+Installing editable hnn-core
+============================
 
-To run the tests using ``pytest``, you need to have the git cloned ``hnn-core`` repository with an editable pip install::
+For making changes to hnn-core, you will need to install an editable
+version of hnn-core. For that you need to have the git cloned ``hnn-core``
+repository and use pip with the editable (``-e``) flag::
 
     $ git clone https://github.com/jonescompneurolab/hnn-core
     $ cd hnn-core
-    $ pip install -e .
+    $ pip install -e '.[gui]'
     $ python setup.py build_mod
 
-Then, install the following python packages::
+The last step builds ``mod`` files which specifies the dynamics of specific
+cellular mechanisms. These are converted to C, and hence require a compilation
+step. In the normal course of development, you will not have to edit these
+files. However, if you do have to update them, they will need to be rebuilt
+using the command::
+
+    $ python setup.py build_mod
+
+Running tests
+=============
+
+Once you have the editable hnn-core, you should install the requirements
+for running the tests. Tests help ensure integrity of the package after
+your change has been made. We recommend developers to run tests locally
+on their computers after making changes.
+
+We use the ``pytest`` testing framework.
+
+Install the following python packages::
 
     $ pip install flake8 pytest pytest-cov
-
-If you update a mod file, you will have to rebuild them using the command::
-
-    $ python setup.py build_mod
 
 To run the tests simply type into your terminal::
 
     $ make test
 
-MPI tests are skipped if the ``mpi4py`` module is not installed. This allows
-testing features not related to parallelization without installing the extra
-dependencies as described in our :doc:`parallel backend guide <parallel>`.
+MPI tests are skipped if the ``mpi4py`` module is not installed. We highly
+encourage contributors to follow the :doc:`parallel backend guide <parallel>`
+to install ``mpi4py`` so that they can run the entire test suite locally
+on their computer.
 
 Updating documentation
 ======================
 
-Update ``doc/api.rst`` and ``doc/whats_new.rst`` as appropriate.
+When you update the documentation, it is recommended to build it locally to
+check whether the documentation renders correctly in HTML.
+
+Certain documentation files require explicit updates by the contributor of a given change (i.e., you). These are:
+
+* ``doc/api.rst`` if you added a new function.
+* ``doc/whats_new.rst`` to document the fix or change so you can be credited on the next release.
+
+Please update these documents once your pull request is ready to merge to avoid rebase conflicts with other
+pull requests.
 
 Building the documentation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,12 +167,7 @@ Building the documentation
 The documentation can be built using sphinx. For that, please additionally
 install the following::
 
-    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil nbsphinx
-
-If you are using a newer version of pip, you may be prompted to use the flag
-``--use-feature=2020-resolver``. If this happens, please add it as recommended::
-
-    $ pip install --use-feature=2020-resolver matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme pillow mpi4py joblib psutil nbsphinx
+    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme sphinx-copybutton pillow joblib psutil nbsphinx
 
 You can build the documentation locally using the command::
 
@@ -159,8 +183,13 @@ use the command::
 
     $ make html-noplot
 
+Finally, to view the documentation, do::
+
+    $ make view
+
 How to rebase
 =============
+
 Commits in hnn-core follow a linear history, therefore we use a "rebase" workflow
 instead of "merge" to resolve commits.
 See `this article <https://www.atlassian.com/git/tutorials/merging-vs-rebasing>`_ for more details
@@ -198,7 +227,6 @@ If you face a lot of difficulting resolving merge conflicts,
 it may be easier to `squash <https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History>`_
 before rebasing.
 
-
 Continuous Integration
 ======================
 
@@ -207,8 +235,8 @@ Circle. The automated tests run on GitHub Actions while the documentation is
 built on Circle.
 
 To speed up the documentation-building process on CircleCI, we enabled versioned 
-`caching <https://circleci.com/docs/caching/>`_ to reduce the building time from
-about 30 minutes to ~5 minutes.
+`caching <https://circleci.com/docs/caching/>`_.
+
 Usually, you don't need to worry about it. But in case a complete rebuild is necessary 
 for a new version of the doc, you can modify the content in ``.circleci/build_cache``, as 
 CircleCI uses the MD5 of that file as the key for previously cached content.
