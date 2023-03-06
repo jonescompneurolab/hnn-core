@@ -14,7 +14,7 @@ from .externals.mne import _validate_type
 def jones_2009_model(params=None, add_drives_from_params=False,
                      legacy_mode=True):
     """Instantiate the network model described in
-    Jones et al. J. Neuroscience 2007 [1]_
+    Jones et al. J. of Neurophys. 2009 [1]_
 
     Parameters
     ----------
@@ -46,10 +46,11 @@ def jones_2009_model(params=None, add_drives_from_params=False,
 
     References
     ----------
-    .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
-        a combined magnetoencephalography and biophysically based
-        computational modeling study."
-        Journal of Neuroscience 27.40 (2007): 10751-10764.
+    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and
+           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
+           Rhythmogenesis and Modulation of Sensory-Evoked Responses."
+           Journal of Neurophysiology 102, 3554–3572 (2009).
+
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     if params is None:
@@ -203,8 +204,8 @@ def law_2021_model(params=None, add_drives_from_params=False,
     References
     ----------
     .. [1] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
-       Relationship between Transient Beta Events and Human Tactile
-       Perception." Cerebral Cortex, 32, 668–688 (2022).
+           Relationship between Transient Beta Events and Human Tactile
+           Perception." Cerebral Cortex, 32, 668–688 (2022).
     """
 
     net = jones_2009_model(params=params,
@@ -286,8 +287,8 @@ def calcium_model(params=None, add_drives_from_params=False,
     References
     ----------
     .. [1] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory
-       Evoked Responses Revealed By Human Neocortical Neurosolver."
-       Brain Topography, 35, 19–35 (2022).
+           Evoked Responses Revealed By Human Neocortical Neurosolver."
+           Brain Topography, 35, 19–35 (2022).
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
