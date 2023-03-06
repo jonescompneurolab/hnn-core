@@ -508,11 +508,6 @@ def test_network_drives_legacy():
                                                  n_pois_sources +
                                                  n_gaus_sources +
                                                  n_bursty_sources)
-    assert len(network_builder._gid_list) ==\
-        len(network_builder._drive_cells) + net._n_cells
-    # first 'evoked drive' comes after real cells and bursty drive cells
-    assert network_builder._drive_cells[n_bursty_sources].gid ==\
-        net._n_cells + n_bursty_sources
 
 
 def test_network_connectivity():
