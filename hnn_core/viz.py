@@ -319,8 +319,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     return axes[0].get_figure()
 
 
-def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
-                     show=True):
+def plot_spikes_hist(cell_response, trial_idx=None, tmin=None, tmax=None,
+                     ax=None, spike_types=None, show=True):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
@@ -329,6 +329,10 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         The CellResponse object from net.cell_response
     trial_idx : int | list of int | None
         Index of trials to be plotted. If None, all trials plotted.
+    tmin : float or None
+        Start time of plot in milliseconds. If None, plot entire simulation.
+    tmax : float or None
+        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None,
         a new figure is created.
@@ -377,6 +381,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         spike_times = np.array([])
         spike_types_data = np.array([])
 
+    spike_types_data, spike_times = _get_plot_data_trange(
+        spike_times, spike_types_data, tmin, tmax)
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
                         for s_type in unique_types}
@@ -1141,6 +1147,7 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
     tmin : float | None
         Start time of plot in milliseconds. If None, plot entire simulation.
     tmax : float | None
+        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     colorbar : bool
@@ -1159,10 +1166,15 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
     import matplotlib.pyplot as plt
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
-    times, data = _get_plot_data_trange(times, data, tmin, tmax)
-    _, contact_labels = _get_plot_data_trange(
-        times, contact_labels, tmin, tmax)
-    im = ax.pcolormesh(times, contact_labels, np.array(data),
+    plot_data = []
+    plot_times = []
+    for time_data in data:
+        print("len(times)", len(times))
+        print("len(time_data)", len(time_data))
+        time_data, plot_times = _get_plot_data_trange(
+            times, time_data, tmin, tmax)
+        plot_data.append(time_data)
+    im = ax.pcolormesh(plot_times, contact_labels, np.array(plot_data),
                        cmap="jet_r", shading='auto')
     ax.set_title("CSD")
 
