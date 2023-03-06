@@ -282,10 +282,6 @@ def test_network_drives():
             assert len(drive['events'][0]) == n_drive_cells
             # this also implicitly tests that events are always a list
             assert len(drive['events'][0][0]) == drive['dynamics']['numspikes']
-        elif drive['type'] == 'gaussian':
-            for kw in ['mu', 'sigma', 'numspikes']:
-                assert kw in drive['dynamics'].keys()
-            assert len(drive['events'][0]) == n_drive_cells
         elif drive['type'] == 'poisson':
             for kw in ['tstart', 'tstop', 'rate_constant']:
                 assert kw in drive['dynamics'].keys()
@@ -388,6 +384,149 @@ def test_network_drives():
     assert len(network_builder.ncs['evdist1_L2Basket_nmda']) == n_connections
     nc = network_builder.ncs['evdist1_L2Basket_nmda'][0]
     assert nc.threshold == params['threshold']
+
+
+def test_network_drives_legacy():
+    """Test manipulation of drives in the network object under legacy mode."""
+    params = read_params(params_fname)
+    # add rhythmic inputs (i.e., a type of common input)
+    params.update({'input_dist_A_weight_L2Pyr_ampa': 1.4e-5,
+                   'input_dist_A_weight_L5Pyr_ampa': 2.4e-5,
+                   't0_input_dist': 50,
+                   'input_prox_A_weight_L2Pyr_ampa': 3.4e-5,
+                   'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
+                   't0_input_prox': 50})
+    net = jones_2009_model(params, legacy_mode=True,
+                           add_drives_from_params=True)
+
+    # instantiate drive events for NetworkBuilder
+    net._instantiate_drives(tstop=params['tstop'],
+                            n_trials=params['N_trials'])
+    network_builder = NetworkBuilder(net)  # needed to instantiate cells
+
+    # Assert that params are conserved across Network initialization
+    for p in params:
+        assert params[p] == net._params[p]
+    assert len(params) == len(net._params)
+    print(network_builder)
+    print(network_builder._cells[:2])
+
+    # Assert that proper number/types of gids are created for Network drives
+    dns_from_gids = [name for name in net.gid_ranges.keys() if
+                     name not in net.cell_types]
+    assert sorted(dns_from_gids) == sorted(net.external_drives.keys())
+    for dn in dns_from_gids:
+        n_drive_cells = net.external_drives[dn]['n_drive_cells']
+        assert len(net.gid_ranges[dn]) == n_drive_cells
+
+    # Check drive dict structure for each external drive
+    for drive_idx, drive in enumerate(net.external_drives.values()):
+        # Check that connectivity sources correspond to gid_ranges
+        conn_idxs = pick_connection(net, src_gids=drive['name'])
+        this_src_gids = set([gid for conn_idx in conn_idxs
+                             for gid in net.connectivity[conn_idx]['src_gids']
+                             ])  # NB set: globals
+        assert sorted(this_src_gids) == list(net.gid_ranges[drive['name']])
+        # Check type-specific dynamics and events
+        n_drive_cells = drive['n_drive_cells']
+        assert len(drive['events']) == 1  # single trial simulated
+        if drive['type'] == 'evoked':
+            for kw in ['mu', 'sigma', 'numspikes']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == n_drive_cells
+            # this also implicitly tests that events are always a list
+            assert len(drive['events'][0][0]) == drive['dynamics']['numspikes']
+        elif drive['type'] == 'gaussian':
+            for kw in ['mu', 'sigma', 'numspikes']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == n_drive_cells
+        elif drive['type'] == 'poisson':
+            for kw in ['tstart', 'tstop', 'rate_constant']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == n_drive_cells
+        elif drive['type'] == 'bursty':
+            for kw in ['tstart', 'tstart_std', 'tstop',
+                       'burst_rate', 'burst_std', 'numspikes']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == n_drive_cells
+            n_events = (
+                drive['dynamics']['numspikes'] *  # 2
+                (1 + (drive['dynamics']['tstop'] -
+                      drive['dynamics']['tstart'] - 1) //
+                    (1000. / drive['dynamics']['burst_rate'])))
+            assert len(drive['events'][0][0]) == n_events  # 4
+
+    # make sure the PRNGs are consistent.
+    target_times = {'evdist1': [66.30498327062551, 61.54362532343694],
+                    'evprox1': [23.80641637082997, 30.857310915553647],
+                    'evprox2': [141.76252038319825, 137.73942375578602]}
+    for drive_name in target_times:
+        for idx in [0, -1]:  # first and last
+            assert_allclose(net.external_drives[drive_name]['events'][0][idx],
+                            target_times[drive_name][idx], rtol=1e-12)
+
+    # check select AMPA weights
+    target_weights = {'evdist1': {'L2_basket': 0.006562,
+                                  'L5_pyramidal': 0.142300},
+                      'evprox1': {'L2_basket': 0.08831,
+                                  'L5_pyramidal': 0.00865},
+                      'evprox2': {'L2_basket': 0.000003,
+                                  'L5_pyramidal': 0.684013},
+                      'bursty1': {'L2_pyramidal': 0.000034,
+                                  'L5_pyramidal': 0.000044},
+                      'bursty2': {'L2_pyramidal': 0.000014,
+                                  'L5_pyramidal': 0.000024}
+                      }
+    for drive_name in target_weights:
+        for target_type in target_weights[drive_name]:
+            conn_idxs = pick_connection(net, src_gids=drive_name,
+                                        target_gids=target_type,
+                                        receptor='ampa')
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity[conn_idx]
+                assert_allclose(drive_conn['nc_dict']['A_weight'],
+                                target_weights[drive_name][target_type],
+                                rtol=1e-12)
+
+    # check select synaptic delays
+    target_delays = {'evdist1': {'L2_basket': 0.1, 'L5_pyramidal': 0.1},
+                     'evprox1': {'L2_basket': 0.1, 'L5_pyramidal': 1.},
+                     'evprox2': {'L2_basket': 0.1, 'L5_pyramidal': 1.}}
+    for drive_name in target_delays:
+        for target_type in target_delays[drive_name]:
+            conn_idxs = pick_connection(net, src_gids=drive_name,
+                                        target_gids=target_type,
+                                        receptor='ampa')
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity[conn_idx]
+                assert_allclose(drive_conn['nc_dict']['A_delay'],
+                                target_delays[drive_name][target_type],
+                                rtol=1e-12)
+
+    # array of simulation times is created in Network.__init__, but passed
+    # to CellResponse-constructor for storage (Network is agnostic of time)
+    with pytest.raises(TypeError,
+                       match="'times' is an np.ndarray of simulation times"):
+        _ = CellResponse(times='blah')
+
+    # Assert that all external drives are initialized
+    # Assumes legacy mode where cell-specific drives create artificial cells
+    # for all network cells regardless of connectivity
+    n_evoked_sources = 3 * net._n_cells
+    n_pois_sources = net._n_cells
+    n_gaus_sources = net._n_cells
+    n_bursty_sources = (net.external_drives['bursty1']['n_drive_cells'] +
+                        net.external_drives['bursty2']['n_drive_cells'])
+    # test that expected number of external driving events are created
+    assert len(network_builder._drive_cells) == (n_evoked_sources +
+                                                 n_pois_sources +
+                                                 n_gaus_sources +
+                                                 n_bursty_sources)
+    assert len(network_builder._gid_list) ==\
+        len(network_builder._drive_cells) + net._n_cells
+    # first 'evoked drive' comes after real cells and bursty drive cells
+    assert network_builder._drive_cells[n_bursty_sources].gid ==\
+        net._n_cells + n_bursty_sources
 
 
 def test_network_connectivity():
