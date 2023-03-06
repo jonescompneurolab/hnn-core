@@ -153,9 +153,8 @@
 
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
-                        <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span>
-                        <span class="n">FloatLogSlider</span><span class="p">,</span> <span class="n">FloatText</span><span class="p">,</span> <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span>
-                        <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+                        <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
+                        <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ipywidgets.embed</span> <span class="kn">import</span> <span class="n">embed_minimal_html</span>
 
 <span class="kn">import</span> <span class="nn">hnn_core</span>
@@ -256,7 +255,7 @@
 <span class="sd">        A list of network drive widgets added by add_drive_button.</span>
 <span class="sd">    drive_boxes : list</span>
 <span class="sd">        A list of network drive layouts.</span>
-<span class="sd">    connectivity_sliders : list</span>
+<span class="sd">    connectivity_textfields : list</span>
 <span class="sd">        A list of boxes that control the weight and probability of connections</span>
 <span class="sd">        in the network.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -345,10 +344,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">()))</span>
 
         <span class="c1"># Simulation parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;tstop (ms):&#39;</span><span class="p">,</span>
-                                      <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;dt (ms):&#39;</span><span class="p">,</span>
-                                   <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;tstop (ms):&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;dt (ms):&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span> <span class="o">=</span> <span class="n">IntText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Trials:&#39;</span><span class="p">,</span>
                                       <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
@@ -808,27 +809,15 @@
     <span class="n">style</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">sliders</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">receptor_name</span> <span class="ow">in</span> <span class="n">conn_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">w_text_input</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span>
-                                 <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                 <span class="n">description</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span>
-                                 <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+        <span class="n">w_text_input</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
 
-        <span class="n">w_slider</span> <span class="o">=</span> <span class="n">FloatLogSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span>
-                                  <span class="nb">min</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-                                  <span class="n">description</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span>
-                                  <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                  <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                  <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span>
-                                  <span class="n">readout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                  <span class="n">readout_format</span><span class="o">=</span><span class="s1">&#39;.2e&#39;</span><span class="p">,</span>
-                                  <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
-
-        <span class="n">link</span><span class="p">((</span><span class="n">w_slider</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">w_text_input</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">))</span>
         <span class="n">conn_widget</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
             <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;p&gt;</span>
 <span class="s2">            Receptor: </span><span class="si">{</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/p&gt;&quot;&quot;&quot;</span><span class="p">),</span>
-            <span class="n">w_text_input</span><span class="p">,</span> <span class="n">w_slider</span><span class="p">,</span>
-            <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;hr style=&#39;margin-bottom:5px&#39;/&gt;&quot;</span><span class="p">)</span>
+            <span class="n">w_text_input</span><span class="p">,</span> <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;hr style=&#39;margin-bottom:5px&#39;/&gt;&quot;</span><span class="p">)</span>
         <span class="p">])</span>
 
         <span class="n">conn_widget</span><span class="o">.</span><span class="n">_belongsto</span> <span class="o">=</span> <span class="p">{</span>
@@ -875,18 +864,15 @@
 
     <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">delays</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
-        <span class="n">weights_ampa</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span>
+        <span class="n">weights_ampa</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">cell_type</span><span class="p">],</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">weights_nmda</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">weights_nmda</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cell_type</span><span class="p">],</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">delays</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">delays</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;delays&#39;</span><span class="p">][</span><span class="n">cell_type</span><span class="p">],</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="n">widgets_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;weights_ampa&#39;</span><span class="p">:</span> <span class="n">weights_ampa</span><span class="p">,</span>
@@ -917,27 +903,27 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">default_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
-    <span class="n">tstart</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">],</span>
-                       <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start time (ms)&#39;</span><span class="p">,</span>
-                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">tstart_std</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstart_std&#39;</span><span class="p">],</span>
-                           <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start time dev (ms)&#39;</span><span class="p">,</span>
-                           <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">tstart</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start time (ms)&#39;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">tstart_std</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstart_std&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start time dev (ms)&#39;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">tstop</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
         <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">],</span>
         <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Stop time (ms)&#39;</span><span class="p">,</span>
         <span class="nb">max</span><span class="o">=</span><span class="n">tstop_widget</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">burst_rate</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;burst_rate&#39;</span><span class="p">],</span>
-                           <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Burst rate (Hz)&#39;</span><span class="p">,</span>
-                           <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">burst_std</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;burst_std&#39;</span><span class="p">],</span>
-                          <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Burst std dev (Hz)&#39;</span><span class="p">,</span>
-                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">repeats</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">],</span>
-                        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Repeats&#39;</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">burst_rate</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;burst_rate&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Burst rate (Hz)&#39;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">burst_std</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;burst_std&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Burst std dev (Hz)&#39;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">repeats</span> <span class="o">=</span> <span class="n">BoundedIntText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Repeats&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">seedcore</span> <span class="o">=</span> <span class="n">IntText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">],</span>
                        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Seed&#39;</span><span class="p">,</span>
                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -985,10 +971,9 @@
     <span class="p">}</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">default_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="n">tstart</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">],</span>
-                       <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start time (ms)&#39;</span><span class="p">,</span>
-                       <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
-                       <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+    <span class="n">tstart</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start time (ms)&#39;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
     <span class="n">tstop</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
         <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">],</span>
         <span class="nb">max</span><span class="o">=</span><span class="n">tstop_widget</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -1004,11 +989,10 @@
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">]</span>
     <span class="n">rate_constant</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
-        <span class="n">rate_constant</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span>
+        <span class="n">rate_constant</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;rate_constant&#39;</span><span class="p">][</span><span class="n">cell_type</span><span class="p">],</span>
-            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span>
-            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
-            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
 
     <span class="n">widgets_list</span><span class="p">,</span> <span class="n">widgets_dict</span> <span class="o">=</span> <span class="n">_get_cell_specific_widgets</span><span class="p">(</span>
         <span class="n">layout</span><span class="p">,</span>
@@ -1050,12 +1034,12 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">default_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
-    <span class="n">mu</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">],</span>
-                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Mean time:&#39;</span><span class="p">,</span>
-                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">sigma</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">],</span>
-                      <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Std dev time:&#39;</span><span class="p">,</span>
-                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Mean time:&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Std dev time:&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">numspikes</span> <span class="o">=</span> <span class="n">IntText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;numspikes&#39;</span><span class="p">],</span>
                         <span class="n">description</span><span class="o">=</span><span class="s1">&#39;No. Spikes:&#39;</span><span class="p">,</span>
                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1165,7 +1149,7 @@
 
 
 <span class="k">def</span> <span class="nf">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                         <span class="n">connectivity_sliders</span><span class="p">):</span>
+                         <span class="n">connectivity_textfields</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add all possible connectivity boxes to connectivity tab.&quot;&quot;&quot;</span>
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">ct</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
@@ -1174,8 +1158,8 @@
 
     <span class="c1"># clear existing connectivity</span>
     <span class="n">connectivity_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
-    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">connectivity_sliders</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">connectivity_sliders</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">connectivity_textfields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">connectivity_textfields</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
     <span class="n">connectivity_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">src_gids</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
@@ -1209,10 +1193,10 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">receptor_related_conn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">connectivity_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src_gids</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">target_gids</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-                    <span class="n">connectivity_sliders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">connectivity_textfields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="n">_get_connectivity_widgets</span><span class="p">(</span><span class="n">receptor_related_conn</span><span class="p">))</span>
 
-    <span class="n">connectivity_boxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">VBox</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span> <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="n">connectivity_sliders</span><span class="p">]</span>
+    <span class="n">connectivity_boxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">VBox</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span> <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="n">connectivity_textfields</span><span class="p">]</span>
     <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">connectivity_names</span><span class="p">):</span>
         <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span><span class="p">)</span>
@@ -1262,12 +1246,12 @@
 
 <span class="k">def</span> <span class="nf">load_drive_and_connectivity</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
                                 <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                                <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+                                <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add drive and connectivity ipywidgets from params.&quot;&quot;&quot;</span>
     <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="c1"># Add connectivity</span>
-        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">)</span>
+        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
         <span class="c1"># Add drives</span>
         <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                       <span class="n">layout</span><span class="p">)</span>
@@ -1275,7 +1259,7 @@
 
 <span class="k">def</span> <span class="nf">on_upload_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
                      <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                     <span class="n">connectivity_sliders</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">load_type</span><span class="p">):</span>
+                     <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">load_type</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Empty change&quot;</span><span class="p">)</span>
         <span class="k">return</span>
@@ -1302,7 +1286,7 @@
         <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params_network</span><span class="p">)</span>
     <span class="c1"># init network, add drives &amp; connectivity</span>
     <span class="k">if</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s1">&#39;connectivity&#39;</span><span class="p">:</span>
-        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">)</span>
+        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s1">&#39;drives&#39;</span><span class="p">:</span>
         <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                       <span class="n">layout</span><span class="p">)</span>
@@ -1314,7 +1298,7 @@
 
 
 <span class="k">def</span> <span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">single_simulation_data</span><span class="p">,</span>
-                               <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">,</span>
+                               <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
                                <span class="n">add_drive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct network and add drives.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init network&quot;</span><span class="p">)</span>
@@ -1325,7 +1309,7 @@
         <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># adjust connectivity according to the connectivity_tab</span>
-    <span class="k">for</span> <span class="n">connectivity_slider</span> <span class="ow">in</span> <span class="n">connectivity_sliders</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">connectivity_slider</span> <span class="ow">in</span> <span class="n">connectivity_textfields</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">vbox</span> <span class="ow">in</span> <span class="n">connectivity_slider</span><span class="p">:</span>
             <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span>
                 <span class="n">net</span><span class="o">=</span><span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span>
@@ -1340,7 +1324,7 @@
                 <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span>
                     <span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;A_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
                 <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span>
-                    <span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                    <span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
     <span class="k">if</span> <span class="n">add_drive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">return</span>
@@ -1411,7 +1395,7 @@
 <span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
                        <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
                        <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
-                       <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_sliders</span><span class="p">,</span>
+                       <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
                        <span class="n">viz_manager</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
     <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
@@ -1432,7 +1416,7 @@
 
         <span class="n">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">],</span> <span class="n">drive_widgets</span><span class="p">,</span>
-                                   <span class="n">connectivity_sliders</span><span class="p">)</span>
+                                   <span class="n">connectivity_textfields</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start simulation&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
