@@ -896,10 +896,10 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     kwargs = dict(layout=layout, style=style)
     mu = BoundedFloatText(
         value=default_data['mu'], description='Mean time:', min=0, max=1e6,
-        **kwargs)
+        step=0.01, **kwargs)
     sigma = BoundedFloatText(
         value=default_data['sigma'], description='Std dev time:', min=0,
-        max=1e6, **kwargs)
+        max=1e6, step=0.01, **kwargs)
     numspikes = IntText(value=default_data['numspikes'],
                         description='No. Spikes:',
                         **kwargs)
