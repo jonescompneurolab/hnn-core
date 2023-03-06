@@ -338,11 +338,12 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
 # References
 # ----------
 # .. [1] Jones, Stephanie R., et al. "Neural correlates of tactile detection:
-#        a combined magnetoencephalography and biophysically based computational
-#        modeling study." Journal of Neuroscience 27.40 (2007): 10751-10764.
+#        a combined magnetoencephalography and biophysically based
+#        computational modeling study."
+#        Journal of Neuroscience 27.40 (2007): 10751-10764.
 # .. [2] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
-#        Relationship between Transient Beta Events and Human Tactile Perception."
-#        Cerebral Cortex, 32, 668–688 (2022).
-# .. [3] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory Evoked
-#        Responses Revealed By Human Neocortical Neurosolver."
+#        Relationship between Transient Beta Events and Human Tactile
+#        Perception." Cerebral Cortex, 32, 668–688 (2022).
+# .. [3] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory
+#        Evoked Responses Revealed By Human Neocortical Neurosolver."
 #        Brain Topography, 35, 19–35 (2022).
