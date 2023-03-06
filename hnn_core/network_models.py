@@ -354,7 +354,3 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         'evprox2', mu=137.12 + tstart, sigma=8.33, numspikes=1,
         weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=synaptic_delays_prox, event_seed=814)
-
-
-
-
