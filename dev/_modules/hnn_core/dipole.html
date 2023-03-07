@@ -203,8 +203,8 @@
                       <span class="s1">&#39;create a predefined network from published models.&#39;</span><span class="p">,</span>
                       <span class="ne">UserWarning</span><span class="p">)</span>
     <span class="c1"># ADD DRIVE WARNINGS HERE</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No external drives loaded&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">net</span><span class="o">.</span><span class="n">external_biases</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No external drives or biases loaded&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]:</span>

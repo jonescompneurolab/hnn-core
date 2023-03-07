@@ -70,6 +70,9 @@ Bug
 - Fix bug where :func:`~hnn_core.network.pick_connection` failed when searching
   for connections with a list of cell types, by `Nick Tolley`_ in :gh:`559`
 
+- Fix bug where :func:`~hnn_core.network.add_evoked_drive` failed when adding
+  a drive with just NMDA weights, by `Nick Tolley`_ in :gh:`611`
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
