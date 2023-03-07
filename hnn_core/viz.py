@@ -1169,8 +1169,6 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
     plot_data = []
     plot_times = []
     for time_data in data:
-        print("len(times)", len(times))
-        print("len(time_data)", len(time_data))
         time_data, plot_times = _get_plot_data_trange(
             times, time_data, tmin, tmax)
         plot_data.append(time_data)
