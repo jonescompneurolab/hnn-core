@@ -272,7 +272,7 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
         The length of the hamming window (in samples) to smooth the
         simulated dipole waveform in each optimization step.
     return_rmse : bool
-        Returns list of unweighted RMSEs between data in dpl and exp_dpl 
+        Returns list of unweighted RMSEs between data in dpl and exp_dpl
         for each optimization step
 
     Returns
