@@ -487,7 +487,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     net : Network instance
         An instance of the Network object with the optimized configuration of
         attached drives.
-    opt_params : list
+    iter_avg_rmse : list of float
         Unweighted RMSE between data in dpl and exp_dpl for each iteration
 
     Notes
