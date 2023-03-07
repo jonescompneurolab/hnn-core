@@ -1263,7 +1263,7 @@ class Network(object):
                 connectivity.append(conn)
         self.connectivity = connectivity
 
-    def clear_drives(self, drive_names='all'):
+    def clear_drives(self, drive_name='all'):
         """Remove all drives defined in Network.connectivity.
 
         Parameters
@@ -1273,20 +1273,11 @@ class Network(object):
         """
         if drive_names == 'all':
             drive_names = list(self.external_drives.keys())
-        print("Total number of drives are "+ str(len(drive_names)))
         _validate_type(drive_names, (list,))
         connectivity = list()
-        counter = 0
         for drive_name in drive_names:
-            counter = counter + 1
             del self.external_drives[drive_name]
-        drive_names_after_deletion = list(self.external_drives.keys())
-        print("Drive names left after deletion are "+ str(len(drive_names_after_deletion)))
-        print("The number of drives deleted are "+ str(counter))
-        self._clear_connectivity(src_types=drive_names)
-
-    def get_external_drive_names(self):
-        return list(self.external_drives.keys())
+        self._clear_connectivity(src_type=drive_names)
 
     def add_electrode_array(self, name, electrode_pos, *, conductivity=0.3,
                             method='psa', min_distance=0.5):
