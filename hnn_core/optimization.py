@@ -271,11 +271,16 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
     smooth_window_len : int
         The length of the hamming window (in samples) to smooth the
         simulated dipole waveform in each optimization step.
+    return_rmse : bool
+        Returns list of unweighted RMSEs between data in dpl and exp_dpl 
+        for each optimization step
 
     Returns
     -------
     avg_rmse: float
         Weighted RMSE between data in dpl and exp_dpl
+    avg_rmse_unweighted : float
+        Unweighted RMSE between data in dpl and exp_dpl
     """
     print("Optimization step %d, iteration %d" % (opt_params['cur_step'] + 1,
                                                   opt_params['optiter'] + 1))
@@ -473,12 +478,17 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     which_drives: 'all' or list
         Evoked drives to optimize. If 'all', will opimize all evoked drives.
         If a subset list of evoked drives, will optimize only the evoked drives in the list.
+    return_rmse : bool
+        Returns list of unweighted RMSEs between data in dpl and exp_dpl 
+        for each optimization step
 
     Returns
     -------
     net : Network instance
         An instance of the Network object with the optimized configuration of
         attached drives.
+    opt_params : list
+        Unweighted RMSE between data in dpl and exp_dpl for each iteration
 
     Notes
     -----
