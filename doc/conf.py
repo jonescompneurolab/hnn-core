@@ -57,6 +57,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'numpydoc',
     'nbsphinx',
+    'sphinx_copybutton',
     'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
@@ -66,6 +67,10 @@ autodoc_default_options = {'inherited-members': None}
 numpydoc_class_members_toctree = False
 numpydoc_attributes_as_param_list = True
 default_role = 'autolink'  # XXX silently allows bad syntax, someone should fix
+
+# Sphinx-Copybutton configuration
+copybutton_prompt_text = r">>> |\.\.\. |\$ "
+copybutton_prompt_is_regexp = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -114,8 +119,7 @@ html_theme_options = {
         ("API", "api"),
         ("Glossary", "glossary"),
         ("Whats new", "whats_new"),
-        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True),
-        ("Roadmap", "roadmap")
+        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
     ],
     'bootswatch_theme': "yeti"
 }
@@ -203,7 +207,10 @@ intersphinx_timeout = 5
 
 linkcheck_ignore = [
    'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
-   'https://neuron.yale.edu/neuron'
+   'https://neuron.yale.edu/neuron',
+   'https://doi.org/10.1152/jn.00535.2009',
+   'https://doi.org/10.1152/jn.00122.2010',
+   'https://groups.google.com/g/hnnsolver'
 ]
 
 # Resolve binder filepath_prefix. From the docs:
@@ -239,4 +246,28 @@ sphinx_gallery_conf = {
                }
 }
 
+suppress_warnings = [
+    'nbsphinx',
+]
+
 nbsphinx_execute = 'always'
+
+nbsphinx_prolog = """
+.. raw:: html
+
+    <style>
+        .body {
+            max-width: 100% !important;
+        }
+        .nbinput.container {
+            padding-top: 5px;
+            display: none !important;
+        }
+        div.nboutput.container div.prompt {
+            display: none !important;
+        }
+        div.nboutput.container div.output_area.stderr {
+            display: none !important;
+        }
+    </style>
+"""

@@ -7,10 +7,12 @@ hnn-core
 
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
-It is early Work in Progress. Contributors are very welcome.
+Contributors are very welcome. Please read our
+:doc:`contributing guide <contributing>` if you are interested.
 
 Dependencies
 ------------
+hnn-core requires Python (>=3.7) and the following packages:
 
 * numpy
 * scipy
@@ -23,8 +25,8 @@ Optional dependencies
 GUI
 ~~~
 
-* ipywidgets
-* voila
+* ipywidgets (<=7.7.1)
+* voila (<=0.3.6)
 
 Parallel processing
 ~~~~~~~~~~~~~~~~~~~
@@ -51,11 +53,11 @@ because the pip installer works better with virtual environments such as the one
 
 If you want to track the latest developments of ``hnn-core``, you can install the current version of the code (nightly) with::
 
-	$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
+   $ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 
 To check if everything worked fine, you can do::
 
-	$ python -c 'import hnn_core'
+   $ python -c 'import hnn_core'
 
 and it should not give any error messages.
 
@@ -64,6 +66,10 @@ and it should not give any error messages.
 To install the GUI dependencies along with ``hnn-core``, a simple tweak to the above command is needed::
 
    $ pip install hnn_core[gui]
+   
+Note if you are zsh in macOS the command is::
+
+   $ pip install hnn_core'[gui]'
 
 To start the GUI, please do::
 
@@ -76,17 +82,17 @@ than one CPU core, refer to our `parallel backend guide`_.
 
 **Note for Windows users**
 
-The pip installer for Neuron does not yet work for Windows. In this case, it is better to
-install ``hnn_core`` without the dependencies::
+Install Neuron using the `precompiled installers`_ **before** installing
+``hnn-core``. Make sure that::
 
-   $ pip install hnn_core --no-deps
+   $ python -c 'import neuron;'
 
-and then install the dependencies separately::
+does not throw any errors before running the install command.
+If you encounter errors, please get help from `NEURON forum`_.
+Finally, do::
 
-   $ pip install scipy numpy matplotlib
+   $ pip install hnn_core[gui]
 
-and install Neuron using the traditional package installer available here
-`https://neuron.yale.edu/neuron/ <https://neuron.yale.edu/neuron/>`_.
 
 Documentation and examples
 ==========================
@@ -117,10 +123,15 @@ report bugs. For user questions and scientific discussions, please join the
 Interested in Contributing?
 ===========================
 
-Read our `contributing guide`_.
+Read our :doc:`contributing guide <contributing>`.
 
-.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
-.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
+Roadmap
+=======
+
+Read our `roadmap`_.
+
+.. _precompiled installers: https://www.neuron.yale.edu/neuron/download
+.. _NEURON forum: https://www.neuron.yale.edu/phpbb/
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
@@ -129,12 +140,12 @@ Read our `contributing guide`_.
    :target: https://circleci.com/gh/jonescompneurolab/hnn-core
 
 .. |Codecov| image:: https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg
-	:target: https://codecov.io/gh/jonescompneurolab/hnn-core
+   :target: https://codecov.io/gh/jonescompneurolab/hnn-core
 
 .. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
-	:target: https://pypi.org/project/hnn-core/
+   :target: https://pypi.org/project/hnn-core/
 
-.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/178095018-35d2619a-6a82-4e27-91c9-ff2796fab435.png
+.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/197026635-39b6564a-f529-4caf-870e-af9ca4d2fb75.png
 
 .. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
    :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge

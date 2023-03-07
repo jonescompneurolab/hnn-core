@@ -3,8 +3,9 @@ version: 2.1
 
 jobs:
     build_docs:
-      docker:
-          - image: circleci/python:3.8.1-buster
+      machine:
+        image: ubuntu-2004:current
+      resource_class: large
       steps:
           - checkout
 
@@ -14,7 +15,7 @@ jobs:
                   sudo apt-get install wget
                   wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh;
                   chmod +x ~/miniconda.sh;
-                  ~/miniconda.sh -b -p ~/miniconda;
+                  bash ~/miniconda.sh -b -p ~/miniconda;
 
           - run:
               name: Install openmpi
@@ -36,7 +37,7 @@ jobs:
               command: |
                   source ~/miniconda/bin/activate testenv
                   sudo apt-get install pandoc
-                  pip install sphinx numpydoc sphinx_bootstrap_theme pillow nbsphinx
+                  pip install sphinx numpydoc sphinx_bootstrap_theme sphinx-copybutton pillow nbsphinx
                   pip install --user -U https://api.github.com/repos/sphinx-gallery/sphinx-gallery/zipball/master
 
           - run:
@@ -50,8 +51,11 @@ jobs:
               command: |
                   source ~/miniconda/bin/activate testenv
                   pip install -U pip setuptools virtualenv
-                  pip install ipywidgets voila
-                  python setup.py install
+                  pip install '.[gui]'
+
+          - restore_cache:
+              keys:
+                - built-{{ checksum ".circleci/build_cache" }}
 
           - run:
               name: Build the documentation
@@ -62,6 +66,12 @@ jobs:
           - persist_to_workspace:
               root: doc/_build
               paths: html
+
+          - save_cache:
+              key: built-{{ checksum ".circleci/build_cache" }}
+              paths:
+                - doc/auto_examples
+                - doc/_build
 
           - store_artifacts:
               path: doc/_build/html/

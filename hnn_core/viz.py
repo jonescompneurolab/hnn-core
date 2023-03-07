@@ -6,7 +6,19 @@
 
 import numpy as np
 from itertools import cycle
+import colorsys
+
 from .externals.mne import _validate_type
+
+
+def _lighten_color(color, amount=0.5):
+    import matplotlib.colors as mc
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
 def _get_plot_data_trange(times, data, tmin, tmax):
@@ -66,15 +78,14 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
-                       decim=None, color='cividis',
-                       voltage_offset=50, voltage_scalebar=200,
-                       contact_labels=None, show=True):
-    """Plot extracellular electrode array voltage time series.
+def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
+                     ax=None, decim=None, color='cividis',
+                     voltage_offset=50, voltage_scalebar=200, show=True):
+    """Plot laminar extracellular electrode array voltage time series.
 
     Parameters
     ----------
-    times : list | Numpy array
+    times : array-like, shape (n_times,)
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
@@ -101,7 +112,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
     voltage_scalebar : float | None (optional)
         Height, in units of uV, of a scale bar to plot in the top-left corner
         of the plot.
-    contact_labels : list (optional)
+    contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
     show : bool
@@ -175,9 +186,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
         ylabel = 'Individual contact traces'
-        if contact_labels is None:
-            ax.set_yticks([])
-        elif len(contact_labels) != n_offsets:
+        if len(contact_labels) != n_offsets:
             raise ValueError(f'contact_labels is length {len(contact_labels)},'
                              f' but {n_offsets} contacts to be plotted')
         else:
@@ -212,7 +221,7 @@ def plot_extracellular(times, data, tmin=None, tmax=None, ax=None,
 
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
-                color='k', average=False, show=True):
+                color='k', label="average", average=False, show=True):
     """Simple layer-specific plot function.
 
     Parameters
@@ -233,8 +242,10 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         The SciPy function :func:`~scipy.signal.decimate` is used, which
         recommends values <13. To achieve higher decimation factors, a list of
         ints can be provided. These are applied successively.
-    color : tuple of float
+    color : tuple of float | str
         RGBA value to use for plotting. By default, 'k' (black)
+    label : str
+        Dipole label. Enabled when average=True
     average : bool
         If True, render the average across all dpls.
     show : bool
@@ -279,13 +290,13 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                                                     tmin, tmax)
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
-
                 if idx == len(dpl) - 1 and average:
                     # the average dpl
-                    ax.plot(times, data, color='g', label="average", lw=1.5)
+                    ax.plot(times, data, color=color, label=label, lw=1.5)
                 else:
                     alpha = 0.5 if average else 1.
-                    ax.plot(times, data, color=color, alpha=alpha, lw=1.)
+                    ax.plot(times, data, color=_lighten_color(color, 0.5),
+                            alpha=alpha, lw=1.)
 
         if average:
             ax.legend()
@@ -359,9 +370,9 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     # Extract desired trials
     if len(cell_response._spike_times[0]) > 0:
         spike_times = np.concatenate(
-            np.array(cell_response._spike_times)[trial_idx])
+            np.array(cell_response._spike_times, dtype=object)[trial_idx])
         spike_types_data = np.concatenate(
-            np.array(cell_response._spike_types)[trial_idx])
+            np.array(cell_response._spike_types, dtype=object)[trial_idx])
     else:
         spike_times = np.array([])
         spike_types_data = np.array([])
@@ -463,11 +474,11 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     # Extract desired trials
     if len(cell_response._spike_times[0]) > 0:
         spike_times = np.concatenate(
-            np.array(cell_response._spike_times)[trial_idx])
+            np.array(cell_response._spike_times, dtype=object)[trial_idx])
         spike_types = np.concatenate(
-            np.array(cell_response._spike_types)[trial_idx])
+            np.array(cell_response._spike_types, dtype=object)[trial_idx])
         spike_gids = np.concatenate(
-            np.array(cell_response._spike_gids)[trial_idx])
+            np.array(cell_response._spike_gids, dtype=object)[trial_idx])
     else:
         spike_times = np.array([])
         spike_types = np.array([])
@@ -481,23 +492,23 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     ypos = 0
+    events = []
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
-            cell_type_ypos.append(np.repeat(ypos, len(gid_time)))
+            cell_type_ypos.append(ypos)
             ypos = ypos - 1
 
         if cell_type_times:
-            cell_type_times = np.concatenate(cell_type_times)
-            cell_type_ypos = np.concatenate(cell_type_ypos)
+            events.append(
+                ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
+                             color=cell_type_colors[cell_type],
+                             label=cell_type, linelengths=5))
 
-            ax.scatter(cell_type_times, cell_type_ypos, label=cell_type,
-                       color=cell_type_colors[cell_type])
-
-    ax.legend(loc=1)
+    ax.legend(handles=[e[0] for e in events], loc=1)
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
@@ -563,7 +574,8 @@ def plot_cells(net, ax=None, show=True):
 
 def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
                     layer='agg', decim=None, padding='zeros', ax=None,
-                    colormap='inferno', colorbar=True, show=True):
+                    colormap='inferno', colorbar=True, colorbar_inside=False,
+                    show=True):
     """Plot Morlet time-frequency representation of dipole time course
 
     Parameters
@@ -596,6 +608,8 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         The name of a matplotlib colormap, e.g., 'viridis'. Default: 'inferno'
     colorbar : bool
         If True (default), adjust figure to include colorbar.
+    colorbar_inside: bool, default False
+        Put the color inside the heatmap if True.
     show : bool
         If True, show the figure
 
@@ -662,17 +676,45 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
         fig = ax.get_figure()
         xfmt = ScalarFormatter()
         xfmt.set_powerlimits((-2, 2))
-        cbar = fig.colorbar(im, ax=ax, format=xfmt, shrink=0.8, pad=0)
-        cbar.ax.yaxis.set_ticks_position('left')
-        cbar.ax.set_ylabel(r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(
-            scale_applied), rotation=-90, va="bottom")
+        # default colorbar
+        if colorbar_inside is False:
+            cbar = fig.colorbar(im, ax=ax, format=xfmt, shrink=0.8, pad=0)
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.ax.set_ylabel(r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(
+                scale_applied), rotation=-90, va="bottom")
+        # put colorbar inside the heatmap.
+        else:
+            cbar_color = "white"
+            cbar_fontsize = 6
+
+            ax_pos = ax.get_position()
+            ax_width = ax_pos.x1 - ax_pos.x0
+            ax_height = ax_pos.y1 - ax_pos.y0
+            cbar_L = ax_pos.x0 + 0.9 * ax_width
+            cbar_B = ax_pos.y0 + 0.8 * ax_height
+            cbar_W = ax_width * 0.04
+            cbar_H = ax_height * 0.15
+
+            cax = fig.add_axes([cbar_L, cbar_B, cbar_W, cbar_H])
+            cbar = fig.colorbar(im, cax=cax, format=xfmt, shrink=0.8, pad=0)
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.ax.yaxis.offsetText.set_fontsize(cbar_fontsize)
+
+            cbar.ax.set_ylabel(
+                r'Power ([nAm $\times$ {:.0f}]$^2$)'.format(scale_applied),
+                rotation=-90, va="bottom", fontsize=cbar_fontsize,
+                color=cbar_color)
+            cbar.ax.tick_params(direction='in', labelsize=cbar_fontsize,
+                                labelcolor=cbar_color, colors=cbar_color)
+            plt.setp(cbar.ax.spines.values(), color=cbar_color)
+            setattr(fig, f'_cbar-ax-{id(ax)}', cbar)
 
     plt_show(show)
     return ax.get_figure()
 
 
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-             ax=None, show=True):
+             color=None, label=None, ax=None, show=True):
     """Plot power spectral density (PSD) of dipole time course
 
     Applies `~scipy.signal.periodogram` from SciPy with ``window='hamming'``.
@@ -695,6 +737,10 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         End time of data to include (in ms). If None, use entire simulation.
     layer : str, default 'agg'
         The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+    color : str or tuple or None
+        The line color of PSD
+    label : str or None
+        Line label for PSD
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     show : bool
@@ -731,7 +777,10 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
         trial_power.append(Pxx)
 
-    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0))
+    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0), color=color,
+            label=label)
+    if label:
+        ax.legend()
     if fmax is not None:
         ax.set_xlim((fmin, fmax))
     ax.ticklabel_format(axis='both', scilimits=(-2, 3))
@@ -1070,4 +1119,49 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     fig.canvas.mpl_connect('button_press_event', _onclick)
 
     plt_show(show)
+    return ax.get_figure()
+
+
+def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
+                     show=True):
+    """Plot laminar current source density (CSD) estimation from LFP array.
+
+    Parameters
+    ----------
+    times : Numpy array, shape (n_times,)
+        Sampling times (in ms).
+    data : array-like, shape (n_channels, n_times)
+        CSD data, channels x time.
+    ax : instance of matplotlib figure | None
+        The matplotlib axis.
+    colorbar : bool
+        If the colorbar is presented.
+    contact_labels : list
+        Labels associated with the contacts to plot. Passed as-is to
+        :func:`~matplotlib.axes.Axes.set_yticklabels`.
+    show : bool
+        If True, show the plot.
+
+    Returns
+    -------
+    fig : instance of matplotlib Figure
+        The matplotlib figure handle.
+    """
+    import matplotlib.pyplot as plt
+    if ax is None:
+        _, ax = plt.subplots(1, 1, constrained_layout=True)
+
+    im = ax.pcolormesh(times, contact_labels, np.array(data),
+                       cmap="jet_r", shading='auto')
+    ax.set_title("CSD")
+
+    if colorbar:
+        color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
+        plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (uV/um^{2})$')
+
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylabel('Electrode depth')
+    plt.tight_layout()
+    plt_show(show)
+
     return ax.get_figure()

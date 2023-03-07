@@ -2,6 +2,7 @@
 
 from glob import glob
 
+import matplotlib.pyplot as plt
 import pytest
 import numpy as np
 
@@ -10,7 +11,6 @@ from hnn_core import CellResponse, read_spikes
 
 def test_cell_response(tmpdir):
     """Test CellResponse object."""
-
     # Round-trip test
     spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
     spike_gids = [[1, 3], [5, 7]]
@@ -32,7 +32,7 @@ def test_cell_response(tmpdir):
     # reset clears all recorded variables, but leaves simulation time intact
     assert len(cell_response.times) == len(sim_times)
     sim_attributes = ['_spike_times', '_spike_gids', '_spike_types',
-                      '_vsoma', '_isoma']
+                      '_vsec', '_isec']
     net_attributes = ['_times', '_cell_type_names']  # `Network.__init__`
     # creates these check that we always know which response attributes are
     # simulated see #291 for discussion; objective is to keep cell_response
@@ -162,3 +162,4 @@ def test_cell_response(tmpdir):
                       'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
         cell_response = read_spikes(tmpdir.join('spk_*.txt'),
                                     gid_ranges=gid_ranges)
+    plt.close('all')

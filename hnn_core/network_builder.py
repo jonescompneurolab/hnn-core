@@ -4,6 +4,8 @@
 #          Sam Neymotin <samnemo@gmail.com>
 #          Blake Caldwell <blake_caldwell@brown.edu>
 
+import os
+import os.path as op
 from copy import deepcopy
 
 import numpy as np
@@ -85,14 +87,18 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     neuron_net.aggregate_data(n_samples=times.size())
 
     # now convert data from Neuron into Python
-    vsoma_py = dict()
-    for gid, rec_v in neuron_net._vsoma.items():
-        vsoma_py[gid] = rec_v.to_python()
+    vsec_py = dict()
+    for gid, vsec_dict in neuron_net._vsec.items():
+        vsec_py[gid] = dict()
+        for sec_name, vsec in vsec_dict.items():
+            vsec_py[gid][sec_name] = vsec.to_python()
 
-    isoma_py = dict()
-    for gid, rec_i in neuron_net._isoma.items():
-        isoma_py[gid] = {key: rec_i.to_python()
-                         for key, rec_i in rec_i.items()}
+    isec_py = dict()
+    for gid, isec_dict in neuron_net._isec.items():
+        isec_py[gid] = dict()
+        for sec_name, isec in isec_dict.items():
+            isec_py[gid][sec_name] = {
+                key: isec.to_python() for key, isec in isec.items()}
 
     dpl_data = np.c_[
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
@@ -111,8 +117,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             'spike_times': neuron_net._all_spike_times.to_python(),
             'spike_gids': neuron_net._all_spike_gids.to_python(),
             'gid_ranges': net.gid_ranges,
-            'vsoma': vsoma_py,
-            'isoma': isoma_py,
+            'vsec': vsec_py,
+            'isec': isec_py,
             'rec_data': rec_arr_py,
             'rec_times': rec_times_py,
             'times': times.to_python()}
@@ -137,27 +143,24 @@ def _is_loaded_mechanisms():
 
 
 def load_custom_mechanisms():
-    import platform
-    import os.path as op
 
     if _is_loaded_mechanisms():
         return
 
-    if platform.system() == 'Windows':
-        mech_fname = op.join(op.dirname(__file__), 'mod', 'nrnmech.dll')
-    else:
-        if platform.system() == 'Darwin' and 'arm64' in platform.platform():
-            cpu_arch = 'arm64'
-        else:  # x86 Mac or Linux
-            cpu_arch = 'x86_64'
+    # recursively find the .so / .dll library
+    mech_fname = list()
+    mod_dir = op.join(op.dirname(__file__), 'mod')
+    for root, dirnames, filenames in os.walk(mod_dir):
+        for filename in filenames:
+            if filename.endswith(('.so', '.dll')):
+                mech_fname.append(os.path.join(root, filename))
+                break
 
-        mech_fname = op.join(op.dirname(__file__), 'mod', cpu_arch,
-                             '.libs', 'libnrnmech.so')
-    if not op.exists(mech_fname):
-        raise FileNotFoundError(f'The file {mech_fname} could not be found')
+    if len(mech_fname) == 0:
+        raise FileNotFoundError(f'No .so or .dll file found in {mod_dir}')
 
-    h.nrn_load_dll(mech_fname)
-    print('Loading custom mechanism files from %s' % mech_fname)
+    h.nrn_load_dll(mech_fname[0])
+    print('Loading custom mechanism files from %s' % mech_fname[0])
     if not _is_loaded_mechanisms():
         raise ValueError('The custom mechanisms could not be loaded')
 
@@ -286,8 +289,8 @@ class NetworkBuilder(object):
         self.ncs = dict()
         self._nrn_dipoles = dict()
 
-        self._vsoma = dict()
-        self._isoma = dict()
+        self._vsec = dict()
+        self._isec = dict()
         self._nrn_rec_arrays = dict()
         self._nrn_rec_callbacks = list()
 
@@ -322,11 +325,11 @@ class NetworkBuilder(object):
 
         self._gid_assign()
 
-        record_vsoma = self.net._params['record_vsoma']
-        record_isoma = self.net._params['record_isoma']
+        record_vsec = self.net._params['record_vsec']
+        record_isec = self.net._params['record_isec']
         self._create_cells_and_drives(threshold=self.net._params['threshold'],
-                                      record_vsoma=record_vsoma,
-                                      record_isoma=record_isoma)
+                                      record_vsec=record_vsec,
+                                      record_isec=record_isec)
 
         self.state_init()
 
@@ -395,8 +398,8 @@ class NetworkBuilder(object):
         # extremely important to get the gids in the right order
         self._gid_list.sort()
 
-    def _create_cells_and_drives(self, threshold, record_vsoma=False,
-                                 record_isoma=False):
+    def _create_cells_and_drives(self, threshold, record_vsec=False,
+                                 record_isec=False):
         """Parallel create cells AND external drives
 
         NB: _Cell.__init__ calls h.Section -> non-picklable!
@@ -431,7 +434,7 @@ class NetworkBuilder(object):
                         src_type in self.net.external_biases['tonic']):
                     cell.create_tonic_bias(**self.net.external_biases
                                            ['tonic'][src_type])
-                cell.record_soma(record_vsoma, record_isoma)
+                cell.record(record_vsec, record_isec)
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
@@ -559,8 +562,8 @@ class NetworkBuilder(object):
                 nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
-            self._vsoma[cell.gid] = cell.rec_v
-            self._isoma[cell.gid] = cell.rec_i
+            self._vsec[cell.gid] = cell.vsec
+            self._isec[cell.gid] = cell.isec
 
         # reduce across threads
         for nrn_dpl in self._nrn_dipoles.values():
@@ -569,8 +572,8 @@ class NetworkBuilder(object):
             _PC.allreduce(nrn_arr._nrn_voltages, 1)
 
         # aggregate the currents and voltages independently on each proc
-        vsoma_list = _PC.py_gather(self._vsoma, 0)
-        isoma_list = _PC.py_gather(self._isoma, 0)
+        vsec_list = _PC.py_gather(self._vsec, 0)
+        isec_list = _PC.py_gather(self._isec, 0)
 
         # combine spiking data from each proc
         spike_times_list = _PC.py_gather(self._spike_times, 0)
@@ -582,10 +585,10 @@ class NetworkBuilder(object):
                 self._all_spike_times.append(spike_vec)
             for spike_vec in spike_gids_list:
                 self._all_spike_gids.append(spike_vec)
-            for vsoma in vsoma_list:
-                self._vsoma.update(vsoma)
-            for isoma in isoma_list:
-                self._isoma.update(isoma)
+            for vsec in vsec_list:
+                self._vsec.update(vsec)
+            for isec in isec_list:
+                self._isec.update(isec)
 
         _PC.barrier()  # get all nodes to this place before continuing
 

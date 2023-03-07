@@ -1,9 +1,11 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
+from hnn_core.gui._viz_manager import _idx2figname, _no_overlay_plot_types
 from hnn_core.gui.gui import _init_network_from_widgets
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
@@ -21,6 +23,7 @@ def test_gui_load_params():
 
     print(gui.params)
     print(gui.params['L2Pyr*'])
+    plt.close('all')
 
 
 def test_gui_upload_params():
@@ -36,17 +39,38 @@ def test_gui_upload_params():
 
     original_tstop = gui.widget_tstop.value
     gui.widget_tstop.value = 1
-
     original_tstep = gui.widget_dt.value
     gui.widget_dt.value = 1
     # simulate upload default.json
-    file_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
-    gui._simulate_upload_file(file_url)
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
+    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json" # noqa
+    gui._simulate_upload_connectivity(file1_url)
+    gui._simulate_upload_drives(file1_url)
 
     # check if parameter is reloaded.
     assert gui.widget_tstop.value == original_tstop
     assert gui.widget_dt.value == original_tstep
     assert len(gui.drive_widgets) == original_drive_count
+
+    # check parameters with different files.
+    # file1: connectivity file2: drives
+    gui._simulate_upload_connectivity(file1_url)
+    assert gui.widget_tstop.value == 170.
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
+    gui._simulate_upload_drives(file2_url)
+    assert gui.widget_tstop.value == 250.
+    # uploading new drives does not influence the existing connectivity.
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
+
+    # file2: connectivity file1: drives
+    gui._simulate_upload_connectivity(file2_url)
+    # now connectivity is refreshed.
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    assert gui.drive_widgets[-1]['tstop'].value == 250.
+    gui._simulate_upload_drives(file1_url)
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    assert gui.drive_widgets[-1]['tstop'].value == 0.
+    plt.close('all')
 
 
 def test_gui_change_connectivity():
@@ -54,8 +78,8 @@ def test_gui_change_connectivity():
     gui = HNNGUI()
     _ = gui.compose()
 
-    for connectivity_slider in gui.connectivity_widgets:
-        for vbox in connectivity_slider:
+    for connectivity_field in gui.connectivity_widgets:
+        for vbox in connectivity_field:
             for w_val in (0.2, 0.9):
                 _single_simulation = {}
                 _single_simulation['net'] = jones_2009_model(gui.params)
@@ -72,10 +96,8 @@ def test_gui_change_connectivity():
 
                 # test if the slider and the input field are synchronous
                 vbox.children[1].value = w_val
-                assert vbox.children[2].value == w_val
 
                 # re initialize network
-
                 _init_network_from_widgets(gui.params, gui.widget_dt,
                                            gui.widget_tstop,
                                            _single_simulation,
@@ -86,6 +108,7 @@ def test_gui_change_connectivity():
                 # test if the new value is reflected in the network
                 assert _single_simulation['net'].connectivity[conn_idx][
                     'nc_dict']['A_weight'] == w_val
+    plt.close('all')
 
 
 def test_gui_add_drives():
@@ -106,6 +129,7 @@ def test_gui_add_drives():
             assert gui.drive_widgets[0]['type'] == val_drive_type
             assert gui.drive_widgets[0]['location'] == val_location
             assert val_drive_type in gui.drive_widgets[0]['name']
+    plt.close('all')
 
 
 def test_gui_init_network():
@@ -118,6 +142,7 @@ def test_gui_init_network():
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
                                gui.connectivity_widgets)
+    plt.close('all')
 
     # copied from test_network.py
     assert np.isclose(_single_simulation['net']._inplane_distance, 1.)
@@ -141,6 +166,7 @@ def test_gui_run_simulation_mpi():
     assert isinstance(gui.simulation_data[default_name]["net"], Network)
     assert isinstance(dpls, list)
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
+    plt.close('all')
 
 
 def test_gui_run_simulations():
@@ -204,14 +230,148 @@ def test_gui_run_simulations():
     assert len(gui.simulation_data) == 1
     assert gui._simulation_status_bar.value == \
         gui._simulation_status_contents['failed']
+    plt.close('all')
 
 
 def test_gui_take_screenshots():
-    """Test if the GUI correctly generate screenshots."""
+    """Test if the GUI correctly generates screenshots."""
     gui = HNNGUI()
     gui.compose(return_layout=False)
     screenshot = gui.capture(render=False)
     assert type(screenshot) is IFrame
-    gui.app_layout.left_sidebar.selected_index = 2
+    gui._simulate_left_tab_click("External drives")
     screenshot1 = gui.capture(render=False)
     assert screenshot._repr_html_() != screenshot1._repr_html_()
+    plt.close('all')
+
+
+def test_gui_add_figure():
+    """Test if the GUI adds/deletes figs properly."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    fig_tabs = gui.viz_manager.figs_tabs
+    axes_config_tabs = gui.viz_manager.axes_config_tabs
+    assert len(fig_tabs.children) == 0
+    assert len(axes_config_tabs.children) == 0
+
+    # after each run we should have a default fig
+    gui.run_button.click()
+    assert len(fig_tabs.children) == 1
+    assert len(axes_config_tabs.children) == 1
+
+    assert gui.viz_manager.fig_idx['idx'] == 2
+
+    for idx in range(3):
+        n_fig = idx + 2
+        gui.viz_manager.make_fig_button.click()
+        assert len(fig_tabs.children) == n_fig
+        assert len(axes_config_tabs.children) == n_fig
+
+    # we should have 4 figs here
+    # delete the 2nd and test if the total number and fig names match or not.
+    tmp_fig_idx = 2
+    tab_index = tmp_fig_idx - 1
+    assert gui.viz_manager.fig_idx['idx'] == 5
+    # test delete figures
+    axes_config_tabs.children[tab_index].children[0].click()
+    assert gui.viz_manager.fig_idx['idx'] == 5
+
+    assert len(fig_tabs.children) == 3
+    assert len(axes_config_tabs.children) == 3
+    remaining_titles1 = [
+        fig_tabs.get_title(idx) for idx in range(len(fig_tabs.children))
+    ]
+    remaining_titles2 = [
+        axes_config_tabs.get_title(idx)
+        for idx in range(len(axes_config_tabs.children))
+    ]
+    correct_remaining_titles = [_idx2figname(idx) for idx in (1, 3, 4)]
+    assert remaining_titles1 == remaining_titles2 == correct_remaining_titles
+    plt.close('all')
+
+
+def test_gui_edit_figure():
+    """Test if the GUI adds/deletes figs properly."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    fig_tabs = gui.viz_manager.figs_tabs
+    axes_config_tabs = gui.viz_manager.axes_config_tabs
+
+    # after each run we should have a default fig
+    sim_names = ["t1", "t2", "t3"]
+    for sim_idx, sim_name in enumerate(sim_names):
+        gui.widget_simulation_name.value = sim_name
+        gui.run_button.click()
+        print(len(fig_tabs.children), sim_idx)
+        n_figs = sim_idx + 1
+        assert len(fig_tabs.children) == n_figs
+        assert len(axes_config_tabs.children) == n_figs
+
+        axes_config = axes_config_tabs.children[-1].children[1]
+        simulation_selection = axes_config.children[0].children[0]
+        assert simulation_selection.options == tuple(sim_names[:n_figs])
+    plt.close('all')
+
+
+def test_gui_figure_overlay():
+    """Test if the GUI adds/deletes figs properly."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    axes_config_tabs = gui.viz_manager.axes_config_tabs
+
+    gui.run_button.click()
+    for tab in axes_config_tabs.children:
+        for controls in tab.children[1].children:
+            add_plot_button = controls.children[-2].children[0]
+            clear_ax_button = controls.children[-2].children[1]
+            plot_type_selection = controls.children[1]
+
+            assert plot_type_selection.disabled is True
+            clear_ax_button.click()
+            # after clearing the axis, we should be able to select plot type.
+            assert plot_type_selection.disabled is False
+
+            # disable overlay for certain plot types
+            for plot_type in _no_overlay_plot_types:
+                plot_type_selection.value = plot_type
+                add_plot_button.click()
+                assert add_plot_button.disabled is True
+                clear_ax_button.click()
+                assert add_plot_button.disabled is False
+    plt.close('all')
+
+
+def test_gui_adaptive_spectrogram():
+    gui = HNNGUI()
+    gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    gui.run_button.click()
+    figid = 1
+    figname = f'Figure {figid}'
+    axname = 'ax1'
+    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                             'spectrogram', {}, 'clear')
+    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                             'spectrogram', {}, 'plot')
+    # make sure the colorbar is correctly added
+    assert any(['_cbar-ax-' in attr
+                for attr in dir(gui.viz_manager.figs[figid])]) is True
+    assert len(gui.viz_manager.figs[1].axes) == 3
+    # make sure the colorbar is safely removed
+    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                             'spectrogram', {}, 'clear')
+    assert any(['_cbar-ax-' in attr
+                for attr in dir(gui.viz_manager.figs[figid])]) is False
+    assert len(gui.viz_manager.figs[1].axes) == 2
+    plt.close('all')

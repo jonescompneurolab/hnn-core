@@ -48,12 +48,12 @@ class CellResponse(object):
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occured at the corresonding time stamp.
         Each gid corresponds to a type via Network::gid_ranges.
-    vsoma : list (n_trials,) of dict, shape
+    vsec : list (n_trials,) of dict, shape
         Each element of the outer list is a trial.
-        Dictionary indexed by gids containing somatic voltages.
-    isoma : list (n_trials,) of dict, shape
+        Dictionary indexed by gids containing voltages for cell sections.
+    isec : list (n_trials,) of dict, shape
         Each element of the outer list is a trial.
-        Dictionary indexed by gids containing somatic currents.
+        Dictionary indexed by gids containing currents for cell sections.
     times : array-like, shape (n_times,)
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
@@ -109,8 +109,8 @@ class CellResponse(object):
         self._spike_times = spike_times
         self._spike_gids = spike_gids
         self._spike_types = spike_types
-        self._vsoma = list()
-        self._isoma = list()
+        self._vsec = list()
+        self._isec = list()
         if times is not None:
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
@@ -215,12 +215,12 @@ class CellResponse(object):
         return self._spike_types
 
     @property
-    def vsoma(self):
-        return self._vsoma
+    def vsec(self):
+        return self._vsec
 
     @property
-    def isoma(self):
-        return self._isoma
+    def isec(self):
+        return self._isec
 
     @property
     def times(self):

@@ -6,12 +6,13 @@
 import warnings
 import numpy as np
 from copy import deepcopy
+from .externals.mne import _check_option
 
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
-def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
-                    record_isoma=False, postproc=False):
+def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
+                    record_isec=False, postproc=False):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -26,10 +27,12 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     n_trials : int | None
         The number of trials to simulate. If None, the 'N_trials' value
         of the ``params`` used to create ``net`` is used (must be >0)
-    record_vsoma : bool
-        Option to record somatic voltages from cells
-    record_isoma : bool
-        Option to record somatic currents from cells
+    record_vsec : 'all' | 'soma' | False
+        Option to record voltages from all sections ('all'), or just
+        the soma ('soma'). Default: False.
+    record_isec : 'all' | 'soma' | False
+        Option to record voltages from all sections ('all'), or just
+        the soma ('soma'). Default: False.
     postproc : bool
         If True, smoothing (``dipole_smooth_win``) and scaling
         (``dipole_scalefctr``) values are read from the parameter file, and
@@ -60,6 +63,9 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
                       'net = jones_2009_model() or net = law_2021_model() to '
                       'create a predefined network from published models.',
                       UserWarning)
+    # ADD DRIVE WARNINGS HERE
+    if not net.external_drives:
+        warnings.warn('No external drives loaded', UserWarning)
 
     for drive_name, drive in net.external_drives.items():
         if 'tstop' in drive['dynamics']:
@@ -78,17 +84,13 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsoma=False,
     net._instantiate_drives(n_trials=n_trials, tstop=tstop)
     net._reset_rec_arrays()
 
-    if isinstance(record_vsoma, bool):
-        net._params['record_vsoma'] = record_vsoma
-    else:
-        raise TypeError("record_vsoma must be bool, got %s"
-                        % type(record_vsoma).__name__)
+    _check_option('record_vsec', record_vsec, ['all', 'soma', False])
 
-    if isinstance(record_isoma, bool):
-        net._params['record_isoma'] = record_isoma
-    else:
-        raise TypeError("record_isoma must be bool, got %s"
-                        % type(record_isoma).__name__)
+    net._params['record_vsec'] = record_vsec
+
+    _check_option('record_isec', record_isec, ['all', 'soma', False])
+
+    net._params['record_isec'] = record_isec
 
     if postproc:
         warnings.warn('The postproc-argument is deprecated and will be removed'
@@ -421,7 +423,7 @@ class Dipole(object):
                            decim=decim, color=color, show=show)
 
     def plot_psd(self, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-                 ax=None, show=True):
+                 color=None, label=None, ax=None, show=True):
         """Plot power spectral density (PSD) of dipole time course
 
         Applies `~scipy.signal.periodogram` from SciPy with
@@ -448,6 +450,10 @@ class Dipole(object):
             simulation.
         layer : str, default 'agg'
             The layer to plot. Can be one of 'agg', 'L2', and 'L5'
+        color : str | tuple | None
+            The line color of PSD
+        label : str | None
+            Line label for PSD
         ax : instance of matplotlib figure | None
             The matplotlib axis.
         show : bool
@@ -459,11 +465,13 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         return plot_psd(self, fmin=fmin, fmax=fmax, tmin=tmin, tmax=tmax,
-                        layer=layer, ax=ax, show=show)
+                        layer=layer, color=color, label=label, ax=ax,
+                        show=show)
 
     def plot_tfr_morlet(self, freqs, n_cycles=7., tmin=None, tmax=None,
                         layer='agg', decim=None, padding='zeros', ax=None,
-                        colormap='inferno', colorbar=True, show=True):
+                        colormap='inferno', colorbar=True,
+                        colorbar_inside=False, show=True):
         """Plot Morlet time-frequency representation of dipole time course
 
         NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be
@@ -501,6 +509,8 @@ class Dipole(object):
             'inferno'
         colorbar : bool
             If True (default), adjust figure to include colorbar.
+        colorbar_inside: bool, default False
+            Put the color inside the heatmap if True.
         show : bool
             If True, show the figure
 
@@ -512,7 +522,8 @@ class Dipole(object):
         return plot_tfr_morlet(
             self, freqs, n_cycles=n_cycles, tmin=tmin, tmax=tmax,
             layer=layer, decim=decim, padding=padding, ax=ax,
-            colormap=colormap, colorbar=colorbar, show=show)
+            colormap=colormap, colorbar=colorbar,
+            colorbar_inside=colorbar_inside, show=show)
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.

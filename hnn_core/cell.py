@@ -269,13 +269,15 @@ class Cell:
         The synapses that the cell can use for connections.
     dipole_pp : list of h.Dipole()
         The Dipole objects (see dipole.mod).
-    rec_v : h.Vector()
-        Recording of somatic voltage. Must be enabled
-        by running simulate_dipole(net, record_vsoma=True)
-    rec_i : dict
-        Contains recording of somatic currents indexed
-        by synapse type. (keys are soma_gabaa, soma_gabab etc.)
-        Must be enabled by running simulate_dipole(net, record_isoma=True)
+    vsec : dict
+        Recording of section specific voltage. Must be enabled
+        by running simulate_dipole(net, record_vsec=True) or
+        simulate_dipole(net, record_vsoma=True)
+    isec : dict
+        Contains recording of section specific currents indexed
+        by synapse type (keys can be soma_gabaa, soma_gabab etc.).
+        Must be enabled by running simulate_dipole(net, record_isec=True)
+        or simulate_dipole(net, record_isoma=True)
     tonic_biases : list of h.IClamp
         The current clamps inserted at each section of the cell
         for tonic biasing inputs.
@@ -311,8 +313,8 @@ class Cell:
         self._nrn_sections = dict()
         self._nrn_synapses = dict()
         self.dipole_pp = list()
-        self.rec_v = h.Vector()
-        self.rec_i = dict()
+        self.vsec = dict()
+        self.isec = dict()
         # insert iclamp
         self.list_IClamp = list()
         self._gid = None
@@ -533,31 +535,49 @@ class Cell:
         stim.amp = amplitude
         self.tonic_biases.append(stim)
 
-    def record_soma(self, record_vsoma=False, record_isoma=False):
-        """Record current and voltage at soma.
+    def record(self, record_vsec=False, record_isec=False):
+        """ Record current and voltage from all sections
 
         Parameters
         ----------
-        record_vsoma : bool
-            Option to record somatic voltages from cells
-        record_isoma : bool
-            Option to record somatic currents from cells
-
+        record_vsec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        record_isec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
         """
-        # a soma exists at self._nrn_sections['soma']
-        if record_isoma:
-            # assumes that self._nrn_synapses is a dict that exists
-            list_syn_soma = [key for key in self._nrn_synapses.keys()
-                             if key.startswith('soma_')]
-            # matching dict from the list_syn_soma keys
-            self.rec_i = dict.fromkeys(list_syn_soma)
-            # iterate through keys and record currents appropriately
-            for key in self.rec_i:
-                self.rec_i[key] = h.Vector()
-                self.rec_i[key].record(self._nrn_synapses[key]._ref_i)
 
-        if record_vsoma:
-            self.rec_v.record(self._nrn_sections['soma'](0.5)._ref_v)
+        section_names = list(self.sections.keys())
+
+        # Logic checks if just recording soma, sections, or both
+        if record_vsec == 'soma':
+            self.vsec = dict.fromkeys(['soma'])
+        elif record_vsec == 'all':
+            self.vsec = dict.fromkeys(section_names)
+
+        if record_vsec:
+            for sec_name in self.vsec:
+                self.vsec[sec_name] = h.Vector()
+                self.vsec[sec_name].record(
+                    self._nrn_sections[sec_name](0.5)._ref_v)
+
+        if record_isec == 'soma':
+            self.isec = dict.fromkeys(['soma'])
+        elif record_isec == 'all':
+            self.isec = dict.fromkeys(section_names)
+
+        if record_isec:
+            for sec_name in self.isec:
+                list_syn = [key for key in self._nrn_synapses.keys()
+                            if key.startswith(f'{sec_name}_')]
+                self.isec[sec_name] = dict.fromkeys(list_syn)
+
+                for syn_name in self.isec[sec_name]:
+                    self.isec[sec_name][syn_name] = h.Vector()
+
+                    self.isec[sec_name][syn_name].record(
+                        self._nrn_synapses[syn_name]._ref_i)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.

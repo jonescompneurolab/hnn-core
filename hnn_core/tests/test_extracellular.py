@@ -9,8 +9,11 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
-from hnn_core.extracellular import ExtracellularArray
+from hnn_core.extracellular import (ExtracellularArray, calculate_csd2d,
+                                    _get_laminar_z_coords)
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+
+import matplotlib.pyplot as plt
 
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -77,6 +80,20 @@ def test_extracellular_api():
                                  times=[0], voltages=[[[0], [0]]])
     with pytest.raises(RuntimeError, match="Sampling rate is not defined"):
         _ = rec_arr.sfreq
+
+    # test colinearity and equal spacing between electrode contacts for laminar
+    # profiling (e.g., for platting laminar LFP or CSD)
+    electrode_pos = [(1, 2, 1000), (2, 3, 3000), (3, 4, 5000),
+                     (4, 5, 7000)]
+    z_coords, z_delta = _get_laminar_z_coords(electrode_pos)
+    assert np.array_equal(z_coords, [1000, 3000, 5000, 7000])
+    assert z_delta == 2000
+    with pytest.raises(ValueError, match='Electrode array positions must '
+                       'contain more than 1 contact'):
+        _, _ = _get_laminar_z_coords([(1, 2, 3)])
+    with pytest.raises(ValueError, match='Make sure the electrode postions '
+                       'are equispaced, colinear'):
+        _, _ = _get_laminar_z_coords([(1, 1, 3), (1, 1, 4), (1, 1, 3.5)])
 
 
 def test_transmembrane_currents():
@@ -147,14 +164,15 @@ def test_transfer_resistance():
 @requires_psutil
 def test_extracellular_backends(run_hnn_core_fixture):
     """Test extracellular outputs across backends."""
-
-    electrode_array = {'arr1': [(2, 2, 400), (6, 6, 800)]}
+    # calculation of CSD requires >=4 electrode contacts
+    electrode_array = {'arr1': [(2, 2, 400), (2, 2, 600), (2, 2, 800),
+                                (2, 2, 1000)]}
     _, joblib_net = run_hnn_core_fixture(
-        backend='joblib', n_jobs=1, reduced=True, record_isoma=True,
-        record_vsoma=True, electrode_array=electrode_array)
+        backend='joblib', n_jobs=1, reduced=True, record_isec='soma',
+        record_vsec='soma', electrode_array=electrode_array)
     _, mpi_net = run_hnn_core_fixture(
-        backend='mpi', n_procs=2, reduced=True, record_isoma=True,
-        record_vsoma=True, electrode_array=electrode_array)
+        backend='mpi', n_procs=2, reduced=True, record_isec='soma',
+        record_vsec='soma', electrode_array=electrode_array)
 
     assert (len(electrode_array['arr1']) ==
             len(joblib_net.rec_arrays['arr1'].positions) ==
@@ -178,11 +196,14 @@ def test_extracellular_backends(run_hnn_core_fixture):
     # make sure sampling rate is fixed (raises RuntimeError if not)
     _ = joblib_net.rec_arrays['arr1'].sfreq
     # check plotting works
-    joblib_net.rec_arrays['arr1'].plot(show=False)
+    joblib_net.rec_arrays['arr1'].plot_lfp(show=False)
+    joblib_net.rec_arrays['arr1'].plot_csd(show=False)
+
+    plt.close('all')
 
 
 def test_rec_array_calculation():
-    """Test LFP calculation."""
+    """Test LFP/CSD calculation."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
@@ -192,17 +213,25 @@ def test_rec_array_calculation():
                    't_evdist_1': 17})
     net = jones_2009_model(params, add_drives_from_params=True)
 
-    # one electrode inside, one above the active elements of the network
-    electrode_pos = [(1.5, 1.5, 1000), (1.5, 1.5, 3000)]
+    # one electrode inside, one above the active elements of the network,
+    # and two more to allow calculation of CSD (2nd spatial derivative)
+    electrode_pos = [(1, 2, 1000), (2, 3, 3000), (3, 4, 5000),
+                     (4, 5, 7000)]
     net.add_electrode_array('arr1', electrode_pos)
     _ = simulate_dipole(net, tstop=5, n_trials=1)
 
     # test accessing simulated voltages
     assert (len(net.rec_arrays['arr1']) ==
             len(net.rec_arrays['arr1'].voltages) == 1)  # n_trials
-    assert len(net.rec_arrays['arr1'].voltages[0]) == 2  # n_contacts
+    assert len(net.rec_arrays['arr1'].voltages[0]) == 4  # n_contacts
     assert (len(net.rec_arrays['arr1'].voltages[0][0]) ==
             len(net.rec_arrays['arr1'].times))
+
+    # test dimensionality of LFP and CSD matrices
+    lfp_data = net.rec_arrays['arr1'].voltages[0]
+    csd_data = calculate_csd2d(lfp_data)
+    assert lfp_data.shape == csd_data.shape
+
     # ensure copy drops data (but retains electrode position information etc.)
     net_copy = net.copy()
     assert isinstance(net_copy.rec_arrays['arr1'], ExtracellularArray)

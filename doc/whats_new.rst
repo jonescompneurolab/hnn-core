@@ -21,11 +21,16 @@ Changelog
 - Add interface to modify attributes of sections in
   :func:`~hnn_core.Cell.modify_section`, by `Nick Tolley`_ in :gh:`481`
 
- - Add ability to target specific sections when adding drives or connections,
-   by `Nick Tolley`_ in :gh:`419`
+- Add ability to target specific sections when adding drives or connections,
+  by `Nick Tolley`_ in :gh:`419`
 
 - Runtime output messages now specify the trial with which each simulation time
   checkpoint belongs too, by `Ryan Thorpe`_ in :gh:`546`.
+
+- Add warning if network drives are not loaded, by `Orsolya Beatrix Kolozsvari`_ in :gh:`516`
+
+- Add ability to record voltages and synaptic currents from all sections in :class:`~hnn_core.CellResponse`,
+  by `Nick Tolley`_ in :gh:`502`.
 
 Bug
 ~~~
@@ -62,6 +67,9 @@ Bug
   simulation with an oversubscribed MPI session on a reduced network, by
   `Ryan Thorpe`_ in :gh:`545`.
 
+- Fix bug where :func:`~hnn_core.network.pick_connection` failed when searching
+  for connections with a list of cell types, by `Nick Tolley`_ in :gh:`559`
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
@@ -72,6 +80,19 @@ API
 
 - `~hnn_core.viz.plot_dipole` now supports separate visualizations of different
   layers, by `Huzi Cheng`_ in :gh:`479`.
+
+- Current source density (CSD) can now be calculated with
+  :func:`~hnn_core.extracellular.calculate_csd2d` and plotted with
+  :meth:`~hnn_core.extracellular.ExtracellularArray.plot_csd`. The method for
+  plotting local field potential (LFP) is now found at
+  :meth:`~hnn_core.extracellular.ExtracellularArray.plot_lfp`, by
+  `Steven Brandt`_ and `Ryan Thorpe`_ in :gh:`517`.
+
+- Recorded voltages/currents from the soma, as well all sections, are enabled by
+  setting either `record_vsec` or `record_isec` to `'all'` or `'soma'` 
+  in :func:`~hnn_core.simulate_dipole`. Recordings are now accessed through
+  :class:`~hnn_core.CellResponse.vsec` and :class:`~hnn_core.CellResponse.isec`,
+  by `Nick Tolley`_ in :gh:`502`.
 
 .. _0.2:
 
@@ -337,7 +358,9 @@ People who contributed to this release (in alphabetical order):
 .. _Mattan Pelah: https://github.com/mjpelah
 .. _Mohamed A. Sherif: https://github.com/mohdsherif/
 .. _Nick Tolley: https://github.com/ntolley
+.. _Orsolya Beatrix Kolozsvari: http://github.com/orbekolo/
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane
 .. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
+.. _Steven Brandt: https://github.com/spbrandt

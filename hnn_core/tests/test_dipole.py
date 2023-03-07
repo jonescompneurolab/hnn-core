@@ -2,6 +2,7 @@ import os.path as op
 from urllib.request import urlretrieve
 
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
@@ -93,20 +94,22 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
 
     # XXX all below to be deprecated in 0.3
     dpls_raw, net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
-                                         reduced=True, record_isoma=True,
-                                         record_vsoma=True)
+                                         reduced=True, record_isec='soma',
+                                         record_vsec='soma')
     # test deprecation of postproc
     with pytest.warns(DeprecationWarning,
                       match='The postproc-argument is deprecated'):
         dpls, _ = run_hnn_core_fixture(backend='joblib', n_jobs=1,
-                                       reduced=True, record_isoma=True,
-                                       record_vsoma=True, postproc=True)
+                                       reduced=True, record_isec='soma',
+                                       record_vsec='soma', postproc=True)
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
 
     dpls_raw[0]._post_proc(net._params['dipole_smooth_win'],
                            net._params['dipole_scalefctr'])
     assert_allclose(dpls_raw[0].data['agg'], dpls[0].data['agg'])
+
+    plt.close('all')
 
 
 def test_dipole_simulation():
@@ -123,11 +126,11 @@ def test_dipole_simulation():
     net = jones_2009_model(params, add_drives_from_params=True)
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=25., n_trials=0)
-    with pytest.raises(TypeError, match="record_vsoma must be bool, got int"):
-        simulate_dipole(net, tstop=25., n_trials=1, record_vsoma=0)
-    with pytest.raises(TypeError, match="record_isoma must be bool, got int"):
-        simulate_dipole(net, tstop=25., n_trials=1, record_vsoma=False,
-                        record_isoma=0)
+    with pytest.raises(ValueError, match="Invalid value for the"):
+        simulate_dipole(net, tstop=25., n_trials=1, record_vsec='abc')
+    with pytest.raises(ValueError, match="Invalid value for the"):
+        simulate_dipole(net, tstop=25., n_trials=1, record_vsec=False,
+                        record_isec='abc')
 
     # test Network.copy() returns 'bare' network after simulating
     dpl = simulate_dipole(net, tstop=25., n_trials=1)[0]
@@ -144,6 +147,7 @@ def test_dipole_simulation():
 
         # Smoke test for raster plot with no spikes
         net.cell_response.plot_spikes_raster()
+    plt.close('all')
 
 
 @requires_mpi4py
@@ -154,32 +158,38 @@ def test_cell_response_backends(run_hnn_core_fixture):
     # reduced simulation has n_trials=2
     trial_idx, n_trials, gid = 0, 2, 7
     _, joblib_net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
-                                         reduced=True, record_isoma=True,
-                                         record_vsoma=True)
+                                         reduced=True, record_vsec='all',
+                                         record_isec='soma')
     _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
-                                      record_isoma=True, record_vsoma=True)
+                                      record_vsec='all', record_isec='soma')
     n_times = len(joblib_net.cell_response.times)
 
-    assert len(joblib_net.cell_response.vsoma) == n_trials
-    assert len(joblib_net.cell_response.isoma) == n_trials
-    assert len(joblib_net.cell_response.vsoma[trial_idx][gid]) == n_times
-    assert len(joblib_net.cell_response.isoma[
-               trial_idx][gid]['soma_gabaa']) == n_times
+    assert len(joblib_net.cell_response.vsec) == n_trials
+    assert len(joblib_net.cell_response.isec) == n_trials
+    assert len(joblib_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
+    assert len(joblib_net.cell_response.isec[trial_idx][gid]) == 1
+    assert len(joblib_net.cell_response.vsec[
+        trial_idx][gid]['apical_1']) == n_times
+    assert len(joblib_net.cell_response.isec[
+               trial_idx][gid]['soma']['soma_gabaa']) == n_times
 
-    assert len(mpi_net.cell_response.vsoma) == n_trials
-    assert len(mpi_net.cell_response.isoma) == n_trials
-    assert len(mpi_net.cell_response.vsoma[trial_idx][gid]) == n_times
-    assert len(mpi_net.cell_response.isoma[
-               trial_idx][gid]['soma_gabaa']) == n_times
-    assert mpi_net.cell_response.vsoma == joblib_net.cell_response.vsoma
-    assert mpi_net.cell_response.isoma == joblib_net.cell_response.isoma
+    assert len(mpi_net.cell_response.vsec) == n_trials
+    assert len(mpi_net.cell_response.isec) == n_trials
+    assert len(mpi_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
+    assert len(mpi_net.cell_response.isec[trial_idx][gid]) == 1
+    assert len(mpi_net.cell_response.vsec[
+        trial_idx][gid]['apical_1']) == n_times
+    assert len(mpi_net.cell_response.isec[
+               trial_idx][gid]['soma']['soma_gabaa']) == n_times
+    assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
+    assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
 
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
     times = np.array(joblib_net.cell_response.times)
     spike_times = np.array(joblib_net.cell_response.spike_times[trial_idx])
     spike_gids = np.array(joblib_net.cell_response.spike_gids[trial_idx])
-    vsoma = np.array(joblib_net.cell_response.vsoma[trial_idx][gid])
+    vsoma = np.array(joblib_net.cell_response.vsec[trial_idx][gid]['soma'])
 
     v_mask = vsoma > v_thresh
     assert np.all([spike_times[spike_gids == gid] > times[v_mask][0],

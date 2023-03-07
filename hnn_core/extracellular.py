@@ -28,6 +28,74 @@ from neuron import h
 from .externals.mne import _validate_type, _check_option
 
 
+def calculate_csd2d(lfp_data, delta=1):
+    """Current source density (CSD) estimation
+
+    Parameters
+    ----------
+    lfp_data : array, shape (n_channels, n_times)
+        LFP data.
+    delta : int
+        Spacing between channels (um), scales the CSD.
+
+    Returns
+    -------
+    csd2d : array, shape (n_channels, n_times)
+        The 2nd derivative current source density estimate (csd2d)
+
+    Notes
+    -----
+    The three-point finite-difference approximation of the
+    second spatial derivative for computing 1-dimensional CSD
+    with border electrode interpolation
+    csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +
+                       LFP[electrode + 1]) / spacing ** 2
+    """
+    csd2d = -np.diff(lfp_data, n=2, axis=0) / delta ** 2
+    bottom_border = csd2d[-1, :] * 2 - csd2d[-2, :]
+    top_border = csd2d[0, :] * 2 - csd2d[1, :]
+    csd2d = np.concatenate((top_border[None, ...], csd2d,
+                            bottom_border[None, ...]), axis=0)
+    return csd2d
+
+
+def _get_laminar_z_coords(electrode_positions):
+    """Get equispaced, colinear electrode coordinates along z-axis.
+
+    Parameters
+    ----------
+    electrode_positions : list of tuple
+        The (x, y, z) coordinates (in um) of the extracellular electrodes.
+
+    Returns
+    -------
+    z_coordinates : array, shape (n_contacts,)
+        Z-coordinates of the electrode contacts.
+    z_delta : float
+        Magnitude of change in the z-direction.
+    """
+    n_contacts = np.array(electrode_positions).shape[0]
+    if n_contacts < 2:
+        raise ValueError(
+            'Electrode array positions must contain more than 1 contact to be '
+            'compatible with laminar profiling in a neocortical column. Got '
+            f'{n_contacts} electrode contact positions.')
+    displacements = np.diff(electrode_positions, axis=0)
+    z_delta = np.abs(displacements[0, 2])
+    magnitudes = np.linalg.norm(displacements, axis=1)
+    cross_prods = np.cross(displacements[:-1], displacements[1:])
+    if not (np.allclose(magnitudes, magnitudes[0]) and  # equally spaced
+            z_delta > 0 and  # changes in z-direction
+            np.allclose(cross_prods, 0)):  # colinear
+        raise ValueError(
+            'Electrode contacts are incompatible with laminar profiling '
+            'in a neocortical column. Make sure the '
+            'electrode postions are equispaced, colinear, and projecting '
+            'along the z-axis.')
+    else:
+        return np.array(electrode_positions)[:, 2], z_delta
+
+
 def _transfer_resistance(section, electrode_pos, conductivity, method,
                          min_distance=0.5):
     """Transfer resistance between section and electrode position.
@@ -208,7 +276,7 @@ class ExtracellularArray:
                  min_distance=0.5, times=None, voltages=None):
 
         _validate_type(positions, (tuple, list), 'positions')
-        if len(positions) == 3:  # a single coordinate given
+        if np.array(positions).shape == (3,):  # a single coordinate given
             positions = [positions]
         for pos in positions:
             _validate_type(pos, (tuple, list), 'positions')
@@ -353,10 +421,10 @@ class ExtracellularArray:
 
         return self
 
-    def plot(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
-             ax=None, decim=None, color='cividis', voltage_offset=50,
-             voltage_scalebar=200, contact_labels=None, show=True):
-        """Plot extracellular electrode array voltage time series.
+    def plot_lfp(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
+                 ax=None, decim=None, color='cividis', voltage_offset=50,
+                 voltage_scalebar=200, show=True):
+        """Plot laminar local field potential time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
         with or without (default) and offset.
@@ -392,9 +460,6 @@ class ExtracellularArray:
         voltage_scalebar : float | None (optional)
             Height, in units of uV, of a scale bar to plot in the top-left
             corner of the plot.
-        contact_labels : list (optional)
-            Labels associated with the contacts to plot. Passed as-is to
-            :meth:`~matplotlib.axes.Axes.set_yticklabels`.
         show : bool
             If True, show the figure
 
@@ -403,7 +468,7 @@ class ExtracellularArray:
         fig : instance of plt.fig
             The matplotlib figure handle into which time series were plotted.
         """
-        from .viz import plot_extracellular
+        from .viz import plot_laminar_lfp
 
         if trial_no is None:
             plot_data = self.voltages
@@ -417,18 +482,46 @@ class ExtracellularArray:
         elif contact_no is not None:
             raise ValueError(f'unknown contact number type, got {contact_no}')
 
-        if contact_labels is None:
-            positions = np.array(self.positions)
-            contact_labels = positions[:, 2]
+        contact_labels, _ = _get_laminar_z_coords(self.positions)
 
         for trial_data in plot_data:
-            fig = plot_extracellular(
+            fig = plot_laminar_lfp(
                 self.times, trial_data, tmin=tmin, tmax=tmax, ax=ax,
                 decim=decim, color=color,
                 voltage_offset=voltage_offset,
                 voltage_scalebar=voltage_scalebar,
                 contact_labels=contact_labels,
                 show=show)
+        return fig
+
+    def plot_csd(self, colorbar=True, ax=None, show=True):
+        """Plot laminar current source density (CSD) estimation
+
+        Parameters
+        ----------
+        colorbar : bool
+            If the colorbar is presented.
+        ax : instance of matplotlib figure | None
+            The matplotlib axis.
+        show : bool
+            If True, show the plot.
+
+        Returns
+        -------
+        fig : instance of matplotlib Figure
+            The matplotlib figure handle.
+        """
+        from .viz import plot_laminar_csd
+        lfp = self.voltages[0]
+        contact_labels, delta = _get_laminar_z_coords(self.positions)
+
+        csd_data = calculate_csd2d(lfp_data=lfp,
+                                   delta=delta)
+
+        fig = plot_laminar_csd(self.times, csd_data,
+                               contact_labels=contact_labels, ax=ax,
+                               colorbar=colorbar, show=show)
+
         return fig
 
 
