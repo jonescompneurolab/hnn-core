@@ -152,7 +152,8 @@
 
 <div class="viewcode-block" id="jones_2009_model"><a class="viewcode-back" href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model">[docs]</a><span class="k">def</span> <span class="nf">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the Jones et al. 2009 model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the network model described in</span>
+<span class="sd">    Jones et al. J. of Neurophys. 2009 [1]_</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -181,6 +182,14 @@
 <span class="sd">    the net is created using the set_cell_positions-method. An all-to-all</span>
 <span class="sd">    connectivity pattern is applied between cells. Inhibitory basket cells are</span>
 <span class="sd">    present at a 1:3-ratio.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Jones, Stephanie R., et al. &quot;Quantitative Analysis and</span>
+<span class="sd">           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:</span>
+<span class="sd">           Rhythmogenesis and Modulation of Sensory-Evoked Responses.&quot;</span>
+<span class="sd">           Journal of Neurophysiology 102, 3554–3572 (2009).</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -305,7 +314,9 @@
 
 <div class="viewcode-block" id="law_2021_model"><a class="viewcode-back" href="../../generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model">[docs]</a><span class="k">def</span> <span class="nf">law_2021_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the beta modulated ERP network model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the expansion of Jones 2009 model to study beta</span>
+<span class="sd">    modulated ERPs as described in</span>
+<span class="sd">    Law et al. Cereb. Cortex 2021 [1]_</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -328,6 +339,12 @@
 <span class="sd">    4) Removal of L5 pyramidal somatic and basal dendrite calcium channels</span>
 <span class="sd">    5) Replace L2_basket -&gt; L5_pyramidal GABAa connection with GABAb</span>
 <span class="sd">    6) Addition of L5_basket -&gt; L5_pyramidal distal connection</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Law, Robert G., et al. &quot;Thalamocortical Mechanisms Regulating the</span>
+<span class="sd">           Relationship between Transient Beta Events and Human Tactile</span>
+<span class="sd">           Perception.&quot; Cerebral Cortex, 32, 668–688 (2022).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
@@ -384,7 +401,9 @@
 <span class="c1"># (only relevant for Jones 2009 model)</span>
 <div class="viewcode-block" id="calcium_model"><a class="viewcode-back" href="../../generated/hnn_core.calcium_model.html#hnn_core.calcium_model">[docs]</a><span class="k">def</span> <span class="nf">calcium_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the Jones 2009 model with improved calcium dynamics.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the Jones 2009 model with improved calcium dynamics in</span>
+<span class="sd">    L5 pyramidal neurons. For more details on changes to calcium dynamics</span>
+<span class="sd">    see Kohl et al. Brain Topragr 2022 [1]_</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -403,6 +422,12 @@
 <span class="sd">    Specifically, this model introduces a distance dependent maximum</span>
 <span class="sd">    conductance (gbar) on calcium channels such that the gbar linearly</span>
 <span class="sd">    decreases along the dendrites in the direction of the soma.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Kohl, Carmen, et al. &quot;Neural Mechanisms Underlying Human Auditory</span>
+<span class="sd">           Evoked Responses Revealed By Human Neocortical Neurosolver.&quot;</span>
+<span class="sd">           Brain Topography, 35, 19–35 (2022).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="n">params_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hnn_core_root</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;default.json&#39;</span><span class="p">)</span>

@@ -152,7 +152,9 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.calcium_model">
 <span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">calcium_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network_models.html#calcium_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.calcium_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiate the Jones 2009 model with improved calcium dynamics.</p>
+<dd><p>Instantiate the Jones 2009 model with improved calcium dynamics in
+L5 pyramidal neurons. For more details on changes to calcium dynamics
+see Kohl et al. Brain Topragr 2022 <a class="reference internal" href="#ra064675c014c-1" id="id1">[1]</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -174,6 +176,15 @@ accurate distribution of calcium channels on L5 pyramidal cells.
 Specifically, this model introduces a distance dependent maximum
 conductance (gbar) on calcium channels such that the gbar linearly
 decreases along the dendrites in the direction of the soma.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="ra064675c014c-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Kohl, Carmen, et al. “Neural Mechanisms Underlying Human Auditory
+Evoked Responses Revealed By Human Neocortical Neurosolver.”
+Brain Topography, 35, 19–35 (2022).</p>
+</div>
+</div>
 </dd></dl>
 
 <span class="target" id="sphx-glr-backreferences-hnn-core-calcium-model"></span></section>
