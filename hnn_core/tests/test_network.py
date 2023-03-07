@@ -499,6 +499,14 @@ def test_network():
 
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
+
+    # Testing deleting a custom number of drives
+    all_drives = net.get_external_drive_names()
+    drives_to_be_deleted = all_drives[0:2]  # Deleting 2 drives in this test
+    net.clear_drives(drive_names=drives_to_be_deleted)
+    assert len(net.connectivity) == 15
+
+    # Deleting all drives
     net.clear_drives()
     assert len(net.connectivity) == 0
 
