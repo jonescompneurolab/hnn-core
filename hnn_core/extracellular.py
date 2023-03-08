@@ -494,7 +494,8 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, colorbar=True, tmin=None, tmax=None, ax=None, show=True):
+    def plot_csd(self, colorbar=True, tmin=None, tmax=None, ax=None,
+                 show=True):
         """Plot laminar current source density (CSD) estimation
 
         Parameters
