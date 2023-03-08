@@ -1254,7 +1254,13 @@ class Network(object):
         self.connectivity.append(deepcopy(conn))
 
     def clear_connectivity(self, src_types=None):
-        """Remove connections with src_type in Network.connectivity."""
+        """Remove connections with src_type in Network.connectivity.
+
+        Parameters
+        ----------
+        src_types : list | None
+            Source types of connections to be removed
+        """
         if src_types is None:
             src_types = list()
             # Storing all external drives
@@ -1286,7 +1292,8 @@ class Network(object):
             del self.external_drives[drive_name]
         self.clear_connectivity(src_types=drive_names)
 
-    def get_external_drive_names(self):
+    @property
+    def drive_names(self):
         """Returns a list containing names of all external drives."""
         return list(self.external_drives.keys())
 

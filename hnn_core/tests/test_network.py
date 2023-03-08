@@ -789,7 +789,7 @@ def test_network_connectivity():
     # Testing deletion of a custom number of drives
 
     # Deleting one external drive
-    all_drives = net.get_external_drive_names()
+    all_drives = net.drive_names
     drives_to_be_deleted = all_drives[0:1]
     connectivities_to_be_deleted = 0
     for drive in drives_to_be_deleted:
