@@ -32,6 +32,8 @@ Changelog
 - Add ability to record voltages and synaptic currents from all sections in :class:`~hnn_core.CellResponse`,
   by `Nick Tolley`_ in :gh:`502`.
 
+- Add ability to return unweighted RMSE for each optimization iteration in :func:`~hnn_core.optimization.optimize_evoked`, by `Kaisu Lankinen`_ in :gh:`610`.
+
 Bug
 ~~~
 - Fix bugs in drives API to enable: rate constant argument as float; evoked drive with
@@ -364,3 +366,4 @@ People who contributed to this release (in alphabetical order):
 .. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
 .. _Steven Brandt: https://github.com/spbrandt
+.. _Kaisu Lankinen: http://klankinen.github.io/
