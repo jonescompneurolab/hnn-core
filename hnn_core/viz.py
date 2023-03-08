@@ -275,8 +275,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     for single_dpl in dpl:
         if not isinstance(single_dpl, Dipole):
-            raise ValueError('Arg 1 should be of type dipole or list of dipol'
-                             'es, 'f'but {single_dpl} is a {type(single_dpl)}')
+            raise ValueError('dpl should be of type Dipole or list of Dipole, '
+                             f'but {single_dpl} is a {type(single_dpl)}')
 
     scale_applied = dpl[0].scale_applied
 

@@ -34,6 +34,9 @@ Changelog
 
 - Add ability to return unweighted RMSE for each optimization iteration in :func:`~hnn_core.optimization.optimize_evoked`, by `Kaisu Lankinen`_ in :gh:`610`.
 
+- Add ability to check instance type of Dipole in :func:`~hnn_core.viz.plot_dipole`,
+  by `Rajat Partani`_in :gh:`606`.
+
 Bug
 ~~~
 - Fix bugs in drives API to enable: rate constant argument as float; evoked drive with
