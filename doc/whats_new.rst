@@ -81,6 +81,9 @@ Bug
 - Fix bug where :func:`~hnn_core.params.read_params` failed to create a network when
   legacy mode is False, by `Nick Tolley`_ in :gh:`614`
 
+- Fix bug where :func:`~hnn_core.viz.plot_dipole` failed to check the instance
+  type of Dipole, by `Rajat Partani`_ in :gh:`606`
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
