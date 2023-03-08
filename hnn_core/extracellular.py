@@ -494,7 +494,7 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, colorbar=True, ax=None, show=True):
+    def plot_csd(self, colorbar=True, tmin=None, tmax=None, ax=None, show=True):
         """Plot laminar current source density (CSD) estimation
 
         Parameters
@@ -503,6 +503,11 @@ class ExtracellularArray:
             If the colorbar is presented.
         ax : instance of matplotlib figure | None
             The matplotlib axis.
+        tmin : float | None
+            Start time of plot in milliseconds. If None, plot entire
+            simulation.
+        tmax : float | None
+            End time of plot in milliseconds. If None, plot entire simulation.
         show : bool
             If True, show the plot.
 
@@ -534,6 +539,7 @@ class _ExtracellularArrayBuilder(object):
         The instance of :class:`hnn_core.extracellular.ExtracellularArray` to
         build in NEURON-Python
     """
+
     def __init__(self, array):
         self.array = array
         self.n_contacts = array.n_contacts
