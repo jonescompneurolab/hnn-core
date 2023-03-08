@@ -479,8 +479,8 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
         Evoked drives to optimize. If 'all', will opimize all evoked drives.
         If a subset list of evoked drives, will optimize only the evoked drives in the list.
     return_rmse : bool
-        Returns list of unweighted RMSEs between data in dpl and exp_dpl 
-        for each optimization step
+        Returns list of unweighted RMSEs between the simulated and experimental dipole 
+        waveforms for each optimization step
 
     Returns
     -------
@@ -488,7 +488,8 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
         An instance of the Network object with the optimized configuration of
         attached drives.
     iter_avg_rmse : list of float
-        Unweighted RMSE between data in dpl and exp_dpl for each iteration
+        Unweighted RMSE between data in dpl and exp_dpl for each iteration. Returned only
+        if return_rmse is True
 
     Notes
     -----
@@ -545,7 +546,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     opt_params = dict()
 
     if return_rmse is True:
-        opt_params['iter_avg_rmse'] = []
+        opt_params['iter_avg_rmse'] = list()
 
     for step in range(len(param_chunks)):
         opt_params['cur_step'] = step
