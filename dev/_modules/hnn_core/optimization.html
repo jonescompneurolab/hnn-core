@@ -377,7 +377,8 @@
 
 
 <span class="k">def</span> <span class="nf">_optrun</span><span class="p">(</span><span class="n">drive_params_updated</span><span class="p">,</span> <span class="n">drive_params_static</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
-            <span class="n">n_trials</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">opt_dpls</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">smooth_window_len</span><span class="p">):</span>
+            <span class="n">n_trials</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">opt_dpls</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">smooth_window_len</span><span class="p">,</span>
+            <span class="n">return_rmse</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the function to run a simulation</span>
 
 <span class="sd">    Parameters</span>
@@ -409,11 +410,16 @@
 <span class="sd">    smooth_window_len : int</span>
 <span class="sd">        The length of the hamming window (in samples) to smooth the</span>
 <span class="sd">        simulated dipole waveform in each optimization step.</span>
+<span class="sd">    return_rmse : bool</span>
+<span class="sd">        Returns list of unweighted RMSEs between data in dpl and exp_dpl</span>
+<span class="sd">        for each optimization step</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    avg_rmse: float</span>
 <span class="sd">        Weighted RMSE between data in dpl and exp_dpl</span>
+<span class="sd">    avg_rmse_unweighted : float</span>
+<span class="sd">        Unweighted RMSE between data in dpl and exp_dpl</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization step </span><span class="si">%d</span><span class="s2">, iteration </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;cur_step&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                                                   <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;optiter&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
@@ -477,7 +483,11 @@
                      <span class="n">tstart</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">],</span>
                      <span class="n">tstop</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">],</span>
                      <span class="n">weights</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span>
+    <span class="n">avg_rmse_unweighted</span> <span class="o">=</span> <span class="n">_rmse</span><span class="p">(</span><span class="n">avg_dpl</span><span class="p">,</span> <span class="n">opt_dpls</span><span class="p">[</span><span class="s1">&#39;target_dpl&#39;</span><span class="p">],</span>
+                                <span class="n">tstart</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">],</span>
+                                <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
+    <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;iter_avg_rmse&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_rmse_unweighted</span><span class="p">)</span>
     <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;stepminopterr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_rmse</span>
     <span class="n">opt_dpls</span><span class="p">[</span><span class="s1">&#39;best_dpl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_dpl</span>
 
@@ -486,7 +496,7 @@
 
     <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;optiter&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">return</span> <span class="n">avg_rmse</span>  <span class="c1"># nlopt expects error</span>
+    <span class="k">return</span> <span class="n">avg_rmse</span><span class="p">,</span> <span class="n">avg_rmse_unweighted</span>  <span class="c1"># nlopt expects error</span>
 
 
 <span class="k">def</span> <span class="nf">_run_optimization</span><span class="p">(</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">param_ranges</span><span class="p">,</span> <span class="n">optrun</span><span class="p">):</span>
@@ -567,7 +577,7 @@
                     <span class="n">timing_range_multiplier</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">sigma_range_multiplier</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
                     <span class="n">synweight_range_multiplier</span><span class="o">=</span><span class="mf">500.0</span><span class="p">,</span> <span class="n">decay_multiplier</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span>
                     <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">smooth_window_len</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span>
-                    <span class="n">which_drives</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
+                    <span class="n">which_drives</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">return_rmse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimize drives to generate evoked response.</span>
 
 <span class="sd">    Parameters</span>
@@ -607,12 +617,18 @@
 <span class="sd">    which_drives: &#39;all&#39; or list</span>
 <span class="sd">        Evoked drives to optimize. If &#39;all&#39;, will opimize all evoked drives.</span>
 <span class="sd">        If a subset list of evoked drives, will optimize only the evoked drives in the list.</span>
+<span class="sd">    return_rmse : bool</span>
+<span class="sd">        Returns list of unweighted RMSEs between the simulated and experimental dipole </span>
+<span class="sd">        waveforms for each optimization step</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    net : Network instance</span>
 <span class="sd">        An instance of the Network object with the optimized configuration of</span>
 <span class="sd">        attached drives.</span>
+<span class="sd">    iter_avg_rmse : list of float</span>
+<span class="sd">        Unweighted RMSE between data in dpl and exp_dpl for each iteration. Returned only</span>
+<span class="sd">        if return_rmse is True</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -667,6 +683,10 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial RMSE: </span><span class="si">%.2e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">best_rmse</span><span class="p">)</span>
 
     <span class="n">opt_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">return_rmse</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;iter_avg_rmse&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
     <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param_chunks</span><span class="p">)):</span>
         <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;cur_step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span>
         <span class="n">total_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_chunks</span><span class="p">)</span>
@@ -726,7 +746,8 @@
                             <span class="n">opt_params</span><span class="o">=</span><span class="n">opt_params</span><span class="p">,</span>
                             <span class="n">opt_dpls</span><span class="o">=</span><span class="n">opt_dpls</span><span class="p">,</span>
                             <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span>
-                            <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">smooth_window_len</span><span class="p">)</span>
+                            <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">smooth_window_len</span><span class="p">,</span>
+                            <span class="n">return_rmse</span><span class="o">=</span><span class="n">return_rmse</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimizing from [</span><span class="si">%3.3f</span><span class="s1">-</span><span class="si">%3.3f</span><span class="s1">] ms&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">],</span>
                                                     <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_end&#39;</span><span class="p">]))</span>
@@ -749,6 +770,9 @@
             <span class="n">net</span> <span class="o">=</span> <span class="n">net_opt</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Final RMSE: </span><span class="si">%.2e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">best_rmse</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_rmse</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">net</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;iter_avg_rmse&#39;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">net</span></div>
 </pre></div>
 

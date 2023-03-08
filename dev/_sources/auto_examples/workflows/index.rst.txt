@@ -34,7 +34,7 @@ help users get started.
 .. only:: html
 
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
-    :alt: 01. Simulate Event Related Potentials (ERPs)
+    :alt:
 
   :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
 
@@ -51,7 +51,7 @@ help users get started.
 .. only:: html
 
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
-    :alt: 02. Simulate Alpha and Beta Rhythms
+    :alt:
 
   :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`
 
@@ -68,7 +68,7 @@ help users get started.
 .. only:: html
 
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
-    :alt: 03. Simulate Gamma Rhythms
+    :alt:
 
   :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py`
 
@@ -85,7 +85,7 @@ help users get started.
 .. only:: html
 
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
-    :alt: 04. From MEG sensor-space data to HNN simulation
+    :alt:
 
   :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py`
 
@@ -102,7 +102,7 @@ help users get started.
 .. only:: html
 
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_beta_thumb.png
-    :alt: 05. Simulate beta modulated ERP
+    :alt:
 
   :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py`
 

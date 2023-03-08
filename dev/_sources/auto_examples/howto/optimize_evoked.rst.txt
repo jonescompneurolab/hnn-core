@@ -186,6 +186,8 @@ the improved dipole fit.
         :alt: Launch binder
         :width: 150 px
 
+
+
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: optimize_evoked.py <optimize_evoked.py>`

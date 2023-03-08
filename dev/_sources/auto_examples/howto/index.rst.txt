@@ -22,7 +22,7 @@ tasks.
 .. only:: html
 
   .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_firing_pattern_thumb.png
-    :alt: 01. Plot firing pattern
+    :alt:
 
   :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py`
 
@@ -39,7 +39,7 @@ tasks.
 .. only:: html
 
   .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
-    :alt: 02. Record extracellular potentials
+    :alt:
 
   :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py`
 
@@ -56,7 +56,7 @@ tasks.
 .. only:: html
 
   .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_connectivity_thumb.png
-    :alt: 03. Modifying local connectivity
+    :alt:
 
   :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py`
 
@@ -73,7 +73,7 @@ tasks.
 .. only:: html
 
   .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_simulate_mpi_backend_thumb.png
-    :alt: 04. Use MPI backend for parallelization
+    :alt:
 
   :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py`
 
@@ -90,7 +90,7 @@ tasks.
 .. only:: html
 
   .. image:: /auto_examples/howto/images/thumb/sphx_glr_optimize_evoked_thumb.png
-    :alt: 05. Optimize simulated evoked response parameters
+    :alt:
 
   :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py`
 
