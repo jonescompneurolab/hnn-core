@@ -1253,23 +1253,42 @@ class Network(object):
 
         self.connectivity.append(deepcopy(conn))
 
-    def clear_connectivity(self):
-        """Remove all connections defined in Network.connectivity
-        """
-        connectivity = list()
+    def clear_connectivity(self, src_types=None):
+        """Remove connections with src_type in Network.connectivity."""
+        if src_types is None:
+            src_types = list()
+            # Storing all external drives
+            src_types_external_drives = self.external_drives.keys()
+            for conn in self.connectivity:
+                src_type = conn['src_type']
+                if src_type not in src_types_external_drives:
+                    src_types.append(src_type)  # Storing drives to be deleted
+            src_types = list(set(src_types))  # Removing duplicate entries
+        connectivity = list()  # Initialize empty list
         for conn in self.connectivity:
-            if conn['src_type'] in self.external_drives.keys():
+            # Removes connections in src_types
+            if conn['src_type'] not in src_types:
                 connectivity.append(conn)
         self.connectivity = connectivity
 
-    def clear_drives(self):
-        """Remove all drives defined in Network.connectivity"""
-        connectivity = list()
-        for conn in self.connectivity:
-            if conn['src_type'] not in self.external_drives.keys():
-                connectivity.append(conn)
-        self.external_drives = dict()
-        self.connectivity = connectivity
+    def clear_drives(self, drive_names='all'):
+        """Remove all drives defined in Network.connectivity.
+
+        Parameters
+        ----------
+        drive_names : list | 'all'
+            The drive_names to remove
+        """
+        if drive_names == 'all':
+            drive_names = list(self.external_drives.keys())
+        _validate_type(drive_names, (list,))
+        for drive_name in drive_names:
+            del self.external_drives[drive_name]
+        self.clear_connectivity(src_types=drive_names)
+
+    def get_external_drive_names(self):
+        """Returns a list containing names of all external drives."""
+        return list(self.external_drives.keys())
 
     def add_electrode_array(self, name, electrode_pos, *, conductivity=0.3,
                             method='psa', min_distance=0.5):

@@ -784,8 +784,26 @@ def test_network_connectivity():
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
     assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
+
+    # Only external drive connections are left
+    # Testing deletion of a custom number of drives
+
+    # Deleting one external drive
+    all_drives = net.get_external_drive_names()
+    drives_to_be_deleted = all_drives[0:1]
+    connectivities_to_be_deleted = 0
+    for drive in drives_to_be_deleted:
+        drive_connections = len(pick_connection(net, src_gids=drive))
+        connectivities_to_be_deleted = (connectivities_to_be_deleted +
+                                        drive_connections)
+    expected_connectivity_length = (len(net.connectivity) -
+                                    connectivities_to_be_deleted)
+    net.clear_drives(drive_names=drives_to_be_deleted)
+    assert len(net.connectivity) == expected_connectivity_length
+
+    # Deleting all remaining external drives
     net.clear_drives()
-    assert len(net.connectivity) == 0
+    assert len(net.connectivity) == 0  # All connections are deleted
 
     with pytest.warns(UserWarning, match='No connections'):
         simulate_dipole(net, tstop=10)
