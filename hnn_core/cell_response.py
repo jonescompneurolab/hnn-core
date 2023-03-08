@@ -345,7 +345,7 @@ class CellResponse(object):
             The matplotlib figure object.
         """
         return plot_spikes_raster(
-            cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
+            cell_response=self, tmin=tmin, tmax=tmax, trial_idx=trial_idx, ax=ax, show=show)
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, tmin=None, tmax=None, spike_types=None,
                          show=True):
@@ -388,7 +388,7 @@ class CellResponse(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
+        return plot_spikes_hist(self, trial_idx=trial_idx, tmin=tmin, tmax=tmax, ax=ax,
                                 spike_types=spike_types, show=show)
 
     def write(self, fname):

@@ -523,7 +523,7 @@ class ExtracellularArray:
         csd_data = calculate_csd2d(lfp_data=lfp,
                                    delta=delta)
 
-        fig = plot_laminar_csd(self.times, csd_data,
+        fig = plot_laminar_csd(self.times, csd_data, tmin=tmin, tmax=tmax,
                                contact_labels=contact_labels, ax=ax,
                                colorbar=colorbar, show=show)
 
