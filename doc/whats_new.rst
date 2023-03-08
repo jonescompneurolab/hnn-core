@@ -369,4 +369,4 @@ People who contributed to this release (in alphabetical order):
 .. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
 .. _Steven Brandt: https://github.com/spbrandt
-.. _Kaisu Lankinen: http://klankinen.github.io/
+.. _Kaisu Lankinen: https://github.com/klankinen
