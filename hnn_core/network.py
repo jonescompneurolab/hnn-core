@@ -1263,12 +1263,11 @@ class Network(object):
         """
         if src_types is None:
             src_types = list()
-            # Storing all external drives
-            src_types_external_drives = self.external_drives.keys()
             for conn in self.connectivity:
                 src_type = conn['src_type']
-                if src_type not in src_types_external_drives:
-                    src_types.append(src_type)  # Storing drives to be deleted
+                # src_type should not be a external drive in this case
+                if src_type not in self.drive_names:
+                    src_types.append(src_type)  # Store src_types to be deleted
             src_types = list(set(src_types))  # Removing duplicate entries
         connectivity = list()  # Initialize empty list
         for conn in self.connectivity:
@@ -1286,7 +1285,7 @@ class Network(object):
             The drive_names to remove
         """
         if drive_names == 'all':
-            drive_names = list(self.external_drives.keys())
+            drive_names = self.drive_names
         _validate_type(drive_names, (list,))
         for drive_name in drive_names:
             del self.external_drives[drive_name]
