@@ -44,8 +44,8 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
 
     # Test wrong argument to plot_dipole()
     with pytest.raises(ValueError, match="dpl should be of "
-                       "type Dipole, but 10 is "
-                       "a <class 'int'>"):
+                       "type Dipole or list of Dipole, but is "
+                       "a list containing type <class 'int'>"):
         plot_dipole([dipole, 10], show=False)
 
     # Test IO
