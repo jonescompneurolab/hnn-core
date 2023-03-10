@@ -1260,6 +1260,8 @@ class Network(object):
         ----------
         src_types : list | None
             Source types of connections to be removed
+            None - Remove all connections other than those which have an
+            external drive as a source type
         """
         if src_types is None:
             src_types = list()
