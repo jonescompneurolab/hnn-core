@@ -145,6 +145,9 @@ def _add_drives_from_params(net):
                 synaptic_delays=specs['synaptic_delays'],
                 space_constant=specs['space_constant'])
         elif specs['type'] == 'poisson':
+            if (not net._legacy_mode) and specs[
+                    'dynamics']['tstop'] < specs['dynamics']['tstart']:
+                continue
             net.add_poisson_drive(
                 drive_name, tstart=specs['dynamics']['tstart'],
                 tstop=specs['dynamics']['tstop'],
@@ -165,6 +168,9 @@ def _add_drives_from_params(net):
                 synaptic_delays=specs['synaptic_delays'],
                 space_constant=specs['space_constant'])
         elif specs['type'] == 'bursty':
+            if (not net._legacy_mode) and specs[
+                    'dynamics']['tstop'] < specs['dynamics']['tstart']:
+                continue
             net.add_bursty_drive(
                 drive_name,
                 tstart=specs['dynamics']['tstart'],
