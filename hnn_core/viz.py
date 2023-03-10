@@ -272,15 +272,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         dpl = [dpl]
     elif isinstance(dpl, list):
         for single_dpl in dpl:
-            if not isinstance(single_dpl, Dipole):
-                raise ValueError('dpl should be of type Dipole or list of '
-                                 'Dipole, but is a list containing '
-                                 f'type {type(single_dpl)}')
+            _validate_type(single_dpl, Dipole, 'dpl', 'Dipole, list of Dipole')
         if average:
             dpl = dpl + [average_dipoles(dpl)]
     else:
-        raise ValueError('dpl should be of type Dipole or list of Dipole, '
-                         f'but is a type {type(dpl)}')
+        _validate_type(dpl, Dipole, 'dpl', 'Dipole, list of Dipole')
 
     scale_applied = dpl[0].scale_applied
 
