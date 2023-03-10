@@ -75,6 +75,9 @@ Bug
 - Fix bug where :func:`~hnn_core.network.add_evoked_drive` failed when adding
   a drive with just NMDA weights, by `Nick Tolley`_ in :gh:`611`
 
+- Fix bug where :func:`~hnn_core.params.read_params` failed to create a network when
+  legacy mode is False, by `Nick Tolley`_ in :gh:`614`
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
