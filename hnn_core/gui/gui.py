@@ -604,6 +604,10 @@ class HNNGUI:
         return js_string
 
     # below are a series of methods that are used to manipulate the GUI
+    def _simulate_upload_data(self, file_url):
+        uploaded_value = _prepare_upload_file_from_url(file_url)
+        self.load_data_button.set_trait('value', uploaded_value)
+
     def _simulate_upload_connectivity(self, file_url):
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_connectivity_button.set_trait('value', uploaded_value)

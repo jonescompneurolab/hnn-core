@@ -73,6 +73,36 @@ def test_gui_upload_params():
     plt.close('all')
 
 
+def test_gui_upload_data():
+    """Test if gui handles uploaded data"""
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    assert len(gui.viz_manager.data['figs']) == 0
+    assert len(gui.data['simulation_data']) == 0
+
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
+    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"  # noqa
+    gui._simulate_upload_data(file1_url)
+    assert len(gui.data['simulation_data']) == 1
+    assert 'S1_SupraT' in gui.data['simulation_data'].keys()
+    assert gui.data['simulation_data']['S1_SupraT']['net'] is None
+    assert type(gui.data['simulation_data']['S1_SupraT']['dpls']) is list
+    assert len(gui.viz_manager.data['figs']) == 1
+    # support uploading multiple external data.
+    gui._simulate_upload_data(file2_url)
+    assert len(gui.data['simulation_data']) == 2
+    assert len(gui.viz_manager.data['figs']) == 2
+
+    # make sure data are overwritten.
+    gui._simulate_upload_data(file1_url)
+    assert len(gui.data['simulation_data']) == 2
+    # however, we will add new figures for each single uploading event.
+    assert len(gui.viz_manager.data['figs']) == 3
+
+    plt.close('all')
+
+
 def test_gui_change_connectivity():
     """Test if GUI properly changes cell connectivity parameters."""
     gui = HNNGUI()
