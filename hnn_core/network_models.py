@@ -12,7 +12,7 @@ from .externals.mne import _validate_type
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
-                     legacy_mode=True):
+                     legacy_mode=False):
     """Instantiate the network model described in
     Jones et al. J. of Neurophys. 2009 [1]_
 
@@ -27,7 +27,7 @@ def jones_2009_model(params=None, add_drives_from_params=False,
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
     legacy_mode : bool
-        Set to True by default to enable matching HNN GUI output when drives
+        Set to False by default. Enables matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
 
     Returns
@@ -174,7 +174,7 @@ def jones_2009_model(params=None, add_drives_from_params=False,
 
 
 def law_2021_model(params=None, add_drives_from_params=False,
-                   legacy_mode=True):
+                   legacy_mode=False):
     """Instantiate the expansion of Jones 2009 model to study beta
     modulated ERPs as described in
     Law et al. Cereb. Cortex 2021 [1]_
@@ -261,7 +261,7 @@ def law_2021_model(params=None, add_drives_from_params=False,
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
 def calcium_model(params=None, add_drives_from_params=False,
-                  legacy_mode=True):
+                  legacy_mode=False):
     """Instantiate the Jones 2009 model with improved calcium dynamics in
     L5 pyramidal neurons. For more details on changes to calcium dynamics
     see Kohl et al. Brain Topragr 2022 [1]_
