@@ -11,7 +11,7 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
-
+import numpy as np
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
@@ -1144,11 +1144,11 @@ def on_upload_data_change(change, data, viz_manager):
     ext_content = change['new'][key]['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     e_c = io.StringIO(ext_content)
-
-    data['simulation_data'][data_fname] = {
-        'net': None,
-        'dpls': [hnn_core.read_dipole(e_c)]
-    }
+    dpls = list()
+    dpl_data = np.loadtxt(e_c, dtype=float)
+    for idx in range(1, dpl_data.shape[1]):
+        dpls.append(hnn_core.Dipole(dpl_data[:, 0], dpl_data[:, idx]))
+    data['simulation_data'][data_fname] = {'net': None, 'dpls': dpls}
     logger.info(f'External data {data_fname} loaded.')
     try:
         viz_manager.reset_fig_config_tabs(template_name='single figure')
