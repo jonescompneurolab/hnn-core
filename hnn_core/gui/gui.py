@@ -1134,7 +1134,7 @@ def on_upload_data_change(change, data, viz_manager):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
-    logger.info(f"Loading data to {data['simulation_data']}...")
+
     key = list(change['new'].keys())[0]
 
     data_fname = change['new'][key]['metadata']['name'].rstrip('.txt')
