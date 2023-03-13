@@ -92,7 +92,9 @@ def run_hnn_core_fixture():
                            't_evprox_2': 20,
                            'N_trials': 2})
             tstop = 40.
-        net = jones_2009_model(params, add_drives_from_params=True)
+        # Legacy mode necessary for exact dipole comparison test
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               legacy_mode=True)
         if electrode_array is not None:
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)
