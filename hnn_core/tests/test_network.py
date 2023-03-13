@@ -40,10 +40,9 @@ def test_network_models():
     add_erp_drives_to_jones_model(net_default)
     for drive_name in ['evdist1', 'evprox1', 'evprox2']:
         assert drive_name in net_default.external_drives.keys()
-    # 15 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
-    # evprox1: 4 ampa, evprox2: 4 ampa, and 1 extra zero-weighted ampa
-    # evdist1->L5_basket connection is added to comply with legacy_mode
-    assert len(net_default.connectivity) == n_conn + 15
+    # 14 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
+    # evprox1: 4 ampa, evprox2: 4 ampa
+    assert len(net_default.connectivity) == n_conn + 14
 
     # Ensure distant dependent calcium gbar
     net_calcium = calcium_model()
