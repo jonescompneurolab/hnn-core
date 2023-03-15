@@ -393,16 +393,11 @@ class Dipole(object):
                                             self.sfreq)
         return self
 
-    def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             color='k', show=True):
+    def plot(self, layer='agg', decim=None, ax=None, color='k', show=True):
         """Simple layer-specific plot function.
 
         Parameters
         ----------
-        tmin : float or None
-            Start time of plot (in ms). If None, plot entire simulation.
-        tmax : float or None
-            End time of plot (in ms). If None, plot entire simulation.
         layer : str
             The layer to plot. Can be one of 'agg', 'L2', and 'L5'
         decimate : int
@@ -419,8 +414,8 @@ class Dipole(object):
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        return plot_dipole(self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
-                           decim=decim, color=color, show=show)
+        return plot_dipole(self, ax=ax, layer=layer, decim=decim, color=color,
+                           show=show)
 
     def plot_psd(self, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
                  color=None, label=None, ax=None, show=True):

@@ -421,9 +421,9 @@ class ExtracellularArray:
 
         return self
 
-    def plot_lfp(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
-                 ax=None, decim=None, color='cividis', voltage_offset=50,
-                 voltage_scalebar=200, show=True):
+    def plot_lfp(self, *, trial_no=None, contact_no=None, ax=None, decim=None,
+                 color='cividis', voltage_offset=50, voltage_scalebar=200,
+                 show=True):
         """Plot laminar local field potential time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
@@ -435,10 +435,6 @@ class ExtracellularArray:
             Trial number(s) to plot
         contact_no : int | list of int | slice
             Electrode contact number(s) to plot
-        tmin : float | None
-            Start time of plot in milliseconds. If None, plot entire
-            simulation.
-        tmax : float | None
             End time of plot in milliseconds. If None, plot entire simulation.
         ax : instance of matplotlib figure | None
             The matplotlib axis
@@ -486,7 +482,7 @@ class ExtracellularArray:
 
         for trial_data in plot_data:
             fig = plot_laminar_lfp(
-                self.times, trial_data, tmin=tmin, tmax=tmax, ax=ax,
+                self.times, trial_data, ax=ax,
                 decim=decim, color=color,
                 voltage_offset=voltage_offset,
                 voltage_scalebar=voltage_scalebar,
@@ -494,8 +490,7 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, colorbar=True, tmin=None, tmax=None, ax=None,
-                 show=True):
+    def plot_csd(self, colorbar=True, ax=None, show=True):
         """Plot laminar current source density (CSD) estimation
 
         Parameters
@@ -504,11 +499,6 @@ class ExtracellularArray:
             If the colorbar is presented.
         ax : instance of matplotlib figure | None
             The matplotlib axis.
-        tmin : float | None
-            Start time of plot in milliseconds. If None, plot entire
-            simulation.
-        tmax : float | None
-            End time of plot in milliseconds. If None, plot entire simulation.
         show : bool
             If True, show the plot.
 
@@ -524,7 +514,7 @@ class ExtracellularArray:
         csd_data = calculate_csd2d(lfp_data=lfp,
                                    delta=delta)
 
-        fig = plot_laminar_csd(self.times, csd_data, tmin=tmin, tmax=tmax,
+        fig = plot_laminar_csd(self.times, csd_data,
                                contact_labels=contact_labels, ax=ax,
                                colorbar=colorbar, show=show)
 

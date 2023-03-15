@@ -322,19 +322,13 @@ class CellResponse(object):
 
         return spike_rates
 
-    def plot_spikes_raster(self, trial_idx=None, tmin=None, tmax=None,
-                           ax=None, show=True):
+    def plot_spikes_raster(self, trial_idx=None, ax=None, show=True):
         """Plot the aggregate spiking activity according to cell type.
 
         Parameters
         ----------
         trial_idx : int | list of int | None
             Index of trials to be plotted. If None, all trials plotted.
-        tmin : float | None
-            Start time of plot in milliseconds. If None, plot entire
-            simulation.
-        tmax : float | None
-            End time of plot in milliseconds. If None, plot entire simulation.
         ax : instance of matplotlib axis | None
             An axis object from matplotlib. If None, a new figure is created.
         show : bool
@@ -346,22 +340,16 @@ class CellResponse(object):
             The matplotlib figure object.
         """
         return plot_spikes_raster(
-            cell_response=self, tmin=tmin, tmax=tmax, trial_idx=trial_idx,
-            ax=ax, show=show)
+            cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
 
-    def plot_spikes_hist(self, trial_idx=None, ax=None, tmin=None, tmax=None,
-                         spike_types=None, show=True):
+    def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
+                         show=True):
         """Plot the histogram of spiking activity across trials.
 
         Parameters
         ----------
         trial_idx : int | list of int | None
             Index of trials to be plotted. If None, all trials plotted.
-        tmin : float | None
-            Start time of plot in milliseconds. If None, plot entire
-            simulation.
-        tmax : float | None
-            End time of plot in milliseconds. If None, plot entire simulation.
         ax : instance of matplotlib axis | None
             An axis object from matplotlib. If None, a new figure is created.
         spike_types: string | list | dictionary | None
@@ -390,9 +378,8 @@ class CellResponse(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_spikes_hist(self, trial_idx=trial_idx, tmin=tmin,
-                                tmax=tmax, ax=ax, spike_types=spike_types,
-                                show=show)
+        return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
+                                spike_types=spike_types, show=show)
 
     def write(self, fname):
         """Write spiking activity per trial to a collection of files.

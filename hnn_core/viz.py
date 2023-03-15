@@ -78,9 +78,9 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
-                     ax=None, decim=None, color='cividis',
-                     voltage_offset=50, voltage_scalebar=200, show=True):
+def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
+                     color='cividis', voltage_offset=50, voltage_scalebar=200,
+                     show=True):
     """Plot laminar extracellular electrode array voltage time series.
 
     Parameters
@@ -89,10 +89,6 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
-    tmin : float | None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float | None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     decim : int | list of int | None (default)
@@ -168,11 +164,11 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         trace_offsets = np.arange(n_offsets)[:, np.newaxis] * voltage_offset
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
-        plot_data, plot_times = _get_plot_data_trange(times, trace, tmin, tmax)
-
+        plot_data = []
+        plot_times = []
         if decim is not None:
-            plot_data, plot_times = _decimate_plot_data(decim, plot_data,
-                                                        plot_times)
+            plot_data, plot_times = _decimate_plot_data(decim, trace,
+                                                        times)
 
         if isinstance(color, np.ndarray):
             col = color[contact_no]
@@ -182,7 +178,7 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
             col = color
         ax.plot(plot_times, plot_data + trace_offsets[contact_no],
                 label=f'C{contact_no}', color=col)
-
+        ax.set_xlim(right=plot_times[-1])
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
         ylabel = 'Individual contact traces'
@@ -220,7 +216,7 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
     return ax.get_figure()
 
 
-def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
+def plot_dipole(dpl, ax=None, layer='agg', decim=None,
                 color='k', label="average", average=False, show=True):
     """Simple layer-specific plot function.
 
@@ -228,10 +224,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
-    tmin : float or None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float or None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     layer : str
@@ -285,11 +277,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
             if layer in dpl_trial.data.keys():
 
                 # extract scaled data and times
-                data, times = _get_plot_data_trange(dpl_trial.times,
-                                                    dpl_trial.data[layer],
-                                                    tmin, tmax)
+                data = []
+                times = []
                 if decim is not None:
-                    data, times = _decimate_plot_data(decim, data, times)
+                    data, times = _decimate_plot_data(
+                        decim, dpl_trial.data[layer], dpl_trial.times)
                 if idx == len(dpl) - 1 and average:
                     # the average dpl
                     ax.plot(times, data, color=color, label=label, lw=1.5)
@@ -297,7 +289,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                     alpha = 0.5 if average else 1.
                     ax.plot(times, data, color=_lighten_color(color, 0.5),
                             alpha=alpha, lw=1.)
-
+            ax.set_xlim(right=dpl_trial.times[-1])
         if average:
             ax.legend()
 
@@ -319,8 +311,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     return axes[0].get_figure()
 
 
-def plot_spikes_hist(cell_response, trial_idx=None, tmin=None, tmax=None,
-                     ax=None, spike_types=None, show=True):
+def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
+                     show=True):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
@@ -329,10 +321,6 @@ def plot_spikes_hist(cell_response, trial_idx=None, tmin=None, tmax=None,
         The CellResponse object from net.cell_response
     trial_idx : int | list of int | None
         Index of trials to be plotted. If None, all trials plotted.
-    tmin : float or None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float or None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None,
         a new figure is created.
@@ -381,8 +369,6 @@ def plot_spikes_hist(cell_response, trial_idx=None, tmin=None, tmax=None,
         spike_times = np.array([])
         spike_types_data = np.array([])
 
-    spike_types_data, spike_times = _get_plot_data_trange(
-        spike_times, spike_types_data, tmin, tmax)
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
                         for s_type in unique_types}
@@ -443,13 +429,12 @@ def plot_spikes_hist(cell_response, trial_idx=None, tmin=None, tmax=None,
                 label=label, color=color)
     ax.set_ylabel("Counts")
     ax.legend()
-
+    ax.set_xlim(right=spike_times[-1])
     plt_show(show)
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
-                       ax=None, show=True):
+def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -458,10 +443,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
         The CellResponse object from net.cell_response
     trial_idx : int | list of int | None
         Index of trials to be plotted. If None, all trials plotted
-    tmin : float or None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float or None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
@@ -490,11 +471,12 @@ def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
             np.array(cell_response._spike_types, dtype=object)[trial_idx])
         spike_gids = np.concatenate(
             np.array(cell_response._spike_gids, dtype=object)[trial_idx])
+        tstop = spike_times[-1]
     else:
         spike_times = np.array([])
         spike_types = np.array([])
         spike_gids = np.array([])
-
+        tstop = 0
     cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
     cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
                         'L2_pyramidal': 'g', 'L2_basket': 'w'}
@@ -509,7 +491,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
         cell_type_times, cell_type_ypos = [], []
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
-            _, gid_time = _get_plot_data_trange(gid_time, gid_time, tmin, tmax)
             cell_type_times.append(gid_time)
             cell_type_ypos.append(ypos)
             ypos = ypos - 1
@@ -524,7 +505,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
-    ax.set_xlim(left=0)
+    ax.set_xlim(left=0, right=tstop)
 
     plt_show(show)
     return ax.get_figure()
@@ -1134,8 +1115,8 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     return ax.get_figure()
 
 
-def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
-                     ax=None, colorbar=True, show=True):
+def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
+                     show=True):
     """Plot laminar current source density (CSD) estimation from LFP array.
 
     Parameters
@@ -1144,10 +1125,6 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
         Sampling times (in ms).
     data : array-like, shape (n_channels, n_times)
         CSD data, channels x time.
-    tmin : float | None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float | None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     colorbar : bool
@@ -1166,13 +1143,7 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
     import matplotlib.pyplot as plt
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
-    plot_data = []
-    plot_times = []
-    for time_data in data:
-        time_data, plot_times = _get_plot_data_trange(
-            times, time_data, tmin, tmax)
-        plot_data.append(time_data)
-    im = ax.pcolormesh(plot_times, contact_labels, np.array(plot_data),
+    im = ax.pcolormesh(times, contact_labels, np.array(data),
                        cmap="jet_r", shading='auto')
     ax.set_title("CSD")
 
@@ -1182,6 +1153,7 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
 
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Electrode depth')
+    ax.set_xlim(right=times[-1])
     plt.tight_layout()
     plt_show(show)
 
