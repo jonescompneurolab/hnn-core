@@ -1072,8 +1072,7 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
     net = jones_2009_model(params)
     drive_specs = _extract_drive_specs_from_hnn_params(
-        params,
-        list(net.cell_types.keys()))
+        params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1203,10 +1202,6 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         print(
             f"drive type is {drive['type']}, location={drive['location']}")
         if drive['type'] == 'Poisson':
-            # XX: Necessary for loading parameters with legacy_mode=False
-            if (not single_simulation_data['net']._legacy_mode) and drive[
-                    'tstop'].value < drive['tstart'].value:
-                continue
             rate_constant = {
                 k: v.value
                 for k, v in drive['rate_constant'].items() if v.value > 0
@@ -1243,10 +1238,6 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 space_constant=3.0,
                 event_seed=drive['seedcore'].value)
         elif drive['type'] in ('Rhythmic', 'Bursty'):
-            # XX: Necessary for loading parameters with legacy_mode=False
-            if (not single_simulation_data['net']._legacy_mode) and drive[
-                    'tstop'].value < drive['tstart'].value:
-                continue
             single_simulation_data['net'].add_bursty_drive(
                 name=drive['name'],
                 tstart=drive['tstart'].value,
