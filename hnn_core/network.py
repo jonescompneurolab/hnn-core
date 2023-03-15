@@ -11,6 +11,7 @@ import itertools as it
 from copy import deepcopy
 
 import numpy as np
+import warnings
 
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
@@ -337,7 +338,8 @@ class Network(object):
     connectivity information contained in ``params`` will be ignored.
     """
 
-    def __init__(self, params, add_drives_from_params=False, legacy_mode=True):
+    def __init__(self, params, add_drives_from_params=False,
+                 legacy_mode=False):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -353,6 +355,12 @@ class Network(object):
         # XXX this can be removed once tests are made independent of HNN GUI
         # creates nc_dict-entries for ALL cell types
         self._legacy_mode = legacy_mode
+        if self._legacy_mode:
+            warnings.warn(
+                'Legacy mode is used solely to maintain compatibility with'
+                '.param files of the old HNN GUI. This feature will be '
+                'deprecrated in future relases.', DeprecationWarning,
+                stacklevel=1)
 
         # Source dict of names, first real ones only!
         cell_types = {
