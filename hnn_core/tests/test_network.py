@@ -381,6 +381,14 @@ def test_network_drives_legacy():
                    'input_prox_A_weight_L2Pyr_ampa': 3.4e-5,
                    'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
                    't0_input_prox': 50})
+
+    # Test deprecation warning of legacy mode
+    with pytest.warns(DeprecationWarning, match='Legacy mode'):
+        _ = jones_2009_model(legacy_mode=True)
+        _ = law_2021_model(legacy_mode=True)
+        _ = calcium_model(legacy_mode=True)
+        _ = Network(params, legacy_mode=True)
+
     net = jones_2009_model(params, legacy_mode=True,
                            add_drives_from_params=True)
 

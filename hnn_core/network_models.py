@@ -208,8 +208,7 @@ def law_2021_model(params=None, add_drives_from_params=False,
            Perception." Cerebral Cortex, 32, 668–688 (2022).
     """
 
-    net = jones_2009_model(params=params,
-                           add_drives_from_params=add_drives_from_params)
+    net = jones_2009_model(params, add_drives_from_params, legacy_mode)
 
     # Update biophysics (increase gabab duration of inhibition)
     net.cell_types['L2_pyramidal'].synapses['gabab']['tau1'] = 45.0
@@ -295,7 +294,7 @@ def calcium_model(params=None, add_drives_from_params=False,
     if params is None:
         params = read_params(params_fname)
 
-    net = jones_2009_model(params, add_drives_from_params)
+    net = jones_2009_model(params, add_drives_from_params, legacy_mode)
 
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = 'L5_pyramidal'

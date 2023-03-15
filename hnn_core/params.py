@@ -251,7 +251,6 @@ def _extract_drive_specs_from_hnn_params(
         elif feed_name.startswith('extpois'):
             if (not legacy_mode) and par['t_interval'][1] < par[
                     't_interval'][0]:
-                print(f"interval!!!!! {par['t_interval']}")
                 continue
             drive['type'] = 'poisson'
             drive['location'] = par['loc']
