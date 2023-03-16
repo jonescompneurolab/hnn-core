@@ -274,7 +274,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
         _validate_type(this_dpl, Dipole, 'dpl', 'Dipole, list of Dipole')
 
     if average:
-        dpl = dpl + [average_dipoles(dpl)]
+        dpl.append(average_dipoles(dpl))
 
     scale_applied = dpl[0].scale_applied
 
