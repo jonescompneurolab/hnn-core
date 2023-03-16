@@ -7,7 +7,7 @@ import os.path as op
 import numpy as np
 
 import hnn_core
-from hnn_core import Params, Network, read_params
+from hnn_core import Network, read_params
 from hnn_core.drives import (_drive_cell_event_times, _get_prng,
                              _create_extpois, _create_bursty_input)
 from hnn_core.params import _extract_drive_specs_from_hnn_params
