@@ -237,6 +237,7 @@ tasks.
    /auto_examples/workflows/index.rst
    /auto_examples/howto/index.rst
 
+
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-gallery

@@ -409,8 +409,11 @@
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
         <span class="n">dpl</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpl</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">average</span><span class="p">:</span>
-        <span class="n">dpl</span> <span class="o">=</span> <span class="n">dpl</span> <span class="o">+</span> <span class="p">[</span><span class="n">average_dipoles</span><span class="p">(</span><span class="n">dpl</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">this_dpl</span> <span class="ow">in</span> <span class="n">dpl</span><span class="p">:</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">this_dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">,</span> <span class="s1">&#39;dpl&#39;</span><span class="p">,</span> <span class="s1">&#39;Dipole, list of Dipole&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">average</span><span class="p">:</span>
+        <span class="n">dpl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">average_dipoles</span><span class="p">(</span><span class="n">dpl</span><span class="p">))</span>
 
     <span class="n">scale_applied</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scale_applied</span>
 
