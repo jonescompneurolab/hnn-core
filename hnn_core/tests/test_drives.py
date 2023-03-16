@@ -14,12 +14,14 @@ from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 
 def test_external_drive_times():
     """Test the different external drives."""
 
-    params = Params()
+    params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
+    params = read_params(params_fname)
     cellname_list = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
     drive_specs = _extract_drive_specs_from_hnn_params(params, cellname_list)
 
