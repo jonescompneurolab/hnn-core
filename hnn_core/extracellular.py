@@ -435,7 +435,6 @@ class ExtracellularArray:
             Trial number(s) to plot
         contact_no : int | list of int | slice
             Electrode contact number(s) to plot
-            End time of plot in milliseconds. If None, plot entire simulation.
         ax : instance of matplotlib figure | None
             The matplotlib axis
         decim : int | list of int | None (default)

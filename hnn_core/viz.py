@@ -164,8 +164,6 @@ def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
         trace_offsets = np.arange(n_offsets)[:, np.newaxis] * voltage_offset
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
-        plot_data = []
-        plot_times = []
         if decim is not None:
             plot_data, plot_times = _decimate_plot_data(decim, trace,
                                                         times)
