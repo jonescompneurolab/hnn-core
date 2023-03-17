@@ -359,7 +359,7 @@ class Network(object):
             warnings.warn(
                 'Legacy mode is used solely to maintain compatibility with'
                 '.param files of the old HNN GUI. This feature will be '
-                'deprecrated in future relases.', DeprecationWarning,
+                'deprecrated in future releases.', DeprecationWarning,
                 stacklevel=1)
 
         # Source dict of names, first real ones only!
