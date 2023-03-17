@@ -164,6 +164,8 @@ def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
         trace_offsets = np.arange(n_offsets)[:, np.newaxis] * voltage_offset
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
+        plot_data = trace
+        plot_times = times
         if decim is not None:
             plot_data, plot_times = _decimate_plot_data(decim, trace,
                                                         times)
@@ -275,8 +277,8 @@ def plot_dipole(dpl, ax=None, layer='agg', decim=None,
             if layer in dpl_trial.data.keys():
 
                 # extract scaled data and times
-                data = []
-                times = []
+                data = dpl_trial.data[layer]
+                times = dpl_trial.times
                 if decim is not None:
                     data, times = _decimate_plot_data(
                         decim, dpl_trial.data[layer], dpl_trial.times)
