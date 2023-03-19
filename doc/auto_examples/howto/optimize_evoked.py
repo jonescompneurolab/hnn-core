@@ -108,6 +108,6 @@ conn_indices = pick_connection(net=net_opt, src_gids='evprox1', target_gids='L2_
 conn_idx = conn_indices[0]
 weight_opt = net_opt.connectivity[conn_idx]
 
-print('Optimized dynamic properties: ', dynamics_opt)
-print('\nOptimized weight: ', weight_opt)
+print("Optimized dynamic properties: ", dynamics_opt)
+print("\nOptimized weight: ", weight_opt)
 
