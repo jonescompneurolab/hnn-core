@@ -7,6 +7,8 @@ What's new?
 
 .. currentmodule:: hnn_core
 
+.. _0.3:
+
 0.3
 ---
 
