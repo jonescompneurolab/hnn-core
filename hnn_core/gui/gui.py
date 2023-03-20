@@ -315,8 +315,9 @@ class HNNGUI:
             value=self._simulation_status_contents['not_running'])
 
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
-        self._operation_buttons = HBox([self.run_button],
-                                       layout=self.layout['operation_box'])
+        self._operation_buttons = HBox(
+            [self.run_button, self.load_data_button],
+            layout=self.layout['operation_box'])
         # title
         self._header = HTML(value=f"""<div
             style='background:{self.layout['theme_color']};
@@ -423,8 +424,7 @@ class HNNGUI:
             VBox([
                 self.widget_simulation_name, self.widget_tstop, self.widget_dt,
                 self.widget_ntrials, self.widget_backend_selection,
-                self._backend_config_out, self.load_data_button
-            ]),
+                self._backend_config_out]),
         ], layout=self.layout['config_box'])
 
         connectivity_box = VBox([
