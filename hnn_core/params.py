@@ -232,6 +232,9 @@ def _extract_drive_specs_from_hnn_params(
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
         elif feed_name.startswith('extgauss'):
+            if (not legacy_mode) and par[
+                    'L2_basket'][3] > params['tstop']:
+                continue
             drive['type'] = 'gaussian'
             drive['location'] = par['loc']
 
