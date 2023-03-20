@@ -36,6 +36,8 @@ _no_overlay_plot_types = [
     'input histogram',
 ]
 
+_ext_data_disabled_plot_types = ['spikes', 'input histogram', 'network']
+
 _spectrogram_color_maps = [
     "viridis",
     "plasma",
@@ -68,6 +70,15 @@ fig_templates = {
 }
 
 
+def check_sim_plot_types(new_sim_name, plot_type_selection, data):
+    if data["simulations"][new_sim_name.new]['net'] is None:
+        plot_type_selection.options = [
+            pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
+        ]
+    else:
+        plot_type_selection.options = _plot_types
+
+
 def _idx2figname(idx):
     return f"Figure {idx}"
 
@@ -95,7 +106,6 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
     # Make sure that visualization does not change the original data
     dpls_copied = copy.deepcopy(single_simulation['dpls'])
     net_copied = copy.deepcopy(single_simulation['net'])
-
     for dpl in dpls_copied:
         if plot_config['dipole_smooth'] > 0:
             dpl.smooth(plot_config['dipole_smooth']).scale(
@@ -104,8 +114,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             dpl.scale(plot_config['dipole_scaling'])
 
     if net_copied is None:
-        print("No network data")
-        return
+        assert plot_type not in _ext_data_disabled_plot_types
 
     # Explicitly do this in case the
     # x and y axis are hidden after plotting some functions.
@@ -263,6 +272,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     analysis_style = {'description_width': '200px'}
     layout = Layout(width="98%")
     simulation_names = tuple(data['simulations'].keys())
+    sim_name_default = simulation_names[-1]
     if len(simulation_names) == 0:
         simulation_names = [
             "None",
@@ -270,16 +280,23 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 
     simulation_selection = Dropdown(
         options=simulation_names,
-        value=simulation_names[-1],
+        value=sim_name_default,
         description='Simulation:',
         disabled=False,
         layout=layout,
         style=analysis_style,
     )
 
+    if data['simulations'][sim_name_default]['net'] is None:
+        valid_plot_types = [
+            pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
+        ]
+    else:
+        valid_plot_types = _plot_types
+
     plot_type_selection = Dropdown(
-        options=_plot_types,
-        value=_plot_types[0],
+        options=valid_plot_types,
+        value=valid_plot_types[0],
         description='Type:',
         disabled=False,
         layout=layout,
@@ -315,6 +332,11 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 
     plot_button = Button(description='Add plot')
     clear_button = Button(description='Clear axis')
+
+    def _on_sim_data_change(new_sim_name):
+        return check_sim_plot_types(new_sim_name, plot_type_selection, data)
+
+    simulation_selection.observe(_on_sim_data_change, 'value')
 
     clear_button.on_click(
         partial(
@@ -530,7 +552,7 @@ class _VizManager:
             "figs": self.figs
         }
 
-    def reset_fig_config_tabs(self):
+    def reset_fig_config_tabs(self, template_name=None):
         """Reset the figure config tabs with most recent simulation data."""
         simulation_names = tuple(self.data['simulations'].keys())
         for tab in self.axes_config_tabs.children:
@@ -539,7 +561,9 @@ class _VizManager:
                 simulation_selection = ax_control.children[0]
                 simulation_selection.options = simulation_names
         # recover the default layout
-        self._simulate_switch_fig_template(list(fig_templates.keys())[0])
+        if template_name is None:
+            template_name = list(fig_templates.keys())[0]
+        self._simulate_switch_fig_template(template_name)
 
     def compose(self):
         """Compose widgets."""
