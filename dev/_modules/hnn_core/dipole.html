@@ -255,6 +255,10 @@
 <span class="sd">        The instance of Dipole class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">ncols</span> <span class="o">=</span> <span class="n">dpl_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ncols</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Data are supposed to have 2 or 4 columns while we have </span><span class="si">{</span><span class="n">ncols</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
     <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
     <span class="k">return</span> <span class="n">dpl</span></div>
 
