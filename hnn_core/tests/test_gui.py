@@ -94,11 +94,10 @@ def test_gui_upload_data():
     assert len(gui.data['simulation_data']) == 2
     assert len(gui.viz_manager.data['figs']) == 2
 
-    # make sure data are overwritten.
+    # make sure no repeated uploading for the same name.
     gui._simulate_upload_data(file1_url)
     assert len(gui.data['simulation_data']) == 2
-    # however, we will add new figures for each single uploading event.
-    assert len(gui.viz_manager.data['figs']) == 3
+    assert len(gui.viz_manager.data['figs']) == 2
 
     plt.close('all')
 

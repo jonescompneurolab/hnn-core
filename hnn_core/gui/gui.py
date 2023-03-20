@@ -1139,7 +1139,8 @@ def on_upload_data_change(change, data, viz_manager):
 
     data_fname = change['new'][key]['metadata']['name'].rstrip('.txt')
     if data_fname in data['simulation_data'].keys():
-        logger.warn(f"Overwrite the existing data {data_fname}")
+        logger.error(f"Found existing data: {data_fname}.")
+        return
 
     ext_content = change['new'][key]['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
