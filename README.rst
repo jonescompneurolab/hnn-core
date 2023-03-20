@@ -78,7 +78,7 @@ To start the GUI, please do::
 **Parallel backends**
 
 For further instructions on installation and usage of parallel backends for using more
-than one CPU core, refer to our `parallel backend guide`_.
+than one CPU core, refer to our `parallel backend guide <parallel>`_.
 
 **Note for Windows users**
 
