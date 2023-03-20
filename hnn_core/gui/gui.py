@@ -1144,12 +1144,11 @@ def on_upload_data_change(change, data, viz_manager):
 
     ext_content = change['new'][key]['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
-    e_c = io.StringIO(ext_content)
-    dpls = list()
-    dpl_data = np.loadtxt(e_c, dtype=float)
-    for idx in range(1, dpl_data.shape[1]):
-        dpls.append(hnn_core.Dipole(dpl_data[:, 0], dpl_data[:, idx]))
-    data['simulation_data'][data_fname] = {'net': None, 'dpls': dpls}
+    # just load the first column, single trial.
+    dpl_data = np.loadtxt(io.StringIO(ext_content), dtype=float)
+    data['simulation_data'][data_fname] = {'net': None, 'dpls': [
+        hnn_core.Dipole(dpl_data[:, 0], dpl_data[:, 1])
+    ]}
     logger.info(f'External data {data_fname} loaded.')
     try:
         viz_manager.reset_fig_config_tabs(template_name='single figure')
