@@ -131,6 +131,15 @@ def test_optimize_evoked():
 
     which_drives = ['evprox1']  # drive selected to optimize
     maxiter = 10
+    # try without returning iteration RMSE first
+    net_opt = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
+                              target_dpl=dpl_orig,
+                              initial_dpl=dpl_offset,
+                              timing_range_multiplier=3.,
+                              sigma_range_multiplier=50.,
+                              synweight_range_multiplier=500.,
+                              maxiter=maxiter, which_drives=which_drives,
+                              return_rmse=False)
     net_opt, rmse = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
                                     target_dpl=dpl_orig,
                                     initial_dpl=dpl_offset,

@@ -8,7 +8,7 @@ hnn-core
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
 Contributors are very welcome. Please read our
-:doc:`contributing guide <contributing>` if you are interested.
+`contributing guide`_ if you are interested.
 
 Dependencies
 ------------
@@ -123,7 +123,7 @@ report bugs. For user questions and scientific discussions, please join the
 Interested in Contributing?
 ===========================
 
-Read our :doc:`contributing guide <contributing>`.
+Read our `contributing guide`_.
 
 Roadmap
 =======
@@ -132,6 +132,8 @@ Read our `roadmap`_.
 
 .. _precompiled installers: https://www.neuron.yale.edu/neuron/download
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
+.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
+.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/stable/parallel.html
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
