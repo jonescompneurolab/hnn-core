@@ -8,7 +8,7 @@ hnn-core
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
 Contributors are very welcome. Please read our
-:doc:`contributing guide <contributing>` if you are interested.
+`contributing guide <contributing>`_ if you are interested.
 
 Dependencies
 ------------
