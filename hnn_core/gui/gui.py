@@ -11,7 +11,6 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
-import numpy as np
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
@@ -1144,15 +1143,13 @@ def on_upload_data_change(change, data, viz_manager):
 
     ext_content = change['new'][key]['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
-    # just load the first column, single trial.
-    dpl_data = np.loadtxt(io.StringIO(ext_content), dtype=float)
-    if dpl_data.shape[1] > 2:
-        logger.error("New GUI does not support multi-trial data.")
-        return
+    try:
+        data['simulation_data'][data_fname] = {'net': None, 'dpls': [
+            hnn_core.read_dipole(io.StringIO(ext_content))
+        ]}
+    except ValueError as e:
+        logger.error(f"Data error: {e}.")
 
-    data['simulation_data'][data_fname] = {'net': None, 'dpls': [
-        hnn_core.read_dipole(io.StringIO(ext_content))
-    ]}
     logger.info(f'External data {data_fname} loaded.')
     try:
         viz_manager.reset_fig_config_tabs(template_name='single figure')

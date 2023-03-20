@@ -116,6 +116,8 @@ def read_dipole(fname):
         The instance of Dipole class
     """
     dpl_data = np.loadtxt(fname, dtype=float)
+    if dpl_data.shape[1] != 2 or 4:
+        raise ValueError('hnn-core does not support multi-trial data.')
     dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:])
     return dpl
 
