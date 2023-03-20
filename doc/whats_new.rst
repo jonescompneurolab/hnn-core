@@ -7,8 +7,8 @@ What's new?
 
 .. currentmodule:: hnn_core
 
-Current
--------
+0.3
+---
 
 Changelog
 ~~~~~~~~~
@@ -108,6 +108,23 @@ API
 - legacy_mode is now set to False by default in all for all
   :class:`~hnn_core.Network` objects, 
   by `Nick Tolley`_ and `Ryan Thorpe`_ in :gh:`619`.
+
+People who contributed to this release (in alphabetical order):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- `Christopher Bailey`_
+- `Huzi Cheng`_
+- `Kaisu Lankinen`_
+- `Mainak Jas`_
+- `Mattan Pelah`_
+- `Mohamed A. Sherif`_
+- `Mostafa Khalil`_
+- `Nick Tolley`_
+- `Orsolya Beatrix Kolozsvari`_
+- `Rajat Partani`_
+- `Ryan Thorpe`_
+- `Stephanie R. Jones`_
+- `Steven Brandt`_
 
 .. _0.2:
 
@@ -372,6 +389,7 @@ People who contributed to this release (in alphabetical order):
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Mattan Pelah: https://github.com/mjpelah
 .. _Mohamed A. Sherif: https://github.com/mohdsherif/
+.. _Mostafa Khalil: https://github.com/mkhalil8
 .. _Nick Tolley: https://github.com/ntolley
 .. _Orsolya Beatrix Kolozsvari: http://github.com/orbekolo/
 .. _Ryan Thorpe: https://github.com/rythorpe
