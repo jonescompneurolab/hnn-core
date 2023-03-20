@@ -20,11 +20,6 @@ hnn_core_root = op.dirname(hnn_core.__file__)
 def test_external_drive_times():
     """Test the different external drives."""
 
-    params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
-    params = read_params(params_fname)
-    cellname_list = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-    drive_specs = _extract_drive_specs_from_hnn_params(params, cellname_list)
-
     drive_type = 'invalid_drive'
     dynamics = dict(mu=5, sigma=0.5, numspikes=1)
     tstop = 10
@@ -35,7 +30,9 @@ def test_external_drive_times():
 
     # validate poisson input time interval
     drive_type = 'poisson'
-    dynamics = drive_specs['extpois']['dynamics']
+    dynamics = {'tstart': 0, 'tstop': 250.0, 'rate_constant':
+                {'L2_basket': 1, 'L2_pyramidal': 140.0, 'L5_basket': 1,
+                 'L5_pyramidal': 40.0}}
     with pytest.raises(ValueError, match='The end time for Poisson input'):
         dynamics['tstop'] = -1
         event_times = _drive_cell_event_times(drive_type=drive_type,
