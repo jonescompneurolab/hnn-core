@@ -151,7 +151,7 @@
 
 
 <div class="viewcode-block" id="jones_2009_model"><a class="viewcode-back" href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model">[docs]</a><span class="k">def</span> <span class="nf">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                     <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the network model described in</span>
 <span class="sd">    Jones et al. J. of Neurophys. 2009 [1]_</span>
 
@@ -166,7 +166,7 @@
 <span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
 <span class="sd">        future release. Default: False</span>
 <span class="sd">    legacy_mode : bool</span>
-<span class="sd">        Set to True by default to enable matching HNN GUI output when drives</span>
+<span class="sd">        Set to False by default. Enables matching HNN GUI output when drives</span>
 <span class="sd">        are added suitably. Will be deprecated in a future release.</span>
 
 <span class="sd">    Returns</span>
@@ -313,7 +313,7 @@
 
 
 <div class="viewcode-block" id="law_2021_model"><a class="viewcode-back" href="../../generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model">[docs]</a><span class="k">def</span> <span class="nf">law_2021_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                   <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                   <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the expansion of Jones 2009 model to study beta</span>
 <span class="sd">    modulated ERPs as described in</span>
 <span class="sd">    Law et al. Cereb. Cortex 2021 [1]_</span>
@@ -347,8 +347,7 @@
 <span class="sd">           Perception.&quot; Cerebral Cortex, 32, 668–688 (2022).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                           <span class="n">add_drives_from_params</span><span class="o">=</span><span class="n">add_drives_from_params</span><span class="p">)</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="p">)</span>
 
     <span class="c1"># Update biophysics (increase gabab duration of inhibition)</span>
     <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span><span class="p">[</span><span class="s1">&#39;gabab&#39;</span><span class="p">][</span><span class="s1">&#39;tau1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">45.0</span>
@@ -400,7 +399,7 @@
 <span class="c1"># Remove params argument after updating examples</span>
 <span class="c1"># (only relevant for Jones 2009 model)</span>
 <div class="viewcode-block" id="calcium_model"><a class="viewcode-back" href="../../generated/hnn_core.calcium_model.html#hnn_core.calcium_model">[docs]</a><span class="k">def</span> <span class="nf">calcium_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                  <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the Jones 2009 model with improved calcium dynamics in</span>
 <span class="sd">    L5 pyramidal neurons. For more details on changes to calcium dynamics</span>
 <span class="sd">    see Kohl et al. Brain Topragr 2022 [1]_</span>
@@ -434,7 +433,7 @@
     <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
 
-    <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="p">)</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="p">)</span>
 
     <span class="c1"># Replace L5 pyramidal cell template with updated calcium</span>
     <span class="n">cell_name</span> <span class="o">=</span> <span class="s1">&#39;L5_pyramidal&#39;</span>

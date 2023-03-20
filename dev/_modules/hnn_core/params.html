@@ -279,7 +279,8 @@
     <span class="k">return</span> <span class="n">bias_specs</span>
 
 
-<span class="k">def</span> <span class="nf">_extract_drive_specs_from_hnn_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cellname_list</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_extract_drive_specs_from_hnn_params</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span> <span class="n">cellname_list</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create &#39;drive specification&#39; dicts from saved parameters&quot;&quot;&quot;</span>
     <span class="c1"># convert legacy params-dict to legacy &quot;feeds&quot; dicts</span>
     <span class="n">p_common</span><span class="p">,</span> <span class="n">p_unique</span> <span class="o">=</span> <span class="n">create_pext</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">])</span>
@@ -287,6 +288,8 @@
     <span class="c1"># Using &#39;feed&#39; for legacy compatibility, &#39;drives&#39; for new API</span>
     <span class="n">drive_specs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">ic</span><span class="p">,</span> <span class="n">par</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p_common</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]:</span>
+            <span class="k">continue</span>
         <span class="n">feed_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;bursty</span><span class="si">{</span><span class="n">ic</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="n">drive</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bursty&#39;</span>
@@ -352,10 +355,12 @@
                                  <span class="s1">&#39;numspikes&#39;</span><span class="p">:</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;numspikes&#39;</span><span class="p">],</span>
                                  <span class="s1">&#39;n_drive_cells&#39;</span><span class="p">:</span> <span class="n">n_drive_cells</span><span class="p">}</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;space_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span>
             <span class="c1"># XXX Force random states to be the same as HNN-gui for the default</span>
             <span class="c1"># parameter set after increasing the number of bursty drive</span>
             <span class="c1"># gids from 2 to 20</span>
-            <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;prng_seedcore&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">18</span>
+            <span class="k">if</span> <span class="n">legacy_mode</span><span class="p">:</span>
+                <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">18</span>
             <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">par</span><span class="p">:</span>
                     <span class="n">ampa_weight</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">cellname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -365,7 +370,11 @@
                     <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmda_weight</span>
                     <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">][</span><span class="n">cellname</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
 
+        <span class="c1"># Skip drive if not in legacy mode</span>
         <span class="k">elif</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;extgauss&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span>
+                    <span class="s1">&#39;L2_basket&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span>
 
@@ -385,6 +394,9 @@
 
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># no NMDA weights for Gaussians</span>
         <span class="k">elif</span> <span class="n">feed_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;extpois&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">legacy_mode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;t_interval&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">par</span><span class="p">[</span>
+                    <span class="s1">&#39;t_interval&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">continue</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;poisson&#39;</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span>
             <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;space_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span>

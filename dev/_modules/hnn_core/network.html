@@ -150,6 +150,7 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_drive_cell_event_times</span>
 <span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_get_target_properties</span><span class="p">,</span> <span class="n">_add_drives_from_params</span>
@@ -476,7 +477,8 @@
 <span class="sd">    connectivity information contained in ``params`` will be ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># Save the parameters used to create the Network</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">params</span>
@@ -492,6 +494,12 @@
         <span class="c1"># XXX this can be removed once tests are made independent of HNN GUI</span>
         <span class="c1"># creates nc_dict-entries for ALL cell types</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span> <span class="o">=</span> <span class="n">legacy_mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s1">&#39;Legacy mode is used solely to maintain compatibility with&#39;</span>
+                <span class="s1">&#39;.param files of the old HNN GUI. This feature will be &#39;</span>
+                <span class="s1">&#39;deprecrated in future releases.&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Source dict of names, first real ones only!</span>
         <span class="n">cell_types</span> <span class="o">=</span> <span class="p">{</span>

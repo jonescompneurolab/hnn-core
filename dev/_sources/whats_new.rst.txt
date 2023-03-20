@@ -105,6 +105,10 @@ API
   :class:`~hnn_core.CellResponse.vsec` and :class:`~hnn_core.CellResponse.isec`,
   by `Nick Tolley`_ in :gh:`502`.
 
+- legacy_mode is now set to False by default in all for all
+  :class:`~hnn_core.Network` objects, 
+  by `Nick Tolley`_ and `Ryan Thorpe`_ in :gh:`619`.
+
 .. _0.2:
 
 0.2

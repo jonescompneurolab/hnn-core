@@ -139,7 +139,7 @@ of ``net.connectivity`` that match the provided parameters.
 
  .. code-block:: none
 
-    66
+    38
     L5_basket -> L5_pyramidal
     cell counts: 35 srcs, 100 targets
     connection probability: 1.0 
@@ -477,7 +477,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  32.953 seconds)
+   **Total running time of the script:** ( 1 minutes  27.890 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:
@@ -493,6 +493,8 @@ the aggregate current dipole.
         :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_connectivity.ipynb
         :alt: Launch binder
         :width: 150 px
+
+
 
     .. container:: sphx-glr-download sphx-glr-download-python
 

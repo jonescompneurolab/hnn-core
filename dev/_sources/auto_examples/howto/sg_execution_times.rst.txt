@@ -6,16 +6,16 @@
 
 Computation times
 =================
-**03:02.129** total execution time for **auto_examples_howto** files:
+**02:58.723** total execution time for **auto_examples_howto** files:
 
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)                                       | 01:32.953 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)                                       | 01:27.890 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``) | 00:35.997 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``) | 00:36.418 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``plot_firing_pattern.py``)                                   | 00:30.880 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``plot_firing_pattern.py``)                                   | 00:31.608 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)                       | 00:22.298 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)                       | 00:22.807 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``optimize_evoked.py``)                                           | 00:00.000 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------------------------------+-----------+--------+

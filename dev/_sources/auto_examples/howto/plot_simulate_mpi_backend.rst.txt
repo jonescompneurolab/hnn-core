@@ -172,7 +172,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  22.298 seconds)
+   **Total running time of the script:** ( 0 minutes  22.807 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:
@@ -188,6 +188,8 @@ start the simulation across the number of processors (cores) specified by
         :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb
         :alt: Launch binder
         :width: 150 px
+
+
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
