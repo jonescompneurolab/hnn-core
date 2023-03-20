@@ -1148,6 +1148,7 @@ def on_upload_data_change(change, data, viz_manager):
         ]}
     except ValueError as e:
         logger.error(f"Data error: {e}.")
+        return
 
     logger.info(f'External data {data_fname} loaded.')
     try:
