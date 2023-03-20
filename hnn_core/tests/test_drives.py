@@ -10,7 +10,6 @@ import hnn_core
 from hnn_core import Network, read_params
 from hnn_core.drives import (_drive_cell_event_times, _get_prng,
                              _create_extpois, _create_bursty_input)
-from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
