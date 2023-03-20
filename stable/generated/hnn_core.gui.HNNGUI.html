@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>hnn_core.gui.HNNGUI &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../auto_examples/index.html">Examples</a></li>
+                <li><a href="../gui/index.html">GUI</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../glossary.html">Glossary</a></li>
+                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hnn_core.gui.HNNGUI</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/generated/hnn_core.gui.HNNGUI.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.3
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hnn-core-gui-hnngui">
+<h1>hnn_core.gui.HNNGUI<a class="headerlink" href="#hnn-core-gui-hnngui" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.gui.</span></span><span class="sig-name descname"><span class="pre">HNNGUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theme_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#8A2BE2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">800</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation_box_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drive_widget_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_sidebar_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">576</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_window_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI" title="Permalink to this definition">¶</a></dt>
+<dd><p>HNN GUI class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>theme_color</strong><span class="classifier">str</span></dt><dd><p>The theme color of the whole dashboard.</p>
+</dd>
+<dt><strong>total_height</strong><span class="classifier">int</span></dt><dd><p>The height of the GUI (in pixel, same for all following parameters).</p>
+</dd>
+<dt><strong>total_width</strong><span class="classifier">int</span></dt><dd><p>The width of the GUI.</p>
+</dd>
+<dt><strong>header_height</strong><span class="classifier">int</span></dt><dd><p>The height of the header.</p>
+</dd>
+<dt><strong>button_height</strong><span class="classifier">int</span></dt><dd><p>The height of buttons.</p>
+</dd>
+<dt><strong>operation_box_height</strong><span class="classifier">int</span></dt><dd><p>The operation_box_height of operations box.</p>
+</dd>
+<dt><strong>drive_widget_width</strong><span class="classifier">int</span></dt><dd><p>The width of GUI drive box.</p>
+</dd>
+<dt><strong>left_sidebar_width</strong><span class="classifier">int</span></dt><dd><p>The width of left sidebad.</p>
+</dd>
+<dt><strong>log_window_height</strong><span class="classifier">int</span></dt><dd><p>The height of logging window.</p>
+</dd>
+<dt><strong>status_height</strong><span class="classifier">int</span></dt><dd><p>The height of status bar.</p>
+</dd>
+<dt><strong>dpi</strong><span class="classifier">int</span></dt><dd><p>The screen dpi.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>layout</strong><span class="classifier">dict</span></dt><dd><p>The styling configuration of GUI.</p>
+</dd>
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>The parameters to use for constructing the network.</p>
+</dd>
+<dt><strong>simulation_data</strong><span class="classifier">dict</span></dt><dd><p>Simulation related objects, such as net and dpls.</p>
+</dd>
+<dt><strong>widget_tstop</strong><span class="classifier">Widget</span></dt><dd><p>Simulation stop time widget.</p>
+</dd>
+<dt><strong>widget_dt</strong><span class="classifier">Widget</span></dt><dd><p>Simulation step size widget.</p>
+</dd>
+<dt><strong>widget_ntrials</strong><span class="classifier">Widget</span></dt><dd><p>Widget that controls the number of trials in a single simulation.</p>
+</dd>
+<dt><strong>widget_backend_selection</strong><span class="classifier">Widget</span></dt><dd><p>Widget that selects the backend used in simulations.</p>
+</dd>
+<dt><strong>widget_viz_layout_selection</strong><span class="classifier">Widget</span></dt><dd><p>Widget that selects the layout of visualization window.</p>
+</dd>
+<dt><strong>widget_mpi_cmd</strong><span class="classifier">Widget</span></dt><dd><p>Widget that specify the mpi command to use when the backend is
+MPIBackend.</p>
+</dd>
+<dt><strong>widget_n_jobs</strong><span class="classifier">Widget</span></dt><dd><p>Widget that specify the cores in multi-trial simulations.</p>
+</dd>
+<dt><strong>widget_drive_type_selection</strong><span class="classifier">Widget</span></dt><dd><p>Widget that is used to select the drive to be added to the network.</p>
+</dd>
+<dt><strong>widget_location_selection</strong><span class="classifier">Widget.</span></dt><dd><p>Widget that specifies the location of network drives. Could be proximal
+or distal.</p>
+</dd>
+<dt><strong>add_drive_button</strong><span class="classifier">Widget</span></dt><dd><p>Clickable widget that is used to add a drive to the network.</p>
+</dd>
+<dt><strong>run_button</strong><span class="classifier">Widget</span></dt><dd><p>Clickable widget that triggers simulation.</p>
+</dd>
+<dt><strong>load_button</strong><span class="classifier">Widget</span></dt><dd><p>Clickable widget that receives uploaded parameter files.</p>
+</dd>
+<dt><strong>delete_drive_button</strong><span class="classifier">Widget</span></dt><dd><p>Clickable widget that clear all existing network drives.</p>
+</dd>
+<dt><strong>plot_outputs_dict</strong><span class="classifier">list</span></dt><dd><p>A list of visualization panel outputs.</p>
+</dd>
+<dt><strong>plot_dropdown_types_dict</strong><span class="classifier">list</span></dt><dd><p>A list of dropdown menus that control the plot types in
+plot_outputs_dict.</p>
+</dd>
+<dt><strong>drive_widgets</strong><span class="classifier">list</span></dt><dd><p>A list of network drive widgets added by add_drive_button.</p>
+</dd>
+<dt><strong>drive_boxes</strong><span class="classifier">list</span></dt><dd><p>A list of network drive layouts.</p>
+</dd>
+<dt><strong>connectivity_textfields</strong><span class="classifier">list</span></dt><dd><p>A list of boxes that control the weight and probability of connections
+in the network.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.capture" title="hnn_core.gui.HNNGUI.capture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capture</span></code></a>([width, height, extra_margin, render])</p></td>
+<td><p>Take a screenshot of the current GUI.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.compose" title="hnn_core.gui.HNNGUI.compose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose</span></code></a>([return_layout])</p></td>
+<td><p>Compose widgets.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.load_parameters" title="hnn_core.gui.HNNGUI.load_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_parameters</span></code></a>([params_fname])</p></td>
+<td><p>Read parameters from file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.gui.HNNGUI.run_notebook_cells" title="hnn_core.gui.HNNGUI.run_notebook_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_notebook_cells</span></code></a>()</p></td>
+<td><p>Run all but the last cells sequentially in a Jupyter notebook.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 74%" />
+<col style="width: 26%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>add_logging_window_logger</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>show</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.analysis_config">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">analysis_config</span></span><a class="headerlink" href="#hnn_core.gui.HNNGUI.analysis_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides everything viz window needs except for the data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.capture">
+<span class="sig-name descname"><span class="pre">capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.capture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.capture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a screenshot of the current GUI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>width</strong><span class="classifier">int | None</span></dt><dd><p>The width of iframe window use to show the snapshot.</p>
+</dd>
+<dt><strong>height</strong><span class="classifier">int | None</span></dt><dd><p>The height of iframe window use to show the snapshot.</p>
+</dd>
+<dt><strong>extra_margin: int</strong></dt><dd><p>Extra margin in pixel for the GUI.</p>
+</dd>
+<dt><strong>render</strong><span class="classifier">bool</span></dt><dd><p>Will return an IFrame object if False</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>snapshot</strong><span class="classifier">An iframe snapshot object that can be rendered in notebooks.</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.compose">
+<span class="sig-name descname"><span class="pre">compose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.compose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.compose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compose widgets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>return_layout</strong><span class="classifier">bool</span></dt><dd><p>If the method returns the layout object which can be rendered by
+IPython.display.display() method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#hnn_core.gui.HNNGUI.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides easy access to simulation-related data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.load_parameters">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.load_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.load_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read parameters from file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.gui.HNNGUI.run_notebook_cells">
+<span class="sig-name descname"><span class="pre">run_notebook_cells</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/gui/gui.html#HNNGUI.run_notebook_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.gui.HNNGUI.run_notebook_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all but the last cells sequentially in a Jupyter notebook.</p>
+<dl class="simple">
+<dt>To properly use this function:</dt><dd><ol class="arabic simple">
+<li><p>Put this into the penultimate cell.</p></li>
+<li><p>init the HNNGUI in a single cell.</p></li>
+<li><p>Hit ‘run all’ button to run the whole notebook and it will
+selectively run twice.</p></li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="sphx-glr-backreferences-hnn-core-gui-hnngui"></span></section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
