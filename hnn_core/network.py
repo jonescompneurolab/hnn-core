@@ -1253,30 +1253,42 @@ class Network(object):
 
         self.connectivity.append(deepcopy(conn))
 
-    def clear_connectivity(self, src_types=None):
+    def clear_connectivity(self, src_types="all"):
         """Remove connections with src_type in Network.connectivity.
 
         Parameters
         ----------
-        src_types : list | None
-            Source types of connections to be removed
-            None - Remove all connections other than those which have an
-            external drive as a source type
+        src_types : list | all | drives | local
+            Source types of connections to be cleared
+            all - Clear all connections (Default)
+            drives - Clear connections originating from external drives
+            local - Clear connections within cells
+
         """
-        if src_types is None:
+
+        if src_types == "all":
             src_types = list()
             for conn in self.connectivity:
-                src_type = conn['src_type']
-                # src_type should not be a external drive in this case
-                if src_type not in self.drive_names:
-                    src_types.append(src_type)  # Store src_types to be deleted
-            src_types = list(set(src_types))  # Removing duplicate entries
-        connectivity = list()  # Initialize empty list
-        for conn in self.connectivity:
-            # Removes connections in src_types
-            if conn['src_type'] not in src_types:
-                connectivity.append(conn)
-        self.connectivity = connectivity
+                if conn['src_type'] not in src_types:
+                    src_types.append(conn['src_type'])
+        elif src_types == "drives":
+            src_types = self.drive_names
+        elif src_types == "local":
+            src_types = list()
+            external_drives = self.drive_names
+            for conn in self.connectivity:
+                if (conn['src_type'] not in src_types and
+                   conn['src_type'] not in external_drives):
+                    src_types.append(conn['src_type'])
+        _validate_type(src_types, list, 'src_types', 'list, drives, local')
+        # Finding connection indices to be deleted
+        conn_idxs = list()
+        for src_type in src_types:
+            conn_idxs.extend(pick_connection(self, src_gids=src_type))
+
+        # Deleting the indices
+        for conn_idx in sorted(conn_idxs, reverse=True):
+            del self.connectivity[conn_idx]
 
     def clear_drives(self, drive_names='all'):
         """Remove all drives defined in Network.connectivity.
