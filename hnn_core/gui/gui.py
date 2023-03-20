@@ -1148,16 +1148,13 @@ def on_upload_data_change(change, data, viz_manager, log_out):
             hnn_core.read_dipole(io.StringIO(ext_content))
         ]}
         logger.info(f'External data {data_fname} loaded.')
-        try:
-            viz_manager.reset_fig_config_tabs(template_name='single figure')
-            viz_manager.add_figure()
-            fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
-            ax_plots = [("ax0", "current dipole")]
-            for ax_name, plot_type in ax_plots:
-                viz_manager._simulate_edit_figure(
-                    fig_name, ax_name, data_fname, plot_type, {}, "plot")
-        except Exception as e:
-            logger.error(f'viz got error {e}')
+        viz_manager.reset_fig_config_tabs(template_name='single figure')
+        viz_manager.add_figure()
+        fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
+        ax_plots = [("ax0", "current dipole")]
+        for ax_name, plot_type in ax_plots:
+            viz_manager._simulate_edit_figure(
+                fig_name, ax_name, data_fname, plot_type, {}, "plot")
 
 
 def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
