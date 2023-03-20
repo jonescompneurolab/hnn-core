@@ -58,7 +58,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.dev0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.4.dev0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -106,7 +106,7 @@
           
 <div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
   <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v0.3.dev0
+    v0.4.dev0
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -114,6 +114,7 @@
     <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
     <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
     <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
   </ul>
 </div>
 
@@ -487,7 +488,8 @@
                                 <span class="n">tstart</span><span class="o">=</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;opt_start&#39;</span><span class="p">],</span>
                                 <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-    <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;iter_avg_rmse&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_rmse_unweighted</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_rmse</span><span class="p">:</span>
+        <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;iter_avg_rmse&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_rmse_unweighted</span><span class="p">)</span>
     <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;stepminopterr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_rmse</span>
     <span class="n">opt_dpls</span><span class="p">[</span><span class="s1">&#39;best_dpl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_dpl</span>
 
@@ -787,7 +789,7 @@
       
     </p>
     <p>
-        &copy; Copyright 2021, HNN Developers.<br/>
+        &copy; Copyright 2023, HNN Developers.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br/>
     </p>
   </div>
