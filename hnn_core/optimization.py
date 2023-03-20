@@ -348,7 +348,8 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
                                 tstart=opt_params['opt_start'],
                                 tstop=tstop, weights=None)
 
-    opt_params['iter_avg_rmse'].append(avg_rmse_unweighted)
+    if return_rmse:
+        opt_params['iter_avg_rmse'].append(avg_rmse_unweighted)
     opt_params['stepminopterr'] = avg_rmse
     opt_dpls['best_dpl'] = avg_dpl
 
