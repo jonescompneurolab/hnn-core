@@ -230,7 +230,6 @@ class HNNGUI:
             accept='.txt', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load data',
-            # layout=self.layout['btn_full_w'],
             button_style='success')
 
         # Drive selection
