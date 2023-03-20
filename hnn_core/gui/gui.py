@@ -1146,8 +1146,12 @@ def on_upload_data_change(change, data, viz_manager):
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     # just load the first column, single trial.
     dpl_data = np.loadtxt(io.StringIO(ext_content), dtype=float)
+    if dpl_data.shape[1] > 2:
+        logger.error("New GUI does not support multi-trial data.")
+        return
+
     data['simulation_data'][data_fname] = {'net': None, 'dpls': [
-        hnn_core.Dipole(dpl_data[:, 0], dpl_data[:, 1])
+        hnn_core.read_dipole(io.StringIO(ext_content))
     ]}
     logger.info(f'External data {data_fname} loaded.')
     try:
