@@ -132,8 +132,8 @@ Read our `roadmap`_.
 
 .. _precompiled installers: https://www.neuron.yale.edu/neuron/download
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
-.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
-.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/stable/parallel.html
+.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
+.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
