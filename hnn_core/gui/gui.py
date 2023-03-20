@@ -388,7 +388,8 @@ class HNNGUI:
                 "drives")
 
         def _on_upload_data(change):
-            return on_upload_data_change(change, self.data, self.viz_manager)
+            return on_upload_data_change(change, self.data, self.viz_manager,
+                                         self._log_out)
 
         def _run_button_clicked(b):
             return run_button_clicked(
@@ -1128,7 +1129,7 @@ def load_drive_and_connectivity(params, log_out, drives_out,
                       layout)
 
 
-def on_upload_data_change(change, data, viz_manager):
+def on_upload_data_change(change, data, viz_manager, log_out):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
@@ -1142,25 +1143,21 @@ def on_upload_data_change(change, data, viz_manager):
 
     ext_content = change['new'][key]['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
-    try:
+    with log_out:
         data['simulation_data'][data_fname] = {'net': None, 'dpls': [
             hnn_core.read_dipole(io.StringIO(ext_content))
         ]}
-    except ValueError as e:
-        logger.error(f"Data error: {e}.")
-        return
-
-    logger.info(f'External data {data_fname} loaded.')
-    try:
-        viz_manager.reset_fig_config_tabs(template_name='single figure')
-        viz_manager.add_figure()
-        fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
-        ax_plots = [("ax0", "current dipole")]
-        for ax_name, plot_type in ax_plots:
-            viz_manager._simulate_edit_figure(fig_name, ax_name, data_fname,
-                                              plot_type, {}, "plot")
-    except Exception as e:
-        logger.error(f'viz got error {e}')
+        logger.info(f'External data {data_fname} loaded.')
+        try:
+            viz_manager.reset_fig_config_tabs(template_name='single figure')
+            viz_manager.add_figure()
+            fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
+            ax_plots = [("ax0", "current dipole")]
+            for ax_name, plot_type in ax_plots:
+                viz_manager._simulate_edit_figure(
+                    fig_name, ax_name, data_fname, plot_type, {}, "plot")
+        except Exception as e:
+            logger.error(f'viz got error {e}')
 
 
 def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
