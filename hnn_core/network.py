@@ -1265,21 +1265,18 @@ class Network(object):
             local - Clear connections within cells
 
         """
-
         if src_types == "all":
             src_types = list()
-            for conn in self.connectivity:
-                if conn['src_type'] not in src_types:
-                    src_types.append(conn['src_type'])
+            for src_type in self.gid_ranges.keys():
+                src_types.append(src_type)
         elif src_types == "drives":
             src_types = self.drive_names
         elif src_types == "local":
             src_types = list()
-            external_drives = self.drive_names
-            for conn in self.connectivity:
-                if (conn['src_type'] not in src_types and
-                   conn['src_type'] not in external_drives):
-                    src_types.append(conn['src_type'])
+            all_src_types = self.gid_ranges.keys()
+            local_src_types = all_src_types - self.drive_names
+            for src_type in local_src_types:
+                src_types.append(src_type)
         _validate_type(src_types, list, 'src_types', 'list, drives, local')
         # Finding connection indices to be deleted
         conn_idxs = list()

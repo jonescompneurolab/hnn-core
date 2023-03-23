@@ -511,15 +511,20 @@ def test_network_drives_legacy():
 
 
 def get_expected_connectivities(net, src_types='all'):
-    """Return expected connectivities left after clearng
-    connections.
+    """Return expected connectivities left after clearng connections.
 
     Parameters
     ----------
-    net - The network instance
-    src_types = list | all
+    net
+        The network instance
+    src_types : list | all
         Connection source types to be cleared
-        all - return 0 as all connections cleared
+
+    Returns
+    -------
+    int
+        Number of connections left after the deletion
+        operation
     """
     if src_types == 'all':
         return 0
