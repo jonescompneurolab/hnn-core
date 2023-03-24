@@ -1260,9 +1260,9 @@ class Network(object):
         ----------
         src_types : list | 'all' | 'drives' | 'local'
             Source types of connections to be cleared
-            all - Clear all connections (Default)
-            drives - Clear connections originating from external drives
-            local - Clear connections within cells
+            'all' - Clear all connections (Default)
+            'drives' - Clear connections originating from external drives
+            'local' - Clear connections within cells
 
         """
         if src_types == "all":
