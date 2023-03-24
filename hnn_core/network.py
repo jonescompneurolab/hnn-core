@@ -1258,7 +1258,7 @@ class Network(object):
 
         Parameters
         ----------
-        src_types : list | all | drives | local
+        src_types : list | 'all' | 'drives' | 'local'
             Source types of connections to be cleared
             all - Clear all connections (Default)
             drives - Clear connections originating from external drives
@@ -1266,17 +1266,12 @@ class Network(object):
 
         """
         if src_types == "all":
-            src_types = list()
-            for src_type in self.gid_ranges.keys():
-                src_types.append(src_type)
+            src_types = list(self.gid_ranges.keys())
         elif src_types == "drives":
             src_types = self.drive_names
         elif src_types == "local":
-            src_types = list()
-            all_src_types = self.gid_ranges.keys()
-            local_src_types = all_src_types - self.drive_names
-            for src_type in local_src_types:
-                src_types.append(src_type)
+            src_types = list((src_type for src_type in self.gid_ranges.keys()
+                             if src_type not in self.drive_names))
         _validate_type(src_types, list, 'src_types', 'list, drives, local')
         # Finding connection indices to be deleted
         conn_idxs = list()
