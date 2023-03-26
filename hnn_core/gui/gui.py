@@ -11,14 +11,11 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
-
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
-                        BoundedIntText, Button, Dropdown, FileUpload,
-                        FloatSlider, FloatText, HBox, IntText, Layout,
-                        Output, RadioButtons, Tab, Text, VBox, link)
+                        BoundedIntText, Button, Dropdown, FileUpload, VBox,
+                        HBox, IntText, Layout, Output, RadioButtons, Tab, Text)
 from ipywidgets.embed import embed_minimal_html
-
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
                       simulate_dipole)
@@ -117,7 +114,7 @@ class HNNGUI:
         A list of network drive widgets added by add_drive_button.
     drive_boxes : list
         A list of network drive layouts.
-    connectivity_sliders : list
+    connectivity_textfields : list
         A list of boxes that control the weight and probability of connections
         in the network.
     """
@@ -206,10 +203,12 @@ class HNNGUI:
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
         # Simulation parameters
-        self.widget_tstop = FloatText(value=170, description='tstop (ms):',
-                                      disabled=False)
-        self.widget_dt = FloatText(value=0.025, description='dt (ms):',
-                                   disabled=False)
+        self.widget_tstop = BoundedFloatText(
+            value=170, description='tstop (ms):', min=0, max=1e6, step=1,
+            disabled=False)
+        self.widget_dt = BoundedFloatText(
+            value=0.025, description='dt (ms):', min=0, max=10, step=0.01,
+            disabled=False)
         self.widget_ntrials = IntText(value=1, description='Trials:',
                                       disabled=False)
         self.widget_simulation_name = Text(value='default',
@@ -227,6 +226,11 @@ class HNNGUI:
                                             max=multiprocessing.cpu_count(),
                                             description='Cores:',
                                             disabled=False)
+        self.load_data_button = FileUpload(
+            accept='.txt', multiple=False,
+            style={'button_color': self.layout['theme_color']},
+            description='Load data',
+            button_style='success')
 
         # Drive selection
         self.widget_drive_type_selection = RadioButtons(
@@ -309,8 +313,9 @@ class HNNGUI:
             value=self._simulation_status_contents['not_running'])
 
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
-        self._operation_buttons = HBox([self.run_button],
-                                       layout=self.layout['operation_box'])
+        self._operation_buttons = HBox(
+            [self.run_button, self.load_data_button],
+            layout=self.layout['operation_box'])
         # title
         self._header = HTML(value=f"""<div
             style='background:{self.layout['theme_color']};
@@ -374,24 +379,24 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_connectivity(change):
-            return on_upload_change(change, self.params, self.widget_tstop,
-                                    self.widget_dt, self._log_out,
-                                    self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self._conn_drive_s,
-                                    self._connectivity_out,
-                                    self.connectivity_widgets,
-                                    self.layout['drive_textbox'],
-                                    "connectivity")
+            return on_upload_params_change(
+                change, self.params, self.widget_tstop, self.widget_dt,
+                self._log_out, self.drive_boxes, self.drive_widgets,
+                self._drives_out, self._connectivity_out,
+                self.connectivity_widgets, self.layout['drive_textbox'],
+                "connectivity")
 
         def _on_upload_drives(change):
-            return on_upload_change(change, self.params, self.widget_tstop,
-                                    self.widget_dt, self._log_out,
-                                    self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self._conn_drive_s,
-                                    self._connectivity_out,
-                                    self.connectivity_widgets,
-                                    self.layout['drive_textbox'],
-                                    "drives")
+            return on_upload_params_change(
+                change, self.params, self.widget_tstop, self.widget_dt,
+                self._log_out, self.drive_boxes, self.drive_widgets,
+                self._drives_out, self._connectivity_out,
+                self.connectivity_widgets, self.layout['drive_textbox'],
+                "drives")
+
+        def _on_upload_data(change):
+            return on_upload_data_change(change, self.data, self.viz_manager,
+                                         self._log_out)
 
         def _run_button_clicked(b):
             return run_button_clicked(
@@ -410,6 +415,8 @@ class HNNGUI:
         self.load_drives_button.observe(_on_upload_drives, names='value')
         self.run_button.on_click(_run_button_clicked)
 
+        self.load_data_button.observe(_on_upload_data, names='value')
+
     def compose(self, return_layout=True):
         """Compose widgets.
 
@@ -423,8 +430,7 @@ class HNNGUI:
             VBox([
                 self.widget_simulation_name, self.widget_tstop, self.widget_dt,
                 self.widget_ntrials, self.widget_backend_selection,
-                self._backend_config_out
-            ]),
+                self._backend_config_out]),
         ], layout=self.layout['config_box'])
 
         connectivity_box = VBox([
@@ -605,6 +611,10 @@ class HNNGUI:
         return js_string
 
     # below are a series of methods that are used to manipulate the GUI
+    def _simulate_upload_data(self, file_url):
+        uploaded_value = _prepare_upload_file_from_url(file_url)
+        self.load_data_button.set_trait('value', uploaded_value)
+
     def _simulate_upload_connectivity(self, file_url):
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_connectivity_button.set_trait('value', uploaded_value)
@@ -679,27 +689,15 @@ def _get_connectivity_widgets(conn_data):
     style = {}
     sliders = list()
     for receptor_name in conn_data.keys():
-        w_text_input = FloatText(value=conn_data[receptor_name]['weight'],
-                                 disabled=False, continuous_update=False,
-                                 description="weight",
-                                 style=style)
+        w_text_input = BoundedFloatText(
+            value=conn_data[receptor_name]['weight'], disabled=False,
+            continuous_update=False, min=0, max=1e6, step=0.01,
+            description="weight", style=style)
 
-        w_slider = FloatSlider(value=conn_data[receptor_name]['weight'],
-                                  min=-5, max=1, step=0.2,
-                                  description=" ",
-                                  disabled=False,
-                                  continuous_update=False,
-                                  orientation='horizontal',
-                                  readout=False,
-                                  readout_format='.2e',
-                                  style=style)
-
-        link((w_slider, 'value'), (w_text_input, 'value'))
         conn_widget = VBox([
             HTML(value=f"""<p>
             Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
-            w_text_input, w_slider,
-            HTML(value="<hr style='margin-bottom:5px'/>")
+            w_text_input, HTML(value="<hr style='margin-bottom:5px'/>")
         ])
 
         conn_widget._belongsto = {
@@ -746,18 +744,15 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
 
     weights_ampa, weights_nmda, delays = dict(), dict(), dict()
     for cell_type in cell_types:
-        weights_ampa[f'{cell_type}'] = FloatText(
+        weights_ampa[f'{cell_type}'] = BoundedFloatText(
             value=default_data['weights_ampa'][cell_type],
-            description=f'{cell_type}:',
-            **kwargs)
-        weights_nmda[f'{cell_type}'] = FloatText(
+            description=f'{cell_type}:', min=0, max=1e6, step=0.01, **kwargs)
+        weights_nmda[f'{cell_type}'] = BoundedFloatText(
             value=default_data['weights_nmda'][cell_type],
-            description=f'{cell_type}:',
-            **kwargs)
-        delays[f'{cell_type}'] = FloatText(
+            description=f'{cell_type}:', min=0, max=1e6, step=0.01, **kwargs)
+        delays[f'{cell_type}'] = BoundedFloatText(
             value=default_data['delays'][cell_type],
-            description=f'{cell_type}:',
-            **kwargs)
+            description=f'{cell_type}:', min=0, max=1e6, step=0.1, **kwargs)
 
     widgets_dict = {
         'weights_ampa': weights_ampa,
@@ -788,27 +783,27 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     if isinstance(data, dict):
         default_data.update(data)
     kwargs = dict(layout=layout, style=style)
-    tstart = FloatText(value=default_data['tstart'],
-                       description='Start time (ms)',
-                       **kwargs)
-    tstart_std = FloatText(value=default_data['tstart_std'],
-                           description='Start time dev (ms)',
-                           **kwargs)
+    tstart = BoundedFloatText(
+        value=default_data['tstart'], description='Start time (ms)',
+        min=0, max=1e6, **kwargs)
+    tstart_std = BoundedFloatText(
+        value=default_data['tstart_std'], description='Start time dev (ms)',
+        min=0, max=1e6, **kwargs)
     tstop = BoundedFloatText(
         value=default_data['tstop'],
         description='Stop time (ms)',
         max=tstop_widget.value,
         **kwargs,
     )
-    burst_rate = FloatText(value=default_data['burst_rate'],
-                           description='Burst rate (Hz)',
-                           **kwargs)
-    burst_std = FloatText(value=default_data['burst_std'],
-                          description='Burst std dev (Hz)',
-                          **kwargs)
-    repeats = FloatText(value=default_data['repeats'],
-                        description='Repeats',
-                        **kwargs)
+    burst_rate = BoundedFloatText(
+        value=default_data['burst_rate'], description='Burst rate (Hz)',
+        min=0, max=1e6, **kwargs)
+    burst_std = BoundedFloatText(
+        value=default_data['burst_std'], description='Burst std dev (Hz)',
+        min=0, max=1e6, **kwargs)
+    repeats = BoundedIntText(
+        value=default_data['repeats'], description='Repeats', min=0,
+        max=int(1e6), **kwargs)
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        **kwargs)
@@ -856,10 +851,9 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
     }
     if isinstance(data, dict):
         default_data.update(data)
-    tstart = FloatText(value=default_data['tstart'],
-                       description='Start time (ms)',
-                       layout=layout,
-                       style=style)
+    tstart = BoundedFloatText(
+        value=default_data['tstart'], description='Start time (ms)',
+        min=0, max=1e6, layout=layout, style=style)
     tstop = BoundedFloatText(
         value=default_data['tstop'],
         max=tstop_widget.value,
@@ -875,11 +869,10 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
     rate_constant = dict()
     for cell_type in cell_types:
-        rate_constant[f'{cell_type}'] = FloatText(
+        rate_constant[f'{cell_type}'] = BoundedFloatText(
             value=default_data['rate_constant'][cell_type],
-            description=f'{cell_type}:',
-            layout=layout,
-            style=style)
+            description=f'{cell_type}:', min=0, max=1e6, step=0.01,
+            layout=layout, style=style)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
         layout,
@@ -921,12 +914,12 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     if isinstance(data, dict):
         default_data.update(data)
     kwargs = dict(layout=layout, style=style)
-    mu = FloatText(value=default_data['mu'],
-                   description='Mean time:',
-                   **kwargs)
-    sigma = FloatText(value=default_data['sigma'],
-                      description='Std dev time:',
-                      **kwargs)
+    mu = BoundedFloatText(
+        value=default_data['mu'], description='Mean time:', min=0, max=1e6,
+        step=0.01, **kwargs)
+    sigma = BoundedFloatText(
+        value=default_data['sigma'], description='Std dev time:', min=0,
+        max=1e6, step=0.01, **kwargs)
     numspikes = IntText(value=default_data['numspikes'],
                         description='No. Spikes:',
                         **kwargs)
@@ -1020,7 +1013,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, tstop_widget,
 
 
 def add_connectivity_tab(params, connectivity_out,
-                         connectivity_sliders):
+                         connectivity_textfields):
     """Add all possible connectivity boxes to connectivity tab."""
     net = jones_2009_model(params)
     cell_types = [ct for ct in net.cell_types.keys()]
@@ -1029,8 +1022,8 @@ def add_connectivity_tab(params, connectivity_out,
 
     # clear existing connectivity
     connectivity_out.clear_output()
-    while len(connectivity_sliders) > 0:
-        connectivity_sliders.pop()
+    while len(connectivity_textfields) > 0:
+        connectivity_textfields.pop()
 
     connectivity_names = list()
     for src_gids in cell_types:
@@ -1064,10 +1057,10 @@ def add_connectivity_tab(params, connectivity_out,
                 if len(receptor_related_conn) > 0:
                     connectivity_names.append(
                         f"{src_gids}→{target_gids} ({location})")
-                    connectivity_sliders.append(
+                    connectivity_textfields.append(
                         _get_connectivity_widgets(receptor_related_conn))
 
-    connectivity_boxes = [VBox(slider) for slider in connectivity_sliders]
+    connectivity_boxes = [VBox(slider) for slider in connectivity_textfields]
     cell_connectivity = Accordion(children=connectivity_boxes)
     for idx, connectivity_name in enumerate(connectivity_names):
         cell_connectivity.set_title(idx, connectivity_name)
@@ -1101,8 +1094,7 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
     net = jones_2009_model(params)
     drive_specs = _extract_drive_specs_from_hnn_params(
-        params,
-        list(net.cell_types.keys()))
+        params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1135,14 +1127,12 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
 
 def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                conn_drive_s, connectivity_sliders, tstop,
-                                layout):
+                                connectivity_textfields, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
     log_out.clear_output()
     with log_out:
         # Add connectivity
-        _, _conns = add_connectivity_tab(params, connectivity_out,
-                                         connectivity_sliders)
+        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
         # Add drives
         _, _drives = add_drive_tab(params, drives_out, drive_widgets,
                                    drive_boxes, tstop, layout)
@@ -1151,10 +1141,37 @@ def load_drive_and_connectivity(params, log_out, drives_out,
         conn_drive_s['drive'] = _drives
 
 
-def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
-                     drive_widgets, drives_out, conn_drive_s,
-                     connectivity_out, connectivity_sliders, layout,
-                     load_type):
+def on_upload_data_change(change, data, viz_manager, log_out):
+    if len(change['owner'].value) == 0:
+        logger.info("Empty change")
+        return
+
+    key = list(change['new'].keys())[0]
+
+    data_fname = change['new'][key]['metadata']['name'].rstrip('.txt')
+    if data_fname in data['simulation_data'].keys():
+        logger.error(f"Found existing data: {data_fname}.")
+        return
+
+    ext_content = change['new'][key]['content']
+    ext_content = codecs.decode(ext_content, encoding="utf-8")
+    with log_out:
+        data['simulation_data'][data_fname] = {'net': None, 'dpls': [
+            hnn_core.read_dipole(io.StringIO(ext_content))
+        ]}
+        logger.info(f'External data {data_fname} loaded.')
+        viz_manager.reset_fig_config_tabs(template_name='single figure')
+        viz_manager.add_figure()
+        fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
+        ax_plots = [("ax0", "current dipole")]
+        for ax_name, plot_type in ax_plots:
+            viz_manager._simulate_edit_figure(
+                fig_name, ax_name, data_fname, plot_type, {}, "plot")
+
+
+def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
+                            drive_widgets, drives_out, connectivity_out,
+                            connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
@@ -1181,9 +1198,7 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
         params.update(params_network)
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        _, _conns = add_connectivity_tab(params, connectivity_out,
-                                         connectivity_sliders)
-        conn_drive_s['connectivity'] = _conns
+        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
         _, _drives = add_drive_tab(params, drives_out, drive_widgets,
                                    drive_boxes, tstop, layout)
@@ -1196,7 +1211,7 @@ def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
 
 
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
-                               drive_widgets, connectivity_sliders,
+                               drive_widgets, connectivity_textfields,
                                add_drive=True):
     """Construct network and add drives."""
     print("init network")
@@ -1207,7 +1222,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         add_drives_from_params=False,
     )
     # adjust connectivity according to the connectivity_tab
-    for connectivity_slider in connectivity_sliders:
+    for connectivity_slider in connectivity_textfields:
         for vbox in connectivity_slider:
             conn_indices = pick_connection(
                 net=single_simulation_data['net'],
@@ -1222,7 +1237,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 single_simulation_data['net'].connectivity[conn_idx][
                     'nc_dict']['A_weight'] = vbox.children[1].value
                 single_simulation_data['net'].connectivity[conn_idx][
-                    'probability'] = vbox.children[3].value
+                    'probability'] = vbox.children[2].value
 
     if add_drive is False:
         return
@@ -1300,7 +1315,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        all_data, dt, tstop, ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
-                       simulation_status_contents, connectivity_sliders,
+                       simulation_status_contents, connectivity_textfields,
                        viz_manager):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
@@ -1308,8 +1323,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
     with log_out:
         # clear empty trash simulations
         for _name in tuple(simulation_data.keys()):
-            if simulation_data[_name]['net'] is None or len(
-                    simulation_data[_name]['dpls']) == 0:
+            if len(simulation_data[_name]['dpls']) == 0:
                 del simulation_data[_name]
 
         _sim_name = widget_simulation_name.value
@@ -1321,7 +1335,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 
         _init_network_from_widgets(params, dt, tstop,
                                    simulation_data[_sim_name], drive_widgets,
-                                   connectivity_sliders)
+                                   connectivity_textfields)
 
         print("start simulation")
         if backend_selection.value == "MPI":

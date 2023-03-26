@@ -1,6 +1,5 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from copy import deepcopy
 from hnn_core.dipole import simulate_dipole
 import os.path as op
 import numpy as np
@@ -41,10 +40,9 @@ def test_network_models():
     add_erp_drives_to_jones_model(net_default)
     for drive_name in ['evdist1', 'evprox1', 'evprox2']:
         assert drive_name in net_default.external_drives.keys()
-    # 15 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
-    # evprox1: 4 ampa, evprox2: 4 ampa, and 1 extra zero-weighted ampa
-    # evdist1->L5_basket connection is added to comply with legacy_mode
-    assert len(net_default.connectivity) == n_conn + 15
+    # 14 drive connections are added as follows: evdist1: 3 ampa + 3 nmda,
+    # evprox1: 4 ampa, evprox2: 4 ampa
+    assert len(net_default.connectivity) == n_conn + 14
 
     # Ensure distant dependent calcium gbar
     net_calcium = calcium_model()
@@ -128,10 +126,253 @@ def test_network_cell_positions():
                     net.pos_dict['origin'][idx])
 
 
-def test_network():
-    """Test network object."""
+def test_network_drives():
+    """Test manipulation of drives in the network object."""
     with pytest.raises(TypeError, match='params must be an instance of dict'):
         Network('hello')
+    params = read_params(params_fname)
+    net = jones_2009_model(params, legacy_mode=False)
+
+    # add all drives explicitly and ensure that the expected number of drive
+    # cells get instantiated for each case
+    n_drive_cells_list = list()
+
+    # use erp drive sequence
+    n_drive_cells = 'n_cells'
+    n_drive_cells_list.append(n_drive_cells)
+    drive_weights = dict()
+    drive_weights['evdist1'] = {'L2_basket': 0.01, 'L2_pyramidal': 0.02,
+                                'L5_pyramidal': 0.03}
+    drive_delays = dict()
+    drive_delays['evdist1'] = {'L2_basket': 0.1, 'L2_pyramidal': 0.2,
+                               'L5_pyramidal': 0.3}
+    net.add_evoked_drive(
+        name='evdist1',
+        mu=63.53,
+        sigma=3.85,
+        numspikes=1,
+        location='distal',
+        n_drive_cells=n_drive_cells,
+        cell_specific=True,
+        weights_ampa=drive_weights['evdist1'],
+        weights_nmda=drive_weights['evdist1'],
+        synaptic_delays=drive_delays['evdist1'],
+        event_seed=274)
+
+    n_drive_cells = 'n_cells'
+    n_drive_cells_list.append(n_drive_cells)
+    drive_weights['evprox1'] = {'L2_basket': 0.04, 'L2_pyramidal': 0.05,
+                                'L5_basket': 0.06, 'L5_pyramidal': 0.07}
+    drive_delays['evprox1'] = {'L2_basket': 0.4, 'L2_pyramidal': 0.5,
+                               'L5_basket': 0.6, 'L5_pyramidal': 0.7}
+    net.add_evoked_drive(
+        name='evprox1',
+        mu=26.61,
+        sigma=2.47,
+        numspikes=1,
+        location='proximal',
+        n_drive_cells=n_drive_cells,
+        cell_specific=True,
+        weights_ampa=drive_weights['evprox1'],
+        weights_nmda=drive_weights['evprox1'],
+        synaptic_delays=drive_delays['evprox1'],
+        event_seed=544)
+
+    n_drive_cells = 'n_cells'
+    n_drive_cells_list.append(n_drive_cells)
+    drive_weights['evprox2'] = {'L2_basket': 0.08, 'L2_pyramidal': 0.09,
+                                'L5_basket': 0.1, 'L5_pyramidal': 0.11}
+    drive_delays['evprox2'] = {'L2_basket': 0.8, 'L2_pyramidal': 0.9,
+                               'L5_basket': 1.0, 'L5_pyramidal': 1.1}
+    net.add_evoked_drive(
+        name='evprox2',
+        mu=137.12,
+        sigma=8.33,
+        numspikes=1,
+        location='proximal',
+        n_drive_cells=n_drive_cells,
+        cell_specific=True,
+        weights_ampa=drive_weights['evprox2'],
+        weights_nmda=drive_weights['evprox2'],
+        synaptic_delays=drive_delays['evprox2'],
+        event_seed=814)
+
+    # add an bursty drive as well
+    n_drive_cells = 10
+    n_drive_cells_list.append(n_drive_cells)
+    drive_weights['bursty1'] = {'L2_basket': 0.12, 'L2_pyramidal': 0.13,
+                                'L5_basket': 0.14, 'L5_pyramidal': 0.15}
+    drive_delays['bursty1'] = {'L2_basket': 1.2, 'L2_pyramidal': 1.3,
+                               'L5_basket': 1.4, 'L5_pyramidal': 1.5}
+    net.add_bursty_drive(
+        name='bursty1',
+        tstart=10.,
+        tstart_std=0.5,
+        tstop=30.,
+        location='proximal',
+        burst_rate=100.,
+        burst_std=0.,
+        numspikes=2,
+        spike_isi=1.,
+        n_drive_cells=n_drive_cells,
+        cell_specific=False,
+        weights_ampa=drive_weights['bursty1'],
+        weights_nmda=drive_weights['bursty1'],
+        synaptic_delays=drive_delays['bursty1'],
+        event_seed=4)
+
+    # add poisson drive as well
+    n_drive_cells = 'n_cells'
+    n_drive_cells_list.append(n_drive_cells)
+    drive_weights['poisson1'] = {'L2_basket': 0.16, 'L2_pyramidal': 0.17,
+                                 'L5_pyramidal': 0.18}
+    drive_delays['poisson1'] = {'L2_basket': 1.6, 'L2_pyramidal': 1.7,
+                                'L5_pyramidal': 1.8}
+    net.add_poisson_drive(
+        name='poisson1',
+        tstart=10.,
+        tstop=30.,
+        rate_constant=50.,
+        location='distal',
+        n_drive_cells=n_drive_cells,
+        cell_specific=True,
+        weights_ampa=drive_weights['poisson1'],
+        weights_nmda=drive_weights['poisson1'],
+        synaptic_delays=drive_delays['poisson1'],
+        event_seed=4)
+
+    # instantiate drive events for NetworkBuilder
+    net._instantiate_drives(tstop=params['tstop'],
+                            n_trials=params['N_trials'])
+    network_builder = NetworkBuilder(net)  # needed to instantiate cells
+
+    # Assert that params are conserved across Network initialization
+    for p in params:
+        assert params[p] == net._params[p]
+    assert len(params) == len(net._params)
+    print(network_builder)
+    print(network_builder._cells[:2])
+
+    # Assert that proper number/types of gids are created for Network drives
+    dns_from_gids = [name for name in net.gid_ranges.keys() if
+                     name not in net.cell_types]
+    assert (sorted(dns_from_gids) == sorted(net.external_drives.keys()) ==
+            sorted(drive_weights.keys()))
+    for dn in dns_from_gids:
+        n_drive_cells = net.external_drives[dn]['n_drive_cells']
+        assert len(net.gid_ranges[dn]) == n_drive_cells
+
+    # Check drive dict structure for each external drive
+    for drive_idx, drive in enumerate(net.external_drives.values()):
+        # Check that connectivity sources correspond to gid_ranges
+        conn_idxs = pick_connection(net, src_gids=drive['name'])
+        this_src_gids = set([gid for conn_idx in conn_idxs
+                             for gid in net.connectivity[conn_idx]['src_gids']
+                             ])  # NB set: globals
+        assert sorted(this_src_gids) == list(net.gid_ranges[drive['name']])
+        # Check type-specific dynamics and events
+        n_drive_cells = drive['n_drive_cells']
+        if n_drive_cells_list[drive_idx] != 'n_cells':
+            assert n_drive_cells_list[drive_idx] == n_drive_cells
+        assert len(drive['events']) == 1  # single trial simulated
+        if drive['type'] == 'evoked':
+            for kw in ['mu', 'sigma', 'numspikes']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == n_drive_cells
+            # this also implicitly tests that events are always a list
+            assert len(drive['events'][0][0]) == drive['dynamics']['numspikes']
+        elif drive['type'] == 'poisson':
+            for kw in ['tstart', 'tstop', 'rate_constant']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == n_drive_cells
+        elif drive['type'] == 'bursty':
+            for kw in ['tstart', 'tstart_std', 'tstop',
+                       'burst_rate', 'burst_std', 'numspikes']:
+                assert kw in drive['dynamics'].keys()
+            assert len(drive['events'][0]) == n_drive_cells
+            n_events = (
+                drive['dynamics']['numspikes'] *  # 2
+                (1 + (drive['dynamics']['tstop'] -
+                      drive['dynamics']['tstart'] - 1) //
+                    (1000. / drive['dynamics']['burst_rate'])))
+            assert len(drive['events'][0][0]) == n_events  # 4
+
+    # make sure the PRNGs are consistent.
+    target_times = {'evdist1': [66.30498327062551, 66.33129889343446],
+                    'evprox1': [23.80641637082997, 30.857310915553647],
+                    'evprox2': [141.76252038319825, 137.73942375578602]}
+    for drive_name in target_times:
+        for idx in [0, -1]:  # first and last
+            assert_allclose(net.external_drives[drive_name]['events'][0][idx],
+                            target_times[drive_name][idx], rtol=1e-12)
+
+    # check select excitatory (AMPA+NMDA) synaptic weights and delays
+    for drive_name in drive_weights:
+        for target_type in drive_weights[drive_name]:
+            conn_idxs = pick_connection(net, src_gids=drive_name,
+                                        target_gids=target_type)
+            for conn_idx in conn_idxs:
+                drive_conn = net.connectivity[conn_idx]
+                # weights
+                assert_allclose(drive_conn['nc_dict']['A_weight'],
+                                drive_weights[drive_name][target_type],
+                                rtol=1e-12)
+                # delays
+                assert_allclose(drive_conn['nc_dict']['A_delay'],
+                                drive_delays[drive_name][target_type],
+                                rtol=1e-12)
+
+    # array of simulation times is created in Network.__init__, but passed
+    # to CellResponse-constructor for storage (Network is agnostic of time)
+    with pytest.raises(TypeError,
+                       match="'times' is an np.ndarray of simulation times"):
+        _ = CellResponse(times='blah')
+
+    # Check that all external drives are initialized with the expected amount
+    # of artificial cells assuming legacy_mode=False (i.e., dependent on
+    # drive targets).
+    prox_targets = (len(net.gid_ranges['L2_basket']) +
+                    len(net.gid_ranges['L2_pyramidal']) +
+                    len(net.gid_ranges['L5_basket']) +
+                    len(net.gid_ranges['L5_pyramidal']))
+    dist_targets = (len(net.gid_ranges['L2_basket']) +
+                    len(net.gid_ranges['L2_pyramidal']) +
+                    len(net.gid_ranges['L5_pyramidal']))
+    n_evoked_sources = dist_targets + (2 * prox_targets)
+    n_pois_sources = dist_targets
+    n_bursty_sources = net.external_drives['bursty1']['n_drive_cells']
+    # test that expected number of external driving events are created
+    assert len(network_builder._drive_cells) == (n_evoked_sources +
+                                                 n_pois_sources +
+                                                 n_bursty_sources)
+    assert len(network_builder._gid_list) ==\
+        len(network_builder._drive_cells) + net._n_cells
+    # first 'evoked drive' comes after real cells and bursty drive cells
+    assert network_builder._drive_cells[n_bursty_sources].gid ==\
+        net._n_cells + n_bursty_sources
+
+    # check that Network drive connectivity tranfers to NetworkBuilder
+    n_pyr = len(net.gid_ranges['L2_pyramidal'])
+    n_basket = len(net.gid_ranges['L2_basket'])
+
+    # Check bursty drives which use cell_specific=False
+    assert 'bursty1_L2Pyr_ampa' in network_builder.ncs
+    n_bursty1_sources = net.external_drives['bursty1']['n_drive_cells']
+    n_connections = n_bursty1_sources * 3 * n_pyr  # 3 synapses / cell
+    assert len(network_builder.ncs['bursty1_L2Pyr_ampa']) == n_connections
+    nc = network_builder.ncs['bursty1_L2Pyr_ampa'][0]
+    assert nc.threshold == params['threshold']
+
+    # Check evoked drives which use cell_specific=True
+    assert 'evdist1_L2Basket_nmda' in network_builder.ncs
+    n_connections = n_basket  # 1 synapse / cell
+    assert len(network_builder.ncs['evdist1_L2Basket_nmda']) == n_connections
+    nc = network_builder.ncs['evdist1_L2Basket_nmda'][0]
+    assert nc.threshold == params['threshold']
+
+
+def test_network_drives_legacy():
+    """Test manipulation of drives in the network object under legacy mode."""
     params = read_params(params_fname)
     # add rhythmic inputs (i.e., a type of common input)
     params.update({'input_dist_A_weight_L2Pyr_ampa': 1.4e-5,
@@ -141,7 +382,16 @@ def test_network():
                    'input_prox_A_weight_L5Pyr_ampa': 4.4e-5,
                    't0_input_prox': 50})
 
-    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
+    # Test deprecation warning of legacy mode
+    with pytest.warns(DeprecationWarning, match='Legacy mode'):
+        _ = jones_2009_model(legacy_mode=True)
+        _ = law_2021_model(legacy_mode=True)
+        _ = calcium_model(legacy_mode=True)
+        _ = Network(params, legacy_mode=True)
+
+    net = jones_2009_model(params, legacy_mode=True,
+                           add_drives_from_params=True)
+
     # instantiate drive events for NetworkBuilder
     net._instantiate_drives(tstop=params['tstop'],
                             n_trials=params['N_trials'])
@@ -265,13 +515,51 @@ def test_network():
                                                  n_pois_sources +
                                                  n_gaus_sources +
                                                  n_bursty_sources)
-    assert len(network_builder._gid_list) ==\
-        len(network_builder._drive_cells) + net._n_cells
-    # first 'evoked drive' comes after real cells and bursty drive cells
-    assert network_builder._drive_cells[n_bursty_sources].gid ==\
-        net._n_cells + n_bursty_sources
 
-    # Assert that netcons are created properly
+
+def test_network_connectivity():
+    """Test manipulation of local network connectivity."""
+    params = read_params(params_fname)
+    net = Network(params, legacy_mode=False)
+
+    # add some basic local network connectivity
+    # layer2 Pyr -> layer2 Pyr
+    # layer5 Pyr -> layer5 Pyr
+    for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
+        for receptor in ['nmda', 'ampa']:
+            net.add_connection(
+                target_cell, target_cell, loc='proximal', receptor=receptor,
+                weight=5e-4, delay=net.delay, lamtha=3.0, allow_autapses=False)
+    # layer2 Basket -> layer2 Pyr
+    # layer5 Basket -> layer5 Pyr
+    for receptor in ['gabaa', 'gabab']:
+        net.add_connection(
+            src_gids='L2_basket', target_gids='L2_pyramidal', loc='soma',
+            receptor=receptor, weight=5e-4, delay=net.delay, lamtha=50.0)
+        net.add_connection(
+            src_gids='L5_basket', target_gids='L2_pyramidal', loc='soma',
+            receptor=receptor, weight=5e-4, delay=net.delay, lamtha=70.0)
+    # layer2 Basket -> layer2 Basket (autapses allowed)
+    net.add_connection(
+        src_gids='L2_basket', target_gids='L2_basket', loc='soma',
+        receptor='gabaa', weight=5e-4, delay=net.delay, lamtha=20.0)
+
+    # add arbitrary drives that contribute artificial cells to network
+    net.add_evoked_drive(name='evdist1', mu=5.0, sigma=1.0,
+                         numspikes=1, location='distal',
+                         weights_ampa={'L2_basket': 0.1,
+                                       'L2_pyramidal': 0.1})
+    net.add_evoked_drive(name='evprox1', mu=5.0, sigma=1.0,
+                         numspikes=1, location='proximal',
+                         weights_ampa={'L2_basket': 0.1,
+                                       'L2_pyramidal': 0.1})
+
+    # instantiate drive events and artificial cells for NetworkBuilder
+    net._instantiate_drives(tstop=10.0,
+                            n_trials=1)
+    network_builder = NetworkBuilder(net)
+
+    # start by checking that Network connectivity tranfers to NetworkBuilder
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
     n_basket = len(net.gid_ranges['L2_basket'])
 
@@ -282,14 +570,6 @@ def test_network():
     nc = network_builder.ncs['L2Pyr_L2Pyr_nmda'][0]
     assert nc.threshold == params['threshold']
 
-    # Check bursty drives which use cell_specific=False
-    assert 'bursty1_L2Pyr_ampa' in network_builder.ncs
-    n_bursty1_sources = net.external_drives['bursty1']['n_drive_cells']
-    n_connections = n_bursty1_sources * 3 * n_pyr  # 3 synapses / cell
-    assert len(network_builder.ncs['bursty1_L2Pyr_ampa']) == n_connections
-    nc = network_builder.ncs['bursty1_L2Pyr_ampa'][0]
-    assert nc.threshold == params['threshold']
-
     # Check basket-basket connection where allow_autapses=True
     assert 'L2Basket_L2Basket_gabaa' in network_builder.ncs
     n_connections = n_basket ** 2  # 1 synapse / cell
@@ -297,33 +577,22 @@ def test_network():
     nc = network_builder.ncs['L2Basket_L2Basket_gabaa'][0]
     assert nc.threshold == params['threshold']
 
-    # Check evoked drives which use cell_specific=True
-    assert 'evdist1_L2Basket_nmda' in network_builder.ncs
-    n_connections = n_basket  # 1 synapse / cell
-    assert len(network_builder.ncs['evdist1_L2Basket_nmda']) == n_connections
-    nc = network_builder.ncs['evdist1_L2Basket_nmda'][0]
-    assert nc.threshold == params['threshold']
-
-    # Test inputs for connectivity API
-    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
-    # instantiate drive events for NetworkBuilder
-    net._instantiate_drives(tstop=params['tstop'],
-                            n_trials=params['N_trials'])
+    # get initial number of connections targeting a single section
     n_conn_prox = len(network_builder.ncs['L2Pyr_L2Pyr_ampa'])
+    n_conn_trunk = len(network_builder.ncs['L2Pyr_L2Pyr_nmda'])
+
+    # add connections targeting single section and rebuild
     kwargs_default = dict(src_gids=[35, 36], target_gids=[35, 36],
                           loc='proximal', receptor='ampa',
                           weight=5e-4, delay=1.0, lamtha=1e9,
                           probability=1.0)
     net.add_connection(**kwargs_default)  # smoke test
-
-    # Test adding connection targeting single section
     kwargs_trunk = kwargs_default.copy()
     kwargs_trunk['loc'] = 'apical_trunk'
     kwargs_trunk['receptor'] = 'nmda'
-    n_conn_trunk = len(network_builder.ncs['L2Pyr_L2Pyr_nmda'])
     net.add_connection(**kwargs_trunk)
-
     network_builder = NetworkBuilder(net)
+
     # Check proximal targeted connection count increased by right number
     # (2*2 connections between cells, 3 sections in proximal target)
     assert len(network_builder.ncs['L2Pyr_L2Pyr_ampa']) == n_conn_prox + 4 * 3
@@ -444,17 +713,20 @@ def test_network():
                 assert np.any(np.in1d([item], net.connectivity[conn_idx][arg]))
 
     # Test searching a list of src or target types
-    cell_type_list = ['L2_basket', 'L5_basket']
+    src_cell_type_list = ['L2_basket', 'L5_basket']
     true_gid_set = set(list(net.gid_ranges['L2_basket']) + list(
         net.gid_ranges['L5_basket']))
-    indices = pick_connection(net, src_gids=cell_type_list)
+    indices = pick_connection(net, src_gids=src_cell_type_list)
     pick_gid_list = list()
     for conn_idx in indices:
         pick_gid_list.extend(
             net.connectivity[conn_idx]['src_gids'])
     assert true_gid_set == set(pick_gid_list)
 
-    indices = pick_connection(net, target_gids=['L2_basket', 'L5_basket'])
+    target_cell_type_list = ['L2_pyramidal', 'L5_pyramidal']
+    true_gid_set = set(list(net.gid_ranges['L2_pyramidal']) + list(
+        net.gid_ranges['L5_pyramidal']))
+    indices = pick_connection(net, target_gids=target_cell_type_list)
     pick_gid_list = list()
     for conn_idx in indices:
         pick_gid_list.extend(
@@ -518,7 +790,7 @@ def test_network():
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceeding tests
     net.clear_connectivity()
-    assert len(net.connectivity) == 50
+    assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
     net.clear_drives()
     assert len(net.connectivity) == 0
 
@@ -565,7 +837,12 @@ def test_tonic_biases():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    net = Network(params, add_drives_from_params=True)
+    net = Network(params)
+    # add arbitrary local network connectivity to avoid simulation warning
+    net.add_connection(src_gids='L2_pyramidal',
+                       target_gids='L2_basket',
+                       loc='soma', receptor='ampa', weight=1e-3,
+                       delay=1.0, lamtha=3.0)
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
                            t0=0.0, tstop=4.0)

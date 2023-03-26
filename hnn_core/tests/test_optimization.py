@@ -116,9 +116,9 @@ def test_optimize_evoked():
         net_empty = net_offset.copy()
         del net_empty.external_drives['evprox1']
         del net_empty.external_drives['evdist1']
-        net_opt = optimize_evoked(net_empty, tstop=tstop, n_trials=n_trials,
-                                  target_dpl=dpl_orig, initial_dpl=dpl_offset,
-                                  maxiter=10)
+        net_opt = optimize_evoked(net_empty, tstop=tstop,
+                                  n_trials=n_trials, target_dpl=dpl_orig,
+                                  initial_dpl=dpl_offset, maxiter=10)
 
     with pytest.raises(ValueError, match='The drives selected to be optimized '
                        'are not evoked drives'):
@@ -130,12 +130,30 @@ def test_optimize_evoked():
                                   which_drives=which_drives, maxiter=10)
 
     which_drives = ['evprox1']  # drive selected to optimize
+    maxiter = 10
+    # try without returning iteration RMSE first
     net_opt = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
-                              target_dpl=dpl_orig, initial_dpl=dpl_offset,
+                              target_dpl=dpl_orig,
+                              initial_dpl=dpl_offset,
                               timing_range_multiplier=3.,
                               sigma_range_multiplier=50.,
                               synweight_range_multiplier=500.,
-                              maxiter=10, which_drives=which_drives)
+                              maxiter=maxiter, which_drives=which_drives,
+                              return_rmse=False)
+    net_opt, rmse = optimize_evoked(net_offset, tstop=tstop, n_trials=n_trials,
+                                    target_dpl=dpl_orig,
+                                    initial_dpl=dpl_offset,
+                                    timing_range_multiplier=3.,
+                                    sigma_range_multiplier=50.,
+                                    synweight_range_multiplier=500.,
+                                    maxiter=maxiter, which_drives=which_drives,
+                                    return_rmse=True)
+
+    # the number of returned rmse values should be the same as maxiter
+    assert len(rmse) <= maxiter
+
+    # the returned rmse values should be positive
+    assert all(vals > 0 for vals in rmse)
 
     # the names of drives should be preserved during optimization
     assert net_offset.external_drives.keys() == net_opt.external_drives.keys()

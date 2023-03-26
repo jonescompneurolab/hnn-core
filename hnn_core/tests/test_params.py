@@ -8,7 +8,7 @@ from urllib.request import urlretrieve
 import pytest
 
 import hnn_core
-from hnn_core import read_params, Params
+from hnn_core import read_params, Params, jones_2009_model
 hnn_core_root = op.dirname(hnn_core.__file__)
 
 
@@ -16,6 +16,11 @@ def test_read_params():
     """Test reading of params object."""
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
+    # Smoke test that network loads params
+    _ = jones_2009_model(
+        params, add_drives_from_params=True, legacy_mode=False)
+    _ = jones_2009_model(
+        params, add_drives_from_params=True, legacy_mode=True)
     print(params)
     print(params['L2Pyr*'])
 

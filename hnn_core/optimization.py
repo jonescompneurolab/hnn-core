@@ -238,7 +238,8 @@ def _consolidate_chunks(inputs):
 
 
 def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
-            n_trials, opt_params, opt_dpls, scale_factor, smooth_window_len):
+            n_trials, opt_params, opt_dpls, scale_factor, smooth_window_len,
+            return_rmse):
     """This is the function to run a simulation
 
     Parameters
@@ -270,11 +271,16 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
     smooth_window_len : int
         The length of the hamming window (in samples) to smooth the
         simulated dipole waveform in each optimization step.
+    return_rmse : bool
+        Returns list of unweighted RMSEs between data in dpl and exp_dpl
+        for each optimization step
 
     Returns
     -------
     avg_rmse: float
         Weighted RMSE between data in dpl and exp_dpl
+    avg_rmse_unweighted : float
+        Unweighted RMSE between data in dpl and exp_dpl
     """
     print("Optimization step %d, iteration %d" % (opt_params['cur_step'] + 1,
                                                   opt_params['optiter'] + 1))
@@ -338,7 +344,12 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
                      tstart=opt_params['opt_start'],
                      tstop=opt_params['opt_end'],
                      weights=opt_params['weights'])
+    avg_rmse_unweighted = _rmse(avg_dpl, opt_dpls['target_dpl'],
+                                tstart=opt_params['opt_start'],
+                                tstop=tstop, weights=None)
 
+    if return_rmse:
+        opt_params['iter_avg_rmse'].append(avg_rmse_unweighted)
     opt_params['stepminopterr'] = avg_rmse
     opt_dpls['best_dpl'] = avg_dpl
 
@@ -347,7 +358,7 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
 
     opt_params['optiter'] += 1
 
-    return avg_rmse  # nlopt expects error
+    return avg_rmse, avg_rmse_unweighted  # nlopt expects error
 
 
 def _run_optimization(maxiter, param_ranges, optrun):
@@ -428,7 +439,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                     timing_range_multiplier=3.0, sigma_range_multiplier=50.0,
                     synweight_range_multiplier=500.0, decay_multiplier=1.6,
                     scale_factor=1., smooth_window_len=None, dt=0.025,
-                    which_drives='all'):
+                    which_drives='all', return_rmse=False):
     """Optimize drives to generate evoked response.
 
     Parameters
@@ -468,12 +479,18 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     which_drives: 'all' or list
         Evoked drives to optimize. If 'all', will opimize all evoked drives.
         If a subset list of evoked drives, will optimize only the evoked drives in the list.
+    return_rmse : bool
+        Returns list of unweighted RMSEs between the simulated and experimental dipole 
+        waveforms for each optimization step
 
     Returns
     -------
     net : Network instance
         An instance of the Network object with the optimized configuration of
         attached drives.
+    iter_avg_rmse : list of float
+        Unweighted RMSE between data in dpl and exp_dpl for each iteration. Returned only
+        if return_rmse is True
 
     Notes
     -----
@@ -528,6 +545,10 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     print("Initial RMSE: %.2e" % best_rmse)
 
     opt_params = dict()
+
+    if return_rmse is True:
+        opt_params['iter_avg_rmse'] = list()
+
     for step in range(len(param_chunks)):
         opt_params['cur_step'] = step
         total_steps = len(param_chunks)
@@ -587,7 +608,8 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                             opt_params=opt_params,
                             opt_dpls=opt_dpls,
                             scale_factor=scale_factor,
-                            smooth_window_len=smooth_window_len)
+                            smooth_window_len=smooth_window_len,
+                            return_rmse=return_rmse)
 
         print('Optimizing from [%3.3f-%3.3f] ms' % (opt_params['opt_start'],
                                                     opt_params['opt_end']))
@@ -610,4 +632,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
             net = net_opt
 
     print("Final RMSE: %.2e" % best_rmse)
+
+    if return_rmse is True:
+        return net, opt_params['iter_avg_rmse']
     return net

@@ -64,8 +64,8 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
                       'create a predefined network from published models.',
                       UserWarning)
     # ADD DRIVE WARNINGS HERE
-    if not net.external_drives:
-        warnings.warn('No external drives loaded', UserWarning)
+    if not net.external_drives and not net.external_biases:
+        warnings.warn('No external drives or biases loaded', UserWarning)
 
     for drive_name, drive in net.external_drives.items():
         if 'tstop' in drive['dynamics']:
@@ -116,6 +116,10 @@ def read_dipole(fname):
         The instance of Dipole class
     """
     dpl_data = np.loadtxt(fname, dtype=float)
+    ncols = dpl_data.shape[1]
+    if ncols not in (2, 4):
+        raise ValueError(
+            f'Data are supposed to have 2 or 4 columns while we have {ncols}.')
     dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:])
     return dpl
 

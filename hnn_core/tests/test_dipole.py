@@ -42,6 +42,13 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     dipole.plot(show=False)
     plot_dipole([dipole, dipole], show=False)
 
+    # Test wrong argument to plot_dipole()
+    with pytest.raises(TypeError, match='dpl must be an instance of'):
+        plot_dipole([dipole, 10], show=False)
+    with pytest.raises(AttributeError, match="'numpy.ndarray' object has no"
+                       " attribute 'append'"):
+        plot_dipole(np.array([dipole, dipole]), average=True, show=False)
+
     # Test IO
     dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)

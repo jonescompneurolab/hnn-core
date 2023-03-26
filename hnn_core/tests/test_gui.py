@@ -69,7 +69,45 @@ def test_gui_upload_params():
     assert gui.drive_widgets[-1]['tstop'].value == 250.
     gui._simulate_upload_drives(file1_url)
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
-    assert gui.drive_widgets[-1]['tstop'].value == 0.
+    plt.close('all')
+
+
+def test_gui_upload_data():
+    """Test if gui handles uploaded data"""
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    assert len(gui.viz_manager.data['figs']) == 0
+    assert len(gui.data['simulation_data']) == 0
+
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
+    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"  # noqa
+    gui._simulate_upload_data(file1_url)
+    assert len(gui.data['simulation_data']) == 1
+    assert 'S1_SupraT' in gui.data['simulation_data'].keys()
+    assert gui.data['simulation_data']['S1_SupraT']['net'] is None
+    assert type(gui.data['simulation_data']['S1_SupraT']['dpls']) is list
+    assert len(gui.viz_manager.data['figs']) == 1
+    # support uploading multiple external data.
+    gui._simulate_upload_data(file2_url)
+    assert len(gui.data['simulation_data']) == 2
+    assert len(gui.viz_manager.data['figs']) == 2
+
+    # make sure no repeated uploading for the same name.
+    gui._simulate_upload_data(file1_url)
+    assert len(gui.data['simulation_data']) == 2
+    assert len(gui.viz_manager.data['figs']) == 2
+
+    # No data loading for legacy multi-trial data files.
+    file3_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/gamma_tutorial/100_trials.txt"  # noqa
+    with pytest.raises(
+            ValueError,
+            match="Data are supposed to have 2 or 4 columns while we have 101."
+    ):
+        gui._simulate_upload_data(file3_url)
+    assert len(gui.data['simulation_data']) == 2
+    assert len(gui.viz_manager.data['figs']) == 2
+
     plt.close('all')
 
 
@@ -78,8 +116,8 @@ def test_gui_change_connectivity():
     gui = HNNGUI()
     _ = gui.compose()
 
-    for connectivity_slider in gui.connectivity_widgets:
-        for vbox in connectivity_slider:
+    for connectivity_field in gui.connectivity_widgets:
+        for vbox in connectivity_field:
             for w_val in (0.2, 0.9):
                 _single_simulation = {}
                 _single_simulation['net'] = jones_2009_model(gui.params)
@@ -96,10 +134,8 @@ def test_gui_change_connectivity():
 
                 # test if the slider and the input field are synchronous
                 vbox.children[1].value = w_val
-                assert vbox.children[2].value == w_val
 
                 # re initialize network
-
                 _init_network_from_widgets(gui.params, gui.widget_dt,
                                            gui.widget_tstop,
                                            _single_simulation,

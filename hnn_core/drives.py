@@ -25,7 +25,7 @@ def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
         weights_nmda = dict()
 
     weights_by_type = {cell_type: dict() for cell_type in
-                       (set(weights_ampa.keys()) | set(weights_ampa.keys()))}
+                       (set(weights_ampa.keys()) | set(weights_nmda.keys()))}
     for cell_type in weights_ampa:
         weights_by_type[cell_type].update({'ampa': weights_ampa[cell_type]})
     for cell_type in weights_nmda:
@@ -126,7 +126,7 @@ def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
 
 def _add_drives_from_params(net):
     drive_specs = _extract_drive_specs_from_hnn_params(
-        net._params, list(net.cell_types.keys()))
+        net._params, list(net.cell_types.keys()), net._legacy_mode)
     bias_specs = _extract_bias_specs_from_hnn_params(
         net._params, list(net.cell_types.keys()))
 
@@ -197,7 +197,7 @@ def _add_drives_from_params(net):
         drive['event_seed'] += net.gid_ranges[drive_name][0]
 
 
-def _get_prng(seed, gid, sync_evinput=False):
+def _get_prng(seed, gid):
     """Random generator for this instance.
 
     Parameters
@@ -212,24 +212,12 @@ def _get_prng(seed, gid, sync_evinput=False):
     Returns
     -------
     prng : instance of RandomState
-        The seed for events assuming a given start time.
+        The seed for events assuming a given start time; dependent on gid.
     prng2 : instance of RandomState
         The seed for generating randomized start times.
         Used in _create_bursty_input
     """
-    # XXX: some param files use seed < 0 but numpy
-    # does not allow this.
-    if seed >= 0:
-        # only used for randomisation of t0 of bursty drives
-        prng2 = np.random.RandomState(seed)
-    else:
-        prng2 = None
-
-    if not sync_evinput:
-        seed = seed + gid
-
-    prng = np.random.RandomState(seed)
-    return prng, prng2
+    return np.random.RandomState(seed + gid), np.random.RandomState(seed)
 
 
 def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
@@ -314,115 +302,6 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     if len(event_times) > 0:
         event_times = event_times[np.logical_and(event_times > 0,
                                                  event_times <= tstop)]
-        event_times.sort()
-        event_times = event_times.tolist()
-
-    return event_times
-
-
-def drive_event_times(drive_type, target_cell_type, params, gid, trial_idx=0):
-    """External spike input times.
-
-    An external input drive to the network, i.e., one that is independent of
-    the spiking output of cells in the network.
-
-    Parameters
-    ----------
-    drive_type : str
-        The drive type, which is one of
-        'extpois' : Poisson-distributed input to proximal dendrites
-        'extgauss' : Gaussian-distributed input to proximal dendrites
-        'evprox' : Proximal input at specified time (or Gaussian spread)
-        'evdist' : Distal input at specified time (or Gaussian spread)
-
-        'common' : As opposed to other drive types, these have timing that is
-        identical (synchronous) for all real cells in the network. Proximal
-        and distal dendrites have separate parameter sets, and need not be
-        synchronous. Note that not all cells classes (types) are required to
-        receive 'common' input---separate conductivity values can be assigned
-        to basket vs. pyramidal cells and AMPA vs. NMDA synapses
-    target_cell_type : str | None
-        The target cell type of the drive, e.g., 'L2_basket', 'L5_pyramidal',
-        etc., or None for 'common' inputs
-    params : dict
-        Parameters of the external input drive, arranged into a dictionary.
-    gid : int
-        The cell ID.
-    trial_idx : int
-        The index number of the current trial of a simulation.
-
-    Returns
-    -------
-    event_times : list
-        The event times at which spikes occur.
-    """
-    prng, prng2 = _get_prng(
-        seed=params['prng_seedcore'] + trial_idx,
-        gid=gid,
-        sync_evinput=params.get('sync_evinput', False))
-
-    # check drive name validity, allowing substring matches ('evprox1' etc)
-    valid_drives = ['extpois', 'extgauss', 'common', 'evprox', 'evdist']
-    # NB check if drive_type has a valid substring, not vice versa
-    matches = [f for f in valid_drives if f in drive_type]
-    if len(matches) == 0:
-        raise ValueError('Invalid external drive: %s' % drive_type)
-    elif len(matches) > 1:
-        raise ValueError('Ambiguous external drive: %s' % drive_type)
-
-    # Return values not checked: False if all weights for given drive type
-    # are zero. Designed to be silent so that zeroing input weights
-    # effectively disables each.
-    target_syn_weights_zero = False
-    if target_cell_type in params:
-        target_syn_weights_zero = (params[target_cell_type][0] <= 0.0 and
-                                   params[target_cell_type][1] <= 0.0)
-
-    all_syn_weights_zero = True
-    for key in params.keys():
-        if key.startswith(('L2Pyr', 'L5Pyr', 'L2Bask', 'L5Bask')):
-            if params[key][0] > 0.0:
-                all_syn_weights_zero = False
-
-    event_times = list()
-    if drive_type == 'extpois' and not target_syn_weights_zero:
-        event_times = _create_extpois(
-            t0=params['t_interval'][0],
-            T=params['t_interval'][1],
-            # ind 3 is frequency (lamtha))
-            lamtha=params[target_cell_type][3],
-            prng=prng)
-    elif drive_type.startswith(('evprox', 'evdist')) and \
-            target_cell_type in params:
-        event_times = _create_gauss(
-            mu=params['t0'],
-            # ind 3 is sigma_t (stdev))
-            sigma=params[target_cell_type][3],
-            numspikes=int(params['numspikes']),
-            prng=prng)
-    elif drive_type == 'extgauss' and not target_syn_weights_zero:
-        event_times = _create_gauss(
-            mu=params[target_cell_type][3],
-            sigma=params[target_cell_type][4],
-            numspikes=50,
-            prng=prng)
-    elif drive_type == 'common' and not all_syn_weights_zero:
-        event_times = _create_bursty_input(
-            t0=params['t0'],
-            t0_stdev=params['t0_stdev'],
-            tstop=params['tstop'],
-            f_input=params['f_input'],
-            events_jitter_std=params['stdev'],
-            events_per_cycle=params['events_per_cycle'],
-            cycle_events_isi=10,
-            prng=prng,
-            prng2=prng2)
-
-    # brute force remove non-zero times. Might result in fewer vals
-    # than desired
-    # values MUST be sorted for VecStim()!
-    if len(event_times) > 0:
-        event_times = event_times[event_times > 0]
         event_times.sort()
         event_times = event_times.tolist()
 

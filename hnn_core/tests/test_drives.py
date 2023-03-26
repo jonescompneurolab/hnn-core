@@ -7,67 +7,42 @@ import os.path as op
 import numpy as np
 
 import hnn_core
-from hnn_core import Params, Network, read_params
-from hnn_core.drives import (drive_event_times, _get_prng, _create_extpois,
-                             _create_bursty_input)
-from hnn_core.params import create_pext
+from hnn_core import Network, read_params
+from hnn_core.drives import (_drive_cell_event_times, _get_prng,
+                             _create_extpois, _create_bursty_input)
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 
 def test_external_drive_times():
     """Test the different external drives."""
 
-    params = Params()
-    p_common, p_unique = create_pext(params,
-                                     params['tstop'])
-
-    # drive name must be valid and unambiguous
-    p_bogus = {'prng_seedcore': 0}
-    pytest.raises(ValueError, drive_event_times,
-                  'invalid_drive', None, p_bogus, 0)
-    pytest.raises(ValueError, drive_event_times,
-                  'ev', None, p_bogus, 0)  # ambiguous
-
-    # 'unique' external drives are always created
-    for drive_type in ['extpois', 'extgauss']:
-        event_times = drive_event_times(
-            drive_type=drive_type,
-            target_cell_type='L2_basket',
-            params=p_unique[drive_type],
-            gid=0)
-
-    # but 'common' (rhythmic) drives are not
-    for ii in range(len(p_common)):  # len == 0 for def. params
-        event_times = drive_event_times(
-            drive_type='common',
-            target_cell_type=None,
-            params=p_common[ii],
-            gid=0)
-        # parameters should lead to 0 input spikes for default params
-        assert len(event_times) == 0
-        # check that ei.p_ext matches params
-        loc = p_common[ii]['loc'][:4]  # loc=prox or dist
-        for layer in ['L2', 'L5']:
-            key = 'input_{}_A_weight_{}Pyr_ampa'.format(loc, layer)
-            assert p_common[ii][layer + 'Pyr_ampa'][0] == params[key]
+    drive_type = 'invalid_drive'
+    dynamics = dict(mu=5, sigma=0.5, numspikes=1)
+    tstop = 10
+    pytest.raises(ValueError, _drive_cell_event_times,
+                  'invalid_drive', dynamics, tstop)
+    pytest.raises(ValueError, _drive_cell_event_times,
+                  'ss', dynamics, tstop)  # ambiguous
 
     # validate poisson input time interval
-    p_extpois = p_unique['extpois']
-    p_extpois['L2_basket'] = (1., 1., 0., 0.)
+    drive_type = 'poisson'
+    dynamics = {'tstart': 0, 'tstop': 250.0, 'rate_constant':
+                {'L2_basket': 1, 'L2_pyramidal': 140.0, 'L5_basket': 1,
+                 'L5_pyramidal': 40.0}}
     with pytest.raises(ValueError, match='The end time for Poisson input'):
-        p_extpois['t_interval'] = (p_extpois['t_interval'][0], -1)
-        event_times = drive_event_times(
-            drive_type='extpois',
-            target_cell_type='L2_basket',
-            params=p_extpois, gid=0)
+        dynamics['tstop'] = -1
+        event_times = _drive_cell_event_times(drive_type=drive_type,
+                                              dynamics=dynamics,
+                                              tstop=tstop)
     with pytest.raises(ValueError, match='The start time for Poisson'):
-        p_extpois['t_interval'] = (-1, 5)
-        event_times = drive_event_times(
-            drive_type='extpois',
-            target_cell_type='L2_basket',
-            params=p_extpois, gid=0)
+        dynamics['tstop'] = tstop
+        dynamics['tstart'] = -1
+        event_times = _drive_cell_event_times(drive_type=drive_type,
+                                              dynamics=dynamics,
+                                              tstop=tstop)
 
     # checks the poisson spike train generation
     prng = np.random.RandomState()
@@ -91,7 +66,7 @@ def test_external_drive_times():
     events_per_cycle = 3
     cycle_events_isi = 7
     events_jitter_std = 5.
-    prng, prng2 = _get_prng(seed=0, gid=5, sync_evinput=False)
+    prng, prng2 = _get_prng(seed=0, gid=5)
     event_times = _create_bursty_input(
         t0=t0, t0_stdev=t0_stdev, tstop=tstop,
         f_input=f_input, events_jitter_std=events_jitter_std,
@@ -241,6 +216,14 @@ def test_add_drives():
             assert num_connections == \
                 np.around(len(net.gid_ranges[cell_type]) *
                           probability[cell_type]).astype(int)
+
+    # Test adding just the NMDA weights (no AMPA)
+    net.add_evoked_drive(
+        'evoked_nmda', mu=1.0, sigma=1.0, numspikes=1,
+        weights_nmda=weights_nmda,
+        location='distal', synaptic_delays=syn_delays, cell_specific=True,
+        probability=probability)
+
     # Round trip test to ensure drives API produces a functioning Network
     simulate_dipole(net, tstop=1)
 
@@ -428,7 +411,7 @@ def test_add_drives():
             synaptic_delays={'L2_pyramidal': 1.},
             probability={'L2_pyramidal': 2.0})
 
-    with pytest.warns(UserWarning, match='No external drives loaded'):
+    with pytest.warns(UserWarning, match='No external drives or biases load'):
         net.clear_drives()
         simulate_dipole(net, tstop=10)
 

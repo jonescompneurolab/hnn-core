@@ -140,7 +140,8 @@ def _extract_bias_specs_from_hnn_params(params, cellname_list):
     return bias_specs
 
 
-def _extract_drive_specs_from_hnn_params(params, cellname_list):
+def _extract_drive_specs_from_hnn_params(
+        params, cellname_list, legacy_mode=False):
     """Create 'drive specification' dicts from saved parameters"""
     # convert legacy params-dict to legacy "feeds" dicts
     p_common, p_unique = create_pext(params, params['tstop'])
@@ -148,6 +149,8 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
     # Using 'feed' for legacy compatibility, 'drives' for new API
     drive_specs = dict()
     for ic, par in enumerate(p_common):
+        if (not legacy_mode) and par['tstop'] < par['t0']:
+            continue
         feed_name = f'bursty{ic + 1}'
         drive = dict()
         drive['type'] = 'bursty'
@@ -213,10 +216,12 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                                  'numspikes': par['numspikes'],
                                  'n_drive_cells': n_drive_cells}
             drive['space_constant'] = par['lamtha']
+            drive['event_seed'] = par['prng_seedcore']
             # XXX Force random states to be the same as HNN-gui for the default
             # parameter set after increasing the number of bursty drive
             # gids from 2 to 20
-            drive['event_seed'] = par['prng_seedcore'] - 18
+            if legacy_mode:
+                drive['event_seed'] -= 18
             for cellname in cellname_list:
                 if cellname in par:
                     ampa_weight = par[cellname][0]
@@ -226,7 +231,11 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
                     drive['weights_nmda'][cellname] = nmda_weight
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
+        # Skip drive if not in legacy mode
         elif feed_name.startswith('extgauss'):
+            if (not legacy_mode) and par[
+                    'L2_basket'][3] > params['tstop']:
+                continue
             drive['type'] = 'gaussian'
             drive['location'] = par['loc']
 
@@ -246,6 +255,9 @@ def _extract_drive_specs_from_hnn_params(params, cellname_list):
 
             drive['weights_nmda'] = dict()  # no NMDA weights for Gaussians
         elif feed_name.startswith('extpois'):
+            if (not legacy_mode) and par['t_interval'][1] < par[
+                    't_interval'][0]:
+                continue
             drive['type'] = 'poisson'
             drive['location'] = par['loc']
             drive['space_constant'] = par['lamtha']

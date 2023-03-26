@@ -270,8 +270,11 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
     if isinstance(dpl, Dipole):
         dpl = [dpl]
-    elif average:
-        dpl = dpl + [average_dipoles(dpl)]
+    for this_dpl in dpl:
+        _validate_type(this_dpl, Dipole, 'dpl', 'Dipole, list of Dipole')
+
+    if average:
+        dpl.append(average_dipoles(dpl))
 
     scale_applied = dpl[0].scale_applied
 
@@ -370,9 +373,9 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     # Extract desired trials
     if len(cell_response._spike_times[0]) > 0:
         spike_times = np.concatenate(
-            np.array(cell_response._spike_times)[trial_idx])
+            np.array(cell_response._spike_times, dtype=object)[trial_idx])
         spike_types_data = np.concatenate(
-            np.array(cell_response._spike_types)[trial_idx])
+            np.array(cell_response._spike_types, dtype=object)[trial_idx])
     else:
         spike_times = np.array([])
         spike_types_data = np.array([])
@@ -474,11 +477,11 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     # Extract desired trials
     if len(cell_response._spike_times[0]) > 0:
         spike_times = np.concatenate(
-            np.array(cell_response._spike_times)[trial_idx])
+            np.array(cell_response._spike_times, dtype=object)[trial_idx])
         spike_types = np.concatenate(
-            np.array(cell_response._spike_types)[trial_idx])
+            np.array(cell_response._spike_types, dtype=object)[trial_idx])
         spike_gids = np.concatenate(
-            np.array(cell_response._spike_gids)[trial_idx])
+            np.array(cell_response._spike_gids, dtype=object)[trial_idx])
     else:
         spike_times = np.array([])
         spike_types = np.array([])

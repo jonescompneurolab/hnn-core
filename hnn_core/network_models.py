@@ -12,8 +12,9 @@ from .externals.mne import _validate_type
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
-                     legacy_mode=True):
-    """Instantiate the Jones et al. 2009 model.
+                     legacy_mode=False):
+    """Instantiate the network model described in
+    Jones et al. J. of Neurophys. 2009 [1]_
 
     Parameters
     ----------
@@ -26,7 +27,7 @@ def jones_2009_model(params=None, add_drives_from_params=False,
         for backward-compatibility with HNN GUI, and will be deprecated in a
         future release. Default: False
     legacy_mode : bool
-        Set to True by default to enable matching HNN GUI output when drives
+        Set to False by default. Enables matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
 
     Returns
@@ -42,6 +43,14 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     the net is created using the set_cell_positions-method. An all-to-all
     connectivity pattern is applied between cells. Inhibitory basket cells are
     present at a 1:3-ratio.
+
+    References
+    ----------
+    .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and
+           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
+           Rhythmogenesis and Modulation of Sensory-Evoked Responses."
+           Journal of Neurophysiology 102, 3554–3572 (2009).
+
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     if params is None:
@@ -165,8 +174,10 @@ def jones_2009_model(params=None, add_drives_from_params=False,
 
 
 def law_2021_model(params=None, add_drives_from_params=False,
-                   legacy_mode=True):
-    """Instantiate the beta modulated ERP network model.
+                   legacy_mode=False):
+    """Instantiate the expansion of Jones 2009 model to study beta
+    modulated ERPs as described in
+    Law et al. Cereb. Cortex 2021 [1]_
 
     Returns
     -------
@@ -189,10 +200,15 @@ def law_2021_model(params=None, add_drives_from_params=False,
     4) Removal of L5 pyramidal somatic and basal dendrite calcium channels
     5) Replace L2_basket -> L5_pyramidal GABAa connection with GABAb
     6) Addition of L5_basket -> L5_pyramidal distal connection
+
+    References
+    ----------
+    .. [1] Law, Robert G., et al. "Thalamocortical Mechanisms Regulating the
+           Relationship between Transient Beta Events and Human Tactile
+           Perception." Cerebral Cortex, 32, 668–688 (2022).
     """
 
-    net = jones_2009_model(params=params,
-                           add_drives_from_params=add_drives_from_params)
+    net = jones_2009_model(params, add_drives_from_params, legacy_mode)
 
     # Update biophysics (increase gabab duration of inhibition)
     net.cell_types['L2_pyramidal'].synapses['gabab']['tau1'] = 45.0
@@ -244,8 +260,10 @@ def law_2021_model(params=None, add_drives_from_params=False,
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
 def calcium_model(params=None, add_drives_from_params=False,
-                  legacy_mode=True):
-    """Instantiate the Jones 2009 model with improved calcium dynamics.
+                  legacy_mode=False):
+    """Instantiate the Jones 2009 model with improved calcium dynamics in
+    L5 pyramidal neurons. For more details on changes to calcium dynamics
+    see Kohl et al. Brain Topragr 2022 [1]_
 
     Returns
     -------
@@ -264,13 +282,19 @@ def calcium_model(params=None, add_drives_from_params=False,
     Specifically, this model introduces a distance dependent maximum
     conductance (gbar) on calcium channels such that the gbar linearly
     decreases along the dendrites in the direction of the soma.
+
+    References
+    ----------
+    .. [1] Kohl, Carmen, et al. "Neural Mechanisms Underlying Human Auditory
+           Evoked Responses Revealed By Human Neocortical Neurosolver."
+           Brain Topography, 35, 19–35 (2022).
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     if params is None:
         params = read_params(params_fname)
 
-    net = jones_2009_model(params, add_drives_from_params)
+    net = jones_2009_model(params, add_drives_from_params, legacy_mode)
 
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = 'L5_pyramidal'

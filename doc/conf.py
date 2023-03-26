@@ -31,11 +31,11 @@ sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 # -- Project information -----------------------------------------------------
 
 project = 'hnn-core'
-copyright = '2021, HNN Developers'
+copyright = '2023, HNN Developers'
 author = 'HNN Developers'
 
 # The short X.Y version
-version = '0.3.dev0'
+version = '0.4.dev0'
 # The full version, including alpha/beta/rc tags
 release = ''
 
@@ -57,6 +57,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'numpydoc',
     'nbsphinx',
+    'sphinx_copybutton',
     'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
@@ -66,6 +67,10 @@ autodoc_default_options = {'inherited-members': None}
 numpydoc_class_members_toctree = False
 numpydoc_attributes_as_param_list = True
 default_role = 'autolink'  # XXX silently allows bad syntax, someone should fix
+
+# Sphinx-Copybutton configuration
+copybutton_prompt_text = r">>> |\.\.\. |\$ "
+copybutton_prompt_is_regexp = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -202,7 +207,10 @@ intersphinx_timeout = 5
 
 linkcheck_ignore = [
    'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
-   'https://neuron.yale.edu/neuron'
+   'https://neuron.yale.edu/neuron',
+   'https://doi.org/10.1152/jn.00535.2009',
+   'https://doi.org/10.1152/jn.00122.2010',
+   'https://groups.google.com/g/hnnsolver'
 ]
 
 # Resolve binder filepath_prefix. From the docs:
