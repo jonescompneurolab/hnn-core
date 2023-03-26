@@ -382,7 +382,7 @@ class HNNGUI:
             return on_upload_params_change(
                 change, self.params, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
-                self._drives_out, self._connectivity_out,
+                self._drives_out, self._connectivity_out, self._conn_drive_s,
                 self.connectivity_widgets, self.layout['drive_textbox'],
                 "connectivity")
 
@@ -390,7 +390,7 @@ class HNNGUI:
             return on_upload_params_change(
                 change, self.params, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
-                self._drives_out, self._connectivity_out,
+                self._drives_out, self._connectivity_out, self._conn_drive_s,
                 self.connectivity_widgets, self.layout['drive_textbox'],
                 "drives")
 
@@ -1127,12 +1127,14 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
 
 def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_textfields, tstop, layout):
+                                conn_drive_s, connectivity_textfields, tstop,
+                                layout):
     """Add drive and connectivity ipywidgets from params."""
     log_out.clear_output()
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        _, _conns = add_connectivity_tab(
+            params, connectivity_out, connectivity_textfields)
         # Add drives
         _, _drives = add_drive_tab(params, drives_out, drive_widgets,
                                    drive_boxes, tstop, layout)
@@ -1171,7 +1173,8 @@ def on_upload_data_change(change, data, viz_manager, log_out):
 
 def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
-                            connectivity_textfields, layout, load_type):
+                            conn_drive_s, connectivity_textfields, layout,
+                            load_type):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
@@ -1254,8 +1257,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
         print(
             f"drive type is {drive['type']}, location={drive['location']} "
-            f"synaptic_delays={synaptic_delays}"
-            )
+            f"synaptic_delays={synaptic_delays}")
         if drive['type'] == 'Poisson':
             rate_constant = {
                 k: v.value
