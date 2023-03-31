@@ -95,15 +95,14 @@ net_opt.cell_response.plot_spikes_hist(ax=axes[1])
 ###############################################################################
 # Finally, let's explore which parameters were changed to cause the 
 # improved dipole fit. 
-
 # As an example, we will look at the new dynamics of the first proximal drive, 
-# as well as the synaptic weight of its layer 2/3 AMPA receptors.
+# as well as the synaptic weight of its layer 2/3, pyramidal AMPA receptors.
 
 from hnn_core.network import pick_connection
 
 dynamics_opt = net_opt.external_drives['evdist1']['dynamics']
 
-conn_indices = pick_connection(net=net_opt, src_gids='evprox1', target_gids='L2_basket',
+conn_indices = pick_connection(net=net_opt, src_gids='evprox1', target_gids='L2_pyramidal',
     loc='proximal', receptor='ampa')
 conn_idx = conn_indices[0]
 weight_opt = net_opt.connectivity[conn_idx]
@@ -111,3 +110,14 @@ weight_opt = net_opt.connectivity[conn_idx]
 print("Optimized dynamic properties: ", dynamics_opt)
 print("\nOptimized weight: ", weight_opt)
 
+###############################################################################
+# Let's compare to the initial dynamic properties and weight.
+dynamics_initial = net.external_drives['evdist1']['dynamics']
+
+conn_indices = pick_connection(net=net, src_gids='evprox1', target_gids='L2_pyramidal',
+    loc='proximal', receptor='ampa')
+conn_idx = conn_indices[0]
+weight_initial = net.connectivity[conn_idx]
+
+print("Initial dynamic properties: ", dynamics_initial)
+print("\Initial weight: ", weight_initial)
