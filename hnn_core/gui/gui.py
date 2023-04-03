@@ -392,7 +392,7 @@ class HNNGUI:
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out, self._conn_drive_s,
                 self.connectivity_widgets, self.layout['drive_textbox'],
-                "drives")
+                "drive")
 
         def _on_upload_data(change):
             return on_upload_data_change(change, self.data, self.viz_manager,
@@ -1203,7 +1203,7 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
     if load_type == 'connectivity':
         _, _res = add_connectivity_tab(params, connectivity_out,
                                        connectivity_textfields)
-    elif load_type == 'drives':
+    elif load_type == 'drive':
         _, _res = add_drive_tab(params, drives_out, drive_widgets, drive_boxes,
                                 tstop, layout)
     else:
