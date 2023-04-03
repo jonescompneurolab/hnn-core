@@ -1201,13 +1201,14 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
         params.update(params_network)
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        _, _res = add_connectivity_tab(params, connectivity_out,
+                                       connectivity_textfields)
     elif load_type == 'drives':
-        _, _drives = add_drive_tab(params, drives_out, drive_widgets,
-                                   drive_boxes, tstop, layout)
-        conn_drive_s['drive'] = _drives
+        _, _res = add_drive_tab(params, drives_out, drive_widgets, drive_boxes,
+                                tstop, layout)
     else:
         raise ValueError
+    conn_drive_s[load_type] = _res
 
     change['owner'].set_trait('_counter', 0)
     change['owner'].set_trait('value', {})
