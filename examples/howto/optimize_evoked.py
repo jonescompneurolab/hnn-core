@@ -120,4 +120,4 @@ conn_idx = conn_indices[0]
 weight_initial = net.connectivity[conn_idx]
 
 print("Initial dynamic properties: ", dynamics_initial)
-print("\Initial weight: ", weight_initial)
+print("\nInitial weight: ", weight_initial)
