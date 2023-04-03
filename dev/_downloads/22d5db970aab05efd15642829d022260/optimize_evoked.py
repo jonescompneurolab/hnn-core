@@ -81,10 +81,8 @@ with MPIBackend(n_procs=n_procs):
     best_dpl = best_dpl.scale(scale_factor).smooth(smooth_window_len)
 
 ###############################################################################
-# Finally, we can plot the pre- and post-optimization simulations alongside the
-# experimental data. Upon visualizing the change in optimized versus initial
-# dipole, you should consider exploring which parameters were changed to cause
-# the improved dipole fit.
+# Then, we can plot the pre- and post-optimization simulations alongside the
+# experimental data. 
 
 fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6))
 
@@ -93,3 +91,33 @@ initial_dpl.plot(ax=axes[0], layer='agg', show=False, color='tab:orange')
 best_dpl.plot(ax=axes[0], layer='agg', show=False, color='tab:green')
 axes[0].legend(['experimental', 'initial', 'optimized'])
 net_opt.cell_response.plot_spikes_hist(ax=axes[1])
+
+###############################################################################
+# Finally, let's explore which parameters were changed to cause the 
+# improved dipole fit. 
+# As an example, we will look at the new dynamics of the first proximal drive, 
+# as well as the synaptic weight of its layer 2/3 pyramidal AMPA receptors.
+
+from hnn_core.network import pick_connection
+
+dynamics_opt = net_opt.external_drives['evdist1']['dynamics']
+
+conn_indices = pick_connection(net=net_opt, src_gids='evprox1', target_gids='L2_pyramidal',
+    loc='proximal', receptor='ampa')
+conn_idx = conn_indices[0]
+weight_opt = net_opt.connectivity[conn_idx]
+
+print("Optimized dynamic properties: ", dynamics_opt)
+print("\nOptimized weight: ", weight_opt)
+
+###############################################################################
+# Let's compare to the initial dynamic properties and weight.
+dynamics_initial = net.external_drives['evdist1']['dynamics']
+
+conn_indices = pick_connection(net=net, src_gids='evprox1', target_gids='L2_pyramidal',
+    loc='proximal', receptor='ampa')
+conn_idx = conn_indices[0]
+weight_initial = net.connectivity[conn_idx]
+
+print("Initial dynamic properties: ", dynamics_initial)
+print("\nInitial weight: ", weight_initial)
