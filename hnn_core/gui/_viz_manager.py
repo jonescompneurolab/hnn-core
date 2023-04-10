@@ -356,11 +356,12 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
             rmse, t0, tstop = _calculate_rmse(
                 dpls_processed, target_dpl_processed, t0, tstop)
             # Show the RMSE between the two dipoles.
-            ax.hlines(
-                rmse, t0, tstop,
-                colors=next(ax._get_lines.prop_cycler)['color'],
-                label=f'RMSE({sim_name}-{target_sim_name}): {rmse:.4f}')
-            ax.legend()
+            ax.annotate(f'RMSE({sim_name}, {target_sim_name}): {rmse:.4f}',
+                        xy=(0.95, 0.05),
+                        xycoords='axes fraction',
+                        horizontalalignment='right',
+                        verticalalignment='bottom',
+                        fontsize=12)
         except Exception as e:
             logger.info(f'rmse error: {e}')
 
