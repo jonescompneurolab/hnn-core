@@ -66,7 +66,9 @@ def test_gui_upload_params():
     gui._simulate_upload_connectivity(file2_url)
     # now connectivity is refreshed.
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
-    assert gui.drive_widgets[-1]['tstop'].value == 250.
+
+    # We use -2 instead of -1 here as now the last one is the tonic inputs.
+    assert gui.drive_widgets[-2]['tstop'].value == 250.
     gui._simulate_upload_drives(file1_url)
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
     plt.close('all')
