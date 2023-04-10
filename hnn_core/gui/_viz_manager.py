@@ -128,7 +128,6 @@ def _calculate_rmse(dpl, dpl_target, tstart, tstop, weights=None):
 
     dpl_sim_agg = dpl.data['agg'][sim_start_index:sim_end_index]
     dpl_target_agg = dpl_target.data['agg'][exp_start_index:exp_end_index]
-    logger.info('6')
 
     if (sim_length > exp_length):
         # downsample simulation timeseries to match exp data
@@ -142,7 +141,6 @@ def _calculate_rmse(dpl, dpl_target, tstart, tstop, weights=None):
         dpl_target_agg = signal.resample(dpl_target_agg, sim_length)
 
     se = (dpl_sim_agg - dpl_target_agg)**2
-    logger.info('9')
     if weights is not None:
         err = np.sqrt((weight * se).sum() / weight.sum())
     else:
