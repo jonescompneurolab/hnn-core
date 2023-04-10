@@ -1183,17 +1183,10 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
     logger.info(f'Adding bias_specs from params: {bias_specs}')
     should_render = True
     add_drive_widget(
-        'Tonic',
-        drive_boxes,
-        drive_widgets,
-        drives_out,
-        tstop,
-        None,
-        layout=layout,
-        prespecified_drive_name=drive_name,
+        'Tonic', drive_boxes, drive_widgets, drives_out, tstop, None,
+        layout=layout, prespecified_drive_name=drive_name,
         prespecified_drive_data=bias_specs['tonic'],
-        render=should_render,
-        expand_last_drive=False,
+        render=should_render, expand_last_drive=False,
     )
 
 
