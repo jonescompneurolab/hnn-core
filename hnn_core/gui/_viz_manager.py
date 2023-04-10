@@ -12,7 +12,9 @@ import numpy as np
 from IPython.display import display
 from ipywidgets import (Box, Button, Dropdown, FloatText, HBox, Label, Layout,
                         Output, Tab, VBox, link)
+from scipy import signal
 
+from hnn_core.dipole import average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
@@ -79,12 +81,73 @@ def check_sim_plot_types(new_sim_name, plot_type_selection, data):
         plot_type_selection.options = _plot_types
 
 
+def target_comparison_change(new_target_name, simulation_selection, data):
+    """Triggered when the target data is turned on or changed.
+    """
+    pass
+
+
+def plot_type_coupled_change(new_plot_type, target_data_selection):
+    if new_plot_type != 'current dipole':
+        target_data_selection.disabled = True
+
+
 def _idx2figname(idx):
     return f"Figure {idx}"
 
 
 def _figname2idx(fname):
     return int(fname.split(" ")[-1])
+
+
+def _calculate_rmse(dpl, dpl_target, tstart, tstop, weights=None):
+    """Calculate RMSE between a target dipole and some input dipole(s).
+    Note: This function now only supports a single target dipole.
+    """
+    if len(dpl) > 1:
+        # get average dipole
+        dpl = average_dipoles(dpl)
+
+    # stealed from legacy hnn code.
+    exp_times = dpl_target.times
+    sim_times = dpl.times
+
+    tstart = max(tstart, max(exp_times[0], sim_times[0]))
+    tstop = min(tstop, min(exp_times[-1], sim_times[-1]))
+
+    # make sure start and end times are valid for both dipoles
+    exp_start_index = (np.abs(exp_times - tstart)).argmin()
+    exp_end_index = (np.abs(exp_times - tstop)).argmin()
+    exp_length = exp_end_index - exp_start_index
+
+    sim_start_index = (np.abs(sim_times - tstart)).argmin()
+    sim_end_index = (np.abs(sim_times - tstop)).argmin()
+    sim_length = sim_end_index - sim_start_index
+    if weights is not None:
+        weight = weights[sim_start_index:sim_end_index]
+
+    dpl_sim_agg = dpl.data['agg'][sim_start_index:sim_end_index]
+    dpl_target_agg = dpl_target.data['agg'][exp_start_index:exp_end_index]
+    logger.info('6')
+
+    if (sim_length > exp_length):
+        # downsample simulation timeseries to match exp data
+        dpl_sim_agg = signal.resample(dpl_sim_agg, exp_length)
+        if weights is not None:
+            weight = signal.resample(weight, exp_length)
+            indices = np.where(weight < 1e-4)
+            weight[indices] = 0
+    elif (sim_length < exp_length):
+        # downsample exp timeseries to match simulation data
+        dpl_target_agg = signal.resample(dpl_target_agg, sim_length)
+
+    se = (dpl_sim_agg - dpl_target_agg)**2
+    logger.info('9')
+    if weights is not None:
+        err = np.sqrt((weight * se).sum() / weight.sum())
+    else:
+        err = np.sqrt(se.mean())
+    return err, tstart, tstop
 
 
 def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
@@ -150,11 +213,16 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif 'dipole' in plot_type:
         if len(dpls_copied) > 0:
+            if len(dpls_copied) > 1:
+                label = f"{sim_name}: average"
+            else:
+                label = sim_name
+
             color = next(ax._get_lines.prop_cycler)['color']
             if plot_type == 'current dipole':
                 plot_dipole(dpls_copied,
                             ax=ax,
-                            label=f"{sim_name}: average",
+                            label=label,
                             color=color,
                             average=True,
                             show=False)
@@ -165,7 +233,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 }
                 plot_dipole(dpls_copied,
                             ax=ax,
-                            label=f"{sim_name}: average",
+                            label=label,
                             color=color,
                             layer=layer_namemap[plot_type.split(" ")[0]],
                             average=True,
@@ -195,6 +263,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
         max_x = max([dpl.times[-1] for dpl in dpls_copied])
         ax.set_xlim(left=-margin_x, right=max_x + margin_x)
 
+    return dpls_copied
+
 
 def _static_rerender(widgets, fig, fig_idx):
     logger.debug('_static_re_render is called')
@@ -217,9 +287,31 @@ def _dynamic_rerender(fig):
 
 
 def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
+                  target_simulations,
                   spectrogram_colormap_selection, dipole_smooth,
                   max_spectral_frequency, dipole_scaling, widgets, data,
                   fig_idx, fig, ax, existing_plots):
+    """Plotting different types of data on the given axes.
+    Now this function is also responsible for comparing multiple simulations,
+    or simulations vs. experimental data.
+    Parameters
+    ----------
+    b : ipywidgets.Button
+    widgets_simulation : ipywidgets.Dropdown
+    widgets_plot_type : ipywidgets.Dropdown
+    target_simulations : ipywidgets.Dropdown
+        The target data we want to compare with. Note that this could be 'None'
+    spectrogram_colormap_selection : ipywidgets.Dropdown
+    dipole_smooth : ipywidgets.FloatText
+    max_spectral_frequency : ipywidgets.FloatText
+    dipole_scaling : ipywidgets.FloatText
+    widgets : dict
+    data : dict
+    fig_idx : int
+    fig : matplotlib.figure.Figure
+    ax : matplotlib.axes._subplots.AxesSubplot
+    existing_plots : ipywidgets.VBox
+    """
     sim_name = widgets_simulation.value
     plot_type = widgets_plot_type.value
     # disable add plots for types that do not support overlay
@@ -238,7 +330,39 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
         "spectrogram_cm": spectrogram_colormap_selection.value
     }
 
-    _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config)
+    dpls_processed = _update_ax(fig, ax, single_simulation, sim_name,
+                                plot_type, plot_config)
+
+    # If target_simulations is not None and we are plotting a dipole,
+    # we need to plot the target dipole as well.
+    if target_simulations.value in data['simulations'].keys(
+    ) and plot_type == 'current dipole':
+
+        target_sim_name = target_simulations.value
+        target_sim = data['simulations'][target_sim_name]
+        # plot the target dipole.
+        target_plot_config = copy.deepcopy(plot_config)
+        # disable scaling for the target dipole.
+        target_plot_config['dipole_scaling'] = 1.
+
+        # plot the target dipole.
+        target_dpl_processed = _update_ax(
+            fig, ax, target_sim, target_sim_name, plot_type,
+            target_plot_config)[0]  # we assume there is only one dipole.
+        try:
+            # calculate the RMSE between the two dipoles.
+            t0 = 0.0
+            tstop = dpls_processed[-1].times[-1]
+            rmse, t0, tstop = _calculate_rmse(
+                dpls_processed, target_dpl_processed, t0, tstop)
+            # Show the RMSE between the two dipoles.
+            ax.hlines(
+                rmse, t0, tstop,
+                colors=next(ax._get_lines.prop_cycler)['color'],
+                label=f'RMSE({sim_name}-{target_sim_name}): {rmse:.4f}')
+            ax.legend()
+        except Exception as e:
+            logger.info(f'rmse error: {e}')
 
     existing_plots.children = (*existing_plots.children,
                                Label(f"{sim_name}: {plot_type}"))
@@ -303,6 +427,15 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style,
     )
 
+    target_data_selection = Dropdown(
+        options=simulation_names + ('None',),
+        value='None',
+        description='Target data:',
+        disabled=False,
+        layout=layout,
+        style=analysis_style,
+    )
+
     spectrogram_colormap_selection = Dropdown(
         description='Spectrogram Colormap:',
         options=[(cm, cm) for cm in _spectrogram_color_maps],
@@ -336,7 +469,16 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     def _on_sim_data_change(new_sim_name):
         return check_sim_plot_types(new_sim_name, plot_type_selection, data)
 
+    def _on_target_comparison_change(new_target_name):
+        return target_comparison_change(new_target_name, simulation_selection,
+                                        data)
+
+    def _on_plot_type_change(new_plot_type):
+        return plot_type_coupled_change(new_plot_type, target_data_selection)
+
     simulation_selection.observe(_on_sim_data_change, 'value')
+    target_data_selection.observe(_on_target_comparison_change, 'value')
+    plot_type_selection.observe(_on_plot_type_change, 'value')
 
     clear_button.on_click(
         partial(
@@ -356,6 +498,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             _plot_on_axes,
             widgets_simulation=simulation_selection,
             widgets_plot_type=plot_type_selection,
+            target_simulations=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
             dipole_smooth=dipole_smooth,
             max_spectral_frequency=max_spectral_frequency,
@@ -369,8 +512,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         ))
 
     vbox = VBox([
-        simulation_selection, plot_type_selection, dipole_smooth,
-        dipole_scaling, max_spectral_frequency, spectrogram_colormap_selection,
+        simulation_selection, plot_type_selection, target_data_selection,
+        dipole_smooth, dipole_scaling, max_spectral_frequency,
+        spectrogram_colormap_selection,
         HBox(
             [plot_button, clear_button],
             layout=Layout(justify_content='space-between'),
