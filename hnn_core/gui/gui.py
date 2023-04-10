@@ -3,6 +3,7 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Huzi Cheng <hzcheng15@icloud.com>
 import codecs
+import copy
 import io
 import logging
 import multiprocessing
@@ -22,7 +23,8 @@ from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
-from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
+from hnn_core.params import (_extract_drive_specs_from_hnn_params,
+                             _extract_bias_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
 
 
@@ -233,9 +235,10 @@ class HNNGUI:
             button_style='success')
 
         # Drive selection
+        external_drive_types = ['Evoked', 'Poisson', 'Rhythmic', 'Tonic']
         self.widget_drive_type_selection = RadioButtons(
-            options=['Evoked', 'Poisson', 'Rhythmic'],
-            value='Evoked',
+            options=external_drive_types,
+            value=external_drive_types[0],
             description='Drive:',
             disabled=False,
             layout=self.layout['drive_widget'])
@@ -943,6 +946,54 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     return drive, drive_box
 
 
+def _get_tonic_widget(name, layout, style, data=None):
+    default_data = {
+        'amplitude': 0,
+        't0': 0,
+        'tstop': 0,
+        'seedcore': 14,
+    }
+
+    cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
+
+    if isinstance(data, dict):
+        default_data.update(data)
+    kwargs = dict(layout=layout, style=style)
+
+    amplitudes, start_times, stop_times = dict(), dict(), dict()
+    for cell_type in cell_types:
+        if cell_type in data:
+            default_data.update(data[cell_type])
+        amplitudes[cell_type] = BoundedFloatText(
+            value=copy.deepcopy(default_data['amplitude']),
+            description=cell_type, min=0, max=1e6, step=0.01, **kwargs)
+        start_times[cell_type] = BoundedFloatText(
+            value=copy.deepcopy(default_data['t0']), description=cell_type,
+            min=0, max=1e6, step=0.01, **kwargs)
+        stop_times[cell_type] = BoundedFloatText(
+            value=copy.deepcopy(default_data['tstop']), description=cell_type,
+            min=-1, max=1e6, step=0.01, **kwargs)
+
+    widgets_dict = {
+        'amplitude': amplitudes,
+        't0': start_times,
+        'tstop': stop_times
+    }
+    widgets_list = ([HTML(value="<b>Amplitude (nA):</b>")] +
+                    list(amplitudes.values()) +
+                    [HTML(value="<b>Start time (ms):</b>")] +
+                    list(start_times.values()) +
+                    [HTML(value="<b>Stop time (ms):</b>")] +
+                    list(stop_times.values()))
+
+    drive_box = VBox(widgets_list)
+    drive = dict(type='Tonic',
+                 name=name,
+                 sync_within_trial=False)
+    drive.update(widgets_dict)
+    return drive, drive_box
+
+
 def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      tstop_widget, location, layout,
                      prespecified_drive_name=None,
@@ -1000,8 +1051,18 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 default_delays=prespecified_delays,
             )
 
+        # notice this is a special case.
+        elif drive_type == 'Tonic':
+            name = drive_type + str(len(drive_boxes))
+            drive, drive_box = _get_tonic_widget(
+                name,
+                layout,
+                style,
+                data=prespecified_drive_data
+            )
+
         if drive_type in [
-                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian'
+                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian', 'Tonic'
         ]:
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
@@ -1014,8 +1075,11 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             )
 
             for idx, drive in enumerate(drive_widgets):
-                accordion.set_title(idx,
-                                    f"{drive['name']} ({drive['location']})")
+                if 'location' in drive:
+                    title = f"{drive['name']} ({drive['location']})"
+                else:
+                    title = drive['name']
+                accordion.set_title(idx, title)
 
             display(accordion)
 
@@ -1081,10 +1145,12 @@ def add_connectivity_tab(params, connectivity_out,
 
 def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
+    """Add all possible drive boxes to drive tab given a parameter file."""
     net = jones_2009_model(params)
+    cellname_list = list(net.cell_types.keys())
     drive_specs = _extract_drive_specs_from_hnn_params(
-        params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
-
+        params, cellname_list, legacy_mode=net._legacy_mode)
+    bias_specs = _extract_bias_specs_from_hnn_params(params, cellname_list)
     # clear before adding drives
     drives_out.clear_output()
     while len(drive_widgets) > 0:
@@ -1094,8 +1160,8 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
     drive_names = sorted(drive_specs.keys())
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
-        should_render = idx == (len(drive_names) - 1)
-
+        should_render = idx == (len(drive_names) -
+                                1) and len(bias_specs['tonic']) > 0
         add_drive_widget(
             specs['type'].capitalize(),
             drive_boxes,
@@ -1113,6 +1179,22 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
             expand_last_drive=False,
             event_seed=specs['event_seed'],
         )
+
+    logger.info(f'Adding bias_specs from params: {bias_specs}')
+    should_render = True
+    add_drive_widget(
+        'Tonic',
+        drive_boxes,
+        drive_widgets,
+        drives_out,
+        tstop,
+        None,
+        layout=layout,
+        prespecified_drive_name=drive_name,
+        prespecified_drive_data=bias_specs['tonic'],
+        render=should_render,
+        expand_last_drive=False,
+    )
 
 
 def load_drive_and_connectivity(params, log_out, drives_out,
@@ -1162,7 +1244,7 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
-    logger.info("Loading connectivity...")
+    logger.info(f"Loading data (type={load_type})...")
     key = list(change['new'].keys())[0]
 
     params_fname = change['new'][key]['metadata']['name']
@@ -1229,66 +1311,82 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         return
     # add drives to network
     for drive in drive_widgets:
-        weights_ampa = {
-            k: v.value
-            for k, v in drive['weights_ampa'].items()
-        }
-        weights_nmda = {
-            k: v.value
-            for k, v in drive['weights_nmda'].items()
-        }
-        synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
-        print(
-            f"drive type is {drive['type']}, location={drive['location']}")
-        if drive['type'] == 'Poisson':
-            rate_constant = {
-                k: v.value
-                for k, v in drive['rate_constant'].items() if v.value > 0
-            }
+        if drive['type'] != 'Tonic':
             weights_ampa = {
-                k: v
-                for k, v in weights_ampa.items() if k in rate_constant
+                k: v.value
+                for k, v in drive['weights_ampa'].items()
             }
             weights_nmda = {
-                k: v
-                for k, v in weights_nmda.items() if k in rate_constant
+                k: v.value
+                for k, v in drive['weights_nmda'].items()
             }
-            single_simulation_data['net'].add_poisson_drive(
-                name=drive['name'],
-                tstart=drive['tstart'].value,
-                tstop=drive['tstop'].value,
-                rate_constant=rate_constant,
-                location=drive['location'],
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                space_constant=100.0,
-                event_seed=drive['seedcore'].value)
-        elif drive['type'] in ('Evoked', 'Gaussian'):
-            single_simulation_data['net'].add_evoked_drive(
-                name=drive['name'],
-                mu=drive['mu'].value,
-                sigma=drive['sigma'].value,
-                numspikes=drive['numspikes'].value,
-                location=drive['location'],
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                space_constant=3.0,
-                event_seed=drive['seedcore'].value)
-        elif drive['type'] in ('Rhythmic', 'Bursty'):
-            single_simulation_data['net'].add_bursty_drive(
-                name=drive['name'],
-                tstart=drive['tstart'].value,
-                tstart_std=drive['tstart_std'].value,
-                burst_rate=drive['burst_rate'].value,
-                burst_std=drive['burst_std'].value,
-                location=drive['location'],
-                tstop=drive['tstop'].value,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                event_seed=drive['seedcore'].value)
+            synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
+            print(
+                f"drive type is {drive['type']}, location={drive['location']}")
+            if drive['type'] == 'Poisson':
+                rate_constant = {
+                    k: v.value
+                    for k, v in drive['rate_constant'].items() if v.value > 0
+                }
+                weights_ampa = {
+                    k: v
+                    for k, v in weights_ampa.items() if k in rate_constant
+                }
+                weights_nmda = {
+                    k: v
+                    for k, v in weights_nmda.items() if k in rate_constant
+                }
+                single_simulation_data['net'].add_poisson_drive(
+                    name=drive['name'],
+                    tstart=drive['tstart'].value,
+                    tstop=drive['tstop'].value,
+                    rate_constant=rate_constant,
+                    location=drive['location'],
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    space_constant=100.0,
+                    event_seed=drive['seedcore'].value)
+            elif drive['type'] in ('Evoked', 'Gaussian'):
+                single_simulation_data['net'].add_evoked_drive(
+                    name=drive['name'],
+                    mu=drive['mu'].value,
+                    sigma=drive['sigma'].value,
+                    numspikes=drive['numspikes'].value,
+                    location=drive['location'],
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    space_constant=3.0,
+                    event_seed=drive['seedcore'].value)
+            elif drive['type'] in ('Rhythmic', 'Bursty'):
+                single_simulation_data['net'].add_bursty_drive(
+                    name=drive['name'],
+                    tstart=drive['tstart'].value,
+                    tstart_std=drive['tstart_std'].value,
+                    burst_rate=drive['burst_rate'].value,
+                    burst_std=drive['burst_std'].value,
+                    location=drive['location'],
+                    tstop=drive['tstop'].value,
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    event_seed=drive['seedcore'].value)
+
+        elif drive['type'] == 'Tonic':
+            cell_types = list(drive['amplitude'].keys())
+            assert set(cell_types) == set(drive['t0'].keys()) == set(
+                drive['tstop'].keys())
+            for cell_type in cell_types:
+                if drive['tstop'][cell_type].value < 0:
+                    continue
+                print(f"adding tonic drive to {cell_type}"
+                      f"tstop={drive['tstop'][cell_type].value}")
+                single_simulation_data['net'].add_tonic_bias(
+                    cell_type=cell_type,
+                    amplitude=drive['amplitude'][cell_type].value,
+                    t0=drive['t0'][cell_type].value,
+                    tstop=drive['tstop'][cell_type].value)
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
