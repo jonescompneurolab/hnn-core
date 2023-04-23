@@ -132,11 +132,12 @@ def _extract_bias_specs_from_hnn_params(params, cellname_list):
                     f'start time and end time specified. One '
                     f'or more parameter may be missing for '
                     f'cell type {cellname}')
-            bias_specs['tonic'][cellname] = {
-                'amplitude': params[f'Itonic_A_{short_name}_soma'],
-                't0': params[f'Itonic_t0_{short_name}_soma'],
-                'tstop': params[f'Itonic_T_{short_name}_soma']
-            }
+            if params[f'Itonic_T_{short_name}_soma'] > 0:
+                bias_specs['tonic'][cellname] = {
+                    'amplitude': params[f'Itonic_A_{short_name}_soma'],
+                    't0': params[f'Itonic_t0_{short_name}_soma'],
+                    'tstop': params[f'Itonic_T_{short_name}_soma']
+                }
     return bias_specs
 
 

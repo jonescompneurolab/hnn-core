@@ -1151,6 +1151,8 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
     drive_specs = _extract_drive_specs_from_hnn_params(
         params, cellname_list, legacy_mode=net._legacy_mode)
     bias_specs = _extract_bias_specs_from_hnn_params(params, cellname_list)
+    bias_is_present = len(bias_specs['tonic']) > 0
+    logger.info(f'bias_specs:{bias_specs}')
     # clear before adding drives
     drives_out.clear_output()
     while len(drive_widgets) > 0:
@@ -1160,8 +1162,12 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
     drive_names = sorted(drive_specs.keys())
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
-        should_render = idx == (len(drive_names) -
-                                1) and len(bias_specs['tonic']) > 0
+        # should_render = idx == (len(drive_names) -
+        #                         1) and len(bias_specs['tonic']) > 0
+        if bias_is_present:
+            should_render = False
+        else:
+            should_render = idx == len(drive_names) - 1
         add_drive_widget(
             specs['type'].capitalize(),
             drive_boxes,
@@ -1180,14 +1186,15 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
             event_seed=specs['event_seed'],
         )
 
-    logger.info(f'Adding bias_specs from params: {bias_specs}')
-    should_render = True
-    add_drive_widget(
-        'Tonic', drive_boxes, drive_widgets, drives_out, tstop, None,
-        layout=layout, prespecified_drive_name=drive_name,
-        prespecified_drive_data=bias_specs['tonic'],
-        render=should_render, expand_last_drive=False,
-    )
+    if bias_is_present:
+        logger.info(f'Adding bias_specs from params: {bias_specs}')
+        should_render = True
+        add_drive_widget(
+            'Tonic', drive_boxes, drive_widgets, drives_out, tstop, None,
+            layout=layout, prespecified_drive_name=drive_name,
+            prespecified_drive_data=bias_specs['tonic'],
+            render=should_render, expand_last_drive=False,
+        )
 
 
 def load_drive_and_connectivity(params, log_out, drives_out,
