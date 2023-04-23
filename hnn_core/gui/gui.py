@@ -1336,11 +1336,14 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 
     viz_manager.reset_fig_config_tabs()
     viz_manager.add_figure()
+
     fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
-    ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
-    for ax_name, plot_type in ax_plots:
-        viz_manager._simulate_edit_figure(fig_name, ax_name, _sim_name,
-                                          plot_type, {}, "plot")
+    ax_plots = [("ax0", "input histogram", {'spike_types': 'evdist'}),
+                ("ax1", "input histogram", {'spike_types': 'evprox'}),
+                ("ax2", "current dipole", {})]
+    for ax_name, plot_type, plot_configs in ax_plots:
+        viz_manager._simulate_edit_figure(
+            fig_name, ax_name, _sim_name, plot_type, plot_configs, "plot")
 
 
 def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):

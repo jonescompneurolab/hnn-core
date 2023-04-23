@@ -47,6 +47,10 @@ _spectrogram_color_maps = [
 ]
 
 fig_templates = {
+    "3row x 1col (1:1:6)": {
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,1,6]}",
+        "mosaic": "00\n11\n22",
+    },
     "2row x 1col (1:3)": {
         "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
         "mosaic": "00\n11",
@@ -126,7 +130,14 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'input histogram':
         if net_copied.cell_response:
-            net_copied.cell_response.plot_spikes_hist(ax=ax, show=False)
+            if plot_config['spike_types'] == 'all':
+                spike_types = None
+            else:
+                spike_types = [plot_config['spike_types']]
+                if 'dist' in plot_config['spike_types']:
+                    ax.invert_yaxis()
+            net_copied.cell_response.plot_spikes_hist(
+                ax=ax, spike_types=spike_types, show=False)
 
     elif plot_type == 'PSD':
         if len(dpls_copied) > 0:
@@ -218,8 +229,8 @@ def _dynamic_rerender(fig):
 
 def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
                   spectrogram_colormap_selection, dipole_smooth,
-                  max_spectral_frequency, dipole_scaling, widgets, data,
-                  fig_idx, fig, ax, existing_plots):
+                  max_spectral_frequency, dipole_scaling, spike_types, widgets,
+                  data, fig_idx, fig, ax, existing_plots):
     sim_name = widgets_simulation.value
     plot_type = widgets_plot_type.value
     # disable add plots for types that do not support overlay
@@ -235,7 +246,8 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
         "max_spectral_frequency": max_spectral_frequency.value,
         "dipole_scaling": dipole_scaling.value,
         "dipole_smooth": dipole_smooth.value,
-        "spectrogram_cm": spectrogram_colormap_selection.value
+        "spectrogram_cm": spectrogram_colormap_selection.value,
+        "spike_types": spike_types.value
     }
 
     _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config)
@@ -321,6 +333,16 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
                                layout=layout,
                                style=analysis_style)
 
+    valid_spike_types = ['all', 'evprox', 'evdist']
+    spike_types = Dropdown(
+        options=valid_spike_types,
+        value=valid_spike_types[0],
+        description='Spike types:',
+        disabled=False,
+        layout=layout,
+        style=analysis_style,
+    )
+
     max_spectral_frequency = FloatText(
         value=100,
         description='Max Spectral Frequency (Hz):',
@@ -358,6 +380,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             widgets_plot_type=plot_type_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
             dipole_smooth=dipole_smooth,
+            spike_types=spike_types,
             max_spectral_frequency=max_spectral_frequency,
             dipole_scaling=dipole_scaling,
             widgets=widgets,
@@ -370,7 +393,8 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 
     vbox = VBox([
         simulation_selection, plot_type_selection, dipole_smooth,
-        dipole_scaling, max_spectral_frequency, spectrogram_colormap_selection,
+        dipole_scaling, spike_types, max_spectral_frequency,
+        spectrogram_colormap_selection,
         HBox(
             [plot_button, clear_button],
             layout=Layout(justify_content='space-between'),
@@ -667,11 +691,14 @@ class _VizManager:
         plot_type_ctrl = ax_control_tabs.children[ax_idx].children[1]
         plot_type_ctrl.value = plot_type
 
+        # Below is the mapping between the config name and the index of the
+        # corresponding widget in the vis config list for each ax.
         config_name_idx = {
             "dipole_smooth": 2,
             "dipole_scaling": 3,
-            "max_spectral_frequency": 4,
-            "spectrogram_colormap_selection": 5,
+            "spike_types": 4,
+            "max_spectral_frequency": 5,
+            "spectrogram_colormap_selection": 6
         }
         for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()
