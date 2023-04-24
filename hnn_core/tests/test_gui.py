@@ -405,11 +405,12 @@ def test_gui_adaptive_spectrogram():
     # make sure the colorbar is correctly added
     assert any(['_cbar-ax-' in attr
                 for attr in dir(gui.viz_manager.figs[figid])]) is True
-    assert len(gui.viz_manager.figs[1].axes) == 3
+    # default is 1:1:6
+    assert len(gui.viz_manager.figs[1].axes) == 4
     # make sure the colorbar is safely removed
     gui._simulate_viz_action("edit_figure", figname, axname, 'default',
                              'spectrogram', {}, 'clear')
     assert any(['_cbar-ax-' in attr
                 for attr in dir(gui.viz_manager.figs[figid])]) is False
-    assert len(gui.viz_manager.figs[1].axes) == 2
+    assert len(gui.viz_manager.figs[1].axes) == 3
     plt.close('all')
