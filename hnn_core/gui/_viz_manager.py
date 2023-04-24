@@ -12,9 +12,8 @@ import numpy as np
 from IPython.display import display
 from ipywidgets import (Box, Button, Dropdown, FloatText, HBox, Label, Layout,
                         Output, Tab, VBox, link)
-from scipy import signal
 
-from hnn_core.dipole import average_dipoles
+from hnn_core.dipole import average_dipoles, _rmse
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
@@ -106,54 +105,6 @@ def _idx2figname(idx):
 
 def _figname2idx(fname):
     return int(fname.split(" ")[-1])
-
-
-def _calculate_rmse(dpl, dpl_target, tstart, tstop, weights=None):
-    """Calculate RMSE between a target dipole and some input dipole(s).
-    Note: This function now only supports a single target dipole.
-    """
-    if len(dpl) > 1:
-        # get average dipole
-        dpl = average_dipoles(dpl)
-
-    # stealed from legacy hnn code.
-    exp_times = dpl_target.times
-    sim_times = dpl.times
-
-    tstart = max(tstart, max(exp_times[0], sim_times[0]))
-    tstop = min(tstop, min(exp_times[-1], sim_times[-1]))
-
-    # make sure start and end times are valid for both dipoles
-    exp_start_index = (np.abs(exp_times - tstart)).argmin()
-    exp_end_index = (np.abs(exp_times - tstop)).argmin()
-    exp_length = exp_end_index - exp_start_index
-
-    sim_start_index = (np.abs(sim_times - tstart)).argmin()
-    sim_end_index = (np.abs(sim_times - tstop)).argmin()
-    sim_length = sim_end_index - sim_start_index
-    if weights is not None:
-        weight = weights[sim_start_index:sim_end_index]
-
-    dpl_sim_agg = dpl.data['agg'][sim_start_index:sim_end_index]
-    dpl_target_agg = dpl_target.data['agg'][exp_start_index:exp_end_index]
-
-    if (sim_length > exp_length):
-        # downsample simulation timeseries to match exp data
-        dpl_sim_agg = signal.resample(dpl_sim_agg, exp_length)
-        if weights is not None:
-            weight = signal.resample(weight, exp_length)
-            indices = np.where(weight < 1e-4)
-            weight[indices] = 0
-    elif (sim_length < exp_length):
-        # downsample exp timeseries to match simulation data
-        dpl_target_agg = signal.resample(dpl_target_agg, sim_length)
-
-    se = (dpl_sim_agg - dpl_target_agg)**2
-    if weights is not None:
-        err = np.sqrt((weight * se).sum() / weight.sum())
-    else:
-        err = np.sqrt(se.mean())
-    return err, tstart, tstop
 
 
 def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
@@ -355,21 +306,22 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
         target_dpl_processed = _update_ax(
             fig, ax, target_sim, target_sim_name, plot_type,
             target_plot_config)[0]  # we assume there is only one dipole.
-        try:
-            # calculate the RMSE between the two dipoles.
-            t0 = 0.0
-            tstop = dpls_processed[-1].times[-1]
-            rmse, t0, tstop = _calculate_rmse(
-                dpls_processed, target_dpl_processed, t0, tstop)
-            # Show the RMSE between the two dipoles.
-            ax.annotate(f'RMSE({sim_name}, {target_sim_name}): {rmse:.4f}',
-                        xy=(0.95, 0.05),
-                        xycoords='axes fraction',
-                        horizontalalignment='right',
-                        verticalalignment='bottom',
-                        fontsize=12)
-        except Exception as e:
-            logger.info(f'rmse error: {e}')
+
+        # calculate the RMSE between the two dipoles.
+        t0 = 0.0
+        tstop = dpls_processed[-1].times[-1]
+        if len(dpls_processed) > 1:
+            dpl = average_dipoles(dpls_processed)
+        else:
+            dpl = dpls_processed
+        rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
+        # Show the RMSE between the two dipoles.
+        ax.annotate(f'RMSE({sim_name}, {target_sim_name}): {rmse:.4f}',
+                    xy=(0.95, 0.05),
+                    xycoords='axes fraction',
+                    horizontalalignment='right',
+                    verticalalignment='bottom',
+                    fontsize=12)
 
     existing_plots.children = (*existing_plots.children,
                                Label(f"{sim_name}: {plot_type}"))
