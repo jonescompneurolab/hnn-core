@@ -343,7 +343,7 @@ class CellResponse(object):
             cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
-                         show=True):
+                         color=None, show=True):
         """Plot the histogram of spiking activity across trials.
 
         Parameters
@@ -370,6 +370,13 @@ class CellResponse(object):
             Valid strings also include leading characters of spike types
 
             | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
+        color : str | list of str | None
+            String input defining color of histograms plotted. If list of str
+            provided, histograms for each cell type will be plotted by cycling
+            through colors in the list.
+
+            | Ex: ``'r'``, ``['r', 'g']``
+        If None, default color cycle used.
         show : bool
             If True, show the figure.
 
@@ -379,7 +386,8 @@ class CellResponse(object):
             The matplotlib figure handle.
         """
         return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
-                                spike_types=spike_types, show=show)
+                                spike_types=spike_types, color=color,
+                                show=show)
 
     def write(self, fname):
         """Write spiking activity per trial to a collection of files.

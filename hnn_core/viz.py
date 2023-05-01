@@ -323,7 +323,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
 
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
-                     show=True):
+                     color=None, show=True):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
@@ -353,6 +353,13 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         Valid strings also include leading characters of spike types
 
         | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
+    color : str | list of str | None
+        String input defining color of histograms plotted. If list of str
+        provided, histograms for each cell type will be plotted by cycling
+        through colors in the list.
+        | Ex: ``'r'``, ``['r', 'g']``
+
+        If None, default color cycle used.
     show : bool
         If True, show the figure.
 
@@ -425,7 +432,14 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
+    _validate_type(color, (str, list, None), 'color', 'str or list of str')
+
+    if color is None:
+        color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
+    elif isinstance(color, str):
+        color_cycle = cycle([color])
+    elif isinstance(color, list):
+        color_cycle = cycle(color)
 
     bins = np.linspace(0, spike_times[-1], 50)
     spike_color = dict()
@@ -435,9 +449,9 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
             spike_color[spike_label] = next(color_cycle)
             label = spike_label
 
-        color = spike_color[spike_label]
+        hist_color = spike_color[spike_label]
         ax.hist(spike_times[spike_types_mask[spike_type]], bins,
-                label=label, color=color)
+                label=label, color=hist_color)
     ax.set_ylabel("Counts")
     ax.legend()
 
